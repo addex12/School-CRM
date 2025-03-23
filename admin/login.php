@@ -1,3 +1,49 @@
+<?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    require_once '../config/db_config.php';
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ?");
+    if ($stmt) {
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            if (password_verify($password, $row['password'])) {
+                // Successful login
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['username'] = $username;
+                header("Location: dashboard.php"); // Redirect to admin dashboard
+                exit();
+            } else {
+                // Failed login
+                $error_message = "Invalid username or password.";
+            }
+        } else {
+            // Failed login
+            $error_message = "Invalid username or password.";
+        }
+
+        $stmt->close();
+    } else {
+        $error_message = "Database query failed: " . $conn->error;
+    }
+
+    $conn->close();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,54 +66,12 @@
             </div>
             <button type="submit">Login</button>
         </form>
+        <?php
+        if (isset($error_message)) {
+            echo "<p>$error_message</p>";
+        }
+        ?>
     </div>
-
-    <?php
-    session_start();
-    error_reporting(E_ALL);
-    ini_set('display_errors', 1);
-
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        require_once '../config/db_config.php';
-
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        $username = $_POST['username'];
-        $password = $_POST['password'];
-
-        $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ?");
-        if ($stmt) {
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                if (password_verify($password, $row['password'])) {
-                    // Successful login
-                    $_SESSION['admin_logged_in'] = true;
-                    $_SESSION['username'] = $username;
-                    header("Location: dashboard.php"); // Redirect to admin dashboard
-                    exit();
-                } else {
-                    // Failed login
-                    echo "<p>Invalid username or password.</p>";
-                }
-            } else {
-                // Failed login
-                echo "<p>Invalid username or password.</p>";
-            }
-
-            $stmt->close();
-        } else {
-            echo "<p>Database query failed: " . $conn->error . "</p>";
-        }
-
-        $conn->close();
-    }
-    ?>
 </body>
 </html>
 
