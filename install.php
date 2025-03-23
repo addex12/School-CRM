@@ -100,63 +100,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <title>School-CRM Installation</title>
     <link rel="stylesheet" type="text/css" href="/public/css/style.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #5cb85c;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: #4cae4c;
-        }
-        .hidden { display: none; }
-        .progress-bar {
-            width: 100%;
-            background-color: #f3f3f3;
-            border-radius: 5px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        .progress-bar-inner {
-            height: 20px;
-            width: 0;
-            background-color: #5cb85c;
-            text-align: center;
-            color: white;
-            line-height: 20px;
-            border-radius: 5px;
-        }
-    </style>
     <script>
         function showStep(step) {
             document.getElementById('step1').classList.add('hidden');
