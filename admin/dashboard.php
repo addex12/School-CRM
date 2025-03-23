@@ -21,24 +21,60 @@ if (!isset($_SESSION['admin_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['create_survey'])) {
-        // Handle create survey logic here
+        handleCreateSurvey();
     } elseif (isset($_POST['delete_survey'])) {
-        // Handle delete survey logic here
+        handleDeleteSurvey();
     } elseif (isset($_POST['edit_survey'])) {
-        // Handle edit/update survey logic here
+        handleEditSurvey();
     } elseif (isset($_POST['create_student'])) {
-        // Handle create student logic here
+        handleCreateStudent();
     } elseif (isset($_POST['create_teacher'])) {
-        // Handle create teacher logic here
+        handleCreateTeacher();
     } elseif (isset($_POST['create_parent'])) {
-        // Handle create parent logic here
+        handleCreateParent();
     } elseif (isset($_POST['update_student'])) {
-        // Handle update student logic here
+        handleUpdateStudent();
     } elseif (isset($_POST['update_teacher'])) {
-        // Handle update teacher logic here
+        handleUpdateTeacher();
     } elseif (isset($_POST['update_parent'])) {
-        // Handle update parent logic here
+        handleUpdateParent();
     }
+}
+
+function handleCreateSurvey() {
+    // Handle create survey logic here
+}
+
+function handleDeleteSurvey() {
+    // Handle delete survey logic here
+}
+
+function handleEditSurvey() {
+    // Handle edit/update survey logic here
+}
+
+function handleCreateStudent() {
+    // Handle create student logic here
+}
+
+function handleCreateTeacher() {
+    // Handle create teacher logic here
+}
+
+function handleCreateParent() {
+    // Handle create parent logic here
+}
+
+function handleUpdateStudent() {
+    // Handle update student logic here
+}
+
+function handleUpdateTeacher() {
+    // Handle update teacher logic here
+}
+
+function handleUpdateParent() {
+    // Handle update parent logic here
 }
 
 ?>
