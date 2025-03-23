@@ -12,36 +12,20 @@
  * Twitter: https://twitter.com/eleganceict1
  */
 
-require_once '../config/db_config.php';
 session_start();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $admin_id = $_POST['admin_id'];
     $password = $_POST['password'];
 
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $stmt = $conn->prepare("SELECT id, password FROM admins WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($id, $hashedPassword);
-    $stmt->fetch();
-
-    if ($stmt->num_rows > 0 && password_verify($password, $hashedPassword)) {
-        $_SESSION['admin_id'] = $id;
+    // Replace with actual authentication logic
+    if ($admin_id == 'admin' && $password == 'password') {
+        $_SESSION['admin_id'] = $admin_id;
         header("Location: /admin/dashboard.php");
         exit();
     } else {
-        $error = "Invalid username or password";
+        $error = "Invalid admin ID or password.";
     }
-
-    $stmt->close();
-    $conn->close();
 }
 ?>
 <!DOCTYPE html>
@@ -54,13 +38,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container">
         <h1>Admin Login</h1>
         <?php if (isset($error)): ?>
-            <p class="error"><?php echo $error; ?></p>
+            <p style="color: red;"><?php echo $error; ?></p>
         <?php endif; ?>
-        <form method="POST">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required><br>
+        <form method="post">
+            <label for="admin_id">Admin ID:</label>
+            <input type="text" id="admin_id" name="admin_id" required>
+            <br>
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br>
+            <input type="password" id="password" name="password" required>
+            <br>
             <button type="submit">Login</button>
         </form>
     </div>
