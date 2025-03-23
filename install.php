@@ -22,6 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $message = "Error creating database: " . $conn->error;
         }
 
+        $conn->select_db($db_name);
+
+        // Import the database schema
+        $schema = file_get_contents('database/schema.sql');
+        if ($conn->multi_query($schema)) {
+            do {
+                if ($result = $conn->store_result()) {
+                    $result->free();
+                }
+            } while ($conn->next_result());
+            $message .= "<br>Database schema imported successfully.";
+        } else {
+            $message .= "<br>Error importing database schema: " . $conn->error;
+        }
+
         $conn->close();
 
         $config_content = "<?php\n";
