@@ -26,6 +26,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Handle delete survey logic here
     } elseif (isset($_POST['edit_survey'])) {
         // Handle edit/update survey logic here
+    } elseif (isset($_POST['create_student'])) {
+        // Handle create student logic here
+    } elseif (isset($_POST['create_teacher'])) {
+        // Handle create teacher logic here
+    } elseif (isset($_POST['create_parent'])) {
+        // Handle create parent logic here
+    } elseif (isset($_POST['update_student'])) {
+        // Handle update student logic here
+    } elseif (isset($_POST['update_teacher'])) {
+        // Handle update teacher logic here
+    } elseif (isset($_POST['update_parent'])) {
+        // Handle update parent logic here
     }
 }
 
@@ -90,6 +102,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <li><a href="#email_configuration">Email Configuration</a></li>
                 <li><a href="#module_configuration">Module Configuration</a></li>
                 <li><a href="#feature_management">Feature Management</a></li>
+                <li><a href="#create_student">Create Student</a></li>
+                <li><a href="#create_teacher">Create Teacher</a></li>
+                <li><a href="#create_parent">Create Parent</a></li>
+                <li><a href="#update_student">Update Student</a></li>
+                <li><a href="#update_teacher">Update Teacher</a></li>
+                <li><a href="#update_parent">Update Parent</a></li>
                 <!-- Add more features as needed -->
             </ul>
         </div>
@@ -204,6 +222,54 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <!-- Add form fields for Feature Management -->
                     <input type="hidden" name="feature_management" value="1">
                     <button type="submit">Save</button>
+                </form>
+            </div>
+            <div class="grid-item" id="create_student" onclick="toggleEdit('create_student')">
+                <h2>Create Student</h2>
+                <form method="post">
+                    <!-- Add form fields for creating a student -->
+                    <input type="hidden" name="create_student" value="1">
+                    <button type="submit">Create Student</button>
+                </form>
+            </div>
+            <div class="grid-item" id="create_teacher" onclick="toggleEdit('create_teacher')">
+                <h2>Create Teacher</h2>
+                <form method="post">
+                    <!-- Add form fields for creating a teacher -->
+                    <input type="hidden" name="create_teacher" value="1">
+                    <button type="submit">Create Teacher</button>
+                </form>
+            </div>
+            <div class="grid-item" id="create_parent" onclick="toggleEdit('create_parent')">
+                <h2>Create Parent</h2>
+                <form method="post">
+                    <!-- Add form fields for creating a parent -->
+                    <input type="hidden" name="create_parent" value="1">
+                    <button type="submit">Create Parent</button>
+                </form>
+            </div>
+            <div class="grid-item" id="update_student" onclick="toggleEdit('update_student')">
+                <h2>Update Student</h2>
+                <form method="post">
+                    <!-- Add form fields for updating a student -->
+                    <input type="hidden" name="update_student" value="1">
+                    <button type="submit">Update Student</button>
+                </form>
+            </div>
+            <div class="grid-item" id="update_teacher" onclick="toggleEdit('update_teacher')">
+                <h2>Update Teacher</h2>
+                <form method="post">
+                    <!-- Add form fields for updating a teacher -->
+                    <input type="hidden" name="update_teacher" value="1">
+                    <button type="submit">Update Teacher</button>
+                </form>
+            </div>
+            <div class="grid-item" id="update_parent" onclick="toggleEdit('update_parent')">
+                <h2>Update Parent</h2>
+                <form method="post">
+                    <!-- Add form fields for updating a parent -->
+                    <input type="hidden" name="update_parent" value="1">
+                    <button type="submit">Update Parent</button>
                 </form>
             </div>
             <!-- Add more grid items as needed -->
