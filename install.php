@@ -109,6 +109,14 @@
 
     <div class="container">
         <div id="step1">
+            <h2>Welcome to the School-CRM Installation</h2>
+            <p>Follow the steps to configure your database and create an administrator account.</p>
+            <ol>
+                <li>Click the "Start" button to begin the installation process.</li>
+                <li>Enter your database details and create an administrator account.</li>
+                <li>Click "Next" to test the database connection and create the administrator account.</li>
+                <li>Click "Install" to complete the installation.</li>
+            </ol>
             <button class="button" onclick="showStep('step2')">Start</button>
         </div>
 
@@ -140,6 +148,8 @@
 
     <footer>
         <p>&copy; 2023 School-CRM. All Rights Reserved.</p>
+        <p>Developer: Adugna Gizaw | Email: gizawadugna@gmail.com | Phone: +251925582067</p>
+        <p>LinkedIn: <a href="https://www.linkedin.com/in/eleganceict" target="_blank">eleganceict</a> | Twitter: <a href="https://twitter.com/eleganceict1" target="_blank">@eleganceict1</a> | GitHub: <a href="https://github.com/addex12" target="_blank">addex12</a></p>
     </footer>
 </body>
 </html>
