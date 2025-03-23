@@ -12,6 +12,13 @@
  * Twitter: https://twitter.com/eleganceict1
  */
 
+session_start();
+
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: /admin/login.php");
+    exit();
+}
+
 // ...existing code...
 
 ?>
@@ -19,7 +26,7 @@
 <html>
 <head>
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/style.css">
 </head>
 <body>
     <div class="container">
