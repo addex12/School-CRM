@@ -20,7 +20,7 @@ $dbname = 'school_crm';
 
 $conn = new mysqli($host, $user, $pass);
 if ($conn->connect_error) {
-    die('Database connection failed: ' . $conn->connect_error);
+    die('Database connection failed: ' . $conn->connect_error . ' (' . $conn->connect_errno . ')');
 }
 
 // Create database
@@ -78,7 +78,9 @@ foreach ($queries as $query) {
 // Create admin user
 $admin_username = 'admin';
 $admin_password = password_hash('admin123', PASSWORD_BCRYPT);
-$conn->query("INSERT INTO users (username, password, role) VALUES ('$admin_username', '$admin_password', 'admin')");
+if (!$conn->query("INSERT INTO users (username, password, role) VALUES ('$admin_username', '$admin_password', 'admin')")) {
+    die('Admin user creation failed: ' . $conn->error);
+}
 
 echo 'Installation completed successfully.';
 ?>
