@@ -14,6 +14,7 @@ $status = $kernel->handle(
 
 // Check if the application is already installed
 if (file_exists(__DIR__ . '/storage/installed')) {
+    header('HTTP/1.1 403 Forbidden');
     die('Application is already installed.');
 }
 
@@ -27,8 +28,10 @@ try {
     // Create an installed file to prevent reinstallation
     file_put_contents(__DIR__ . '/storage/installed', 'Installed on ' . date('Y-m-d H:i:s'));
 
+    header('HTTP/1.1 200 OK');
     echo 'Installation completed successfully.';
 } catch (Exception $e) {
+    header('HTTP/1.1 500 Internal Server Error');
     echo 'Installation failed: ' . $e->getMessage();
 }
 
