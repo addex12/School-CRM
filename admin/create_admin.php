@@ -38,20 +38,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>Admin Account Creation</title>
+    <link rel="stylesheet" type="text/css" href="/public/css/style.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
         }
         h1, h2 {
             color: #333;
+            text-align: center;
         }
         label {
             display: block;
@@ -66,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         button {
             display: inline-block;
+            width: 100%;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
@@ -73,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #fff;
             border: none;
             border-radius: 5px;
+            margin-top: 10px;
         }
         button:hover {
             background-color: #4cae4c;
