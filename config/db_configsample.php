@@ -15,10 +15,10 @@
  * @package School-CRM
  */
 
-$servername = "localhost";
-$username = "root";
+$servername = "";
+$username = "";
 $password = "";
-$dbname = "school_crm";
+$dbname = "";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);

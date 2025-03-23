@@ -309,10 +309,30 @@ function executeQuery($conn, $sql) {
 
 function createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass) {
     $configContent = "<?php\n";
-    $configContent .= "define('DB_HOST', '$dbHost');\n";
-    $configContent .= "define('DB_NAME', '$dbName');\n";
-    $configContent .= "define('DB_USER', '$dbUser');\n";
-    $configContent .= "define('DB_PASS', '$dbPass');\n";
+    $configContent .= "/**\n";
+    $configContent .= " * Database Configuration\n";
+    $configContent .= " * This file contains the database configuration settings.\n";
+    $configContent .= " * It is used to establish a connection to the database.\n";
+    $configContent .= " * Developer: Adugna Gizaw\n";
+    $configContent .= " * Email: gizawadugna@gmail.com\n";
+    $configContent .= " * Phone: +251925582067\n";
+    $configContent .= " * GitHub: https://github.com/addex12\n";
+    $configContent .= " * LinkedIn: https://www.linkedin.com/in/eleganceict\n";
+    $configContent .= " * Twitter: https://twitter.com/eleganceict1\n";
+    $configContent .= " * @package School-CRM\n";
+    $configContent .= " */\n";
+    $configContent .= "\$servername = '$dbHost';\n";
+    $configContent .= "\$username = '$dbUser';\n";
+    $configContent .= "\$password = '$dbPass';\n";
+    $configContent .= "\$dbname = '$dbName';\n";
+    $configContent .= "\n";
+    $configContent .= "// Create connection\n";
+    $configContent .= "\$conn = new mysqli(\$servername, \$username, \$password, \$dbname);\n";
+    $configContent .= "\n";
+    $configContent .= "// Check connection\n";
+    $configContent .= "if (\$conn->connect_error) {\n";
+    $configContent .= "    die('Connection failed: ' . \$conn->connect_error);\n";
+    $configContent .= "}\n";
     $configContent .= "?>";
 
     file_put_contents(__DIR__ . '/config/db_config.php', $configContent);
