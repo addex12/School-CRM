@@ -62,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Install School-CRM</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="install.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -118,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <div class="container">
         <h1>Install School-CRM</h1>
-        <form method="POST" action="">
+        <form method="POST" action="" onsubmit="return validateForm()">
             <label for="host">Database Host</label>
             <input type="text" id="host" name="host" required>
 
