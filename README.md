@@ -1,3 +1,7 @@
+<!-- Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+Phone: +251925582067 -->
+
 # School-CRM
 
 School-CRM is a comprehensive Customer Relationship Management (CRM) system designed specifically for educational institutions. It helps manage student information, track academic progress, and facilitate communication between students, parents, and staff.

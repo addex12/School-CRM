@@ -1,10 +1,6 @@
-<?php
-/**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * Phone: +251925582067
- */
-?>
+<!-- Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+Phone: +251925582067 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>

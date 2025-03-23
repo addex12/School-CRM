@@ -1,6 +1,6 @@
-// Author: Adugna Gizaw
-// Email: gizawadugna@gmail.com
-// Phone: +251925582067
+<!-- Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+Phone: +251925582067 -->
 
 <?php
 class Lead {
