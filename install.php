@@ -211,6 +211,18 @@ function createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass) {
     file_put_contents(__DIR__ . '/config/db_config.php', $configContent);
 }
 
+function createDbConnectionFile() {
+    $dbConnectionContent = "<?php\n";
+    $dbConnectionContent .= "require_once __DIR__ . '/../config/db_config.php';\n";
+    $dbConnectionContent .= "\$conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);\n";
+    $dbConnectionContent .= "if (\$conn->connect_error) {\n";
+    $dbConnectionContent .= "    die('Connection failed: ' . \$conn->connect_error);\n";
+    $dbConnectionContent .= "}\n";
+    $dbConnectionContent .= "?>";
+
+    file_put_contents(__DIR__ . '/../includes/db.php', $dbConnectionContent);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dbHost = $_POST['dbHost'];
     $dbName = $_POST['dbName'];
@@ -228,8 +240,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     createDatabaseTables($conn);
     createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass);
+    createDbConnectionFile();
 
     $conn->close();
+
+    // Delete install.php file and redirect to admin login page
+    unlink(__FILE__);
+    header('Location: /admin/login.php');
+    exit();
 }
 ?>
 <!DOCTYPE html>
