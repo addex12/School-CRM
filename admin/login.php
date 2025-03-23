@@ -15,6 +15,10 @@
 session_start();
 require_once '../config/db_config.php';
 
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_id = $_POST['admin_id'];
     $password = $_POST['password'];
