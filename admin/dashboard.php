@@ -7,11 +7,10 @@
  * LinkedIn: https://www.linkedin.com/in/eleganceict
  * Twitter: https://twitter.com/eleganceict1
  */
-
 ?>
 <div class="container">
-<?phpinclude('header.php'); ?>
     <div class="dashboard-container">
+    <?phpinclude('header.php'); ?>
         <h1>Admin Dashboard</h1>
         <nav class="dashboard-nav">
             <ul>
