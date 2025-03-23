@@ -9,24 +9,18 @@ body {
     background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
 .container {
-    width: 90%;
-    max-width: 600px;
+    width: 50%;
+    margin: 50px auto;
     background: #fff;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
 }
 
 h1, h2 {
     color: #333;
-    text-align: center;
 }
 
 label {
@@ -37,46 +31,44 @@ label {
 input[type="text"], input[type="password"] {
     width: 100%;
     padding: 10px;
-    margin: 5px 0 20px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 button {
-    display: inline-block;
-    width: 100%;
+    background-color: #4CAF50;
+    color: white;
     padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: #5cb85c;
-    color: #fff;
     border: none;
-    border-radius: 5px;
-    margin-top: 10px;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 button:hover {
-    background-color: #4cae4c;
+    background-color: #45a049;
 }
 
-.hidden { display: none; }
+.hidden {
+    display: none;
+}
 
 .progress-bar {
     width: 100%;
     background-color: #f3f3f3;
-    border-radius: 5px;
-    overflow: hidden;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     margin: 20px 0;
 }
 
 .progress-bar-inner {
-    height: 20px;
+    height: 30px;
     width: 0;
-    background-color: #5cb85c;
+    background-color: #4CAF50;
     text-align: center;
+    line-height: 30px;
     color: white;
-    line-height: 20px;
-    border-radius: 5px;
+    border-radius: 4px;
 }
 
 .error{

@@ -1,4 +1,13 @@
-<?php include('../includes/header.php'); ?>
+<?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * Phone: +251925582067
+ * GitHub: https://github.com/addex12
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ */
+include('../includes/header.php'); ?>
 <h1>Communications & Chat Setup</h1>
 <form action="communications_actions.php" method="post">
     <input type="hidden" name="action" value="email_config">
