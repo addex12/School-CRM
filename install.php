@@ -14,22 +14,28 @@
  */
 
 function createDatabaseTables($conn) {
-    createStudentsTable($conn);
-    createTeachersTable($conn);
-    createClassesTable($conn);
-    createEnrollmentsTable($conn);
-    createAdminsTable($conn);
-    createParentSurveysTable($conn);
-    createTeacherSurveysTable($conn);
-    createStudentSurveysTable($conn);
-    createCommunicationSetupTable($conn);
-    createParentSetupTable($conn);
-    createStudentSetupTable($conn);
-    createTeacherSetupTable($conn);
-    createAccountManagementTable($conn);
-    createEmailConfigurationTable($conn);
-    createModuleConfigurationTable($conn);
-    createFeatureManagementTable($conn);
+    $tableCreationFunctions = [
+        'createStudentsTable',
+        'createTeachersTable',
+        'createClassesTable',
+        'createEnrollmentsTable',
+        'createAdminsTable',
+        'createParentSurveysTable',
+        'createTeacherSurveysTable',
+        'createStudentSurveysTable',
+        'createCommunicationSetupTable',
+        'createParentSetupTable',
+        'createStudentSetupTable',
+        'createTeacherSetupTable',
+        'createAccountManagementTable',
+        'createEmailConfigurationTable',
+        'createModuleConfigurationTable',
+        'createFeatureManagementTable'
+    ];
+
+    foreach ($tableCreationFunctions as $function) {
+        $function($conn);
+    }
 
     $sql = "
     CREATE TABLE IF NOT EXISTS parents (
@@ -340,8 +346,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    $conn->query("CREATE DATABASE IF NOT EXISTS $dbName");
-    $conn->select_db($dbName);
+    if (!$conn->query("CREATE DATABASE IF NOT EXISTS $dbName")) {
+        die("Database creation failed: " . $conn->error);
+    }
+
+    if (!$conn->select_db($dbName)) {
+        die("Database selection failed: " . $conn->error);
+    }
 
     createDatabaseTables($conn);
     createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass);
