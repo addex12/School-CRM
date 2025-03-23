@@ -1,4 +1,9 @@
 <?php
+// Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Check PHP version
 if (version_compare(PHP_VERSION, '7.4.0', '<')) {
     die('PHP 7.4.0 or higher is required.');
