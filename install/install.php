@@ -19,9 +19,9 @@ foreach ($required_extensions as $ext) {
 
 // Database connection
 $host = 'localhost';
-$user = 'root';
-$pass = '';
-$dbname = 'school_crm';
+$user = 'flipperschool_crm';
+$pass = 'A25582067s_';
+$dbname = 'flipperschool_school_crm';
 
 $conn = new mysqli($host, $user, $pass);
 if ($conn->connect_error) {
