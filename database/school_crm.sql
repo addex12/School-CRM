@@ -7,7 +7,7 @@
 -- Database: school_crm
 
 -- Table: parents
-CREATE TABLE parents (
+CREATE TABLE IF NOT EXISTS parents (
     parent_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE parents (
 );
 
 -- Table: messages
-CREATE TABLE messages (
+CREATE TABLE IF NOT EXISTS messages (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
     sender_id INT NOT NULL,
     receiver_id INT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE messages (
 );
 
 -- Table: feedback
-CREATE TABLE feedback (
+CREATE TABLE IF NOT EXISTS feedback (
     feedback_id INT AUTO_INCREMENT PRIMARY KEY,
     parent_id INT NOT NULL,
     subject VARCHAR(255) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE feedback (
 );
 
 -- Table: surveys
-CREATE TABLE surveys (
+CREATE TABLE IF NOT EXISTS surveys (
     survey_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -51,7 +51,7 @@ CREATE TABLE surveys (
 );
 
 -- Table: survey_responses
-CREATE TABLE survey_responses (
+CREATE TABLE IF NOT EXISTS survey_responses (
     response_id INT AUTO_INCREMENT PRIMARY KEY,
     survey_id INT NOT NULL,
     parent_id INT NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE survey_responses (
 );
 
 -- Table: notifications
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     notification_id INT AUTO_INCREMENT PRIMARY KEY,
     parent_id INT,
     message TEXT NOT NULL,
@@ -72,7 +72,7 @@ CREATE TABLE notifications (
 );
 
 -- Table: events
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
     event_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT,
@@ -81,9 +81,39 @@ CREATE TABLE events (
 );
 
 -- Table: announcements
-CREATE TABLE announcements (
+CREATE TABLE IF NOT EXISTS announcements (
     announcement_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: students
+CREATE TABLE IF NOT EXISTS students (
+    student_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL,
+    date_of_birth DATE NOT NULL,
+    parent_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES parents(parent_id)
+);
+
+-- Table: classes
+CREATE TABLE IF NOT EXISTS classes (
+    class_id INT AUTO_INCREMENT PRIMARY KEY,
+    class_name VARCHAR(255) NOT NULL,
+    teacher_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table: enrollments
+CREATE TABLE IF NOT EXISTS enrollments (
+    enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT NOT NULL,
+    class_id INT NOT NULL,
+    enrollment_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES students(student_id),
+    FOREIGN KEY (class_id) REFERENCES classes(class_id)
 );
