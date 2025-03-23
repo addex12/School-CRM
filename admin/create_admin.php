@@ -50,6 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <input type="password" id="adminPass" name="adminPass" required><br>
             <button type="submit">Create Admin Account</button>
         </form>
+        <button onclick="window.location.href='/admin/login.php'">Go to Admin Login</button>
     </div>
 </body>
 </html>
