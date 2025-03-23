@@ -335,6 +335,24 @@ function createDbConnectionFile() {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action']) && $_POST['action'] === 'test_connection') {
+        $dbHost = $_POST['dbHost'];
+        $dbUser = $_POST['dbUser'];
+        $dbPass = $_POST['dbPass'];
+
+        $conn = new mysqli($dbHost, $dbUser, $dbPass);
+
+        if ($conn->connect_error) {
+            http_response_code(500);
+            echo "Connection failed: " . $conn->connect_error;
+        } else {
+            echo "Connection successful";
+        }
+
+        $conn->close();
+        exit();
+    }
+
     $dbHost = $_POST['dbHost'];
     $dbName = $_POST['dbName'];
     $dbUser = $_POST['dbUser'];
@@ -382,6 +400,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         function testDatabaseConnection() {
             var form = document.getElementById('dbForm');
             var formData = new FormData(form);
+            formData.append('action', 'test_connection');
 
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '', true);
@@ -390,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     alert('Database connection successful!');
                     showStep('step3');
                 } else {
-                    alert('Database connection failed!');
+                    alert('Database connection failed: ' + xhr.responseText);
                 }
             };
             xhr.send(formData);
