@@ -22,6 +22,10 @@ header {
     color: #fff;
     padding: 10px 0;
     text-align: center;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
 header a {
@@ -64,7 +68,7 @@ footer {
 /* Dashboard Styles */
 .dashboard-container {
     width: 80%;
-    margin: 20px auto;
+    margin: 80px auto 60px auto; /* Adjusted for fixed header and footer */
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
