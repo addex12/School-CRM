@@ -10,7 +10,7 @@
 ?>
 <div class="container">
     <div class="dashboard-container">
-    <?phpinclude('header.php'); ?>
+    <?php include('header.php'); ?>
         <h1>Admin Dashboard</h1>
         <nav class="dashboard-nav">
             <ul>
