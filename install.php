@@ -99,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html>
 <head>
     <title>School-CRM Installation</title>
+    <link rel="stylesheet" type="text/css" href="/public/css/style.css">
     <style>
         body {
             font-family: Arial, sans-serif;
