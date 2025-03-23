@@ -83,10 +83,10 @@
                 <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
                 <li><a href="/admin/settings"><i class="fas fa-cogs"></i> Settings</a></li>
                 <li><a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                <li><a href="users.php" class="nav-link"><i class="fas fa-user-cog"></i> Manage Users</a></li>
-                <li><a href="surveys.php" class="nav-link"><i class="fas fa-poll"></i> Manage Surveys</a></li>
-                <li><a href="communications.php" class="nav-link"><i class="fas fa-envelope"></i> Communications Setup</a></li>
-                <li><a href="settings.php" class="nav-link"><i class="fas fa-tools"></i> Settings</a></li>
+                <li><a href="/admin/users.php" class="nav-link"><i class="fas fa-user-cog"></i> Manage Users</a></li>
+                <li><a href="/admin/surveys.php" class="nav-link"><i class="fas fa-poll"></i> Manage Surveys</a></li>
+                <li><a href="/admin/communications.php" class="nav-link"><i class="fas fa-envelope"></i> Communications Setup</a></li>
+                <li><a href="/admin/settings.php" class="nav-link"><i class="fas fa-tools"></i> Settings</a></li>
                 <!-- Add other navigation links as necessary -->
             </ul>
         </nav>
