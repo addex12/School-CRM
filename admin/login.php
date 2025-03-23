@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <link rel="stylesheet" href="../styles.css"> <!-- Link to your CSS file -->
 </head>
 <body>
     <div class="login-container">
@@ -23,6 +23,8 @@
     </div>
 
     <?php
+    session_start();
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         require_once '../config/db_config.php';
 
@@ -30,20 +32,27 @@
         $password = $_POST['password'];
 
         $stmt = $conn->prepare("SELECT * FROM admins WHERE username = ? AND password = ?");
-        $stmt->bind_param("ss", $username, $password);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        if ($stmt) {
+            $stmt->bind_param("ss", $username, $password);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-        if ($result->num_rows > 0) {
-            // Successful login
-            echo "<p>Login successful!</p>";
-            // Redirect to admin dashboard or set session variables
+            if ($result->num_rows > 0) {
+                // Successful login
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['username'] = $username;
+                header("Location: dashboard.php"); // Redirect to admin dashboard
+                exit();
+            } else {
+                // Failed login
+                echo "<p>Invalid username or password.</p>";
+            }
+
+            $stmt->close();
         } else {
-            // Failed login
-            echo "<p>Invalid username or password.</p>";
+            echo "<p>Database query failed: " . $conn->error . "</p>";
         }
 
-        $stmt->close();
         $conn->close();
     }
     ?>
