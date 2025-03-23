@@ -1,0 +1,16 @@
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+use Illuminate\Contracts\Console\Kernel;
+
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+$kernel = $app->make(Kernel::class);
+
+$kernel->handle(
+    $input = new Symfony\Component\Console\Input\ArgvInput,
+    $output = new Symfony\Component\Console\Output\ConsoleOutput
+);
+
+$kernel->terminate($input, $output);

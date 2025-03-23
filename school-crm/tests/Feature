@@ -1,0 +1,86 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class UserManagementTest extends TestCase
+{
+    use RefreshDatabase;
+
+    /** @test */
+    public function it_can_create_a_student()
+    {
+        $response = $this->post('/admin/students', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'password',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('students', [
+            'email' => 'john@example.com',
+        ]);
+    }
+
+    /** @test */
+    public function it_can_update_a_student()
+    {
+        $student = \App\Models\Student::factory()->create();
+
+        $response = $this->put("/admin/students/{$student->id}", [
+            'name' => 'Jane Doe',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'name' => 'Jane Doe',
+        ]);
+    }
+
+    /** @test */
+    public function it_can_delete_a_student()
+    {
+        $student = \App\Models\Student::factory()->create();
+
+        $response = $this->delete("/admin/students/{$student->id}");
+
+        $response->assertStatus(204);
+        $this->assertDatabaseMissing('students', [
+            'id' => $student->id,
+        ]);
+    }
+
+    /** @test */
+    public function it_can_create_a_survey()
+    {
+        $response = $this->post('/admin/surveys', [
+            'title' => 'Parent Feedback',
+            'description' => 'Please provide your feedback.',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('surveys', [
+            'title' => 'Parent Feedback',
+        ]);
+    }
+
+    /** @test */
+    public function it_can_submit_a_survey_response()
+    {
+        $survey = \App\Models\Survey::factory()->create();
+
+        $response = $this->post("/surveys/{$survey->id}/responses", [
+            'student_id' => 1,
+            'response' => 'Great school!',
+        ]);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('survey_responses', [
+            'survey_id' => $survey->id,
+            'response' => 'Great school!',
+        ]);
+    }
+}
