@@ -1,4 +1,9 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * Phone: +251925582067
+ */
 require_once __DIR__ . '/../includes/auth.php';
 if (!isLoggedIn()) {
     redirect('index.php');
