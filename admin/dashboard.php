@@ -14,12 +14,36 @@ include('../includes/header.php');
     <h1>Admin Dashboard</h1>
     <nav class="dashboard-nav">
         <ul>
-            <li><a href="users.php">Manage Users</a></li>
-            <li><a href="surveys.php">Manage Surveys</a></li>
-            <li><a href="communications.php">Communications & Chat Setup</a></li>
-            <li><a href="settings.php">Settings</a></li>
+            <li><a href="users.php" class="nav-link">Manage Users</a></li>
+            <li><a href="surveys.php" class="nav-link">Manage Surveys</a></li>
+            <li><a href="communications.php" class="nav-link">Communications Setup</a></li>
+            <li><a href="settings.php" class="nav-link">Settings</a></li>
             <!-- Add other navigation links as necessary -->
         </ul>
+    </nav>
+    <style>
+        .dashboard-nav {
+            background-color: #2c3e50;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .dashboard-nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .dashboard-nav ul li {
+            display: inline;
+            margin-right: 15px;
+        }
+        .dashboard-nav .nav-link {
+            color: #ecf0f1;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .dashboard-nav .nav-link:hover {
+            color: #3498db;
+        }
+    </style>
     </nav>
     <div class="dashboard-content">
         <!-- Dashboard Widgets -->
