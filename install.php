@@ -12,6 +12,10 @@
  * LinkedIn: https://www.linkedin.com/in/eleganceict
  * Twitter: https://twitter.com/eleganceict1
  */
+?>
+<?php
+// Enable error reporting for mysqli
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 function createDatabaseTables($conn) {
     $tableCreationFunctions = [
@@ -340,13 +344,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dbUser = $_POST['dbUser'];
         $dbPass = $_POST['dbPass'];
 
-        $conn = new mysqli($dbHost, $dbUser, $dbPass);
-
-        if ($conn->connect_error) {
-            http_response_code(500);
-            echo "Connection failed: " . $conn->connect_error;
-        } else {
+        try {
+            $conn = new mysqli($dbHost, $dbUser, $dbPass);
             echo "Connection successful";
+        } catch (mysqli_sql_exception $e) {
+            http_response_code(500);
+            echo "Connection failed: " . $e->getMessage();
         }
 
         $conn->close();
@@ -358,30 +361,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dbUser = $_POST['dbUser'];
     $dbPass = $_POST['dbPass'];
 
-    $conn = new mysqli($dbHost, $dbUser, $dbPass);
+    try {
+        $conn = new mysqli($dbHost, $dbUser, $dbPass);
 
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
+        $conn->query("CREATE DATABASE IF NOT EXISTS $dbName");
+        $conn->select_db($dbName);
+
+        createDatabaseTables($conn);
+        createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass);
+        createDbConnectionFile();
+
+        $conn->close();
+
+        // Delete install.php file and redirect to admin login page
+        unlink(__FILE__);
+        header('Location: /admin/login.php');
+        exit();
+    } catch (mysqli_sql_exception $e) {
+        die("Error: " . $e->getMessage());
     }
-
-    if (!$conn->query("CREATE DATABASE IF NOT EXISTS $dbName")) {
-        die("Database creation failed: " . $conn->error);
-    }
-
-    if (!$conn->select_db($dbName)) {
-        die("Database selection failed: " . $conn->error);
-    }
-
-    createDatabaseTables($conn);
-    createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass);
-    createDbConnectionFile();
-
-    $conn->close();
-
-    // Delete install.php file and redirect to admin login page
-    unlink(__FILE__);
-    header('Location: /admin/login.php');
-    exit();
 }
 ?>
 <!DOCTYPE html>
