@@ -33,6 +33,7 @@ $users = $conn->query("SELECT id, username, role FROM users");
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles/theme.css">
 </head>
 <body>
     <h1>Admin Dashboard</h1>
