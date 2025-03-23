@@ -20,8 +20,8 @@ if (!$conn) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $admin_id = $_POST['admin_id'];
-    $password = $_POST['password'];
+    $admin_id = $_POST['admin_id'] ?? '';
+    $password = $_POST['password'] ?? '';
 
     $stmt = $conn->prepare("SELECT * FROM admins WHERE admin_id = ?");
     if ($stmt === false) {
@@ -57,7 +57,7 @@ $conn->close();
     <div class="container">
         <h1>Admin Login</h1>
         <?php if (isset($error)): ?>
-            <p style="color: red;"><?php echo $error; ?></p>
+            <p style="color: red;"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></p>
         <?php endif; ?>
         <form method="post">
             <label for="admin_id">Admin ID:</label>
