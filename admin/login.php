@@ -13,13 +13,18 @@
  */
 
 session_start();
+require_once '../config/db_config.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_id = $_POST['admin_id'];
     $password = $_POST['password'];
 
-    // Replace with actual authentication logic
-    if ($admin_id == 'admin' && $password == 'password') {
+    $stmt = $conn->prepare("SELECT * FROM admins WHERE admin_id = ? AND password = ?");
+    $stmt->bind_param("ss", $admin_id, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
         $_SESSION['admin_id'] = $admin_id;
         header("Location: /admin/dashboard.php");
         exit();
