@@ -5,15 +5,15 @@
  */
 /* General Styles */
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-    background-color: #e0f7fa;
     color: #212121;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #00796b;
+    color: #333;
 }
 
 /* Header Styles */
@@ -187,9 +187,11 @@ footer {
 
 /* Additional Styles */
 .container {
-    width: 90%;
-    margin: 0 auto;
-    overflow: hidden;
+    width: 50%;
+    margin: 50px auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 label {
@@ -200,21 +202,23 @@ label {
 input[type="text"], input[type="password"] {
     width: 100%;
     padding: 10px;
-    margin-bottom: 10px;
+    margin: 5px 0 10px 0;
     border: 1px solid #ccc;
+    box-sizing: border-box;
     border-radius: 4px;
 }
 
 button {
-    background-color: #00796b;
-    color: #fff;
-    border: none;
+    background-color: #4CAF50;
+    color: white;
     padding: 10px 20px;
+    border: none;
     cursor: pointer;
+    margin-top: 10px;
 }
 
 button:hover {
-    background-color: #004d40;
+    background-color: #45a049;
 }
 
 .hidden {
@@ -223,16 +227,15 @@ button:hover {
 
 .progress-bar {
     width: 100%;
-    background-color: #e0f2f1;
+    background-color: #f3f3f3;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    margin: 20px 0;
+    margin-top: 20px;
 }
 
 .progress-bar-inner {
     height: 30px;
     width: 0;
-    background-color: #00796b;
+    background-color: #4CAF50;
     text-align: center;
     line-height: 30px;
     color: white;
