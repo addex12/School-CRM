@@ -1,8 +1,7 @@
+<!--Author: Adugna Gizaw
+Email: gizawadugna@gmail.com
+Phone: +251925582067 --!>
 <?php
-// Author: Adugna Gizaw
-// Email: gizawadugna@gmail.com
-// Phone: +251925582067
-
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
