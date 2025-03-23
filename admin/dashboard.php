@@ -45,8 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             border: 1px solid #ccc;
             padding: 20px;
             text-align: center;
+            cursor: pointer;
+        }
+        .grid-item form {
+            display: none;
+        }
+        .grid-item.editable form {
+            display: block;
         }
     </style>
+    <script>
+        function toggleEdit(id) {
+            var element = document.getElementById(id);
+            element.classList.toggle('editable');
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -73,19 +86,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </ul>
         </div>
         <div class="grid-container">
-            <div class="grid-item" id="parent_survey">
+            <div class="grid-item" id="parent_survey" onclick="toggleEdit('parent_survey')">
                 <h2>Parent Survey</h2>
-                <!-- Add content for Parent Survey -->
+                <form method="post">
+                    <!-- Add form fields for Parent Survey -->
+                    <input type="hidden" name="parent_survey" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="teachers_survey">
+            <div class="grid-item" id="teachers_survey" onclick="toggleEdit('teachers_survey')">
                 <h2>Teachers Survey</h2>
-                <!-- Add content for Teachers Survey -->
+                <form method="post">
+                    <!-- Add form fields for Teachers Survey -->
+                    <input type="hidden" name="teachers_survey" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="student_survey">
+            <div class="grid-item" id="student_survey" onclick="toggleEdit('student_survey')">
                 <h2>Student Survey</h2>
-                <!-- Add content for Student Survey -->
+                <form method="post">
+                    <!-- Add form fields for Student Survey -->
+                    <input type="hidden" name="student_survey" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="create_survey">
+            <div class="grid-item" id="create_survey" onclick="toggleEdit('create_survey')">
                 <h2>Create Survey</h2>
                 <form method="post">
                     <!-- Add form fields for creating a survey -->
@@ -93,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button type="submit">Create Survey</button>
                 </form>
             </div>
-            <div class="grid-item" id="delete_survey">
+            <div class="grid-item" id="delete_survey" onclick="toggleEdit('delete_survey')">
                 <h2>Delete Survey</h2>
                 <form method="post">
                     <!-- Add form fields for deleting a survey -->
@@ -101,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button type="submit">Delete Survey</button>
                 </form>
             </div>
-            <div class="grid-item" id="edit_survey">
+            <div class="grid-item" id="edit_survey" onclick="toggleEdit('edit_survey')">
                 <h2>Edit/Update Survey</h2>
                 <form method="post">
                     <!-- Add form fields for editing/updating a survey -->
@@ -109,37 +134,69 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <button type="submit">Edit/Update Survey</button>
                 </form>
             </div>
-            <div class="grid-item" id="communication_setup">
+            <div class="grid-item" id="communication_setup" onclick="toggleEdit('communication_setup')">
                 <h2>Communication Setup</h2>
-                <!-- Add content for Communication Setup -->
+                <form method="post">
+                    <!-- Add form fields for Communication Setup -->
+                    <input type="hidden" name="communication_setup" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="parent_setup">
+            <div class="grid-item" id="parent_setup" onclick="toggleEdit('parent_setup')">
                 <h2>Parent Setup</h2>
-                <!-- Add content for Parent Setup -->
+                <form method="post">
+                    <!-- Add form fields for Parent Setup -->
+                    <input type="hidden" name="parent_setup" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="student_setup">
+            <div class="grid-item" id="student_setup" onclick="toggleEdit('student_setup')">
                 <h2>Student Setup</h2>
-                <!-- Add content for Student Setup -->
+                <form method="post">
+                    <!-- Add form fields for Student Setup -->
+                    <input type="hidden" name="student_setup" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="teachers_setup">
+            <div class="grid-item" id="teachers_setup" onclick="toggleEdit('teachers_setup')">
                 <h2>Teachers Setup</h2>
-                <!-- Add content for Teachers Setup -->
+                <form method="post">
+                    <!-- Add form fields for Teachers Setup -->
+                    <input type="hidden" name="teachers_setup" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="account_management">
+            <div class="grid-item" id="account_management" onclick="toggleEdit('account_management')">
                 <h2>Account Management</h2>
-                <!-- Add content for Account Management -->
+                <form method="post">
+                    <!-- Add form fields for Account Management -->
+                    <input type="hidden" name="account_management" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="email_configuration">
+            <div class="grid-item" id="email_configuration" onclick="toggleEdit('email_configuration')">
                 <h2>Email Configuration</h2>
-                <!-- Add content for Email Configuration -->
+                <form method="post">
+                    <!-- Add form fields for Email Configuration -->
+                    <input type="hidden" name="email_configuration" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="module_configuration">
+            <div class="grid-item" id="module_configuration" onclick="toggleEdit('module_configuration')">
                 <h2>Module Configuration</h2>
-                <!-- Add content for Module Configuration -->
+                <form method="post">
+                    <!-- Add form fields for Module Configuration -->
+                    <input type="hidden" name="module_configuration" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
-            <div class="grid-item" id="feature_management">
+            <div class="grid-item" id="feature_management" onclick="toggleEdit('feature_management')">
                 <h2>Feature Management</h2>
-                <!-- Add content for Feature Management -->
+                <form method="post">
+                    <!-- Add form fields for Feature Management -->
+                    <input type="hidden" name="feature_management" value="1">
+                    <button type="submit">Save</button>
+                </form>
             </div>
             <!-- Add more grid items as needed -->
         </div>
