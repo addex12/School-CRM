@@ -24,6 +24,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
 
     $stmt = $conn->prepare("SELECT * FROM admins WHERE admin_id = ?");
+    if ($stmt === false) {
+        die("Prepare failed: " . $conn->error);
+    }
     $stmt->bind_param("s", $admin_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -40,7 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         $error = "Invalid admin ID or password.";
     }
+    $stmt->close();
 }
+$conn->close();
 ?>
 <!DOCTYPE html>
 <html>
