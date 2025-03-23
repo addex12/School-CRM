@@ -53,6 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         .grid-item.editable form {
             display: block;
         }
+        header, footer {
+            background-color: #f1f1f1;
+            padding: 20px;
+            text-align: center;
+        }
     </style>
     <script>
         function toggleEdit(id) {
@@ -62,6 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </script>
 </head>
 <body>
+    <header>
+        <h1>School-CRM Admin Dashboard</h1>
+    </header>
     <div class="container">
         <h1>Admin Dashboard</h1>
         <p>Welcome to the admin dashboard.</p>
@@ -201,5 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <!-- Add more grid items as needed -->
         </div>
     </div>
+    <footer>
+        <p>&copy; 2025 School-CRM. All rights reserved.</p>
+    </footer>
 </body>
 </html>
