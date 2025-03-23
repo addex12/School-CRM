@@ -1,21 +1,30 @@
 <?php
 /**
+ * Database Configuration
+ * 
+ * This file contains the database configuration settings.
+ * It is used to establish a connection to the database.
+ * 
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
  * Phone: +251925582067
+ * GitHub: https://github.com/addex12
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * 
+ * @package School-CRM
  */
 
-// Database credentials
-define('DB_HOST', 'localhost');
-define('DB_USER', 'your_db_user');
-define('DB_PASS', 'your_db_password');
-define('DB_NAME', 'school_crm');
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "school_crm";
 
-// Create a database connection
-$conn = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 ?>

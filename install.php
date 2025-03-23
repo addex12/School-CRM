@@ -13,6 +13,8 @@
  * Twitter: https://twitter.com/eleganceict1
  */
 
+require_once 'config/db_config.php';
+
 function createDatabaseTables($conn) {
     $sql = "
     CREATE TABLE IF NOT EXISTS students (
@@ -53,6 +55,13 @@ function createDatabaseTables($conn) {
         username VARCHAR(50) NOT NULL,
         password VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS admins (
+        id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(30) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );
     ";
 
