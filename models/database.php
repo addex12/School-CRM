@@ -4,10 +4,10 @@ Phone: +251925582067 -->
 
 <?php
 class Database {
-    private $host = "localhost";
-    private $db_name = "school_crm";
-    private $username = "yourusername";
-    private $password = "yourpassword";
+    private $host = DB_HOST;
+    private $db_name = DB_NAME;
+    private $username = DB_USER;
+    private $password = DB_PASS;
     public $conn;
 
     public function getConnection() {
