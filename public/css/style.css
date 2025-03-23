@@ -1,0 +1,19 @@
+/*
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * Phone: +251925582067
+ */
+/* Basic styling */
+body {
+    font-family: sans-serif;
+}
+.container {
+    width: 80%;
+    margin: 0 auto;
+}
+.error{
+    color: red;
+}
+.success{
+    color: green;
+}
