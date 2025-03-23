@@ -8,7 +8,7 @@
  * Twitter: https://twitter.com/eleganceict1
  */
 
-include('../includes/header.php'); 
+include('header.html'); 
 ?>
 <div class="dashboard-container">
     <h1>Admin Dashboard</h1>
@@ -87,4 +87,4 @@ include('../includes/header.php');
 </div>
 <!-- Add necessary JavaScript files -->
 <script src="../js/dashboard.js"></script>
-<?php include('../includes/footer.php'); ?>
+<?php include('footer.html'); ?>
