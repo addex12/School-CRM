@@ -26,16 +26,9 @@ if ($conn->connect_error) {
 // Fetch data for display (example for user management)
 $users = $conn->query("SELECT id, username, role FROM users");
 
+include 'header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="styles/theme.css">
-</head>
-<body>
     <h1>Admin Dashboard</h1>
     <nav>
         <ul>
@@ -102,5 +95,7 @@ $users = $conn->query("SELECT id, username, role FROM users");
         <br>
         <a href="view_surveys.php">View Surveys</a>
     </section>
+
+<?php include 'footer.php'; ?>
 </body>
 </html>
