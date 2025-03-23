@@ -58,6 +58,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $conn->close();
 }
+
+function getDatabases($host, $user, $pass) {
+    $conn = new mysqli($host, $user, $pass);
+    if ($conn->connect_error) {
+        return [];
+    }
+    $result = $conn->query("SHOW DATABASES");
+    $databases = [];
+    while ($row = $result->fetch_assoc()) {
+        $databases[] = $row['Database'];
+    }
+    $conn->close();
+    return $databases;
+}
+
+$defaultHost = 'localhost';
+$databases = getDatabases($defaultHost, 'root', '');
 ?>
 <!DOCTYPE html>
 <html>
@@ -173,9 +190,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <h2>Database Configuration</h2>
             <form id="dbForm">
                 <label for="dbHost">Database Host:</label>
-                <input type="text" id="dbHost" name="dbHost" required><br>
+                <input type="text" id="dbHost" name="dbHost" value="<?php echo $defaultHost; ?>" required><br>
                 <label for="dbName">Database Name:</label>
-                <input type="text" id="dbName" name="dbName" required><br>
+                <select id="dbName" name="dbName" required>
+                    <?php foreach ($databases as $database): ?>
+                        <option value="<?php echo $database; ?>"><?php echo $database; ?></option>
+                    <?php endforeach; ?>
+                </select><br>
                 <label for="dbUser">Database Username:</label>
                 <input type="text" id="dbUser" name="dbUser" required><br>
                 <label for="dbPass">Database Password:</label>
