@@ -1,43 +1,54 @@
 <?php
-include('config.php');
+include('../config.php');
 include('session.php');
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $errors = [];
+function updateTeacher(): array {
+    global $db;
 
-    if (empty($_POST["teacher_name"])) {
-        $errors[] = "Teacher name is required.";
-    }
-    if (empty($_POST["teacher_email"])) {
-        $errors[] = "Teacher email is required.";
-    }
-    if (empty($_POST["teacher_subjects"])) {
-        $errors[] = "At least one subject is required.";
-    }
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $errors = [];
 
-    if (empty($errors)) {
-        $teacher_id = $_POST['teacher_id'];
-        $teacher_name = $_POST['teacher_name'];
-        $teacher_email = $_POST['teacher_email'];
-        $teacher_subjects = implode(',', $_POST['teacher_subjects']);
+        if (empty($_POST["teacher_name"])) {
+            $errors[] = "Teacher name is required.";
+        }
+        if (empty($_POST["teacher_email"])) {
+            $errors[] = "Teacher email is required.";
+        }
+        if (empty($_POST["teacher_subjects"])) {
+            $errors[] = "At least one subject is required.";
+        }
 
-        $sql = "UPDATE teachers SET name='$teacher_name', email='$teacher_email', subjects='$teacher_subjects' WHERE id='$teacher_id'";
-        if (mysqli_query($db, $sql)) {
-            echo "Record updated successfully";
+        if (empty($errors)) {
+            $teacher_id = $_POST['teacher_id'];
+            $teacher_name = $_POST['teacher_name'];
+            $teacher_email = $_POST['teacher_email'];
+            $teacher_subjects = implode(',', $_POST['teacher_subjects']);
+
+            $stmt = $db->prepare("UPDATE teachers SET name=?, email=?, subjects=? WHERE id=?");
+            $stmt->bind_param("sssi", $teacher_name, $teacher_email, $teacher_subjects, $teacher_id);
+            if ($stmt->execute()) {
+                echo "Record updated successfully";
+            } else {
+                echo "Error updating record: " . $stmt->error;
+            }
+            $stmt->close();
         } else {
-            echo "Error updating record: " . mysqli_error($db);
-        }
-    } else {
-        foreach ($errors as $error) {
-            echo "<p style='color:red;'>$error</p>";
+            foreach ($errors as $error) {
+                echo "<p style='color:red;'>$error</p>";
+            }
         }
     }
+
+    $teacher_id = $_GET['id'];
+    $sql = "SELECT * FROM teachers WHERE id='$teacher_id'";
+    $result = mysqli_query($db, $sql);
+    $row = mysqli_fetch_assoc($result);
+    $subjects = explode(',', $row['subjects']);
+
+    return $row;
 }
 
-$teacher_id = $_GET['id'];
-$sql = "SELECT * FROM teachers WHERE id='$teacher_id'";
-$result = mysqli_query($db, $sql);
-$row = mysqli_fetch_assoc($result);
+$row = updateTeacher();
 $subjects = explode(',', $row['subjects']);
 ?>
 

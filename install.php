@@ -14,135 +14,189 @@
  */
 
 function createDatabaseTables($conn) {
-    $sql = "
-    CREATE TABLE IF NOT EXISTS students (
+    createStudentsTable($conn);
+    createTeachersTable($conn);
+    createClassesTable($conn);
+    createEnrollmentsTable($conn);
+    createAdminsTable($conn);
+    createParentSurveysTable($conn);
+    createTeacherSurveysTable($conn);
+    createStudentSurveysTable($conn);
+    createCommunicationSetupTable($conn);
+    createParentSetupTable($conn);
+    createStudentSetupTable($conn);
+    createTeacherSetupTable($conn);
+    createAccountManagementTable($conn);
+    createEmailConfigurationTable($conn);
+    createModuleConfigurationTable($conn);
+    createFeatureManagementTable($conn);
+
+    echo "<script>alert('Tables created successfully! Proceeding to admin user creation...'); window.location.href = '/admin/create_admin.php';</script>";
+}
+
+function createTable($conn, $tableName, $columns) {
+    $sql = "CREATE TABLE IF NOT EXISTS $tableName ($columns);";
+    executeQuery($conn, $sql);
+}
+
+function createEntityTable($conn, $tableName, $additionalColumns = '') {
+    $columns = "
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL,
         phone VARCHAR(15) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+        $additionalColumns
+    ";
+    createTable($conn, $tableName, $columns);
+}
 
-    CREATE TABLE IF NOT EXISTS teachers (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) NOT NULL,
-        phone VARCHAR(15) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+function createStudentsTable($conn) {
+    createEntityTable($conn, 'students');
+}
 
-    CREATE TABLE IF NOT EXISTS classes (
+function createTeachersTable($conn) {
+    createEntityTable($conn, 'teachers');
+}
+
+function createClassesTable($conn) {
+    $columns = "
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         teacher_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (teacher_id) REFERENCES teachers(id)
-    );
+    ";
+    createTable($conn, 'classes', $columns);
+}
 
-    CREATE TABLE IF NOT EXISTS enrollments (
+function createEnrollmentsTable($conn) {
+    $columns = "
         id INT AUTO_INCREMENT PRIMARY KEY,
         student_id INT,
         class_id INT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (student_id) REFERENCES students(id),
         FOREIGN KEY (class_id) REFERENCES classes(id)
-    );
+    ";
+    createTable($conn, 'enrollments', $columns);
+}
 
-    CREATE TABLE IF NOT EXISTS admins (
+function createAdminsTable($conn) {
+    $sql = "CREATE TABLE IF NOT EXISTS admins (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(30) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
         reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    );
+    );";
+    executeQuery($conn, $sql);
+}
 
-    CREATE TABLE IF NOT EXISTS parent_surveys (
+function createSurveyTable($conn, $tableName) {
+    $sql = "CREATE TABLE IF NOT EXISTS $tableName (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    );";
+    executeQuery($conn, $sql);
+}
 
-    CREATE TABLE IF NOT EXISTS teacher_surveys (
+function createParentSurveysTable($conn) {
+    createSurveyTable($conn, 'parent_surveys');
+}
+
+function createTeacherSurveysTable($conn) {
+    createSurveyTable($conn, 'teacher_surveys');
+}
+
+function createStudentSurveysTable($conn) {
+    createSurveyTable($conn, 'student_surveys');
+}
+
+function createSetupTable($conn, $tableName, $columns) {
+    $sql = "CREATE TABLE IF NOT EXISTS $tableName (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        description TEXT NOT NULL,
+        $columns,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    );";
+    executeQuery($conn, $sql);
+}
 
-    CREATE TABLE IF NOT EXISTS student_surveys (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        description TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-    CREATE TABLE IF NOT EXISTS communication_setup (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+function createCommunicationSetupTable($conn) {
+    createSetupTable($conn, 'communication_setup', "
         type VARCHAR(50) NOT NULL,
-        details TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+        details TEXT NOT NULL
+    ");
+}
 
-    CREATE TABLE IF NOT EXISTS parent_setup (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+function createParentSetupTable($conn) {
+    createSetupTable($conn, 'parent_setup', "
         parent_name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL,
-        phone VARCHAR(15) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+        phone VARCHAR(15) NOT NULL
+    ");
+}
 
-    CREATE TABLE IF NOT EXISTS student_setup (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+function createStudentSetupTable($conn) {
+    createSetupTable($conn, 'student_setup', "
         student_name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL,
-        phone VARCHAR(15) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+        phone VARCHAR(15) NOT NULL
+    ");
+}
 
-    CREATE TABLE IF NOT EXISTS teacher_setup (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+function createTeacherSetupTable($conn) {
+    createSetupTable($conn, 'teacher_setup', "
         teacher_name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL,
-        phone VARCHAR(15) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+        phone VARCHAR(15) NOT NULL
+    ");
+}
 
-    CREATE TABLE IF NOT EXISTS account_management (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+function createAccountManagementTable($conn) {
+    createSetupTable($conn, 'account_management', "
         account_name VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL,
-        phone VARCHAR(15) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+        phone VARCHAR(15) NOT NULL
+    ");
+}
 
-    CREATE TABLE IF NOT EXISTS email_configuration (
+function createEmailConfigurationTable($conn) {
+    $sql = "CREATE TABLE IF NOT EXISTS email_configuration (
         id INT AUTO_INCREMENT PRIMARY KEY,
         smtp_server VARCHAR(255) NOT NULL,
         port INT NOT NULL,
         username VARCHAR(100) NOT NULL,
         password VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    );";
+    executeQuery($conn, $sql);
+}
 
-    CREATE TABLE IF NOT EXISTS module_configuration (
+function createModuleConfigurationTable($conn) {
+    $sql = "CREATE TABLE IF NOT EXISTS module_configuration (
         id INT AUTO_INCREMENT PRIMARY KEY,
         module_name VARCHAR(100) NOT NULL,
         status VARCHAR(50) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
+    );";
+    executeQuery($conn, $sql);
+}
 
-    CREATE TABLE IF NOT EXISTS feature_management (
+function createFeatureManagementTable($conn) {
+    $sql = "CREATE TABLE IF NOT EXISTS feature_management (
         id INT AUTO_INCREMENT PRIMARY KEY,
         feature_name VARCHAR(100) NOT NULL,
         status VARCHAR(50) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    ";
+    );";
+    executeQuery($conn, $sql);
+}
 
-    if ($conn->multi_query($sql) === TRUE) {
-        echo "<script>alert('Tables created successfully! Proceeding to admin user creation...'); window.location.href = '/admin/create_admin.php';</script>";
-    } else {
-        echo "Error creating tables: " . $conn->error;
+function executeQuery($conn, $sql) {
+    if ($conn->query($sql) !== TRUE) {
+        echo "Error creating table: " . $conn->error;
     }
 }
 
