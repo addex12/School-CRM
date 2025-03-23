@@ -8,6 +8,9 @@
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
  * Phone: +251925582067
+ * GitHub: https://github.com/addex12
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
  */
 
 function createDatabaseTables($conn) {
@@ -86,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $conn->close();
 
-    echo "<script>alert('Installation successful!');</script>";
+    echo "<script>alert('Installation successful! Redirecting to admin login...'); window.location.href = '/admin/login.php';</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -165,6 +168,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>School-CRM Installation</h1>
 
         <div id="step1">
+            <h2>Welcome to the School-CRM Installation</h2>
+            <p>Follow the steps to configure your database and create an administrator account.</p>
+            <p>Developer: Adugna Gizaw</p>
+            <p>Email: gizawadugna@gmail.com</p>
+            <p>Phone: +251925582067</p>
+            <p>GitHub: <a href="https://github.com/addex12" target="_blank">https://github.com/addex12</a></p>
+            <p>LinkedIn: <a href="https://www.linkedin.com/in/eleganceict" target="_blank">https://www.linkedin.com/in/eleganceict</a></p>
+            <p>Twitter: <a href="https://twitter.com/eleganceict1" target="_blank">https://twitter.com/eleganceict1</a></p>
             <button onclick="showStep('step2')">Start</button>
         </div>
 
