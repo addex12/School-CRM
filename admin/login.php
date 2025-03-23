@@ -16,6 +16,7 @@ session_start();
 require_once '../config/db_config.php';
 
 if (!$conn) {
+    error_log("Connection failed: " . mysqli_connect_error());
     die("Connection failed: " . mysqli_connect_error());
 }
 
@@ -25,6 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $stmt = $conn->prepare("SELECT * FROM admins WHERE admin_id = ?");
     if ($stmt === false) {
+        error_log("Prepare failed: " . $conn->error);
         die("Prepare failed: " . $conn->error);
     }
     $stmt->bind_param("s", $admin_id);
