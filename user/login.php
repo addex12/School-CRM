@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Check if the connection was successful
     if ($conn->connect_error) {
+        error_log("Connection failed: " . $conn->connect_error);
         die("Connection failed: " . $conn->connect_error);
     }
 
@@ -26,12 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 exit();
             } else {
                 $error = 'Invalid password.';
+                error_log($error);
             }
         } else {
             $error = 'User not found.';
+            error_log($error);
         }
     } else {
         $error = 'Query failed: ' . $conn->error;
+        error_log($error);
     }
     $conn->close();
 }
