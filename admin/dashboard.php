@@ -30,14 +30,7 @@ include 'header.php';
 ?>
 
     <h1>Admin Dashboard</h1>
-    <nav>
-        <ul>
-            <li><a href="#user-management">User Management</a></li>
-            <li><a href="#communication-configuration">Communication Configuration</a></li>
-            <li><a href="#system-parameterization">System Parameterization</a></li>
-            <li><a href="#parent-survey-management">Parent Survey Management</a></li>
-        </ul>
-    </nav>
+    <!-- Removed navigation menu from here -->
 
     <section id="user-management">
         <h2>User Management</h2>
