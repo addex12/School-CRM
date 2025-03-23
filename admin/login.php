@@ -1,9 +1,8 @@
 <?php
 /**
- * Admin Login Page
+ * Admin Login Script
  * 
- * This page handles the login functionality for the admin users.
- * It verifies the username and password and starts a session for the authenticated user.
+ * This script handles the admin login process.
  * 
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -13,58 +12,55 @@
  * Twitter: https://twitter.com/eleganceict1
  */
 
-session_start();
 require_once '../config/db_config.php';
+session_start();
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Query to check if the user exists
-    $query = "SELECT * FROM admins WHERE username = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param('s', $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-    if ($result->num_rows == 1) {
-        $admin = $result->fetch_assoc();
-        if (password_verify($password, $admin['password'])) {
-            $_SESSION['admin_id'] = $admin['id'];
-            header('Location: dashboard.php');
-            exit();
-        } else {
-            $error = "Invalid password.";
-        }
-    } else {
-        $error = "Invalid username.";
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
     }
+
+    $stmt = $conn->prepare("SELECT id, password FROM admins WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($id, $hashedPassword);
+    $stmt->fetch();
+
+    if ($stmt->num_rows > 0 && password_verify($password, $hashedPassword)) {
+        $_SESSION['admin_id'] = $id;
+        header("Location: /admin/dashboard.php");
+        exit();
+    } else {
+        $error = "Invalid username or password";
+    }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/style.css">
 </head>
 <body>
-    <div class="login-container">
-        <h2>Admin Login</h2>
+    <div class="container">
+        <h1>Admin Login</h1>
         <?php if (isset($error)): ?>
             <p class="error"><?php echo $error; ?></p>
         <?php endif; ?>
-        <form action="login.php" method="POST">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
+        <form method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
             <button type="submit">Login</button>
         </form>
     </div>
