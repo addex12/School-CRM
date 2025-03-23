@@ -9,8 +9,9 @@
  */
 ?>
 <div class="container">
-    <div class="dashboard-container">
-    <?php include('header.php'); ?>
+<?php include('header.php'); ?>
+    
+<div class="dashboard-container">
         <h1>Admin Dashboard</h1>
         <nav class="dashboard-nav">
             <ul>
