@@ -1,8 +1,7 @@
+<?php
 // Author: Adugna Gizaw
 // Email: gizawadugna@gmail.com
 // Phone: +251925582067
-
-<?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $host = $_POST['host'];
     $db_name = $_POST['db_name'];
