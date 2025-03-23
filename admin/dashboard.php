@@ -42,8 +42,8 @@ include 'header.php';
             <?php while ($user = $users->fetch_assoc()): ?>
             <tr>
                 <td><?php echo $user['id']; ?></td>
-                <td><?php echo $user['username']; ?></td>
-                <td><?php echo $user['role']; ?></td>
+                <td data-editable><?php echo $user['username']; ?></td>
+                <td data-editable><?php echo $user['role']; ?></td>
                 <td>
                     <a href="edit_user.php?id=<?php echo $user['id']; ?>">Edit</a>
                     <a href="delete_user.php?id=<?php echo $user['id']; ?>">Delete</a>
@@ -86,6 +86,43 @@ include 'header.php';
         <br>
         <a href="view_surveys.php">View Surveys</a>
     </section>
+
+    <section id="teacher-management">
+        <h2>Teacher Management</h2>
+        <a href="create_teacher.php">Create New Teacher</a>
+        <br>
+        <a href="view_teachers.php">View Teachers</a>
+    </section>
+
+    <section id="student-management">
+        <h2>Student Management</h2>
+        <a href="create_student.php">Create New Student</a>
+        <br>
+        <a href="view_students.php">View Students</a>
+    </section>
+
+    <section id="parents-management">
+        <h2>Parents Management</h2>
+        <a href="create_parent.php">Create New Parent</a>
+        <br>
+        <a href="view_parents.php">View Parents</a>
+    </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("#user-management table tr").forEach(row => {
+        row.querySelectorAll("td[data-editable]").forEach(cell => {
+            cell.addEventListener("click", function() {
+                this.contentEditable = true;
+            });
+            cell.addEventListener("blur", function() {
+                this.contentEditable = false;
+                // ...AJAX or form submission to update cell in DB...
+            });
+        });
+    });
+});
+</script>
 
 <?php include 'footer.php'; ?>
 </body>
