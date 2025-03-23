@@ -2,6 +2,9 @@
 // Author: Adugna Gizaw
 // Email: gizawadugna@gmail.com
 // Phone: +251925582067
+
+$message = '';
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $host = $_POST['host'];
     $db_name = $_POST['db_name'];
@@ -11,28 +14,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $conn = new mysqli($host, $username, $password);
 
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $sql = "CREATE DATABASE IF NOT EXISTS $db_name";
-    if ($conn->query($sql) === TRUE) {
-        echo "Database created successfully";
+        $message = "Connection failed: " . $conn->connect_error;
     } else {
-        echo "Error creating database: " . $conn->error;
+        $sql = "CREATE DATABASE IF NOT EXISTS $db_name";
+        if ($conn->query($sql) === TRUE) {
+            $message = "Database created successfully";
+        } else {
+            $message = "Error creating database: " . $conn->error;
+        }
+
+        $conn->close();
+
+        $config_content = "<?php\n";
+        $config_content .= "define('DB_HOST', '$host');\n";
+        $config_content .= "define('DB_USER', '$username');\n";
+        $config_content .= "define('DB_PASS', '$password');\n";
+        $config_content .= "define('DB_NAME', '$db_name');\n";
+        $config_content .= "?>";
+
+        if (file_put_contents('includes/config.php', $config_content)) {
+            $message .= "<br>Configuration file created successfully.";
+        } else {
+            $message .= "<br>Error creating configuration file.";
+        }
     }
-
-    $conn->close();
-
-    $config_content = "<?php\n";
-    $config_content .= "define('DB_HOST', '$host');\n";
-    $config_content .= "define('DB_USER', '$username');\n";
-    $config_content .= "define('DB_PASS', '$password');\n";
-    $config_content .= "define('DB_NAME', '$db_name');\n";
-    $config_content .= "?>";
-
-    file_put_contents('includes/config.php', $config_content);
-
-    echo "Configuration file created successfully.";
 }
 ?>
 
@@ -85,6 +90,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         button:hover {
             background-color: #45a049;
         }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e7f3e7;
+            border: 1px solid #d4e5d4;
+            color: #3c763d;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -105,6 +118,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             <button type="submit">Install</button>
         </form>
+        <?php if ($message): ?>
+            <div class="message"><?php echo $message; ?></div>
+        <?php endif; ?>
     </div>
 </body>
 </html>
