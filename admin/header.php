@@ -4,14 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/theme.css"> <!-- Added theme.css -->
 </head>
 <body>
 
 <header>
     <div class="logo">
         <img src="logo.png" alt="School CRM Logo">
-    </div>
     <nav>
         <ul>
             <li><a href="#user-management">User Management</a></li>
@@ -33,7 +32,6 @@
     </div>
 </header>
 
-<!-- Add closing tags for body and html -->
 </body>
 </html>
 
