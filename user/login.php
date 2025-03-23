@@ -1,34 +1,34 @@
 <?php
 session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Database connection
-    $host = 'localhost';
-    $user = 'flipperschool_crm';
-    $pass = 'A25582067s_';
-    $dbname = 'flipperschool_school_crm';
+    // Include database connection
+    require_once '../config/db.php';
 
-    $conn = new mysqli($host, $user, $pass, $dbname);
-    if ($conn->connect_error) {
-        die('Database connection failed: ' . $conn->connect_error);
-    }
-
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = $conn->real_escape_string($_POST['username']);
+    $password = $conn->real_escape_string($_POST['password']);
 
     $result = $conn->query("SELECT id, password, role FROM users WHERE username='$username'");
-    if ($result->num_rows > 0) {
-        $user = $result->fetch_assoc();
-        if (password_verify($password, $user['password'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['role'] = $user['role'];
-            header('Location: dashboard.php');
-            exit();
+    if ($result) {
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            if (password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['role'] = $user['role'];
+                header('Location: dashboard.php');
+                exit();
+            } else {
+                $error = 'Invalid password.';
+            }
         } else {
-            $error = 'Invalid password.';
+            $error = 'User not found.';
         }
     } else {
-        $error = 'User not found.';
+        $error = 'Query failed: ' . $conn->error;
     }
+    $conn->close();
 }
 ?>
 
