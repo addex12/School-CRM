@@ -46,14 +46,12 @@ function handleCreateSurvey() {
         $title = $_POST['survey_title'];
         $description = $_POST['survey_description'];
         
-        // Add logic to save the survey to the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("INSERT INTO surveys (title, description) VALUES (?, ?)");
-        // $stmt->bind_param("ss", $title, $description);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
+        $db = new mysqli('localhost', 'username', 'password', 'database');
+        $stmt = $db->prepare("INSERT INTO surveys (title, description) VALUES (?, ?)");
+        $stmt->bind_param("ss", $title, $description);
+        $stmt->execute();
+        $stmt->close();
+        $db->close();
         
         echo "Survey created successfully!";
     } else {
@@ -62,177 +60,207 @@ function handleCreateSurvey() {
 }
 
 function handleDeleteSurvey() {
-    if (isset($_POST['survey_id'])) {
-        $survey_id = $_POST['survey_id'];
-        
-        // Add logic to delete the survey from the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("DELETE FROM surveys WHERE id = ?");
-        // $stmt->bind_param("i", $survey_id);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
-        
+    if (!isset($_POST['survey_id'])) {
+        echo "Please provide a survey ID.";
+        return;
+    }
+
+    $survey_id = $_POST['survey_id'];
+    if (deleteSurveyById($survey_id)) {
         echo "Survey deleted successfully!";
     } else {
-        echo "Please provide a survey ID.";
+        echo "Failed to delete survey.";
     }
 }
 
+function deleteSurveyById($survey_id) {
+    $params = [$survey_id];
+    $query = "DELETE FROM surveys WHERE id = ?";
+    return executeQuery($query, $params);
+}
 function handleEditSurvey() {
-    if (isset($_POST['survey_id']) && isset($_POST['survey_title']) && isset($_POST['survey_description'])) {
-        $survey_id = $_POST['survey_id'];
-        $title = $_POST['survey_title'];
-        $description = $_POST['survey_description'];
-        
-        // Add logic to update the survey in the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("UPDATE surveys SET title = ?, description = ? WHERE id = ?");
-        // $stmt->bind_param("ssi", $title, $description, $survey_id);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
-        
+    if (!isset($_POST['survey_id'])) {
+        echo "Please provide a survey ID.";
+        return;
+    }
+    if (!isset($_POST['survey_title'])) {
+        echo "Please provide a survey title.";
+        return;
+    }
+    if (!isset($_POST['survey_description'])) {
+        echo "Please provide a survey description.";
+        return;
+    }
+
+    $survey_id = $_POST['survey_id'];
+    $title = $_POST['survey_title'];
+    $description = $_POST['survey_description'];
+    
+    $params = [$title, $description, $survey_id];
+    $query = "UPDATE surveys SET title = ?, description = ? WHERE id = ?";
+    
+    if (executeQuery($query, $params)) {
         echo "Survey updated successfully!";
     } else {
-        echo "Please provide a survey ID, title, and description.";
+        echo "Failed to update survey.";
     }
 }
-
-function handleCreateStudent() {
-    if (isset($_POST['student_name']) && isset($_POST['student_age']) && isset($_POST['student_class'])) {
-        $name = $_POST['student_name'];
-        $age = $_POST['student_age'];
-        $class = $_POST['student_class'];
         
-        // Add logic to save the student to the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("INSERT INTO students (name, age, class) VALUES (?, ?, ?)");
-        // $stmt->bind_param("sis", $name, $age, $class);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
-        
-        echo "Student created successfully!";
-    } else {
-        echo "Please provide a name, age, and class for the student.";
-    }
-}
-
-function handleCreateTeacher() {
-    if (isset($_POST['teacher_name']) && isset($_POST['teacher_subject'])) {
-        $name = $_POST['teacher_name'];
-        $subject = $_POST['teacher_subject'];
-        
-        // Add logic to save the teacher to the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("INSERT INTO teachers (name, subject) VALUES (?, ?)");
-        // $stmt->bind_param("ss", $name, $subject);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
-        
-        echo "Teacher created successfully!";
-    } else {
-        echo "Please provide a name and subject for the teacher.";
-    }
-}
-
-function handleCreateParent() {
-    if (isset($_POST['parent_name']) && isset($_POST['parent_contact'])) {
-        $name = $_POST['parent_name'];
-        $contact = $_POST['parent_contact'];
-        
-        // Add logic to save the parent to the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("INSERT INTO parents (name, contact) VALUES (?, ?)");
-        // $stmt->bind_param("ss", $name, $contact);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
-        
-        echo "Parent created successfully!";
-    } else {
-        echo "Please provide a name and contact for the parent.";
-    }
-}
-
 function handleUpdateStudent() {
-    if (isset($_POST['student_id']) && isset($_POST['student_name']) && isset($_POST['student_age']) && isset($_POST['student_class'])) {
+    if (areStudentFieldsSet()) {
         $id = $_POST['student_id'];
         $name = $_POST['student_name'];
         $age = $_POST['student_age'];
         $class = $_POST['student_class'];
         
-        // Add logic to update the student in the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("UPDATE students SET name = ?, age = ?, class = ? WHERE id = ?");
-        // $stmt->bind_param("sisi", $name, $age, $class, $id);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
+        $params = [$name, $age, $class, $id];
+        $query = "UPDATE students SET name = ?, age = ?, class = ? WHERE id = ?";
         
-        echo "Student updated successfully!";
+        if (executeQuery($query, $params)) {
+            echo "Student updated successfully!";
+        } else {
+            echo "Failed to update student.";
+        }
     } else {
         echo "Please provide a student ID, name, age, and class.";
     }
 }
 
-function handleUpdateTeacher() {
-    if (isset($_POST['teacher_id']) && isset($_POST['teacher_name']) && isset($_POST['teacher_subject'])) {
-        $id = $_POST['teacher_id'];
-        $name = $_POST['teacher_name'];
-        $subject = $_POST['teacher_subject'];
+function areStudentFieldsSet() {
+    return isset($_POST['student_id']) && isset($_POST['student_name']) && isset($_POST['student_age']) && isset($_POST['student_class']);
+}
+    if (areStudentFieldsSet()) {
+        $id = $_POST['student_id'];
+        $name = $_POST['student_name'];
+        $age = $_POST['student_age'];
+        $class = $_POST['student_class'];
         
-        // Add logic to update the teacher in the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("UPDATE teachers SET name = ?, subject = ? WHERE id = ?");
-        // $stmt->bind_param("ssi", $name, $subject, $id);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
+        $params = [$name, $age, $class, $id];
+        $query = "UPDATE students SET name = ?, age = ?, class = ? WHERE id = ?";
         
-        echo "Teacher updated successfully!";
+        if (executeQuery($query, $params)) {
+            echo "Student updated successfully!";
+        } else {
+            echo "Failed to update student.";
+        }
     } else {
-        echo "Please provide a teacher ID, name, and subject.";
+        echo "Please provide a student ID, name, age, and class.";
     }
 }
 
+    if (areStudentFieldsSet()) {
+    return isset($_POST['student_id']) && isset($_POST['student_name']) && isset($_POST['student_age']) && isset($_POST['student_class']);
+}
+    $isStudentIdSet = isset($_POST['student_id']);
+    $isStudentNameSet = isset($_POST['student_name']);
+    $isStudentAgeSet = isset($_POST['student_age']);
+    $isStudentClassSet = isset($_POST['student_class']);
+    
+    if ($isStudentIdSet) {
+        if ($isStudentNameSet) {
+            if ($isStudentAgeSet) {
+                if ($isStudentClassSet) {
+        $id = $_POST['student_id'];
+        $name = $_POST['student_name'];
+function handleUpdateStudent() {
+    $isStudentIdSet = isset($_POST['student_id']);
+function handleUpdateStudent() {
+    $isStudentIdSet = isset($_POST['student_id']);
+    $isStudentNameSet = isset($_POST['student_name']);
+    $isStudentAgeSet = isset($_POST['student_age']);
+    $isStudentClassSet = isset($_POST['student_class']);
+    
+    if ($isStudentIdSet && $isStudentNameSet && $isStudentAgeSet && $isStudentClassSet) {
+        $id = $_POST['student_id'];
+        $name = $_POST['student_name'];
+        $age = $_POST['student_age'];
+        $class = $_POST['student_class'];
+        
+        $params = [$name, $age, $class, $id];
+        $query = "UPDATE students SET name = ?, age = ?, class = ? WHERE id = ?";
+        
+        if (executeQuery($query, $params)) {
+            echo "Student updated successfully!";
+                } else {
+                    echo "Please provide a student class.";
+                }
+            } else {
+                echo "Please provide a student age.";
+            }
+        } else {
+            echo "Please provide a student name.";
+        }
+    } else {
+        echo "Please provide a student ID.";
+    }
+    } else {
+        echo "Please provide a student ID, name, age, and class.";
+    }
+}
+        $name = $_POST['teacher_name'];
+        $subject = $_POST['teacher_subject'];
+        
+        $params = [$name, $subject, $id];
+        $query = "UPDATE teachers SET name = ?, subject = ? WHERE id = ?";
+        
+        if (executeQuery($query, $params)) {
+            echo "Teacher updated successfully!";
+        } else {
+        echo "Please provide a parent ID, name, and contact.";
 function handleUpdateParent() {
     if (isset($_POST['parent_id']) && isset($_POST['parent_name']) && isset($_POST['parent_contact'])) {
         $id = $_POST['parent_id'];
         $name = $_POST['parent_name'];
         $contact = $_POST['parent_contact'];
         
-        // Add logic to update the parent in the database
-        // Example:
-        // $db = new mysqli('localhost', 'username', 'password', 'database');
-        // $stmt = $db->prepare("UPDATE parents SET name = ?, contact = ? WHERE id = ?");
-        // $stmt->bind_param("ssi", $name, $contact, $id);
-        // $stmt->execute();
-        // $stmt->close();
-        // $db->close();
+        $params = [$name, $contact, $id];
+        $query = "UPDATE parents SET name = ?, contact = ? WHERE id = ?";
         
-        echo "Parent updated successfully!";
+        if (executeQuery($query, $params)) {
+            echo "Parent updated successfully!";
+        } else {
+            echo "Failed to update parent.";
+        }
     } else {
         echo "Please provide a parent ID, name, and contact.";
     }
 }
 
+function executeQuery($query, $params) {
+    $db = new mysqli('localhost', 'username', 'password', 'database');
+    if ($db->connect_error) {
+        return false;
+        return false;
+    }
+    $types = str_repeat('s', count($params));
+    $stmt->bind_param($types, ...$params);
+    $result = $stmt->execute();
+    $stmt->close();
+    $db->close();
+    return $result;
+}
+
+include('../database/db_config.php');
+include('session.php');
+
+// Fetch teachers data
+$sql = "SELECT * FROM teachers";
+$result = mysqli_query($db, $sql);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
     <title>Admin Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="../style.css">
     <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .dashboard-menu {
+            margin-bottom: 20px;
+        }
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -242,10 +270,6 @@ function handleUpdateParent() {
             border: 1px solid #ccc;
             padding: 20px;
             text-align: center;
-            cursor: pointer;
-        }
-        .grid-item form {
-            display: none;
         }
         .grid-item.editable form {
             display: block;
@@ -459,6 +483,21 @@ function handleUpdateParent() {
             </div>
             <!-- Add more grid items as needed -->
         </div>
+        <h2>Teachers List</h2>
+        <table border="1">
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subjects</th>
+            </tr>
+            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+            <tr>
+                <td><?php echo $row['name']; ?></td>
+                <td><?php echo $row['email']; ?></td>
+                <td><?php echo $row['subjects']; ?></td>
+            </tr>
+            <?php endwhile; ?>
+        </table>
     </div>
     <footer>
         <p>&copy; 2025 School-CRM. All rights reserved.</p>
