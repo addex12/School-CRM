@@ -19,15 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $admin_id = $_POST['admin_id'];
     $password = $_POST['password'];
 
-    $stmt = $conn->prepare("SELECT * FROM admins WHERE admin_id = ? AND password = ?");
-    $stmt->bind_param("ss", $admin_id, $password);
+    $stmt = $conn->prepare("SELECT * FROM admins WHERE admin_id = ?");
+    $stmt->bind_param("s", $admin_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $_SESSION['admin_id'] = $admin_id;
-        header("Location: /admin/dashboard.php");
-        exit();
+        $admin = $result->fetch_assoc();
+        if (password_verify($password, $admin['password'])) {
+            $_SESSION['admin_id'] = $admin_id;
+            header("Location: /admin/dashboard.php");
+            exit();
+        } else {
+            $error = "Invalid admin ID or password.";
+        }
     } else {
         $error = "Invalid admin ID or password.";
     }
