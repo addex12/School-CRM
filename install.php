@@ -13,7 +13,7 @@
  * Twitter: https://twitter.com/eleganceict1
  */
 
-require_once 'config/db_config.php';
+//require_once 'config/db_config.php';
 
 function createDatabaseTables($conn) {
     $sql = "
@@ -59,7 +59,7 @@ function createDatabaseTables($conn) {
     ";
 
     if ($conn->multi_query($sql) === TRUE) {
-        echo "Tables created successfully";
+        echo "<script>alert('System installation successful! Redirecting to admin login...'); window.location.href = '/admin/login.php';</script>";
     } else {
         echo "Error creating tables: " . $conn->error;
     }
@@ -90,8 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->close();
 
     $conn->close();
-
-    echo "<script>alert('Installation successful! Redirecting to admin login...'); window.location.href = '/admin/login.php';</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -239,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div id="step3" class="hidden">
             <h2>Ready to Install</h2>
             <div class="progress-bar">
-                <div id="progressBarInner" class="progress-bar-inner">0%</</div>
+                <div id="progressBarInner" class="progress-bar-inner">0%</div>
             </div>
             <button onclick="startInstallation()">Install</button>
         </div>
