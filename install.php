@@ -13,8 +13,6 @@
  * Twitter: https://twitter.com/eleganceict1
  */
 
-//require_once 'config/db_config.php';
-
 function createDatabaseTables($conn) {
     $sql = "
     CREATE TABLE IF NOT EXISTS students (
@@ -59,10 +57,21 @@ function createDatabaseTables($conn) {
     ";
 
     if ($conn->multi_query($sql) === TRUE) {
-        echo "<script>alert('System installation successful! Redirecting to admin login...'); window.location.href = '/admin/login.php';</script>";
+        echo "<script>alert('Tables created successfully! Proceeding to admin user creation...'); window.location.href = '/admin/create_admin.php';</script>";
     } else {
         echo "Error creating tables: " . $conn->error;
     }
+}
+
+function createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass) {
+    $configContent = "<?php\n";
+    $configContent .= "define('DB_HOST', '$dbHost');\n";
+    $configContent .= "define('DB_NAME', '$dbName');\n";
+    $configContent .= "define('DB_USER', '$dbUser');\n";
+    $configContent .= "define('DB_PASS', '$dbPass');\n";
+    $configContent .= "?>";
+
+    file_put_contents(__DIR__ . '/config/db_config.php', $configContent);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -70,8 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dbName = $_POST['dbName'];
     $dbUser = $_POST['dbUser'];
     $dbPass = $_POST['dbPass'];
-    $adminUser = $_POST['adminUser'];
-    $adminPass = password_hash($_POST['adminPass'], PASSWORD_BCRYPT);
 
     $conn = new mysqli($dbHost, $dbUser, $dbPass);
 
@@ -83,11 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->select_db($dbName);
 
     createDatabaseTables($conn);
-
-    $stmt = $conn->prepare("INSERT INTO admins (username, password) VALUES (?, ?)");
-    $stmt->bind_param("ss", $adminUser, $adminPass);
-    $stmt->execute();
-    $stmt->close();
+    createDbConfigFile($dbHost, $dbName, $dbUser, $dbPass);
 
     $conn->close();
 }
@@ -225,11 +228,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="text" id="dbUser" name="dbUser" required><br>
                 <label for="dbPass">Database Password:</label>
                 <input type="password" id="dbPass" name="dbPass" required><br>
-                <h2>Administrator Account</h2>
-                <label for="adminUser">Admin Username:</label>
-                <input type="text" id="adminUser" name="adminUser" required><br>
-                <label for="adminPass">Admin Password:</label>
-                <input type="password" id="adminPass" name="adminPass" required><br>
                 <button type="button" onclick="testDatabaseConnection()">Next</button>
             </form>
         </div>
