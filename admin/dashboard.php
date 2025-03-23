@@ -135,5 +135,5 @@ $settings = mysqli_fetch_assoc($result_settings);
     <?php include('footer.php'); ?>
 </div>
 <!-- Add necessary JavaScript files -->
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="style.css">
 <script src="../js/dashboard.js"></script>
