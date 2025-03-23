@@ -188,7 +188,7 @@ $databases = getDatabases($defaultHost, 'root', '');
 
         <div id="step2" class="hidden">
             <h2>Database Configuration</h2>
-            <form id="dbForm">
+            <form id="dbForm" method="POST" action="">
                 <label for="dbHost">Database Host:</label>
                 <input type="text" id="dbHost" name="dbHost" value="<?php echo $defaultHost; ?>" required><br>
                 <label for="dbName">Database Name:</label>
@@ -213,12 +213,12 @@ $databases = getDatabases($defaultHost, 'root', '');
         <div id="step3" class="hidden">
             <h2>Ready to Install</h2>
             <form method="POST" action="">
-                <input type="hidden" name="dbHost" value="<?php echo $_POST['dbHost']; ?>">
-                <input type="hidden" name="dbName" value="<?php echo $_POST['dbName']; ?>">
-                <input type="hidden" name="dbUser" value="<?php echo $_POST['dbUser']; ?>">
-                <input type="hidden" name="dbPass" value="<?php echo $_POST['dbPass']; ?>">
-                <input type="hidden" name="adminUser" value="<?php echo $_POST['adminUser']; ?>">
-                <input type="hidden" name="adminPass" value="<?php echo $_POST['adminPass']; ?>">
+                <input type="hidden" name="dbHost" value="<?php echo isset($_POST['dbHost']) ? $_POST['dbHost'] : ''; ?>">
+                <input type="hidden" name="dbName" value="<?php echo isset($_POST['dbName']) ? $_POST['dbName'] : ''; ?>">
+                <input type="hidden" name="dbUser" value="<?php echo isset($_POST['dbUser']) ? $_POST['dbUser'] : ''; ?>">
+                <input type="hidden" name="dbPass" value="<?php echo isset($_POST['dbPass']) ? $_POST['dbPass'] : ''; ?>">
+                <input type="hidden" name="adminUser" value="<?php echo isset($_POST['adminUser']) ? $_POST['adminUser'] : ''; ?>">
+                <input type="hidden" name="adminPass" value="<?php echo isset($_POST['adminPass']) ? $_POST['adminPass'] : ''; ?>">
                 <button class="button" type="submit">Install</button>
             </form>
         </div>
