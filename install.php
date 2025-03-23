@@ -9,6 +9,55 @@
  * Email: gizawadugna@gmail.com
  * Phone: +251925582067
  */
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $dbHost = $_POST['dbHost'];
+    $dbName = $_POST['dbName'];
+    $dbUser = $_POST['dbUser'];
+    $dbPass = $_POST['dbPass'];
+    $adminUser = $_POST['adminUser'];
+    $adminPass = $_POST['adminPass'];
+
+    $conn = new mysqli($dbHost, $dbUser, $dbPass);
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $sql = "CREATE DATABASE IF NOT EXISTS $dbName";
+    if ($conn->query($sql) === TRUE) {
+        $conn->select_db($dbName);
+
+        $adminPassHash = password_hash($adminPass, PASSWORD_BCRYPT);
+        $sql = "CREATE TABLE IF NOT EXISTS admin (
+            id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(30) NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            reg_date TIMESTAMP
+        )";
+
+        if ($conn->query($sql) === TRUE) {
+            $sql = "INSERT INTO admin (username, password) VALUES ('$adminUser', '$adminPassHash')";
+            if ($conn->query($sql) === TRUE) {
+                // Delete install folder
+                array_map('unlink', glob(__DIR__ . "/*"));
+                rmdir(__DIR__);
+
+                // Redirect to admin login page
+                header("Location: /admin/login.php");
+                exit();
+            } else {
+                echo "Error creating admin account: " . $conn->error;
+            }
+        } else {
+            echo "Error creating table: " . $conn->error;
+        }
+    } else {
+        echo "Error creating database: " . $conn->error;
+    }
+
+    $conn->close();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -142,7 +191,15 @@
 
         <div id="step3" class="hidden">
             <h2>Ready to Install</h2>
-            <button class="button" onclick="document.getElementById('dbForm').submit()">Install</button>
+            <form method="POST" action="">
+                <input type="hidden" name="dbHost" value="<?php echo $_POST['dbHost']; ?>">
+                <input type="hidden" name="dbName" value="<?php echo $_POST['dbName']; ?>">
+                <input type="hidden" name="dbUser" value="<?php echo $_POST['dbUser']; ?>">
+                <input type="hidden" name="dbPass" value="<?php echo $_POST['dbPass']; ?>">
+                <input type="hidden" name="adminUser" value="<?php echo $_POST['adminUser']; ?>">
+                <input type="hidden" name="adminPass" value="<?php echo $_POST['adminPass']; ?>">
+                <button class="button" type="submit">Install</button>
+            </form>
         </div>
     </div>
 
