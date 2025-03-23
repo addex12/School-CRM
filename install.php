@@ -50,13 +50,6 @@ function createDatabaseTables($conn) {
         FOREIGN KEY (class_id) REFERENCES classes(id)
     );
 
-    CREATE TABLE IF NOT EXISTS admin (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50) NOT NULL,
-        password VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
     CREATE TABLE IF NOT EXISTS admins (
         id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(30) NOT NULL UNIQUE,
@@ -91,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     createDatabaseTables($conn);
 
-    $stmt = $conn->prepare("INSERT INTO admin (username, password) VALUES (?, ?)");
+    $stmt = $conn->prepare("INSERT INTO admins (username, password) VALUES (?, ?)");
     $stmt->bind_param("ss", $adminUser, $adminPass);
     $stmt->execute();
     $stmt->close();
@@ -145,6 +138,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background-color: #4cae4c;
         }
         .hidden { display: none; }
+        .progress-bar {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .progress-bar-inner {
+            height: 20px;
+            width: 0;
+            background-color: #5cb85c;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            border-radius: 5px;
+        }
     </style>
     <script>
         function showStep(step) {
@@ -169,6 +178,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             };
             xhr.send(formData);
+        }
+
+        function updateProgressBar(progress) {
+            var progressBar = document.getElementById('progressBarInner');
+            progressBar.style.width = progress + '%';
+            progressBar.innerText = progress + '%';
+        }
+
+        function startInstallation() {
+            showStep('step3');
+            updateProgressBar(0);
+
+            setTimeout(function() { updateProgressBar(25); }, 1000);
+            setTimeout(function() { updateProgressBar(50); }, 2000);
+            setTimeout(function() { updateProgressBar(75); }, 3000);
+            setTimeout(function() { 
+                updateProgressBar(100); 
+                document.getElementById('dbForm').submit();
+            }, 4000);
         }
     </script>
 </head>
@@ -210,7 +238,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div id="step3" class="hidden">
             <h2>Ready to Install</h2>
-            <button onclick="document.getElementById('dbForm').submit()">Install</button>
+            <div class="progress-bar">
+                <div id="progressBarInner" class="progress-bar-inner">0%</</div>
+            </div>
+            <button onclick="startInstallation()">Install</button>
         </div>
     </div>
 </body>
