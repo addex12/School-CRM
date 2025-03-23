@@ -1,26 +1,70 @@
-<!-- filepath: /home/orbalia/School-CRM/admin/header.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/path/to/your/css/style.css">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 10px 20px;
+            color: white;
+        }
+        .header-container h1 {
+            margin: 0;
+        }
+        .header-container nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .header-container nav ul li {
+            margin-left: 20px;
+        }
+        .header-container nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .header-container nav ul li a:hover {
+            text-decoration: underline;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+    </style>
     <title>Admin Dashboard</title>
 </head>
 <body>
 <header>
     <div class="header-container">
-        <h1>Admin Dashboard</h1>
+        <div class="logo">
+            <img src="/path/to/your/logo.png" alt="Logo">
+            <h1>Admin Dashboard</h1>
+        </div>
         <nav>
             <ul>
-                <li><a href="/admin/dashboard">Dashboard</a></li>
-                <li><a href="/admin/users">Users</a></li>
-                <li><a href="/admin/settings">Settings</a></li>
-                <li><a href="/admin/logout">Logout</a></li>
-                <li><a href="users.php" class="nav-link">Manage Users</a></li>
-                <li><a href="surveys.php" class="nav-link">Manage Surveys</a></li>
-                <li><a href="communications.php" class="nav-link">Communications Setup</a></li>
-                <li><a href="settings.php" class="nav-link">Settings</a></li>
+                <li><a href="/admin/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="/admin/users"><i class="fas fa-users"></i> Users</a></li>
+                <li><a href="/admin/settings"><i class="fas fa-cogs"></i> Settings</a></li>
+                <li><a href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="users.php" class="nav-link"><i class="fas fa-user-cog"></i> Manage Users</a></li>
+                <li><a href="surveys.php" class="nav-link"><i class="fas fa-poll"></i> Manage Surveys</a></li>
+                <li><a href="communications.php" class="nav-link"><i class="fas fa-envelope"></i> Communications Setup</a></li>
+                <li><a href="settings.php" class="nav-link"><i class="fas fa-tools"></i> Settings</a></li>
                 <!-- Add other navigation links as necessary -->
             </ul>
         </nav>
