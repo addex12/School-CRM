@@ -20,4 +20,6 @@ include('../includes/header.php');
         <!-- Add other navigation links as necessary -->
     </ul>
 </nav>
+<!-- Add necessary JavaScript files -->
+<script src="../js/dashboard.js"></script>
 <?php include('../includes/footer.php'); ?>
