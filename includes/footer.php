@@ -7,8 +7,9 @@
  * Twitter: https://twitter.com/eleganceict1
 -->
 
+</div> <!-- End of container -->
 <footer>
-    <p>&copy; 2023 School-CRM. All rights reserved.</p>
+    <p>&copy; <?php echo date("Y"); ?> School CRM. All rights reserved.</p>
 </footer>
 <!-- Add necessary JS files -->
 </body>
