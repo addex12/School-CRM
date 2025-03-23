@@ -8,9 +8,12 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
         .header-container {
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             background-color: #333;
@@ -19,12 +22,14 @@
         }
         .header-container h1 {
             margin: 0;
+            font-size: 1.5em;
         }
         .header-container nav ul {
             list-style: none;
             margin: 0;
             padding: 0;
             display: flex;
+            flex-wrap: wrap;
         }
         .header-container nav ul li {
             margin-left: 20px;
@@ -44,6 +49,23 @@
         .logo img {
             height: 40px;
             margin-right: 10px;
+        }
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-container nav ul {
+                flex-direction: column;
+                width: 100%;
+            }
+            .header-container nav ul li {
+                margin-left: 0;
+                margin-bottom: 10px;
+            }
+            .header-container nav ul li a {
+                font-size: 18px;
+            }
         }
     </style>
     <title>Admin Dashboard</title>
