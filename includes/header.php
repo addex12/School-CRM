@@ -16,16 +16,18 @@
 </head>
 <body>
 <header>
-    <h1>School CRM</h1>
-    <nav>
-        <ul>
-            <li><a href="../admin/dashboard.php">Dashboard</a></li>
-            <li><a href="../admin/users.php">Users</a></li>
-            <li><a href="../admin/surveys.php">Surveys</a></li>
-            <li><a href="../admin/communications.php">Communications</a></li>
-            <li><a href="../admin/settings.php">Settings</a></li>
-        </ul>
-    </nav>
+    <div class="header-container">
+        <h1>School CRM</h1>
+        <nav>
+            <ul>
+                <li><a href="../admin/dashboard.php">Dashboard</a></li>
+                <li><a href="../admin/users.php">Users</a></li>
+                <li><a href="../admin/surveys.php">Surveys</a></li>
+                <li><a href="../admin/communications.php">Communications</a></li>
+                <li><a href="../admin/settings.php">Settings</a></li>
+            </ul>
+        </nav>
+    </div>
 </header>
 <div class="container">
 </body>

@@ -21,17 +21,43 @@ header {
     background-color: #333;
     color: #fff;
     padding: 10px 0;
-    text-align: center;
     position: fixed;
     top: 0;
     width: 100%;
     z-index: 1000;
 }
 
-header a {
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+header nav ul li {
+    margin-left: 20px;
+}
+
+header nav ul li a {
     color: #fff;
     text-decoration: none;
-    margin: 0 15px;
+}
+
+header nav ul li a:hover {
+    text-decoration: underline;
 }
 
 /* Navigation Styles */
@@ -65,10 +91,33 @@ footer {
     width: 100%;
 }
 
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    header nav ul {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    header nav ul li {
+        margin: 10px 0;
+    }
+}
+
 /* Dashboard Styles */
 .dashboard-container {
     width: 80%;
-    margin: 80px auto 60px auto; /* Adjusted for fixed header and footer */
+    margin: 100px auto 60px auto; /* Adjusted for fixed header and footer */
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;

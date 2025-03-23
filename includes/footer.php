@@ -9,7 +9,9 @@
 
 </div> <!-- End of container -->
 <footer>
-    <p>&copy; <?php echo date("Y"); ?> School CRM. All rights reserved.</p>
+    <div class="footer-container">
+        <p>&copy; <?php echo date("Y"); ?> School CRM. All rights reserved.</p>
+    </div>
 </footer>
 <!-- Add necessary JS files -->
 </body>
