@@ -14,15 +14,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Database connection
-$host = 'localhost';
-$user = 'flipperschool_crm';
-$pass = 'A25582067s_';
-$dbname = 'flipperschool_school_crm';
-
-$conn = new mysqli($host, $user, $pass, $dbname);
-if ($conn->connect_error) {
-    die('Database connection failed: ' . $conn->connect_error . ' (' . $conn->connect_errno . ')');
-}
+require_once __DIR__ . '/../config/db.php';
 
 // Get user ID from the query string
 $user_id = isset($_GET['id']) ? $_GET['id'] : 0;
@@ -41,7 +33,7 @@ if (!$user) {
 }
 
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_username = $_POST['username'];
     $new_role = $_POST['role'];
     $new_email = $_POST['email'];

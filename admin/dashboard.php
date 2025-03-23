@@ -30,8 +30,6 @@ include 'header.php';
 ?>
 
     <h1>Admin Dashboard</h1>
-    <!-- Removed navigation menu from here -->
-
     <section id="user-management">
         <h2>User Management</h2>
         <table border="1">

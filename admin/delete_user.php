@@ -7,11 +7,7 @@ if (!isset($_SESSION['admin_logged_in'])) {
     exit();
 }
 
-// Replace with your actual DB connection...
-$conn = new mysqli("localhost", "username", "password", "SchoolCRM_DB");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+require_once __DIR__ . '/../config/db.php';
 
 $user_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
