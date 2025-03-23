@@ -9,11 +9,11 @@
 -- Table: parents
 CREATE TABLE parents (
     parent_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    first_name VARCHAR(255),
-    last_name VARCHAR(255),
+    email VARCHAR(255) NOT NULL UNIQUE,
+    first_name VARCHAR(255) NULL,
+    last_name VARCHAR(255) NULL,
     phone VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

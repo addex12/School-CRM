@@ -1,12 +1,10 @@
 <?php
-/**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * Phone: +251925582067
- */
+// Author: Adugna Gizaw
+// Email: gizawadugna@gmail.com
+// Phone: +251925582067
 ?>
     <footer>
-        <p>&copy; <?php echo date("Y"); ?> Flipper International School</p>
+        <p>&copy; 2023 School-CRM. All rights reserved.</p>
     </footer>
 </body>
 </html>
