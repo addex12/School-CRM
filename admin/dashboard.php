@@ -7,7 +7,9 @@
  * LinkedIn: https://www.linkedin.com/in/eleganceict
  * Twitter: https://twitter.com/eleganceict1
  */
-include('../includes/header.php'); ?>
+include('../includes/header.php'); 
+?>
+<link rel="stylesheet" type="text/css" href="../style.css">
 <h1>Admin Dashboard</h1>
 <nav>
     <ul>
