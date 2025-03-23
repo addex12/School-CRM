@@ -3,20 +3,69 @@
  * Email: gizawadugna@gmail.com
  * Phone: +251925582067
  */
-/* Basic styling */
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #444;
+}
+
+/* Header Styles */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+header a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+/* Navigation Styles */
+nav ul {
+    list-style: none;
     padding: 0;
 }
 
+nav ul li {
+    display: inline;
+    margin-right: 10px;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+/* Additional Styles */
 .container {
-    width: 50%;
-    margin: 50px auto;
-    background: #fff;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
 h1, h2 {
@@ -37,16 +86,15 @@ input[type="text"], input[type="password"] {
 }
 
 button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
     border: none;
-    border-radius: 4px;
+    padding: 10px 20px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #555;
 }
 
 .hidden {
