@@ -7,6 +7,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Include database connection
     require_once '../config/db.php';
 
+    // Check if the connection was successful
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
     $username = $conn->real_escape_string($_POST['username']);
     $password = $conn->real_escape_string($_POST['password']);
 
