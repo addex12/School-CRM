@@ -21,30 +21,6 @@ include('header.php');
             <!-- Add other navigation links as necessary -->
         </ul>
     </nav>
-    <style>
-        .dashboard-nav {
-            background-color: #2c3e50;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .dashboard-nav ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .dashboard-nav ul li {
-            display: inline;
-            margin-right: 15px;
-        }
-        .dashboard-nav .nav-link {
-            color: #ecf0f1;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .dashboard-nav .nav-link:hover {
-            color: #3498db;
-        }
-    </style>
-    </nav>
     <div class="dashboard-content">
         <!-- Dashboard Widgets -->
         <div class="widget">
@@ -86,5 +62,6 @@ include('header.php');
     </div>
 </div>
 <!-- Add necessary JavaScript files -->
+<link rel="stylesheet" href="../style.css">
 <script src="../js/dashboard.js"></script>
 <?php include('footer.php'); ?>
