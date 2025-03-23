@@ -17,3 +17,8 @@
         <li><a href="#reports">Reports</a></li>
     </ul>
 </nav>
+
+<!-- Add closing tags for body and html -->
+</body>
+</html>
+
