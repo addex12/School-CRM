@@ -17,6 +17,11 @@
                 <li><a href="/admin/users">Users</a></li>
                 <li><a href="/admin/settings">Settings</a></li>
                 <li><a href="/admin/logout">Logout</a></li>
+                <li><a href="users.php" class="nav-link">Manage Users</a></li>
+                <li><a href="surveys.php" class="nav-link">Manage Surveys</a></li>
+                <li><a href="communications.php" class="nav-link">Communications Setup</a></li>
+                <li><a href="settings.php" class="nav-link">Settings</a></li>
+                <!-- Add other navigation links as necessary -->
             </ul>
         </nav>
     </div>

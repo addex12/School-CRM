@@ -9,18 +9,10 @@
  */
 ?>
 <div class="container">
-<?php include('header.php'); ?>
-    
 <div class="dashboard-container">
         <h1>Admin Dashboard</h1>
         <nav class="dashboard-nav">
-            <ul>
-                <li><a href="users.php" class="nav-link">Manage Users</a></li>
-                <li><a href="surveys.php" class="nav-link">Manage Surveys</a></li>
-                <li><a href="communications.php" class="nav-link">Communications Setup</a></li>
-                <li><a href="settings.php" class="nav-link">Settings</a></li>
-                <!-- Add other navigation links as necessary -->
-            </ul>
+        <?php include('header.php'); ?>    
         </nav>
         <div class="dashboard-content">
             <!-- Dashboard Widgets -->
