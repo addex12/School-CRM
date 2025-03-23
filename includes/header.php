@@ -6,8 +6,9 @@ Phone: +251925582067 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School-CRM</title>
+    <title>School CRM</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Add necessary CSS and JS files -->
 </head>
 <body>
     <header>

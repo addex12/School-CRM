@@ -5,5 +5,6 @@ Phone: +251925582067 -->
 <footer>
     <p>&copy; 2023 School-CRM. All rights reserved.</p>
 </footer>
+<!-- Add necessary JS files -->
 </body>
 </html>
