@@ -138,5 +138,26 @@ if (!$conn->query("INSERT INTO users (username, password, role) VALUES ('$admin_
     die('Admin user creation failed: ' . $conn->error);
 }
 
+// Create config/db.php file
+$config_content = <<<PHP
+<?php
+return [
+    'host' => '$host',
+    'user' => '$user',
+    'pass' => '$pass',
+    'dbname' => '$dbname'
+];
+PHP;
+
+$config_dir = __DIR__ . '/../config';
+if (!is_dir($config_dir)) {
+    mkdir($config_dir, 0755, true);
+}
+
+file_put_contents($config_dir . '/db.php', $config_content);
+
+// Delete the install.php file
+unlink(__FILE__);
+
 echo 'Installation completed successfully.';
 ?>
