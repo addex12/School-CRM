@@ -1,0 +1,14 @@
+{#
+/**
+ * Question error tips. For now, called from em_manager_helper::_ValidateQuestion and used for real error (db issue for example)
+ * @var $qid
+ * @var coreId : need to be the id of the tag (part of the API)
+ * @var coreClass : need to be in class (part of the API)
+ * @var $vclass
+ * @var $vtip
+ */
+#}
+<div id='{{ coreId }}' class='ls-question-message text-danger {{ coreClass }}'>
+    <span class='fa fa-exclamation-circle ri-error-warning-fill' aria-hidden="true"></span>
+    {{ vtip }}
+</div>

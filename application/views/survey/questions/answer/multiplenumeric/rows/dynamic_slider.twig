@@ -1,0 +1,42 @@
+{# /**
+ * Multiple numeric : dynamic row (remaining + total)
+ * @var $id
+ * @var $sumRemainingEqn
+ * @var $sumEqn
+ * @var $sLabelWidth
+ * @var $sInputContainerWidth
+ * @var $prefix
+ * @var $suffix
+ */ #}
+
+{% if sumRemainingEqn %}
+    <li class="row mb-3 ls-group-remaining">
+        <div class="col-12 col-md-{{ sInputContainerWidth }} offset-md-{{ sLabelWidth }} px-md-5">
+            {{ gT('Remaining') }}:
+            {% if prefix %}
+                <span class="prefix-text prefix"><!-- Suffix prefix are not shown inline, but only in the slider: completely different concept : set hidden -->
+                    {{ processString(prefix) }}
+                </span>
+            {% endif %}
+            <span id="remainingvalue_{{ id }}" class="form-control-static numeric dynamic-remaining" data-number="1"><!-- alternative class : form-control : display like an input:text -->
+                {{ sumRemainingEqn }}
+            </span>
+            {% if suffix %}
+                <span class="suffix-text suffix">
+                   {{ processString(suffix) }}
+                </span>
+            {% endif %}
+        </div>
+    </li>
+{% endif %}
+
+{% if sumEqn %}
+    <li class="row mb-3 ls-group-total">
+        <div class="col-12 col-md-{{ sInputContainerWidth }} offset-md-{{ sLabelWidth }} px-md-5">
+            {{ gT('Total:') }}
+            <span id="totalvalue_{{ id }}" class="form-control-static numeric dynamic-total" data-number="1">
+                {{ sumEqn }}
+            </span>
+        </div>
+    </li>
+{% endif %}

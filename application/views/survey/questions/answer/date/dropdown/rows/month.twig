@@ -1,0 +1,26 @@
+{#
+/**
+ * Month dropdown Html
+ * @var $monthId
+ * @var $currentmonth
+ * @var $montharray
+ */
+#}
+
+<!-- month -->
+<div class="col-12">
+    <label for="month{{ monthId }}" class="visually-hidden control-label">
+        {{ gT('Month') }}
+    </label>
+    <select id="month{{ monthId }}" name="month{{ monthId }}" class="month form-select">
+        <option value="">
+            {{ gT('Month') }}
+        </option>
+        {% for i in 1..12 %}
+            <option value="{{ sprintf('%02d', i) }}"{% if i == intval(currentmonth) %} selected{% endif %}>
+                {{ montharray[(i-1)] }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+<!-- end of month -->

@@ -1,66 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
+<div id="top"></div>
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<img src="https://www.limesurvey.org/images/limesurvey/svg/logo_limesurvey_head.svg" width="400" alt='LimeSurvey Logo' />
 </p>
 
-## About Laravel
+# LimeSurvey: The world’s #1 open-source survey platform 
+It's what we love and do best since 2006...
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+🌐 [Website](https://www.limesurvey.org) · 🔮 [Demo](https://demo.limesurvey.org/admin) · 📚 [Documentation](https://www.limesurvey.org/manual) · ⚙️ [Request a feature](https://bugs.limesurvey.org) · 🐛 [Report a bug](https://bugs.limesurvey.org) · 🗨️ [Forums](https://forums.limesurvey.org) · 🗨️ [Discord](https://discord.gg/DEjguXn)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+[LimeSurvey](https://www.limesurvey.org) is a free and open-source online survey platfrom used by businesses of all sizes, professionals, academic institutions, teachers, students, governments, financial institutes, and [Anja](https://www.linkedin.com/in/anja-meinders-ba3b29213/) from HR (who is hiring and looking for a **DevOps** and **Technical Support Engineer/Developer**  – [drop her a Lime…](https://www.linkedin.com/in/anja-meinders-ba3b29213/)) in 80+ countries worldwide. It offers features like conditional logic, question branching, customizable templates, multilingual support, and GDPR compliance.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🌟 Why LimeSurvey?
 
-## Learning Laravel
+LimeSurvey is perfect for you if you are...
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- 📊 Gathering feedback from customers, employees, or stakeholders
+- 🎓 Conducting academic research or field studies
+- 🌍 Running multilingual surveys for global audiences
+- 🔐 Prioritizing privacy and GDPR compliance in data collection
+- 🛠 Needing customizable, flexible survey platform for various projects
+- 🚀 Scaling surveys for startups, mid-sized businesses, or large organizations
+- 🎯 Looking for an open-source solution with no vendor lock-in
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🚀 Features
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- ✅ **Unlimited surveys**
+- ✅ **Unlimited questions**
+- ✅ **30+ question types**
+- ✅ **900+ survey templates**
+- ✅ **Easy LimeSurvey editor**
+- ✅ **On-brand surveys** (fonts, colors, logo, CSS, JavaScript)
+- ✅ **Multilingual surveys** (80+ languages)
+- ✅ **Skip logic and question branching**
+- ✅ **Easy survey sharing** (via public link, QR code, socials)
+- ✅ **Closed access mode** (via personal link, invite-only)
+- ✅ **Responses & statistics**
+- ✅ **Advanced data analysis tools**
+- ✅ **RemoteControl API** (via XML-RPC / JSON-RPC)
+- ✅ **Google Analytics**
+- ✅ **Data security & anonymization**
+- ✅ **Two-factor** authentication
+- ✅ **GDPR compliance** and strong data security
+- ✅ **WCAG 2.0 compliance** 🌐💚
+- ✅ **Plugins** (questions themes, survey themes, audit log, ExportR, ExportSTATAxml, AuthCAS ...)
+- ✅ **Integrations** (SAML, LDAP, SURFconext, Remote Control, REST API ...)
+- ✅ **And much more ...**
 
-## Laravel Sponsors
+##  Installation
+⬇️ **Stable Release**: We recommend downloading the [latest stable version](https://community.limesurvey.org/downloads/) for optimal reliability and performance.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+⚠️ **Repository**:  You can also access the development repository. Be aware that it may contain versions that are not fully tested.
 
-### Premium Partners
+## Requirements
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Minimal
+- Apache ≥ 2.4, nginx ≥ 1.1, or any PHP-ready web server
+- PHP ≥ 7.4 with mbstring and PDO drivers
+- MySQL ≥ 8.0, PostgreSQL ≥ 12, MariaDB ≥ 10.3.38, or MSSQL ≥ 2016
 
-## Contributing
+### Recommended
+- Latest nginx version
+- Latest PHP version with php-fpm, mbstring, gd2, imap, ldap, zip, zlib, and database drivers
+- Latest MariaDB or MySQL version
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## ☁️ You don’t want to host yourself? Let us do it for you!
+Skip the technical setup and focus on creating and analyzing surveys. With our hosted SaaS, you get a fast, easy-to-use online survey platform that ensures security and complies with privacy regulations like GDPR. We take care of all the hosting and maintenance, so you don’t have to worry about it and can scale away: 
+👉 [Create free online survey](https://www.limesurvey.org/)!
 
-## Code of Conduct
+## ❤️ Join the community
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- ⭐ Show your support and star this repo now
+- 💬 Join the discussion in our [forums](https://forums.limesurvey.org)
+- 🐛 Submit [bugs](https://bugs.limesurvey.org) and [feature requests](https://bugs.limesurvey.org)
+- 🔗 Follow us on [LinkedIn](https://www.linkedin.com/company/limesurvey)
+- 💬 Join our [Discord](https://discord.gg/DEjguXn)
+- 🦸 Make [contributions](https://www.limesurvey.org/manual/How_to_join_the_LimeSurvey_project_team) or [join the LimeSurvey project team](https://www.limesurvey.org/manual/How_to_join_the_LimeSurvey_project_team)
 
-## Security Vulnerabilities
+## All Thanks to our contributors
+<a href="https://github.com/limesurvey/limesurvey/graphs/contributors">
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
+<img src="https://contrib.rocks/image?repo=limesurvey/limesurvey&max=1000" />
+  
 ## License
+LimeSurvey is licensed under [GPL v2.0, with the option to use any later GPL version](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html). Pictures and the LimeSurvey Logo are registered trademarks of LimeSurvey GmbH, based in Hamburg, Germany.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<p align="right"><a href="#top">🔼 Back to top</a></p>

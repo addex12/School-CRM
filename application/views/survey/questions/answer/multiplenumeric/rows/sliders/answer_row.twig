@@ -1,0 +1,83 @@
+{#
+/**
+ * Multiple short texts question, item input text Html
+ * @var $tip
+ * @var $alert
+ * @var $maxlength
+ * @var $tiwidth
+ * @var $extraclass
+ * @var $sDisplayStyle
+ * @var $prefix
+ * @var $myfname
+ * @var $labelText
+ * @var $prefix
+ * @var $kpclass
+ * @var $rows
+ * @var $checkconditionFunction
+ * @var $dispVal
+ * @var $suffix
+ * @var $sUnformatedValue
+ * @var $slider_min
+ * @var $slider_max
+ * @var $slider_step
+ * @var $slider_default
+ * @var $slider_orientation
+ * @var $slider_handle
+ * @var $slider_reset
+ * @var $slider_reversed
+ * @var $sSeparator
+ */
+#}
+
+<li id='javatbd{{ myfname }}' class="row question-item answer-item numeric-item text-item slider-item {{ extraclass }}{% if alert %} ls-error-mandatory has-error {% endif %}">
+    <div class="col-12">
+        <div class="row ls-slider-item-row">
+            <label id="label-{{ myfname }}" class='control-label col-12 col-md-{{ sLabelWidth }}{% if sLabelWidth == 0 %} d-none{% endif %}' for="answer{{ myfname }}">
+                {{ processString(labelText) }}
+            </label>
+            <div class='col-md-{{ sInputContainerWidth }} px-md-5'>
+                {% if slider_orientation is same as('horizontal') %}
+                    {% include '/survey/questions/answer/multiplenumeric/rows/sliders/horizontal_slider.twig' %}
+                {% endif %}
+                {% if slider_orientation is same as('vertical') %}
+                    {% include '/survey/questions/answer/multiplenumeric/rows/sliders/vertical_slider.twig' %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</li>
+
+{% set script %}
+    window.activeSliders = window.activeSliders || {};
+    if(window.activeSliders.s{{ myfname }}){
+    window.activeSliders.s{{ myfname }}.unsetSlider();
+    delete window.activeSliders.s{{ myfname }};
+    }
+    window.activeSliders.s{{ myfname }} = new LSSlider({
+    'qid': "{{ qid }}",
+    'element': "{{ myfname }}slid",
+    'rootElement': "{{ myfname }}",
+    'labelElement': "label-{{ myfname }}",
+    'value' : '{{ slider_value }}',
+    'min' : {{ slider_min }},
+    'max' : {{ slider_max }},
+    'step' : {{ slider_step }},
+    'orientation' : "{{ slider_orientation }}",
+    'handle' : "{{ slider_handle }}",
+    'tooltip' : 'always',
+    'reset' : "{{ slider_reset }}",
+    'prefix' : "{{ processString(prefix,1) }}",
+    'suffix' : "{{ processString(suffix,1) }}",
+    'separator' : "{{ sSeparator }}",
+    'number' : true,
+    'integer' : {{ integeronly }},
+    'position' : parseFloat({{ slider_position }}),
+    'custom_handle' : "{{ slider_custom_handle }}",
+    'setPosition' : "{{ slider_default_set }}",
+    'reversed' : {{ slider_reversed }},
+    });
+    window.activeSliders.s{{ myfname }}.init();
+{% endset %}
+{{ registerScript( 'SliderQuestion'~myfname, script, 'POS_POSTSCRIPT') }}
+
+<!-- end of answer_row -->

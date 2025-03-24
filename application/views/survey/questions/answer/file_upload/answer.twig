@@ -1,0 +1,149 @@
+{#<?php
+/**
+ * File upload question Html
+ * @var $fileid
+ * @var $value
+ * @var $filecountvalue
+ */
+?>#}
+
+<!-- File Upload  -->
+
+<!--answer -->
+<div class="{{ coreClass }}">
+    <div class='upload-button'>
+        <a role="button"
+           id='upload_{{ fileid }}'
+           class='btn btn-primary upload'
+           href='{{ uploadurl }}'
+           data-bs-toggle="modal"
+           data-bs-target="#file-upload-modal-{{ fileid }}"
+           data-showtitle="{{ showTitle }}"
+           data-showcomment="{{ showComment }}"
+           data-fieldname="{{ basename }}"
+        >
+            <span class='fa fa-upload ri-upload-fill'></span>
+            &nbsp;
+            {{ uploadButtonLabel }}
+        </a>
+    </div>
+    <input type='hidden' id='java{{ fileid }}' name='{{ fileid }}' value='{{ value|escape("html_attr") }}' />
+    <input type='hidden' id='java{{ fileid }}_filecount' name='{{ fileid }}_filecount' value="{{ filecountvalue }}" />
+    <div id='{{ fileid }}_uploadedfiles' class="d-none">
+        <table width="100%" class="question uploadedfiles">
+            <thead>
+                <tr>
+                    <th width="20%">&nbsp;</th>
+                    {% if showTitle %}
+                        <th>{{ "Title" | gT }}</th>
+                    {% endif %}
+                    {% if showComment %}
+                        <th>{{ "Comment" | gT }}</th>
+                    {% endif %}
+                    <th>{{ "File name" | gT }}</th>
+                    <th class="edit"></th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- modal -->
+<div id="file-upload-modal-{{fileid}}" class="modal fade file-upload-modal" role="dialog">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header file-upload-modal-header">
+                <h5 class="modal-title"> {{ ngT("Upload file|Upload files", maxFiles) }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body file-upload-modal-body">
+                <div id="uploader{{fileid}}" name="uploader{{fileid}}" class="uploader-frame" data-src="{{uploadurl}}" title="{{gT("Upload")}}"></div>
+            </div>
+            <div class="modal-footer file-upload-modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    {{ gT("Save changes") }}
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+    
+
+<!-- end of answer -->
+
+<script type='text/javascript'>
+    var surveyid = '{{surveyId}}',
+        uploadLang = {
+             title: '{{ "Upload your files" | gT }}',
+             returnTxt: '{{ "Return to survey" | gT }}',
+             headTitle: '{{ "Title" | gT }}',
+             headComment: '{{ "Comment" | gT }}',
+             headFileName: '{{ "File name" | gT }}',
+             deleteFile : '{{ "Delete" | gT }}',
+             editFile : '{{ "Edit" | gT }}',
+        },
+        imageurl =  '{{imageurl}}',
+        uploadurl =  '{{scriptloc}}';
+        
+    window.uploadQuestionController_{{ fileid }} = new UploadQuestionController('{{ fileid }}');
+    window.uploadQuestionController_{{ fileid }}.prepareOpenUploadModalDialog();
+    
+    $(document).on("ready pjax:scriptcomplete", function(){
+        var fieldname = "{{fileid}}",
+            filecount = $("#"+fieldname+"_filecount").val(),
+            showTitle = "{{showTitle}}",
+            showComment = "{{showComment}}";
+        window.uploadQuestionController_{{ fileid }}.displayUploadedFiles( filecount, fieldname, showTitle, showComment);
+    });
+
+    $(".basic_{{fileid}}").change(function() {
+        var i = 1,
+            filecount = 0,
+            jsonArray = [];
+
+        for (; i <= LEMval("{{maxFiles}}"); i++) {
+            //Break if the file input is empty
+            if ($("#{{fileid}}_"+i).val() == "") { continue; }
+
+            filecount++;
+
+            var fileObject = {
+                title : {{showTitle ? '$("#{{fileid}}_title_"+i).val()' : '""' }},
+                comment: {{showComment ? '$("#{{fileid}}_comment_"+i).val()' : '""'}},
+                size: '',
+                name: '',
+                ext: ''
+            };
+
+            jsonArray.push(fileObject);
+        }
+
+        $("#{{fileid}}").val(JSON.stringify(jsonArray));
+        $("#{{fileid}}_filecount").val(filecount);
+    });
+</script>
+
+<script type="text/x-template" id="filerowtemplate_{{fileid}}">
+    <tr>
+        <td class="upload {imageOrPlaceholder}">{imageOrPlaceholderHtml}</td>
+        {% if showTitle %}
+            <td class="upload title">{title}</td>
+        {% endif %}
+        {% if showComment %}
+            <td class="upload comment">{comment}</td>
+        {% endif %}
+        <td class="upload edit">{name}</td>
+        <td>
+            <a role="button" class="btn btn-primary trigger_edit_upload_{{fileid}}" data-file="{filepointer}">
+                <i class="fa fa-pencil ri-pencil-fill"></i>
+                &nbsp; 
+                {{ "Edit" | gT }}
+            </a>
+        </td>
+    </tr>
+</script>
