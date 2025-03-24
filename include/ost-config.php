@@ -42,9 +42,9 @@ define('ADMIN_EMAIL','admin@flipperschools.com');
 define('DBTYPE','mysql');
 #  DBHOST can have comma separated hosts (e.g db1:6033,db2:6033)
 define('DBHOST','localhost');
-define('DBNAME','flipperschool_support');
-define('DBUSER','flipperschool_support');
-define('DBPASS','-(5(CJnh-96S-pY0');
+define('DBNAME','flipperschool_crm');
+define('DBUSER','flipperschool_crm');
+define('DBPASS','A25582067s_');
 
 # Database TCP/IP Connect Timeout (default: 3 seconds)
 # Timeout is important when DBHOST has multiple proxies to try
