@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <?php
 // filepath: /home/orbalia/School-CRM/admin/edit_user.php
 session_start();
