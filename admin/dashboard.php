@@ -108,6 +108,31 @@ include 'header.php';
         <a href="view_parents.php">View Parents</a>
     </section>
 
+    <section id="parent-dashboard">
+        <h2>Parent Dashboard</h2>
+        <a href="parent_dashboard.php">View Parent Dashboard</a>
+    </section>
+
+    <section id="feedback-concerns">
+        <h2>Feedback and Concerns</h2>
+        <a href="view_feedback.php">View Feedback and Concerns</a>
+    </section>
+
+    <section id="messaging-system">
+        <h2>Messaging System</h2>
+        <a href="view_messages.php">View Messages</a>
+    </section>
+
+    <section id="push-notifications">
+        <h2>Push Notifications</h2>
+        <form method="post" action="send_notifications.php">
+            <label for="notification_message">Notification Message:</label>
+            <textarea id="notification_message" name="notification_message" required></textarea>
+            <br>
+            <button type="submit">Send Notification</button>
+        </form>
+    </section>
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll("#user-management table tr").forEach(row => {
