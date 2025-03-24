@@ -54,8 +54,10 @@ return array(
     ),
     // Use the following config variable to set modified optional settings copied from config-defaults.php
     'config'=>array(
-    // debug: Set this to 1 if you are looking for errors. If you still get no errors after enabling this
-    ) // Added closing parenthesis
+        // debug: Set this to 1 if you are looking for errors. If you still get no errors after enabling this
+        'debug'=>2, // Set debug to 2 to display all errors
+        'debugsql'=>1, // Set this to 1 to enable SQL logging, only active when debug = 2
+    )
 );
 /* End of file config.php */
 /* Location: ./application/config/config.php */
