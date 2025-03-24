@@ -138,8 +138,8 @@ if (is_dir($application_folder)) {
 
 include __DIR__ . '/setdebug.php';
 
-if (version_compare(PHP_VERSION, '5.3.3', '<')) {
-    die('This script can only be run on PHP version 5.3.3 or later! Your version: '.PHP_VERSION.'<br />');
+if (version_compare(PHP_VERSION, '7.4.0', '<')) {
+    die('This script can only be run on PHP version 7.4.0 or later! Your version: '.PHP_VERSION.'<br />');
 }
 require_once __DIR__ . '/vendor/autoload.php';
 

@@ -89,10 +89,29 @@ $internalConfig = array(
         'pageSizeOptionsTokens' => array(5 => 5, 10 => 10, 25 => 25, 50 => 50, 100 => 100, 250 => 250, 500 => 500, 1000 => 1000, 2500 => 2500, 5000 => 5000, 10000 => 10000), // Tokens needs different options
         'defaultEllipsizeHeaderValue' => 30, // Default max characters before ellipsizing the headers of responses grid
         'defaultEllipsizeQuestionValue' => 50, // Default max characters before ellipsizing the questions inside responses grid
-    )
-);
-
+    ),
     'import' => array(
+        'application.core.*',
+        'application.core.db.*',
+        'application.models.*',
+        'application.models.Interfaces.*',
+        'application.models.Traits.*',
+        'application.helpers.*',
+        'application.controllers.*',
+        'application.modules.*',
+        'yiistrap_fork.widgets.*',
+        'yiistrap_fork.helpers.*',
+        'yiistrap_fork.behaviors.*',
+        'yiistrap_fork.components.*',
+        'yiiwheels.widgets.select2.WhSelect2',
+        'vendor.Twig.*',
+        'vendor.sodium.*',
+        'ext.captchaExtended.CaptchaExtendedAction',
+        'ext.captchaExtended.CaptchaExtendedValidator',
+        'questiontypes.*'
+    ),
+    'preload' => array('log', 'ETwigViewRenderer'),
+    'components' => array(
         'application.core.*',
         'application.core.db.*',
         'application.models.*',
@@ -149,8 +168,8 @@ $internalConfig = array(
             'class' => 'application.core.LSYii_AssetManager'
         ),
         /* Leave default errorhandler : managed in LSYii_Application->onException */
-        'errorHandler' => [
-        ],
+        'errorHandler' => array(
+        ),
         'request' => array(
             'class' => 'LSHttpRequest',
             'enableCsrfValidation' => true, // CSRF protection
@@ -455,9 +474,9 @@ $internalConfig = array(
         'versionFetcherServiceLocator' => array(
             'class' => '\LimeSurvey\ExtensionInstaller\VersionFetcherServiceLocator',
         ),
-        'formExtensionService' => [
+        'formExtensionService' => array(
             'class' => '\LimeSurvey\Libraries\FormExtension\FormExtensionService',
-        ]
+        )
     )
 );
 
