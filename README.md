@@ -80,6 +80,11 @@ Skip the technical setup and focus on creating and analyzing surveys. With our h
 <a href="https://github.com/limesurvey/limesurvey/graphs/contributors">
 
 <img src="https://contrib.rocks/image?repo=limesurvey/limesurvey&max=1000" />
+
+## Developer Information
+- **Name**: Agugna Gizaw
+- **Email**: gizawadugna@gmail.com
+- **Phone**: +251925582067
   
 ## License
 LimeSurvey is licensed under [GPL v2.0, with the option to use any later GPL version](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html). Pictures and the LimeSurvey Logo are registered trademarks of LimeSurvey GmbH, based in Hamburg, Germany.
