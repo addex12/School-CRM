@@ -58,7 +58,7 @@ return array(
     // LimeSurvey developers: Set this to 2 to additionally display STRICT PHP error messages and get full access to standard themes
         'debug'=>0,
         'debugsql'=>0 // Set this to 1 to enanble sql logging, only active when debug = 2
-    )
+    ) // Added closing parenthesis
 );
 /* End of file config.php */
 /* Location: ./application/config/config.php */
