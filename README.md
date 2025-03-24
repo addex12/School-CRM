@@ -1,101 +1,66 @@
-<!-- Developer: Adugna Gizaw
-Email: gizawadugna@gmail.com
-Phone: +251925582067 -->
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-# School-CRM
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-School-CRM is a comprehensive Customer Relationship Management (CRM) system designed specifically for educational institutions. It helps manage student information, track academic progress, and facilitate communication between students, parents, and staff.
+## About Laravel
 
-## Features
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- Student Information Management
-- Academic Progress Tracking
-- Attendance Management
-- Communication Tools
-- Reporting and Analytics
-- Staff (Users) and Role Management
-- Lead Management System
-- Attendance Management System
-- Staff Work Management System
-- Staff Daily Work Status Management
-- Customer Management System
-- Appointment Management System
-- Call Follow-up History
-- Files Management System
-- Quote Management System
-- Invoice Billing Management System
-- Expense Management System
-- Inventory Management System
-- User Management System
-- Customer Help Desk System
-- Accounting Report
-- GST Tax Management System
-- Twilio WhatsApp Gateway Integration
-- RestFul API & IP Security
-- SMTP email integration
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
-## Installation
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/addex12/School-CRM.git
-    ```
-2. Navigate to the project directory:
-    ```sh
-    cd School-CRM
-    ```
-3. Set up the database:
-    ```sql
-    CREATE DATABASE school_crm;
-    ```
-4. Import the database schema:
-    ```sh
-    mysql -u yourusername -p school_crm < database/schema.sql
-    ```
-5. Configure your web server to serve the project directory.
-6. Run the installation script:
-    ```sh
-    php install.php
-    ```
+## Learning Laravel
 
-## Usage
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
 
-1. Open your browser and navigate to your local server (e.g., `http://localhost/school-crm`).
-2. Log in with your credentials.
-3. Use the navigation menu to access different features:
-    - **Students**: Manage student records.
-    - **Teachers**: Manage teacher records.
-    - **Courses**: Manage course information.
-    - **Staff**: Manage staff and roles.
-    - **Leads**: Manage leads.
-    - **Attendance**: Track attendance.
-    - **Work**: Manage staff work and daily status.
-    - **Customers**: Manage customer information.
-    - **Appointments**: Manage appointments.
-    - **Files**: Manage files.
-    - **Quotes**: Manage quotes.
-    - **Invoices**: Manage invoices and billing.
-    - **Expenses**: Manage expenses.
-    - **Inventory**: Manage inventory.
-    - **Help Desk**: Access customer help desk.
-    - **Reports**: Generate accounting and GST tax reports.
-    - **Settings**: Configure system settings, including Twilio WhatsApp Gateway and SMTP email integration.
+You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+
+## Laravel Sponsors
+
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+
+### Premium Partners
+
+- **[Vehikl](https://vehikl.com/)**
+- **[Tighten Co.](https://tighten.co)**
+- **[WebReinvent](https://webreinvent.com/)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
+- **[Cyber-Duck](https://cyber-duck.co.uk)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Jump24](https://jump24.co.uk)**
+- **[Redberry](https://redberry.international/laravel/)**
+- **[Active Logic](https://activelogic.com)**
+- **[byte5](https://byte5.de)**
+- **[OP.GG](https://op.gg)**
 
 ## Contributing
 
-We welcome contributions! Please follow these steps:
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Make your changes.
-4. Commit your changes (`git commit -m 'Add some feature'`).
-5. Push to the branch (`git push origin feature-branch`).
-6. Open a pull request.
+## Code of Conduct
+
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-For any inquiries or support, please contact us at gizawadugna@gmail.com.
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
