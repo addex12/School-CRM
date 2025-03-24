@@ -125,9 +125,9 @@ $internalConfig = array(
         'sodium' => array(
             'class' => 'LSSodium',
        ),
-        'sodiumOld' => [
+        'sodiumOld' => array(
             'class' => 'LSSodiumOld'
-        ],
+        ),
         'clientScript' => array(
             'packages' => array_merge(
                 require('vendor.php'),
