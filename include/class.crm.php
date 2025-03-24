@@ -47,6 +47,41 @@ class CRM {
 
     // Getters and setters for the properties
     // ...existing code...
+
+    public function addContact($name, $email, $phone) {
+        // Code to add contact to CRM
+        $sql = "INSERT INTO contacts (name, email, phone) VALUES (?, ?, ?)";
+        $stmt = db_prepare($sql);
+        db_bind_param($stmt, 'sss', $name, $email, $phone);
+        db_execute($stmt);
+    }
+
+    public function getContacts() {
+        // Code to get all contacts
+        $sql = "SELECT * FROM contacts";
+        $result = db_query($sql);
+        $contacts = array();
+        while ($row = db_fetch_assoc($result)) {
+            $contacts[] = $row;
+        }
+        return $contacts;
+    }
+
+    public function updateContact($id, $name, $email, $phone) {
+        // Code to update a contact
+        $sql = "UPDATE contacts SET name = ?, email = ?, phone = ? WHERE id = ?";
+        $stmt = db_prepare($sql);
+        db_bind_param($stmt, 'sssi', $name, $email, $phone, $id);
+        db_execute($stmt);
+    }
+
+    public function deleteContact($id) {
+        // Code to delete a contact
+        $sql = "DELETE FROM contacts WHERE id = ?";
+        $stmt = db_prepare($sql);
+        db_bind_param($stmt, 'i', $id);
+        db_execute($stmt);
+    }
 }
 
 require_once INCLUDE_DIR . 'class.crm.php';
