@@ -112,27 +112,6 @@ $internalConfig = array(
     ),
     'preload' => array('log', 'ETwigViewRenderer'),
     'components' => array(
-        'application.core.*',
-        'application.core.db.*',
-        'application.models.*',
-        'application.models.Interfaces.*',
-        'application.models.Traits.*',
-        'application.helpers.*',
-        'application.controllers.*',
-        'application.modules.*',
-        'yiistrap_fork.widgets.*',
-        'yiistrap_fork.helpers.*',
-        'yiistrap_fork.behaviors.*',
-        'yiistrap_fork.components.*',
-        'yiiwheels.widgets.select2.WhSelect2',
-        'vendor.Twig.*',
-        'vendor.sodium.*',
-        'ext.captchaExtended.CaptchaExtendedAction',
-        'ext.captchaExtended.CaptchaExtendedValidator',
-        'questiontypes.*'
-    ),
-    'preload' => array('log', 'ETwigViewRenderer'),
-    'components' => array(
         // yiistrap_fork configuration
         'bootstrap5' => array(
             'class' => 'yiistrap_fork.components.TbApi',
@@ -165,7 +144,9 @@ $internalConfig = array(
         // These are defaults and are later overwritten in LSYii_Application by a path based on config tempdir/tempurl
         'assetManager' => array(
             'excludeFiles' => array("config.xml", "node_modules", "src"),
-            'class' => 'application.core.LSYii_AssetManager'
+            'class' => 'application.core.LSYii_AssetManager',
+            'basePath' => realpath(__DIR__ . '/../../assets'), // Ensure this path is correct
+            'baseUrl' => '/assets', // Ensure this URL is correct
         ),
         /* Leave default errorhandler : managed in LSYii_Application->onException */
         'errorHandler' => array(
