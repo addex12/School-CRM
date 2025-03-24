@@ -48,5 +48,12 @@ $ost->addExtraHeader('<meta name="tip-namespace" content="dashboard.dashboard" /
 
 require(STAFFINC_DIR.'header.inc.php');
 require_once(STAFFINC_DIR.'dashboard.inc.php');
+
+if (CRM_ENABLED) {
+    echo '<h2>CRM</h2>';
+    // Code to display CRM features
+    require('crm.php');
+}
+
 include(STAFFINC_DIR.'footer.inc.php');
 ?>

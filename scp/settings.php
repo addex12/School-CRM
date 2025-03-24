@@ -55,5 +55,15 @@ $ost->addExtraHeader('<meta name="tip-namespace" content="'.$page[1].'" />',
 $nav->setTabActive('settings', ('settings.php?t='.$target));
 require_once(STAFFINC_DIR.'header.inc.php');
 include_once(STAFFINC_DIR."settings-$target.inc.php");
+
+// CRM Settings
+echo '<h2>CRM Settings</h2>';
+echo '<form action="settings.php" method="post">';
+echo '<input type="hidden" name="t" value="crm">';
+echo '<label for="crm_enabled">Enable CRM:</label>';
+echo '<input type="checkbox" name="crm_enabled" id="crm_enabled" '.(CRM_ENABLED ? 'checked' : '').'>';
+echo '<input type="submit" value="Save">';
+echo '</form>';
+
 include_once(STAFFINC_DIR.'footer.inc.php');
 ?>
