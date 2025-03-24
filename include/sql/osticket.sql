@@ -1,0 +1,9 @@
+CREATE TABLE `crm` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `customer_name` VARCHAR(255) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    `phone` VARCHAR(20),
+    `notes` TEXT,
+    `created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
