@@ -1,4 +1,9 @@
 <?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once 'includes/Database.php';
@@ -8,10 +13,12 @@ session_start();
 $db = new Database();
 $pdo = $db->getConnection();
 
-function isLoggedIn(): bool {
-    return isset($_SESSION['user_id']);
+class AuthHelper {
+    public static function isLoggedIn(): bool {
+        return isset($_SESSION['user_id']);
+    }
 }
-
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && AuthHelper::isLoggedIn()) {
 $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
