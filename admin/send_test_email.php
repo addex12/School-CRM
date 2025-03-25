@@ -2,20 +2,17 @@
 // Start output buffering to prevent unintended output
 ob_start();
 
-// Include PHPMailer manually
-require_once __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php';
-require_once __DIR__ . '/../vendor/phpmailer/src/SMTP.php';
-require_once __DIR__ . '/../vendor/phpmailer/src/Exception.php';
-
-use PHPMailer\PHPMailer\PHPMailer;
+// Include Composer's autoloader to handle PHPMailer and other dependencies
+require_once __DIR__ . '/../vendor/autoload.php'; // Ensure Composer's autoloader is included
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    throw new Exception('PHPMailer is not installed or autoloaded. Run "composer require phpmailer/phpmailer".');
+}
+use PHPMailer\PHPMailer\PHPMailer; // Ensure PHPMailer is properly imported
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-// Example usage
-$mail = new PHPMailer(exceptions: true);
-require_once '../includes/config.php'; // Ensure $pdo is initialized
-require_once '../includes/auth.php';
-requireAdmin();
+// Correct the instantiation of PHPMailer
+$mail = new PHPMailer(true); // Instantiate PHPMailer only once
 
 header(header: 'Content-Type: application/json'); // Ensure JSON response header
 
@@ -69,14 +66,18 @@ try {
     
     $mail->send();
     // Clear any previous output and send JSON response
-    ob_clean();
+    if (ob_get_length()) {
+        ob_clean(); // Clear the buffer if there's any content
+    }
     echo json_encode(value: ['success' => true]);
 } catch (Exception $e) {
     // Clear any previous output and send JSON error response
-    ob_clean();
+    if (ob_get_length()) {
+        ob_clean(); // Clear the buffer if there's any content
+    }
     echo json_encode(value: ['success' => false, 'message' => $e->getMessage()]);
 } finally {
-    // End output buffering
+    // End output buffering and flush the output
     ob_end_flush();
 }
 ?>
