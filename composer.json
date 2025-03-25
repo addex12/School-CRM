@@ -1,16 +1,15 @@
 {
-    "name": "survey-system",
+    "name": "orbalia/survey-system",
     "description": "A survey system for schools and organizations.",
     "type": "project",
     "require": {
         "php": "^8.2",
-        "phpmailer/phpmailer": "^6.8",                // For sending emails
-        "mpdf/mpdf": "^8.1",                          // For generating PDF reports
-        "vlucas/phpdotenv": "^5.5",                   // For environment variable management
-        "phpoffice/phpspreadsheet": "^1.28",          // For handling Excel files
-        "guzzlehttp/guzzle": "^7.5",                  // For making HTTP requests
-        "symfony/var-dumper": "^6.3",                 // For debugging and variable dumping
-        "monolog/monolog": "^3.4"                     // For logging
+        "phpmailer/phpmailer": "^6.9",
+        "vlucas/phpdotenv": "^5.5",
+        "phpoffice/phpspreadsheet": "^1.28",
+        "guzzlehttp/guzzle": "^7.5",
+        "symfony/var-dumper": "^6.3",
+        "monolog/monolog": "^3.4"
     },
     "autoload": {
         "psr-4": {
