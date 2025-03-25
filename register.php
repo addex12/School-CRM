@@ -8,8 +8,6 @@ require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once 'includes/Database.php';
 
-session_start();
-
 // Initialize database connection
 $db = new Database();
 $pdo = $db->getConnection();
