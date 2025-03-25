@@ -7,32 +7,28 @@
  * GitHub: https://github.com/addex12
  */
 
- error_reporting(E_ALL);
- ini_set('display_errors', 1);
- 
- require_once __DIR__ . '/../includes/auth.php';
- requireLogin();
- 
- // Debugging: Confirm session works
- // echo "<pre>"; print_r($_SESSION); echo "</pre>"; exit;
- 
- // Get available surveys (simplified query)
- try {
-     $stmt = $pdo->prepare("
-         SELECT s.*, 
-             (SELECT COUNT(*) FROM survey_responses r 
-              WHERE r.survey_id = s.id AND r.user_id = ?) as completed
-         FROM surveys s
-         WHERE s.is_active = 1 
-         AND s.starts_at <= NOW() 
-         AND s.ends_at >= NOW()
-         ORDER BY s.ends_at ASC
-     ");
-     $stmt->execute([$_SESSION['user_id']]);
-     $surveys = $stmt->fetchAll();
- } catch (PDOException $e) {
-     die("Database error: " . $e->getMessage());
- }
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+// Include necessary files with absolute paths
+require_once __DIR__ . '/../includes/db.php'; // Contains $pdo initialization
+require_once __DIR__ . '/../includes/auth.php';
+requireLogin();
+
+// Get available surveys
+$stmt = $pdo->prepare("
+    SELECT s.*, 
+           (SELECT COUNT(*) FROM survey_responses r 
+            WHERE r.survey_id = s.id AND r.user_id = ?) as completed
+    FROM surveys s
+    WHERE s.is_active = TRUE 
+    AND s.starts_at <= NOW() 
+    AND s.ends_at >= NOW()
+    AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(?))
+    ORDER BY s.ends_at ASC
+");
+
  
  // Get completed surveys count
  $completedCount = $pdo->prepare("

@@ -29,8 +29,17 @@ class Database {
         }
     }
 
-    public function getConnection(): PDO {
-        return $this->conn;
+    public static function getConnection() {
+        static $conn = null;
+        if ($conn === null) {
+            $conn = new Database();
+        }
+        return $conn->conn;
     }
+}
+
+// Initialize the connection globally
+$pdo = Database::getConnection();
+?>
 }
 ?>
