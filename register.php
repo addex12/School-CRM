@@ -22,15 +22,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validation
     if (empty($username)) $errors['username'] = "Username is required";
     if (empty($email)) $errors['email'] = "Email is required";
-    if (!filter_var(value: $email, filter: FILTER_VALIDATE_EMAIL)) $errors['email'] = "Invalid email format";
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = "Invalid email format";
     if (empty($password)) $errors['password'] = "Password is required";
     if (strlen($password) < 6) $errors['password'] = "Password must be at least 6 characters";
     if ($password !== $confirm_password) $errors['confirm_password'] = "Passwords do not match";
     
     // Check if username or email exists
     if (empty($errors)) {
-        $stmt = $pdo->prepare(query: "SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
-        $stmt->execute(params: [$username, $email]);
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$username, $email]);
         $count = $stmt->fetchColumn();
         
         if ($count > 0) {
@@ -39,12 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     
     if (empty($errors)) {
-        $hashed_password = password_hash(password: $password, algo: PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare(query: "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
         
-        if ($stmt->execute(params: [$username, $email, $hashed_password, $role])) {
+        if ($stmt->execute([$username, $email, $hashed_password, $role])) {
             $_SESSION['success'] = "Registration successful! Please login.";
-            header(header: "Location: login.php");
+            header("Location: login.php");
             exit();
         } else {
             $errors['general'] = "Registration failed. Please try again.";
