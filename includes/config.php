@@ -1,4 +1,7 @@
 <?php
+// Add at the top of includes/config.php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 //require_once __DIR__ . '/../vendor/autoload.php'; // Include Composer autoloader
 require_once 'Database.php';
 
