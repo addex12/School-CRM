@@ -7,11 +7,11 @@ class Database {
     private $conn;
 
     public function __construct() {
-        $this->host = getenv(name: 'DB_HOST') ?: 'localhost';
-        $this->dbname = getenv(name: 'DB_NAME') ?: 'parent_survey_system';
-        $this->user = getenv(name: 'DB_USER') ?: 'root';
-        $this->pass = getenv(name: 'DB_PASS') ?: '';
-        
+        $this->host = getenv(name: 'DB_HOST') ?: '127.0.0.1';
+        $this->dbname = getenv(name: 'DB_NAME') ?: 'flipperschool_parent_survey_system';
+        $this->user = getenv(name: 'DB_USER') ?: 'flipperschool';
+        $this->pass = getenv(name: 'DB_PASS') ?: 'jobk4iFz37@f*BaDKLjk@x4qL';
+                
         try {
             $this->conn = new PDO(
                 dsn: "mysql:host={$this->host};dbname={$this->dbname};charset=utf8mb4",
