@@ -1,9 +1,17 @@
 <?php
-require_once __DIR__ . '/includes/header.php'; // Correct relative path
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
+
 require_once '../includes/auth.php';
+requireLogin();
 
 // Get available surveys for the current user
-$stmt = $pdo->prepare(query: "
+$stmt = $pdo->prepare("
     SELECT s.*, 
            (SELECT COUNT(*) FROM survey_responses r WHERE r.survey_id = s.id AND r.user_id = ?) as completed
     FROM surveys s
@@ -13,16 +21,16 @@ $stmt = $pdo->prepare(query: "
     AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(?))
     ORDER BY s.ends_at ASC
 ");
-$stmt->execute(params: [$_SESSION['user_id'], $_SESSION['role']]);
+$stmt->execute([$_SESSION['user_id'], $_SESSION['role']]);
 $surveys = $stmt->fetchAll();
 
 // Get completed surveys count
-$completedCount = $pdo->prepare(query: "
+$completedCount = $pdo->prepare("
     SELECT COUNT(DISTINCT survey_id) 
     FROM survey_responses 
     WHERE user_id = ?
 ");
-$completedCount->execute(params: [$_SESSION['user_id']]);
+$completedCount->execute([$_SESSION['user_id']]);
 $completedSurveys = $completedCount->fetchColumn();
 ?>
 
@@ -36,7 +44,7 @@ $completedSurveys = $completedCount->fetchColumn();
 <body>
     <div class="container">
         <header>
-            <h1>Welcome, <?php echo htmlspecialchars(string: $_SESSION['username']); ?></h1>
+            <h1>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></h1>
             <nav>
                 <a href="dashboard.php" class="active">Dashboard</a>
                 <a href="../logout.php">Logout</a>
@@ -46,7 +54,7 @@ $completedSurveys = $completedCount->fetchColumn();
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Available Surveys</h3>
-                <p><?php echo count(value: $surveys); ?></p>
+                <p><?php echo count($surveys); ?></p>
             </div>
             <div class="stat-card">
                 <h3>Completed Surveys</h3>
@@ -57,20 +65,20 @@ $completedSurveys = $completedCount->fetchColumn();
         <div class="survey-list">
             <h2>Available Surveys</h2>
             
-            <?php if (count(value: $surveys) > 0): ?>
+            <?php if (count($surveys) > 0): ?>
                 <div class="survey-cards">
                     <?php foreach ($surveys as $survey): ?>
                         <div class="survey-card <?php echo $survey['completed'] ? 'completed' : ''; ?>">
-                            <h3><?php echo htmlspecialchars(string: $survey['title']); ?></h3>
-                            <p class="survey-description"><?php echo htmlspecialchars(string: $survey['description']); ?></p>
+                            <h3><?php echo htmlspecialchars($survey['title']); ?></h3>
+                            <p class="survey-description"><?php echo htmlspecialchars($survey['description']); ?></p>
                             <div class="survey-meta">
-                                <p><strong>Deadline:</strong> <?php echo date(format: 'M j, Y', timestamp: strtotime(datetime: $survey['ends_at'])); ?></p>
+                                <p><strong>Deadline:</strong> <?php echo date('M j, Y', strtotime($survey['ends_at'])); ?></p>
                                 <p><strong>Time Left:</strong> 
                                     <?php 
                                     $now = new DateTime();
-                                    $end = new DateTime(datetime: $survey['ends_at']);
-                                    $interval = $now->diff(targetObject: $end);
-                                    echo $interval->format(format: '%a days %h hours');
+                                    $end = new DateTime($survey['ends_at']);
+                                    $interval = $now->diff($end);
+                                    echo $interval->format('%a days %h hours');
                                     ?>
                                 </p>
                             </div>
@@ -92,7 +100,5 @@ $completedSurveys = $completedCount->fetchColumn();
     </div>
     
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <?php require_once 'includes/footer.php'; // Include the footer file if necessary ?>
-
 </body>
 </html>
