@@ -1,4 +1,16 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: <a href="mailto:Gizawadugna@gmail.com">Gizawadugna@gmail.com</a>
+ * Phone: +251925582067
+ * LinkedIn: <a href="https://linkedin.com/in/eleganceict" target="_blank">linkedin.com/in/eleganceict</a>
+ * Twitter: <a href="https://twitter.com/eleganceict1" target="_blank">@eleganceict1</a>
+ * GitHub: <a href="https://github.com/addex12" target="_blank">github.com/addex12</a>
+ *
+ * File: survey.php
+ * Description: Displays and handles user surveys.
+ */
+
 require_once '../includes/auth.php';
 requireLogin();
 

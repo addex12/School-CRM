@@ -1,3 +1,15 @@
+/**
+ * Developer: Adugna Gizaw
+ * Email: Gizawadugna@gmail.com
+ * Phone: +251925582067
+ * LinkedIn: eleganceict
+ * Twitter: eleganceict1
+ * GitHub: addex12
+ *
+ * File: functions.php
+ * Description: Contains utility functions for the system.
+ */
+
 <?php
 require_once 'db.php';
 

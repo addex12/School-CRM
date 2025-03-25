@@ -3,6 +3,12 @@
         {
             "name": "composer/pcre",
             "version": "3.3.2",
+            "version_normalized": "
+{
+    "packages": [
+        {
+            "name": "composer/pcre",
+            "version": "3.3.2",
             "version_normalized": "3.3.2.0",
             "source": {
                 "type": "git",

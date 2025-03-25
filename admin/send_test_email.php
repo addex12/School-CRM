@@ -1,3 +1,15 @@
+/**
+ * Developer: Adugna Gizaw
+ * Email: Gizawadugna@gmail.com
+ * Phone: +251925582067
+ * LinkedIn: eleganceict
+ * Twitter: eleganceict1
+ * GitHub: addex12
+ *
+ * File: send_test_email.php
+ * Description: Handles sending test emails using PHPMailer.
+ */
+
 <?php
 // Start output buffering to prevent unintended output
 ob_start();

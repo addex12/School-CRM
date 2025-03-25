@@ -1,4 +1,16 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: Gizawadugna@gmail.com
+ * Phone: +251925582067
+ * LinkedIn: eleganceict
+ * Twitter: eleganceict1
+ * GitHub: addex12
+ *
+ * File: dashboard.php
+ * Description: Displays the user dashboard with survey statistics.
+ */
+
 require_once __DIR__ . '/includes/header.php'; // Correct relative path
 require_once '../includes/auth.php';
 

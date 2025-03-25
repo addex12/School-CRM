@@ -1,3 +1,15 @@
+/**
+ * Developer: Adugna Gizaw
+ * Email: Gizawadugna@gmail.com
+ * Phone: +251925582067
+ * LinkedIn: eleganceict
+ * Twitter: eleganceict1
+ * GitHub: addex12
+ *
+ * File: contact.php
+ * Description: Handles user contact form submissions.
+ */
+
 <?php
 require_once '../includes/auth.php';
 $auth->requireLogin();
