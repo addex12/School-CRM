@@ -2,17 +2,14 @@
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
  */
 
 // Enable error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Include necessary files with absolute paths
-require_once __DIR__ . '/../includes/db.php'; // Contains $pdo initialization
+// Include necessary files
+require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
@@ -29,74 +26,111 @@ $stmt = $pdo->prepare("
     ORDER BY s.ends_at ASC
 ");
 
- 
- // Get completed surveys count
- $completedCount = $pdo->prepare("
-     SELECT COUNT(DISTINCT survey_id) 
-     FROM survey_responses 
-     WHERE user_id = ?
- ");
- $completedCount->execute([$_SESSION['user_id']]);
- $completedSurveys = $completedCount->fetchColumn();
- ?>
- 
- <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <title>User Dashboard</title>
-     <link rel="stylesheet" href="../assets/css/style.css">
- </head>
- <body>
-     <div class="container">
-         <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></h1>
+// Execute the survey query
+$stmt->execute([$_SESSION['user_id'], $_SESSION['role']]);
+$surveys = $stmt->fetchAll();
+
+// Get completed surveys count
+$completedCount = $pdo->prepare("
+    SELECT COUNT(DISTINCT survey_id) 
+    FROM survey_responses 
+    WHERE user_id = ?
+");
+$completedCount->execute([$_SESSION['user_id']]);
+$completedSurveys = $completedCount->fetchColumn();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard - Survey System</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Additional styles for new features */
+        .main-menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .menu-item {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+        .menu-item:hover {
+            background: #2980b9;
+        }
+        .quick-access {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
     <div class="container">
         <header>
-            <nav>
-                <a href="dashboard.php" class="active">Dashboard</a>
-                <a href="../logout.php">Logout</a>
+            <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></h1>
+            <nav class="main-menu">
+                <a href="dashboard.php" class="menu-item active">Dashboard</a>
+                <a href="chat.php" class="menu-item">Chat</a>
+                <a href="feedback.php" class="menu-item">Feedback</a>
+                <a href="contact.php" class="menu-item">Contact</a>
+                <a href="../logout.php" class="menu-item">Logout</a>
             </nav>
         </header>
-        
+
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Available Surveys</h3>
-                <p><?php echo count($surveys); ?></p>
+                <p><?= count($surveys) ?></p>
             </div>
             <div class="stat-card">
                 <h3>Completed Surveys</h3>
-                <p><?php echo $completedSurveys; ?></p>
+                <p><?= $completedSurveys ?></p>
             </div>
         </div>
-        
+
+        <div class="quick-access">
+            <h2>Quick Actions</h2>
+            <div class="main-menu">
+                <a href="chat.php" class="menu-item">Start Chat</a>
+                <a href="feedback.php" class="menu-item">Submit Feedback</a>
+                <a href="contact.php" class="menu-item">Contact Support</a>
+            </div>
+        </div>
+
         <div class="survey-list">
             <h2>Available Surveys</h2>
             
             <?php if (count($surveys) > 0): ?>
                 <div class="survey-cards">
                     <?php foreach ($surveys as $survey): ?>
-                        <div class="survey-card <?php echo $survey['completed'] ? 'completed' : ''; ?>">
-                            <h3><?php echo htmlspecialchars($survey['title']); ?></h3>
-                            <p class="survey-description"><?php echo htmlspecialchars($survey['description']); ?></p>
+                        <div class="survey-card <?= $survey['completed'] ? 'completed' : '' ?>">
+                            <h3><?= htmlspecialchars($survey['title']) ?></h3>
+                            <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
                             <div class="survey-meta">
-                                <p><strong>Deadline:</strong> <?php echo date('M j, Y', strtotime($survey['ends_at'])); ?></p>
+                                <p><strong>Deadline:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
                                 <p><strong>Time Left:</strong> 
                                     <?php 
                                     $now = new DateTime();
                                     $end = new DateTime($survey['ends_at']);
-                                    $interval = $now->diff($end);
-                                    echo $interval->format('%a days %h hours');
+                                    echo $now->diff($end)->format('%a days %h hours');
                                     ?>
                                 </p>
                             </div>
                             
-                            <?php if ($survey['completed']): ?>
-                                <div class="survey-status completed">
+                            <?= $survey['completed'] ? 
+                                '<div class="survey-status completed">
                                     <i class="fas fa-check-circle"></i> Completed
-                                </div>
-                            <?php else: ?>
-                                <a href="survey.php?id=<?php echo $survey['id']; ?>" class="btn btn-primary">Take Survey</a>
-                            <?php endif; ?>
+                                </div>' : 
+                                '<a href="survey.php?id='.$survey['id'].'" class="btn btn-primary">Take Survey</a>'
+                            ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -105,7 +139,7 @@ $stmt = $pdo->prepare("
             <?php endif; ?>
         </div>
     </div>
-    
+
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-</>
+</body>
 </html>
