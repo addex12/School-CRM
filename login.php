@@ -1,4 +1,12 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
+
 require_once 'includes/config.php'; // Ensure this initializes $pdo
 require_once 'includes/auth.php';
 
@@ -94,3 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>
+
+<?php
+include 'includes/footer.php';
+?>
