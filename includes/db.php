@@ -40,6 +40,5 @@ class Database {
 
 // Initialize the connection globally
 $pdo = Database::getConnection();
-?>
-}
-?>
+
+
