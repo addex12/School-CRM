@@ -1,4 +1,4 @@
-/**
+<!--
  * Developer: Adugna Gizaw
  * Email: <a href="mailto:Gizawadugna@gmail.com">Gizawadugna@gmail.com</a>
  * Phone: +251925582067
@@ -8,7 +8,7 @@
  *
  * File: db.php
  * Description: Handles database connection and initialization.
- */
+-->
 
 <?php
 class Database {
