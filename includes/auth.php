@@ -7,7 +7,6 @@ session_set_cookie_params([
     'httponly' => true,
     'samesite' => 'Strict'
 ]);
-session_start();
 // Removed duplicate function declaration
 function isLoggedIn(): bool {
     return isset($_SESSION['user_id']);
