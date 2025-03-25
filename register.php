@@ -9,7 +9,8 @@ require_once 'includes/auth.php';
 require_once 'includes/Database.php';
 
 session_start();
-// Initialize $pdo
+
+// Initialize database connection
 $db = new Database();
 $pdo = $db->getConnection();
 
@@ -18,15 +19,18 @@ class AuthHelper {
         return isset($_SESSION['user_id']);
     }
 }
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && AuthHelper::isLoggedIn()) {
+
 $errors = [];
+$username = $email = $role = '';
+
+// Move POST handling outside of the AuthHelper check
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
     $role = $_POST['role'] ?? 'parent';
-    
+
     // Validation
     if (empty($username)) $errors['username'] = "Username is required";
     if (empty($email)) $errors['email'] = "Email is required";
@@ -34,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($password)) $errors['password'] = "Password is required";
     if (strlen($password) < 6) $errors['password'] = "Password must be at least 6 characters";
     if ($password !== $confirm_password) $errors['confirm_password'] = "Passwords do not match";
-    
+
     // Check if username or email exists
     if (empty($errors)) {
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
@@ -45,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors['general'] = "Username or email already exists";
         }
     }
-    
+
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
