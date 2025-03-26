@@ -10,6 +10,5 @@ $database = new Database();
 $pdo = $database->getConnection();
 
 // Base configuration
-define(constant_name: 'BASE_URL', value: 'http://localhost/survey');
+define(constant_name: 'BASE_URL', value: 'https://crm.flipperschool.com');
 define(constant_name: 'UPLOAD_DIR', value: __DIR__ . '/../uploads');
-?>
