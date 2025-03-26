@@ -6,7 +6,7 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-require_once("user/includes/header.php");
+require_once 'user/includes/header.php';
 require_once 'includes/config.php'; // Ensure this initializes $pdo
 require_once 'includes/auth.php';
 
