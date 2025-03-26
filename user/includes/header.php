@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/auth.php';
+include '../includes/auth.php';
 requireLogin();
 ?>
 <!DOCTYPE html>
