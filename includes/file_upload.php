@@ -1,18 +1,23 @@
 <?php
 function handleFileUpload($inputName) {
-    // Check if file was actually uploaded
-    if (!isset($_FILES[$inputName]) {
+    if (!isset($_FILES[$inputName])) {
         return null;
     }
 
     $file = $_FILES[$inputName];
-    
-    // Check for upload errors
+    validateFile($file);
+
+    $filename = generateUniqueFilename($file);
+    $destination = moveFileToUploadDir($file, $filename);
+
+    return $filename;
+}
+
+function validateFile($file) {
     if ($file['error'] !== UPLOAD_ERR_OK) {
         throw new Exception(getUploadErrorMessage($file['error']));
     }
 
-    // Security checks
     $allowedTypes = [
         'application/pdf' => 'pdf',
         'image/jpeg' => 'jpg',
@@ -21,38 +26,49 @@ function handleFileUpload($inputName) {
         'application/msword' => 'doc',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'
     ];
-    
     $maxFileSize = 5 * 1024 * 1024; // 5MB
+
     $fileInfo = new finfo(FILEINFO_MIME_TYPE);
     $mimeType = $fileInfo->file($file['tmp_name']);
 
-    // Validate file type
     if (!array_key_exists($mimeType, $allowedTypes)) {
         throw new Exception("Invalid file type. Allowed types: PDF, JPG, PNG, TXT, DOC/DOCX");
     }
 
-    // Validate file size
     if ($file['size'] > $maxFileSize) {
         throw new Exception("File size exceeds 5MB limit");
     }
+}
 
-    // Generate unique filename
+function generateUniqueFilename($file) {
+    $allowedTypes = [
+        'application/pdf' => 'pdf',
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'text/plain' => 'txt',
+        'application/msword' => 'doc',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'
+    ];
+
+    $fileInfo = new finfo(FILEINFO_MIME_TYPE);
+    $mimeType = $fileInfo->file($file['tmp_name']);
     $extension = $allowedTypes[$mimeType];
-    $filename = uniqid('file_', true) . '.' . $extension;
-    
-    // Define upload directory
+
+    return uniqid('file_', true) . '.' . $extension;
+}
+
+function moveFileToUploadDir($file, $filename) {
     $uploadDir = __DIR__ . '/../uploads/';
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
 
-    // Move file to permanent location
     $destination = $uploadDir . $filename;
     if (!move_uploaded_file($file['tmp_name'], $destination)) {
         throw new Exception("Failed to move uploaded file");
     }
 
-    return $filename;
+    return $destination;
 }
 
 function getUploadErrorMessage($errorCode) {
