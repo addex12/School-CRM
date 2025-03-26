@@ -78,5 +78,60 @@ class SurveyBuilder {
         this.fieldsData.value = JSON.stringify(fields);
     }
 
-    // ... rest of the enhanced builder implementation ...
+   //Lets enhance the builder implementation ...
 }
+    
+    // Preview button
+    document.getElementById('preview-btn').addEventListener('click', function() {
+        const previewContent = document.getElementById('survey-preview-content');
+        previewContent.innerHTML = `
+            <h3>${document.getElementById('title').value || 'Survey Title'}</h3>
+            <p>${document.getElementById('description').value || 'Survey description'}</p>
+            <hr>
+            ${formPreview.innerHTML.replace(/field-actions/g, 'hidden-actions')}
+        `;
+        
+        // Initialize rating fields in preview
+        previewContent.querySelectorAll('.rating-container').forEach(container => {
+            const stars = container.querySelectorAll('.rating-star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.dataset.value);
+                    stars.forEach((s, i) => {
+                        if (i < value) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                    container.querySelector('input[type="hidden"]').value = value;
+                });
+            });
+        });
+        
+        previewModal.style.display = 'block';
+    });
+    
+    // Close modal buttons
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', function() {
+            fieldModal.style.display = 'none';
+            previewModal.style.display = 'none';
+        });
+    });
+    
+    // Cancel field button
+    document.getElementById('cancel-field').addEventListener('click', function() {
+        fieldModal.style.display = 'none';
+    });
+    
+    // Close modals when clicking outside
+    window.addEventListener('click', function(e) {
+        if (e.target === fieldModal) {
+            fieldModal.style.display = 'none';
+        }
+        if (e.target === previewModal) {
+            previewModal.style.display = 'none';
+        }
+    });
+});
