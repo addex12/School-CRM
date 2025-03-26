@@ -87,6 +87,18 @@ if (empty($adminMenu)) {
             'icon'  => 'fa-cog',
             'roles' => ['admin'],
         ],
+        [
+            'title' => 'Feedback Management',
+            'url'   => 'feedback_mgmt.php',
+            'icon'  => 'fa-comment-dots',
+            'roles' => ['admin'],
+        ],
+        [
+            'title' => 'Chat Management',
+            'url'   => 'chat_mgmt.php',
+            'icon'  => 'fa-comments',
+            'roles' => ['admin'],
+        ],
     ];
 }
 
@@ -171,10 +183,10 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboa
         }
     </style>
 </head>
-<body></body>
+<body>
     <div class="admin-layout">
         <header class="admin-header">
-            <div class="logo"></div>
+            <div class="logo">
                 <?php if (!empty($siteLogo)): ?>
                     <img src="../assets/images/<?= htmlspecialchars($siteLogo) ?>"
                          alt="<?= htmlspecialchars($siteName) ?> Logo"
@@ -204,6 +216,9 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboa
                     <span class="nav-text">Logout</span>
                 </a>
             </nav>
+            <div class="notifications">
+                <?php include 'notifications.php'; ?>
+            </div>
         </header>
 
         <div class="admin-content-wrapper">
