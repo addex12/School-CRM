@@ -160,16 +160,7 @@ if ($survey) {
 <body>
     <div class="container">
         <header>
-            <h1>Survey Results</h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php">Survey Builder</a>
-                <a href="categories.php">Categories</a>
-                <a href="users.php">Users</a>
-                <a href="results.php" class="active">Results</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
+      <?php require_once 'includes/header.php'; ?>
         </header>
         
         <div class="content">
