@@ -3,8 +3,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once '../includes/auth.php';
-//include 'includes/header.php';
-
 requireAdmin();
 require_once '../includes/config.php'; // Include config to initialize $pdo
 
@@ -33,6 +31,8 @@ $recentResponses = $pdo->query("
     ORDER BY r.submitted_at DESC
     LIMIT 5
 ")->fetchAll();
+include 'includes/header.php';
+
 ?>
 
 <!DOCTYPE html>
