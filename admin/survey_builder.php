@@ -67,7 +67,6 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
 <body>
     <div class="container">
         <header>
-            <h1>Survey Builder</h1>
 <?php require_once 'includes/header.php'; ?>
         </header>
         
