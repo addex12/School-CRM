@@ -21,11 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Send confirmation email
         $user_email = $_SESSION['email'];
-        $mail->setFrom('support@yourdomain.com', 'Support Team');
-        $mail->addAddress($user_email);
-        $mail->Subject = "Ticket Created: $ticket_number";
-        $mail->Body = "Your support ticket has been created.\n\nTicket Number: $ticket_number";
-        $mail->send();
+        sendEmail($user_email, "Ticket Created: $ticket_number", "Your support ticket has been created.\n\nTicket Number: $ticket_number");
         
         // Notify admins
         $admin_subject = "New Support Ticket: $ticket_number";
@@ -50,7 +46,7 @@ $tickets->execute([$_SESSION['user_id']]);
 <head>
     <meta charset="UTF-8">
     <title>Contact Support</title>
-    <?php include 'includes/header.php'; ?>
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
     <div class="container">

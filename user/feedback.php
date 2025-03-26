@@ -20,11 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Send confirmation email
         $user_email = $_SESSION['email'];
-        $mail->setFrom('support@yourdomain.com', 'Support Team');
-        $mail->addAddress($user_email);
-        $mail->Subject = "Feedback Received";
-        $mail->Body = "Thank you for your feedback!\n\nWe appreciate your input.";
-        $mail->send();
+        sendEmail($user_email, "Feedback Received", "Thank you for your feedback!\n\nWe appreciate your input.");
         
         // Notify admins
         $admin_subject = "New Feedback Submission";
@@ -49,7 +45,7 @@ $feedback->execute([$_SESSION['user_id']]);
 <head>
     <meta charset="UTF-8">
     <title>Feedback System</title>
-    <?php include 'includes/header.php'; ?>
+    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         .rating-stars { color: #ffd700; font-size: 1.5em; }
         .feedback-history { margin-top: 30px; }
