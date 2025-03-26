@@ -144,8 +144,10 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
     </style>
 </head>
 <body>
-    <div class="container">
-        <?php include 'includes/admin_sidebar.php'; ?>
+
+ <data class="admin-dashboard"        <?php include 'includes/admin_sidebar.php'; ?>
+ ></data>iv   
+<div class="container">
         
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>

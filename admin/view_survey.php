@@ -16,7 +16,7 @@ $surveys = $pdo->query("SELECT id, title, description, is_active, starts_at, end
 </head>
 <body>
     <div class="container">
-        <?php include 'includes/admin_Ssidebar.php'; ?>
+        <?php include 'includes/admin_sidebar.php'; ?>
         
         <div class="content">
             <h1>View Surveys</h1>
