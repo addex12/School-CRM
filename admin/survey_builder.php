@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/config.php'; // Include config to initialize $pdo
+require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
@@ -61,62 +61,22 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
     <meta charset="UTF-8">
     <title>Survey Builder - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="survey_builder.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .builder-container {
-            display: flex;
-            gap: 20px;
-        }
-        .form-preview {
-            flex: 1;
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        .fields-panel {
-            width: 300px;
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 5px;
-        }
-        .field-item {
-            background: white;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 3px;
-            cursor: move;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .form-field {
-            margin-bottom: 15px;
-            padding: 15px;
-            background: white;
-            border-radius: 3px;
-            border: 1px dashed #ccc;
-        }
-        .field-options {
-            margin-top: 10px;
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 3px;
-            display: none;
-        }
-        .field-config {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
-        }
-        .sortable-ghost {
-            opacity: 0.5;
-            background: #c8ebfb;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Survey Builder</h1>
+            <nav>
+                <a href="dashboard.php">Dashboard</a>
+                <a href="surveys.php">Surveys</a>
+                <a href="survey_builder.php" class="active">Survey Builder</a>
+                <a href="results.php">Results</a>
+                <a href="../logout.php">Logout</a>
+            </nav>
         </header>
+        
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
@@ -148,9 +108,9 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                     <div class="form-group">
                         <label>Target Audience:</label>
                         <div class="checkbox-group">
-                            <label><input type="checkbox" name="target_roles[]" value="student"> Students</label>
-                            <label><input type="checkbox" name="target_roles[]" value="teacher"> Teachers</label>
-                            <label><input type="checkbox" name="target_roles[]" value="parent"> Parents</label>
+                            <label><input type="checkbox" name="target_roles[]" value="student" checked> Students</label>
+                            <label><input type="checkbox" name="target_roles[]" value="teacher" checked> Teachers</label>
+                            <label><input type="checkbox" name="target_roles[]" value="parent" checked> Parents</label>
                         </div>
                     </div>
                     
@@ -171,11 +131,10 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                     <h2>Survey Fields</h2>
                     <div class="builder-container">
                         <div class="form-preview" id="form-preview">
-                            <p>Drag fields from the right panel to build your form</p>
+                            <p class="empty-message">Drag fields from the right panel to build your form</p>
                         </div>
-                        <script src="../assets/js/sortable.js"></script>
-                        <script src="../assets/js/survey_builder.js"></script>
-                        <div class="fields-panel">
+                        
+                        <div class="fields-panel" id="fields-panel">
                             <h3>Available Fields</h3>
                             <div class="field-item" data-type="text">
                                 <i class="fas fa-font"></i> Text Input
@@ -224,7 +183,7 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
             <h3>Configure Field</h3>
             <form id="field-config-form">
                 <input type="hidden" id="field-type">
-                <input type="hidden" id="field-order">
+                <input type="hidden" id="field-id">
                 
                 <div class="form-group">
                     <label for="field-label">Label:</label>
@@ -288,5 +247,19 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
             </div>
         </div>
     </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="../assets/js/survey_builder.js"></script>
+    <script>
+        // Initialize date/time inputs with current time
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            const timezoneOffset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
+            
+            document.getElementById('starts_at').value = localISOTime;
+            document.getElementById('ends_at').value = localISOTime;
+        });
+    </script>
 </body>
 </html>
