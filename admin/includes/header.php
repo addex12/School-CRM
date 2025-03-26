@@ -67,10 +67,11 @@ if (!$adminMenu || json_last_error() !== JSON_ERROR_NONE) {
             </nav>
         </header>
         <div class="content-wrapper">
-            <nav class="admin-nav">
+        <nav class="admin-nav">
     <?php foreach ($adminMenu as $item):
+        // Add null coalescing operator for roles
         $allowedRoles = $item['roles'] ?? ['admin'];
-        if (!in_array($_SESSION['role'], $allowedRoles)) continue;
+        if (!in_array($_SESSION['role'] ?? '', $allowedRoles)) continue;
     ?>
         <a href="<?= htmlspecialchars($item['url']) ?>" 
            class="<?= basename($_SERVER['PHP_SELF']) === $item['url'] ? 'active' : '' ?>">
