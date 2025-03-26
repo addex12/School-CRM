@@ -1,17 +1,11 @@
 <?php
+// Load PHPMailer classes
+require_once __DIR__ . '/../PHPMailer/Exception.php';
+require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
+require_once __DIR__ . '/../PHPMailer/SMTP.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-
-// Ensure the Exception class is properly loaded
-if (!class_exists('PHPMailer\PHPMailer\Exception')) {
-    require_once 'vendor/phpmailer/phpmailer/src/Exception.php';
-}
-
-// Ensure PHPMailer classes are properly loaded
-require_once 'vendor/phpmailer/phpmailer/src/PHPMailer.php';
-require_once 'vendor/phpmailer/phpmailer/src/SMTP.php';
-require_once 'vendor/phpmailer/phpmailer/src/Exception.php';
-require 'vendor/autoload.php';
 
 function sendEmail($to, $subject, $body) {
     $mail = new PHPMailer(true);
@@ -22,15 +16,15 @@ function sendEmail($to, $subject, $body) {
         $mail->SMTPAuth = true;
         $mail->Username = 'your_email@yourdomain.com'; // SMTP username
         $mail->Password = 'your_password'; // SMTP password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
+        $mail->Port = 587; // TCP port to connect to
 
         //Recipients
         $mail->setFrom('support@yourdomain.com', 'Support Team');
         $mail->addAddress($to); // Add a recipient
 
         // Content
-        $mail->isHTML(false);
+        $mail->isHTML(false); // Set email format to plain text
         $mail->Subject = $subject;
         $mail->Body    = $body;
 
