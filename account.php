@@ -1,81 +1,102 @@
 <?php
-// Enable error reporting for debugging
+// Enable full error reporting
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Start session before any output
+session_start();
+
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 
-// Debugging: Check if session is started
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
-// Debugging: Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    die("Error: User is not logged in. Please log in to access this page.");
-}
-
+// Verify user is logged in
 requireLogin();
+
+// Check session user data exists
+if (!isset($_SESSION['user_id']) {
+    die("Session error: User not authenticated");
+}
 
 $user_id = $_SESSION['user_id'];
 
-// Debugging: Check database connection
-if (!$pdo) {
-    die("Error: Database connection is not established.");
+// Database connection check
+try {
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
 }
 
+// Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Handle profile update
-    if (isset($_POST['update_profile'])) {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
-        if (!$stmt) {
-            die("Error preparing statement: " . implode(" ", $pdo->errorInfo()));
+    try {
+        if (isset($_POST['update_profile'])) {
+            // Profile update logic
+            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
+            $stmt->execute([
+                $_POST['username'],
+                $_POST['email'],
+                $user_id
+            ]);
+            // Update session data
+            $_SESSION['user']['username'] = $_POST['username'];
+            $_SESSION['user']['email'] = $_POST['email'];
+            $_SESSION['success'] = "Profile updated successfully!";
         }
-        $stmt->execute([
-            $_POST['username'],
-            $_POST['email'],
-            $user_id
-        ]);
-        $_SESSION['success'] = "Profile updated successfully!";
-    }
-    
-    // Handle password change
-    if (isset($_POST['change_password'])) {
-        if (password_verify($_POST['current_password'], $_SESSION['user']['password'])) {
-            if ($_POST['new_password'] === $_POST['confirm_password']) {
-                $newHash = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-                if (!$stmt) {
-                    die("Error preparing statement: " . implode(" ", $pdo->errorInfo()));
-                }
-                $stmt->execute([$newHash, $user_id]);
-                $_SESSION['success'] = "Password changed successfully!";
-            } else {
+
+        if (isset($_POST['change_password'])) {
+            // Password change logic
+            $user = $pdo->prepare("SELECT password FROM users WHERE id = ?")->execute([$user_id])->fetch();
+            
+            if (!password_verify($_POST['current_password'], $user['password'])) {
+                $_SESSION['error'] = "Current password is incorrect!";
+            } elseif ($_POST['new_password'] !== $_POST['confirm_password']) {
                 $_SESSION['error'] = "New passwords don't match!";
+            } else {
+                $newHash = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+                $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")
+                    ->execute([$newHash, $user_id]);
+                $_SESSION['success'] = "Password changed successfully!";
             }
-        } else {
-            $_SESSION['error'] = "Current password is incorrect!";
         }
+    } catch (PDOException $e) {
+        die("Database error: " . $e->getMessage());
     }
 }
 
-// Get user data
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-if (!$stmt) {
-    die("Error preparing statement: " . implode(" ", $pdo->errorInfo()));
+// Fetch updated user data
+try {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$user) {
+        die("User not found in database");
+    }
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
 }
-$stmt->execute([$user_id]);
-$user = $stmt->fetch();
-if (!$user) {
-    die("Error: User not found in the database.");
+
+// Verify header file exists
+$headerFile = '../includes/header.php';
+if (!file_exists($headerFile)) {
+    die("Missing header file: $headerFile");
 }
 ?>
 
-<?php include '../includes/header.php'; ?>
+<!-- HTML START -->
+<?php include $headerFile; ?>
 
 <div class="account-container">
+    <!-- Display session messages -->
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+    <?php endif; ?>
+
     <h1>Account Management</h1>
     
     <div class="form-section">
@@ -83,21 +104,26 @@ if (!$user) {
         <form method="POST">
             <div class="form-group">
                 <label>Avatar:</label>
-                <img src="../uploads/avatars/<?= $user['avatar'] ?>" class="avatar-preview">
+                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
+                     class="avatar-preview">
                 <input type="file" name="avatar">
             </div>
             
             <div class="form-group">
                 <label>Username:</label>
-                <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>">
+                <input type="text" name="username" 
+                       value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
             </div>
             
             <div class="form-group">
                 <label>Email:</label>
-                <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>">
+                <input type="email" name="email" 
+                       value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
             </div>
             
-            <button type="submit" name="update_profile" class="btn btn-primary">Update Profile</button>
+            <button type="submit" name="update_profile" class="btn btn-primary">
+                Update Profile
+            </button>
         </form>
     </div>
 
@@ -119,15 +145,26 @@ if (!$user) {
                 <input type="password" name="confirm_password" required>
             </div>
             
-            <button type="submit" name="change_password" class="btn btn-warning">Change Password</button>
+            <button type="submit" name="change_password" class="btn btn-warning">
+                Change Password
+            </button>
         </form>
     </div>
 
     <div class="form-section">
         <h2>Login Security</h2>
-        <p>Last Login: <?= date('M j, Y g:i a', strtotime($user['last_login'])) ?></p>
+        <p>Last Login: 
+            <?= isset($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?>
+        </p>
         <a href="activity_log.php" class="btn btn-secondary">View Activity Log</a>
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php 
+// Verify footer file exists
+$footerFile = '../includes/footer.php';
+if (!file_exists($footerFile)) {
+    die("Missing footer file: $footerFile");
+}
+include $footerFile; 
+?>
