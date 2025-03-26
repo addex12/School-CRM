@@ -8,7 +8,7 @@ $survey_id = $_GET['id'] ?? null;
 
 // Validate survey_id
 if (!$survey_id || !is_numeric($survey_id)) {
-    header("Location: dashboard.php");
+    header("Location: surveys.php");
     exit();
 }
 
