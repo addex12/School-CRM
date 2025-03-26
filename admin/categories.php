@@ -41,10 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['success'] = "Category deleted successfully!";
         }
     }
-    
-    header(header: "Location: categories.php");
-    exit();
-}
+    }
 
 // Get all categories
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
