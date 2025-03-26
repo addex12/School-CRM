@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . 'includes/header.php';
 require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireAdmin();
