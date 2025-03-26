@@ -12,6 +12,21 @@ $subject = $message = $priority = '';
 $attachment = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = $_POST['name'] ?? '';
+    $email = $_POST['email'] ?? ''; // Ensure 'email' key exists
+    $message = $_POST['message'] ?? '';
+
+    if (empty($name) || empty($email) || empty($message)) {
+        $error = "All fields are required.";
+    } elseif (!filter_var(value: $email, filter: FILTER_VALIDATE_EMAIL)) {
+        $error = "Invalid email address.";
+    } else {
+        // Process the contact form submission
+        $stmt = $pdo->prepare(query: "INSERT INTO contact_messages (name, email, message, created_at) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([$name, $email, $message]);
+        $success = "Your message has been sent successfully.";
+    }
+
     // Sanitize inputs
     $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -82,6 +97,9 @@ $tickets->execute([$_SESSION['user_id']]);
     <script src="../assets/js/contact.js" defer></script>
 </head>
 <body>
+    <div class="container">
+        <?php require_once 'includes/header.php'; ?>
+
         <div class="content">
             <h2>Contact Support</h2>
             
