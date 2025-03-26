@@ -29,6 +29,12 @@ requireLogin();
                 <a href="contact.php" class="<?= basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Contact
                 </a>
+                <a href="account.php" class="<?= basename($_SERVER['PHP_SELF']) === 'account.php' ? 'active' : '' ?>">
+                    <i class="fas fa-user"></i> Account
+                </a>
+                <a href="../inbox.php" class="logout">
+                    <i class="fas fa-sign-out-alt"></i> Inbox
+                </a>
                 <a href="../logout.php" class="logout">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>

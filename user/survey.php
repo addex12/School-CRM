@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Field-type specific validation
-        $validation_rules = json_decode($field['validation_rules'], true);
+        $validation_rules = $field['validation_rules'] ? json_decode($field['validation_rules'], true) : null;
         if ($validation_rules) {
             // Min validation
             if (isset($validation_rules['min']) && $field_value) {
