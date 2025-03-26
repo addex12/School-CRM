@@ -104,5 +104,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </html>
 
 <?php
-require_once 'includes/footer.php';
+require_once 'user/includes/footer.php';
 ?>
