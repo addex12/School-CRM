@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch and display ticket history
     const loadTickets = async () => {
         try {
-            const response = await fetch('/user/api/tickets.php');
+            const response = await fetch('/user/contact.php?action=getTickets');
             const tickets = await response.json();
 
             ticketsContainer.innerHTML = '';
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(contactForm);
         try {
-            const response = await fetch('/user/api/contact.php', {
+            const response = await fetch('/user/contact.php?action=createTicket', {
                 method: 'POST',
                 body: formData,
             });

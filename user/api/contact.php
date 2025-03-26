@@ -1,17 +1,36 @@
 <?php
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/db.php';
-require_once __DIR__ . '/../../includes/file_upload.php';
 require_once __DIR__ . '/../../includes/mailer.php';
 requireLogin();
 
 header('Content-Type: application/json');
 
+function uploadAttachment($fileKey) {
+    if (!isset($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK) {
+        return null; // No file uploaded or an error occurred
+    }
+
+    $uploadDir = __DIR__ . '/../../uploads/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true); // Create the directory if it doesn't exist
+    }
+
+    $fileName = uniqid() . '_' . basename($_FILES[$fileKey]['name']);
+    $filePath = $uploadDir . $fileName;
+
+    if (move_uploaded_file($_FILES[$fileKey]['tmp_name'], $filePath)) {
+        return $fileName; // Return the uploaded file name
+    }
+
+    return null; // Return null if the upload failed
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $priority = filter_input(INPUT_POST, 'priority', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $attachment = handleFileUpload('attachment');
+    $attachment = uploadAttachment('attachment');
 
     // Validate required fields
     if (empty($subject) || empty($message) || empty($priority)) {
