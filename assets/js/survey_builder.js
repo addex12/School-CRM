@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the builder with these enhancements
     const builder = new SurveyBuilder({
-        fieldTypes: <?php echo json_encode($fieldTypes); ?>,
+        fieldTypes: JSON.parse(document.getElementById('field-types-data').textContent),
         validationRules: {
             text: ['required', 'minLength', 'maxLength', 'regex'],
             number: ['required', 'min', 'max'],
@@ -77,8 +77,6 @@ class SurveyBuilder {
         
         this.fieldsData.value = JSON.stringify(fields);
     }
-
-   //Lets enhance the builder implementation ...
 }
     
     // Preview button
@@ -134,4 +132,3 @@ class SurveyBuilder {
             previewModal.style.display = 'none';
         }
     });
-});
