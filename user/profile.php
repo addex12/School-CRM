@@ -27,7 +27,6 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 echo json_encode($user);
-exit();
 ?>
 
 <!DOCTYPE html>
