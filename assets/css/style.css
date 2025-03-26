@@ -526,3 +526,79 @@
 .logout-btn:hover {
     background-color: rgba(255, 255, 255, 0.3);
 }
+/* Contact Form Styles */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    transition: opacity 0.5s ease;
+}
+
+.ticket {
+    background: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.ticket-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.ticket-number {
+    font-weight: bold;
+}
+
+.priority {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.priority.low {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.priority.medium {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.priority.high {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.attachment {
+    margin-top: 10px;
+}
+
+.attachment a {
+    color: #3498db;
+}
+
+.file-hint {
+    display: block;
+    margin-top: 5px;
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+/* Loading spinner */
+.fa-spinner {
+    margin-right: 5px;
+}
