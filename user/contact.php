@@ -4,15 +4,19 @@ ini_set('display_errors', 1);
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/includes/mailer.php';
-//require_once __DIR__ . '/../includes/file_upload.php';
+require_once __DIR__ . '/../includes/file_upload.php';
 requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING);
-    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
-    $priority = filter_input(INPUT_POST, 'priority', FILTER_SANITIZE_STRING);
-    //$attachment = handleFileUpload('attachment');
+    $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $priority = filter_input(INPUT_POST, 'priority', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $attachment = handleFileUpload('attachment');
 
+    $attachment = null;
+if (!empty($_FILES['attachment']['name'])) {
+    $attachment = handleFileUpload('attachment');
+}
     try {
         // Generate ticket number
         $ticket_number = 'TKT-' . strtoupper(uniqid());
