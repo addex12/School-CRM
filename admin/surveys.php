@@ -9,12 +9,6 @@ $survey_id = $_GET['id'] ?? null;
 // Validate survey_id
 if (!$survey_id || !is_numeric($survey_id)) {
     header("Location: dashboard.php?error=invalid_survey");
-        exit();
-}
-
-// Optional: Check if survey is active only if needed
-if (!$survey['is_active']) {
-    header("Location: dashboard.php?error=survey_inactive");
     exit();
 }
 $pageTitle = "Manage Surveys";
@@ -22,13 +16,19 @@ ob_start(); // Start output buffering to prevent header errors
 include 'includes/header.php';
 
 // Get survey info
-$stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ? AND is_active = TRUE");
+$stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
 $stmt->execute([$survey_id]);
 $survey = $stmt->fetch();
 
 if (!$survey) {
     header("Location: dashboard.php?error=survey_not_found");
-        exit();
+    exit();
+}
+
+// Check if the survey is active
+if (!$survey['is_active'] || strtotime($survey['starts_at']) > time() || strtotime($survey['ends_at']) < time()) {
+    header("Location: dashboard.php?error=survey_inactive");
+    exit();
 }
 
 // Check if the survey is anonymous
@@ -40,7 +40,7 @@ $stmt->execute([$survey_id, $_SESSION['user_id']]);
 $completed = $stmt->fetchColumn() > 0;
 
 if ($completed) {
-    header("Location: dashboard.php");
+    header("Location: dashboard.php?error=survey_completed");
     exit();
 }
 
