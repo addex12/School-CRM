@@ -31,7 +31,6 @@ $recentResponses = $pdo->query("
     ORDER BY r.submitted_at DESC
     LIMIT 5
 ")->fetchAll();
-include 'includes/header.php';
 
 ?>
 
@@ -39,6 +38,7 @@ include 'includes/header.php';
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <?php require_once 'includes/header.php'; ?>
     <title>Admin Dashboard - Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
