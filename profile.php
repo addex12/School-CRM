@@ -1,6 +1,13 @@
 <?php
 session_start();
 
+// Ensure the file is accessible
+if (!file_exists(__FILE__)) {
+    http_response_code(404);
+    echo "Profile page not found.";
+    exit();
+}
+
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
