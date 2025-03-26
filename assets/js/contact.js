@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const result = await response.json();
             if (result.success) {
-                alert('Ticket created successfully!');
+                alert(result.message);
                 contactForm.reset();
                 loadTickets();
             } else {
