@@ -791,3 +791,64 @@ footer {
     color: #7f8c8d;
     border-top: 1px solid #eee;
 }
+/* Admin Specific Styles */
+.admin-content {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.content-section {
+    margin-top: 30px;
+}
+
+.search-filter {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.chat-list, .feedback-list {
+    border: 1px solid #eee;
+    border-radius: 6px;
+}
+
+.chat-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.chat-item:hover {
+    background-color: #f9f9f9;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+}
+
+.status-badge.open { background: #ffd700; color: #000; }
+.status-badge.pending { background: #ffa500; color: #fff; }
+.status-badge.resolved { background: #32cd32; color: #fff; }
+
+.rating-group {
+    margin-bottom: 30px;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.rating-group h3 {
+    color: #333;
+    border-bottom: 2px solid;
+    padding-bottom: 10px;
+}
+
+.rating-5 { background: #e8f5e9; border-color: #4caf50; }
+.rating-4 { background: #f1f8e9; border-color: #8bc34a; }
+.rating-3 { background: #fff3e0; border-color: #ffa726; }
+.rating-2 { background: #ffebee; border-color: #ef5350; }
+.rating-1 { background: #fce4ec; border-color: #ec407a; }

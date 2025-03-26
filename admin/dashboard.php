@@ -1,4 +1,7 @@
 <?php
+require_once '../includes/auth.php';
+requireAdmin();
+include 'includes/header.php';
 require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireAdmin();
@@ -40,20 +43,7 @@ $recentResponses = $pdo->query("
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Admin Dashboard</h1>
-            <nav>
-                <a href="dashboard.php" class="active">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php">Survey Builder</a>
-                <a href="categories.php">Categories</a>
-                <a href="users.php">Users</a>
-                <a href="results.php">Results</a>
-                <a href="settings.php">Site Settings</a> <!-- Added Site Settings -->
-                <a href="../logout.php">Logout</a>
-            </nav>
-        </header>
-        
+        <h1>Admin Dashboard</h1>      
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Surveys</h3>

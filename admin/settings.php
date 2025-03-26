@@ -1,4 +1,7 @@
 <?php
+require_once '../includes/auth.php';
+requireAdmin();
+include 'includes/header.php';
 require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireAdmin();
@@ -194,20 +197,15 @@ $smtp_providers = [
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>System Settings</h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php">Survey Builder</a>
-                <a href="categories.php">Categories</a>
-                <a href="users.php">Users</a>
-                <a href="results.php">Results</a>
-                <a href="settings.php" class="active">Settings</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
-        </header>
-        
+    <div class="setting-group">
+    <h3>Admin Menu Configuration</h3>
+    <div class="setting-item">
+        <label for="admin_menu">Menu Items (JSON format):</label>
+        <textarea id="admin_menu" name="settings[admin_menu]" rows="10" 
+                  style="font-family: monospace;"><?php echo htmlspecialchars(getSettingValue($settings, 'general', 'admin_menu')); ?></textarea>
+        <p class="help-text">Format: [{"title":"Dashboard","url":"dashboard.php","icon":"fa-home"},...]</p>
+    </div>
+</div>
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>

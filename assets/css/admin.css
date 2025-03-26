@@ -63,3 +63,51 @@
     max-width: 600px;
     margin: 2rem auto;
 }
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    color: white;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-img {
+    height: 40px;
+    width: auto;
+}
+
+.admin-nav {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.admin-nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.admin-nav a:hover {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.admin-nav a.active {
+    background-color: rgba(255,255,255,0.2);
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background-color: #e74c3c !important;
+}
