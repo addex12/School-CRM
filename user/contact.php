@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
-include_once __DIR__ . '/includes/header.php';
 
 // Get user information
 $user_id = $_SESSION['user_id'] ?? null;
@@ -9,6 +8,8 @@ $user_email = $_SESSION['email'] ?? '';
 ?>
 
 <div class="container">
+<?php include_once __DIR__ . '/includes/header.php';
+?>
     <h2>Contact Support</h2>
     
     <?php if (isset($_GET['success'])): ?>
@@ -59,4 +60,4 @@ $user_email = $_SESSION['email'] ?? '';
     </form>
 </div>
 
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
+<?php require_once '/includes/footer.php'; ?>
