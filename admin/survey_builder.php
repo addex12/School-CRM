@@ -3,57 +3,95 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
+// Add field types configuration
+$fieldTypes = [
+    'text' => ['icon' => 'fas fa-font', 'has_options' => false],
+    'textarea' => ['icon' => 'fas fa-align-left', 'has_options' => false],
+    'radio' => ['icon' => 'far fa-dot-circle', 'has_options' => true],
+    'checkbox' => ['icon' => 'far fa-check-square', 'has_options' => true],
+    'select' => ['icon' => 'fas fa-caret-down', 'has_options' => true],
+    'number' => ['icon' => 'fas fa-hashtag', 'has_options' => false],
+    'date' => ['icon' => 'far fa-calendar-alt', 'has_options' => false],
+    'rating' => ['icon' => 'fas fa-star', 'has_options' => false],
+    'file' => ['icon' => 'fas fa-file-upload', 'has_options' => false]
+];
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['create_survey'])) {
+    try {
+        $pdo->beginTransaction();
+        
         // Save survey basic info
-        $title = $_POST['title'];
-        $description = $_POST['description'];
-        $category_id = $_POST['category_id'];
-        $target_roles = json_encode($_POST['target_roles']);
-        $starts_at = $_POST['starts_at'];
-        $ends_at = $_POST['ends_at'];
+        $stmt = $pdo->prepare("INSERT INTO surveys 
+            (title, description, category_id, target_roles, status, starts_at, ends_at, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         
-        $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, target_roles, created_by, starts_at, ends_at) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $category_id, $target_roles, $_SESSION['user_id'], $starts_at, $ends_at]);
-        $survey_id = $pdo->lastInsertId();
+        $stmt->execute([
+            $_POST['title'],
+            $_POST['description'],
+            $_POST['category_id'],
+            json_encode($_POST['target_roles']),
+            $_POST['status'],
+            $_POST['starts_at'],
+            $_POST['ends_at'],
+            $_SESSION['user_id']
+        ]);
         
+        $surveyId = $pdo->lastInsertId();
+
         // Save fields
         if (!empty($_POST['fields'])) {
+            $order = 0;
             foreach ($_POST['fields'] as $field) {
                 $options = null;
-                if (in_array($field['type'], ['radio', 'checkbox', 'select'])) {
-                    $options = json_encode(explode("\n", $field['options']));
-                }
-                
                 $validation = null;
-                if (!empty($field['validation'])) {
-                    $validation = json_encode($field['validation']);
+                
+                if (in_array($field['type'], ['radio', 'checkbox', 'select'])) {
+                    $options = json_encode(array_map('trim', explode("\n", $field['options'])));
                 }
                 
-                $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_type, field_label, field_name, field_options, is_required, validation_rules, display_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                if (!empty($field['validation'])) {
+                    $validation = json_encode([
+                        'required' => $field['required'] ?? false,
+                        'min' => $field['min'] ?? null,
+                        'max' => $field['max'] ?? null,
+                        'regex' => $field['regex'] ?? null
+                    ]);
+                }
+                
+                $stmt = $pdo->prepare("INSERT INTO survey_fields 
+                    (survey_id, field_type, field_label, field_name, placeholder, 
+                     field_options, validation_rules, display_order)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                
                 $stmt->execute([
-                    $survey_id,
+                    $surveyId,
                     $field['type'],
                     $field['label'],
                     $field['name'],
+                    $field['placeholder'] ?? '',
                     $options,
-                    isset($field['required']) ? 1 : 0,
                     $validation,
-                    $field['order']
+                    $order++
                 ]);
             }
         }
         
+        $pdo->commit();
         $_SESSION['success'] = "Survey created successfully!";
-        header("Location: survey_preview.php?id=$survey_id");
+        header("Location: survey_preview.php?id=$surveyId");
         exit();
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $_SESSION['error'] = "Error creating survey: " . $e->getMessage();
     }
 }
 
 // Get categories
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
