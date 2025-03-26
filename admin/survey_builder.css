@@ -1,247 +1,54 @@
-/* ================ BASE STYLES ================ */
-.builder-container {
-    display: flex;
-    gap: 20px;
-    margin-top: 20px;
-  }
-  
-  .form-preview {
-    flex: 1;
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 5px;
-    min-height: 500px;
+/* Advanced Field Styling */
+.field-logic {
+  border-left: 3px solid #3498db;
+  padding-left: 15px;
+  margin: 10px 0;
+  background: #f8faff;
+}
+
+.logic-rule {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  margin: 5px 0;
+}
+
+.logic-actions {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+
+/* Conditional Formatting */
+.field-conditional {
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.field-conditional.active {
+  opacity: 1;
+  border-color: #2ecc71;
+}
+
+/* Touch Optimization */
+.field-item {
+  touch-action: manipulation;
+}
+
+@media (max-width: 768px) {
+  .builder-container {
+      flex-direction: column;
   }
   
   .fields-panel {
-    width: 300px;
-    background: #f0f0f0;
-    padding: 15px;
-    border-radius: 5px;
+      width: 100%;
+      order: -1;
   }
   
-  .field-item {
-    background: white;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 3px;
-    cursor: grab;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .form-preview {
+      min-height: 300px;
   }
-  
-  .field-item i {
-    font-size: 1.2rem;
-  }
-  
-  .form-field {
-    margin-bottom: 15px;
-    padding: 15px;
-    background: white;
-    border-radius: 3px;
-    border: 1px dashed #ccc;
-    position: relative;
-  }
-  
-  .form-field:hover {
-    border-color: #3498db;
-  }
-  
-  .field-actions {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    display: flex;
-    gap: 5px;
-  }
-  
-  .field-actions button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #666;
-    font-size: 0.9rem;
-  }
-  
-  .field-actions button:hover {
-    color: #3498db;
-  }
-  
-  .sortable-ghost {
-    opacity: 0.5;
-    background: #c8ebfb;
-    border: 2px dashed #3498db;
-  }
-  
-  .empty-message {
-    color: #7f8c8d;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  /* Modal Styles */
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-  }
-  
-  .modal-content {
-    background-color: white;
-    margin: 5% auto;
-    padding: 20px;
-    border-radius: 5px;
-    width: 80%;
-    max-width: 700px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    position: relative;
-  }
-  
-  .close-modal {
-    position: absolute;
-    right: 20px;
-    top: 10px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .close-modal:hover {
-    color: #e74c3c;
-  }
-  
-  /* Field Options */
-  .field-options {
-    margin-top: 10px;
-    padding: 10px;
-    background: #f5f5f5;
-    border-radius: 3px;
-  }
-  
-  .field-config {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #eee;
-  }
-  
-  /* Form Elements */
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .form-group input,
-  .form-group textarea,
-  .form-group select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-  }
-  
-  /* Rating Stars */
-  .rating-container {
-    margin: 10px 0;
-  }
-  
-  .rating-star {
-    font-size: 24px;
-    color: #ddd;
-    cursor: pointer;
-    margin-right: 5px;
-  }
-  
-  .rating-star.active {
-    color: #f1c40f;
-  }
-  
-  .rating-labels {
-    display: flex;
-    justify-content: space-between;
-    width: 200px;
-    margin-top: 5px;
-    color: #7f8c8d;
-    font-size: 12px;
-  }
-  
-  /* Options */
-  .options {
-    margin-top: 10px;
-  }
-  
-  .option {
-    display: block;
-    margin-bottom: 8px;
-  }
-  
-  /* Buttons */
-  .btn {
-    display: inline-block;
-    padding: 8px 15px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .btn:hover {
-    background-color: #2980b9;
-  }
-  
-  .btn-primary {
-    background-color: #2ecc71;
-  }
-  
-  .btn-primary:hover {
-    background-color: #27ae60;
-  }
-  
-  /* Form Sections */
-  .form-section {
-    margin-bottom: 30px;
-    background: white;
-    padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  
-  .form-row {
-    display: flex;
-    gap: 20px;
-  }
-  
-  .form-row .form-group {
-    flex: 1;
-  }
-  
-  /* Checkbox Group */
-  .checkbox-group {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-  }
-  
-  .checkbox-group label {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  
-  /* Required Field Indicator */
-  .required {
-    color: #e74c3c;
-  }
+}
