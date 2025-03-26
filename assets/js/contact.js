@@ -70,3 +70,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('support-form');
+
+    form.addEventListener('submit', (event) => {
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
+        const attachment = document.getElementById('attachment').files[0];
+
+        if (!subject || !message) {
+            alert('Subject and message are required.');
+            event.preventDefault();
+            return;
+        }
+
+        if (attachment && attachment.size > 5 * 1024 * 1024) {
+            alert('Attachment size must not exceed 5MB.');
+            event.preventDefault();
+        }
+    });
+});

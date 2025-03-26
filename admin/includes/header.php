@@ -76,6 +76,12 @@ if (empty($adminMenu)) {
             'roles' => ['admin'],
         ],
         [
+            'title' => 'Bulk Email',
+            'url'   => 'bulk_email.php',
+            'icon'  => 'fa-envelope',
+            'roles' => ['admin'],
+        ],
+        [
             'title' => 'Settings',
             'url'   => 'settings.php',
             'icon'  => 'fa-cog',

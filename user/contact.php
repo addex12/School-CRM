@@ -4,7 +4,6 @@ ini_set('display_errors', 1);
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/includes/mailer.php';
-require_once __DIR__ . '/../includes/file_upload.php';
 requireLogin();
 
 // Initialize variables
@@ -20,35 +19,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Handle file upload
     if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-        try {
-            $attachment = handleFileUpload('attachment');
-        } catch (Exception $e) {
-            $error = "File upload error: " . $e->getMessage();
+        $upload_dir = __DIR__ . '/../uploads/';
+        $file_name = basename($_FILES['attachment']['name']);
+        $file_path = $upload_dir . $file_name;
+
+        if (move_uploaded_file($_FILES['attachment']['tmp_name'], $file_path)) {
+            $attachment = $file_name;
+        } else {
+            $error = "Failed to upload the file.";
         }
     }
 
     if (empty($error)) {
         try {
             // Generate ticket number
-            $ticket_number = 'TKT-' . strtoupper(string: uniqid());
+            $ticket_number = 'TKT-' . strtoupper(uniqid());
             
-            $stmt = $pdo->prepare(query: "INSERT INTO support_tickets 
+            $stmt = $pdo->prepare("INSERT INTO support_tickets 
                                 (user_id, ticket_number, subject, message, priority, attachment) 
                                 VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute(params: [$_SESSION['user_id'], $ticket_number, $subject, $message, $priority, $attachment]);
+            $stmt->execute([$_SESSION['user_id'], $ticket_number, $subject, $message, $priority, $attachment]);
             
-            // Send confirmation email
+            // Send confirmation email to user
             $user_email = $_SESSION['email'];
-            sendEmail(to: $user_email, subject: "Ticket Created: $ticket_number", 
-                body: "Your support ticket has been created.\n\nTicket Number: $ticket_number");
+            sendEmail($user_email, "Ticket Created: $ticket_number", 
+                "Your support ticket has been created.\n\nTicket Number: $ticket_number");
             
             // Notify admins
             $admin_subject = "New Support Ticket: $ticket_number";
             $admin_body = "Priority: $priority\nSubject: $subject\nMessage: $message";
             if ($attachment) {
-                $admin_body .= "\n\nAttachment: " . $ticket['attachment'];
+                $admin_body .= "\n\nAttachment: $attachment";
             }
-            sendEmailToAdmins($admin_subject, $admin_body);
+            sendEmail("contactus@flipperschools.com", $admin_subject, $admin_body);
+            sendEmail("adugna.gizaw@flipperschools.com", $admin_subject, $admin_body);
             
             $success = "Ticket created successfully! Check your email for confirmation.";
             
@@ -68,7 +72,6 @@ $tickets = $pdo->prepare("SELECT * FROM support_tickets
                          ORDER BY created_at DESC");
 $tickets->execute([$_SESSION['user_id']]);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
