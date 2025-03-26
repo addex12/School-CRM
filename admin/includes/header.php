@@ -12,11 +12,11 @@ require_once '../includes/setting.php';
 requireAdmin();
 
 // Update user last activity timestamp
-$stmt = $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
+$stmt = $pdo->prepare(query: "UPDATE users SET last_activity = NOW() WHERE id = ?");
+$stmt->execute(params: [$_SESSION['user_id']]);
 
 // Retrieve site-wide settings
-$siteName     = getSystemSetting('site_name', 'My Website'); // Set a default site name
+$siteName     = getSystemSetting('site_name', 'Admin Panel'); // Set a default site name
 $siteLogo     = getSystemSetting('site_logo');
 $themeColor   = getSystemSetting('theme_color', '#3498db'); // Default theme color
 
@@ -26,12 +26,12 @@ $menuJson  = getSystemSetting('admin_menu');
 
 // Attempt to decode the admin menu from the settings
 if (!empty($menuJson)) {
-    $decodedMenu = json_decode($menuJson, true);
+    $decodedMenu = json_decode(json: $menuJson, associative: true);
     if (json_last_error() === JSON_ERROR_NONE && is_array($decodedMenu)) {
         $adminMenu = $decodedMenu;
     } else {
         // Log an error if the JSON is invalid
-        error_log("Invalid admin menu JSON in settings: " . json_last_error_msg());
+        error_log(message: "Invalid admin menu JSON in settings: " . json_last_error_msg());
         // Fallback to the default menu will occur below
     }
 }
@@ -85,7 +85,7 @@ if (empty($adminMenu)) {
 }
 
 // Sanitize page title
-$pageTitle = isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dashboard';
+$pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -98,7 +98,7 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dashboard';
     <style>
         /* Dynamically set the primary color from the settings */
         :root {
-            --primary-color: <?= htmlspecialchars($themeColor) ?>;
+            --primary-color: <?= htmlspecialchars(string: $themeColor) ?>;
         }
     </style>
 </head>
@@ -118,13 +118,13 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dashboard';
                     <?php
                     // Check if the user's role is allowed to see this menu item
                     $allowedRoles = $item['roles'] ?? ['admin'];
-                    if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], $allowedRoles)) {
+                    if (!isset($_SESSION['role']) || !in_array(needle: $_SESSION['role'], haystack: $allowedRoles)) {
                         continue;
                     }
                     // Determine if the current menu item is active
-                    $isActive = (basename($_SERVER['PHP_SELF']) === $item['url']);
+                    $isActive = (basename(path: $_SERVER['PHP_SELF']) === $item['url']);
                     ?>
-                    <a href="<?= htmlspecialchars($item['url']) ?>"
+                    <a href="<?= htmlspecialchars(string: $item['url']) ?>"
                        class="<?= $isActive ? 'active' : '' ?>">
                         <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
                         <span class="nav-text"><?= htmlspecialchars($item['title']) ?></span>
