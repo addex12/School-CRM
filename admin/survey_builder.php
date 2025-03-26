@@ -145,9 +145,9 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
 </head>
 <body>
 
- <div class="admin-dashboard"><?php include 'includes/admin_sidebar.php'; ?></div> 
+ <div class="admin-dashboard"> <?php include 'includes/admin_sidebar.php'; ?> 
   
-<div class="container">
+ <div class="container">
         
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
@@ -263,6 +263,7 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
             </form>
         </div>
     </div>
+ </div>
 
     <script>
         document.getElementById('add-field').addEventListener('click', function () {
