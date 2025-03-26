@@ -1,5 +1,5 @@
 <?php
-include '../includes/auth.php';
+include 'auth.php';
 requireAdmin();
 ?>
 <!DOCTYPE html>
