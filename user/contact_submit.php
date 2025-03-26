@@ -1,4 +1,13 @@
 <?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Log errors to a file
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../logs/error.log');
+
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/PHPMailer/PHPMailer.php';
@@ -67,7 +76,13 @@ try {
                           (user_id, ticket_number, subject, message, priority, status, attachment, created_at) 
                           VALUES (?, ?, ?, ?, ?, 'open', ?, NOW())");
     $stmt->execute([$user_id, $ticket_number, $subject, $message, $priority, $attachment_path]);
-    
+} catch (PDOException $e) {
+    error_log("Database Error: " . $e->getMessage());
+    header("Location: contact.php?error=Database error occurred. Please try again later.");
+    exit();
+}
+
+try {
     // Send email to admin
     $mail = new PHPMailer(true);
     
@@ -106,7 +121,9 @@ try {
         $mail->send();
     } catch (Exception $e) {
         error_log("Mailer Error: " . $mail->ErrorInfo);
-        // Continue even if email fails
+        // Redirect with a warning if email fails
+        header("Location: contact.php?success=1&ticket=" . urlencode($ticket_number) . "&warning=Email not sent");
+        exit();
     }
     
     // Redirect to success page
