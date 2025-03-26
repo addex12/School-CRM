@@ -41,8 +41,8 @@ if ($completed) {
     exit();
 }
 
-// Get questions for this survey
-$stmt = $pdo->prepare("SELECT * FROM questions WHERE survey_id = ? ORDER BY id");
+// Fetch questions for this survey
+$stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
 $stmt->execute([$survey_id]);
 $questions = $stmt->fetchAll();
 
@@ -50,39 +50,38 @@ $questions = $stmt->fetchAll();
 $error = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $success = true;
-    
+    $responses = $_POST['responses'] ?? [];
+
     foreach ($questions as $question) {
-        $response = $_POST['responses'][$question['id']] ?? '';
-        
-        // Validate required questions
+        $response = $responses[$question['id']] ?? null;
+
+        // Validate required fields
         if ($question['is_required'] && empty($response)) {
             $success = false;
-            $error = "Please answer all required questions";
+            $error = "Please answer all required questions.";
             break;
         }
-        
-        // Validate rating questions
-        if ($question['question_type'] === 'rating' && !empty($response)) {
+
+        // Validate rating fields
+        if ($question['field_type'] === 'rating' && !empty($response)) {
             $rating = intval($response);
             if ($rating < 1 || $rating > 5) {
                 $success = false;
-                $error = "Please provide a valid rating between 1 and 5";
+                $error = "Please provide a valid rating between 1 and 5.";
                 break;
             }
         }
     }
-    
+
     if ($success) {
         // Save responses
         foreach ($questions as $question) {
-            $response = $_POST['responses'][$question['id']] ?? null;
-            
+            $response = $responses[$question['id']] ?? null;
             if ($response !== null) {
-                $stmt = $pdo->prepare("INSERT INTO responses (survey_id, question_id, user_id, response) VALUES (?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO responses (survey_id, field_id, user_id, response) VALUES (?, ?, ?, ?)");
                 $stmt->execute([$survey_id, $question['id'], $_SESSION['user_id'], $response]);
             }
         }
-        
         header("Location: dashboard.php?completed=1");
         exit();
     }

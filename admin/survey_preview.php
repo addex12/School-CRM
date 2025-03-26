@@ -94,57 +94,23 @@ $target_roles = json_decode($survey['target_roles'], true);
                             <?php elseif ($field['field_type'] === 'textarea'): ?>
                                 <textarea rows="3" disabled placeholder="Textarea input"></textarea>
                             
-                            <?php elseif ($field['field_type'] === 'radio'): ?>
+                            <?php elseif (in_array($field['field_type'], ['radio', 'checkbox', 'dropdown'])): ?>
                                 <div class="options">
                                     <?php 
                                     $options = json_decode($field['field_options'], true);
                                     foreach ($options as $option): ?>
                                         <label class="option">
-                                            <input type="radio" name="preview_<?php echo $field['id']; ?>" disabled>
+                                            <input type="<?php echo $field['field_type'] === 'radio' ? 'radio' : 'checkbox'; ?>" disabled>
                                             <?php echo htmlspecialchars($option); ?>
                                         </label>
                                     <?php endforeach; ?>
                                 </div>
-                            
-                            <?php elseif ($field['field_type'] === 'checkbox'): ?>
-                                <div class="options">
-                                    <?php 
-                                    $options = json_decode($field['field_options'], true);
-                                    foreach ($options as $option): ?>
-                                        <label class="option">
-                                            <input type="checkbox" disabled>
-                                            <?php echo htmlspecialchars($option); ?>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            
-                            <?php elseif ($field['field_type'] === 'select'): ?>
-                                <select disabled>
-                                    <option value="">Select an option</option>
-                                    <?php 
-                                    $options = json_decode($field['field_options'], true);
-                                    foreach ($options as $option): ?>
-                                        <option><?php echo htmlspecialchars($option); ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            
-                            <?php elseif ($field['field_type'] === 'number'): ?>
-                                <input type="number" disabled placeholder="Number input">
-                            
-                            <?php elseif ($field['field_type'] === 'date'): ?>
-                                <input type="date" disabled>
                             
                             <?php elseif ($field['field_type'] === 'rating'): ?>
                                 <div class="rating-container">
-                                    <span class="rating-star">★</span>
-                                    <span class="rating-star">★</span>
-                                    <span class="rating-star">★</span>
-                                    <span class="rating-star">★</span>
-                                    <span class="rating-star">★</span>
-                                    <div class="rating-labels">
-                                        <span>1 (Poor)</span>
-                                        <span>5 (Excellent)</span>
-                                    </div>
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <span class="rating-star">★</span>
+                                    <?php endfor; ?>
                                 </div>
                             
                             <?php elseif ($field['field_type'] === 'file'): ?>

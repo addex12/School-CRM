@@ -21,6 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
+        // Ensure 'status' has a default value if not set
+        $status = $_POST['status'] ?? 'inactive';
+
         // Save survey basic info
         $stmt = $pdo->prepare("INSERT INTO surveys 
             (title, description, category_id, target_roles, status, starts_at, ends_at, created_by)
@@ -30,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['description'],
             $_POST['category_id'],
             json_encode($_POST['target_roles']),
-            $_POST['status'],
+            $status,
             $_POST['starts_at'],
             $_POST['ends_at'],
             $_SESSION['user_id']
@@ -139,6 +142,13 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                             <label for="ends_at">End Date/Time:</label>
                             <input type="datetime-local" id="ends_at" name="ends_at" required>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status:</label>
+                        <select id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive" selected>Inactive</option>
+                        </select>
                     </div>
                 </div>
 
