@@ -68,13 +68,7 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
     <div class="container">
         <header>
             <h1>Survey Builder</h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php" class="active">Survey Builder</a>
-                <a href="results.php">Results</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
+<?php require_once 'includes/header.php'; ?>
         </header>
         
         <div class="content">
