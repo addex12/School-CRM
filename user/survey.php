@@ -120,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             $pdo->commit();
-            header("Location: dashboard.php?survey_completed=1");
+            header("Location: thank_you.php");
             exit();
         } catch (Exception $e) {
             $pdo->rollBack();
