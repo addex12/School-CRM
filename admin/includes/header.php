@@ -24,55 +24,8 @@ if (!empty($menuJson)) {
         $adminMenu = [];
     }
 }
-
-// Fallback to default menu if empty or invalid
-if (empty($adminMenu)) {
-    $adminMenu = [
-        [
-            'title' => 'Dashboard',
-            'url'   => 'dashboard.php',
-            'icon'  => 'fa-home',
-            'roles' => ['admin']
-        ],
-        [
-            'title' => 'Surveys',
-            'url'   => 'surveys.php',
-            'icon'  => 'fa-poll', 
-            'roles' => ['admin']
-        ],
-        [
-            'title' => 'Survey Builder',
-            'url'   => 'survey_builder.php',
-            'icon'  => 'fa-wrench',
-            'roles' => ['admin']
-        ],
-        [
-            'title' => 'Categories',
-            'url'   => 'categories.php',
-            'icon'  => 'fa-folder',
-            'roles' => ['admin']
-        ],
-        [
-            'title' => 'Users',
-            'url'   => 'users.php',
-            'icon'  => 'fa-users',
-            'roles' => ['admin']
-        ],
-        [
-            'title' => 'Results',
-            'url'   => 'results.php',
-            'icon'  => 'fa-chart-bar',
-            'roles' => ['admin']
-        ],
-        [
-            'title' => 'Settings',
-            'url'   => 'settings.php',
-            'icon'  => 'fa-cog',
-            'roles' => ['admin']
-        ]
-    ];
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
