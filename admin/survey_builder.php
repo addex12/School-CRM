@@ -117,7 +117,7 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
         <header>
             <h1>Survey Builder</h1>
         </header>
-        <script src="../assets/js/sortable.js"></script>
+        <script src="../assets/js/sortable.min.js"></script>
         <script src="../assets/js/survey_builder.js"></script>
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
