@@ -65,16 +65,8 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
 <body>
     <div class="container">
         <header>
-            <h1>Manage Users</h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php">Survey Builder</a>
-                <a href="categories.php">Categories</a>
-                <a href="users.php" class="active">Users</a>
-                <a href="results.php">Results</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
+                       <?php require_once 'includes/header.php'; ?>
+ <h1>Manage Users</h1>
         </header>
         
         <div class="content">
