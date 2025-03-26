@@ -1,7 +1,7 @@
 <?php
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
-require_once '../admin/includes/settings.php'; 
+require_once 'includes/settings.php'; 
 
 $stmt = $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
