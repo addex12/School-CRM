@@ -1,24 +1,48 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/mailer.php';
 requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
     $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING);
     $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    $priority = filter_input(INPUT_POST, 'priority', FILTER_SANITIZE_STRING);
+    $attachment = handleFileUpload('attachment');
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO contact_requests 
-                             (user_id, name, email, subject, message) 
-                             VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$_SESSION['user_id'], $name, $email, $subject, $message]);
-        $success = "Your message has been sent successfully!";
-    } catch (PDOException $e) {
-        $error = "Error sending message: " . $e->getMessage();
+        // Generate ticket number
+        $ticket_number = 'TKT-' . strtoupper(uniqid());
+        
+        $stmt = $pdo->prepare("INSERT INTO support_tickets 
+                            (user_id, ticket_number, subject, message, priority, attachment) 
+                            VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$_SESSION['user_id'], $ticket_number, $subject, $message, $priority, $attachment]);
+        
+        // Send confirmation email
+        $user_email = $_SESSION['email'];
+        $mail->setFrom('support@yourdomain.com', 'Support Team');
+        $mail->addAddress($user_email);
+        $mail->Subject = "Ticket Created: $ticket_number";
+        $mail->Body = "Your support ticket has been created.\n\nTicket Number: $ticket_number";
+        $mail->send();
+        
+        // Notify admins
+        $admin_subject = "New Support Ticket: $ticket_number";
+        $admin_body = "Priority: $priority\nSubject: $subject\nMessage: $message";
+        sendEmailToAdmins($admin_subject, $admin_body);
+        
+        $success = "Ticket created successfully! Check your email for confirmation.";
+    } catch (Exception $e) {
+        $error = "Error: " . $e->getMessage();
     }
 }
+
+// Get ticket history
+$tickets = $pdo->prepare("SELECT * FROM support_tickets 
+                         WHERE user_id = ? 
+                         ORDER BY created_at DESC");
+$tickets->execute([$_SESSION['user_id']]);
 ?>
 
 <!DOCTYPE html>
@@ -26,37 +50,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Contact Support</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <?php include 'includes/header.php'; ?>
 </head>
 <body>
     <div class="container">
-        <?php include 'header.php'; ?>
+        <?php include 'includes/header.php'; ?>
 
         <div class="content">
             <h2>Contact Support</h2>
             
-            <?php if(isset($success)): ?>
-                <div class="success-message"><?= $success ?></div>
-            <?php endif; ?>
-            
-            <?php if(isset($error)): ?>
-                <div class="error-message"><?= $error ?></div>
-            <?php endif; ?>
-
-            <form method="POST">
-                <div class="form-group">
-                    <label>Name:</label>
-                    <input type="text" name="name" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="email" name="email" required>
-                </div>
-                
+            <form method="POST" enctype="multipart/form-data">
                 <div class="form-group">
                     <label>Subject:</label>
                     <input type="text" name="subject" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Priority:</label>
+                    <select name="priority" required>
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -64,9 +79,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <textarea name="message" rows="5" required></textarea>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">Send Message</button>
+                <div class="form-group">
+                    <label>Attachment:</label>
+                    <input type="file" name="attachment">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Submit Ticket</button>
             </form>
+
+            <div class="ticket-history">
+                <h3>Your Support Tickets</h3>
+                <?php foreach ($tickets as $ticket): ?>
+                    <div class="ticket">
+                        <div class="ticket-header">
+                            <span class="ticket-number"><?= $ticket['ticket_number'] ?></span>
+                            <span class="priority <?= $ticket['priority'] ?>">
+                                <?= ucfirst($ticket['priority']) ?>
+                            </span>
+                        </div>
+                        <h4><?= htmlspecialchars($ticket['subject']) ?></h4>
+                        <p><?= htmlspecialchars($ticket['message']) ?></p>
+                        <?php if ($ticket['attachment']): ?>
+                            <div class="attachment">
+                                <a href="../uploads/<?= $ticket['attachment'] ?>" target="_blank">
+                                    <i class="fas fa-paperclip"></i> Attachment
+                                </a>
+                            </div>
+                        <?php endif; ?>
+                        <small>Created: <?= date('M d, Y H:i', strtotime($ticket['created_at'])) ?></small>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
+
+        <?php include 'includes/footer.php'; ?>
     </div>
 </body>
 </html>

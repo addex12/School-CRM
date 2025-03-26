@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/mailer.php';
 requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -11,38 +12,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO feedback (user_id, subject, message, rating) 
-                             VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO feedback 
+                            (user_id, subject, message, rating) 
+                            VALUES (?, ?, ?, ?)");
         $stmt->execute([$_SESSION['user_id'], $subject, $message, $rating]);
-        $success = "Thank you for your feedback!";
-    } catch (PDOException $e) {
-        $error = "Error submitting feedback: " . $e->getMessage();
+        
+        // Send confirmation email
+        $user_email = $_SESSION['email'];
+        $mail->setFrom('support@yourdomain.com', 'Support Team');
+        $mail->addAddress($user_email);
+        $mail->Subject = "Feedback Received";
+        $mail->Body = "Thank you for your feedback!\n\nWe appreciate your input.";
+        $mail->send();
+        
+        // Notify admins
+        $admin_subject = "New Feedback Submission";
+        $admin_body = "Rating: $rating/5\nSubject: $subject\nMessage: $message";
+        sendEmailToAdmins($admin_subject, $admin_body);
+        
+        $success = "Thank you for your feedback! We've sent a confirmation email.";
+    } catch (Exception $e) {
+        $error = "Error: " . $e->getMessage();
     }
 }
+
+// Get feedback history
+$feedback = $pdo->prepare("SELECT * FROM feedback 
+                          WHERE user_id = ? 
+                          ORDER BY created_at DESC");
+$feedback->execute([$_SESSION['user_id']]);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Submit Feedback</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Feedback System</title>
+    <?php include 'includes/header.php'; ?>
+    <style>
+        .rating-stars { color: #ffd700; font-size: 1.5em; }
+        .feedback-history { margin-top: 30px; }
+    </style>
 </head>
 <body>
     <div class="container">
-        <?php include 'header.php'; ?>
+        <?php include 'includes/header.php'; ?>
 
         <div class="content">
             <h2>Submit Feedback</h2>
             
-            <?php if(isset($success)): ?>
-                <div class="success-message"><?= $success ?></div>
-            <?php endif; ?>
-            
-            <?php if(isset($error)): ?>
-                <div class="error-message"><?= $error ?></div>
-            <?php endif; ?>
-
+            <!-- Feedback Form -->
             <form method="POST">
                 <div class="form-group">
                     <label>Subject:</label>
@@ -55,19 +74,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
                 
                 <div class="form-group">
-                    <label>Rating (1-5):</label>
-                    <select name="rating" required>
-                        <option value="1">1 - Poor</option>
-                        <option value="2">2 - Fair</option>
-                        <option value="3">3 - Good</option>
-                        <option value="4">4 - Very Good</option>
-                        <option value="5">5 - Excellent</option>
-                    </select>
+                    <label>Rating:</label>
+                    <div class="star-rating">
+                        <?php for ($i = 5; $i >= 1; $i--): ?>
+                            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required>
+                            <label for="star<?= $i ?>" class="fas fa-star"></label>
+                        <?php endfor; ?>
+                    </div>
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Submit Feedback</button>
             </form>
+
+            <!-- Feedback History -->
+            <div class="feedback-history">
+                <h3>Your Previous Feedback</h3>
+                <?php foreach ($feedback as $item): ?>
+                    <div class="feedback-item">
+                        <div class="rating-stars">
+                            <?= str_repeat('★', $item['rating']) . str_repeat('☆', 5 - $item['rating']) ?>
+                        </div>
+                        <h4><?= htmlspecialchars($item['subject']) ?></h4>
+                        <p><?= htmlspecialchars($item['message']) ?></p>
+                        <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         </div>
+
+        <?php include 'includes/footer.php'; ?>
     </div>
 </body>
 </html>
