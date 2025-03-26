@@ -84,3 +84,101 @@ if (empty($adminMenu)) {
     ];
 }
 return $adminMenu;
+?>
+<!DOCTYPE html>
+<html lang="en">
+    <head>  
+        <meta charset="UTF-8">
+        <title><?= htmlspecialchars($siteName) ?></title>
+        <link rel="stylesheet" href="../assets/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <script src="../assets/js/admin.js" defer></script>
+        <style>
+            :root {
+                --theme-color: <?= $themeColor ?>;
+            }
+        </style>
+        </head>
+    <body>
+    
+        <div class="container">
+            <header>
+                <div class="logo">
+                    <?php if ($siteLogo): ?>
+                        <img src="<?= htmlspecialchars($siteLogo) ?>" alt="<?= htmlspecialchars($siteName) ?>">
+                    <?php endif; ?>
+                    <h1><?= htmlspecialchars($siteName) ?></h1>
+                </div>
+                <nav>
+                    <?php foreach ($adminMenu as $item): ?>
+                        <?php if (array_intersect($_SESSION['roles'], $item['roles'])): ?>
+                            <a href="<?= htmlspecialchars($item['url']) ?>" class="<?= basename($_SERVER['SCRIPT_NAME']) === $item['url'] ? 'active' : '' ?>">
+                                <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
+                                <?= htmlspecialchars($item['title']) ?>
+                            </a>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <a href="../logout.php">Logout</a>
+                </nav>
+            </header>
+            <main>
+                <div class="content">
+                    <?php if (isset($_SESSION['success'])): ?>
+                        <div class="success-message"><?= $_SESSION['success'] ?></div>
+                        <?php unset($_SESSION['success']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="error-message"><?= $_SESSION['error'] ?></div>
+                        <?php unset($_SESSION['error']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['warning'])): ?>
+                        <div class="warning-message"><?= $_SESSION['warning'] ?></div>
+                        <?php unset($_SESSION['warning']); ?>
+                    <?php endif; ?>
+
+
+    </head>
+    <body>  
+        <div class="container">
+            <header>
+                <div class="logo">
+                    <?php if ($siteLogo): ?>
+                        <img src="<?= htmlspecialchars($siteLogo) ?>" alt="<?= htmlspecialchars($siteName) ?>">
+                    <?php endif; ?>
+                    <h1><?= htmlspecialchars($siteName) ?></h1>
+                </div>
+                <nav>
+                    <?php foreach ($adminMenu as $item): ?>
+                        <?php if (array_intersect($_SESSION['roles'], $item['roles'])): ?>
+                            <a href="<?= htmlspecialchars($item['url']) ?>" class="<?= basename($_SERVER['SCRIPT_NAME']) === $item['url'] ? 'active' : '' ?>">
+                                <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
+                                <?= htmlspecialchars($item['title']) ?>
+                            </a>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <a href="../logout.php">Logout</a>
+                </nav>
+            </header>
+            <main>
+                <div class="content">
+                    <?php if (isset($_SESSION['success'])): ?>
+                        <div class="success-message"><?= $_SESSION['success'] ?></div>
+                        <?php unset($_SESSION['success']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="error-message"><?= $_SESSION['error'] ?></div>
+                        <?php unset($_SESSION['error']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['warning'])): ?>
+                        <div class="warning-message"><?= $_SESSION['warning'] ?></div>
+                        <?php unset($_SESSION['warning']); ?>
+                    <?php endif; ?>
+                </div>
+            </main>
+        </div>
+        <script src="../assets/js/admin.js" defer></script>
+        </body>
+    </html>
+    
+
+    </body>
