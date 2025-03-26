@@ -89,4 +89,14 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Dashboard';
                     $isActive = (basename($_SERVER['PHP_SELF']) === $item['url']);
                     ?>
                     <a href="<?= htmlspecialchars($item['url']) ?>"
-                       class="<?= $isActive ?
+                       class="<?= $isActive ?'':''?><?= htmlspecialchars($item['title'])    ?><?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor)  ?><?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor) ?> <?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor)  
+                       ?>
+                          <?= $isActive ? 'active' : '' ?>">
+                            <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
+                            <?= htmlspecialchars($item['title']) ?><?= htmlspecialchars($siteName) ?> <?= htmlspecialchars($themeColor)
+                            ?>
+                        </a>
+                <?php endforeach; ?>
+            </nav>
+        </header>
+        
