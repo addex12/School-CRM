@@ -126,8 +126,8 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboa
                     ?>
                     <a href="<?= htmlspecialchars(string: $item['url']) ?>"
                        class="<?= $isActive ? 'active' : '' ?>">
-                        <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
-                        <span class="nav-text"><?= htmlspecialchars($item['title']) ?></span>
+                        <i class="fas <?= htmlspecialchars(string: $item['icon']) ?>"></i>
+                        <span class="nav-text"><?= htmlspecialchars(string: $item['title']) ?></span>
                     </a>
                 <?php endforeach; ?>
                 <a href="../logout.php" class="logout-btn">
@@ -143,16 +143,16 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboa
                     <?php
                     // Check if the user's role is allowed to see this menu item
                     $allowedRoles = $item['roles'] ?? ['admin'];
-                    if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], $allowedRoles)) {
+                    if (!isset($_SESSION['role']) || !in_array(needle: $_SESSION['role'], haystack: $allowedRoles)) {
                         continue;
                     }
                     // Determine if the current menu item is active
-                    $isActive = (basename($_SERVER['PHP_SELF']) === $item['url']);
+                    $isActive = (basename(path: $_SERVER['PHP_SELF']) === $item['url']);
                     ?>
-                    <a href="<?= htmlspecialchars($item['url']) ?>"
+                    <a href="<?= htmlspecialchars(string: $item['url']) ?>"
                        class="<?= $isActive ? 'active' : '' ?>">
-                        <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
-                        <span class="nav-text"><?= htmlspecialchars($item['title']) ?></span>
+                        <i class="fas <?= htmlspecialchars(string: $item['icon']) ?>"></i>
+                        <span class="nav-text"><?= htmlspecialchars(string: $item['title']) ?></span>
                     </a>
                 <?php endforeach; ?>
                 <a href="../logout.php" class="logout-btn">
@@ -162,4 +162,3 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboa
             </nav>
 
             <main class="admin-main-content">
-                
