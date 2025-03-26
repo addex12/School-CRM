@@ -12,19 +12,11 @@ $subject = $message = $priority = '';
 $attachment = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Debugging: Log the POST data to check if all fields are being sent
-    error_log(print_r($_POST, true));
+    $name = $_POST['name'] ?? '';
+    $email = $_POST['email'] ?? ''; // Ensure 'email' key exists
+    $message = $_POST['message'] ?? '';
 
-    $name = trim($_POST['name'] ?? ''); // Trim to remove extra spaces
-    $email = trim($_POST['email'] ?? ''); // Ensure 'email' key exists and trim
-    $message = trim($_POST['message'] ?? ''); // Trim to remove extra spaces
-    $subject = trim($_POST['subject'] ?? ''); // Ensure 'subject' key exists
-    $priority = trim($_POST['priority'] ?? ''); // Ensure 'priority' key exists
-
-    // Debugging: Log the trimmed values to ensure they are not empty
-    error_log("Name: $name, Email: $email, Message: $message, Subject: $subject, Priority: $priority");
-
-    if (empty($name) || empty($email) || empty($message) || empty($subject) || empty($priority)) {
+    if (empty($name) || empty($email) || empty($message)) {
         $error = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Invalid email address.";
@@ -46,13 +38,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Ensure the upload directory exists
         if (!is_dir(filename: $upload_dir)) {
-            mkdir(directory: $upload_dir, permissions: 0755, recursive: true); // Create the directory with appropriate permissions
+            mkdir($upload_dir, 0755, true); // Create the directory with appropriate permissions
         }
 
-        $file_name = basename(path: $_FILES['attachment']['name']);
+        $file_name = basename($_FILES['attachment']['name']);
         $file_path = $upload_dir . $file_name;
 
-        if (move_uploaded_file(from: $_FILES['attachment']['tmp_name'], to: $file_path)) {
+        if (move_uploaded_file($_FILES['attachment']['tmp_name'], $file_path)) {
             $attachment = $file_name;
         } else {
             $error = "Failed to upload the file.";
@@ -62,17 +54,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($error)) {
         try {
             // Generate ticket number
-            $ticket_number = 'TKT-' . strtoupper(string: uniqid());
+            $ticket_number = 'TKT-' . strtoupper(uniqid());
             
-            $stmt = $pdo->prepare(query: "INSERT INTO support_tickets 
+            $stmt = $pdo->prepare("INSERT INTO support_tickets 
                                 (user_id, ticket_number, subject, message, priority, attachment) 
                                 VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute(params: [$_SESSION['user_id'], $ticket_number, $subject, $message, $priority, $attachment]);
+            $stmt->execute([$_SESSION['user_id'], $ticket_number, $subject, $message, $priority, $attachment]);
             
             // Send confirmation email to user
             $user_email = $_SESSION['email'];
-            sendEmail(to: $user_email, subject: "Ticket Created: $ticket_number", 
-                body: "Your support ticket has been created.\n\nTicket Number: $ticket_number");
+            sendEmail($user_email, "Ticket Created: $ticket_number", 
+                "Your support ticket has been created.\n\nTicket Number: $ticket_number");
             
             // Notify admins
             $admin_subject = "New Support Ticket: $ticket_number";
@@ -80,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($attachment) {
                 $admin_body .= "\n\nAttachment: $attachment";
             }
-            sendEmail(to: "contactus@flipperschools.com", subject: $admin_subject, body: $admin_body);
-            sendEmail(to: "adugna.gizaw@flipperschools.com", subject: $admin_subject, body: $admin_body);
+            sendEmail("contactus@flipperschools.com", $admin_subject, $admin_body);
+            sendEmail("adugna.gizaw@flipperschools.com", $admin_subject, $admin_body);
             
             $success = "Ticket created successfully! Check your email for confirmation.";
             
@@ -96,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get ticket history
-$tickets = $pdo->prepare(query: "SELECT * FROM support_tickets 
+$tickets = $pdo->prepare("SELECT * FROM support_tickets 
                          WHERE user_id = ? 
                          ORDER BY created_at DESC");
 $tickets->execute(params: [$_SESSION['user_id']]);
