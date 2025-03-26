@@ -44,6 +44,8 @@ $recentResponses = $pdo->query("
 </head>
 <body>
     <div class="container">
+    <?php require_once 'includes/header.php'; ?>
+
         <h1>Admin Dashboard</h1>      
         <div class="stats-grid">
             <div class="stat-card">
