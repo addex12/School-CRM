@@ -14,7 +14,7 @@ require_once '../includes/auth.php';
 requireLogin();
 
 // Check session user data exists
-if (!isset($_SESSION['user_id']) {
+if (!isset($_SESSION['user_id'])) {
     die("Session error: User not authenticated");
 }
 
@@ -46,7 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (isset($_POST['change_password'])) {
             // Password change logic
-            $user = $pdo->prepare("SELECT password FROM users WHERE id = ?")->execute([$user_id])->fetch();
+            $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch();
             
             if (!password_verify($_POST['current_password'], $user['password'])) {
                 $_SESSION['error'] = "Current password is incorrect!";
