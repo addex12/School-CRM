@@ -1,5 +1,4 @@
 <?php
-require_once 'includes/header.php';
 require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireAdmin();
@@ -56,18 +55,7 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Manage Survey Categories</h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php">Survey Builder</a>
-                <a href="categories.php" class="active">Categories</a>
-                <a href="users.php">Users</a>
-                <a href="results.php">Results</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
-        </header>
+        <?php require_once 'includes/header.php'; ?>
         
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
