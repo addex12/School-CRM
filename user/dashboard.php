@@ -128,6 +128,7 @@ $completedSurveys = $completedCount->fetchColumn();
                 <p class="no-surveys">No surveys available at this time.</p>
             <?php endif; ?>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
