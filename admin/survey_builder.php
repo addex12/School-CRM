@@ -1,4 +1,4 @@
-<?php
+<div?php
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
@@ -145,8 +145,8 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
 </head>
 <body>
 
- <data class="admin-dashboard"        <?php include 'includes/admin_sidebar.php'; ?>
- ></data>iv   
+ <div class="admin-dashboard"><?php include 'includes/admin_sidebar.php'; ?></div> 
+  
 <div class="container">
         
         <div class="content">
