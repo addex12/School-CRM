@@ -4,30 +4,28 @@ require_once '../includes/auth.php';
 requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $stmt = $pdo->prepare("
-        INSERT INTO messages (sender_id, receiver_id, subject, content, is_email)
-        VALUES (?, ?, ?, ?, ?)
-    ");
-    
-    // Get receiver ID from username
+    $data = json_decode(file_get_contents('php://input'), true);
     $stmtUser = $pdo->prepare("SELECT id FROM users WHERE username = ?");
-    $stmtUser->execute([$_POST['recipient']]);
+    $stmtUser->execute([$data['recipient']]);
     $receiver = $stmtUser->fetch();
-    
+
     if ($receiver) {
+        $stmt = $pdo->prepare("
+            INSERT INTO messages (sender_id, receiver_id, subject, content, is_email)
+            VALUES (?, ?, ?, ?, ?)
+        ");
         $stmt->execute([
             $_SESSION['user_id'],
             $receiver['id'],
-            $_POST['subject'],
-            $_POST['content'],
-            isset($_POST['is_email']) ? 1 : 0
+            $data['subject'],
+            $data['content'],
+            $data['is_email'] ? 1 : 0
         ]);
-        $_SESSION['success'] = "Message sent successfully!";
-        header("Location: inbox.php");
-        exit();
+        echo json_encode(['success' => true]);
     } else {
-        $_SESSION['error'] = "Recipient not found!";
+        echo json_encode(['error' => 'Recipient not found']);
     }
+    exit();
 }
 ?>
 
@@ -44,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="compose-container">
         <h1>Compose New Message</h1>
         
-        <form method="POST">
+        <form id="composeForm">
             <div class="form-group">
                 <label>Recipient Username:</label>
                 <input type="text" name="recipient" required>
@@ -70,5 +68,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" class="btn btn-primary">Send Message</button>
         </form>
     </div>
+
+    <script>
+        document.getElementById('composeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('Message sent successfully!');
+                    window.location.href = 'inbox.php';
+                } else {
+                    alert(result.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
 </html>
