@@ -58,7 +58,7 @@ $messages = $stmt->fetchAll();
 </head>
 <body>
     <div class="container">
-        <?php include 'header.php'; ?>
+        <?php include 'includes/header.php'; ?>
 
         <div class="chat-container">
             <h2>Live Chat Support</h2>
@@ -88,6 +88,8 @@ $messages = $stmt->fetchAll();
                 <button type="submit" class="btn btn-primary">Send Message</button>
             </form>
         </div>
+
+        <?php include 'includes/footer.php'; ?>
     </div>
 </body>
 </html>
