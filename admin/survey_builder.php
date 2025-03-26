@@ -173,7 +173,7 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                         <div class="form-preview" id="form-preview">
                             <p>Drag fields from the right panel to build your form</p>
                         </div>
-                        <script src="../assets/js/sortable.min.js"></script>
+                        <script src="../assets/js/sortable.js"></script>
                         <script src="../assets/js/survey_builder.js"></script>
                         <div class="fields-panel">
                             <h3>Available Fields</h3>
