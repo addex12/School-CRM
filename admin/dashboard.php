@@ -38,7 +38,6 @@ $recentResponses = $pdo->query("
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <?php require_once 'includes/header.php'; ?>
     <title>Admin Dashboard - Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
