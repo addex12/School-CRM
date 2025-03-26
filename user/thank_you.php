@@ -1,7 +1,12 @@
 <?php
-require_once '../includes/header.php';
+require_once '../includes/config.php'; // Ensure the config file is included
 require_once '../includes/auth.php';
 requireLogin();
+
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,5 +22,5 @@ requireLogin();
         <a href="dashboard.php" class="btn btn-primary">Back to Dashboard</a>
     </div>
 </body>
-<?php require_once '../includes/footer.php';?>
+<?php require_once '../includes/footer.php'; ?>
 </html>
