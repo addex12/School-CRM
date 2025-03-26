@@ -10,7 +10,7 @@ $thread_id = $_GET['thread_id'] ?? null;
 
 // Handle message submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $attachment = handleFileUpload('attachment');
     
     try {
@@ -54,6 +54,35 @@ if ($thread_id) {
                              WHERE thread_id = ?
                              ORDER BY cm.created_at ASC");
     $messages->execute([$thread_id]);
+}
+
+// Implement handleFileUpload function
+function handleFileUpload($inputName) {
+    if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
+        return null;
+    }
+
+    $uploadDir = __DIR__ . '/../uploads/';
+    $filename = basename($_FILES[$inputName]['name']);
+    $targetFile = $uploadDir . $filename;
+
+    if (move_uploaded_file($_FILES[$inputName]['tmp_name'], $targetFile)) {
+        return $filename;
+    }
+
+    return null;
+}
+
+// Implement sendEmailToAdmins function
+function sendEmailToAdmins($subject, $body) {
+    global $pdo;
+
+    $stmt = $pdo->query("SELECT email FROM users WHERE is_admin = 1");
+    $adminEmails = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    foreach ($adminEmails as $email) {
+        mail($email, $subject, $body);
+    }
 }
 ?>
 
