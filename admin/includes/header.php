@@ -100,12 +100,75 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboa
         :root {
             --primary-color: <?= htmlspecialchars($themeColor) ?>;
         }
+
+        /* General styles for header and navigation */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .admin-header .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .admin-header .logo-img {
+            max-height: 40px;
+            margin-right: 10px;
+        }
+
+        .admin-nav-horizontal {
+            display: flex;
+            gap: 15px;
+        }
+
+        .admin-nav-horizontal a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .admin-nav-horizontal a.active {
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            margin-left: auto;
+        }
+
+        /* Responsive styles for smaller screens */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .admin-nav-horizontal {
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 10px;
+            }
+
+            .admin-nav-horizontal a {
+                font-size: 14px;
+            }
+
+            .admin-header .logo h1 {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
-<body>
+<body></body>
     <div class="admin-layout">
         <header class="admin-header">
-            <div class="logo">
+            <div class="logo"></div>
                 <?php if (!empty($siteLogo)): ?>
                     <img src="../assets/images/<?= htmlspecialchars($siteLogo) ?>"
                          alt="<?= htmlspecialchars($siteName) ?> Logo"
