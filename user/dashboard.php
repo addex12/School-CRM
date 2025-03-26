@@ -74,17 +74,7 @@ $completedSurveys = $completedCount->fetchColumn();
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?></h1>
-            <nav class="main-menu">
-                <a href="dashboard.php" class="menu-item active">Dashboard</a>
-                <a href="chat.php" class="menu-item">Chat</a>
-                <a href="feedback.php" class="menu-item">Feedback</a>
-                <a href="contact.php" class="menu-item">Contact</a>
-                <a href="../logout.php" class="menu-item">Logout</a>
-            </nav>
-        </header>
-
+    <?php include 'includes/header.php'; ?>
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Available Surveys</h3>
