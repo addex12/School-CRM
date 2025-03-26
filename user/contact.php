@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($name) || empty($email) || empty($message)) {
         $error = "All fields are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif (!filter_var(value: $email, filter: FILTER_VALIDATE_EMAIL)) {
         $error = "Invalid email address.";
     } else {
         // Process the contact form submission
@@ -28,19 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Sanitize inputs
-    $subject = filter_input(type: INPUT_POST, var_name: 'subject', filter: FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $message = filter_input(type: INPUT_POST, var_name: 'message', filter: FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $priority = filter_input(type: INPUT_POST, var_name: 'priority', filter: FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $priority = filter_input(INPUT_POST, 'priority', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     
     // Handle file upload
     if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
         $upload_dir = __DIR__ . '/../uploads/';
-        
-        // Ensure the upload directory exists
-        if (!is_dir(filename: $upload_dir)) {
-            mkdir($upload_dir, 0755, true); // Create the directory with appropriate permissions
-        }
-
         $file_name = basename($_FILES['attachment']['name']);
         $file_path = $upload_dir . $file_name;
 
@@ -91,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $tickets = $pdo->prepare("SELECT * FROM support_tickets 
                          WHERE user_id = ? 
                          ORDER BY created_at DESC");
-$tickets->execute(params: [$_SESSION['user_id']]);
+$tickets->execute([$_SESSION['user_id']]);
 ?>
 <!DOCTYPE html>
 <html lang="en">
