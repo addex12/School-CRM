@@ -150,40 +150,22 @@ $activity = $pdo->query("
         <div class="admin-main">
             <h1>Admin Dashboard</h1>
             
+            <!-- Display success and error messages -->
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
             <?php endif; ?>
-            
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
             <?php endif; ?>
             
             <!-- Dashboard Widgets -->
             <div class="widget-grid">
-                <div class="dashboard-widget widget-stat">
-                    <h3>Total Users</h3>
-                    <p><?php echo $stats['total_users']; ?></p>
-                </div>
-                <div class="dashboard-widget widget-stat">
-                    <h3>Active Surveys</h3>
-                    <p><?php echo $stats['active_surveys']; ?></p>
-                </div>
-                <div class="dashboard-widget widget-stat">
-                    <h3>Total Responses</h3>
-                    <p><?php echo $stats['total_responses']; ?></p>
-                </div>
-                <div class="dashboard-widget widget-stat">
-                    <h3>Open Tickets</h3>
-                    <p><?php echo $stats['open_tickets']; ?></p>
-                </div>
-                <div class="dashboard-widget widget-stat">
-                    <h3>Active Chats</h3>
-                    <p><?php echo $stats['active_chats']; ?></p>
-                </div>
-                <div class="dashboard-widget widget-stat">
-                    <h3>New Feedback</h3>
-                    <p><?php echo $stats['new_feedback']; ?></p>
-                </div>
+                <?php foreach ($stats as $key => $value): ?>
+                    <div class="dashboard-widget widget-stat">
+                        <h3><?php echo ucwords(str_replace('_', ' ', $key)); ?></h3>
+                        <p><?php echo $value; ?></p>
+                    </div>
+                <?php endforeach; ?>
             </div>
             
             <!-- Support Tickets Section -->
@@ -191,13 +173,13 @@ $activity = $pdo->query("
                 <div class="ticket-header">
                     <h2>Support Tickets</h2>
                     <div class="ticket-filters">
+                        <!-- Filters for tickets -->
                         <select id="status-filter">
                             <option value="all" <?php echo $status_filter === 'all' ? 'selected' : ''; ?>>All Statuses</option>
                             <option value="open" <?php echo $status_filter === 'open' ? 'selected' : ''; ?>>Open</option>
                             <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
                             <option value="closed" <?php echo $status_filter === 'closed' ? 'selected' : ''; ?>>Closed</option>
                         </select>
-                        
                         <select id="priority-filter">
                             <option value="all" <?php echo $priority_filter === 'all' ? 'selected' : ''; ?>>All Priorities</option>
                             <option value="critical" <?php echo $priority_filter === 'critical' ? 'selected' : ''; ?>>Critical</option>
@@ -205,16 +187,17 @@ $activity = $pdo->query("
                             <option value="medium" <?php echo $priority_filter === 'medium' ? 'selected' : ''; ?>>Medium</option>
                             <option value="low" <?php echo $priority_filter === 'low' ? 'selected' : ''; ?>>Low</option>
                         </select>
-                        
                         <button id="apply-filters" class="btn btn-primary">Apply Filters</button>
                     </div>
                 </div>
                 
+                <!-- Display tickets -->
                 <?php if (empty($tickets)): ?>
                     <p>No tickets found matching your criteria.</p>
                 <?php else: ?>
                     <?php foreach ($tickets as $ticket): ?>
                         <div class="ticket-card">
+                            <!-- Ticket details -->
                             <div class="ticket-header">
                                 <div>
                                     <strong>#<?php echo $ticket['ticket_number']; ?></strong> - <?php echo htmlspecialchars($ticket['subject']); ?>
@@ -228,8 +211,8 @@ $activity = $pdo->query("
                                     </span>
                                 </div>
                             </div>
-                            
                             <div class="ticket-body">
+                                <!-- Ticket meta and actions -->
                                 <div class="ticket-meta">
                                     <span><i class="bi bi-person"></i> <?php echo htmlspecialchars($ticket['username'] ?? 'Guest'); ?></span>
                                     <span><i class="bi bi-envelope"></i> <?php echo htmlspecialchars($ticket['email']); ?></span>
@@ -304,7 +287,7 @@ $activity = $pdo->query("
             </div>
             
             <!-- Chats and Feedback Section -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="dashboard-grid">
                 <!-- Active Chats -->
                 <div class="dashboard-widget chat-container">
                     <h2>Active Chats</h2>
@@ -372,15 +355,14 @@ $activity = $pdo->query("
                     <?php foreach ($activity as $item): ?>
                         <div class="activity-item">
                             <div class="activity-icon">
-                                <?php switch($item['type']):
+                                <?php switch ($item['type']):
                                     case 'survey': ?>
                                         <i class="bi bi-clipboard-check"></i>
                                         <?php break; ?>
-                                    <?php case 'ticket': ?>
-                                        <?php break; ?>
+                                    case 'ticket': ?>
                                         <i class="bi bi-ticket-detailed"></i>
                                         <?php break; ?>
-                                    <?php case 'feedback': ?>
+                                    case 'feedback': ?>
                                         <i class="bi bi-chat-square-text"></i>
                                         <?php break; ?>
                                 <?php endswitch; ?>
