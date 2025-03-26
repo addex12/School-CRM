@@ -87,7 +87,7 @@ if (empty($adminMenu)) {
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="admin-layout">
         <header class="admin-header">
             <div class="logo">
                 <?php if (!empty($siteLogo)): ?>
@@ -97,7 +97,7 @@ if (empty($adminMenu)) {
                 <?php endif; ?>
                 <h1><?= htmlspecialchars($siteName) ?></h1>
             </div>
-            <nav class="admin-nav">
+            <nav class="admin-nav-horizontal">
                 <?php foreach ($adminMenu as $item): ?>
                     <?php
                     $allowedRoles = $item['roles'] ?? ['admin'];
@@ -106,16 +106,18 @@ if (empty($adminMenu)) {
                     <a href="<?= htmlspecialchars($item['url']) ?>" 
                        class="<?= basename($_SERVER['PHP_SELF']) === $item['url'] ? 'active' : '' ?>">
                         <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
-                        <?= htmlspecialchars($item['title']) ?>
+                        <span class="nav-text"><?= htmlspecialchars($item['title']) ?></span>
                     </a>
                 <?php endforeach; ?>
                 <a href="../logout.php" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Logout</span>
                 </a>
             </nav>
         </header>
-        <div class="content-wrapper">
-            <nav class="admin-nav vertical">
+
+        <div class="admin-content-wrapper">
+            <nav class="admin-nav-vertical">
                 <?php foreach ($adminMenu as $item): ?>
                     <?php
                     $allowedRoles = $item['roles'] ?? ['admin'];
@@ -124,10 +126,13 @@ if (empty($adminMenu)) {
                     <a href="<?= htmlspecialchars($item['url']) ?>" 
                        class="<?= basename($_SERVER['PHP_SELF']) === $item['url'] ? 'active' : '' ?>">
                         <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
-                        <?= htmlspecialchars($item['title']) ?>
+                        <span class="nav-text"><?= htmlspecialchars($item['title']) ?></span>
                     </a>
                 <?php endforeach; ?>
                 <a href="../logout.php" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Logout</span>
                 </a>
             </nav>
+
+            <main class="admin-main-content">
