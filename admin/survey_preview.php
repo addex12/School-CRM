@@ -77,6 +77,7 @@ $target_roles = json_decode($survey['target_roles'], true);
                     <?php echo date('M j, Y g:i A', strtotime($survey['starts_at'])); ?> to 
                     <?php echo date('M j, Y g:i A', strtotime($survey['ends_at'])); ?>
                 </p>
+                <p><strong>Anonymous:</strong> <?php echo $survey['is_anonymous'] ? 'Yes' : 'No'; ?></p>
             </div>
             
             <div class="survey-preview">

@@ -31,6 +31,9 @@ if (!$survey) {
         exit();
 }
 
+// Check if the survey is anonymous
+$is_anonymous = $survey['is_anonymous'];
+
 // Check if user has already completed this survey
 $stmt = $pdo->prepare("SELECT COUNT(*) FROM responses WHERE survey_id = ? AND user_id = ?");
 $stmt->execute([$survey_id, $_SESSION['user_id']]);
@@ -79,7 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $response = $responses[$question['id']] ?? null;
             if ($response !== null) {
                 $stmt = $pdo->prepare("INSERT INTO responses (survey_id, field_id, user_id, response) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$survey_id, $question['id'], $_SESSION['user_id'], $response]);
+                $stmt->execute([
+                    $survey_id,
+                    $question['id'],
+                    $is_anonymous ? null : $_SESSION['user_id'], // Nullify user_id if anonymous
+                    $response
+                ]);
             }
         }
         header("Location: dashboard.php?completed=1");

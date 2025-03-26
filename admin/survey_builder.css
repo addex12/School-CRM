@@ -96,3 +96,11 @@
 .btn:hover {
     opacity: 0.9;
 }
+
+.form-group label[for="is_anonymous"] {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    margin-top: 1rem;
+}
