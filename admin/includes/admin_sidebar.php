@@ -4,6 +4,10 @@
         <ul>
             <li><a href="dashboard.php" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
             <li><a href="surveys.php"><i class="bi bi-clipboard-check"></i> Surveys</a></li>
+            <li><a href="survey_builder.php"><i class="bi bi-people"></i>Build Survey</a></li>
+            <li><a href="users.php"><i class="bi bi-people"></i> Users</a></li>
+            <li><a href="users.php"><i class="bi bi-people"></i> Users</a></li>
+            <li><a href="users.php"><i class="bi bi-people"></i> Users</a></li>
             <li><a href="users.php"><i class="bi bi-people"></i> Users</a></li>
             <li><a href="support_tickets.php"><i class="bi bi-ticket-detailed"></i> Support Tickets</a></li>
             <li><a href="chats.php"><i class="bi bi-chat-left-text"></i> Live Chats</a></li>
