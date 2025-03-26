@@ -1,19 +1,19 @@
 <?php
-/**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
+// ...existing code...
 
-require_once 'includes/auth.php';
-require_once 'includes/config.php'; // Ensure this initializes $pdo
-// Redirect based on login status
+// Include the file where the Auth class is defined
+require_once 'auth.php';
+
+// Initialize $auth
+$auth = new Auth();
+
+// Check if the user is logged in
 if ($auth->isLoggedIn()) {
-    header("Location: " . ($auth->getUser()['role'] === 'admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
-}else {
-        header("Location: login.php");
+    // ...existing code...
+} else {
+    header("Location: login.php");
+    exit();
 }
-exit();
+
+// ...existing code...
 ?>
