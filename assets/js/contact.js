@@ -1,138 +1,66 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const supportForm = document.getElementById('support-form');
-    const attachmentInput = document.getElementById('attachment');
-    const maxFileSize = 5 * 1024 * 1024; // 5MB
-    
-    if (supportForm) {
-        supportForm.addEventListener('submit', function(e) {
-            // Validate file size if file is selected
-            if (attachmentInput.files.length > 0) {
-                const file = attachmentInput.files[0];
-                
-                if (file.size > maxFileSize) {
-                    e.preventDefault();
-                    alert('File size exceeds 5MB limit. Please choose a smaller file.');
-                    return;
-                }
-                
-                // Validate file type
-                const validTypes = [
-                    'application/pdf',
-                    'image/jpeg',
-                    'image/png',
-                    'text/plain',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                ];
-                
-                if (!validTypes.includes(file.type)) {
-                    e.preventDefault();
-                    alert('Invalid file type. Please upload PDF, JPG, PNG, TXT, or DOC/DOCX files only.');
-                    return;
-                }
-            }
+    const form = document.getElementById('contact-form');
+    const fileInput = document.getElementById('attachment');
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const allowedTypes = [
+        'application/pdf',
+        'image/jpeg',
+        'image/png',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    form.addEventListener('submit', function(e) {
+        // Clear previous errors
+        document.querySelectorAll('.is-invalid').forEach(el => {
+            el.classList.remove('is-invalid');
+        });
+        
+        // Validate email
+        const email = document.getElementById('email');
+        if (!email.value.includes('@') || !email.value.includes('.')) {
+            e.preventDefault();
+            email.classList.add('is-invalid');
+            return;
+        }
+        
+        // Validate subject
+        const subject = document.getElementById('subject');
+        if (subject.value.trim().length < 5) {
+            e.preventDefault();
+            subject.classList.add('is-invalid');
+            return;
+        }
+        
+        // Validate message
+        const message = document.getElementById('message');
+        if (message.value.trim().length < 10) {
+            e.preventDefault();
+            message.classList.add('is-invalid');
+            return;
+        }
+        
+        // Validate file if present
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
             
-            // Validate required fields
-            const subject = document.getElementById('subject').value.trim();
-            const message = document.getElementById('message').value.trim();
-            
-            if (!subject || !message) {
+            if (!allowedTypes.includes(file.type)) {
                 e.preventDefault();
-                alert('Please fill in all required fields.');
+                alert('Only PDF, JPG, PNG, or DOCX files are allowed');
+                fileInput.classList.add('is-invalid');
                 return;
             }
             
-            // Show loading state
-            const submitBtn = supportForm.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-        });
-    }
-    
-    // Preview selected file name
-    if (attachmentInput) {
-        attachmentInput.addEventListener('change', function() {
-            const fileHint = document.querySelector('.file-hint');
-            if (this.files.length > 0) {
-                fileHint.textContent = 'Selected: ' + this.files[0].name;
-            } else {
-                fileHint.textContent = 'Max file size: 5MB (PDF, JPG, PNG, TXT, DOC/DOCX)';
-            }
-        });
-    }
-    
-    // Clear success message after 5 seconds
-    const successMessage = document.querySelector('.success-message');
-    if (successMessage) {
-        setTimeout(() => {
-            successMessage.style.opacity = '0';
-            setTimeout(() => successMessage.remove(), 500);
-        }, 5000);
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const contactForm = document.getElementById('contact-form');
-    const ticketsContainer = document.getElementById('tickets-container');
-
-    // Fetch and display ticket history
-    const loadTickets = async () => {
-        try {
-            const response = await fetch('/user/contact.php?action=getTickets');
-            const tickets = await response.json();
-
-            ticketsContainer.innerHTML = '';
-            if (tickets.length === 0) {
-                ticketsContainer.innerHTML = '<p>You have no support tickets.</p>';
+            if (file.size > maxSize) {
+                e.preventDefault();
+                alert('File size exceeds 5MB limit');
+                fileInput.classList.add('is-invalid');
                 return;
             }
-
-            tickets.forEach(ticket => {
-                const ticketDiv = document.createElement('div');
-                ticketDiv.classList.add('ticket');
-                ticketDiv.innerHTML = `
-                    <div class="ticket-header">
-                        <span class="ticket-number">${ticket.ticket_number}</span>
-                        <span class="priority ${ticket.priority}">${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}</span>
-                    </div>
-                    <h4>${ticket.subject}</h4>
-                    <p>${ticket.message}</p>
-                    ${ticket.attachment ? `<div class="attachment"><a href="/uploads/${ticket.attachment}" target="_blank"><i class="fas fa-paperclip"></i> Attachment</a></div>` : ''}
-                    <small>Created: ${new Date(ticket.created_at).toLocaleString()}</small>
-                `;
-                ticketsContainer.appendChild(ticketDiv);
-            });
-        } catch (error) {
-            console.error('Error loading tickets:', error);
-            ticketsContainer.innerHTML = '<p>Error loading tickets. Please try again later.</p>';
         }
-    };
-
-    // Handle form submission
-    contactForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        const formData = new FormData(contactForm);
-        try {
-            const response = await fetch('/user/contact.php?action=createTicket', {
-                method: 'POST',
-                body: formData,
-            });
-
-            const result = await response.json();
-            if (result.success) {
-                alert(result.message);
-                contactForm.reset();
-                loadTickets();
-            } else {
-                alert(`Error: ${result.message}`);
-            }
-        } catch (error) {
-            console.error('Error submitting ticket:', error);
-            alert('An error occurred while submitting your ticket. Please try again.');
-        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
     });
-
-    // Load tickets on page load
-    loadTickets();
 });
