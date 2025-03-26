@@ -9,7 +9,7 @@ $stmt->execute([$_SESSION['user_id']]);
 requireAdmin();
 
 // Get site settings
-$siteName     = getSystemSetting('site_name', 'site_name');
+$siteName     = getSystemSetting('site_name', '');
 $siteLogo     = getSystemSetting('site_logo');
 $themeColor   = getSystemSetting('theme_color', '#3498db');
 
