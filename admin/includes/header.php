@@ -21,7 +21,7 @@ $siteLogo     = getSystemSetting('site_logo');
 $themeColor   = getSystemSetting('theme_color', '#3498db'); // Default theme color
 
 // Initialize the admin menu array
-$adminMenu =;
+$adminMenu = [];
 $menuJson  = getSystemSetting('admin_menu');
 
 // Attempt to decode the admin menu from the settings
