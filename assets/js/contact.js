@@ -72,22 +72,67 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('support-form');
+    const contactForm = document.getElementById('contact-form');
+    const ticketsContainer = document.getElementById('tickets-container');
 
-    form.addEventListener('submit', (event) => {
-        const subject = document.getElementById('subject').value.trim();
-        const message = document.getElementById('message').value.trim();
-        const attachment = document.getElementById('attachment').files[0];
+    // Fetch and display ticket history
+    const loadTickets = async () => {
+        try {
+            const response = await fetch('/user/api/tickets.php');
+            const tickets = await response.json();
 
-        if (!subject || !message) {
-            alert('Subject and message are required.');
-            event.preventDefault();
-            return;
+            ticketsContainer.innerHTML = '';
+            if (tickets.length === 0) {
+                ticketsContainer.innerHTML = '<p>You have no support tickets.</p>';
+                return;
+            }
+
+            tickets.forEach(ticket => {
+                const ticketDiv = document.createElement('div');
+                ticketDiv.classList.add('ticket');
+                ticketDiv.innerHTML = `
+                    <div class="ticket-header">
+                        <span class="ticket-number">${ticket.ticket_number}</span>
+                        <span class="priority ${ticket.priority}">${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}</span>
+                    </div>
+                    <h4>${ticket.subject}</h4>
+                    <p>${ticket.message}</p>
+                    ${ticket.attachment ? `<div class="attachment"><a href="/uploads/${ticket.attachment}" target="_blank"><i class="fas fa-paperclip"></i> Attachment</a></div>` : ''}
+                    <small>Created: ${new Date(ticket.created_at).toLocaleString()}</small>
+                `;
+                ticketsContainer.appendChild(ticketDiv);
+            });
+        } catch (error) {
+            console.error('Error loading tickets:', error);
+            ticketsContainer.innerHTML = '<p>Error loading tickets. Please try again later.</p>';
         }
+    };
 
-        if (attachment && attachment.size > 5 * 1024 * 1024) {
-            alert('Attachment size must not exceed 5MB.');
-            event.preventDefault();
+    // Handle form submission
+    contactForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(contactForm);
+        try {
+            const response = await fetch('/user/api/contact.php', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('Ticket created successfully!');
+                contactForm.reset();
+                loadTickets();
+            } else {
+                alert(`Error: ${result.message}`);
+            }
+        } catch (error) {
+            console.error('Error submitting ticket:', error);
+            alert('An error occurred while submitting your ticket. Please try again.');
         }
     });
+
+    // Load tickets on page load
+    loadTickets();
 });
