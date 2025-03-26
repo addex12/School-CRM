@@ -13,7 +13,6 @@ if (!$survey_id || !is_numeric($survey_id)) {
 }
 $pageTitle = "Manage Surveys";
 ob_start(); // Start output buffering to prevent header errors
-include 'includes/header.php';
 
 // Get survey info
 $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
@@ -101,117 +100,78 @@ ob_end_flush(); // End output buffering and send output
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Survey: <?php echo htmlspecialchars($survey['title']); ?> - Parent Survey System</title>
+    <title>Manage Surveys</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .question {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background: #f9f9f9;
-            border-radius: 5px;
-        }
-        .required {
-            color: red;
-        }
-        .options {
-            margin-top: 1rem;
-        }
-        .option {
-            display: block;
-            margin: 0.5rem 0;
-        }
-        .rating-container {
-            margin-top: 1rem;
-        }
-        .rating-star {
-            font-size: 2rem;
-            color: #ccc;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .rating-star:hover,
-        .rating-star.active {
-            color: gold;
-        }
-        .rating-labels {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-            color: #666;
-        }
-        .error-message {
-            color: red;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            background: #ffeeee;
-            border: 1px solid #ffcccc;
-            border-radius: 4px;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">       
-        <div class="survey-content">
-            <?php if (isset($error)): ?>
-                <div class="error-message"><?php echo $error; ?></div>
-            <?php endif; ?>
-            
-            <h1><?php echo htmlspecialchars($survey['title']); ?></h1>
-            
-            <div class="survey-description">
-                <p><?php echo htmlspecialchars($survey['description']); ?></p>
-            </div>
-            
-            <form id="survey-form" method="POST">
-                <?php foreach ($questions as $question): ?>
-                    <div class="question" data-required="<?php echo $question['is_required'] ? 'true' : 'false'; ?>">
-                        <h3>
-                            <?php echo htmlspecialchars($question['question_text']); ?>
-                            <?php if ($question['is_required']): ?>
-                                <span class="required">*</span>
-                            <?php endif; ?>
-                        </h3>
-                        
-                        <?php if ($question['question_type'] === 'multiple_choice'): ?>
-                            <?php 
-                            $options = json_decode($question['options'], true);
-                            if (is_array($options)): ?>
-                                <div class="options">
-                                    <?php foreach ($options as $index => $option): ?>
-                                        <label class="option">
-                                            <input type="radio" name="responses[<?php echo $question['id']; ?>]" 
-                                                   value="<?php echo htmlspecialchars($option); ?>" 
-                                                   <?php echo $question['is_required'] ? 'required' : ''; ?>>
-                                            <?php echo htmlspecialchars($option); ?>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        <?php elseif ($question['question_type'] === 'text'): ?>
-                            <textarea name="responses[<?php echo $question['id']; ?>]" 
-                                      rows="4" 
-                                      style="width: 100%;"
-                                      <?php echo $question['is_required'] ? 'required' : ''; ?>></textarea>
-                        <?php elseif ($question['question_type'] === 'rating'): ?>
-                            <div class="rating-container">
-                                <input type="hidden" name="responses[<?php echo $question['id']; ?>]" value="">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <span class="rating-star" data-value="<?php echo $i; ?>">★</span>
-                                <?php endfor; ?>
-                                <div class="rating-labels">
-                                    <span>1 (Poor)</span>
-                                    <span>5 (Excellent)</span>
-                                </div>
-                            </div>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <div class="content">
+                <div class="container">       
+                    <div class="survey-content">
+                        <?php if (isset($error)): ?>
+                            <div class="error-message"><?php echo $error; ?></div>
                         <?php endif; ?>
+                        
+                        <h1><?php echo htmlspecialchars($survey['title']); ?></h1>
+                        
+                        <div class="survey-description">
+                            <p><?php echo htmlspecialchars($survey['description']); ?></p>
+                        </div>
+                        
+                        <form id="survey-form" method="POST">
+                            <?php foreach ($questions as $question): ?>
+                                <div class="question" data-required="<?php echo $question['is_required'] ? 'true' : 'false'; ?>">
+                                    <h3>
+                                        <?php echo htmlspecialchars($question['question_text']); ?>
+                                        <?php if ($question['is_required']): ?>
+                                            <span class="required">*</span>
+                                        <?php endif; ?>
+                                    </h3>
+                                    
+                                    <?php if ($question['question_type'] === 'multiple_choice'): ?>
+                                        <?php 
+                                        $options = json_decode($question['options'], true);
+                                        if (is_array($options)): ?>
+                                            <div class="options">
+                                                <?php foreach ($options as $index => $option): ?>
+                                                    <label class="option">
+                                                        <input type="radio" name="responses[<?php echo $question['id']; ?>]" 
+                                                               value="<?php echo htmlspecialchars($option); ?>" 
+                                                               <?php echo $question['is_required'] ? 'required' : ''; ?>>
+                                                        <?php echo htmlspecialchars($option); ?>
+                                                    </label>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php elseif ($question['question_type'] === 'text'): ?>
+                                        <textarea name="responses[<?php echo $question['id']; ?>]" 
+                                                  rows="4" 
+                                                  style="width: 100%;"
+                                                  <?php echo $question['is_required'] ? 'required' : ''; ?>></textarea>
+                                    <?php elseif ($question['question_type'] === 'rating'): ?>
+                                        <div class="rating-container">
+                                            <input type="hidden" name="responses[<?php echo $question['id']; ?>]" value="">
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <span class="rating-star" data-value="<?php echo $i; ?>">★</span>
+                                            <?php endfor; ?>
+                                            <div class="rating-labels">
+                                                <span>1 (Poor)</span>
+                                                <span>5 (Excellent)</span>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Submit Survey</button>
+                            </div>
+                        </form>
                     </div>
-                <?php endforeach; ?>
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Submit Survey</button>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
     

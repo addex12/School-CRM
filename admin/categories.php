@@ -54,66 +54,67 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <?php require_once 'includes/header.php'; ?>
-        
-        <div class="content">
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
-            <?php endif; ?>
-            
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
-            <?php endif; ?>
-            
-            <div class="form-section">
-                <h2>Add New Category</h2>
-                <form method="POST">
-                    <div class="form-group">
-                        <label for="name">Category Name:</label>
-                        <input type="text" id="name" name="name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="description">Description:</label>
-                        <textarea id="description" name="description" rows="3"></textarea>
-                    </div>
-                    
-                    <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
-                </form>
-            </div>
-            
-            <div class="table-section">
-                <h2>Existing Categories</h2>
-                
-                <?php if (count($categories) > 0): ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($categories as $category): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($category['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($category['description']); ?></td>
-                                    <td>
-                                        <button type="button" class="btn btn-edit" onclick="openEditModal(<?php echo $category['id']; ?>, '<?php echo htmlspecialchars($category['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($category['description'], ENT_QUOTES); ?>')">Edit</button>
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="id" value="<?php echo $category['id']; ?>">
-                                            <button type="submit" name="delete_category" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No categories found.</p>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <div class="content">
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
                 <?php endif; ?>
+                
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                <?php endif; ?>
+                
+                <div class="form-section">
+                    <h2>Add New Category</h2>
+                    <form method="POST">
+                        <div class="form-group">
+                            <label for="name">Category Name:</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea id="description" name="description" rows="3"></textarea>
+                        </div>
+                        
+                        <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
+                    </form>
+                </div>
+                
+                <div class="table-section">
+                    <h2>Existing Categories</h2>
+                    
+                    <?php if (count($categories) > 0): ?>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($categories as $category): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($category['name']); ?></td>
+                                        <td><?php echo htmlspecialchars($category['description']); ?></td>
+                                        <td>
+                                            <button type="button" class="btn btn-edit" onclick="openEditModal(<?php echo $category['id']; ?>, '<?php echo htmlspecialchars($category['name'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($category['description'], ENT_QUOTES); ?>')">Edit</button>
+                                            <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="id" value="<?php echo $category['id']; ?>">
+                                                <button type="submit" name="delete_category" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No categories found.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>

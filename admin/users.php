@@ -63,68 +63,69 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="container">
-                      <?php require_once 'includes/admin_sidebar.php'; ?>
-        
-        <div class="content">
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
-            <?php endif; ?>
-            
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
-            <?php endif; ?>
-            
-            <div class="table-section">
-                <h2>User Accounts</h2>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <div class="content">
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                <?php endif; ?>
                 
-                <?php if (count($users) > 0): ?>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Created</th>
-                                <th>Last Login</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($users as $user): ?>
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                <?php endif; ?>
+                
+                <div class="table-section">
+                    <h2>User Accounts</h2>
+                    
+                    <?php if (count($users) > 0): ?>
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                    <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                    <td><?php echo ucfirst($user['role']); ?></td>
-                                    <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
-                                    <td><?php echo $user['last_login'] ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
-                                    <td>
-                                        <button type="button" class="btn btn-edit" onclick="openEditModal(
-                                            <?php echo $user['id']; ?>,
-                                            '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>',
-                                            '<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>',
-                                            '<?php echo $user['role']; ?>'
-                                        )">Edit</button>
-                                        
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
-                                            <button type="submit" name="reset_password" class="btn btn-reset" onclick="return confirm('Reset password to default?')">Reset Password</button>
-                                        </form>
-                                        
-                                        <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Created</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($users as $user): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($user['username']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                        <td><?php echo ucfirst($user['role']); ?></td>
+                                        <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
+                                        <td><?php echo $user['last_login'] ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
+                                        <td>
+                                            <button type="button" class="btn btn-edit" onclick="openEditModal(
+                                                <?php echo $user['id']; ?>,
+                                                '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>',
+                                                '<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>',
+                                                '<?php echo $user['role']; ?>'
+                                            )">Edit</button>
+                                            
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
-                                                <button type="submit" name="delete_user" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                                <button type="submit" name="reset_password" class="btn btn-reset" onclick="return confirm('Reset password to default?')">Reset Password</button>
                                             </form>
-                                        <?php endif; ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No users found.</p>
-                <?php endif; ?>
+                                            
+                                            <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                                                <form method="POST" style="display:inline;">
+                                                    <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+                                                    <button type="submit" name="delete_user" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                                                </form>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No users found.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
