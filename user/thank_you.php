@@ -1,4 +1,5 @@
 <?php
+require_once 'includes/header.php'; // Start session and include necessary functions
 require_once '../includes/config.php'; // Ensure the config file is included
 require_once '../includes/auth.php';
 requireLogin();
@@ -22,5 +23,5 @@ error_reporting(E_ALL);
         <a href="dashboard.php" class="btn btn-primary">Back to Dashboard</a>
     </div>
 </body>
-<?php require_once '../includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>
 </html>
