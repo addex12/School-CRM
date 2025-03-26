@@ -205,12 +205,14 @@ $smtp_providers = [
             border-radius: 4px;
         }
     </style>
+    <?php include 'includes/header.php';
+    ?>
 </head>
 <body>
     <div class="container">
     <div class="setting-group">
-    <?php include 'includes/header.php';?>
-        <div class="setting-item">
+    <h3>Admin Menu Configuration</h3>
+    <div class="setting-item">
         <label for="admin_menu">Menu Items (JSON format):</label>
         <textarea id="admin_menu" name="settings[admin_menu]" rows="10" 
                   style="font-family: monospace;"><?php echo htmlspecialchars(getSettingValue($settings, 'general', 'admin_menu')); ?></textarea>
