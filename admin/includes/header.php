@@ -138,27 +138,4 @@ $pageTitle = isset($pageTitle) ? htmlspecialchars(string: $pageTitle) : 'Dashboa
         </header>
 
         <div class="admin-content-wrapper">
-            <nav class="admin-nav-vertical">
-                <?php foreach ($adminMenu as $item): ?>
-                    <?php
-                    // Check if the user's role is allowed to see this menu item
-                    $allowedRoles = $item['roles'] ?? ['admin'];
-                    if (!isset($_SESSION['role']) || !in_array(needle: $_SESSION['role'], haystack: $allowedRoles)) {
-                        continue;
-                    }
-                    // Determine if the current menu item is active
-                    $isActive = (basename(path: $_SERVER['PHP_SELF']) === $item['url']);
-                    ?>
-                    <a href="<?= htmlspecialchars(string: $item['url']) ?>"
-                       class="<?= $isActive ? 'active' : '' ?>">
-                        <i class="fas <?= htmlspecialchars(string: $item['icon']) ?>"></i>
-                        <span class="nav-text"><?= htmlspecialchars(string: $item['title']) ?></span>
-                    </a>
-                <?php endforeach; ?>
-                <a href="../logout.php" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span class="nav-text">Logout</span>
-                </a>
-            </nav>
-
             <main class="admin-main-content">
