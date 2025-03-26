@@ -1,7 +1,6 @@
 <?php
 require_once '../includes/auth.php';
 requireAdmin();
-include 'includes/header.php';
 require_once '../includes/config.php'; // Include config to initialize $pdo
 
 // Handle form submission
@@ -210,8 +209,8 @@ $smtp_providers = [
 <body>
     <div class="container">
     <div class="setting-group">
-    <h3>Admin Menu Configuration</h3>
-    <div class="setting-item">
+    <?php include 'includes/header.php';?>
+        <div class="setting-item">
         <label for="admin_menu">Menu Items (JSON format):</label>
         <textarea id="admin_menu" name="settings[admin_menu]" rows="10" 
                   style="font-family: monospace;"><?php echo htmlspecialchars(getSettingValue($settings, 'general', 'admin_menu')); ?></textarea>
