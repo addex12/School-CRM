@@ -5,27 +5,26 @@ requireAdmin();
 
 // Add field types configuration
 $fieldTypes = [
-    'text' => ['icon' => 'fas fa-font', 'has_options' => false],
-    'textarea' => ['icon' => 'fas fa-align-left', 'has_options' => false],
-    'radio' => ['icon' => 'far fa-dot-circle', 'has_options' => true],
-    'checkbox' => ['icon' => 'far fa-check-square', 'has_options' => true],
-    'select' => ['icon' => 'fas fa-caret-down', 'has_options' => true],
-    'number' => ['icon' => 'fas fa-hashtag', 'has_options' => false],
-    'date' => ['icon' => 'far fa-calendar-alt', 'has_options' => false],
-    'rating' => ['icon' => 'fas fa-star', 'has_options' => false],
-    'file' => ['icon' => 'fas fa-file-upload', 'has_options' => false]
+    'text' => 'Text Input',
+    'textarea' => 'Text Area',
+    'radio' => 'Radio Buttons',
+    'checkbox' => 'Checkboxes',
+    'dropdown' => 'Dropdown',
+    'number' => 'Number',
+    'date' => 'Date',
+    'rating' => 'Rating',
+    'file' => 'File Upload'
 ];
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
-        
+
         // Save survey basic info
         $stmt = $pdo->prepare("INSERT INTO surveys 
             (title, description, category_id, target_roles, status, starts_at, ends_at, created_by)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        
         $stmt->execute([
             $_POST['title'],
             $_POST['description'],
@@ -36,52 +35,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['ends_at'],
             $_SESSION['user_id']
         ]);
-        
+
         $surveyId = $pdo->lastInsertId();
 
         // Save fields
-        if (!empty($_POST['fields'])) {
-            $order = 0;
-            foreach ($_POST['fields'] as $field) {
+        if (!empty($_POST['questions'])) {
+            foreach ($_POST['questions'] as $index => $question) {
                 $options = null;
-                $validation = null;
-                
-                if (in_array($field['type'], ['radio', 'checkbox', 'select'])) {
-                    $options = json_encode(array_map('trim', explode("\n", $field['options'])));
+                if (in_array($_POST['field_types'][$index], ['radio', 'checkbox', 'dropdown'])) {
+                    $options = json_encode(array_map('trim', explode(',', $_POST['options'][$index])));
                 }
-                
-                if (!empty($field['validation'])) {
-                    $validation = json_encode([
-                        'required' => $field['required'] ?? false,
-                        'min' => $field['min'] ?? null,
-                        'max' => $field['max'] ?? null,
-                        'regex' => $field['regex'] ?? null
-                    ]);
-                }
-                
+
                 $stmt = $pdo->prepare("INSERT INTO survey_fields 
-                    (survey_id, field_type, field_label, field_name, placeholder, 
-                     field_options, validation_rules, display_order)
+                    (survey_id, field_type, field_label, field_name, placeholder, field_options, is_required, display_order)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                
                 $stmt->execute([
                     $surveyId,
-                    $field['type'],
-                    $field['label'],
-                    $field['name'],
-                    $field['placeholder'] ?? '',
+                    $_POST['field_types'][$index],
+                    $question,
+                    'field_' . ($index + 1),
+                    $_POST['placeholders'][$index] ?? '',
                     $options,
-                    $validation,
-                    $order++
+                    isset($_POST['required'][$index]) ? 1 : 0,
+                    $index
                 ]);
             }
         }
-        
+
         $pdo->commit();
         $_SESSION['success'] = "Survey created successfully!";
         header("Location: survey_preview.php?id=$surveyId");
         exit();
-
     } catch (Exception $e) {
         $pdo->rollBack();
         $_SESSION['error'] = "Error creating survey: " . $e->getMessage();
@@ -92,27 +76,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Survey Builder - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="survey_builder.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .survey-field { margin-bottom: 1.5rem; padding: 1rem; background: #f9f9f9; border-radius: 5px; }
+        .field-options { display: none; margin-top: 1rem; }
+        .form-actions { margin-top: 2rem; }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
-<?php require_once 'includes/header.php'; ?>
+            <h1>Survey Builder</h1>
         </header>
-        
+
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
             <?php endif; ?>
-            
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
+
             <form id="survey-form" method="POST">
                 <div class="form-section">
                     <h2>Survey Information</h2>
@@ -120,12 +109,10 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                         <label for="title">Survey Title:</label>
                         <input type="text" id="title" name="title" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="description">Description:</label>
                         <textarea id="description" name="description" rows="3"></textarea>
                     </div>
-                    
                     <div class="form-group">
                         <label for="category_id">Category:</label>
                         <select id="category_id" name="category_id" required>
@@ -135,161 +122,94 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label>Target Audience:</label>
-                        <div class="checkbox-group">
+                        <div>
                             <label><input type="checkbox" name="target_roles[]" value="student" checked> Students</label>
                             <label><input type="checkbox" name="target_roles[]" value="teacher" checked> Teachers</label>
                             <label><input type="checkbox" name="target_roles[]" value="parent" checked> Parents</label>
                         </div>
                     </div>
-                    
                     <div class="form-row">
                         <div class="form-group">
                             <label for="starts_at">Start Date/Time:</label>
                             <input type="datetime-local" id="starts_at" name="starts_at" required>
                         </div>
-                        
                         <div class="form-group">
                             <label for="ends_at">End Date/Time:</label>
                             <input type="datetime-local" id="ends_at" name="ends_at" required>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-section">
-                    <h2>Survey Fields</h2>
-                    <div class="builder-container">
-                        <div class="form-preview" id="form-preview">
-                            <p class="empty-message">Drag fields from the right panel to build your form</p>
-                        </div>
-                        
-                        <div class="fields-panel" id="fields-panel">
-                            <h3>Available Fields</h3>
-                            <div class="field-item" data-type="text">
-                                <i class="fas fa-font"></i> Text Input
+                    <h2>Survey Questions</h2>
+                    <div id="survey-fields">
+                        <div class="survey-field">
+                            <label for="question-1">Question 1</label>
+                            <input type="text" name="questions[]" id="question-1" placeholder="Enter your question" required>
+                            <select name="field_types[]" class="field-type-selector" required>
+                                <?php foreach ($fieldTypes as $type => $label): ?>
+                                    <option value="<?php echo $type; ?>"><?php echo $label; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <input type="text" name="placeholders[]" placeholder="Placeholder (optional)">
+                            <div class="field-options">
+                                <label>Options (comma-separated):</label>
+                                <input type="text" name="options[]" placeholder="Option1, Option2, Option3">
                             </div>
-                            <div class="field-item" data-type="textarea">
-                                <i class="fas fa-align-left"></i> Text Area
-                            </div>
-                            <div class="field-item" data-type="radio">
-                                <i class="far fa-dot-circle"></i> Radio Buttons
-                            </div>
-                            <div class="field-item" data-type="checkbox">
-                                <i class="far fa-check-square"></i> Checkboxes
-                            </div>
-                            <div class="field-item" data-type="select">
-                                <i class="fas fa-caret-down"></i> Dropdown
-                            </div>
-                            <div class="field-item" data-type="number">
-                                <i class="fas fa-hashtag"></i> Number
-                            </div>
-                            <div class="field-item" data-type="date">
-                                <i class="far fa-calendar-alt"></i> Date
-                            </div>
-                            <div class="field-item" data-type="rating">
-                                <i class="fas fa-star"></i> Rating
-                            </div>
-                            <div class="field-item" data-type="file">
-                                <i class="fas fa-file-upload"></i> File Upload
-                            </div>
+                            <label><input type="checkbox" name="required[]"> Required</label>
+                            <button type="button" class="remove-field btn btn-danger">Remove</button>
                         </div>
                     </div>
+                    <button type="button" id="add-field" class="btn btn-primary">Add Question</button>
                 </div>
-                
-                <input type="hidden" id="fields-data" name="fields">
+
                 <div class="form-actions">
-                    <button type="button" id="preview-btn" class="btn">Preview</button>
-                    <button type="submit" name="create_survey" class="btn btn-primary">Create Survey</button>
+                    <button type="submit" class="btn btn-success">Save Survey</button>
                 </div>
             </form>
         </div>
     </div>
-    
-    <!-- Field Configuration Modal -->
-    <div id="field-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h3>Configure Field</h3>
-            <form id="field-config-form">
-                <input type="hidden" id="field-type">
-                <input type="hidden" id="field-id">
-                
-                <div class="form-group">
-                    <label for="field-label">Label:</label>
-                    <input type="text" id="field-label" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="field-name">Field Name (unique):</label>
-                    <input type="text" id="field-name" required>
-                    <small>No spaces or special characters (use underscore _ )</small>
-                </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="field-required">
-                        Required Field
-                    </label>
-                </div>
-                
-                <div id="options-container" class="field-options">
-                    <div class="form-group">
-                        <label for="field-options">Options (one per line):</label>
-                        <textarea id="field-options" rows="4"></textarea>
-                    </div>
-                </div>
-                
-                <div id="validation-container" class="field-config">
-                    <h4>Validation Rules</h4>
-                    <div class="form-group">
-                        <label for="validation-min">Min Value/Length:</label>
-                        <input type="number" id="validation-min">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="validation-max">Max Value/Length:</label>
-                        <input type="number" id="validation-max">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="validation-regex">Regex Pattern:</label>
-                        <input type="text" id="validation-regex">
-                    </div>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" id="cancel-field" class="btn">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Field</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Preview Modal -->
-    <div id="preview-modal" class="modal">
-        <div class="modal-content" style="max-width: 800px;">
-            <span class="close-modal">&times;</span>
-            <h2>Survey Preview</h2>
-            <div id="survey-preview-content"></div>
-            <div class="form-actions">
-                <button type="button" class="btn close-modal">Close</button>
-            </div>
-        </div>
-    </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script src="../assets/js/survey_builder.js"></script>
+
     <script>
-        // Initialize date/time inputs with current time
-        document.addEventListener('DOMContentLoaded', function() {
-            const now = new Date();
-            const timezoneOffset = now.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
-            
-            document.getElementById('starts_at').value = localISOTime;
-            document.getElementById('ends_at').value = localISOTime;
+        document.getElementById('add-field').addEventListener('click', function () {
+            const fieldCount = document.querySelectorAll('.survey-field').length + 1;
+            const fieldHTML = `
+                <div class="survey-field">
+                    <label for="question-${fieldCount}">Question ${fieldCount}</label>
+                    <input type="text" name="questions[]" id="question-${fieldCount}" placeholder="Enter your question" required>
+                    <select name="field_types[]" class="field-type-selector" required>
+                        <?php foreach ($fieldTypes as $type => $label): ?>
+                            <option value="<?php echo $type; ?>"><?php echo $label; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input type="text" name="placeholders[]" placeholder="Placeholder (optional)">
+                    <div class="field-options">
+                        <label>Options (comma-separated):</label>
+                        <input type="text" name="options[]" placeholder="Option1, Option2, Option3">
+                    </div>
+                    <label><input type="checkbox" name="required[]"> Required</label>
+                    <button type="button" class="remove-field btn btn-danger">Remove</button>
+                </div>`;
+            document.getElementById('survey-fields').insertAdjacentHTML('beforeend', fieldHTML);
+        });
+
+        document.getElementById('survey-fields').addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-field')) {
+                e.target.closest('.survey-field').remove();
+            }
+        });
+
+        document.getElementById('survey-fields').addEventListener('change', function (e) {
+            if (e.target.classList.contains('field-type-selector')) {
+                const optionsDiv = e.target.closest('.survey-field').querySelector('.field-options');
+                if (['radio', 'checkbox', 'dropdown'].includes(e.target.value)) {
+                    optionsDiv.style.display = 'block';
+                } else {
+                    optionsDiv.style.display = 'none';
+                }
+            }
         });
     </script>
 </body>
