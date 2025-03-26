@@ -3,8 +3,8 @@ require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireLogin();
 
-$survey_id = $_GET['id'] ?? 0;
-
+$pageTitle = "Manage Surveys"; // Set the page title
+include 'includes/header.php'; // Replace existing header
 // Get survey info
 $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ? AND is_active = TRUE");
 $stmt->execute([$survey_id]);
@@ -70,7 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 }
-?>
+ include 'includes/header.php'; // Include header 
+ ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -80,15 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1><?php echo htmlspecialchars($survey['title']); ?></h1>
-            <nav>
-                <a href="dashboard.php">Back to Dashboard</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
-        </header>
-        
+    <div class="container">       
         <div class="survey-content">
             <?php if (isset($error)): ?>
                 <div class="error-message"><?php echo $error; ?></div>

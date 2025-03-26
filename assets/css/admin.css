@@ -111,3 +111,24 @@
 .logout-btn:hover {
     background-color: #e74c3c !important;
 }
+@media (max-width: 768px) {
+    .admin-nav {
+        display: none;
+        position: absolute;
+        top: 70px;
+        right: 0;
+        background: var(--primary-color);
+        flex-direction: column;
+        width: 200px;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .admin-nav.active {
+        display: flex;
+    }
+}

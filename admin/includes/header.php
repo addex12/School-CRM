@@ -1,5 +1,7 @@
 <?php
 require_once '../includes/auth.php';
+$stmt = $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
 requireAdmin();
 
 // Get site settings
@@ -28,8 +30,7 @@ if (!$adminMenu || json_last_error() !== JSON_ERROR_NONE) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?php echo htmlspecialchars($siteName); ?> - Admin</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title><?= htmlspecialchars($siteName) ?> - Admin | <?= $pageTitle ?? 'Dashboard' ?></title>    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         :root {
@@ -63,3 +64,18 @@ if (!$adminMenu || json_last_error() !== JSON_ERROR_NONE) {
             </nav>
         </header>
         <div class="content-wrapper">
+            <nav class="admin-nav">
+    <?php foreach ($adminMenu as $item):
+        $allowedRoles = $item['roles'] ?? ['admin'];
+        if (!in_array($_SESSION['role'], $allowedRoles)) continue;
+    ?>
+        <a href="<?= htmlspecialchars($item['url']) ?>" 
+           class="<?= basename($_SERVER['PHP_SELF']) === $item['url'] ? 'active' : '' ?>">
+            <i class="fas <?= htmlspecialchars($item['icon']) ?>"></i>
+            <?= htmlspecialchars($item['title']) ?>
+        </a>
+    <?php endforeach; ?>
+    <a href="../logout.php" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</nav>
