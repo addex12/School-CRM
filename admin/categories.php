@@ -1,5 +1,5 @@
 <?php
-include 'includes/header.php';
+require_once 'includes/header.php';
 require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireAdmin();
@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = $_POST['name'];
         $description = $_POST['description'];
         
-        $stmt = $pdo->prepare("INSERT INTO survey_categories (name, description) VALUES (?, ?)");
-        $stmt->execute([$name, $description]);
+        $stmt = $pdo->prepare(query: "INSERT INTO survey_categories (name, description) VALUES (?, ?)");
+        $stmt->execute(params: [$name, $description]);
         $_SESSION['success'] = "Category added successfully!";
     }
     
@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = $_POST['name'];
         $description = $_POST['description'];
         
-        $stmt = $pdo->prepare("UPDATE survey_categories SET name = ?, description = ? WHERE id = ?");
-        $stmt->execute([$name, $description, $id]);
+        $stmt = $pdo->prepare(query: "UPDATE survey_categories SET name = ?, description = ? WHERE id = ?");
+        $stmt->execute(params: [$name, $description, $id]);
         $_SESSION['success'] = "Category updated successfully!";
     }
     
@@ -29,20 +29,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = $_POST['id'];
         
         // Check if category is in use
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM surveys WHERE category_id = ?");
-        $stmt->execute([$id]);
+        $stmt = $pdo->prepare(query: "SELECT COUNT(*) FROM surveys WHERE category_id = ?");
+        $stmt->execute(params: [$id]);
         $count = $stmt->fetchColumn();
         
         if ($count > 0) {
             $_SESSION['error'] = "Cannot delete category that is in use by surveys!";
         } else {
-            $stmt = $pdo->prepare("DELETE FROM survey_categories WHERE id = ?");
-            $stmt->execute([$id]);
+            $stmt = $pdo->prepare(query: "DELETE FROM survey_categories WHERE id = ?");
+            $stmt->execute(params: [$id]);
             $_SESSION['success'] = "Category deleted successfully!";
         }
     }
     
-    header("Location: categories.php");
+    header(header: "Location: categories.php");
     exit();
 }
 
