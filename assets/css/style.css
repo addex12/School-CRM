@@ -340,6 +340,7 @@ nav a.active,
     gap: 20px;
 }
 
+<<<<<<< HEAD
 .stat-card {
     flex: 1;
     text-align: center;
@@ -417,6 +418,29 @@ tr:hover {
 }
 
 /* Contact Form Styles */
+=======
+.logout-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+/* Contact Form Styles */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    transition: opacity 0.5s ease;
+}
+
+>>>>>>> refs/remotes/origin/develop
 .ticket {
     background: white;
     padding: 15px;
@@ -461,13 +485,21 @@ tr:hover {
 }
 
 .attachment a {
+<<<<<<< HEAD
     color: var(--secondary);
+=======
+    color: #3498db;
+>>>>>>> refs/remotes/origin/develop
 }
 
 .file-hint {
     display: block;
     margin-top: 5px;
+<<<<<<< HEAD
     color: var(--gray);
+=======
+    color: #6c757d;
+>>>>>>> refs/remotes/origin/develop
     font-size: 0.9em;
 }
 
