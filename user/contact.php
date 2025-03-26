@@ -12,11 +12,19 @@ $subject = $message = $priority = '';
 $attachment = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Debugging: Log the POST data to check if all fields are being sent
+    error_log(print_r($_POST, true));
+
     $name = trim($_POST['name'] ?? ''); // Trim to remove extra spaces
     $email = trim($_POST['email'] ?? ''); // Ensure 'email' key exists and trim
     $message = trim($_POST['message'] ?? ''); // Trim to remove extra spaces
+    $subject = trim($_POST['subject'] ?? ''); // Ensure 'subject' key exists
+    $priority = trim($_POST['priority'] ?? ''); // Ensure 'priority' key exists
 
-    if (empty($name) || empty($email) || empty($message)) {
+    // Debugging: Log the trimmed values to ensure they are not empty
+    error_log("Name: $name, Email: $email, Message: $message, Subject: $subject, Priority: $priority");
+
+    if (empty($name) || empty($email) || empty($message) || empty($subject) || empty($priority)) {
         $error = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Invalid email address.";
