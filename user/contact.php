@@ -30,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($error)) {
         try {
             // Generate ticket number
-<<<<<<< HEAD
             $ticket_number = 'TKT-' . strtoupper(string: uniqid());
             
             $stmt = $pdo->prepare(query: "INSERT INTO support_tickets 
@@ -42,19 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user_email = $_SESSION['email'];
             sendEmail(to: $user_email, subject: "Ticket Created: $ticket_number", 
                 body: "Your support ticket has been created.\n\nTicket Number: $ticket_number");
-=======
-            $ticket_number = 'TKT-' . strtoupper(uniqid());
-            
-            $stmt = $pdo->prepare("INSERT INTO support_tickets 
-                                (user_id, ticket_number, subject, message, priority, attachment) 
-                                VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$_SESSION['user_id'], $ticket_number, $subject, $message, $priority, $attachment]);
-            
-            // Send confirmation email
-            $user_email = $_SESSION['email'];
-            sendEmail($user_email, "Ticket Created: $ticket_number", 
-                "Your support ticket has been created.\n\nTicket Number: $ticket_number");
->>>>>>> refs/remotes/origin/develop
             
             // Notify admins
             $admin_subject = "New Support Ticket: $ticket_number";
