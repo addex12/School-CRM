@@ -6,9 +6,25 @@ error_reporting(E_ALL);
 
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
+
+// Debugging: Check if session is started
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+// Debugging: Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    die("Error: User is not logged in. Please log in to access this page.");
+}
+
 requireLogin();
 
 $user_id = $_SESSION['user_id'];
+
+// Debugging: Check database connection
+if (!$pdo) {
+    die("Error: Database connection is not established.");
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle profile update
@@ -53,7 +69,7 @@ if (!$stmt) {
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 if (!$user) {
-    die("User not found.");
+    die("Error: User not found in the database.");
 }
 ?>
 
