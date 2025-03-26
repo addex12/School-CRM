@@ -11,73 +11,71 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentField = null;
     let fieldCounter = 0;
     
-    // Initialize Sortable for fields panel (draggable source)
-    new Sortable(fieldsPanel, {
-        group: {
-            name: 'survey-fields',
-            pull: 'clone',
-            put: false
-        },
-        sort: false,
-        animation: 150,
-        filter: '.field-item',
-        draggable: '.field-item'
-    });
-    
-    // Initialize Sortable for form preview (drop target)
+    // Initialize Sortable for fields panel
     new Sortable(formPreview, {
         group: {
-            name: 'survey-fields',
-            put: ['survey-fields']
+            name: 'survey-builder',
+            pull: 'clone',
+            put: true
         },
         animation: 150,
+        sort: false,
         ghostClass: 'sortable-ghost',
         onAdd: function(evt) {
-            // When a field is added to the preview
+            // When a field is added to the preview, configure it
             const fieldType = evt.item.dataset.type;
             evt.item.remove(); // Remove the dragged element
             
             // Create a new field element
-            createNewField(fieldType);
-        },
-        onEnd: function(evt) {
-            // Update field order when items are rearranged
-            updateFieldsData();
+            createNewField(fieldType, evt.newIndex);
         }
     });
     
     // Field type configuration
     const fieldTemplates = {
         text: {
-            html: (fieldId, label) => `
+            html: (fieldId) => `
                 <div class="form-group">
-                    <label for="${fieldId}">${label}</label>
+                    <label for="${fieldId}">${fieldId}</label>
                     <input type="text" id="${fieldId}" name="${fieldId}">
                 </div>
             `,
             icon: 'fas fa-font'
         },
         textarea: {
-            html: (fieldId, label) => `
+            html: (fieldId) => `
                 <div class="form-group">
-                    <label for="${fieldId}">${label}</label>
+                    <label for="${fieldId}">${fieldId}</label>
                     <textarea id="${fieldId}" name="${fieldId}" rows="3"></textarea>
                 </div>
             `,
             icon: 'fas fa-align-left'
         },
         radio: {
-            html: (fieldId, label, options) => {
-                let optionsHtml = options.map((opt, i) => `
-                    <label class="option">
-                        <input type="radio" name="${fieldId}" value="${opt.trim()}">
-                        ${opt.trim()}
-                    </label>
-                `).join('');
-                
+            html: (fieldId, options) => {
+                let optionsHtml = '';
+                if (options && options.length) {
+                    optionsHtml = options.map((opt, i) => `
+                        <label class="option">
+                            <input type="radio" name="${fieldId}" value="${opt.trim()}">
+                            ${opt.trim()}
+                        </label>
+                    `).join('');
+                } else {
+                    optionsHtml = `
+                        <label class="option">
+                            <input type="radio" name="${fieldId}" value="Option 1">
+                            Option 1
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="${fieldId}" value="Option 2">
+                            Option 2
+                        </label>
+                    `;
+                }
                 return `
                     <div class="form-group">
-                        <label>${label}</label>
+                        <label>${fieldId}</label>
                         <div class="options">${optionsHtml}</div>
                     </div>
                 `;
@@ -85,17 +83,30 @@ document.addEventListener('DOMContentLoaded', function() {
             icon: 'far fa-dot-circle'
         },
         checkbox: {
-            html: (fieldId, label, options) => {
-                let optionsHtml = options.map((opt, i) => `
-                    <label class="option">
-                        <input type="checkbox" name="${fieldId}[]" value="${opt.trim()}">
-                        ${opt.trim()}
-                    </label>
-                `).join('');
-                
+            html: (fieldId, options) => {
+                let optionsHtml = '';
+                if (options && options.length) {
+                    optionsHtml = options.map((opt, i) => `
+                        <label class="option">
+                            <input type="checkbox" name="${fieldId}[]" value="${opt.trim()}">
+                            ${opt.trim()}
+                        </label>
+                    `).join('');
+                } else {
+                    optionsHtml = `
+                        <label class="option">
+                            <input type="checkbox" name="${fieldId}[]" value="Option 1">
+                            Option 1
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" name="${fieldId}[]" value="Option 2">
+                            Option 2
+                        </label>
+                    `;
+                }
                 return `
                     <div class="form-group">
-                        <label>${label}</label>
+                        <label>${fieldId}</label>
                         <div class="options">${optionsHtml}</div>
                     </div>
                 `;
@@ -103,14 +114,21 @@ document.addEventListener('DOMContentLoaded', function() {
             icon: 'far fa-check-square'
         },
         select: {
-            html: (fieldId, label, options) => {
-                let optionsHtml = options.map(opt => `
-                    <option value="${opt.trim()}">${opt.trim()}</option>
-                `).join('');
-                
+            html: (fieldId, options) => {
+                let optionsHtml = '';
+                if (options && options.length) {
+                    optionsHtml = options.map(opt => `
+                        <option value="${opt.trim()}">${opt.trim()}</option>
+                    `).join('');
+                } else {
+                    optionsHtml = `
+                        <option value="Option 1">Option 1</option>
+                        <option value="Option 2">Option 2</option>
+                    `;
+                }
                 return `
                     <div class="form-group">
-                        <label for="${fieldId}">${label}</label>
+                        <label for="${fieldId}">${fieldId}</label>
                         <select id="${fieldId}" name="${fieldId}">
                             <option value="">Select an option</option>
                             ${optionsHtml}
@@ -121,27 +139,27 @@ document.addEventListener('DOMContentLoaded', function() {
             icon: 'fas fa-caret-down'
         },
         number: {
-            html: (fieldId, label) => `
+            html: (fieldId) => `
                 <div class="form-group">
-                    <label for="${fieldId}">${label}</label>
+                    <label for="${fieldId}">${fieldId}</label>
                     <input type="number" id="${fieldId}" name="${fieldId}">
                 </div>
             `,
             icon: 'fas fa-hashtag'
         },
         date: {
-            html: (fieldId, label) => `
+            html: (fieldId) => `
                 <div class="form-group">
-                    <label for="${fieldId}">${label}</label>
+                    <label for="${fieldId}">${fieldId}</label>
                     <input type="date" id="${fieldId}" name="${fieldId}">
                 </div>
             `,
             icon: 'far fa-calendar-alt'
         },
         rating: {
-            html: (fieldId, label) => `
+            html: (fieldId) => `
                 <div class="form-group">
-                    <label>${label}</label>
+                    <label>${fieldId}</label>
                     <div class="rating-container">
                         <input type="hidden" name="${fieldId}" value="">
                         <span class="rating-star" data-value="1">★</span>
@@ -159,9 +177,9 @@ document.addEventListener('DOMContentLoaded', function() {
             icon: 'fas fa-star'
         },
         file: {
-            html: (fieldId, label) => `
+            html: (fieldId) => `
                 <div class="form-group">
-                    <label for="${fieldId}">${label}</label>
+                    <label for="${fieldId}">${fieldId}</label>
                     <input type="file" id="${fieldId}" name="${fieldId}">
                 </div>
             `,
@@ -170,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     // Create a new field in the preview
-    function createNewField(type) {
+    function createNewField(type, position) {
         fieldCounter++;
         const fieldId = `field_${fieldCounter}`;
         
@@ -181,7 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
             label: `${type.charAt(0).toUpperCase() + type.slice(1)} Field`,
             name: fieldId,
             required: true,
-            options: ['Option 1', 'Option 2'],
+            order: position,
+            options: null,
             validation: {}
         };
         
@@ -194,12 +213,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('field-label').value = currentField.label;
         document.getElementById('field-name').value = currentField.name;
         document.getElementById('field-required').checked = currentField.required;
+        document.getElementById('field-order').value = currentField.order;
         
         // Show/hide options based on field type
         const optionsContainer = document.getElementById('options-container');
         if (['radio', 'checkbox', 'select'].includes(currentField.type)) {
             optionsContainer.style.display = 'block';
-            document.getElementById('field-options').value = currentField.options.join('\n');
+            document.getElementById('field-options').value = currentField.options ? 
+                currentField.options.join('\n') : 'Option 1\nOption 2';
         } else {
             optionsContainer.style.display = 'none';
         }
@@ -222,6 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
         currentField.label = document.getElementById('field-label').value;
         currentField.name = document.getElementById('field-name').value;
         currentField.required = document.getElementById('field-required').checked;
+        currentField.order = document.getElementById('field-order').value;
         
         // Get options if applicable
         if (['radio', 'checkbox', 'select'].includes(currentField.type)) {
@@ -249,32 +271,39 @@ document.addEventListener('DOMContentLoaded', function() {
         fieldDiv.className = 'form-field';
         fieldDiv.dataset.fieldId = currentField.id;
         fieldDiv.dataset.fieldType = currentField.type;
-        fieldDiv.dataset.fieldName = currentField.name;
         
         // Add field HTML
         const template = fieldTemplates[currentField.type];
-        fieldDiv.innerHTML = `
-            <div class="field-header">
-                <div class="field-title">
-                    <i class="${template.icon}"></i>
-                    ${currentField.label}
-                    ${currentField.required ? '<span class="required">*</span>' : ''}
-                </div>
-                <div class="field-actions">
-                    <button type="button" class="edit-field" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button type="button" class="delete-field" title="Delete">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+        fieldDiv.innerHTML = template.html(currentField.name, currentField.options);
+        
+        // Add field header with actions
+        const fieldHeader = document.createElement('div');
+        fieldHeader.className = 'field-header';
+        fieldHeader.innerHTML = `
+            <div class="field-title">
+                <i class="${template.icon}"></i>
+                ${currentField.label} (${currentField.name})
+                ${currentField.required ? '<span class="required">*</span>' : ''}
             </div>
-            ${template.html(currentField.name, currentField.label, currentField.options || [])}
+            <div class="field-actions">
+                <button type="button" class="edit-field" title="Edit">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="delete-field" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
         `;
         
-        // Add to preview
-        formPreview.querySelector('.empty-message')?.remove();
-        formPreview.appendChild(fieldDiv);
+        fieldDiv.insertBefore(fieldHeader, fieldDiv.firstChild);
+        
+        // Add to preview at correct position
+        const existingFields = formPreview.querySelectorAll('.form-field');
+        if (existingFields.length > currentField.order) {
+            formPreview.insertBefore(fieldDiv, existingFields[currentField.order]);
+        } else {
+            formPreview.appendChild(fieldDiv);
+        }
         
         // Add event listeners for edit/delete
         fieldDiv.querySelector('.edit-field').addEventListener('click', function() {
@@ -285,14 +314,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm('Are you sure you want to delete this field?')) {
                 fieldDiv.remove();
                 updateFieldsData();
-                
-                // Show empty message if no fields left
-                if (formPreview.querySelectorAll('.form-field').length === 0) {
-                    const emptyMsg = document.createElement('p');
-                    emptyMsg.className = 'empty-message';
-                    emptyMsg.textContent = 'Drag fields from the right panel to build your form';
-                    formPreview.appendChild(emptyMsg);
-                }
+            }
+        });
+        
+        // Make the field draggable for reordering
+        new Sortable(fieldDiv, {
+            group: 'survey-builder',
+            handle: '.field-title',
+            animation: 150,
+            onEnd: function() {
+                updateFieldsData();
             }
         });
         
@@ -309,10 +340,11 @@ document.addEventListener('DOMContentLoaded', function() {
         currentField = {
             type: fieldDiv.dataset.fieldType,
             id: fieldDiv.dataset.fieldId,
-            label: fieldDiv.querySelector('.field-title').textContent.trim().replace(/\s*\*$/, ''),
-            name: fieldDiv.dataset.fieldName,
+            label: fieldDiv.querySelector('.field-title').textContent.trim().split(' (')[0],
+            name: fieldDiv.dataset.fieldName || fieldDiv.querySelector('input, select, textarea').name,
             required: fieldDiv.querySelector('.required') !== null,
-            options: [],
+            order: Array.from(formPreview.querySelectorAll('.form-field')).indexOf(fieldDiv),
+            options: null,
             validation: {}
         };
         
@@ -358,8 +390,8 @@ document.addEventListener('DOMContentLoaded', function() {
         fieldElements.forEach((fieldEl, index) => {
             const field = {
                 type: fieldEl.dataset.fieldType,
-                label: fieldEl.querySelector('.field-title').textContent.trim().replace(/\s*\*$/, ''),
-                name: fieldEl.dataset.fieldName,
+                label: fieldEl.querySelector('.field-title').textContent.trim().split(' (')[0],
+                name: fieldEl.querySelector('input, select, textarea').name,
                 required: fieldEl.querySelector('.required') !== null,
                 order: index
             };

@@ -116,15 +116,9 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
     <div class="container">
         <header>
             <h1>Survey Builder</h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php" class="active">Survey Builder</a>
-                <a href="results.php">Results</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
         </header>
-        
+        <script src="../assets/js/sortable.js"></script>
+        <script src="../assets/js/survey_builder.js"></script>
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
@@ -295,8 +289,5 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
             </div>
         </div>
     </div>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
-    <script src="../assets/js/survey_builder.js"></script>
 </body>
 </html>
