@@ -429,7 +429,7 @@ $smtp_providers = [
                 btn.disabled = false;
                 btn.textContent = 'Send Test Email';
             });
-        });
+        });s
         
         const smtpProviders = <?php echo json_encode($smtp_providers); ?>;
         
