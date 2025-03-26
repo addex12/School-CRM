@@ -145,8 +145,8 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
 </head>
 <body>
     
-< class="admin-dashboard">
-<?php include 'includes/admin_sidebar.php'; ?>         
+<div class="admin-dashboard">
+    <?php include 'includes/admin_sidebar.php'; ?>         
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
