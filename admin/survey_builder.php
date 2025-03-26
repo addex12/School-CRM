@@ -145,10 +145,8 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Survey Builder</h1>
-        </header>
-
+        <?php include 'includes/admin_sidebar.php'; ?>
+        
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
@@ -258,6 +256,7 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-success">Save Survey</button>
+                    <a href="view_survey.php" class="btn btn-secondary">View Surveys</a>
                 </div>
             </form>
         </div>
