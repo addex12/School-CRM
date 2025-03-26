@@ -8,10 +8,15 @@ $survey_id = $_GET['id'] ?? null;
 
 // Validate survey_id
 if (!$survey_id || !is_numeric($survey_id)) {
-    header("Location: surveys.php");
-    exit();
+    header("Location: dashboard.php?error=invalid_survey");
+        exit();
 }
 
+// Optional: Check if survey is active only if needed
+if (!$survey['is_active']) {
+    header("Location: dashboard.php?error=survey_inactive");
+    exit();
+}
 $pageTitle = "Manage Surveys";
 ob_start(); // Start output buffering to prevent header errors
 include 'includes/header.php';
@@ -22,8 +27,8 @@ $stmt->execute([$survey_id]);
 $survey = $stmt->fetch();
 
 if (!$survey) {
-    header("Location: dashboard.php");
-    exit();
+    header("Location: dashboard.php?error=survey_not_found");
+        exit();
 }
 
 // Check if user has already completed this survey
