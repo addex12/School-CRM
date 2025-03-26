@@ -286,6 +286,37 @@ $activity = $pdo->query("
                 <?php endif; ?>
             </div>
             
+            <!-- Survey Builder Section -->
+            <div class="dashboard-widget survey-builder">
+                <h2>Create a Survey</h2>
+                <form id="survey-form" method="post" action="save_survey.php">
+                    <div id="survey-fields">
+                        <div class="survey-field">
+                            <label for="question-1">Question 1</label>
+                            <input type="text" name="questions[]" id="question-1" placeholder="Enter your question" required>
+                            <select name="field_types[]" class="field-type-selector" required>
+                                <option value="text">Text Input</option>
+                                <option value="textarea">Text Area</option>
+                                <option value="radio">Radio Buttons</option>
+                                <option value="checkbox">Checkboxes</option>
+                                <option value="dropdown">Dropdown</option>
+                                <option value="number">Number</option>
+                                <option value="date">Date</option>
+                                <option value="rating">Rating</option>
+                                <option value="file">File Upload</option>
+                            </select>
+                            <div class="field-options" style="display: none;">
+                                <label>Options (comma-separated):</label>
+                                <input type="text" name="options[]" placeholder="Option1, Option2, Option3">
+                            </div>
+                            <button type="button" class="remove-field btn btn-danger">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" id="add-field" class="btn btn-primary">Add Question</button>
+                    <button type="submit" class="btn btn-success">Save Survey</button>
+                </form>
+            </div>
+            
             <!-- Chats and Feedback Section -->
             <div class="dashboard-grid">
                 <!-- Active Chats -->
@@ -421,6 +452,52 @@ $activity = $pdo->query("
                     }]
                 }
             });
+        });
+
+        // Handle adding new survey fields
+        document.getElementById('add-field').addEventListener('click', function () {
+            const fieldCount = document.querySelectorAll('.survey-field').length + 1;
+            const fieldHTML = `
+                <div class="survey-field">
+                    <label for="question-${fieldCount}">Question ${fieldCount}</label>
+                    <input type="text" name="questions[]" id="question-${fieldCount}" placeholder="Enter your question" required>
+                    <select name="field_types[]" class="field-type-selector" required>
+                        <option value="text">Text Input</option>
+                        <option value="textarea">Text Area</option>
+                        <option value="radio">Radio Buttons</option>
+                        <option value="checkbox">Checkboxes</option>
+                        <option value="dropdown">Dropdown</option>
+                        <option value="number">Number</option>
+                        <option value="date">Date</option>
+                        <option value="rating">Rating</option>
+                        <option value="file">File Upload</option>
+                    </select>
+                    <div class="field-options" style="display: none;">
+                        <label>Options (comma-separated):</label>
+                        <input type="text" name="options[]" placeholder="Option1, Option2, Option3">
+                    </div>
+                    <button type="button" class="remove-field btn btn-danger">Remove</button>
+                </div>`;
+            document.getElementById('survey-fields').insertAdjacentHTML('beforeend', fieldHTML);
+        });
+
+        // Handle removing survey fields
+        document.getElementById('survey-fields').addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-field')) {
+                e.target.closest('.survey-field').remove();
+            }
+        });
+
+        // Show options input for applicable field types
+        document.getElementById('survey-fields').addEventListener('change', function (e) {
+            if (e.target.classList.contains('field-type-selector')) {
+                const optionsDiv = e.target.closest('.survey-field').querySelector('.field-options');
+                if (['radio', 'checkbox', 'dropdown'].includes(e.target.value)) {
+                    optionsDiv.style.display = 'block';
+                } else {
+                    optionsDiv.style.display = 'none';
+                }
+            }
         });
     </script>
 </body>
