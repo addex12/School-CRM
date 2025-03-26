@@ -6,7 +6,6 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-require_once 'user/includes/header.php';
 require_once 'includes/config.php'; // Ensure this initializes $pdo
 require_once 'includes/auth.php';
 
@@ -43,6 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<?php require_once 'user/includes/header.php'; ?>
+
     <meta charset="UTF-8">
     <title>Login - Survey System</title>
     <link rel="stylesheet" href="assets/css/style.css">
