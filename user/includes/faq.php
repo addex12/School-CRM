@@ -8,7 +8,7 @@
 </head>
 <body>
     <header>
-        <?php include '/header.php'; ?>
+        <?php include __DIR__ . '/header.php'; ?>
     </header>
     <main>
         <h1>Frequently Asked Questions (FAQ)</h1>
@@ -17,7 +17,7 @@
         </div>
     </main>
     <footer>
-        <?php include 'user/includes/footer.php'; ?>
+        <?php include __DIR__ . '/footer.php'; ?>
     </footer>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

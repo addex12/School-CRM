@@ -3,6 +3,9 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireLogin();
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $stmtUser = $pdo->prepare("SELECT id FROM users WHERE username = ?");
@@ -37,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <?php include 'includes/header.php'; ?>
+    <?php include '../includes/header.php'; ?>
     
     <div class="compose-container">
         <h1>Compose New Message</h1>
@@ -100,6 +103,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
     </script>
 
-    <?php include 'includes/footer.php'; ?>
+    <?php include '../includes/footer.php'; ?>
 </body>
 </html>
