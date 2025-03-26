@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/auth.php';
+require_once'../includes/db.php';
 
 $stmt = $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
