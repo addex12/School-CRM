@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <?php include 'includes/user_header.php'; ?>
+    <?php include 'includes/header.php'; ?>
     
     <div class="compose-container">
         <h1>Compose New Message</h1>
@@ -99,5 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
     </script>
+
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

@@ -8,7 +8,7 @@
 </head>
 <body>
     <header>
-        <?php include 'user/includes/header.php'; ?>
+        <?php include '/header.php'; ?>
     </header>
     <main>
         <h1>Frequently Asked Questions (FAQ)</h1>
