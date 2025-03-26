@@ -7,8 +7,6 @@ require_once '../includes/auth.php';
 requireAdmin();
 include 'includes/header.php';
 require_once '../includes/config.php'; // Include config to initialize $pdo
-require_once '../includes/auth.php';
-requireAdmin();
 
 // Get statistics
 $totalSurveys = $pdo->query("SELECT COUNT(*) FROM surveys")->fetchColumn();
