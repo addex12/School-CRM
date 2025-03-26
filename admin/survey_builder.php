@@ -1,4 +1,4 @@
-<div?php
+<?php
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
@@ -144,11 +144,9 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
     </style>
 </head>
 <body>
-
- <div class="admin-dashboard"> <?php include 'includes/admin_sidebar.php'; ?> 
-  
- <div class="container">
-        
+    
+< class="admin-dashboard">
+<?php include 'includes/admin_sidebar.php'; ?>         
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
@@ -263,7 +261,6 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
             </form>
         </div>
     </div>
- </div>
 
     <script>
         document.getElementById('add-field').addEventListener('click', function () {
