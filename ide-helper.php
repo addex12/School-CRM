@@ -4,6 +4,6 @@ require_once __DIR__ . '/vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Writ
 
 // Fake declarations for IDE
 if (false) {
-    class \PhpOffice\PhpSpreadsheet\Spreadsheet {}
-    class \PhpOffice\PhpSpreadsheet\Writer\Xlsx {}
+    class \PhpOffice\PhpSpreadsheet\Spreadsheet {};
+    class \PhpOffice\PhpSpreadsheet\Writer\Xlsx {};
 }

@@ -6,17 +6,16 @@ $stmt = $pdo->prepare("UPDATE users SET last_activity = NOW() WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 requireAdmin();
 
-// Get site settings
 $siteName = getSystemSetting('site_name', 'Survey System');
 $siteLogo = getSystemSetting('site_logo');
 $themeColor = getSystemSetting('theme_color', '#3498db');
 
-// Get admin menu configuration
+// Get admin menu configuration with validation
 $menuJson = getSystemSetting('admin_menu');
 $adminMenu = json_decode($menuJson, true);
 
-// Default menu if not configured
 if (!$adminMenu || json_last_error() !== JSON_ERROR_NONE) {
+    // Fallback to hardcoded menu
     $adminMenu = [
         ['title' => 'Dashboard', 'url' => 'dashboard.php', 'icon' => 'fa-home'],
         ['title' => 'Surveys', 'url' => 'surveys.php', 'icon' => 'fa-poll'],

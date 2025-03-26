@@ -24,7 +24,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$key, $value]);
         }
     }
-    
+    // Get system setting value
+    function getSystemSetting($key, $default = null) {
+        global $pdo;
+        
+        try {
+            $stmt = $pdo->prepare("SELECT value FROM system_settings WHERE setting_key = ?");
+            $stmt->execute([$key]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return $result ? $result['value'] : $default;
+        } catch (PDOException $e) {
+            error_log("Settings Error: " . $e->getMessage());
+            return $default;
+        }
+    }
     // Handle file uploads (logo, favicon)
     if (!empty($_FILES['site_logo']['name'])) {
         $upload_dir = '../assets/images/';
