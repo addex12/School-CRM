@@ -1,95 +1,62 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $name = $data['name'];
-    $email = $data['email'];
-    $message = $data['message'];
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/db.php';
+include_once __DIR__ . '/includes/header.php';
 
-    // Validate inputs
-    if (empty($name) || empty($email) || empty($message)) {
-        echo json_encode(['error' => 'All fields are required.']);
-        exit();
-    }
-
-    // Save the message to the database (or send an email)
-    require_once '../includes/config.php';
-    $stmt = $pdo->prepare("INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)");
-    if ($stmt->execute([$name, $email, $message])) {
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['error' => 'Failed to send your message. Please try again later.']);
-    }
-    exit();
-}
+// Get user information
+$user_id = $_SESSION['user_id'] ?? null;
+$user_email = $_SESSION['email'] ?? '';
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
-    <?php include 'includes/user_header.php'; ?>
+<div class="container">
+    <h2>Contact Support</h2>
+    
+    <?php if (isset($_GET['success'])): ?>
+        <div class="alert alert-success">
+            Your support ticket has been submitted successfully. Ticket #<?= htmlspecialchars($_GET['ticket']) ?>
+        </div>
+    <?php elseif (isset($_GET['error'])): ?>
+        <div class="alert alert-danger">
+            Error submitting your request: <?= htmlspecialchars($_GET['error']) ?>
+        </div>
+    <?php endif; ?>
+    
+    <form id="contact-form" action="contact-submit.php" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="user_id" value="<?= $user_id ?>">
+        
+        <div class="form-group">
+            <label for="email">Your Email</label>
+            <input type="email" id="email" name="email" class="form-control" value="<?= htmlspecialchars($user_email) ?>" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority" class="form-control" required>
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="attachment">Attachment (if any)</label>
+            <input type="file" id="attachment" name="attachment" class="form-control-file">
+            <small class="text-muted">Max 5MB (PDF, JPG, PNG, DOCX allowed)</small>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+    </form>
+</div>
 
-    <div class="contact-container">
-        <h1>Contact Us</h1>
-        <form id="contactForm">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="message">Message:</label>
-                <textarea id="message" name="message" rows="5" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Send Message</button>
-        </form>
-        <p id="responseMessage" style="display: none;"></p>
-    </div>
-
-    <script>
-        document.getElementById('contactForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-
-            fetch('contact.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                const responseMessage = document.getElementById('responseMessage');
-                if (result.success) {
-                    responseMessage.style.color = 'green';
-                    responseMessage.textContent = 'Your message has been sent successfully!';
-                } else {
-                    responseMessage.style.color = 'red';
-                    responseMessage.textContent = result.error || 'An error occurred. Please try again.';
-                }
-                responseMessage.style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                const responseMessage = document.getElementById('responseMessage');
-                responseMessage.style.color = 'red';
-                responseMessage.textContent = 'An error occurred. Please try again.';
-                responseMessage.style.display = 'block';
-            });
-        });
-    </script>
-</body>
-</html>
+<?php include_once __DIR__ . '/includes/footer.php'; ?>
