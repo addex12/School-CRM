@@ -173,287 +173,252 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?php echo htmlspecialchars($survey['title']); ?> - Survey</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .survey-header {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .survey-title {
-            margin: 0;
-            font-size: 24px;
-        }
-        .survey-description {
-            margin: 10px 0 0;
-        }
-        .survey-meta {
-            margin-top: 15px;
-            font-size: 14px;
-        }
-        .field-error {
-            color: #e74c3c;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .file-preview {
-            max-width: 200px;
-            max-height: 200px;
-            display: block;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Survey: <?php echo htmlspecialchars($survey['title']); ?></h1>
-            <nav>
-                <a href="dashboard.php">Back to Dashboard</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
-        </header>
-        
-        <div class="survey-content">
-            <div class="survey-header">
-                <h2 class="survey-title"><?php echo htmlspecialchars($survey['title']); ?></h2>
-                <p class="survey-description"><?php echo htmlspecialchars($survey['description']); ?></p>
-                <div class="survey-meta">
-                    <p>Available from <?php echo date('M j, Y g:i A', strtotime($survey['starts_at'])); ?> to <?php echo date('M j, Y g:i A', strtotime($survey['ends_at'])); ?></p>
-                </div>
-            </div>
-            
-            <?php if (isset($errors['system'])): ?>
-                <div class="error-message"><?php echo $errors['system']; ?></div>
-            <?php endif; ?>
-            
-            <form method="POST" enctype="multipart/form-data">
-                <?php foreach ($fields as $field): ?>
-                    <div class="form-field">
-                        <?php
-                        $field_name = $field['field_name'];
-                        $field_value = $_POST[$field_name] ?? '';
-                        $error = $errors[$field_name] ?? '';
-                        ?>
-                        
-                        <?php if ($field['field_type'] === 'text'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label for="<?php echo $field_name; ?>">
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <input type="text" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
-                                       value="<?php echo htmlspecialchars($field_value); ?>"
-                                       <?php if ($field['is_required']): ?>required<?php endif; ?>>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'textarea'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label for="<?php echo $field_name; ?>">
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <textarea id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
-                                          rows="4" <?php if ($field['is_required']): ?>required<?php endif; ?>><?php 
-                                          echo htmlspecialchars($field_value); ?></textarea>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'radio'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label>
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <div class="options">
-                                    <?php 
-                                    $options = json_decode($field['field_options'], true);
-                                    foreach ($options as $option): ?>
-                                        <label class="option">
-                                            <input type="radio" name="<?php echo $field_name; ?>" 
-                                                   value="<?php echo htmlspecialchars($option); ?>"
-                                                   <?php if ($field_value === $option): ?>checked<?php endif; ?>
-                                                   <?php if ($field['is_required']): ?>required<?php endif; ?>>
-                                            <?php echo htmlspecialchars($option); ?>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'checkbox'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label>
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <div class="options">
-                                    <?php 
-                                    $options = json_decode($field['field_options'], true);
-                                    $selected_values = is_array($field_value) ? $field_value : explode(', ', $field_value);
-                                    foreach ($options as $option): ?>
-                                        <label class="option">
-                                            <input type="checkbox" name="<?php echo $field_name; ?>[]" 
-                                                   value="<?php echo htmlspecialchars($option); ?>"
-                                                   <?php if (in_array($option, $selected_values)): ?>checked<?php endif; ?>>
-                                            <?php echo htmlspecialchars($option); ?>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'select'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label for="<?php echo $field_name; ?>">
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <select id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>"
-                                        <?php if ($field['is_required']): ?>required<?php endif; ?>>
-                                    <option value="">Select an option</option>
-                                    <?php 
-                                    $options = json_decode($field['field_options'], true);
-                                    foreach ($options as $option): ?>
-                                        <option value="<?php echo htmlspecialchars($option); ?>"
-                                                <?php if ($field_value === $option): ?>selected<?php endif; ?>>
-                                            <?php echo htmlspecialchars($option); ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'number'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label for="<?php echo $field_name; ?>">
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <input type="number" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
-                                       value="<?php echo htmlspecialchars($field_value); ?>"
-                                       <?php if ($field['is_required']): ?>required<?php endif; ?>>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'date'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label for="<?php echo $field_name; ?>">
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <input type="date" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
-                                       value="<?php echo htmlspecialchars($field_value); ?>"
-                                       <?php if ($field['is_required']): ?>required<?php endif; ?>>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'rating'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label>
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <div class="rating-container">
-                                    <input type="hidden" name="<?php echo $field_name; ?>" value="<?php echo htmlspecialchars($field_value); ?>">
-                                    <span class="rating-star" data-value="1">★</span>
-                                    <span class="rating-star" data-value="2">★</span>
-                                    <span class="rating-star" data-value="3">★</span>
-                                    <span class="rating-star" data-value="4">★</span>
-                                    <span class="rating-star" data-value="5">★</span>
-                                    <div class="rating-labels">
-                                        <span>1 (Poor)</span>
-                                        <span>5 (Excellent)</span>
-                                    </div>
-                                </div>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        
-                        <?php elseif ($field['field_type'] === 'file'): ?>
-                            <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
-                                <label for="<?php echo $field_name; ?>">
-                                    <?php echo htmlspecialchars($field['field_label']); ?>
-                                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                                </label>
-                                <input type="file" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>"
-                                       <?php if ($field['is_required']): ?>required<?php endif; ?>>
-                                <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-                
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Submit Survey</button>
-                </div>
-            </form>
-        </div>
-    </div>
+<?php include 'includes/header.php'; ?>
+
+<div class="container">
+    <header>
+        <h1>Survey: <?php echo htmlspecialchars($survey['title']); ?></h1>
+        <nav>
+            <a href="dashboard.php">Back to Dashboard</a>
+            <a href="../logout.php">Logout</a>
+        </nav>
+    </header>
     
-    <script>
-        // Initialize rating fields
-        document.querySelectorAll('.rating-container').forEach(container => {
-            const stars = container.querySelectorAll('.rating-star');
-            const hiddenInput = container.querySelector('input[type="hidden"]');
-            
-            // Set initial stars if value exists
-            if (hiddenInput.value) {
-                const value = parseInt(hiddenInput.value);
-                stars.forEach((star, i) => {
-                    if (i < value) {
-                        star.classList.add('active');
-                    }
-                });
-            }
-            
-            stars.forEach(star => {
-                star.addEventListener('click', function() {
-                    const value = parseInt(this.dataset.value);
-                    stars.forEach((s, i) => {
-                        if (i < value) {
-                            s.classList.add('active');
-                        } else {
-                            s.classList.remove('active');
-                        }
-                    });
-                    hiddenInput.value = value;
-                });
-            });
-        });
+    <div class="survey-content">
+        <div class="survey-header">
+            <h2 class="survey-title"><?php echo htmlspecialchars($survey['title']); ?></h2>
+            <p class="survey-description"><?php echo htmlspecialchars($survey['description']); ?></p>
+            <div class="survey-meta">
+                <p>Available from <?php echo date('M j, Y g:i A', strtotime($survey['starts_at'])); ?> to <?php echo date('M j, Y g:i A', strtotime($survey['ends_at'])); ?></p>
+            </div>
+        </div>
         
-        // Preview image before upload
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file && file.type.match('image.*')) {
-                    const reader = new FileReader();
+        <?php if (isset($errors['system'])): ?>
+            <div class="error-message"><?php echo $errors['system']; ?></div>
+        <?php endif; ?>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <?php foreach ($fields as $field): ?>
+                <div class="form-field">
+                    <?php
+                    $field_name = $field['field_name'];
+                    $field_value = $_POST[$field_name] ?? '';
+                    $error = $errors[$field_name] ?? '';
+                    ?>
                     
-                    reader.onload = function(readerEvent) {
-                        // Remove existing preview if any
-                        const existingPreview = input.nextElementSibling;
-                        if (existingPreview && existingPreview.classList.contains('file-preview')) {
-                            existingPreview.remove();
-                        }
-                        
-                        // Create new preview
-                        const preview = document.createElement('img');
-                        preview.src = readerEvent.target.result;
-                        preview.className = 'file-preview';
-                        input.parentNode.insertBefore(preview, input.nextSibling);
-                    }
+                    <?php if ($field['field_type'] === 'text'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label for="<?php echo $field_name; ?>">
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <input type="text" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
+                                   value="<?php echo htmlspecialchars($field_value); ?>"
+                                   <?php if ($field['is_required']): ?>required<?php endif; ?>>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
                     
-                    reader.readAsDataURL(file);
+                    <?php elseif ($field['field_type'] === 'textarea'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label for="<?php echo $field_name; ?>">
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <textarea id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
+                                      rows="4" <?php if ($field['is_required']): ?>required<?php endif; ?>><?php 
+                                      echo htmlspecialchars($field_value); ?></textarea>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    
+                    <?php elseif ($field['field_type'] === 'radio'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label>
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <div class="options">
+                                <?php 
+                                $options = json_decode($field['field_options'], true);
+                                foreach ($options as $option): ?>
+                                    <label class="option">
+                                        <input type="radio" name="<?php echo $field_name; ?>" 
+                                               value="<?php echo htmlspecialchars($option); ?>"
+                                               <?php if ($field_value === $option): ?>checked<?php endif; ?>
+                                               <?php if ($field['is_required']): ?>required<?php endif; ?>>
+                                        <?php echo htmlspecialchars($option); ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    
+                    <?php elseif ($field['field_type'] === 'checkbox'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label>
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <div class="options">
+                                <?php 
+                                $options = json_decode($field['field_options'], true);
+                                $selected_values = is_array($field_value) ? $field_value : explode(', ', $field_value);
+                                foreach ($options as $option): ?>
+                                    <label class="option">
+                                        <input type="checkbox" name="<?php echo $field_name; ?>[]" 
+                                               value="<?php echo htmlspecialchars($option); ?>"
+                                               <?php if (in_array($option, $selected_values)): ?>checked<?php endif; ?>>
+                                        <?php echo htmlspecialchars($option); ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    
+                    <?php elseif ($field['field_type'] === 'select'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label for="<?php echo $field_name; ?>">
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <select id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>"
+                                    <?php if ($field['is_required']): ?>required<?php endif; ?>>
+                                <option value="">Select an option</option>
+                                <?php 
+                                $options = json_decode($field['field_options'], true);
+                                foreach ($options as $option): ?>
+                                    <option value="<?php echo htmlspecialchars($option); ?>"
+                                            <?php if ($field_value === $option): ?>selected<?php endif; ?>>
+                                        <?php echo htmlspecialchars($option); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    
+                    <?php elseif ($field['field_type'] === 'number'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label for="<?php echo $field_name; ?>">
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <input type="number" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
+                                   value="<?php echo htmlspecialchars($field_value); ?>"
+                                   <?php if ($field['is_required']): ?>required<?php endif; ?>>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    
+                    <?php elseif ($field['field_type'] === 'date'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label for="<?php echo $field_name; ?>">
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <input type="date" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>" 
+                                   value="<?php echo htmlspecialchars($field_value); ?>"
+                                   <?php if ($field['is_required']): ?>required<?php endif; ?>>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    
+                    <?php elseif ($field['field_type'] === 'rating'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label>
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <div class="rating-container">
+                                <input type="hidden" name="<?php echo $field_name; ?>" value="<?php echo htmlspecialchars($field_value); ?>">
+                                <span class="rating-star" data-value="1">★</span>
+                                <span class="rating-star" data-value="2">★</span>
+                                <span class="rating-star" data-value="3">★</span>
+                                <span class="rating-star" data-value="4">★</span>
+                                <span class="rating-star" data-value="5">★</span>
+                                <div class="rating-labels">
+                                    <span>1 (Poor)</span>
+                                    <span>5 (Excellent)</span>
+                                </div>
+                            </div>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    
+                    <?php elseif ($field['field_type'] === 'file'): ?>
+                        <div class="form-group <?php echo $error ? 'has-error' : ''; ?>">
+                            <label for="<?php echo $field_name; ?>">
+                                <?php echo htmlspecialchars($field['field_label']); ?>
+                                <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                            </label>
+                            <input type="file" id="<?php echo $field_name; ?>" name="<?php echo $field_name; ?>"
+                                   <?php if ($field['is_required']): ?>required<?php endif; ?>>
+                            <?php if ($error): ?><div class="field-error"><?php echo $error; ?></div><?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit Survey</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>
+
+<script>
+    // Initialize rating fields
+    document.querySelectorAll('.rating-container').forEach(container => {
+        const stars = container.querySelectorAll('.rating-star');
+        const hiddenInput = container.querySelector('input[type="hidden"]');
+        
+        // Set initial stars if value exists
+        if (hiddenInput.value) {
+            const value = parseInt(hiddenInput.value);
+            stars.forEach((star, i) => {
+                if (i < value) {
+                    star.classList.add('active');
                 }
             });
+        }
+        
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const value = parseInt(this.dataset.value);
+                stars.forEach((s, i) => {
+                    if (i < value) {
+                        s.classList.add('active');
+                    } else {
+                        s.classList.remove('active');
+                    }
+                });
+                hiddenInput.value = value;
+            });
         });
-    </script>
+    });
+    
+    // Preview image before upload
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file && file.type.match('image.*')) {
+                const reader = new FileReader();
+                
+                reader.onload = function(readerEvent) {
+                    // Remove existing preview if any
+                    const existingPreview = input.nextElementSibling;
+                    if (existingPreview && existingPreview.classList.contains('file-preview')) {
+                        existingPreview.remove();
+                    }
+                    
+                    // Create new preview
+                    const preview = document.createElement('img');
+                    preview.src = readerEvent.target.result;
+                    preview.className = 'file-preview';
+                    input.parentNode.insertBefore(preview, input.nextSibling);
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
 </body>
 </html>

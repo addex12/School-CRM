@@ -130,107 +130,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title><?= htmlspecialchars($survey['title']) ?> - Survey</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .survey-container { max-width: 800px; margin: 20px auto; padding: 20px; }
-        .field-group { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
-        .required { color: #dc3545; }
-        .error { color: #dc3545; font-size: 0.9em; }
-        .rating-stars { font-size: 24px; cursor: pointer; }
-        .rating-stars .star { color: #ffd700; }
-    </style>
-</head>
-<body>
-    <div class="survey-container">
-        <h1><?= htmlspecialchars($survey['title']) ?></h1>
-        <p><?= htmlspecialchars($survey['description']) ?></p>
-        
-        <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger">
-                <?php foreach ($errors as $error): ?>
-                    <p><?= $error ?></p>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+<?php include 'includes/header.php'; ?>
 
-        <form method="POST" enctype="multipart/form-data">
-            <?php foreach ($fields as $field): ?>
-                <div class="field-group">
-                    <label>
-                        <?= htmlspecialchars($field['field_label']) ?>
-                        <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
-                    </label>
-                    
-                    <?php if ($field['field_type'] === 'text'): ?>
-                        <input type="text" name="<?= $field['field_name'] ?>" class="form-control"
-                               value="<?= htmlspecialchars($_POST[$field['field_name']] ?? '') ?>">
-                    
-                    <?php elseif ($field['field_type'] === 'textarea'): ?>
-                        <textarea name="<?= $field['field_name'] ?>" class="form-control" rows="4"><?= 
-                            htmlspecialchars($_POST[$field['field_name']] ?? '') ?></textarea>
-                    
-                    <?php elseif ($field['field_type'] === 'radio'): ?>
-                        <?php foreach (json_decode($field['field_options']) as $option): ?>
-                            <div class="form-check">
-                                <input type="radio" name="<?= $field['field_name'] ?>" 
-                                       value="<?= htmlspecialchars($option) ?>" class="form-check-input">
-                                <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
-                            </div>
-                        <?php endforeach; ?>
-                    
-                    <?php elseif ($field['field_type'] === 'checkbox'): ?>
-                        <?php foreach (json_decode($field['field_options']) as $option): ?>
-                            <div class="form-check">
-                                <input type="checkbox" name="<?= $field['field_name'] ?>[]" 
-                                       value="<?= htmlspecialchars($option) ?>" class="form-check-input">
-                                <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
-                            </div>
-                        <?php endforeach; ?>
-                    
-                    <?php elseif ($field['field_type'] === 'file'): ?>
-                        <input type="file" name="<?= $field['field_name'] ?>" class="form-control">
-                    
-                    <?php elseif ($field['field_type'] === 'rating'): ?>
-                        <div class="rating-stars">
-                            <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <span class="star" data-value="<?= $i ?>">★</span>
-                            <?php endfor; ?>
-                            <input type="hidden" name="<?= $field['field_name'] ?>" 
-                                   value="<?= $_POST[$field['field_name']] ?? '' ?>">
-                        </div>
-                    <?php endif; ?>
-                    
-                    <?php if (isset($errors[$field['field_name']])): ?>
-                        <div class="error"><?= $errors[$field['field_name']] ?></div>
-                    <?php endif; ?>
-                </div>
+<div class="survey-container">
+    <h1><?= htmlspecialchars($survey['title']) ?></h1>
+    <p><?= htmlspecialchars($survey['description']) ?></p>
+    
+    <?php if (!empty($errors)): ?>
+        <div class="alert alert-danger">
+            <?php foreach ($errors as $error): ?>
+                <p><?= $error ?></p>
             <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
-            <button type="submit" class="btn btn-primary">Submit Survey</button>
-        </form>
-    </div>
+    <form method="POST" enctype="multipart/form-data">
+        <?php foreach ($fields as $field): ?>
+            <div class="field-group">
+                <label>
+                    <?= htmlspecialchars($field['field_label']) ?>
+                    <?php if ($field['is_required']): ?><span class="required">*</span><?php endif; ?>
+                </label>
+                
+                <?php if ($field['field_type'] === 'text'): ?>
+                    <input type="text" name="<?= $field['field_name'] ?>" class="form-control"
+                           value="<?= htmlspecialchars($_POST[$field['field_name']] ?? '') ?>">
+                
+                <?php elseif ($field['field_type'] === 'textarea'): ?>
+                    <textarea name="<?= $field['field_name'] ?>" class="form-control" rows="4"><?= 
+                        htmlspecialchars($_POST[$field['field_name']] ?? '') ?></textarea>
+                
+                <?php elseif ($field['field_type'] === 'radio'): ?>
+                    <?php foreach (json_decode($field['field_options']) as $option): ?>
+                        <div class="form-check">
+                            <input type="radio" name="<?= $field['field_name'] ?>" 
+                                   value="<?= htmlspecialchars($option) ?>" class="form-check-input">
+                            <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
+                        </div>
+                    <?php endforeach; ?>
+                
+                <?php elseif ($field['field_type'] === 'checkbox'): ?>
+                    <?php foreach (json_decode($field['field_options']) as $option): ?>
+                        <div class="form-check">
+                            <input type="checkbox" name="<?= $field['field_name'] ?>[]" 
+                                   value="<?= htmlspecialchars($option) ?>" class="form-check-input">
+                            <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
+                        </div>
+                    <?php endforeach; ?>
+                
+                <?php elseif ($field['field_type'] === 'file'): ?>
+                    <input type="file" name="<?= $field['field_name'] ?>" class="form-control">
+                
+                <?php elseif ($field['field_type'] === 'rating'): ?>
+                    <div class="rating-stars">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="star" data-value="<?= $i ?>">★</span>
+                        <?php endfor; ?>
+                        <input type="hidden" name="<?= $field['field_name'] ?>" 
+                               value="<?= $_POST[$field['field_name']] ?? '' ?>">
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($errors[$field['field_name']])): ?>
+                    <div class="error"><?= $errors[$field['field_name']] ?></div>
+                <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
 
-    <script>
-        // Rating stars functionality
-        document.querySelectorAll('.rating-stars').forEach(container => {
-            const stars = container.querySelectorAll('.star');
-            const hiddenInput = container.querySelector('input[type="hidden"]');
-            
-            stars.forEach(star => {
-                star.addEventListener('click', () => {
-                    const value = star.dataset.value;
-                    hiddenInput.value = value;
-                    stars.forEach((s, index) => {
-                        s.style.color = index < value ? '#ffd700' : '#ccc';
-                    });
+        <button type="submit" class="btn btn-primary">Submit Survey</button>
+    </form>
+</div>
+
+<?php include 'includes/footer.php'; ?>
+
+<script>
+    // Rating stars functionality
+    document.querySelectorAll('.rating-stars').forEach(container => {
+        const stars = container.querySelectorAll('.star');
+        const hiddenInput = container.querySelector('input[type="hidden"]');
+        
+        stars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = star.dataset.value;
+                hiddenInput.value = value;
+                stars.forEach((s, index) => {
+                    s.style.color = index < value ? '#ffd700' : '#ccc';
                 });
             });
         });
-    </script>
+    });
+</script>
 </body>
 </html>

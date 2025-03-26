@@ -8,7 +8,7 @@
 </head>
 <body>
     <header>
-        <?php include 'includes/header.php'; ?>
+        <?php include 'user/includes/header.php'; ?>
     </header>
     <main>
         <h1>Terms of Service</h1>
@@ -30,7 +30,7 @@
         </div>
     </main>
     <footer>
-        <?php include 'includes/footer.php'; ?>
+        <?php include 'user/includes/footer.php'; ?>
     </footer>
 </body>
 </html>

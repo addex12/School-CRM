@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/includes/header.php';
+include_once __DIR__ . '/includes/header.php';
 
 // Get user information
 $user_id = $_SESSION['user_id'] ?? null;
