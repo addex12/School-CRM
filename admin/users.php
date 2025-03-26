@@ -64,9 +64,7 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
 </head>
 <body>
     <div class="container">
-        <header>
-                       <?php require_once 'includes/admin_sidebar.php'; ?>
-        </header>
+                      <?php require_once 'includes/admin_sidebar.php'; ?>
         
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>
