@@ -11,9 +11,6 @@ session_set_cookie_params([
 
 session_start();
 
-function isLoggedIn(): bool {
-    return isset($_SESSION['user_id']);
-}
 
 function requireLogin(): void {
     if (!isLoggedIn()) {
