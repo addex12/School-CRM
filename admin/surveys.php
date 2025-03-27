@@ -14,9 +14,10 @@ if ($survey_id !== null) {
     $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
     $stmt->execute([$survey_id]);
     $survey = $stmt->fetch();
-
     if (!$survey) {
-        $error = "Survey not found.";
+        header("Location: surveys.php?error=survey_not_found");
+        exit();
+    }
     } elseif (!$survey['is_active']) {
         $error = "This survey is inactive.";
     } elseif (strtotime($survey['starts_at']) > time()) {
@@ -25,10 +26,7 @@ if ($survey_id !== null) {
         $error = "This survey has already ended.";
     }
 }
-if (!$survey) {
-    header("Location: surveys.php?error=survey_not_found");
-    exit();
-}
+
 // Fetch all surveys for display
 $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchAll();
 ?>
