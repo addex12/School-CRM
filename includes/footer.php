@@ -25,3 +25,10 @@ requireAdmin();
             </nav>
         </header>
         <main class="admin-main"></main>
+        <div class="admin-footer">
+            <p>&copy; <?php echo date('Y'); ?> School Survey System. All rights reserved.</p>
+            <p>Developed by <a href="https://github.com/addex12" target="_blank">Adugna Gizaw</a></p>
+        </div>
+    </div>
+</body>
+</html>

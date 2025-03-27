@@ -17,7 +17,7 @@ function isLoggedIn(): bool {
 
 function requireLogin(): void {
     if (!isLoggedIn()) {
-        header(header: "Location: ../login.php");
+        header("Location: ../login.php");
         exit();
     }
 }
@@ -25,7 +25,7 @@ function requireLogin(): void {
 function requireAdmin(): void {
     requireLogin();
     if ($_SESSION['role'] !== 'admin') {
-        header("Location: ../user/dashboard.php");
+        header("Location: ../unauthorized.php");
         exit();
     }
 }
@@ -37,3 +37,4 @@ function getCurrentUser(): ?array {
         'role' => $_SESSION['role']
     ] : null;
 }
+?>

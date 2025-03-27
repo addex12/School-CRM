@@ -4,26 +4,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const fieldCount = document.querySelectorAll('.survey-field').length + 1;
         const fieldHTML = `
             <div class="survey-field">
-                <label for="question-${fieldCount}">Question ${fieldCount}</label>
-                <input type="text" name="questions[]" id="question-${fieldCount}" placeholder="Enter your question" required>
-                <select name="field_types[]" class="field-type-selector" required>
-                    <option value="text">Text Input</option>
-                    <option value="textarea">Text Area</option>
-                    <option value="radio">Radio Buttons</option>
-                    <option value="checkbox">Checkboxes</option>
-                    <option value="dropdown">Dropdown</option>
-                    <option value="number">Number</option>
-                    <option value="date">Date</option>
-                    <option value="rating">Rating</option>
-                    <option value="file">File Upload</option>
-                </select>
-                <input type="text" name="placeholders[]" placeholder="Placeholder (optional)">
-                <div class="field-options" style="display: none;">
-                    <label>Options (comma-separated):</label>
-                    <input type="text" name="options[]" placeholder="Option1, Option2, Option3">
-                </div>
-                <label><input type="checkbox" name="required[]"> Required</label>
-                <button type="button" class="remove-field btn btn-danger">Remove</button>
+                <label>Question ${fieldCount}</label>
+                <input type="text" name="questions[]" placeholder="Enter your question" required>
+                <button type="button" class="remove-field">Remove</button>
             </div>`;
         document.getElementById('survey-fields').insertAdjacentHTML('beforeend', fieldHTML);
     });

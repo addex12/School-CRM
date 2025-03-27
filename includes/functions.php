@@ -69,4 +69,18 @@ function applySystemSettings() {
     define('THEME_COLOR', getSystemSetting('theme_color', '#3498db'));
 }
 
+function sanitizeInput($input) {
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+}
+
+function redirectWithMessage($url, $message, $type = 'success') {
+    $_SESSION[$type] = $message;
+    header("Location: $url");
+    exit();
+}
+
+function formatDate($date, $format = 'M j, Y g:i A') {
+    return date($format, strtotime($date));
+}
+
 ?>
