@@ -6,15 +6,16 @@
         width: calc(100% - 250px); /* Adjust width to exclude sidebar */
         background-color: #2c3e50;
         color: white;
-        padding: 10px 20px;
+        padding: 5px 15px; /* Reduced padding */
         display: flex;
         justify-content: space-between;
         align-items: center;
         border-top: 1px solid #374150;
+        font-size: 14px; /* Reduced font size */
     }
 
     .footer-section {
-        margin: 0 10px;
+        margin: 0 5px; /* Reduced margin */
     }
 
     .footer-link {
@@ -28,8 +29,8 @@
 
     .social-link {
         color: white;
-        margin-right: 10px;
-        font-size: 18px;
+        margin-right: 5px; /* Reduced margin */
+        font-size: 16px; /* Reduced icon size */
     }
 
     .social-link:hover {
