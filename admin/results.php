@@ -110,11 +110,11 @@ if ($survey_id) {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
+            color: #333;
         }
-
-        .admin-container {
+        .admin-main {
+            flex: 1;
             display: flex;
-            min-height: 100vh;
             flex-direction: column;
         }
 
@@ -123,6 +123,9 @@ if ($survey_id) {
             padding: 2rem;
             max-width: 1200px;
             margin: 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .content-header {
@@ -130,21 +133,42 @@ if ($survey_id) {
             margin-bottom: 2rem;
         }
 
+        header.admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: #2c3e50;
+            color: #fff;
+        }
+
+        header.admin-header .page-title {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        header.admin-header .header-actions .btn {
+            background: #3498db;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        header.admin-header .header-actions .btn:hover {
+            background: #2980b9;
+        }
+
         footer {
             text-align: center;
             padding: 1rem;
             background-color: #2c3e50;
             color: #fff;
-            position: relative;
-            bottom: 0;
-            width: 100%;
+            margin-top: auto;
         }
 
         .results-container {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 2rem;
             margin-top: 1.5rem;
         }
 
@@ -219,7 +243,7 @@ if ($survey_id) {
             padding: 1.5rem;
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
         .chart-container {
@@ -248,11 +272,11 @@ if ($survey_id) {
     </style>
 </head>
 <body>
-    <div class="admin-container">
+    <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1 class="page-title"><?= htmlspecialchars($survey['title']) ?> Preview</h1>
+                <h1 class="page-title"><?= htmlspecialchars($survey['title']) ?> Results</h1>
                 <div class="header-actions">
                     <a href="surveys.php" class="btn btn-back">
                         <i class="fas fa-arrow-left"></i> Back to Surveys
