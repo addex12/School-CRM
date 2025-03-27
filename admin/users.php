@@ -6,7 +6,7 @@ requireAdmin();
 $title = "Manage Users";
 
 // Include the revamped sidebar
-include '../includes/admin_sidebar.php';
+include 'includes/admin_sidebar.php';
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -169,7 +169,7 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
   </div>
 
     </div>
-            <?php include '../includes/footer.php';?>
+            <?php include 'includes/footer.php';?>
 
     <script>
         // Edit modal functions

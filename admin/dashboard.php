@@ -298,6 +298,6 @@ foreach ($dashboardConfig['sections'] as $section) {
             });
         });
     </script>
-            <?php include '../includes/footer.php';?>
+            <?php include 'includes/footer.php';?>
             </body>
 </html>
