@@ -252,6 +252,14 @@ if ($survey_id) {
         <?php include 'includes/admin_sidebar.php'; ?>
         
         <main class="main-content">
+        <div class="content">
+                <div class="survey-info">
+                    <div class="survey-meta">
+                        <h2>Survey Details</h2>
+                        <div class="meta-grid">
+                </div>
+            </div>
+            </div>
             <div class="content-header">
                 <h1>Survey Results</h1>
             </div>
