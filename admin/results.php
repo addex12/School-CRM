@@ -464,10 +464,8 @@ if ($survey_id) {
                 <?php endif; ?>
             </div>
         </main>
-
-        <footer>
-            <p>&copy; <?= date('Y') ?> School CRM. All rights reserved.</p>
-        </footer>
+                <?php require_once 'includes/footer.php'; ?>
+        </div>
     </div>
 
     <script>
