@@ -16,6 +16,9 @@ $tickets = $pdo->query("SELECT t.*, u.username FROM support_tickets t LEFT JOIN 
 
 // Fetch recent feedback
 $feedback = $pdo->query("SELECT f.*, u.username FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC LIMIT 5")->fetchAll();
+
+// Fetch recent user activities
+$activities = $pdo->query("SELECT a.*, u.username FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 10")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -43,6 +46,35 @@ $feedback = $pdo->query("SELECT f.*, u.username FROM feedback f LEFT JOIN users 
                             <p><?php echo $value; ?></p>
                         </div>
                     <?php endforeach; ?>
+                </div>
+
+                <!-- Recent Activities Section -->
+                <div class="dashboard-section">
+                    <h2>Recent User Activities</h2>
+                    <?php if (empty($activities)): ?>
+                        <p>No recent activities.</p>
+                    <?php else: ?>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($activities as $activity): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($activity['username'] ?? 'System'); ?></td>
+                                        <td><?php echo htmlspecialchars($activity['action']); ?></td>
+                                        <td><?php echo htmlspecialchars($activity['details']); ?></td>
+                                        <td><?php echo date('M j, Y g:i A', strtotime($activity['created_at'])); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Recent Tickets Section -->
