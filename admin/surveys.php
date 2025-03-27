@@ -53,8 +53,7 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                 <!-- Display all surveys -->
                 <div class="table-section">
                     <h2>All Surveys</h2>
-                    <?php if (count($surveys) > 0): ?>
-                        <table class="table">
+                    <a href="survey_preview.php?id=<?= $survey['id'] ?>"...>                        <table class="table">
                             <thead>
                                 <tr></tr>
                                     <th>Title</th>
