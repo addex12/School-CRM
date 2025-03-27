@@ -90,7 +90,7 @@ if ($survey_id) {
 }
 
 // Start HTML output with header
-include 'includes/header.php';
+include 'includes/admin_sidebar.php';
 ?>
 
 <div class="admin-container">
