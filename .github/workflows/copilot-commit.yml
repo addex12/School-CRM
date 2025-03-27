@@ -1,0 +1,28 @@
+name: Copilot Commit Auto-Comment
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+      - 'bugfix/**'
+
+jobs:
+  copilot-comment:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install Copilot CLI
+      run: npm install -g @githubnext/copilot-cli
+
+    - name: Generate Commit Comments
+      run: |
+        copilot-cli comment --repo . --branch ${{ github.ref_name }} --commit-message "Auto-generated commit comments using Copilot."

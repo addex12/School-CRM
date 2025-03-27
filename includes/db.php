@@ -8,9 +8,9 @@ class Database {
 
     public function __construct() {
         $this->host = getenv('DB_HOST') ?: '127.0.0.1';
-        $this->dbname = getenv('DB_NAME') ?: 'flipperschool_parent_survey_system';
-        $this->user = getenv('DB_USER') ?: 'flipperschool';
-        $this->pass = getenv('DB_PASS') ?: 'jobk4iFz37@f*BaDKLjk@x4qL';
+        $this->dbname = getenv('DB_NAME') ?: 'parent_survey_system';
+        $this->user = getenv('DB_USER') ?: 'root';
+        $this->pass = getenv('DB_PASS') ?: '@f*BaDKLjk@x4qL';
                 
         try {
             $this->conn = new PDO(

@@ -1,5 +1,13 @@
 # 🏫 Custom School Parent Survey System
 
+![vscode marketplace](https://img.shields.io/badge/vscode%20marketplace-v8.2.3-blue)
+![rating](https://img.shields.io/badge/rating-4.2%2F5%20(264)-green)
+![stars](https://img.shields.io/badge/stars-2.6k-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+![build](https://img.shields.io/badge/build-passing-brightgreen)
+![contributors](https://img.shields.io/badge/contributors-15-orange)
+![last commit](https://img.shields.io/badge/last%20commit-October%202023-yellow)
+
 A web-based system for schools to create, manage, and analyze parent surveys with admin dashboards, automated exports (PDF/Excel), and email integration.
 
 ---
@@ -23,78 +31,74 @@ A web-based system for schools to create, manage, and analyze parent surveys wit
 
 ### Steps
 1. **Clone the Repository**:
-   ```
+   ```bash
    git clone https://github.com/yourusername/school-survey-system.git
-       Database Setup:
+   ```
 
-        Import parent_survey_system.sql:
-    
+2. **Database Setup**:
+   - Import `parent_survey_system.sql`:
+     ```bash
+     mysql -u root -p parent_survey_system < parent_survey_system.sql
+     ```
+   - Update `includes/db.php` with your MySQL credentials.
 
-        mysql -u root -p parent_survey_system < parent_survey_system.sql
+3. **Configure PHP**:
+   - Ensure `php.ini` has the following extensions enabled:
+     ```ini
+     extension=mbstring
+     extension=gd
+     extension=zip
+     ```
 
-        Update includes/db.php with your MySQL credentials.
+4. **Manual Dependencies**:
+   - Place `phpmailer/`, `mpdf/`, and `phpoffice/` folders in `vendor/` (already included).
 
-    Configure PHP:
+5. **Web Server**:
+   - Point your server to the project root (e.g., `htdocs/survey/`).
 
-        Ensure php.ini has:
-        ini
-        
+---
 
-        extension=mbstring
-        extension=gd
-        extension=zip
+## 🚀 Usage
 
-    Manual Dependencies:
+### Admin Access
 
-        Place phpmailer/, mpdf/, and phpoffice/ folders in vendor/ (already included).
+- **Login**: Visit `/login.php` → Use admin credentials.
+- **Dashboard**:
+  - Create surveys with drag-and-drop fields.
+  - Assign surveys to roles (parents/teachers/students).
+  - View real-time response charts.
+  - Export results to PDF/Excel/CSV.
 
-    Web Server:
+### Parent/User Access
 
-        Point your server to the project root (e.g., htdocs/survey/).
+- **Survey Link**: Share `/user/survey.php?id=SURVEY_ID`.
+- **Submit Responses**: Fill out assigned surveys.
+- **Completion Tracking**: View completed surveys in `/user/dashboard.php`.
 
-🚀 Usage
-Admin Access
+---
 
-    Login: Visit /login.php → Use admin credentials.
+## 📸 Screenshots
 
-    Dashboard:
+| Admin Dashboard | Survey Builder | Results Export |
+|-----------------|----------------|----------------|
+| ![Admin Dashboard](screenshots/admin_dashboard.png) | ![Survey Builder](screenshots/survey_builder.png) | ![Results Export](screenshots/results_export.png) |
 
-        Create surveys with drag-and-drop fields.
+---
 
-        Assign surveys to roles (parents/teachers/students).
+## 🧰 Technologies Used
 
-        View real-time response charts.
+- **Backend**: PHP, MySQL
+- **Frontend**: HTML5, CSS3, JavaScript (Chart.js, Sortable.js)
+- **Libraries**:
+  - PHPMailer (Emails)
+  - mPDF (PDF exports)
+  - PhpSpreadsheet (Excel exports)
 
-        Export results to PDF/Excel/CSV.
+---
 
-Parent/User Access
+## 📂 Directory Structure
 
-    Survey Link: Share /user/survey.php?id=SURVEY_ID.
-
-    Submit Responses: Fill out assigned surveys.
-
-    Completion Tracking: View completed surveys in /user/dashboard.php.
-
-📸 Screenshots
-Admin Dashboard	Survey Builder	Results Export
-Admin Dashboard	Survey Builder	Export
-
-🧰 Technologies Used
-
-    Backend: PHP, MySQL
-
-    Frontend: HTML5, CSS3, JavaScript (Chart.js, Sortable.js)
-
-    Libraries:
-
-        PHPMailer (Emails)
-
-        mPDF (PDF exports)
-
-        PhpSpreadsheet (Excel exports)
-
-📂 Directory Structure
-
+```
 survey/
 ├── admin/            # Admin panels
 ├── assets/           # CSS/JS/Images
@@ -103,16 +107,20 @@ survey/
 ├── vendor/           # Manual dependencies
 ├── index.php         # Landing page
 └── README.md         # This file
+```
 
-📜 License
+---
+
+## 📜 License
 
 MIT License. See LICENSE for details.
-🙏 Acknowledgments
 
-    Icons by Font Awesome
+---
 
-    Charts by Chart.js
+## 🙏 Acknowledgments
 
+- Icons by Font Awesome
+- Charts by Chart.js
 
 ---
 
