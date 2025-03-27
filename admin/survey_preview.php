@@ -23,7 +23,6 @@ $fields = $stmt->fetchAll();
 // Get target roles
 $target_roles = json_decode($survey['target_roles'], true);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +41,7 @@ $target_roles = json_decode($survey['target_roles'], true);
                 <a href="categories.php">Categories</a>
                 <a href="users.php">Users</a>
                 <a href="results.php">Results</a>
-                <a href="../logout.php">Logout</a>
+                <a href="../../logout.php">Logout</a>
             </nav>
         </header>
         
