@@ -50,8 +50,7 @@
         <div class="footer-section">
             <h4><?php echo $pageTitle; ?> - Admin Panel</h4>
             <p>&copy; <?php echo date('Y'); ?> School Survey System. All rights reserved.</p>
-        </div>
-        <div class="footer-section developer-info">
+
             <h4>Developer</h4>
             <p><strong>Adugna Gizaw</strong></p>
             <p>Email: <a href="mailto:gizawadugna@gmail.com" class="footer-link">gizawadugna@gmail.com</a></p>
