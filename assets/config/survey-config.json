@@ -1,0 +1,26 @@
+{
+    "fieldTypes": {
+      "text": "Text Input",
+      "textarea": "Text Area",
+      "radio": "Radio Buttons",
+      "checkbox": "Checkboxes",
+      "dropdown": "Dropdown",
+      "number": "Number",
+      "date": "Date",
+      "rating": "Rating",
+      "file": "File Upload"
+    },
+    "targetRoles": [
+      {"value": "student", "label": "Students"},
+      {"value": "teacher", "label": "Teachers"},
+      {"value": "parent", "label": "Parents"}
+    ],
+    "statusOptions": [
+      {"value": "active", "label": "Active"},
+      {"value": "inactive", "label": "Inactive"}
+    ],
+    "defaultSettings": {
+      "is_anonymous": false,
+      "status": "inactive"
+    }
+  }
