@@ -101,4 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+<<<<<<< HEAD
 });
+=======
+});
+>>>>>>> parent of 4508a387 (Enhance admin dashboard with responsive design and sidebar toggle functionality)

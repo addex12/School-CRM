@@ -39,6 +39,7 @@ foreach ($dashboardConfig['sections'] as $section) {
 
 <!DOCTYPE html>
 <html lang="en">
+<<<<<<< HEAD
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,6 +49,16 @@ foreach ($dashboardConfig['sections'] as $section) {
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="../../assets/js/admin.js"></script>
     </head>
+=======
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($pageTitle) ?> | Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+>>>>>>> parent of 4508a387 (Enhance admin dashboard with responsive design and sidebar toggle functionality)
         :root {
             --sidebar-width: 280px;
             --header-height: 70px;
