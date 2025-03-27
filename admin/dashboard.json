@@ -1,0 +1,54 @@
+{
+    "widgets": [
+        {
+            "title": "Total Users",
+            "query": "SELECT COUNT(*) FROM users",
+            "icon": "fas fa-users",
+            "color": "primary"
+        },
+        {
+            "title": "Active Surveys",
+            "query": "SELECT COUNT(*) FROM surveys WHERE is_active = 1",
+            "icon": "fas fa-poll",
+            "color": "success"
+        },
+        {
+            "title": "Total Responses",
+            "query": "SELECT COUNT(*) FROM survey_responses",
+            "icon": "fas fa-chart-bar",
+            "color": "info"
+        },
+        {
+            "title": "Open Tickets",
+            "query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
+            "icon": "fas fa-ticket-alt",
+            "color": "warning"
+        }
+    ],
+    "sections": [
+        {
+            "title": "Recent User Activities",
+            "query": "SELECT a.*, u.username FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 10",
+            "columns": ["User", "Action", "Details", "Timestamp"],
+            "fields": ["username", "action", "details", "created_at"],
+            "link": "audit_log.php",
+            "link_text": "View All Activities"
+        },
+        {
+            "title": "Recent Tickets",
+            "query": "SELECT t.*, u.username FROM support_tickets t LEFT JOIN users u ON t.user_id = u.id ORDER BY t.created_at DESC LIMIT 5",
+            "columns": ["#", "Subject", "User", "Status", "Created"],
+            "fields": ["id", "subject", "username", "status", "created_at"],
+            "link": "tickets.php",
+            "link_text": "View All Tickets"
+        },
+        {
+            "title": "Recent Feedback",
+            "query": "SELECT f.*, u.username FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC LIMIT 5",
+            "columns": ["User", "Message", "Date"],
+            "fields": ["username", "message", "created_at"],
+            "link": "feedback_mgmt.php",
+            "link_text": "View All Feedback"
+        }
+    ]
+}
