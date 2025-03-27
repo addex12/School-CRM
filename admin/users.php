@@ -3,7 +3,7 @@ require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireAdmin();
 
-$title = "Manage Users";
+$pageTitle = "Manage Users";
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
