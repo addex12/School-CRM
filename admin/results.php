@@ -51,7 +51,7 @@ if ($survey_id) {
             ");
             $stmt->execute([':target_roles' => $survey['target_roles']]);
             $total_users = $stmt->fetchColumn();
-            $completion_rate = $total_users > 0 ? (count($respondents) / $total_users * 100 : 0;
+            $completion_rate = $total_users > 0 ? (count($respondents) / $total_users * 100) : 0;
 
             // Prepare response data
             foreach ($questions as $question) {
