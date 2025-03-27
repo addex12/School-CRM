@@ -11,44 +11,45 @@ $dashboardConfig = json_decode(file_get_contents(__DIR__ . '/dashboard.json'), t
 // Fetch widget data
 $widgets = [];
 foreach ($dashboardConfig['widgets'] as $widget) {
-    $stmt = $pdo->query($widget['query']);
-    $value = $stmt->fetchColumn();
-    $widgets[] = [
-        'title' => $widget['title'],
-        'value' => $value,
-        'icon' => $widget['icon'],
-        'color' => $widget['color']
-    ];
+    if ($stmt = $pdo->query($widget['query'])) {
+        $value = $stmt->fetchColumn();
+        $widgets[] = [
+            'title' => $widget['title'],
+            'value' => $value,
+            'icon' => $widget['icon'],
+            'color' => $widget['color']
+        ];
+    }
 }
 
 // Fetch section data
 $sections = [];
 foreach ($dashboardConfig['sections'] as $section) {
-    $stmt = $pdo->query($section['query']);
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $sections[] = [
-        'title' => $section['title'],
-        'columns' => $section['columns'],
-        'fields' => $section['fields'],
-        'data' => $data,
-        'link' => $section['link'],
-        'link_text' => $section['link_text']
-    ];
+    if ($stmt = $pdo->query($section['query'])) {
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $sections[] = [
+            'title' => $section['title'],
+            'columns' => $section['columns'],
+            'fields' => $section['fields'],
+            'data' => $data,
+            'link' => $section['link'],
+            'link_text' => $section['link_text']
+        ];
+    }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title><?php echo $title; ?> - Admin Panel</title>
-        <link rel="stylesheet" href="../../assets/css/admin.css">
-        <link rel="stylesheet" href="../../assets/css/responsive.css">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <!-- Include the new admin.js file -->
-        <script src="../../assets/js/admin.js"></script>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $title; ?> - Admin Panel</title>
+    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="../../assets/css/responsive.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Include the admin.js file -->
+    <script src="../../assets/js/admin.js"></script>
+</head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
@@ -114,19 +115,5 @@ foreach ($dashboardConfig['sections'] as $section) {
             </div>
         </div>
     </div>
-
-    <script>
-        // Add interactivity to the sidebar
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuGroups = document.querySelectorAll('.menu-group');
-            
-            menuGroups.forEach(group => {
-                const title = group.querySelector('.group-title');
-                title.addEventListener('click', () => {
-                    group.classList.toggle('active');
-                });
-            });
-        });
-    </script>
 </body>
 </html>
