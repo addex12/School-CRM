@@ -53,7 +53,8 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                 <!-- Display all surveys -->
                 <div class="table-section">
                     <h2>All Surveys</h2>
-                    <a href="survey_preview.php?id=<?= $survey['id'] ?>"...>                        <table class="table">
+                    <?php if (count(value: $surveys) > 0): ?>
+                        <table class="table">
                             <thead>
                                 <tr></tr>
                                     <th>Title</th>
@@ -81,7 +82,7 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="survey_preview.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Preview</a>
+                                        <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-primary">Preview</a>
                                             <a href="results.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Results</a>
                                         </td>
                                     </tr>
