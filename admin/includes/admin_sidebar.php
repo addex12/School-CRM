@@ -157,56 +157,84 @@ $sidebarConfig = json_decode(file_get_contents(__DIR__ . '/sidebar_config.json')
 <body>
     <div class="admin-sidebar">
         <div class="sidebar-header">
-            <div class="logo-container">
-                <i class="fas fa-shield-alt logo-icon"></i>
-                <h2 class="logo-text">Admin Panel</h2>
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
+            <h2>Admin Panel</h2>
         </div>
-        
-        <div class="sidebar-content">
-            <ul class="sidebar-menu">
-                <?php foreach ($sidebarConfig['menu'] as $item): ?>
-                    <?php if (isset($item['items'])): // Category with subitems ?>
-                        <li class="menu-category">
-                            <div class="category-header" data-toggle="collapse" data-target="#<?= $item['id'] ?>">
-                                <i class="fas fa-<?= $item['icon'] ?> category-icon"></i>
-                                <span class="category-text"><?= $item['title'] ?></span>
-                                <i class="fas fa-chevron-down collapse-icon"></i>
-                            </div>
-                            <ul class="submenu collapse" id="<?= $item['id'] ?>">
-                                <?php foreach ($item['items'] as $subitem): ?>
-                                    <li class="submenu-item <?= basename($_SERVER['PHP_SELF']) == $subitem['link'] ? 'active' : '' ?>">
-                                        <a href="<?= $subitem['link'] ?>">
-                                            <i class="fas fa-<?= $subitem['icon'] ?>"></i>
-                                            <span><?= $subitem['title'] ?></span>
-                                        </a>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </li>
-                    <?php else: // Single menu item ?>
-                        <li class="menu-item <?= basename($_SERVER['PHP_SELF']) == $item['link'] ? 'active' : '' ?>">
-                            <a href="<?= $item['link'] ?>" class="menu-link">
-                                <i class="fas fa-<?= $item['icon'] ?> menu-icon"></i>
-                                <span class="menu-text"><?= $item['title'] ?></span>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </ul>
-            
-            <div class="sidebar-footer">
-                <a href="../logout.php" class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="dashboard.php">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
-            </div>
-        </div>
+            </li>
+            <li>
+                <a href="users.php">
+                    <i class="fas fa-users"></i> Manage Users
+                </a>
+            </li>
+            <li>
+                <a href="classes.php">
+                    <i class="fas fa-chalkboard"></i> Manage Classes
+                </a>
+            </li>
+            <li>
+                <a href="reports.php">
+                    <i class="fas fa-file-alt"></i> Reports
+                </a>
+            </li>
+            <li>
+                <a href="settings.php">
+                    <i class="fas fa-cogs"></i> Settings
+                </a>
+            </li>
+            <li>
+                <a href="../logout.php">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
     </div>
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .admin-sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 20px 0;
+        }
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sidebar-header h2 {
+            font-size: 1.5em;
+            color: #ecf0f1;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar-menu li {
+            margin: 15px 0;
+        }
+        .sidebar-menu a {
+            text-decoration: none;
+            color: #ecf0f1;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            transition: background-color 0.3s;
+        }
+        .sidebar-menu a:hover {
+            background-color: #34495e;
+        }
+        .sidebar-menu i {
+            margin-right: 10px;
+        }
+    </style>
     <!-- Include necessary JavaScript -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

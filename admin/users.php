@@ -3,6 +3,11 @@ require_once '../includes/config.php'; // Include config to initialize $pdo
 require_once '../includes/auth.php';
 requireAdmin();
 
+$title = "Manage Users";
+
+// Include the revamped sidebar
+include '../includes/admin_sidebar.php';
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update_user'])) {
