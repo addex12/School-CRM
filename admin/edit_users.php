@@ -4,7 +4,7 @@ requireAdmin();
 require_once '../includes/config.php';
 
 $user_id = $_GET['id'] ?? null;
-
+$pageTitle = "Edit User";
 // Fetch user details
 if ($user_id) {
     $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
