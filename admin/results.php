@@ -276,7 +276,9 @@ if ($survey_id) {
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1 class="page-title"><?= htmlspecialchars($survey['title']) ?> Results</h1>
+                <h1 class="page-title">
+                    <?= $survey ? htmlspecialchars($survey['title']) : 'Survey' ?> Results
+                </h1>
                 <div class="header-actions">
                     <a href="surveys.php" class="btn btn-back">
                         <i class="fas fa-arrow-left"></i> Back to Surveys
