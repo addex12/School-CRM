@@ -1,0 +1,119 @@
+{
+    "menu": [
+        {
+            "title": "Dashboard",
+            "link": "dashboard.php",
+            "icon": "home"
+        },
+        {
+            "title": "User Management",
+            "icon": "users",
+            "id": "userManagement",
+            "items": [
+                {
+                    "title": "Manage Users",
+                    "link": "users.php",
+                    "icon": "list"
+                },
+                {
+                    "title": "Edit Users",
+                    "link": "edit_users.php",
+                    "icon": "user-edit"
+                },
+                {
+                    "title": "User Roles",
+                    "link": "user_roles.php",
+                    "icon": "user-tag"
+                }
+            ]
+        },
+        {
+            "title": "Survey Management",
+            "icon": "poll-h",
+            "id": "surveyManagement",
+            "items": [
+                {
+                    "title": "Surveys",
+                    "link": "surveys.php",
+                    "icon": "poll"
+                },
+                {
+                    "title": "Survey Builder",
+                    "link": "survey_builder.php",
+                    "icon": "wrench"
+                },
+                {
+                    "title": "Results",
+                    "link": "results.php",
+                    "icon": "chart-bar"
+                }
+            ]
+        },
+        {
+            "title": "Content",
+            "icon": "folder-open",
+            "id": "contentManagement",
+            "items": [
+                {
+                    "title": "Categories",
+                    "link": "categories.php",
+                    "icon": "folder"
+                },
+                {
+                    "title": "Templates",
+                    "link": "templates.php",
+                    "icon": "file-alt"
+                }
+            ]
+        },
+        {
+            "title": "Communication",
+            "icon": "comments",
+            "id": "communication",
+            "items": [
+                {
+                    "title": "Bulk Email",
+                    "link": "bulk_email.php",
+                    "icon": "envelope"
+                },
+                {
+                    "title": "Feedback Management",
+                    "link": "feedback_mgmt.php",
+                    "icon": "comment-dots"
+                },
+                {
+                    "title": "Chat Management",
+                    "link": "chat_mgmt.php",
+                    "icon": "comments"
+                }
+            ]
+        },
+        {
+            "title": "System",
+            "icon": "cogs",
+            "id": "system",
+            "items": [
+                {
+                    "title": "Settings",
+                    "link": "settings.php",
+                    "icon": "cog"
+                },
+                {
+                    "title": "Audit Log",
+                    "link": "audit_log.php",
+                    "icon": "history"
+                },
+                {
+                    "title": "Backup",
+                    "link": "backup.php",
+                    "icon": "database"
+                }
+            ]
+        },
+        {
+            "title": "Reports",
+            "link": "reports.php",
+            "icon": "file-chart-line"
+        }
+    ]
+}
