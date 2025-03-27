@@ -25,7 +25,10 @@ if ($survey_id !== null) {
         $error = "This survey has already ended.";
     }
 }
-
+if (!$survey) {
+    header("Location: surveys.php?error=survey_not_found");
+    exit();
+}
 // Fetch all surveys for display
 $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchAll();
 ?>
