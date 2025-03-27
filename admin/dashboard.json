@@ -9,13 +9,13 @@
         {
             "title": "Active Surveys",
             "query": "SELECT COUNT(*) FROM surveys WHERE is_active = 1",
-            "icon": "fas fa-poll",
+            "icon": "fas fa-poll-h",
             "color": "success"
         },
         {
             "title": "Total Responses",
             "query": "SELECT COUNT(*) FROM survey_responses",
-            "icon": "fas fa-chart-bar",
+            "icon": "fas fa-chart-line",
             "color": "info"
         },
         {
@@ -27,42 +27,48 @@
         {
             "title": "Pending Feedback",
             "query": "SELECT COUNT(*) FROM feedback WHERE status = 'pending'",
-            "icon": "fas fa-comment-dots",
+            "icon": "fas fa-comment-alt",
             "color": "danger"
+        },
+        {
+            "title": "Active Chats",
+            "query": "SELECT COUNT(*) FROM chats WHERE status = 'active'",
+            "icon": "fas fa-comments",
+            "color": "primary"
         }
     ],
     "sections": [
         {
             "title": "Recent User Activities",
-            "query": "SELECT a.*, u.username FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 10",
-            "columns": ["User", "Action", "Details", "Timestamp"],
-            "fields": ["username", "action", "details", "created_at"],
+            "query": "SELECT a.*, u.username, u.email FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 8",
+            "columns": ["User", "Email", "Action", "Details", "Timestamp"],
+            "fields": ["username", "email", "action", "details", "created_at"],
             "link": "audit_log.php",
-            "link_text": "View All Activities"
+            "link_text": "View Full Activity Log"
         },
         {
-            "title": "Recent Tickets",
-            "query": "SELECT t.*, u.username FROM support_tickets t LEFT JOIN users u ON t.user_id = u.id ORDER BY t.created_at DESC LIMIT 5",
-            "columns": ["#", "Subject", "User", "Status", "Created"],
-            "fields": ["id", "subject", "username", "status", "created_at"],
+            "title": "Recent Support Tickets",
+            "query": "SELECT t.id, t.subject, u.username, t.status, t.priority, t.created_at FROM support_tickets t LEFT JOIN users u ON t.user_id = u.id ORDER BY t.created_at DESC LIMIT 6",
+            "columns": ["ID", "Subject", "User", "Status", "Priority", "Created"],
+            "fields": ["id", "subject", "username", "status", "priority", "created_at"],
             "link": "tickets.php",
-            "link_text": "View All Tickets"
+            "link_text": "Manage Support Tickets"
         },
         {
-            "title": "Recent Feedback",
-            "query": "SELECT f.*, u.username FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC LIMIT 5",
-            "columns": ["User", "Message", "Date"],
-            "fields": ["username", "message", "created_at"],
+            "title": "Latest User Feedback",
+            "query": "SELECT f.id, u.username, SUBSTRING(f.message, 1, 50) as preview, f.rating, f.created_at FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC LIMIT 5",
+            "columns": ["ID", "User", "Preview", "Rating", "Date"],
+            "fields": ["id", "username", "preview", "rating", "created_at"],
             "link": "feedback_mgmt.php",
             "link_text": "View All Feedback"
         },
         {
-            "title": "Upcoming Surveys",
-            "query": "SELECT * FROM surveys WHERE starts_at > NOW() ORDER BY starts_at ASC LIMIT 5",
-            "columns": ["Title", "Starts At", "Ends At", "Status"],
-            "fields": ["title", "starts_at", "ends_at", "status"],
+            "title": "Survey Timeline",
+            "query": "SELECT title, description, starts_at, ends_at, status FROM surveys WHERE starts_at > NOW() OR ends_at > NOW() ORDER BY starts_at ASC LIMIT 4",
+            "columns": ["Title", "Description", "Starts", "Ends", "Status"],
+            "fields": ["title", "description", "starts_at", "ends_at", "status"],
             "link": "surveys.php",
-            "link_text": "View All Surveys"
+            "link_text": "Manage Surveys"
         }
     ]
 }
