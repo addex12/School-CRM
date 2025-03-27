@@ -46,7 +46,6 @@ foreach ($dashboardConfig['sections'] as $section) {
         <link rel="stylesheet" href="../../assets/css/admin.css">
         <link rel="stylesheet" href="../../assets/css/responsive.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <!-- Include the new admin.js file -->
         <script src="../../assets/js/admin.js"></script>
     </head>
         :root {
