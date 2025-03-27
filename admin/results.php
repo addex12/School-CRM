@@ -250,16 +250,17 @@ if ($survey_id) {
 <body>
     <div class="admin-container">
         <?php include 'includes/admin_sidebar.php'; ?>
-        
-        <main class="main-content">
-        <div class="content">
-                <div class="survey-info">
-                    <div class="survey-meta">
-                        <h2>Survey Details</h2>
-                        <div class="meta-grid">
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1 class="page-title"><?= htmlspecialchars($survey['title']) ?> Preview</h1>
+                <div class="header-actions">
+                    <a href="surveys.php" class="btn btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Surveys
+                    </a>
                 </div>
-            </div>
-            </div>
+            </header>
+        <main class="main-content">
+            
             <div class="content-header">
                 <h1>Survey Results</h1>
             </div>
