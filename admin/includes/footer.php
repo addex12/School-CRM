@@ -1,17 +1,19 @@
+[file name]: footer.php
+[file content begin]
 <style>
     .admin-footer {
-        position: fixed;
+        position: sticky;
         bottom: 0;
         left: 250px;
         width: calc(100% - 250px);
         background-color: #2c3e50;
         color: white;
-        padding: 5px 15px;
+        padding: 8px 15px;
         display: flex;
-        justify-content: space-between;
         align-items: center;
         border-top: 1px solid #374150;
         font-size: 12px;
+        z-index: 100;
     }
 
     .footer-content {
@@ -19,48 +21,87 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
+        gap: 15px;
     }
 
     .footer-section {
-        margin: 0 10px;
+        flex: 1;
+        min-width: 0;
+        padding: 0 5px;
+    }
+
+    .footer-main-info {
+        max-width: 200px;
     }
 
     .footer-link {
         color: white;
         text-decoration: none;
+        font-size: 11px;
     }
 
     .footer-link:hover {
         text-decoration: underline;
     }
 
+    .social-links {
+        display: flex;
+        gap: 8px;
+        margin-top: 3px;
+    }
+
     .social-link {
         color: white;
-        margin-right: 5px;
         font-size: 14px;
+        transition: opacity 0.2s;
     }
 
     .social-link:hover {
-        color: #0d1216;
+        opacity: 0.8;
+    }
+
+    .quick-link-list {
+        display: flex;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
 
     .developer-info {
-        text-align: center;
-        order: 2;
+        text-align: right;
+        flex-shrink: 0;
+    }
+
+    .footer-section h4 {
+        margin: 0 0 2px 0;
+        font-size: 12px;
+    }
+
+    .footer-section p {
+        margin: 0;
+        line-height: 1.3;
     }
 </style>
 
 <footer class="admin-footer">
     <div class="footer-content">
-        <div class="footer-section">
-            <h4><?php echo $pageTitle; ?> - Admin Panel</h4>
-            <p>&copy; <?php echo date('Y'); ?> School Survey System. All rights reserved.</p>
+        <div class="footer-section footer-main-info">
+            <h4><?php echo $pageTitle; ?></h4>
+            <p>&copy; <?php echo date('Y'); ?> School Survey System</p>
         </div>
         
+        <div class="footer-section">
+            <ul class="quick-link-list">
+                <li><a href="dashboard.php" class="footer-link">Dashboard</a></li>
+                <li><a href="surveys.php" class="footer-link">Surveys</a></li>
+                <li><a href="users.php" class="footer-link">Users</a></li>
+                <li><a href="results.php" class="footer-link">Results</a></li>
+                <li><a href="../../logout.php" class="footer-link">Logout</a></li>
+            </ul>
+        </div>
+
         <div class="footer-section developer-info">
-            <h4>Developer</h4>
-            <p><strong>Adugna Gizaw</strong></p>
-            <p>Email: <a href="mailto:gizawadugna@gmail.com" class="footer-link">gizawadugna@gmail.com</a></p>
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="social-link">
                     <i class="fab fa-linkedin"></i>
@@ -72,19 +113,9 @@
                     <i class="fab fa-github"></i>
                 </a>
             </div>
-        </div>
-
-        <div class="footer-section">
-            <div class="quick-links">
-                <h4>Quick Links</h4>
-                <ul class="quick-link-list">
-                    <li><a href="dashboard.php" class="footer-link">Dashboard</a></li>
-                    <li><a href="surveys.php" class="footer-link">Surveys</a></li>
-                    <li><a href="users.php" class="footer-link">Users</a></li>
-                    <li><a href="results.php" class="footer-link">Results</a></li>
-                    <li><a href="../../logout.php" class="footer-link logout">Logout</a></li>
-                </ul>
-            </div>
+            <p class="footer-link">
+                <a href="mailto:gizawadugna@gmail.com">Adugna Gizaw</a>
+            </p>
         </div>
     </div>
 </footer>
