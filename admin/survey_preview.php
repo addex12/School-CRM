@@ -31,20 +31,30 @@ $target_roles = json_decode($survey['target_roles'], true);
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Survey Preview: <?php echo htmlspecialchars($survey['title']); ?></h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php">Survey Builder</a>
-                <a href="categories.php">Categories</a>
-                <a href="users.php">Users</a>
-                <a href="results.php">Results</a>
-                <a href="../../logout.php">Logout</a>
-            </nav>
-        </header>
-        
+<body>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1>Survey Preview: <?= htmlspecialchars($survey['title']) ?></h1>
+            </header>
+            <div class="content">
+        </div>
+        <div class="content-header">
+            <h2>Survey Preview</h2>
+        </div>
+        <div class="content-body">
+            <p>Preview the survey before publishing it to ensure everything is set up correctly.</p>
+        </div>
+        <div class="content-body">
+            <p>Below is a preview of the survey titled "<strong><?php echo htmlspecialchars($survey['title']); ?></strong>".</p>
+        </div>
+        <div class="content-body">
+            <p>Make sure to check the survey fields and settings before publishing.</p>
+        </div>
+        <div class="content-body">
+            <p>If you need to make any changes, click the "Edit Survey" button below.</p>
+        </div>
         <div class="content">
             <div class="survey-info">
                 <h2>Survey Information</h2>

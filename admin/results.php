@@ -159,10 +159,13 @@ if ($survey) {
 </head>
 <body>
     <div class="container">
+        <>
+        <body>
+    <div class="container">
         <header>
-      <?php require_once 'includes/header.php'; ?>
-        </header>
-        
+            <h1>Survey Results - Admin Panel</h1>
+            <?php include 'includes/admin_sidebar.php'; ?>
+        </header>                
         <div class="content">
             <div class="survey-selector">
                 <form method="GET">
