@@ -162,7 +162,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                         'teacher' => 'Teachers',
                                         'parent' => 'Parents'
                                     ];
-                                    echo implode(', ', array_map(fn($role) => $roleNames[$role] ?? ucfirst($role), $target_roles);
+                                    echo implode(', ', array_map(fn($role) => $roleNames[$role] ?? ucfirst($role), $target_roles));
                                     ?>
                                 </p>
                             </div>
