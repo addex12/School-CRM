@@ -61,11 +61,15 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
     <meta charset="UTF-8">
     <title>Manage Users - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
+            <header class="admin-header">
+                <h1>Manage Users</h1>
+            </header>
             <div class="content">
                 <?php if (isset($_SESSION['success'])): ?>
                     <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
@@ -79,7 +83,7 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
                     <h2>User Accounts</h2>
                     
                     <?php if (count($users) > 0): ?>
-                        <table>
+                        <table class="table">
                             <thead>
                                 <tr>
                                     <th>Username</th>
@@ -99,12 +103,7 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
                                         <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
                                         <td><?php echo $user['last_login'] ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
                                         <td>
-                                            <button type="button" class="btn btn-edit" onclick="openEditModal(
-                                                <?php echo $user['id']; ?>,
-                                                '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>',
-                                                '<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>',
-                                                '<?php echo $user['role']; ?>'
-                                            )">Edit</button>
+                                            <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">Edit</a>
                                             
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
