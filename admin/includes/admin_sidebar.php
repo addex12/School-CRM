@@ -24,7 +24,7 @@ $sidebarConfig = json_decode(file_get_contents(__DIR__ . '/sidebar_config.json')
                             <span class="category-text"><?= $item['title'] ?></span>
                             <i class="fas fa-chevron-down collapse-icon"></i>
                         </div>
-                        <ul class="submenu collapse show" id="<?= $item['id'] ?>">
+                        <ul class="submenu collapse" id="<?= $item['id'] ?>">
                             <?php foreach ($item['items'] as $subitem): ?>
                                 <li class="submenu-item <?= basename($_SERVER['PHP_SELF']) == $subitem['link'] ? 'active' : '' ?>">
                                     <a href="<?= $subitem['link'] ?>">
@@ -55,6 +55,21 @@ $sidebarConfig = json_decode(file_get_contents(__DIR__ . '/sidebar_config.json')
     </div>
 </div>
 
+<!-- Include necessary JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Initialize collapse functionality
+        $('.category-header').on('click', function() {
+            var targetId = $(this).data('target');
+            $(targetId).collapse('toggle');
+            
+            // Toggle icon
+            $(this).find('.collapse-icon').toggleClass('fa-chevron-down fa-chevron-up');
+        });
+    });
+</script>
+
 <!-- Create sidebar_config.json in the same directory -->
 <?php
 /*
@@ -64,7 +79,8 @@ $sidebarConfig = json_decode(file_get_contents(__DIR__ . '/sidebar_config.json')
         {
             "title": "Dashboard",
             "link": "dashboard.php",
-            "icon": "home"
+            "icon": "home",
+            "id": "dashboard"
         },
         {
             "title": "User Management",
@@ -103,7 +119,8 @@ $sidebarConfig = json_decode(file_get_contents(__DIR__ . '/sidebar_config.json')
         {
             "title": "Settings",
             "link": "settings.php",
-            "icon": "cogs"
+            "icon": "cogs",
+            "id": "settings"
         }
     ]
 }
