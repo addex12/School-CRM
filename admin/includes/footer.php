@@ -1,3 +1,42 @@
+<style>
+    .admin-footer {
+        position: fixed;
+        bottom: 0;
+        left: 250px; /* Matches the sidebar width */
+        width: calc(100% - 250px); /* Adjust width to exclude sidebar */
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #374150;
+    }
+
+    .footer-section {
+        margin: 0 10px;
+    }
+
+    .footer-link {
+        color: white;
+        text-decoration: none;
+    }
+
+    .footer-link:hover {
+        text-decoration: underline;
+    }
+
+    .social-link {
+        color: white;
+        margin-right: 10px;
+        font-size: 18px;
+    }
+
+    .social-link:hover {
+        color: #0d1216;
+    }
+</style>
+
 <footer class="admin-footer">
     <div class="footer-content">
         <div class="footer-section">
