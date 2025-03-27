@@ -3,14 +3,17 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireLogin();
 
-// Get survey_id from URL parameter
-$survey_id = $_GET['id'] ?? null;
-
-// Validate survey_id
-if (!$survey_id || !is_numeric($survey_id)) {
-    header("Location: dashboard.php?error=invalid_survey");
-    exit();
+// Validate survey_id parameter
+$survey_id = $_GET['survey_id'] ?? null;
+if ($survey_id !== null) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM surveys WHERE id = ?");
+    $stmt->execute([$survey_id]);
+    if ($stmt->fetchColumn() == 0) {
+        header("Location: dashboard.php?error=invalid_survey");
+        exit();
+    }
 }
+
 $pageTitle = "Manage Surveys";
 ob_start(); // Start output buffering to prevent header errors
 
