@@ -39,7 +39,6 @@ foreach ($dashboardConfig['sections'] as $section) {
 
 <!DOCTYPE html>
 <html lang="en">
-<<<<<<< HEAD
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
