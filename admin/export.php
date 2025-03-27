@@ -1,16 +1,8 @@
 <?php
-// Include authentication first to handle redirects before any output
 require_once '../includes/auth.php';
 requireAdmin();
 
-// Manually load PhpSpreadsheet classes
-require_once __DIR__ . '/../vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Spreadsheet.php';
-require_once __DIR__ . '/../vendor/phpoffice/phpspreadsheet/src/PhpSpreadsheet/Writer/Xlsx.php';
-require_once __DIR__ . '/../vendor/mpdf/autoload.php';
-
-// Declare class aliases for IDE support
-class_alias(\PhpOffice\PhpSpreadsheet\Spreadsheet::class, 'PhpOffice\PhpSpreadsheet\Spreadsheet');
-class_alias(\PhpOffice\PhpSpreadsheet\Writer\Xlsx::class, 'PhpOffice\PhpSpreadsheet\Writer\Xlsx');
+require_once __DIR__ . '/../vendor/autoload.php';
 
 $survey_id = $_GET['survey_id'] ?? 0;
 $type = $_GET['type'] ?? 'csv';
@@ -30,7 +22,7 @@ $stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY 
 $stmt->execute([$survey_id]);
 $fields = $stmt->fetchAll();
 
-// Get all responses for this survey
+// Get all responses
 $stmt = $pdo->prepare("
     SELECT r.*, u.username, u.email, u.role
     FROM survey_responses r
@@ -41,7 +33,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$survey_id]);
 $responses = $stmt->fetchAll();
 
-// Get response data for all responses
+// Get response data
 $response_data = [];
 foreach ($responses as $response) {
     $stmt = $pdo->prepare("
@@ -51,12 +43,10 @@ foreach ($responses as $response) {
         WHERE rd.response_id = ?
     ");
     $stmt->execute([$response['id']]);
-    $data = $stmt->fetchAll();
-    
-    $response_data[$response['id']] = $data;
+    $response_data[$response['id']] = $stmt->fetchAll();
 }
 
-// Handle different export types
+// Handle export
 switch ($type) {
     case 'csv':
         exportCSV($survey, $fields, $responses, $response_data);
@@ -78,14 +68,14 @@ function exportCSV($survey, $fields, $responses, $response_data): never {
     
     $output = fopen('php://output', 'w');
     
-    // CSV header
+    // Header
     $header = ['Response ID', 'Username', 'Email', 'Role', 'Submitted At'];
     foreach ($fields as $field) {
         $header[] = $field['field_label'] . ' (' . $field['field_name'] . ')';
     }
     fputcsv($output, $header);
     
-    // CSV data
+    // Rows
     foreach ($responses as $response) {
         $row = [
             $response['id'],
@@ -117,14 +107,14 @@ function exportExcel($survey, $fields, $responses, $response_data): never {
     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
     
-    // Excel header
+    // Header
     $header = ['Response ID', 'Username', 'Email', 'Role', 'Submitted At'];
     foreach ($fields as $field) {
         $header[] = $field['field_label'] . ' (' . $field['field_name'] . ')';
     }
     $sheet->fromArray($header, null, 'A1');
     
-    // Excel data
+    // Data
     $row = 2;
     foreach ($responses as $response) {
         $data = [
@@ -150,10 +140,12 @@ function exportExcel($survey, $fields, $responses, $response_data): never {
         $row++;
     }
     
+    // Auto-size
     foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
     
+    // Output
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment; filename="survey_' . $survey['id'] . '_results.xlsx"');
     
@@ -163,20 +155,23 @@ function exportExcel($survey, $fields, $responses, $response_data): never {
 }
 
 function exportPDF($survey, $fields, $responses, $response_data): never {
-    $mpdf = new \Mpdf\Mpdf();
+    $mpdf = new \Mpdf\Mpdf([
+        'tempDir' => __DIR__ . '/../tmp',
+        'setAutoTopMargin' => 'stretch',
+        'autoMarginPadding' => 5
+    ]);
     
     $html = '<h1>' . htmlspecialchars($survey['title']) . '</h1>';
     $html .= '<p>' . htmlspecialchars($survey['description']) . '</p>';
-    $html .= '<p><strong>Total Responses:</strong> ' . count($responses) . '</p>';
-    $html .= '<hr>';
+    $html .= '<p><strong>Total Responses:</strong> ' . count($responses) . '</p><hr>';
     
-    foreach ($responses as $response) {
+    foreach ($responses as $index => $response) {
         $html .= '<h2>Response from ' . htmlspecialchars($response['username']) . '</h2>';
         $html .= '<p><strong>Role:</strong> ' . htmlspecialchars($response['role']) . '</p>';
         $html .= '<p><strong>Submitted:</strong> ' . $response['submitted_at'] . '</p>';
         
-        $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
-        $html .= '<tr><th width="30%">Question</th><th width="70%">Response</th></tr>';
+        $html .= '<table border="1" cellpadding="5" cellspacing="0" style="width:100%;margin-bottom:20px;">';
+        $html .= '<tr><th style="width:30%;background:#f0f0f0;">Question</th><th style="width:70%;background:#f0f0f0;">Response</th></tr>';
         
         foreach ($response_data[$response['id']] as $data) {
             $html .= '<tr>';
@@ -186,11 +181,14 @@ function exportPDF($survey, $fields, $responses, $response_data): never {
         }
         
         $html .= '</table>';
-        $html .= '<div style="page-break-after: always;"></div>';
+        
+        // Add page break except after last response
+        if ($index !== count($responses) - 1) {
+            $html .= '<pagebreak />';
+        }
     }
     
     $mpdf->WriteHTML($html);
-    
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="survey_' . $survey['id'] . '_results.pdf"');
     $mpdf->Output('php://output', 'D');
