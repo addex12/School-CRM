@@ -1,5 +1,3 @@
-[file name]: footer.php
-[file content begin]
 <style>
     .admin-footer {
         position: sticky;
