@@ -51,10 +51,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Edit User - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include 'includes/header.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
                 <h1>Edit User</h1>
@@ -67,11 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <form method="POST">
                     <div class="form-group">
                         <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="role">Role:</label>
@@ -89,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </form>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 </body>
 </html>

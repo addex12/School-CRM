@@ -183,7 +183,7 @@ if ($survey) {
             <?php if ($survey): ?>
                 <div class="results-header">
                     <h2><?php echo htmlspecialchars(string: $survey['title']); ?></h2>
-                    <p><?php echo htmlspecialchars(string: $survey['description']); ?></p>
+                    <p><?php echo htmlspecialchars($survey['description'] ?? ''); ?></p>
                     <div class="stats">
                         <p><strong>Total Responses:</strong> <?php echo count(value: $respondents); ?></p>
                         <p><strong>Completion Rate:</strong> <?php echo round(num: $completion_rate, precision: 2); ?>%</p>
@@ -211,7 +211,7 @@ if ($survey) {
                         
                         <?php foreach ($response_data as $data): ?>
                             <div class="question-result">
-                                <h3><?php echo htmlspecialchars(string: $data['question']['field_label']); ?></h3>
+                                <h3><?php echo htmlspecialchars($data['question']['field_label'] ?? ''); ?></h3>
                                 <p><strong>Type:</strong> <?php echo ucfirst(string: str_replace(search: '_', replace: ' ', subject: $data['question']['field_type'])); ?></p>
                                 
                                 <?php if ($data['question']['field_type'] === 'rating' && $data['summary']): ?>
@@ -377,7 +377,7 @@ if ($survey) {
                                         $sample = array_slice(array: $data['responses'], offset: 0, length: 5);
                                         foreach ($sample as $response): ?>
                                             <div class="response-item">
-                                                <p><?php echo nl2br(string: htmlspecialchars(string: $response['field_value'])); ?></p>
+                                                <p><?php echo nl2br(htmlspecialchars($response['field_value'] ?? '')); ?></p>
                                             </div>
                                         <?php endforeach; ?>
                                     </div>
