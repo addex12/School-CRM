@@ -106,6 +106,40 @@ if ($survey_id) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .content-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #2c3e50;
+            color: #fff;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+
         .results-container {
             background: #fff;
             border-radius: 8px;
@@ -397,6 +431,10 @@ if ($survey_id) {
                 <?php endif; ?>
             </div>
         </main>
+
+        <footer>
+            <p>&copy; <?= date('Y') ?> School CRM. All rights reserved.</p>
+        </footer>
     </div>
 
     <script>
