@@ -3,7 +3,8 @@
         {
             "title": "Dashboard",
             "link": "dashboard.php",
-            "icon": "home"
+            "icon": "home",
+            "id": "dashboard"
         },
         {
             "title": "User Management",
@@ -29,7 +30,7 @@
         },
         {
             "title": "Survey Management",
-            "icon": "poll-h",
+            "icon": "poll",
             "id": "surveyManagement",
             "items": [
                 {
@@ -68,7 +69,7 @@
         },
         {
             "title": "Communication",
-            "icon": "comments",
+            "icon": "comment",
             "id": "communication",
             "items": [
                 {
@@ -113,7 +114,20 @@
         {
             "title": "Reports",
             "link": "reports.php",
-            "icon": "file-chart-line"
+            "icon": "file-chart-line",
+            "id": "reports",
+            "items": [
+                {
+                    "title": "Generate Reports",
+                    "link": "generate_reports.php",
+                    "icon": "file-pdf"
+                },
+                {
+                    "title": "View Reports",
+                    "link": "view_reports.php",
+                    "icon": "eye"
+                }
+            ]
         }
     ]
 }
