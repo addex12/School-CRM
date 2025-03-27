@@ -2,7 +2,7 @@
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
-
+$pageTitle = 'Survey Results';
 $survey_id = isset($_GET['survey_id']) ? (int)$_GET['survey_id'] : 0;
 $survey = null;
 $surveys = [];
