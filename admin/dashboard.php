@@ -298,5 +298,6 @@ foreach ($dashboardConfig['sections'] as $section) {
             });
         });
     </script>
-</body>
+            <?php include '../includes/footer.php';?>
+            </body>
 </html>

@@ -166,9 +166,11 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
                     <button type="submit" class="btn btn-primary">Update User</button>
                 </div>
             </form>
-        </div>
+  </div>
+
     </div>
-    
+            <?php include '../includes/footer.php';?>
+
     <script>
         // Edit modal functions
         function openEditModal(id, username, email, role) {
