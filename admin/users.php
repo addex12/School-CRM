@@ -166,7 +166,6 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
   </div>
 
     </div>
-            <?php include 'includes/footer.php';?>
 
     <script>
         // Edit modal functions
@@ -190,5 +189,6 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
             }
         }
     </script>
+            <?php include 'includes/footer.php';?>
 </body>
 </html>
