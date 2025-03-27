@@ -102,3 +102,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+// File: assets/js/admin.js
+
+$(document).ready(function() {
+    // Sidebar Toggle Functionality
+    $('#sidebarToggle').click(function() {
+        $('.admin-sidebar').toggleClass('collapsed');
+    });
+
+    // Initialize collapse functionality for sidebar menu
+    $('.category-header').on('click', function() {
+        var targetId = $(this).data('target');
+        $(targetId).collapse('toggle');
+        
+        // Toggle icon
+        $(this).find('.collapse-icon').toggleClass('fa-chevron-down fa-chevron-up');
+    });
+
+    // Active menu item highlighting
+    $('.sidebar-menu a').each(function() {
+        var currentPage = basename(window.location.pathname);
+        var link = $(this).attr('href');
+        if (link === currentPage) {
+            $(this).closest('li').addClass('active');
+            // Also highlight parent menu if it's a submenu item
+            if ($(this).closest('.submenu').length > 0) {
+                $(this).closest('.menu-category').find('.category-header').addClass('active');
+            }
+        }
+    });
+
+    // Logout confirmation
+    $('.logout').click(function(e) {
+        e.preventDefault();
+        if (confirm('Are you sure you want to logout?')) {
+            window.location.href = $(this).attr('href');
+        }
+    });
+});
