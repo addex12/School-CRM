@@ -36,27 +36,48 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Improved layout structure */
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px 30px 80px; /* Added bottom padding for footer */
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
         .preview-container {
             max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 20px auto;
+            padding: 30px;
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
         }
 
         .survey-info {
             margin-bottom: 30px;
-            padding: 20px;
-            background: #f8f9fa;
+            padding: 25px;
+            background: #f1f4f7;
             border-radius: 8px;
+            border-left: 4px solid #4361ee;
         }
 
         .preview-field {
             margin-bottom: 25px;
-            padding: 15px;
-            border: 1px solid #dee2e6;
+            padding: 20px;
+            border: 1px solid #e9ecef;
             border-radius: 6px;
+            transition: transform 0.2s ease;
+        }
+
+        .preview-field:hover {
+            transform: translateX(5px);
         }
 
         .field-meta {
@@ -80,13 +101,32 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
 
         .form-actions {
             margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
             text-align: center;
         }
 
-        .btn-edit {
-            background-color: #17a2b8;
-            color: white;
-            margin-right: 10px;
+        /* Status indicators */
+        .status-active { color: #28a745; font-weight: 500; }
+        .status-inactive { color: #6c757d; }
+        .status-upcoming { color: #ffc107; }
+        .status-ended { color: #dc3545; }
+
+        /* Form elements */
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .options {
+            margin-top: 15px;
+        }
+
+        .form-check {
+            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -97,53 +137,76 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
         <div class="admin-main">
             <header class="admin-header">
                 <h1 class="page-title"><?= htmlspecialchars($survey['title']) ?> Preview</h1>
+                <div class="header-actions">
+                    <a href="surveys.php" class="btn btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Surveys
+                    </a>
+                </div>
             </header>
 
             <div class="content">
                 <div class="survey-info">
-                    <h2>Survey Information</h2>
-                    <p><strong>Description:</strong> <?= htmlspecialchars($survey['description']) ?></p>
-                    <p><strong>Target Audience:</strong>
-                        <?php
-                        $roleNames = [
-                            'student' => 'Students',
-                            'teacher' => 'Teachers',
-                            'parent' => 'Parents'
-                        ];
-                        echo implode(', ', array_map(fn($role) => $roleNames[$role] ?? ucfirst($role), $target_roles));
-                        ?>
-                    </p>
-                    <p><strong>Status:</strong>
-                        <?php if (!$survey['is_active']): ?>
-                            <span class="status-inactive">Inactive</span>
-                        <?php elseif (strtotime($survey['starts_at']) > time()): ?>
-                            <span class="status-upcoming">Upcoming</span>
-                        <?php elseif (strtotime($survey['ends_at']) < time()): ?>
-                            <span class="status-ended">Ended</span>
-                        <?php else: ?>
-                            <span class="status-active">Active</span>
-                        <?php endif; ?>
-                    </p>
-                    <p><strong>Availability:</strong>
-                        <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> -
-                        <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?>
-                    </p>
+                    <div class="survey-meta">
+                        <h2>Survey Details</h2>
+                        <div class="meta-grid">
+                            <div class="meta-item">
+                                <label>Description:</label>
+                                <p><?= htmlspecialchars($survey['description']) ?></p>
+                            </div>
+                            <div class="meta-item">
+                                <label>Target Audience:</label>
+                                <p>
+                                    <?php
+                                    $roleNames = [
+                                        'student' => 'Students',
+                                        'teacher' => 'Teachers',
+                                        'parent' => 'Parents'
+                                    ];
+                                    echo implode(', ', array_map(fn($role) => $roleNames[$role] ?? ucfirst($role), $target_roles);
+                                    ?>
+                                </p>
+                            </div>
+                            <div class="meta-item">
+                                <label>Status:</label>
+                                <p>
+                                    <?php if (!$survey['is_active']): ?>
+                                        <span class="status-inactive">Inactive</span>
+                                    <?php elseif (strtotime($survey['starts_at']) > time()): ?>
+                                        <span class="status-upcoming">Upcoming</span>
+                                    <?php elseif (strtotime($survey['ends_at']) < time()): ?>
+                                        <span class="status-ended">Ended</span>
+                                    <?php else: ?>
+                                        <span class="status-active">Active</span>
+                                    <?php endif; ?>
+                                </p>
+                            </div>
+                            <div class="meta-item">
+                                <label>Schedule:</label>
+                                <p>
+                                    <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> - 
+                                    <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="preview-container">
                     <?php foreach ($fields as $field): ?>
                         <div class="preview-field">
-                            <h3><?= htmlspecialchars($field['field_label']) ?>
-                                <?php if ($field['is_required']): ?>
-                                    <span class="required">*</span>
-                                <?php endif; ?>
-                            </h3>
+                            <div class="field-header">
+                                <h3><?= htmlspecialchars($field['field_label']) ?>
+                                    <?php if ($field['is_required']): ?>
+                                        <span class="required">*</span>
+                                    <?php endif; ?>
+                                </h3>
+                            </div>
                             
                             <?php if ($field['field_type'] === 'text'): ?>
                                 <input type="text" class="form-control" disabled placeholder="Text input">
 
                             <?php elseif ($field['field_type'] === 'textarea'): ?>
-                                <textarea class="form-control" rows="3" disabled placeholder="Textarea input"></textarea>
+                                <textarea class="form-control" rows="4" disabled placeholder="Textarea input"></textarea>
 
                             <?php elseif (in_array($field['field_type'], ['radio', 'checkbox', 'dropdown'])): ?>
                                 <div class="options">
@@ -170,14 +233,19 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                 </div>
 
                             <?php elseif ($field['field_type'] === 'file'): ?>
-                                <input type="file" class="form-control" disabled>
+                                <div class="file-preview">
+                                    <input type="file" class="form-control" disabled>
+                                    <small class="form-text text-muted">File upload preview</small>
+                                </div>
 
                             <?php endif; ?>
 
                             <div class="field-meta">
-                                <p><strong>Field Type:</strong> <?= ucfirst(str_replace('_', ' ', $field['field_type'])) ?></p>
-                                <p><strong>Technical Name:</strong> <code><?= htmlspecialchars($field['field_name']) ?></code></p>
-                                <p><strong>Required:</strong> <?= $field['is_required'] ? 'Yes' : 'No' ?></p>
+                                <div class="meta-row">
+                                    <span><strong>Type:</strong> <?= ucfirst(str_replace('_', ' ', $field['field_type'])) ?></span>
+                                    <span><strong>Technical Name:</strong> <code><?= htmlspecialchars($field['field_name']) ?></code></span>
+                                    <span><strong>Required:</strong> <?= $field['is_required'] ? 'Yes' : 'No' ?></span>
+                                </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -193,8 +261,20 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                 </div>
             </div>
         </div>
+        
+        <?php include 'includes/footer.php'; ?>
     </div>
 
-    <?php include 'includes/footer.php'; ?>
+    <script>
+        // Add smooth scrolling behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
 </body>
 </html>
