@@ -44,13 +44,69 @@ foreach ($dashboardConfig['sections'] as $section) {
     <title><?= htmlspecialchars($pageTitle) ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <style>
+        .page-title {
+            margin: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-section {
+            margin-bottom: 40px;
+        }
+
+        .dashboard-section h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        .dashboard-section .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-section .table th,
+        .dashboard-section .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .dashboard-section .table th {
+            background-color: #f4f4f4;
+        }
+
+        .dashboard-section .btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .dashboard-section .btn:hover {
+            background-color: #2c3e50;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1 class="page-title"><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
                 <!-- Widgets Section -->
@@ -87,7 +143,7 @@ foreach ($dashboardConfig['sections'] as $section) {
                                     <?php endforeach; ?>
                                 </tbody>
                             </table>
-                            <a href="<?= htmlspecialchars($section['link']) ?>" class="btn btn-primary"><?= htmlspecialchars($section['link_text']) ?></a>
+                            <a href="<?= htmlspecialchars($section['link']) ?>" class="btn"><?= htmlspecialchars($section['link_text']) ?></a>
                         <?php else: ?>
                             <p>No data available.</p>
                         <?php endif; ?>

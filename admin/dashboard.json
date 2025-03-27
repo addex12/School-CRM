@@ -23,6 +23,12 @@
             "query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
             "icon": "fas fa-ticket-alt",
             "color": "warning"
+        },
+        {
+            "title": "Pending Feedback",
+            "query": "SELECT COUNT(*) FROM feedback WHERE status = 'pending'",
+            "icon": "fas fa-comment-dots",
+            "color": "danger"
         }
     ],
     "sections": [
@@ -49,6 +55,14 @@
             "fields": ["username", "message", "created_at"],
             "link": "feedback_mgmt.php",
             "link_text": "View All Feedback"
+        },
+        {
+            "title": "Upcoming Surveys",
+            "query": "SELECT * FROM surveys WHERE starts_at > NOW() ORDER BY starts_at ASC LIMIT 5",
+            "columns": ["Title", "Starts At", "Ends At", "Status"],
+            "fields": ["title", "starts_at", "ends_at", "status"],
+            "link": "surveys.php",
+            "link_text": "View All Surveys"
         }
     ]
 }
