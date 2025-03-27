@@ -1,7 +1,7 @@
 <footer class="admin-footer">
     <div class="footer-content">
         <div class="footer-section">
-            <h4><?php echo $title; ?> - Admin Panel</h4>
+        <h4><?= htmlspecialchars( $pageTitle) ?> | Admin Panel</h4>
             <p>&copy; <?php echo date('Y'); ?> School Survey System. All rights reserved.</p>
         </div>
         <div class="footer-section developer-info">
