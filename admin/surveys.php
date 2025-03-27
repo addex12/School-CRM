@@ -95,6 +95,6 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
             </div>
         </div>
     </div>
-    <?php require_once 'includes/footer.php'; ?>
-</body>
+</body>    <?php require_once 'includes/footer.php'; ?>
+
 </html>
