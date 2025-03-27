@@ -51,6 +51,21 @@
             <h4><?php echo $pageTitle; ?> - Admin Panel</h4>
             <p>&copy; <?php echo date('Y'); ?> School Survey System. All rights reserved.</p>
         </div>
+        <div class="footer-section developer-info">
+            <h4>Developer</h4>
+            <p><strong>Adugna Gizaw</strong></p>
+            <p>Email: <a href="mailto:gizawadugna@gmail.com" class="footer-link">gizawadugna@gmail.com</a></p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="social-link">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://twitter.com/eleganceict1" target="_blank" class="social-link">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://github.com/addex12" target="_blank" class="social-link">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
         <div class="footer-section">
             <div class="quick-links">
                 <h4>Quick Links</h4>
