@@ -174,3 +174,5 @@ $(document).ready(function() {
     });
 });
 });
+    // Add new product modal
+
