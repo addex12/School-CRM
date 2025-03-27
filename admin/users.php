@@ -103,13 +103,11 @@ $users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
                                         <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
                                         <td><?php echo $user['last_login'] ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
                                         <td>
-                                            <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">Edit</a>
-                                            
+                                            <a href="edit_users.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">Edit</a>
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
                                                 <button type="submit" name="reset_password" class="btn btn-reset" onclick="return confirm('Reset password to default?')">Reset Password</button>
                                             </form>
-                                            
                                             <?php if ($user['id'] != $_SESSION['user_id']): ?>
                                                 <form method="POST" style="display:inline;">
                                                     <input type="hidden" name="id" value="<?php echo $user['id']; ?>">

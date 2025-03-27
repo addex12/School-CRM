@@ -52,7 +52,7 @@ $activities = $pdo->query("SELECT a.*, u.username FROM audit_logs a LEFT JOIN us
                 <div class="dashboard-section">
                     <h2>Recent User Activities</h2>
                     <?php if (empty($activities)): ?>
-                        <p>No recent activities.</p>
+                        <p>No recent activities. <a href="audit_log.php" class="btn btn-primary">View All Activities</a></p>
                     <?php else: ?>
                         <table class="table">
                             <thead>
@@ -74,6 +74,7 @@ $activities = $pdo->query("SELECT a.*, u.username FROM audit_logs a LEFT JOIN us
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        <a href="audit_log.php" class="btn btn-primary">View All Activities</a>
                     <?php endif; ?>
                 </div>
 
