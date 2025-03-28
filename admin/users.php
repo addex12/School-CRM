@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $to = $user['email'];
             $subject = "Password Reset Notification - School CRM System";
             $message = "Hello,\n\nYour password has been reset to the default password: 'password123'. Please log in and change your password immediately for security purposes.\n\nThank you,\nSchool CRM System";
-            $headers = "From: adugna.gizaw@flipperschools.com.com";
+            $headers = "From: adugna.gizaw@flipperschools.com";
 
             // Send email
             mail($to, $subject, $message, $headers);
