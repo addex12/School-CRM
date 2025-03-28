@@ -90,6 +90,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
+            align-items: start; /* Align items at the start for consistent alignment */
         }
 
         .card {
@@ -97,6 +98,9 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             border-radius: 0.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 2rem;
+            display: flex;
+            flex-direction: column; /* Ensure content stacks properly */
+            justify-content: space-between; /* Space out content evenly */
         }
 
         .form-group {
