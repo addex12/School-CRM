@@ -17,8 +17,8 @@
                     "icon": "list"
                 },
                 {
-                    "title": "Edit Users",
-                    "link": "edit_users.php",
+                    "title": "Add Users",
+                    "link": "add_users.php",
                     "icon": "user-edit"
                 },
                 {
