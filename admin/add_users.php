@@ -60,7 +60,7 @@ Username: $username
 Temporary Password: $temp_password
 
 Please log in to your account at the following link:
-[School CRM Login](https://crm.flipperschool.com/)
+https://crm.flipperschool.com/
 
 For security reasons, we recommend changing your password immediately after logging in.
 
@@ -68,11 +68,16 @@ If you have any questions or need assistance, feel free to contact our support t
 
 Best regards,  
 The School CRM Team  
-adugna.gizaw@flipperschools.com";
-            $headers = "From: School CRM System <no-reply@example.com>\r\n";
-            $headers .= "Content-Type: text/plain; charset=U            @mail($to, $subject, $message, $headers);
-TF-8";
+adugna.gizaw@flipperschools.com
+";
+            $headers = "From: School CRM System <adugna.gizaw@flipperschools.com>\r\n";
+            $headers .= "Reply-To: adugna.gizaw@flipperschools.com\r\n";
+            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
+            // Ensure the mail function is called correctly
+            if (!@mail($to, $subject, $message, $headers)) {
+                throw new Exception("Failed to send account creation email to $email.");
+            }
 
             $_SESSION['success'] = "Account for '$username' created successfully!";
             header("Location: add_users.php");
@@ -157,7 +162,7 @@ Username: $username
 Temporary Password: $temp_password
 
 Please log in to your account at the following link:
-[School CRM Login](https://example.com/login)
+[School CRM Login](https://crm.flipperschool.com/)
 
 For security reasons, we recommend changing your password immediately after logging in.
 
@@ -165,9 +170,9 @@ If you have any questions or need assistance, feel free to contact our support t
 
 Best regards,  
 The School CRM Team  
-support@example.com
+adugna.gizaw@flipperschools.com
 ";
-                    $headers = "From: School CRM <no-reply@example.com>\r\n";
+                    $headers = "From: School CRM <contactus@flipperschools.com>\r\n";
                     $headers .= "Content-Type: text/plain; charset=UTF-8";
 
                     @mail($to, $subject, $message, $headers);
