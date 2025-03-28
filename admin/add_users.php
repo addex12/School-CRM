@@ -107,6 +107,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 fclose($handle);
             }
         }
+
+        if (isset($_POST['create_user'])) {
+            // ...existing code for creating a user...
+
+            // Display success message
+            $_SESSION['success'] = "Account for '$username' created successfully!";
+            header("Location: add_users.php");
+            exit();
+        }
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
         header("Location: add_users.php");
