@@ -36,10 +36,7 @@ function requireAdmin() {
         header("Location: /user/dashboard.php");
         exit();
     }
-    else {
-        return true;
-    }
-}
 
+}
 
 ?>
