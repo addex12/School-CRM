@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Verify CSRF token
         if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            throw new Exception("Invalid CSRF token");
+            throw new Exception("Your session has expired or the request is invalid. Please try again.");
         }
 
         // Single user creation
@@ -131,6 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
+        header("Location: add_users.php"); // Redirect to the same page to display the error
+        exit();
     }
 }
 
