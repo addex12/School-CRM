@@ -1,6 +1,11 @@
 <?php
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
+
+// Define BASE_URL if not already defined
+if (!defined('BASE_URL')) {
+    define('BASE_URL', 'http://crm.flipperschool.com'); // Replace with your actual base URL
+}
 requireAdmin();
 
 $pageTitle = "Add User";
@@ -84,8 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Send email (optional)
                     $to = $email;
-                    $subject = "Your New Account";
-                    $message = "Username: $username\nTemporary Password: $temp_password";
+                    $subject = "FIS School CRM System";
+                    $message = "Username: $username\nTemporary Password: $temp_password is already set.\nPlease change it after logging in. Use the link below to log in:\n" . BASE_URL . "/login.php";   
                     $headers = "From: no-reply@example.com";
                     @mail($to, $subject, $message, $headers);
                 }
