@@ -8,9 +8,6 @@ $pageTitle = "Add User";
 // Get roles with IDs
 $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
 
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -42,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $rowNumber++;
                     $username = trim($data[0] ?? '');
                     $email = trim($data[1] ?? '');
-                    $roleName = trim($data[2] ?? ''); // Using role name from CSV
+                    $roleName = trim($data[2] ?? ''); // Now using role name
 
                     // Validate required fields
                     if (empty($username) || empty($email) || empty($roleName)) {
@@ -93,28 +90,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     @mail($to, $subject, $message, $headers);
                 }
 
-                if ($errors) {
+                $pdo->commit();
+
+                if (!empty($errors)) {
                     $_SESSION['bulk_import_errors'] = $errors;
-                    $pdo->rollBack();
                 } else {
-                    $pdo->commit();
-                    $_SESSION['message'] = "Users imported successfully";
+                    $_SESSION['success'] = "Bulk import completed successfully!";
                 }
+
+                header("Location: add_users.php");
+                exit();
             } catch (Exception $e) {
                 $pdo->rollBack();
-                $_SESSION['error'] = $e->getMessage();
+                $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
+            } finally {
+                fclose($handle);
             }
         }
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
+        header("Location: add_users.php");
+        exit();
     }
 }
 
-// Rest of the HTML remains the same
-?>
+// Generate CSRF token
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-            
-            ?>
+
+// Generate CSRF token
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
