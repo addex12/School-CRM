@@ -88,48 +88,48 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <style>
-        /* Add this CSS for modal alignment */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5); /* Dim background */
-        }
+</head>
+<body>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1>Manage User Roles</h1>
+            </header>
+            <div class="content">
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="success-message"><?= $_SESSION['success'] ?></div>
+                    <?php unset($_SESSION['success']); ?>
+                <?php endif; ?>
+                
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="error-message"><?= $_SESSION['error'] ?></div>
+                    <?php unset($_SESSION['error']); ?>
+                <?php endif; ?>
 
-        .modal-content {
-            background-color: #fff;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%; /* Adjust width as needed */
-            max-width: 600px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-        }
+                <!-- Add Role Form -->
+                <div class="card mb-4">
+                    <h2>Add New Role</h2>
+                    <form method="POST">
+                        <div class="form-group">
+                            <label>Role Name:</label>
+                            <input type="text" name="role_name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea name="description" rows="2"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" name="add_role" class="btn btn-primary">Add Role</button>
+                        </div>
+                    </form>
+                </div>
 
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
+                <!-- Roles Table -->
+                <div class="card">
+                    <h2>Existing Roles</h2>
+                    <?php if (count($roles) > 0): ?>
+                        <table class="table">
                             <thead>
                                 <tr>
                                     <th>Role Name</th>
