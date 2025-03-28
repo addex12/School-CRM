@@ -56,6 +56,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = $e->getMessage();
     }
 }
+// Add to add_user.php
+// Handle bulk import
+if (isset($_POST['bulk_import'])) {
+    try {
+        $csvFile = $_FILES['csv_file']['tmp_name'];
+        
+        if (($handle = fopen($csvFile, "r")) === FALSE) {
+            throw new Exception("Error reading CSV file");
+        }
+
+        $pdo->beginTransaction();
+        
+        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+            if (count($data) !== 3) continue;
+            
+            [$username, $email, $role] = array_map('trim', $data);
+            $temp_password = bin2hex(random_bytes(8));
+
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, role, password) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $username,
+                $email,
+                $role,
+                password_hash($temp_password, PASSWORD_DEFAULT)
+            ]);
+
+            // Send email (implementation similar to single user)
+        }
+
+        $pdo->commit();
+        fclose($handle);
+        
+        $_SESSION['success'] = "Bulk import completed successfully";
+        header("Location: users.php");
+        exit();
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
+    }
+}
 ?>
 
 <!DOCTYPE html>
