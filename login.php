@@ -10,7 +10,7 @@ require_once 'includes/config.php'; // Ensure this initializes $pdo
 require_once 'includes/auth.php';
 
 if (isLoggedIn()) {
-    header("Location: " . ($_SESSION['role'] === 'admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+    header("Location: " . ($_SESSION['role'] === 'Admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
     exit();
 }
 
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update last login
         $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
         
-        header("Location: " . ($user['role'] === 'admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+        header("Location: " . ($user['role'] === 'Admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
         exit();
     } else {
         $error = "Invalid username or password";
