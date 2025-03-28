@@ -31,7 +31,6 @@ function getCurrentUser(): ?array {
     ] : null;
 }
 function requireAdmin() {
-    requireLogin();
     if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] !== 1) {
         header("Location: /user/dashboard.php");
         exit();
