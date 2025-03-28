@@ -106,8 +106,7 @@ $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
                                     <tr>
                                         <td><?php echo htmlspecialchars($user['username']); ?></td>
                                         <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                        <td><?php echo ucfirst($user['role']); ?></td>
-                                        <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
+                                        <td><?php echo ucfirst($user['role_name'] ?? 'No Role'); ?></td>                                        <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
                                         <td><?php echo $user['last_login'] ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
                                         <td>
                                             <a href="edit_users.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">Edit</a>
