@@ -217,7 +217,6 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
     border-bottom: 2px solid #e5e7eb;
-    background-color: white;
 }
 
         .error-message {
