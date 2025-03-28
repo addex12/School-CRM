@@ -52,14 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: users.php");
     exit();
 }
-
-// Get all users
 $users = $pdo->query("
     SELECT users.*, roles.role_name 
     FROM users 
     LEFT JOIN roles ON users.role_id = roles.id 
     ORDER BY roles.role_name, users.username
-")->fetchAll();?>
+")->fetchAll();
+// Get all users
+$stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
+?>
 
 <!DOCTYPE html>
 <html lang="en">
