@@ -1,17 +1,15 @@
 <?php
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
-
-// Define BASE_URL if not already defined
-if (!defined('BASE_URL')) {
-    define('BASE_URL', 'http://crm.flipperschool.com'); // Replace with your actual base URL
-}
 requireAdmin();
 
 $pageTitle = "Add User";
 
 // Get roles with IDs
 $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
+
+// Generate CSRF token
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -44,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $rowNumber++;
                     $username = trim($data[0] ?? '');
                     $email = trim($data[1] ?? '');
-                    $roleName = trim($data[2] ?? ''); // Now using role name
+                    $roleName = trim($data[2] ?? ''); // Using role name from CSV
 
                     // Validate required fields
                     if (empty($username) || empty($email) || empty($roleName)) {
@@ -89,41 +87,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Send email (optional)
                     $to = $email;
-                    $subject = "FIS School CRM System";
-                    $message = "Username: $username\nTemporary Password: $temp_password is already set.\nPlease change it after logging in. Use the link below to log in:\n" . BASE_URL . "/login.php";   
+                    $subject = "Your New Account";
+                    $message = "Username: $username\nTemporary Password: $temp_password";
                     $headers = "From: no-reply@example.com";
                     @mail($to, $subject, $message, $headers);
                 }
 
-                $pdo->commit();
-
-                if (!empty($errors)) {
+                if ($errors) {
                     $_SESSION['bulk_import_errors'] = $errors;
+                    $pdo->rollBack();
                 } else {
-                    $_SESSION['success'] = "Users imported successfully";
+                    $pdo->commit();
+                    $_SESSION['message'] = "Users imported successfully";
                 }
-                
             } catch (Exception $e) {
                 $pdo->rollBack();
-                $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
-            } finally {
-                fclose($handle);
+                $_SESSION['error'] = $e->getMessage();
             }
         }
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
-        header("Location: add_users.php");
-        exit();
     }
 }
-
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
-
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 ?>
+<?php if (isset($_SESSION['message'])): ?>
+    <div class="success-message">
+        <?= htmlspecialchars($_SESSION['message']); unset($_SESSION['message']); ?>
+    </div>
+<?php endif; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -150,6 +141,13 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         .admin-main {
             margin-left: 250px; /* Adjust to ensure it doesn't overlap the sidebar */
         }
+        .success-message {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1.5rem;
+}
 
         .card {
             background: white;
