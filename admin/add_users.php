@@ -214,14 +214,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #f8fafc;
         }
 
-        .success-message {
-            color: #16a34a;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
-            
-        }
-
         .admin-header h1 {
             font-size: 2rem;
             font-weight: 600;
