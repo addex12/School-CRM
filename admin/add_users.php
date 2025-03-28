@@ -75,25 +75,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Skip the header row
                 fgetcsv($handle);
 
+                $rowNumber = 1; // Track row numbers for error reporting
                 while (($data = fgetcsv($handle)) !== false) {
-                    $username = trim($data[0]);
-                    $email = trim($data[1]);
-                    $role_id = (int)$data[2];
-                    $temp_password = bin2hex(random_bytes(8));
+                    $rowNumber++;
+                    $username = trim($data[0] ?? '');
+                    $email = trim($data[1] ?? '');
+                    $role_id = isset($data[2]) ? (int)$data[2] : 0;
 
                     // Validation
                     if (empty($username) || empty($email) || empty($role_id)) {
-                        throw new Exception("Invalid data in CSV file");
+                        throw new Exception("Invalid data in CSV file at row $rowNumber: Missing required fields.");
+                    }
+
+                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        throw new Exception("Invalid data in CSV file at row $rowNumber: Invalid email format.");
                     }
 
                     // Check for existing username or email
                     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
                     $stmt->execute([$username, $email]);
                     if ($stmt->fetchColumn() > 0) {
-                        continue; // Skip duplicate entries
+                        throw new Exception("Invalid data in CSV file at row $rowNumber: Username or email already exists.");
                     }
 
                     // Insert user into the database
+                    $temp_password = bin2hex(random_bytes(8));
                     $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
                     $stmt->execute([
                         $username,
@@ -117,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             } catch (Exception $e) {
                 $pdo->rollBack();
-                throw $e;
+                $_SESSION['error'] = $e->getMessage(); // Store error message in session
             } finally {
                 fclose($handle);
             }
