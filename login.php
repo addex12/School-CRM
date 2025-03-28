@@ -1,12 +1,11 @@
 <?php
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
-
-// Initialize social login configuration
-require_once 'includes/social_auth.php'; // You'll need to create this file
+require_once 'includes/social_auth.php';
 
 if (isLoggedIn()) {
-    header("Location: " . ($_SESSION['role_id'] === '1' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+    // Fixed: Check role_id instead of role
+    header("Location: " . ($_SESSION['role_id'] === 1 ? 'admin/dashboard.php' : 'user/dashboard.php'));
     exit();
 }
 
@@ -24,12 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role_id'];
+        $_SESSION['role_id'] = $user['role_id']; // Fixed: Store role_id in session
         
         // Update last login
         $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
         
-        header("Location: " . ($user['role_id'] === '1' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+        // Fixed: Proper role check with role_id
+        $redirect = ($user['role_id'] == 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+        header("Location: " . $redirect);
         exit();
     } else {
         $error = "Invalid username or password";
@@ -40,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
 if (isset($_GET['provider'])) {
     $provider = $_GET['provider'];
     try {
-        $socialUser = handleSocialLogin($provider); // Implement this function in social_auth.php
+        $socialUser = handleSocialLogin($provider);
         
         // Check if user exists by email
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
@@ -48,26 +49,30 @@ if (isset($_GET['provider'])) {
         $user = $stmt->fetch();
         
         if (!$user) {
-            // Create new user
+            // Create new user with default role (4 for regular user)
             $password = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, created_at) VALUES (?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $socialUser['name'],
                 $socialUser['email'],
                 $password,
-                4 // Default role (e.g., 'User')
+                4 // Default role (regular user)
             ]);
             $userId = $pdo->lastInsertId();
+            $roleId = 4;
         } else {
             $userId = $user['id'];
+            $roleId = $user['role_id'];
         }
         
         // Log user in
         $_SESSION['user_id'] = $userId;
         $_SESSION['username'] = $socialUser['name'];
-        $_SESSION['role'] = $user['role_id'] ?? 4;
+        $_SESSION['role_id'] = $roleId;
         
-        header("Location: " . ($_SESSION['role_id'] === '1' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+        // Fixed: Proper role check with role_id
+        $redirect = ($roleId == 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+        header("Location: " . $redirect);
         exit();
     } catch (Exception $e) {
         $error = "Social login failed: " . $e->getMessage();
@@ -140,17 +145,25 @@ if (isset($_GET['provider'])) {
             padding: 0 10px;
             color: #777;
         }
+        .error-message {
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-logo">
-            <i class="fas fa-poll-h"></i>
+            <i class="fas fa-graduation-cap"></i>
         </div>
         <h1 class="login-title">School CRM System Login</h1>
         
         <?php if ($error): ?>
-            <div class="error-message"><?php echo $error; ?></div>
+            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
         
         <div class="social-login">
