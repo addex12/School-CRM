@@ -74,6 +74,7 @@ if (isset($_GET['provider'])) {
         $error = "Social login failed: " . $e->getMessage();
     }
 }
+}
 ?>
 
 <!DOCTYPE html>
