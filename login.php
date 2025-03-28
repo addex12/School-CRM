@@ -20,21 +20,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     $stmt->execute([$username]);
     $user = $stmt->fetch();
     
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role_id'] = $user['role_id']; // Fixed: Store role_id in session
-        
-        // Update last login
-        $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
-        
-        // Fixed: Proper role check with role_id
-        $redirect = ($user['role_id'] == 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
-        header("Location: " . $redirect);
-        exit();
-    } else {
-        $error = "Invalid username or password";
-    }
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['role_id'] = (int)$user['role_id']; // Cast to integer
+
+    // Update last login
+    $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
+    
+    $redirect = ($_SESSION['role_id'] === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+    header("Location: " . $redirect);
+    exit();
 }
 
 // Handle social login callback
@@ -60,9 +56,9 @@ if (isset($_GET['provider'])) {
             ]);
             $userId = $pdo->lastInsertId();
             $roleId = 4;
-        } else {
+        }  else {
             $userId = $user['id'];
-            $roleId = $user['role_id'];
+            $roleId = (int)$user['role_id']; // Cast to integer
         }
         
         // Log user in
