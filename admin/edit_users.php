@@ -3,100 +3,152 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-$user_id = $_GET['id'] ?? null;
-$pageTitle = "Edit User";
-// Fetch user details
-if ($user_id) {
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->execute([$user_id]);
-    $user = $stmt->fetch();
+// CSRF Protection
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-    if (!$user) {
-        $_SESSION['error'] = "User not found.";
-        header("Location: users.php");
-        exit();
-    }
-} else {
-    $_SESSION['error'] = "Invalid user ID.";
+// Get User Data
+$user_id = $_GET['id'] ?? null;
+if (!$user_id) {
     header("Location: users.php");
     exit();
 }
 
-// Handle form submission
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
+
+if (!$user) {
+    $_SESSION['error'] = "User not found";
+    header("Location: users.php");
+    exit();
+}
+
+// Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $role = $_POST['role_id'];
-
-    // Check for duplicate username or email
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
-    $stmt->execute([$username, $email, $user_id]);
-    $count = $stmt->fetchColumn();
-
-    if ($count > 0) {
-        $_SESSION['error'] = "Username or email already exists.";
-    } else {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $role_id, $id]);
-        $_SESSION['success'] = "User updated successfully.";
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $_SESSION['error'] = "Invalid CSRF token";
         header("Location: users.php");
         exit();
     }
+
+    $username = htmlspecialchars($_POST['username']);
+    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+    $role_id = (int)$_POST['role_id'];
+
+    try {
+        // Check duplicates
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users 
+                             WHERE (username = ? OR email = ?) AND id != ?");
+        $stmt->execute([$username, $email, $user_id]);
+        
+        if ($stmt->fetchColumn() > 0) {
+            throw new Exception("Username or email already exists");
+        }
+
+        // Update user
+        $stmt = $pdo->prepare("UPDATE users 
+                             SET username = ?, email = ?, role_id = ?
+                             WHERE id = ?");
+        $stmt->execute([$username, $email, $role_id, $user_id]);
+        
+        $_SESSION['success'] = "User updated successfully";
+        header("Location: users.php");
+        exit();
+
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+    }
 }
-$roles = $pdo->query("SELECT role_name FROM roles ORDER BY role_name")->fetchAll();
+
+// Get Roles
 $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit User - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css">
+    <style>
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        .main-content {
+            padding: 2rem;
+            background: #f5f7fa;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+    </style>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1>Edit User</h1>
-            </header>
-            <div class="content">
+        
+        <div class="main-content">
+            <h1>Edit User</h1>
+            
+            <div class="card">
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                    <sl-alert variant="danger" open>
+                        <?= htmlspecialchars($_SESSION['error']) ?>
+                        <?php unset($_SESSION['error']) ?>
+                    </sl-alert>
                 <?php endif; ?>
 
-                <form method="POST">
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
-                    </div>
-                    <div class="form-group">
-    <label for="role">Role:</label>
-    <select name="role_id" required>
-    <?php 
-$roles = $pdo->query("SELECT * FROM roles")->fetchAll();
-foreach ($roles as $role): ?>
-<option value="<?= $role['id'] ?>" <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>>
-    <?= ucfirst($role['role_name']) ?>
-</option>
-<?php endforeach; ?>
-</select>
-</div>
-                    <div class="form-group"></div>
+                <form method="POST" class="form-grid">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    
+                    <sl-input 
+                        name="username" 
+                        label="Username" 
+                        value="<?= htmlspecialchars($user['username']) ?>"
+                        required
+                    ></sl-input>
+                    
+                    <sl-input 
+                        type="email" 
+                        name="email" 
+                        label="Email"
+                        value="<?= htmlspecialchars($user['email']) ?>"
+                        required
+                    ></sl-input>
+                    
+                    <sl-select name="role_id" label="Role" value="<?= $user['role_id'] ?>">
+                        <?php foreach ($roles as $role): ?>
+                            <sl-option value="<?= $role['id'] ?>">
+                                <?= htmlspecialchars($role['role_name']) ?>
+                            </sl-option>
+                        <?php endforeach; ?>
+                    </sl-select>
+                    
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Update User</button>
-                        <a href="users.php" class="btn btn-secondary">Cancel</a>
+                        <sl-button type="submit" variant="primary">Update User</sl-button>
+                        <sl-button href="users.php" variant="neutral">Cancel</sl-button>
                     </div>
                 </form>
             </div>
         </div>
-        <?php require_once 'includes/footer.php'; ?>
     </div>
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
 </body>
 </html>
