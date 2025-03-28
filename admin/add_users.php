@@ -16,6 +16,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Your session has expired or the request is invalid. Please try again.");
         }
 
+        if (isset($_POST['create_user'])) {
+            $username = trim($_POST['username']);
+            $email = trim($_POST['email']);
+            $role_id = (int)$_POST['role_id'];
+
+            // Validate required fields
+            if (empty($username) || empty($email) || empty($role_id)) {
+                throw new Exception("All fields are required.");
+            }
+
+            // Validate email format
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid email format.");
+            }
+
+            // Check for existing users
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+            $stmt->execute([$username, $email]);
+            if ($stmt->fetchColumn() > 0) {
+                throw new Exception("Username or email already exists.");
+            }
+
+            // Create user
+            $temp_password = bin2hex(random_bytes(8));
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $username,
+                $email,
+                $role_id,
+                password_hash($temp_password, PASSWORD_DEFAULT)
+            ]);
+
+            // Send email (customized)
+            $to = $email;
+            $subject = "Welcome to School CRM - Your Account Details";
+            $message = "
+Dear $username,
+
+We are excited to welcome you to the School CRM platform. Below are your account details:
+
+Username: $username
+Temporary Password: $temp_password
+
+Please log in to your account at the following link:
+[School CRM Login](https://crm.flipperschool.com/)
+
+For security reasons, we recommend changing your password immediately after logging in.
+
+If you have any questions or need assistance, feel free to contact our support team.
+
+Best regards,  
+The School CRM Team  
+adugna.gizaw@flipperschools.com";
+            $headers = "From: School CRM System <no-reply@example.com>\r\n";
+            $headers .= "Content-Type: text/plain; charset=U            @mail($to, $subject, $message, $headers);
+TF-8";
+
+
+            $_SESSION['success'] = "Account for '$username' created successfully!";
+            header("Location: add_users.php");
+            exit();
+        }
+
         if (isset($_POST['bulk_import'])) {
             if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception("Failed to upload file");
@@ -82,11 +145,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         password_hash($temp_password, PASSWORD_DEFAULT)
                     ]);
 
-                    // Send email (optional)
+                    // Send email (customized)
                     $to = $email;
-                    $subject = "Your New Account";
-                    $message = "Username: $username\nTemporary Password: $temp_password";
-                    $headers = "From: no-reply@example.com";
+                    $subject = "Welcome to School CRM - Your Account Details";
+                    $message = "
+Dear $username,
+
+We are excited to welcome you to the School CRM platform. Below are your account details:
+
+Username: $username
+Temporary Password: $temp_password
+
+Please log in to your account at the following link:
+[School CRM Login](https://example.com/login)
+
+For security reasons, we recommend changing your password immediately after logging in.
+
+If you have any questions or need assistance, feel free to contact our support team.
+
+Best regards,  
+The School CRM Team  
+support@example.com
+";
+                    $headers = "From: School CRM <no-reply@example.com>\r\n";
+                    $headers .= "Content-Type: text/plain; charset=UTF-8";
+
                     @mail($to, $subject, $message, $headers);
                 }
 
