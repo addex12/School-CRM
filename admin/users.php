@@ -49,7 +49,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
         $stmt->execute([$password, $id]);
-        $_SESSION['success'] = "Password reset to 'password123' successfully!";
+
+        // Fetch user email for notification
+        $stmt = $pdo->prepare("SELECT email FROM users WHERE id = ?");
+        $stmt->execute([$id]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $to = $user['email'];
+            $subject = "Password Reset Notification - School CRM System";
+            $message = "Hello,\n\nYour password has been reset to the default password: 'password123'. Please log in and change your password immediately for security purposes.\n\nThank you,\nSchool CRM System";
+            $headers = "From: adugna.gizaw@flipperschools.com.com";
+
+            // Send email
+            mail($to, $subject, $message, $headers);
+        }
+
+        $_SESSION['success'] = "Password reset to 'password123' successfully! A notification email has been sent.";
     }
     
     header("Location: users.php");
