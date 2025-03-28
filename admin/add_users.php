@@ -90,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
                     $stmt->execute([$username, $email]);
                     if ($stmt->fetchColumn() > 0) {
-                        throw new Exception("Username or email already exists for $username");
+                        continue; // Skip duplicate entries
                     }
 
                     // Insert user into the database
@@ -108,9 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message = "Username: $username\nTemporary Password: $temp_password";
                     $headers = "From: no-reply@example.com";
 
-                    if (!mail($to, $subject, $message, $headers)) {
-                        throw new Exception("Failed to send email to $email");
-                    }
+                    mail($to, $subject, $message, $headers); // Ignore email failures
                 }
 
                 $pdo->commit();
@@ -145,14 +143,19 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            overflow: hidden; /* Prevent content overflow */
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: 1fr 1fr; /* Ensure two equal columns */
             gap: 2rem;
             margin-top: 2rem;
             align-items: start; /* Align items at the start for consistent alignment */
+        }
+
+        .admin-main {
+            margin-left: 250px; /* Adjust to ensure it doesn't overlap the sidebar */
         }
 
         .card {
