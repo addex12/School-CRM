@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = $_POST['id'];
         $username = $_POST['username'];
         $email = $_POST['email'];
-        $role = $_POST['role_id'];
+        $role = $_POST['role_name'];
         
         // Check if username or email already exists (excluding current user)
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
