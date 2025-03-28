@@ -6,7 +6,7 @@ require_once 'includes/auth.php';
 require_once 'includes/social_auth.php'; // You'll need to create this file
 
 if (isLoggedIn()) {
-    header("Location: " . ($_SESSION['role'] === 'Admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+    header("Location: " . ($_SESSION['role_id'] === '1' ? 'admin/dashboard.php' : 'user/dashboard.php'));
     exit();
 }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
         // Update last login
         $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
         
-        header("Location: " . ($user['role_id'] === 'Admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+        header("Location: " . ($user['role_id'] === '1' ? 'admin/dashboard.php' : 'user/dashboard.php'));
         exit();
     } else {
         $error = "Invalid username or password";
@@ -67,7 +67,7 @@ if (isset($_GET['provider'])) {
         $_SESSION['username'] = $socialUser['name'];
         $_SESSION['role'] = $user['role_id'] ?? 4;
         
-        header("Location: " . ($_SESSION['role'] === 'Admin' ? 'admin/dashboard.php' : 'user/dashboard.php'));
+        header("Location: " . ($_SESSION['role_id'] === '1' ? 'admin/dashboard.php' : 'user/dashboard.php'));
         exit();
     } catch (Exception $e) {
         $error = "Social login failed: " . $e->getMessage();
