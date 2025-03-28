@@ -84,13 +84,13 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
             background: #f5f7fa;
         }
         
-        .card {
+        .form-container {
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             padding: 2rem;
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 800px;
+            margin: 2rem auto; /* Center align the form */
         }
         
         .form-grid {
@@ -106,7 +106,7 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
         <div class="main-content">
             <h1>Edit User</h1>
             
-            <div class="card">
+            <div class="form-container"> <!-- Changed class name from 'card' to 'form-container' -->
                 <?php if (isset($_SESSION['error'])): ?>
                     <sl-alert variant="danger" open>
                         <?= htmlspecialchars($_SESSION['error']) ?>
