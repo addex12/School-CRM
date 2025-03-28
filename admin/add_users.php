@@ -9,7 +9,9 @@ $pageTitle = "Add User";
 $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
 
 // Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -141,13 +143,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .admin-main {
             margin-left: 250px; /* Adjust to ensure it doesn't overlap the sidebar */
         }
-        .success-message {
-    background: #dcfce7;
-    color: #16a34a;
-    padding: 1rem;
-    border-radius: 0.375rem;
-    margin-bottom: 1.5rem;
-}
 
         .card {
             background: white;
@@ -217,6 +212,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 2rem;
             text-align: center;
             background: #f8fafc;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 1rem;
+            
         }
 
         .admin-header h1 {
