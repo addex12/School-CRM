@@ -1,9 +1,12 @@
 <?php
-require_once '../includes/config.php'; // Include config to initialize $pdo
+require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
 $pageTitle = "Manage Users";
+
+// Fetch all roles for the form select
+$roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -11,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = $_POST['id'];
         $username = $_POST['username'];
         $email = $_POST['email'];
-        $role = $_POST['role_id'];
+        $role_id = $_POST['role_id'];
         
         // Check if username or email already exists (excluding current user)
         $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
@@ -21,8 +24,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($count > 0) {
             $_SESSION['error'] = "Username or email already exists!";
         } else {
-            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?");
-            $stmt->execute([$username, $email, $role, $id]);
+            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
+            $stmt->execute([$username, $email, $role_id, $id]);
             $_SESSION['success'] = "User updated successfully!";
         }
     }
@@ -42,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (isset($_POST['reset_password'])) {
         $id = $_POST['id'];
-        $password = password_hash('password123', PASSWORD_DEFAULT); // Default reset password
+        $password = password_hash('password123', PASSWORD_DEFAULT);
         
         $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
         $stmt->execute([$password, $id]);
@@ -52,14 +55,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: users.php");
     exit();
 }
+
+// Fetch users with role names
 $users = $pdo->query("
     SELECT users.*, roles.role_name 
     FROM users 
     LEFT JOIN roles ON users.role_id = roles.id 
     ORDER BY roles.role_name, users.username
 ")->fetchAll();
-// Get all users
-$stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
 ?>
 
 <!DOCTYPE html>
@@ -106,10 +109,16 @@ $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
                                     <tr>
                                         <td><?php echo htmlspecialchars($user['username']); ?></td>
                                         <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                        <td><?php echo ucfirst($user['role_name'] ?? 'No Role'); ?></td>                                        <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
+                                        <td><?php echo ucfirst($user['role_name'] ?? 'No Role'); ?></td>
+                                        <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
                                         <td><?php echo $user['last_login'] ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
                                         <td>
-                                            <a href="edit_users.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">Edit</a>
+                                            <button onclick="openEditModal(
+                                                '<?php echo $user['id']; ?>',
+                                                '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>',
+                                                '<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>',
+                                                '<?php echo $user['role_id']; ?>'
+                                            )" class="btn btn-edit">Edit</button>
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
                                                 <button type="submit" name="reset_password" class="btn btn-reset" onclick="return confirm('Reset password to default?')">Reset Password</button>
@@ -138,7 +147,7 @@ $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
         <div class="modal-content">
             <span class="close-modal" onclick="closeEditModal()">&times;</span>
             <h2>Edit User</h2>
-            <form id="editForm" method="POST">
+            <form method="POST">
                 <input type="hidden" name="id" id="editId">
                 <input type="hidden" name="update_user">
                 
@@ -154,11 +163,10 @@ $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
                 
                 <div class="form-group">
                     <label for="editRole">Role:</label>
-                    <select id="editRole" name="role" required>
-                        <option value="admin">Admin</option>
-                        <option value="teacher">Teacher</option>
-                        <option value="parent">Parent</option>
-                        <option value="student">Student</option>
+                    <select id="editRole" name="role_id" required>
+                        <?php foreach ($roles as $role): ?>
+                            <option value="<?php echo $role['id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 
@@ -167,17 +175,15 @@ $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
                     <button type="submit" class="btn btn-primary">Update User</button>
                 </div>
             </form>
-  </div>
-
+        </div>
     </div>
 
     <script>
-        // Edit modal functions
-        function openEditModal(id, username, email, role) {
+        function openEditModal(id, username, email, roleId) {
             document.getElementById('editId').value = id;
             document.getElementById('editUsername').value = username;
             document.getElementById('editEmail').value = email;
-            document.getElementById('editRole').value = role;
+            document.getElementById('editRole').value = roleId;
             document.getElementById('editModal').style.display = 'block';
         }
         
@@ -185,14 +191,13 @@ $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
             document.getElementById('editModal').style.display = 'none';
         }
         
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('editModal');
             if (event.target === modal) {
-                modal.style.display = 'none';
+                closeEditModal();
             }
         }
     </script>
-            <?php include 'includes/footer.php';?>
+    <?php include 'includes/footer.php';?>
 </body>
 </html>
