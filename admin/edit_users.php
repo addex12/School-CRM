@@ -71,18 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" required>
                     </div>
                     <div class="form-group">
-    <label for="role">Role:</label>
-    <select id="role" name="role" required>
-        <?php 
-        $roles = $pdo->query("SELECT role_name FROM roles")->fetchAll();
-        foreach ($roles as $role): 
-        ?>
-            <option value="<?= $role['role_name'] ?>" <?= $user['role'] === $role['role_name'] ? 'selected' : '' ?>>
-                <?= ucfirst($role['role_name']) ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Role:</label>
+                        <select id="role" name="role" required>
+                            <option value="admin" <?php echo $user['role'] === 'admin' ? 'selected' : ''; ?>>Admin</option>
+                            <option value="teacher" <?php echo $user['role'] === 'teacher' ? 'selected' : ''; ?>>Teacher</option>
+                            <option value="parent" <?php echo $user['role'] === 'parent' ? 'selected' : ''; ?>>Parent</option>
+                            <option value="student" <?php echo $user['role'] === 'student' ? 'selected' : ''; ?>>Student</option>
+                        </select>
+                    </div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Update User</button>
                         <a href="users.php" class="btn btn-secondary">Cancel</a>
