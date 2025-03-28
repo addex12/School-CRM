@@ -202,6 +202,23 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             color: white;
             border: none;
         }
+        .success-message {
+    background: #dcfce7;
+    color: #16a34a;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-header h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+    background-color: white;
+}
 
         .error-message {
             background: #fee2e2;
@@ -249,6 +266,17 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         <?php unset($_SESSION['bulk_import_errors']); ?>
                     </div>
                 <?php endif; ?>
+                <?php if (isset($_SESSION['error'])): ?>
+    <div class="error-message">
+        <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="success-message">
+        <?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
+    </div>
+<?php endif; ?>
 
                 <div class="form-grid">
                     <!-- Single User Form -->

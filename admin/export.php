@@ -5,6 +5,21 @@ require_once '../includes/database.php'; // Ensure this file contains the getPDO
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+// Ensure this file contains the getPDO function
+
+function getPDO(): PDO {
+    $dsn = 'mysql:host=localhost;dbname=school_crm;charset=utf8mb4';
+    $username = 'your_db_username';
+    $password = 'your_db_password';
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+    ];
+
+    return new PDO($dsn, $username, $password, $options);
+}
+
 // Validate inputs
 $survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT) ?? 0;
 $type = strtolower(filter_input(INPUT_GET, 'type', FILTER_SANITIZE_STRING)) ?? 'csv';
