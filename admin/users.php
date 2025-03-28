@@ -54,8 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get all users
-$users = $pdo->query("SELECT * FROM users ORDER BY role, username")->fetchAll();
-?>
+$users = $pdo->query("
+    SELECT users.*, roles.role_name 
+    FROM users 
+    LEFT JOIN roles ON users.role_id = roles.id 
+    ORDER BY roles.role_name, users.username
+")->fetchAll();?>
 
 <!DOCTYPE html>
 <html lang="en">

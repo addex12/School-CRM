@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 $roles = $pdo->query("SELECT role_name FROM roles ORDER BY role_name")->fetchAll();
+$roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -77,15 +78,16 @@ $roles = $pdo->query("SELECT role_name FROM roles ORDER BY role_name")->fetchAll
                     </div>
                     <div class="form-group">
     <label for="role">Role:</label>
-    <select id="role" name="role" required>
-        <?php foreach ($roles as $role): ?>
-            <option value="<?= htmlspecialchars($role['role_name']) ?>" 
-                <?= $user['role'] === $role['role_name'] ? 'selected' : '' ?>>
-                <?= ucfirst(htmlspecialchars($role['role_name'])) ?>
-            </option>
-        <?php endforeach; ?>
-    </select>
+    <select name="role_id" required>
+    <?php foreach ($roles as $role): ?>
+    <option value="<?= $role['id'] ?>" 
+        <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>>
+        <?= htmlspecialchars($role['role_name']) ?>
+    </option>
+    <?php endforeach; ?>
+</select>
 </div>
+                    <div class="form-group"></div>
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">Update User</button>
                         <a href="users.php" class="btn btn-secondary">Cancel</a>
