@@ -88,133 +88,104 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <style>
+        /* Add modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            width: 50%;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            margin-top: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1>Manage User Roles</h1>
-            </header>
-            <div class="content">
-                <?php if (isset($_SESSION['success'])): ?>
-                    <div class="success-message"><?= $_SESSION['success'] ?></div>
-                    <?php unset($_SESSION['success']); ?>
-                <?php endif; ?>
-                
-                <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message"><?= $_SESSION['error'] ?></div>
-                    <?php unset($_SESSION['error']); ?>
-                <?php endif; ?>
+            <!-- ... [Keep the existing header and content structure] ... -->
 
-                <!-- Add Role Form -->
-                <div class="card mb-4">
-                    <h2>Add New Role</h2>
+            <!-- Edit Role Modal -->
+            <div id="editModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal" onclick="closeEditModal()">&times;</span>
+                    <h2>Edit Role</h2>
                     <form method="POST">
+                        <input type="hidden" name="role_id" id="editRoleId">
+                        <input type="hidden" name="update_role">
+                        
                         <div class="form-group">
                             <label>Role Name:</label>
-                            <input type="text" name="role_name" required>
+                            <input type="text" name="role_name" id="editRoleName" required>
                         </div>
+                        
                         <div class="form-group">
                             <label>Description:</label>
-                            <textarea name="description" rows="2"></textarea>
+                            <textarea name="description" id="editDescription" rows="3"></textarea>
                         </div>
+                        
                         <div class="form-actions">
-                            <button type="submit" name="add_role" class="btn btn-primary">Add Role</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>
                 </div>
-
-                <!-- Roles Table -->
-                <div class="card">
-                    <h2>Existing Roles</h2>
-                    <?php if (count($roles) > 0): ?>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Role Name</th>
-                                    <th>Description</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($roles as $role): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($role['role_name']) ?></td>
-                                        <td><?= htmlspecialchars($role['description']) ?></td>
-                                        <td>
-                                            <button class="btn btn-edit" onclick="openEditModal(
-                                                <?= $role['id'] ?>,
-                                                '<?= htmlspecialchars($role['role_name']) ?>',
-                                                '<?= htmlspecialchars($role['description']) ?>'
-                                            )">Edit</button>
-                                            
-                                            <form method="POST" style="display:inline;">
-                                                <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
-                                                <button type="submit" name="delete_role" class="btn btn-delete" 
-                                                    onclick="return confirm('Are you sure you want to delete this role?')">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <p>No roles found.</p>
-                    <?php endif; ?>
-                </div>
             </div>
+
+            <script>
+                // Modal control functions
+                function openEditModal(id, name, description) {
+                    document.getElementById('editRoleId').value = id;
+                    document.getElementById('editRoleName').value = name;
+                    document.getElementById('editDescription').value = description;
+                    document.getElementById('editModal').style.display = 'block';
+                }
+
+                function closeEditModal() {
+                    document.getElementById('editModal').style.display = 'none';
+                }
+
+                // Close modal when clicking outside
+                window.onclick = function(event) {
+                    const modal = document.getElementById('editModal');
+                    if (event.target === modal) {
+                        closeEditModal();
+                    }
+                }
+
+                // Close modal on ESC key
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape') {
+                        closeEditModal();
+                    }
+                });
+            </script>
         </div>
     </div>
-
-    <!-- Edit Role Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
-            <h2>Edit Role</h2>
-            <form method="POST">
-                <input type="hidden" name="role_id" id="editRoleId">
-                <input type="hidden" name="update_role">
-                
-                <div class="form-group">
-                    <label>Role Name:</label>
-                    <input type="text" name="role_name" id="editRoleName" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Description:</label>
-                    <textarea name="description" id="editDescription" rows="3"></textarea>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function openEditModal(id, name, description) {
-            document.getElementById('editRoleId').value = id;
-            document.getElementById('editRoleName').value = name;
-            document.getElementById('editDescription').value = description;
-            document.getElementById('editModal').style.display = 'block';
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('editModal');
-            if (event.target === modal) {
-                closeEditModal();
-            }
-        }
-    </script>
 </body>
 </html>
