@@ -74,8 +74,9 @@ adugna.gizaw@flipperschools.com
             $headers .= "Reply-To: adugna.gizaw@flipperschools.com\r\n";
             $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
-            // Ensure the mail function is called correctly
+            // Debugging: Log email details if sending fails
             if (!@mail($to, $subject, $message, $headers)) {
+                error_log("Failed to send email to $to. Subject: $subject. Headers: $headers");
                 throw new Exception("Failed to send account creation email to $email.");
             }
 
