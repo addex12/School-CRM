@@ -94,12 +94,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!empty($errors)) {
                     $_SESSION['bulk_import_errors'] = $errors;
+                    header("Location: add_users.php");
                 } else {
-                    $_SESSION['success'] = "Bulk import completed successfully!";
+                    $_SESSION['success'] = "Bulk users imported successfully!";
+                    header("Location: users.php");
                 }
-
                 header("Location: add_users.php");
-                exit();
+                
             } catch (Exception $e) {
                 $pdo->rollBack();
                 $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
