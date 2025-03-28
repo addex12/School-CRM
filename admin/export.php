@@ -102,7 +102,7 @@ function exportCSV($survey, $fields, $responses, $response_data): never {
             $response['id'],
             $response['username'],
             $response['email'],
-            $response['role'],
+            $response['role_name'],
             $response['submitted_at']
         ];
         
