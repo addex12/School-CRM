@@ -109,7 +109,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (isset($_POST['create_user'])) {
-            // ...existing code for creating a user...
+            $username = trim($_POST['username']); // Ensure $username is defined
+            $email = trim($_POST['email']);
+            $role_id = (int)$_POST['role_id'];
+
+            // Validate required fields
+            if (empty($username) || empty($email) || empty($role_id)) {
+                throw new Exception("All fields are required.");
+            }
+
+            // Validate email format
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("Invalid email format.");
+            }
+
+            // Check for existing users
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+            $stmt->execute([$username, $email]);
+            if ($stmt->fetchColumn() > 0) {
+                throw new Exception("Username or email already exists.");
+            }
+
+            // Create user
+            $temp_password = bin2hex(random_bytes(8));
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $username,
+                $email,
+                $role_id,
+                password_hash($temp_password, PASSWORD_DEFAULT)
+            ]);
+
+            // Send email (optional)
+            $to = $email;
+            $subject = "Your New Account";
+            $message = "Username: $username\nTemporary Password: $temp_password";
+            $headers = "From: no-reply@example.com";
+            @mail($to, $subject, $message, $headers);
 
             // Display success message
             $_SESSION['success'] = "Account for '$username' created successfully!";
