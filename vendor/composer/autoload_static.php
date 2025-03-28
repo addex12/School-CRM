@@ -9,11 +9,11 @@ class ComposerStaticInit0afeea5625e037e082f64b33f97eb1be
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'db356362850385d08a5381de2638b5fd' => __DIR__ . '/..' . '/mpdf/mpdf/src/functions.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
     );
@@ -51,6 +51,10 @@ class ComposerStaticInit0afeea5625e037e082f64b33f97eb1be
             'Mpdf\\' => 5,
             'Monolog\\' => 8,
             'Matrix\\' => 7,
+        ),
+        'L' => 
+        array (
+            'League\\OAuth2\\Client\\' => 21,
         ),
         'G' => 
         array (
@@ -149,6 +153,12 @@ class ComposerStaticInit0afeea5625e037e082f64b33f97eb1be
         array (
             0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
         ),
+        'League\\OAuth2\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/oauth2-client/src',
+            1 => __DIR__ . '/..' . '/league/oauth2-facebook/src',
+            2 => __DIR__ . '/..' . '/league/oauth2-google/src',
+        ),
         'GuzzleHttp\\Psr7\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
@@ -184,6 +194,16 @@ class ComposerStaticInit0afeea5625e037e082f64b33f97eb1be
         'App\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
+        ),
+    );
+
+    public static $prefixesPsr0 = array (
+        'H' => 
+        array (
+            'HappyR\\LinkedIn\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/happyr/linkedin-api-client/src',
+            ),
         ),
     );
 
@@ -367,6 +387,51 @@ class ComposerStaticInit0afeea5625e037e082f64b33f97eb1be
         'GuzzleHttp\\RetryMiddleware' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/RetryMiddleware.php',
         'GuzzleHttp\\TransferStats' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/TransferStats.php',
         'GuzzleHttp\\Utils' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/Utils.php',
+        'HappyR\\LinkedIn\\Exceptions\\LinkedInApiException' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Exceptions/LinkedInApiException.php',
+        'HappyR\\LinkedIn\\Exceptions\\LoginError' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Exceptions/LoginError.php',
+        'HappyR\\LinkedIn\\Http\\Request' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Http/Request.php',
+        'HappyR\\LinkedIn\\Http\\RequestInterface' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Http/RequestInterface.php',
+        'HappyR\\LinkedIn\\Http\\UrlGenerator' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Http/UrlGenerator.php',
+        'HappyR\\LinkedIn\\Http\\UrlGeneratorInterface' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Http/UrlGeneratorInterface.php',
+        'HappyR\\LinkedIn\\LinkedIn' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/LinkedIn.php',
+        'HappyR\\LinkedIn\\Storage\\DataStorageInterface' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Storage/DataStorageInterface.php',
+        'HappyR\\LinkedIn\\Storage\\IlluminateSessionStorage' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Storage/IlluminateSessionStorage.php',
+        'HappyR\\LinkedIn\\Storage\\SessionStorage' => __DIR__ . '/..' . '/happyr/linkedin-api-client/src/HappyR/LinkedIn/Storage/SessionStorage.php',
+        'League\\OAuth2\\Client\\Exception\\HostedDomainException' => __DIR__ . '/..' . '/league/oauth2-google/src/Exception/HostedDomainException.php',
+        'League\\OAuth2\\Client\\Grant\\AbstractGrant' => __DIR__ . '/..' . '/league/oauth2-client/src/Grant/AbstractGrant.php',
+        'League\\OAuth2\\Client\\Grant\\AuthorizationCode' => __DIR__ . '/..' . '/league/oauth2-client/src/Grant/AuthorizationCode.php',
+        'League\\OAuth2\\Client\\Grant\\ClientCredentials' => __DIR__ . '/..' . '/league/oauth2-client/src/Grant/ClientCredentials.php',
+        'League\\OAuth2\\Client\\Grant\\Exception\\InvalidGrantException' => __DIR__ . '/..' . '/league/oauth2-client/src/Grant/Exception/InvalidGrantException.php',
+        'League\\OAuth2\\Client\\Grant\\FbExchangeToken' => __DIR__ . '/..' . '/league/oauth2-facebook/src/Grant/FbExchangeToken.php',
+        'League\\OAuth2\\Client\\Grant\\GrantFactory' => __DIR__ . '/..' . '/league/oauth2-client/src/Grant/GrantFactory.php',
+        'League\\OAuth2\\Client\\Grant\\Password' => __DIR__ . '/..' . '/league/oauth2-client/src/Grant/Password.php',
+        'League\\OAuth2\\Client\\Grant\\RefreshToken' => __DIR__ . '/..' . '/league/oauth2-client/src/Grant/RefreshToken.php',
+        'League\\OAuth2\\Client\\OptionProvider\\HttpBasicAuthOptionProvider' => __DIR__ . '/..' . '/league/oauth2-client/src/OptionProvider/HttpBasicAuthOptionProvider.php',
+        'League\\OAuth2\\Client\\OptionProvider\\OptionProviderInterface' => __DIR__ . '/..' . '/league/oauth2-client/src/OptionProvider/OptionProviderInterface.php',
+        'League\\OAuth2\\Client\\OptionProvider\\PostAuthOptionProvider' => __DIR__ . '/..' . '/league/oauth2-client/src/OptionProvider/PostAuthOptionProvider.php',
+        'League\\OAuth2\\Client\\Provider\\AbstractProvider' => __DIR__ . '/..' . '/league/oauth2-client/src/Provider/AbstractProvider.php',
+        'League\\OAuth2\\Client\\Provider\\AppSecretProof' => __DIR__ . '/..' . '/league/oauth2-facebook/src/Provider/AppSecretProof.php',
+        'League\\OAuth2\\Client\\Provider\\Exception\\FacebookProviderException' => __DIR__ . '/..' . '/league/oauth2-facebook/src/Provider/Exception/FacebookProviderException.php',
+        'League\\OAuth2\\Client\\Provider\\Exception\\IdentityProviderException' => __DIR__ . '/..' . '/league/oauth2-client/src/Provider/Exception/IdentityProviderException.php',
+        'League\\OAuth2\\Client\\Provider\\Facebook' => __DIR__ . '/..' . '/league/oauth2-facebook/src/Provider/Facebook.php',
+        'League\\OAuth2\\Client\\Provider\\FacebookUser' => __DIR__ . '/..' . '/league/oauth2-facebook/src/Provider/FacebookUser.php',
+        'League\\OAuth2\\Client\\Provider\\GenericProvider' => __DIR__ . '/..' . '/league/oauth2-client/src/Provider/GenericProvider.php',
+        'League\\OAuth2\\Client\\Provider\\GenericResourceOwner' => __DIR__ . '/..' . '/league/oauth2-client/src/Provider/GenericResourceOwner.php',
+        'League\\OAuth2\\Client\\Provider\\Google' => __DIR__ . '/..' . '/league/oauth2-google/src/Provider/Google.php',
+        'League\\OAuth2\\Client\\Provider\\GoogleUser' => __DIR__ . '/..' . '/league/oauth2-google/src/Provider/GoogleUser.php',
+        'League\\OAuth2\\Client\\Provider\\ResourceOwnerInterface' => __DIR__ . '/..' . '/league/oauth2-client/src/Provider/ResourceOwnerInterface.php',
+        'League\\OAuth2\\Client\\Token\\AccessToken' => __DIR__ . '/..' . '/league/oauth2-client/src/Token/AccessToken.php',
+        'League\\OAuth2\\Client\\Token\\AccessTokenInterface' => __DIR__ . '/..' . '/league/oauth2-client/src/Token/AccessTokenInterface.php',
+        'League\\OAuth2\\Client\\Token\\ResourceOwnerAccessTokenInterface' => __DIR__ . '/..' . '/league/oauth2-client/src/Token/ResourceOwnerAccessTokenInterface.php',
+        'League\\OAuth2\\Client\\Token\\SettableRefreshTokenInterface' => __DIR__ . '/..' . '/league/oauth2-client/src/Token/SettableRefreshTokenInterface.php',
+        'League\\OAuth2\\Client\\Tool\\ArrayAccessorTrait' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/ArrayAccessorTrait.php',
+        'League\\OAuth2\\Client\\Tool\\BearerAuthorizationTrait' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/BearerAuthorizationTrait.php',
+        'League\\OAuth2\\Client\\Tool\\GuardedPropertyTrait' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/GuardedPropertyTrait.php',
+        'League\\OAuth2\\Client\\Tool\\MacAuthorizationTrait' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/MacAuthorizationTrait.php',
+        'League\\OAuth2\\Client\\Tool\\ProviderRedirectTrait' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/ProviderRedirectTrait.php',
+        'League\\OAuth2\\Client\\Tool\\QueryBuilderTrait' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/QueryBuilderTrait.php',
+        'League\\OAuth2\\Client\\Tool\\RequestFactory' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/RequestFactory.php',
+        'League\\OAuth2\\Client\\Tool\\RequiredParameterTrait' => __DIR__ . '/..' . '/league/oauth2-client/src/Tool/RequiredParameterTrait.php',
         'Matrix\\Builder' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Builder.php',
         'Matrix\\Decomposition\\Decomposition' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Decomposition/Decomposition.php',
         'Matrix\\Decomposition\\LU' => __DIR__ . '/..' . '/markbaker/matrix/classes/src/Decomposition/LU.php',
@@ -1443,6 +1508,7 @@ class ComposerStaticInit0afeea5625e037e082f64b33f97eb1be
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit0afeea5625e037e082f64b33f97eb1be::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit0afeea5625e037e082f64b33f97eb1be::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit0afeea5625e037e082f64b33f97eb1be::$prefixesPsr0;
             $loader->classMap = ComposerStaticInit0afeea5625e037e082f64b33f97eb1be::$classMap;
 
         }, null, ClassLoader::class);
