@@ -79,12 +79,13 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
                     <div class="form-group">
     <label for="role">Role:</label>
     <select name="role_id" required>
-    <?php foreach ($roles as $role): ?>
-    <option value="<?= $role['id'] ?>" 
-        <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>>
-        <?= htmlspecialchars($role['role_name']) ?>
-    </option>
-    <?php endforeach; ?>
+    <?php 
+$roles = $pdo->query("SELECT * FROM roles")->fetchAll();
+foreach ($roles as $role): ?>
+<option value="<?= $role['id'] ?>" <?= $user['role_id'] == $role['id'] ? 'selected' : '' ?>>
+    <?= ucfirst($role['role_name']) ?>
+</option>
+<?php endforeach; ?>
 </select>
 </div>
                     <div class="form-group"></div>
