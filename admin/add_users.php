@@ -76,6 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 fgetcsv($handle);
 
                 $rowNumber = 1; // Track row numbers for error reporting
+                $errors = []; // Collect errors for invalid rows
+
                 while (($data = fgetcsv($handle)) !== false) {
                     $rowNumber++;
                     $username = trim($data[0] ?? '');
@@ -84,18 +86,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Validation
                     if (empty($username) || empty($email) || empty($role_id)) {
-                        throw new Exception("Invalid data in CSV file at row $rowNumber: Missing required fields.");
+                        $errors[] = "Row $rowNumber: Missing required fields.";
+                        continue; // Skip invalid row
                     }
 
                     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        throw new Exception("Invalid data in CSV file at row $rowNumber: Invalid email format.");
+                        $errors[] = "Row $rowNumber: Invalid email format.";
+                        continue; // Skip invalid row
                     }
 
                     // Check for existing username or email
                     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
                     $stmt->execute([$username, $email]);
                     if ($stmt->fetchColumn() > 0) {
-                        throw new Exception("Invalid data in CSV file at row $rowNumber: Username or email already exists.");
+                        $errors[] = "Row $rowNumber: Username or email already exists.";
+                        continue; // Skip duplicate entry
                     }
 
                     // Insert user into the database
@@ -118,7 +123,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $pdo->commit();
-                $_SESSION['success'] = "Bulk users imported successfully.";
+
+                if (!empty($errors)) {
+                    $_SESSION['error'] = "Some rows were skipped due to errors:\n" . implode("\n", $errors);
+                } else {
+                    $_SESSION['success'] = "Bulk users imported successfully.";
+                }
+
                 header("Location: users.php");
                 exit();
             } catch (Exception $e) {
