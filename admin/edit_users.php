@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="username">Username:</label>
                         <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>" required>
                     </div>
-<div class="form-group">
+                    <div class="form-group">
     <label for="role">Role:</label>
     <select id="role" name="role" required>
         <?php 
