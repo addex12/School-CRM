@@ -215,9 +215,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .success-message {
-            background: #dcfce7;
             color: #16a34a;
             padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
             
         }
 
