@@ -8,6 +8,9 @@ $pageTitle = "Add User";
 // Get roles with IDs
 $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
 
+// Generate CSRF token
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -16,15 +19,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Your session has expired or the request is invalid. Please try again.");
         }
 
-        // Single user creation (unchanged)
-        // ... [existing single user code] ...
-
-        // Bulk import - FIXED VERSION
         if (isset($_POST['bulk_import'])) {
             if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception("Failed to upload file");
             }
-
+        
             $file = $_FILES['csv_file']['tmp_name'];
             $handle = fopen($file, 'r');
             if (!$handle) {
@@ -43,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $rowNumber++;
                     $username = trim($data[0] ?? '');
                     $email = trim($data[1] ?? '');
-                    $roleName = trim($data[2] ?? ''); // Now using role name
+                    $roleName = trim($data[2] ?? ''); // Using role name from CSV
 
                     // Validate required fields
                     if (empty($username) || empty($email) || empty($roleName)) {
@@ -94,30 +93,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     @mail($to, $subject, $message, $headers);
                 }
 
-                $pdo->commit();
- if (!empty($errors)) {
-        $_SESSION['bulk_import_errors'] = $errors;
-        header("Location: add_users.php"); // Stay on same page for errors
-    } else {
-        $_SESSION['success'] = "Bulk import completed successfully!";
-        header("Location: users.php"); // Redirect to users page on success
+                if ($errors) {
+                    $_SESSION['bulk_import_errors'] = $errors;
+                    $pdo->rollBack();
+                } else {
+                    $pdo->commit();
+                    $_SESSION['message'] = "Users imported successfully";
+                }
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                $_SESSION['error'] = $e->getMessage();
+            }
+        }
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
     }
-    exit();
-} catch (Exception $e) {
-    $pdo->rollBack();
-    $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
-    header("Location: add_users.php"); // Show errors on add page
-    exit();
 }
 
-
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
-
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Rest of the HTML remains the same
 ?>
+
+            
+            ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
