@@ -170,9 +170,8 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
     </div>
 
     <!-- Edit Role Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
+    <div id="editModal" class="modal" style="display:none;">
+        <div class="card mb-4" style="max-width: 500px; margin: auto;">
             <h2>Edit Role</h2>
             <form method="POST">
                 <input type="hidden" name="role_id" id="editRoleId">
@@ -185,7 +184,7 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
                 
                 <div class="form-group">
                     <label>Description:</label>
-                    <textarea name="description" id="editDescription" rows="3"></textarea>
+                    <textarea name="description" id="editDescription" rows="2"></textarea>
                 </div>
                 
                 <div class="form-actions">
