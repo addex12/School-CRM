@@ -227,6 +227,15 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             text-align: center;
             background: #f8fafc;
         }
+
+        .admin-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1f2937; /* Consistent dark gray color */
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #e5e7eb; /* Add a subtle underline */
+            padding-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -235,7 +244,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         
         <div class="admin-main">
             <header class="admin-header">
-                <h1>Add New User</h1>
+                <h1><?= htmlspecialchars($pageTitle) ?></h1> <!-- Ensure consistent styling -->
             </header>
 
             <div class="admin-content">
