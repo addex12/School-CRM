@@ -70,12 +70,12 @@ Best regards,
 The School CRM Team  
 adugna.gizaw@flipperschools.com
 ";
-            $headers = "From: School CRM System <adugna.gizaw@flipperschools.com>\r\n";
-            $headers .= "Reply-To: adugna.gizaw@flipperschools.com\r\n";
-            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
+$headers = "From: School CRM <adugna.gizaw@flipperschools.com>\r\n";
+$headers .= "Reply-To: adugna.gizaw@flipperschools.com\r\n";
+$headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+$headers .= "MIME-Version: 1.0\r\n";
             // Debugging: Log email details if sending fails
-            if (!@mail($to, $subject, $message, $headers)) {
+            if (!mail($to, $subject, $message, $headers)) {
                 error_log("Failed to send email to $to. Subject: $subject. Headers: $headers");
                 throw new Exception("Failed to send account creation email to $email.");
             }
@@ -155,24 +155,24 @@ adugna.gizaw@flipperschools.com
                     $to = $email;
                     $subject = "Welcome to School CRM - Your Account Details";
                     $message = "
-Dear $username,
-
-We are excited to welcome you to the School CRM platform. Below are your account details:
-
-Username: $username
-Temporary Password: $temp_password
-
-Please log in to your account at the following link:
-[School CRM Login](https://crm.flipperschool.com/)
-
-For security reasons, we recommend changing your password immediately after logging in.
-
-If you have any questions or need assistance, feel free to contact our support team.
-
-Best regards,  
-The School CRM Team  
-adugna.gizaw@flipperschools.com
-";
+                    Dear $username,
+                    
+                    We are excited to welcome you to the School CRM platform. Below are your account details:
+                    
+                    Username: $username
+                    Temporary Password: $temp_password
+                    
+                    Please log in to your account at:
+                    https://crm.flipperschool.com/
+                    
+                    For security reasons, we recommend changing your password immediately after logging in.
+                    
+                    If you have any questions or need assistance, feel free to contact our support team.
+                    
+                    Best regards,  
+                    The School CRM Team  
+                    adugna.gizaw@flipperschools.com
+                    ";
                     $headers = "From: School CRM <contactus@flipperschools.com>\r\n";
                     $headers .= "Content-Type: text/plain; charset=UTF-8";
 
