@@ -7,6 +7,7 @@ if (!isset($_GET['id'])) {
     header("Location: users.php");
     exit();
 }
+$pageTitle = 'Edit User';
 
 $id = $_GET['id'];
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
