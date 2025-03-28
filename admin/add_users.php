@@ -16,10 +16,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Your session has expired or the request is invalid. Please try again.");
         }
 
-        // Single user creation (unchanged)
-        // ... [existing single user code] ...
+        // Single user creation
+        if (isset($_POST['create_user'])) {
+            $username = trim($_POST['username']);
+            $email = trim($_POST['email']);
+            $role_id = (int)$_POST['role_id'];
+            $temp_password = bin2hex(random_bytes(8));
 
-        // Bulk import - FIXED VERSION
+            // Validation
+            if (empty($username) || empty($email) || empty($role_id)) {
+                throw new Exception("All fields are required");
+            }
+
+            // Check for existing username or email
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+            $stmt->execute([$username, $email]);
+            if ($stmt->fetchColumn() > 0) {
+                throw new Exception("Username or email already exists");
+            }
+
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
+            $stmt->execute([
+                $username,
+                $email,
+                $role_id,
+                password_hash($temp_password, PASSWORD_DEFAULT)
+            ]);
+
+            // Send email (configure your mail server properly)
+            $to = $email;
+            $subject = "Your New Account";
+            $message = "Username: $username\nTemporary Password: $temp_password";
+            $headers = "From: no-reply@example.com";
+            
+            if (!mail($to, $subject, $message, $headers)) {
+                throw new Exception("Failed to send email");
+            }
+
+            $_SESSION['success'] = "User created successfully. Credentials emailed.";
+            header("Location: users.php");
+            exit();
+        }
+
+        // Bulk import
         if (isset($_POST['bulk_import'])) {
             if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception("Failed to upload file");
@@ -33,50 +72,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $pdo->beginTransaction();
             try {
-                // Skip header
+                // Skip the header row
                 fgetcsv($handle);
 
-                $rowNumber = 1; // Start counting from header row
-                $errors = [];
+                $rowNumber = 1; // Track row numbers for error reporting
+                $errors = []; // Collect errors for invalid rows
 
                 while (($data = fgetcsv($handle)) !== false) {
                     $rowNumber++;
                     $username = trim($data[0] ?? '');
                     $email = trim($data[1] ?? '');
-                    $roleName = trim($data[2] ?? ''); // Now using role name
+                    $role_id = isset($data[2]) ? (int)$data[2] : 0;
 
-                    // Validate required fields
-                    if (empty($username) || empty($email) || empty($roleName)) {
-                        $errors[] = "Row $rowNumber: Missing required fields (username, email, or role)";
-                        continue;
+                    // Validation
+                    if (empty($username) || empty($email) || empty($role_id)) {
+                        $errors[] = "Row $rowNumber: Missing required fields.";
+                        continue; // Skip invalid row
                     }
 
-                    // Validate email format
                     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $errors[] = "Row $rowNumber: Invalid email format";
-                        continue;
+                        $errors[] = "Row $rowNumber: Invalid email format.";
+                        continue; // Skip invalid row
                     }
 
-                    // Get role ID from role name
-                    $stmt = $pdo->prepare("SELECT id FROM roles WHERE role_name = ?");
-                    $stmt->execute([$roleName]);
-                    $role = $stmt->fetch();
-                    
-                    if (!$role) {
-                        $errors[] = "Row $rowNumber: Role '$roleName' does not exist";
-                        continue;
-                    }
-                    $role_id = (int)$role['id'];
-
-                    // Check for existing users
+                    // Check for existing username or email
                     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
                     $stmt->execute([$username, $email]);
                     if ($stmt->fetchColumn() > 0) {
-                        $errors[] = "Row $rowNumber: Username or email already exists";
-                        continue;
+                        $errors[] = "Row $rowNumber: Username or email already exists.";
+                        continue; // Skip duplicate entry
                     }
 
-                    // Create user
+                    // Insert user into the database
                     $temp_password = bin2hex(random_bytes(8));
                     $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
                     $stmt->execute([
@@ -86,43 +113,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         password_hash($temp_password, PASSWORD_DEFAULT)
                     ]);
 
-                    // Send email (optional)
+                    // Optionally, send email to each user
                     $to = $email;
                     $subject = "Your New Account";
                     $message = "Username: $username\nTemporary Password: $temp_password";
                     $headers = "From: no-reply@example.com";
-                    @mail($to, $subject, $message, $headers);
+
+                    mail($to, $subject, $message, $headers); // Ignore email failures
                 }
 
                 $pdo->commit();
 
                 if (!empty($errors)) {
-                    $_SESSION['bulk_import_errors'] = $errors;
+                    $_SESSION['bulk_import_errors'] = $errors; // Store errors in session
                 } else {
-                    $_SESSION['success'] = "Bulk import completed successfully!";
+                    $_SESSION['success'] = "Bulk users imported successfully.";
                 }
 
-                header("Location: add_users.php");
+                header("Location: add_users.php"); // Redirect back to the same page
                 exit();
             } catch (Exception $e) {
                 $pdo->rollBack();
-                $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
+                $_SESSION['error'] = $e->getMessage(); // Store error message in session
             } finally {
                 fclose($handle);
             }
         }
+
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
-        header("Location: add_users.php");
+        header("Location: add_users.php"); // Redirect to the same page to display the error
         exit();
     }
 }
 
 // Generate CSRF token
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-?>
-
-<?php $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 ?>
 <!DOCTYPE html>
 <html lang="en">
