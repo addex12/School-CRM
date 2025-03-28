@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/auth.php';
 requireAdmin();
+require_once '../includes/database.php'; // Ensure this file contains the getPDO function
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -169,9 +170,10 @@ function exportExcel($survey, $fields, $responses, $response_data): never {
     
     // Styling
     $sheet->getStyle('A4:' . $sheet->getHighestColumn() . '4')
-        ->getFont()->setBold(true)
-        ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-        ->getStartColor()->setARGB('FFD9D9D9');
+            ->getFont()->setBold(true);
+        $sheet->getStyle('A4:' . $sheet->getHighestColumn() . '4')
+            ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFD9D9D9');
     
     foreach (range('A', $sheet->getHighestDataColumn()) as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
