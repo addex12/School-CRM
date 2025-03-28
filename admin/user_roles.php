@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $roleId = $_POST['role_id'];
             
             // Check if role is in use
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role = (SELECT role_name FROM roles WHERE id = ?)");
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role_id = ?");
             $stmt->execute([$roleId]);
             if ($stmt->fetchColumn() > 0) {
                 throw new Exception("Cannot delete role assigned to users");
