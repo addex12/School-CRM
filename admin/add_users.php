@@ -127,6 +127,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
         .admin-content {
@@ -222,7 +223,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     </style>
 </head>
 <body>
-    <div class="dashboard">
+    <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">
