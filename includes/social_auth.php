@@ -67,7 +67,7 @@ function handleSocialLogin($providerName) {
             'scope' => $scope,
             'state' => bin2hex(random_bytes(16))
         ]);
-        $_SESSION['oauth2state'] = $provider->getState();
+        $_SESSION['oauth2state'] = $provider->getAuthorizationUrl(['scope' => $scope, 'state' => bin2hex(random_bytes(16))]);
         header('Location: ' . $authUrl);
         exit;
         
@@ -79,9 +79,7 @@ function handleSocialLogin($providerName) {
     } else {
         // Step 2: Get access token
         try {
-            $token = $provider->getAccessToken('authorization_code', [
-                'code' => $_GET['code']
-            ]);
+            $token = $provider->getAccessToken();
             
             // Step 3: Get user details
             switch ($providerName) {
