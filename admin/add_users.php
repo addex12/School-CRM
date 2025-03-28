@@ -222,7 +222,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">

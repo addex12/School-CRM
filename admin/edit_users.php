@@ -2,7 +2,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
-
+$pageTitle ='Edit Users';
 // CSRF Protection
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
