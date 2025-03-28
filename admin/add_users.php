@@ -304,7 +304,18 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            
+                            <?php if (isset($_SESSION['error'])): ?>
+    <div class="error-message">
+        <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['success'])): ?>
+    <div class="success-message">
+        <?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
+    </div>
+<?php endif; ?>
+
                             <button type="submit" name="create_user" class="btn btn-primary">
                                 Create User
                             </button>
