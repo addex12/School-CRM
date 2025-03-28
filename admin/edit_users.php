@@ -26,7 +26,7 @@ if ($user_id) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
-    $role = $_POST['role'];
+    $role = $_POST['role_id'];
 
     // Check for duplicate username or email
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
@@ -36,8 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($count > 0) {
         $_SESSION['error'] = "Username or email already exists.";
     } else {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $role, $user_id]);
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
+        $stmt->execute([$username, $email, $role_id, $id]);
         $_SESSION['success'] = "User updated successfully.";
         header("Location: users.php");
         exit();
