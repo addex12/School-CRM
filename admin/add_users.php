@@ -60,7 +60,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Bulk import
         if (isset($_POST['bulk_import'])) {
-            // ... [Bulk import code with similar fixes] ...
+            if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception("Failed to upload file");
+            }
+
+            $file = $_FILES['csv_file']['tmp_name'];
+            $handle = fopen($file, 'r');
+            if (!$handle) {
+                throw new Exception("Failed to open uploaded file");
+            }
+
+            $pdo->beginTransaction();
+            try {
+                // Skip the header row
+                fgetcsv($handle);
+
+                while (($data = fgetcsv($handle)) !== false) {
+                    $username = trim($data[0]);
+                    $email = trim($data[1]);
+                    $role_id = (int)$data[2];
+                    $temp_password = bin2hex(random_bytes(8));
+
+                    // Validation
+                    if (empty($username) || empty($email) || empty($role_id)) {
+                        throw new Exception("Invalid data in CSV file");
+                    }
+
+                    // Check for existing username or email
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+                    $stmt->execute([$username, $email]);
+                    if ($stmt->fetchColumn() > 0) {
+                        throw new Exception("Username or email already exists for $username");
+                    }
+
+                    // Insert user into the database
+                    $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([
+                        $username,
+                        $email,
+                        $role_id,
+                        password_hash($temp_password, PASSWORD_DEFAULT)
+                    ]);
+
+                    // Optionally, send email to each user
+                    $to = $email;
+                    $subject = "Your New Account";
+                    $message = "Username: $username\nTemporary Password: $temp_password";
+                    $headers = "From: no-reply@example.com";
+
+                    if (!mail($to, $subject, $message, $headers)) {
+                        throw new Exception("Failed to send email to $email");
+                    }
+                }
+
+                $pdo->commit();
+                $_SESSION['success'] = "Bulk users imported successfully.";
+                header("Location: users.php");
+                exit();
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                throw $e;
+            } finally {
+                fclose($handle);
+            }
         }
 
     } catch (Exception $e) {
