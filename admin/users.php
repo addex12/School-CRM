@@ -113,12 +113,7 @@ $users = $pdo->query("
                                         <td><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
                                         <td><?php echo $user['last_login'] ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never'; ?></td>
                                         <td>
-                                            <button onclick="openEditModal(
-                                                '<?php echo $user['id']; ?>',
-                                                '<?php echo htmlspecialchars($user['username'], ENT_QUOTES); ?>',
-                                                '<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>',
-                                                '<?php echo $user['role_id']; ?>'
-                                            )" class="btn btn-edit">Edit</button>
+                                            <a href="edit_user.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">Edit</a>
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="id" value="<?php echo $user['id']; ?>">
                                                 <button type="submit" name="reset_password" class="btn btn-reset" onclick="return confirm('Reset password to default?')">Reset Password</button>
@@ -142,51 +137,7 @@ $users = $pdo->query("
         </div>
     </div>
     
-    <!-- Edit User Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeEditModal()">&times;</span>
-            <h2>Edit User</h2>
-            <form method="POST">
-                <input type="hidden" name="id" id="editId">
-                <input type="hidden" name="update_user">
-                
-                <div class="form-group">
-                    <label for="editUsername">Username:</label>
-                    <input type="text" id="editUsername" name="username" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editEmail">Email:</label>
-                    <input type="email" id="editEmail" name="email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="editRole">Role:</label>
-                    <select id="editRole" name="role_id" required>
-                        <?php foreach ($roles as $role): ?>
-                            <option value="<?php echo $role['id']; ?>"><?php echo htmlspecialchars($role['role_name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Update User</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
-        function openEditModal(id, username, email, roleId) {
-            document.getElementById('editId').value = id;
-            document.getElementById('editUsername').value = username;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editRole').value = roleId;
-            document.getElementById('editModal').style.display = 'block';
-        }
-        
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
         }
