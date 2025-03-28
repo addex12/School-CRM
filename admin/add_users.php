@@ -125,12 +125,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->commit();
 
                 if (!empty($errors)) {
-                    $_SESSION['error'] = "Some rows were skipped due to errors:\n" . implode("\n", $errors);
+                    $_SESSION['bulk_import_errors'] = $errors; // Store errors in session
                 } else {
                     $_SESSION['success'] = "Bulk users imported successfully.";
                 }
 
-                header("Location: users.php");
+                header("Location: add_users.php"); // Redirect back to the same page
                 exit();
             } catch (Exception $e) {
                 $pdo->rollBack();
@@ -270,6 +270,18 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 <?php if (isset($_SESSION['error'])): ?>
                     <div class="error-message">
                         <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['bulk_import_errors'])): ?>
+                    <div class="error-message">
+                        <h3>Some rows were skipped due to errors:</h3>
+                        <ul>
+                            <?php foreach ($_SESSION['bulk_import_errors'] as $error): ?>
+                                <li><?= htmlspecialchars($error) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <?php unset($_SESSION['bulk_import_errors']); ?>
                     </div>
                 <?php endif; ?>
 
