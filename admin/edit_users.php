@@ -26,7 +26,7 @@ if ($user_id) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
-    $role = $_POST['role_name'];
+    $role = $_POST['role_id'];
 
     // Check for duplicate username or email
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
