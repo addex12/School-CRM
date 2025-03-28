@@ -95,28 +95,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $pdo->commit();
-
-                if (!empty($errors)) {
-                    $_SESSION['bulk_import_errors'] = $errors;
-                } else {
-                    $_SESSION['success'] = "Bulk import completed successfully!";
-                }
-
-                header("Location: add_users.php");
-                exit();
-            } catch (Exception $e) {
-                $pdo->rollBack();
-                $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
-            } finally {
-                fclose($handle);
-            }
-        }
-    } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
-        header("Location: add_users.php");
-        exit();
+ if (!empty($errors)) {
+        $_SESSION['bulk_import_errors'] = $errors;
+        header("Location: add_users.php"); // Stay on same page for errors
+    } else {
+        $_SESSION['success'] = "Bulk import completed successfully!";
+        header("Location: users.php"); // Redirect to users page on success
     }
+    exit();
+} catch (Exception $e) {
+    $pdo->rollBack();
+    $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
+    header("Location: add_users.php"); // Show errors on add page
+    exit();
 }
+
 
 // Generate CSRF token
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
