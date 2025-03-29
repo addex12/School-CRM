@@ -10,10 +10,10 @@ $userId = $_SESSION['user_id'];
 
 // Fetch messages for the inbox
 $stmt = $pdo->prepare("
-    SELECT m.id, m.subject, m.body, m.sender_id, m.receiver_id, m.sent_at 
+    SELECT m.id, m.subject, m.content, m.sender_id, m.receiver_id, m.created_at 
     FROM messages m
     WHERE m.receiver_id = ?
-    ORDER BY m.sent_at DESC
+    ORDER BY m.created_at DESC
 ");
 $stmt->execute([$userId]);
 $messages = $stmt->fetchAll();
