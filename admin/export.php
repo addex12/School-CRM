@@ -40,8 +40,8 @@ $stmt = $pdo->prepare("
     FROM survey_responses sr 
     LEFT JOIN users u ON sr.user_id = u.id 
     WHERE sr.survey_id = ?
-    ORDER BY sr.created_at DESC
-");
+    ORDER BY sr.submitted_at DESC
+"); // Ensure 'submitted_at' is the correct column name in the database
 $stmt->execute([$survey_id]);
 $responses = $stmt->fetchAll();
 
@@ -68,9 +68,12 @@ foreach ($responses as $response) {
     foreach ($fields as $field) {
         $row[] = $answers[$field['field_name']] ?? 'N/A';
     }
-    $row[] = date('M j, Y g:i A', strtotime($response['created_at']));
+    $row[] = date('M j, Y g:i A', strtotime($response['submitted_at']));
     fputcsv($output, $row);
 }
 
 fclose($output);
 exit();
+?>
+
+<a href="results.php?survey_id=<?= $survey_id ?>" class="btn btn-secondary">Back to Results</a>

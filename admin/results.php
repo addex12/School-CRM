@@ -64,6 +64,7 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
             <header class="admin-header">
                 <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
                 <a href="export.php?survey_id=<?= $survey_id ?>" class="btn btn-primary">Export Results</a>
+                <a href="surveys.php" class="btn btn-secondary">Back to Surveys</a>
             </header>
             <div class="content">
                 <?php if (count($responses) > 0): ?>
