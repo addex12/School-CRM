@@ -4,50 +4,65 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../includes/db.php';
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
-    exit();
-}
+require_once __DIR__ . '/../includes/auth.php';
+requireLogin();
 
 $userId = $_SESSION['user_id'];
 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    
-    $stmt = $pdo->prepare("UPDATE users SET name = ?, email = ? WHERE id = ?");
-    if ($stmt->execute([$name, $email, $userId])) {
+
+    // Update user details
+    $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
+    if ($stmt->execute([$username, $email, $userId])) {
         $_SESSION['success'] = "Profile updated successfully!";
         header("Location: profile.php");
         exit();
     } else {
-        $error = "Failed to update profile";
+        $_SESSION['error'] = "Failed to update profile.";
     }
 }
 
-$stmt = $pdo->prepare("SELECT name, email FROM users WHERE id = ?");
+// Fetch user details
+$stmt = $pdo->prepare("SELECT username, email FROM users WHERE id = ?");
 $stmt->execute([$userId]);
 $user = $stmt->fetch();
 
-include __DIR__ . '/includes/header.php';
+if (!$user) {
+    $_SESSION['error'] = "User not found.";
+    header("Location: ../login.php");
+    exit();
+}
+
+include __DIR__ . '/../includes/header.php';
 ?>
 
 <h1>Manage Your Profile</h1>
 
 <?php if (isset($_SESSION['success'])): ?>
-    <div class="alert alert-success"><?= $_SESSION['success'] ?></div>
+    <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
     <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
+<?php if (isset($_SESSION['error'])): ?>
+    <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+
 <form method="POST">
-    <label for="name">Name:</label>
-    <input type="text" name="name" value="<?= htmlspecialchars($user['name'] ?? '') ?>" required>
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
+    </div>
     
-    <label for="email">Email:</label>
-    <input type="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+    </div>
     
-    <button type="submit">Update Profile</button>
+    <button type="submit" class="btn btn-primary">Update Profile</button>
 </form>
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>
