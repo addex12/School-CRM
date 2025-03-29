@@ -48,21 +48,6 @@ function getSurveyQuestions($survey_id) {
 }
 
 // Apply system settings to the application
-function applySystemSettings() {
-    // Timezone
-    $timezone = getSystemSetting('timezone', 'UTC');
-    date_default_timezone_set($timezone);
-    
-    // Site name
-    define('SITE_NAME', getSystemSetting('site_name', 'School CRM System'));
-    
-    // Theme color
-    define('THEME_COLOR', getSystemSetting('theme_color', '#3498db'));
-    
-    // Base URL
-    define('BASE_URL', getSystemSetting('base_url', 'http://crm.flipperschool.com'));
-}
-
 function sanitizeInput($input) {
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 }
@@ -77,59 +62,7 @@ function formatDate($date, $format = 'M j, Y g:i A') {
     return date($format, strtotime($date));
 }
 
-function sendResetPasswordEmail($email, $resetToken) {
-    global $pdo;
 
-    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
-    try {
-        // Fetch SMTP settings from the database
-        $smtpHost = getSystemSetting('smtp_host', 'smtp.gmail.com');
-        $smtpPort = getSystemSetting('smtp_port', 587);
-        $smtpUsername = getSystemSetting('smtp_username', 'your-email@gmail.com');
-        $smtpPassword = getSystemSetting('smtp_password', 'your-email-password');
-        $smtpSecure = getSystemSetting('smtp_secure', 'tls');
-
-        // Server settings
-        $mail->isSMTP();
-        $mail->Host = $smtpHost;
-        $mail->SMTPAuth = true;
-        $mail->Username = $smtpUsername;
-        $mail->Password = $smtpPassword;
-        $mail->SMTPSecure = $smtpSecure;
-        $mail->Port = $smtpPort;
-
-        // Recipients
-        $mail->setFrom($smtpUsername, 'School CRM');
-        $mail->addAddress($email);
-
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = 'Reset Your Password';
-        $mail->Body = "Click the link below to reset your password:<br><br>
-                       <a href='" . BASE_URL . "/reset_password.php?token=$resetToken'>Reset Password</a>";
-
-        $mail->send();
-        return true;
-    } catch (Exception $e) {
-        error_log("Mailer Error: " . $mail->ErrorInfo);
-        error_log("SMTP Settings: Host=$smtpHost, Port=$smtpPort, Username=$smtpUsername, Secure=$smtpSecure");
-        return false;
-    }
-}
-
-/**
- * Get the role name based on the role ID.
- *
- * @param int $roleId The role ID.
- * @return string The role name.
- */
-function getUserRoleName(int $roleId): string {
-    global $pdo;
-    $stmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
-    $stmt->execute([$roleId]);
-    $role = $stmt->fetchColumn();
-    return $role ?: 'Unknown';
-}
 
 ?>
