@@ -16,6 +16,15 @@ if (!$user) {
     exit();
 }
 
+// Define $userId from the session
+$userId = $_SESSION['user_id'] ?? null;
+
+if (!$userId) {
+    $_SESSION['error'] = "User ID is missing.";
+    header("Location: ../login.php");
+    exit();
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle profile update
@@ -34,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['error'] = "Email already in use by another account";
             } else {
                 // Handle file upload
-                $avatar = $user['avatar'];
+                $avatar = $user['avatar'] ?? 'default.jpg'; // Ensure a default value for avatar
                 if (!empty($_FILES['avatar']['name'])) {
                     $uploadDir = __DIR__ . '/../uploads/avatars/';
                     if (!file_exists($uploadDir)) {
@@ -56,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['error'] = "File size must be less than 2MB";
                     } else {
                         $fileExt = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
-                        $fileName = 'avatar_' . $user['id'] . '_' . time() . '.' . $fileExt;
+                        $fileName = 'avatar_' . $userId . '_' . time() . '.' . $fileExt;
                         $targetFile = $uploadDir . $fileName;
                         
                         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetFile)) {
