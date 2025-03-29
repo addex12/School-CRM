@@ -41,10 +41,10 @@ function handleSocialLogin($providerName) {
         $_SESSION['oauth2state'] = $provider->getState();
         header('Location: ' . $authUrl);
         exit;
-    } elseif (!isset($_SESSION['oauth2state']) || empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+    } elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
         // Invalid state
-        unset($_SESSION['oauth2state']); // Clear the state to prevent reuse
-        throw new Exception("Invalid state. Please try logging in again.");
+        unset($_SESSION['oauth2state']);
+        throw new Exception("Invalid state");
     } else {
         // Step 2: Get access token and user details
         $userData = fetchUserData($provider, $providerName);
