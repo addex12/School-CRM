@@ -1,7 +1,7 @@
 <?php
 require_once 'db.php';
-require_once 'vendor/autoload.php'; // Ensure PHPMailer is loaded
-require_once 'setting.php'; // Use the existing getSystemSetting function
+require_once '../vendor/autoload.php'; // Ensure PHPMailer is loaded
+require_once '../admin/setting.php'; // Use the existing getSystemSetting function
 
 // Register new user
 function registerUser($username, $email, $password, $role = 'parent') {

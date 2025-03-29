@@ -1,0 +1,25 @@
+{
+    "general": {
+        "site_name": "School CRM System",
+        "site_email": "admin@school.edu",
+        "timezone": "UTC",
+        "items_per_page": "10"
+    },
+    "appearance": {
+        "site_logo": "",
+        "favicon": "",
+        "theme_color": "#3498db"
+    },
+    "email": {
+        "smtp_provider": "gmail",
+        "smtp_host": "smtp.gmail.com",
+        "smtp_port": "587",
+        "smtp_username": "your-email@gmail.com",
+        "smtp_password": "your-email-password",
+        "smtp_secure": "tls"
+    },
+    "notifications": {
+        "email_notifications": true,
+        "push_notifications": true
+    }
+}
