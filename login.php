@@ -15,7 +15,7 @@ $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-    
+}
     $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch();
