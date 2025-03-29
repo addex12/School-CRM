@@ -27,7 +27,7 @@ if (!$user) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle profile update
     if (isset($_POST['update_profile'])) {
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         
         // Validate email
