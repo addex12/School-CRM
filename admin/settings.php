@@ -164,8 +164,7 @@ foreach ($settingGroups as $group => $keys) {
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 </head>
 <body>
-    <?php include 'includes/admin_header.php'; ?>
-    
+   
     <div class="admin-container">
         <?php include 'includes/admin_sidebar.php'; ?>
         
