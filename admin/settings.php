@@ -153,13 +153,13 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
             cursor: pointer;
-            background-color:rgb(241, 241, 241);
+            background-color:rgb(65, 79, 143);
             transition: var(--transition);
         }
 
         .settings-tab.active {
             background-color: var(--primary-color);
-            color: blueviolet;
+            color: white;
         }
 
         .settings-tab-content {
