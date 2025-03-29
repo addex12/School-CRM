@@ -1,4 +1,5 @@
 <?php
+require_once 'includes/db.php'; 
 require_once 'includes/config.php';
 require_once 'includes/functions.php';
 
@@ -24,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             $success = "A password reset email has been sent to your email address.";
         } else {
             $error = "Failed to send the reset email. Please try again later.";
+            error_log("Failed to send reset email to $email. Check SMTP settings or email logs.");
         }
     } else {
         $error = "No account found with that email address.";

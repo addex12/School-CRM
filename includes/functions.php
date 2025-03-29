@@ -123,6 +123,7 @@ function sendResetPasswordEmail($email, $resetToken) {
         return true;
     } catch (Exception $e) {
         error_log("Mailer Error: " . $mail->ErrorInfo);
+        error_log("SMTP Settings: Host=$smtpHost, Port=$smtpPort, Username=$smtpUsername, Secure=$smtpSecure");
         return false;
     }
 }
