@@ -4,33 +4,37 @@ require_once 'includes/auth.php';
 require_once 'includes/social_auth.php';
 
 if (isLoggedIn()) {
-    // Fixed: Check role_id instead of role
-    header("Location: " . ($_SESSION['role_id'] === 1 ? 'admin/dashboard.php' : 'user/dashboard.php'));
+    $roleId = $_SESSION['role_id'] ?? null; // Ensure role_id exists
+    $redirect = ($roleId === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+    header("Location: " . $redirect);
     exit();
 }
 
 $error = '';
 
 // Handle regular form login
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['password'])) {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
-}
+
     $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
     $stmt->execute([$username]);
     $user = $stmt->fetch();
-    
-if ($user && password_verify($password, $user['password'])) {
-    $_SESSION['user_id'] = $user['id'];
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['role_id'] = (int)$user['role_id']; // Cast to integer
 
-    // Update last login
-    $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
-    
-    $redirect = ($_SESSION['role_id'] === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
-    header("Location: " . $redirect);
-    exit();
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role_id'] = (int)$user['role_id']; // Ensure role_id is set
+
+        // Update last login
+        $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
+
+        $redirect = ($_SESSION['role_id'] === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+        header("Location: " . $redirect);
+        exit();
+    } else {
+        $error = "Invalid username or password.";
+    }
 }
 
 // Handle social login callback
@@ -38,12 +42,12 @@ if (isset($_GET['provider'])) {
     $provider = $_GET['provider'];
     try {
         $socialUser = handleSocialLogin($provider);
-        
+
         // Check if user exists by email
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$socialUser['email']]);
         $user = $stmt->fetch();
-        
+
         if (!$user) {
             // Create new user with default role (4 for regular user)
             $password = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
@@ -56,24 +60,22 @@ if (isset($_GET['provider'])) {
             ]);
             $userId = $pdo->lastInsertId();
             $roleId = 4;
-        }  else {
+        } else {
             $userId = $user['id'];
-            $roleId = (int)$user['role_id']; // Cast to integer
+            $roleId = (int)$user['role_id'];
         }
-        
+
         // Log user in
         $_SESSION['user_id'] = $userId;
         $_SESSION['username'] = $socialUser['name'];
         $_SESSION['role_id'] = $roleId;
-        
-        // Fixed: Proper role check with role_id
-        $redirect = ($roleId == 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+
+        $redirect = ($roleId === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
         header("Location: " . $redirect);
         exit();
     } catch (Exception $e) {
         $error = "Social login failed: " . $e->getMessage();
     }
-
 }
 ?>
 
@@ -85,6 +87,7 @@ if (isset($_GET['provider'])) {
     <title>Login - School CRM</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="assets/js/login.js" defer></script>
     <style>
         .login-container {
             max-width: 400px;
