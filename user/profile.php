@@ -4,6 +4,19 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Debugging: Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Debugging: Check if required files exist
+if (!file_exists(__DIR__ . '/../includes/db.php')) {
+    die("Database configuration file is missing.");
+}
+if (!file_exists(__DIR__ . '/../includes/auth.php')) {
+    die("Authentication file is missing.");
+}
+
 // Include required files
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
@@ -31,6 +44,16 @@ if (!$userId) {
     $_SESSION['error'] = "User ID is missing.";
     header("Location: ../login.php");
     exit();
+}
+
+// Debugging: Check session variables
+if (!isset($_SESSION['user_id'])) {
+    die("User is not logged in.");
+}
+
+// Debugging: Check database connection
+if (!$pdo) {
+    die("Database connection failed.");
 }
 
 // Handle form submission
