@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 // Start session and error reporting at the very top
 session_start();
 error_reporting(E_ALL);
