@@ -182,6 +182,7 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Update Profile</button>
+                    <button type="submit" class="btn btn-secondary" name="save_details">Save Details</button>
                 </form>
             </div>
             
