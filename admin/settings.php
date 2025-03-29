@@ -3,6 +3,9 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php'; // Include config to initialize $pdo
 
+$error = '';
+$success = '';
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($_POST['settings'] as $key => $value) {
