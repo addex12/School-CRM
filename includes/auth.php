@@ -11,32 +11,37 @@ session_set_cookie_params([
 
 session_start();
 
-function isLoggedIn(): bool {
-    return isset($_SESSION['user_id']);
-}
-
-//-
-function requireLogin() {
-    if (!isset($_SESSION['user_id'])) {//-
-    if (!isLoggedIn()) {//+
-        header("Location: ../login.php");
-        exit();
+if (!function_exists('isLoggedIn')) {
+    function isLoggedIn(): bool {
+        return isset($_SESSION['user_id']);
     }
 }
 
-function getCurrentUser(): ?array {
-    return isLoggedIn() ? [
-        'id' => $_SESSION['user_id'],
-        'username' => $_SESSION['username'],
-        'role' => $_SESSION['role']
-    ] : null;
-}
-//+
-function requireAdmin() {
-    if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] !== 1) {
-        header("Location: /user/dashboard.php");
-        exit();
+if (!function_exists('requireLogin')) {
+    function requireLogin() {
+        if (!isLoggedIn()) {
+            header("Location: ../login.php");
+            exit();
+        }
     }
 }
+
+if (!function_exists('getCurrentUser')) {
+    function getCurrentUser(): ?array {
+        return isLoggedIn() ? [
+            'id' => $_SESSION['user_id'],
+            'username' => $_SESSION['username'],
+            'role' => $_SESSION['role']
+        ] : null;
+    }
+}
+
+if (!function_exists('requireAdmin')) {
+    function requireAdmin() {
+        if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] !== 1) {
+            header("Location: /user/dashboard.php");
+            exit();
+        }
+    }
 }
 ?>
