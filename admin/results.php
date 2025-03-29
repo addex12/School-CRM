@@ -61,11 +61,17 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
-                <a href="export.php?survey_id=<?= $survey_id ?>" class="btn btn-primary">Export Results</a>
-                <a href="surveys.php" class="btn btn-secondary">Back to Surveys</a>
-            </header>
+        <header class="admin-header">
+    <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
+    <div class="export-dropdown">
+        <button class="btn btn-primary" onclick="toggleExportMenu()">Export Results ▼</button>
+        <div class="export-menu" id="exportMenu">
+            <a href="export.php?survey_id=<?= $survey_id ?>" class="export-option">Export as CSV</a>
+            <a href="#" id="export-pdf" class="export-option">Export as PDF</a>
+        </div>
+    </div>
+    <a href="surveys.php" class="btn btn-secondary">Back to Surveys</a>
+</header>
             <div class="content">
                 <?php if (count($responses) > 0): ?>
                     <div id="chart-container"></div> <!-- Container for charts -->
@@ -100,7 +106,20 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
             </div>
         </div>
     </div>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    function toggleExportMenu() {
+        document.getElementById('exportMenu').style.display = 
+            document.getElementById('exportMenu').style.display === 'block' ? 'none' : 'block';
+    }
+</script>
 
+<!-- Keep the existing scripts that follow -->
+<script id="survey-results-data" type="application/json">
+    <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
+</script>
+<script src="../assets/js/results.js"></script>
     <!-- Embed survey data for JavaScript -->
     <script id="survey-results-data" type="application/json">
         <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>

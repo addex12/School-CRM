@@ -296,3 +296,72 @@ nav a.active {
     background-color: #f2f2f2;
     text-align: left;
 }
+/* Chart Cards */
+.chart-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 45%;
+    float: left;
+    margin-right: 5%;
+    min-height: 400px;
+}
+
+.chart-card-wide {
+    @extend .chart-card;
+    width: 100%;
+    margin-right: 0;
+    clear: both;
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: white;
+}
+
+.table th {
+    background: #4e79a7;
+    color: white;
+    padding: 15px;
+    text-align: left;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Export Dropdown */
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.export-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 10px 0;
+    min-width: 160px;
+}
+
+.export-menu a {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.export-menu a:hover {
+    background: #f8f9fa;
+}
