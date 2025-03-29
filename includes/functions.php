@@ -93,17 +93,24 @@ function sendResetPasswordEmail($email, $resetToken) {
     $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
     try {
+        // Fetch SMTP settings from the database
+        $smtpHost = getSystemSetting('smtp_host', 'smtp.gmail.com');
+        $smtpPort = getSystemSetting('smtp_port', 587);
+        $smtpUsername = getSystemSetting('smtp_username', 'your-email@gmail.com');
+        $smtpPassword = getSystemSetting('smtp_password', 'your-email-password');
+        $smtpSecure = getSystemSetting('smtp_secure', 'tls');
+
         // Server settings
         $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // Replace with your SMTP server
+        $mail->Host = $smtpHost;
         $mail->SMTPAuth = true;
-        $mail->Username = 'your-email@gmail.com'; // Replace with your email
-        $mail->Password = 'your-email-password'; // Replace with your email password
-        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
+        $mail->Username = $smtpUsername;
+        $mail->Password = $smtpPassword;
+        $mail->SMTPSecure = $smtpSecure;
+        $mail->Port = $smtpPort;
 
         // Recipients
-        $mail->setFrom('your-email@gmail.com', 'School CRM'); // Replace with your email
+        $mail->setFrom($smtpUsername, 'School CRM');
         $mail->addAddress($email);
 
         // Content

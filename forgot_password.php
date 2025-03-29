@@ -38,6 +38,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password - School CRM</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 0;
+        }
+        .forgot-password-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .forgot-password-container h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .error-message, .success-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .error-message {
+            background: #fadbd8;
+            color: #e74c3c;
+        }
+        .success-message {
+            background: #d4efdf;
+            color: #27ae60;
+        }
+        .forgot-password-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .forgot-password-footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .forgot-password-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <div class="forgot-password-container">
@@ -55,6 +132,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             </div>
             <button type="submit">Send Reset Email</button>
         </form>
+        <div class="forgot-password-footer">
+            <p><a href="login.php">Back to Login</a></p>
+        </div>
     </div>
 </body>
 </html>
