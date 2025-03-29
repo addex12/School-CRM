@@ -1,28 +1,60 @@
 <?php
-// Start output buffering at the very top
-ob_start();
-
-// Start session and error reporting
+// Start session and error reporting at the very top
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+// Debugging: Enable error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Debugging: Check if required files exist
+if (!file_exists(__DIR__ . '/../includes/db.php')) {
+    die("Database configuration file is missing.");
+}
+if (!file_exists(__DIR__ . '/../includes/auth.php')) {
+    die("Authentication file is missing.");
+}
 
 // Include required files
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
-// Get current user data
+// Ensure the email field is fetched correctly
+$user = getCurrentUser();
+if (!$user || empty($user['email'])) {
+    $_SESSION['error'] = "User email not found.";
+    header("Location: ../login.php");
+    exit();
+}
+
 $user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User not found.";
     header("Location: ../login.php");
-    ob_end_flush();
     exit();
 }
 
-$userId = $user['id'];
-$isAdmin = ($user['role_name'] === 'admin');
+// Define $userId from the session
+$userId = $_SESSION['user_id'] ?? null;
+
+if (!$userId) {
+    $_SESSION['error'] = "User ID is missing.";
+    header("Location: ../login.php");
+    exit();
+}
+
+// Debugging: Check session variables
+if (!isset($_SESSION['user_id'])) {
+    die("User is not logged in.");
+}
+
+// Debugging: Check database connection
+if (!$pdo) {
+    die("Database connection failed.");
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -42,14 +74,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['error'] = "Email already in use by another account";
             } else {
                 // Handle file upload
-                $avatar = $user['avatar'] ?? 'default.jpg';
+                $avatar = $user['avatar'] ?? 'default.jpg'; // Ensure a default value for avatar
                 if (!empty($_FILES['avatar']['name'])) {
                     $uploadDir = __DIR__ . '/../uploads/avatars/';
                     if (!file_exists($uploadDir)) {
                         if (!mkdir($uploadDir, 0755, true)) {
                             $_SESSION['error'] = "Failed to create upload directory";
                             header("Location: profile.php");
-                            ob_end_flush();
                             exit();
                         }
                     }
@@ -84,9 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
                 if ($stmt->execute([$username, $email, $avatar, $userId])) {
                     $_SESSION['success'] = "Profile updated successfully!";
-                    $_SESSION['username'] = $username;
                     header("Location: profile.php");
-                    ob_end_flush();
                     exit();
                 } else {
                     $_SESSION['error'] = "Failed to update profile.";
@@ -118,7 +147,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->execute([$hashedPassword, $userId])) {
                 $_SESSION['success'] = "Password changed successfully!";
                 header("Location: profile.php");
-                ob_end_flush();
                 exit();
             } else {
                 $_SESSION['error'] = "Failed to change password";
@@ -175,7 +203,7 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
                     <div class="form-group">
                         <label for="email">Email:</label>
                         <input type="email" id="email" name="email" 
-                               value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+                               value="<?= htmlspecialchars($user['email']) ?>" required>
                     </div>
                     
                     <div class="form-group">
@@ -185,6 +213,7 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Update Profile</button>
+                    <button type="submit" class="btn btn-secondary" name="save_details">Save Details</button>
                 </form>
             </div>
             
@@ -233,7 +262,6 @@ function confirmDeactivate() {
 </script>
 
 <style>
-/* Your existing CSS styles remain exactly the same */
 .profile-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -246,9 +274,122 @@ function confirmDeactivate() {
     gap: 30px;
 }
 
-/* ... rest of your CSS ... */
+.profile-sidebar {
+    flex: 1;
+    min-width: 300px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-content {
+    flex: 2;
+    min-width: 300px;
+}
+
+.profile-avatar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.avatar-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #eee;
+}
+
+.profile-info {
+    text-align: center;
+}
+
+.role-badge {
+    display: inline-block;
+    background: #4e79a7;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-card h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #4e79a7;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.alert {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.8em;
+}
 </style>
 
-<?php include __DIR__ . '/../includes/footer.php'; 
-ob_end_flush(); // End output buffering and flush all output
-?>
+<?php include __DIR__ . '/../includes/footer.php'; ?>

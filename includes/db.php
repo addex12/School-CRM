@@ -39,7 +39,12 @@ class Database {
 }
 
 // Initialize the connection globally
-$pdo = Database::getConnection();
+try {
+    $pdo = new PDO('mysql:host=localhost;dbname=school_crm', 'username', 'password');
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
 
 // Create necessary tables
 $pdo->exec("
