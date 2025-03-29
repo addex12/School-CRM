@@ -196,7 +196,7 @@ if (isset($_GET['provider'])) {
         </form>
         
         <div class="login-footer">
-            <p>Don't have an account? <a href="register.php">Register here</a></p>
+            <!--<p>Don't have an account? <a href="register.php">Register here</a></p>-->
             <p><a href="forgot_password.php">Forgot your password?</a></p>
         </div>
     </div>
