@@ -118,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
     });
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     // PDF Export Handler
     document.getElementById('export-pdf').addEventListener('click', async () => {
         const { jsPDF } = window.jspdf;

@@ -114,16 +114,18 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
             document.getElementById('exportMenu').style.display === 'block' ? 'none' : 'block';
     }
 </script>
-
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    function toggleExportMenu() {
+        document.getElementById('exportMenu').style.display = 
+            document.getElementById('exportMenu').style.display === 'block' ? 'none' : 'block';
+    }
+</script>
 <!-- Keep the existing scripts that follow -->
 <script id="survey-results-data" type="application/json">
     <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
 </script>
 <script src="../assets/js/results.js"></script>
-    <!-- Embed survey data for JavaScript -->
-    <script id="survey-results-data" type="application/json">
-        <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
-    </script>
-    <script src="../assets/js/results.js"></script>
 </body>
 </html>
