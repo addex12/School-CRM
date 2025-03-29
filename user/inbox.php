@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/functions.php';
 requireLogin();
 
 error_reporting(E_ALL);
@@ -50,7 +49,7 @@ include __DIR__ . 'includes/header.php';
                             <span class="user-status"></span>
                             <span class="username"><?= htmlspecialchars($user['username']) ?></span>
                             <?php if ($user['role_id']): ?>
-                                <span class="user-role">(<?= getUserRoleName($user['role_name']) ?>)</span>
+                                <span class="user-role">(<?= getUserRoleName($user['role_id']) ?>)</span>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
