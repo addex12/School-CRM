@@ -1,5 +1,6 @@
 <?php
 require_once 'db.php';
+require_once 'vendor/autoload.php'; // Ensure PHPMailer is loaded
 
 // Register new user
 function registerUser($username, $email, $password, $role = 'parent') {
@@ -63,10 +64,13 @@ function applySystemSettings() {
     date_default_timezone_set($timezone);
     
     // Site name
-    define('SITE_NAME', getSystemSetting('site_name', 'Survey System'));
+    define('SITE_NAME', getSystemSetting('site_name', 'School CRM System'));
     
     // Theme color
     define('THEME_COLOR', getSystemSetting('theme_color', '#3498db'));
+    
+    // Base URL
+    define('BASE_URL', getSystemSetting('base_url', 'http://cdrm.flipperschool.com'));
 }
 
 function sanitizeInput($input) {
@@ -81,6 +85,39 @@ function redirectWithMessage($url, $message, $type = 'success') {
 
 function formatDate($date, $format = 'M j, Y g:i A') {
     return date($format, strtotime($date));
+}
+
+function sendResetPasswordEmail($email, $resetToken) {
+    global $pdo;
+
+    $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = 'smtp.gmail.com'; // Replace with your SMTP server
+        $mail->SMTPAuth = true;
+        $mail->Username = 'your-email@gmail.com'; // Replace with your email
+        $mail->Password = 'your-email-password'; // Replace with your email password
+        $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
+
+        // Recipients
+        $mail->setFrom('your-email@gmail.com', 'School CRM'); // Replace with your email
+        $mail->addAddress($email);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = 'Reset Your Password';
+        $mail->Body = "Click the link below to reset your password:<br><br>
+                       <a href='" . BASE_URL . "/reset_password.php?token=$resetToken'>Reset Password</a>";
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log("Mailer Error: " . $mail->ErrorInfo);
+        return false;
+    }
 }
 
 ?>
