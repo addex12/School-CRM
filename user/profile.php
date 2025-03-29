@@ -1,8 +1,10 @@
 <?php
+// Start session and error reporting at the very top
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Include required files
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
@@ -43,27 +45,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!empty($_FILES['avatar']['name'])) {
                     $uploadDir = __DIR__ . '/../uploads/avatars/';
                     if (!file_exists($uploadDir)) {
-                        mkdir($uploadDir, 0755, true);
+                        if (!mkdir($uploadDir, 0755, true)) {
+                            $_SESSION['error'] = "Failed to create upload directory";
+                            header("Location: profile.php");
+                            exit();
+                        }
                     }
                     
-                    $fileExt = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
-                    $fileName = 'avatar_' . $userId . '_' . time() . '.' . $fileExt;
-                    $targetFile = $uploadDir . $fileName;
+                    // Validate file type and size
+                    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                    $fileType = $_FILES['avatar']['type'];
+                    $maxSize = 2 * 1024 * 1024; // 2MB
                     
-                    // Check if image file is actual image
-                    $check = getimagesize($_FILES['avatar']['tmp_name']);
-                    if ($check !== false) {
+                    if (!in_array($fileType, $allowedTypes)) {
+                        $_SESSION['error'] = "Only JPG, PNG, and GIF files are allowed.";
+                    } elseif ($_FILES['avatar']['size'] > $maxSize) {
+                        $_SESSION['error'] = "File size must be less than 2MB";
+                    } else {
+                        $fileExt = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+                        $fileName = 'avatar_' . $userId . '_' . time() . '.' . $fileExt;
+                        $targetFile = $uploadDir . $fileName;
+                        
                         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetFile)) {
                             // Delete old avatar if not default
                             if ($avatar != 'default.jpg' && file_exists($uploadDir . $avatar)) {
-                                unlink($uploadDir . $avatar);
+                                @unlink($uploadDir . $avatar);
                             }
                             $avatar = $fileName;
                         } else {
                             $_SESSION['error'] = "Sorry, there was an error uploading your file.";
                         }
-                    } else {
-                        $_SESSION['error'] = "File is not an image.";
                     }
                 }
                 
@@ -72,11 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($stmt->execute([$username, $email, $avatar, $userId])) {
                     $_SESSION['success'] = "Profile updated successfully!";
                     header("Location: profile.php");
+                    exit();
                 } else {
                     $_SESSION['error'] = "Failed to update profile.";
                 }
-                exit();
-
             }
         }
     }
@@ -112,9 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Include header
-require_once __DIR__ . '/includes/header.php';
-
+// Include header after all processing is done
+if (file_exists(__DIR__ . '/../includes/header.php')) {
+    include __DIR__ . '/../includes/header.php';
+}
 ?>
 
 <div class="profile-container">
@@ -135,12 +146,6 @@ require_once __DIR__ . '/includes/header.php';
             <div class="profile-avatar">
                 <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
                      alt="Profile Picture" class="avatar-img">
-                <div class="avatar-upload">
-                    <form method="POST" enctype="multipart/form-data">
-                        <input type="file" name="avatar" id="avatar" accept="image/*" style="display: none;">
-                        <label for="avatar" class="btn btn-secondary">Change Photo</label>
-                    </form>
-                </div>
             </div>
             
             <div class="profile-info">
@@ -166,6 +171,12 @@ require_once __DIR__ . '/includes/header.php';
                         <label for="email">Email:</label>
                         <input type="email" id="email" name="email" 
                                value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="avatar">Profile Picture:</label>
+                        <input type="file" id="avatar" name="avatar" accept="image/*">
+                        <small class="form-text">Max 2MB (JPG, PNG, GIF)</small>
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Update Profile</button>
@@ -254,10 +265,6 @@ function confirmDeactivate() {
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid #eee;
-}
-
-.avatar-upload {
-    margin-top: 15px;
 }
 
 .profile-info {
