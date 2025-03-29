@@ -129,8 +129,6 @@ if (isset($_GET['provider'])) {
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         .google-btn { background: #DB4437; }
-        .facebook-btn { background: #4267B2; }
-        .linkedin-btn { background: #0077B5; }
         .divider {
             display: flex;
             align-items: center;
@@ -169,12 +167,6 @@ if (isset($_GET['provider'])) {
         <div class="social-login">
             <a href="login.php?provider=google" class="social-btn google-btn">
                 <i class="fab fa-google"></i>
-            </a>
-            <a href="login.php?provider=facebook" class="social-btn facebook-btn">
-                <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="login.php?provider=linkedin" class="social-btn linkedin-btn">
-                <i class="fab fa-linkedin-in"></i>
             </a>
         </div>
         
