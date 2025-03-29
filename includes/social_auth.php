@@ -14,7 +14,7 @@ $socialConfig = [
     'google' => [
         'clientId'     => 'YOUR_GOOGLE_CLIENT_ID',
         'clientSecret' => 'YOUR_GOOGLE_CLIENT_SECRET',
-        'redirectUri'  => 'http://gmail.com/login.php?provider=google',
+        'redirectUri'  => 'https://crm.flipperschool.com/login.php?provider=google', // Update this to match the Google API Console
     ]
 ];
 
@@ -41,10 +41,10 @@ function handleSocialLogin($providerName) {
         $_SESSION['oauth2state'] = $provider->getState();
         header('Location: ' . $authUrl);
         exit;
-    } elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+    } elseif (!isset($_SESSION['oauth2state']) || empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
         // Invalid state
-        unset($_SESSION['oauth2state']);
-        throw new Exception("Invalid state");
+        unset($_SESSION['oauth2state']); // Clear the state to prevent reuse
+        throw new Exception("Invalid state. Please try logging in again.");
     } else {
         // Step 2: Get access token and user details
         $userData = fetchUserData($provider, $providerName);
