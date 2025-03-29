@@ -19,6 +19,15 @@ $stmt = $pdo->prepare("
 $stmt->execute([$userId]);
 $messages = $stmt->fetchAll();
 
+// Fetch online users
+$onlineUsersStmt = $pdo->query("
+    SELECT id, username 
+    FROM users 
+    WHERE last_activity >= NOW() - INTERVAL 15 MINUTE
+    ORDER BY username ASC
+");
+$onlineUsers = $onlineUsersStmt->fetchAll();
+
 include __DIR__ . '/../includes/header.php';
 ?>
 
@@ -32,6 +41,19 @@ include __DIR__ . '/../includes/header.php';
             <option value="unread">Unread</option>
             <option value="read">Read</option>
         </select>
+    </div>
+
+    <div class="online-users">
+        <h2>Online Users</h2>
+        <ul>
+            <?php if (count($onlineUsers) > 0): ?>
+                <?php foreach ($onlineUsers as $user): ?>
+                    <li><?= htmlspecialchars($user['username']) ?></li>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <li>No users online.</li>
+            <?php endif; ?>
+        </ul>
     </div>
 
     <div class="message-list">
@@ -144,6 +166,25 @@ document.addEventListener('DOMContentLoaded', () => {
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 4px;
+}
+
+.online-users {
+    margin-bottom: 20px;
+}
+
+.online-users h2 {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+.online-users ul {
+    list-style: none;
+    padding: 0;
+}
+
+.online-users li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
 }
 
 .message-list {
