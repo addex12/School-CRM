@@ -150,7 +150,7 @@ foreach ($defaultSettings as $key => $default) {
     <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
-    <?php include __DIR__ . '/../includes/admin_header.php'; ?>
+    <?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
     
     <div class="admin-container">
         <?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
