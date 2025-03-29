@@ -1,6 +1,7 @@
 <?php
 require_once 'db.php';
 require_once 'vendor/autoload.php'; // Ensure PHPMailer is loaded
+require_once 'setting.php'; // Use the existing getSystemSetting function
 
 // Register new user
 function registerUser($username, $email, $password, $role = 'parent') {
@@ -44,17 +45,6 @@ function getSurveyQuestions($survey_id) {
     $stmt = $pdo->prepare("SELECT * FROM questions WHERE survey_id = ?");
     $stmt->execute([$survey_id]);
     return $stmt->fetchAll();
-}
-
-// Get a system setting
-function getSystemSetting($key, $default = '') {
-    global $pdo;
-    
-    $stmt = $pdo->prepare("SELECT setting_value FROM system_settings WHERE setting_key = ?");
-    $stmt->execute([$key]);
-    $result = $stmt->fetchColumn();
-    
-    return $result !== false ? $result : $default;
 }
 
 // Apply system settings to the application
