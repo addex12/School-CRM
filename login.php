@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once 'includes/social_auth.php';
@@ -233,3 +234,6 @@ if (isset($_GET['provider'])) {
     <?php include 'user/includes/footer.php'; ?>
 </body>
 </html>
+<?php
+ob_end_flush(); // End output buffering
+?>
