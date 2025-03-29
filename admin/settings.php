@@ -2,7 +2,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php'; // Include config to initialize $pdo
-require_once '../includes/setting.json'; // Include the revamped setting functions
+require_once '../includes/settings.json'; // Include the revamped setting functions
 
 $error = '';
 $success = '';
