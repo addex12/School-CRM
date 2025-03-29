@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once 'includes/db.php'; // Database connection
 require_once 'vendor/autoload.php'; // Require Composer autoloader
 require_once 'config.php'; // Your existing config file
