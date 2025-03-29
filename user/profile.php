@@ -156,9 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Include header after all processing is done
-if (file_exists(__DIR__ . '/../includes/header.php')) {
-    include __DIR__ . '/../includes/header.php';
-}
+require_once '/includes/header.php';
 ?>
 
 <div class="profile-container">
@@ -392,4 +390,4 @@ function confirmDeactivate() {
 }
 </style>
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
