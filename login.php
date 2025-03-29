@@ -1,293 +1,228 @@
 <?php
-// Configuration
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
+require_once 'includes/social_auth.php';
 
-// Initialize session
-session_start();
-
-// Check if user is already logged in
 if (isLoggedIn()) {
-    header("Location: dashboard.php");
+    header("Location: " . ($_SESSION['role_id'] === 1 ? 'admin/dashboard.php' : 'user/dashboard.php'));
     exit();
 }
 
-// Login processing
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        $username = trim($_POST['username']);
-        $password = $_POST['password'];
-        
-        // Validate input
-        if (empty($username) || empty($password)) {
-            throw new Exception("Username and password are required");
+$error = '';
+
+// Handle regular form registration
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    
+    // Validate form data
+    if (empty($username) || empty($email) || empty($password)) {
+        $error = "All fields are required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Invalid email format.";
+    } else {
+        try {
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+            $stmt->execute([$username, $email]);
+            if ($stmt->fetchColumn() > 0) {
+                throw new Exception("Username or email already exists.");
+            }
+
+            $password_hash = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, created_at) VALUES (?, ?, ?, ?, NOW())");
+            $stmt->execute([$username, $email, $password_hash, 4]); // 4 is the default role for regular users
+
+            $_SESSION['success'] = "Registration successful! Please login.";
+            header("Location: login.php");
+            exit();
+        } catch (Exception $e) {
+            $error = $e->getMessage();
         }
-
-        // Query database
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-        $stmt->execute([$username]);
-        $user = $stmt->fetch();
-
-        if (!$user || !password_verify($password, $user['password'])) {
-            throw new Exception("Invalid username or password");
-        }
-
-        // Set session
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-
-        // Return success response
-        $response = [
-            'status' => 'success',
-            'message' => 'Login successful',
-            'data' => [
-                'user_id' => $user['id'],
-                'username' => $user['username'],
-                'role' => $user['role']
-            ]
-        ];
-
-        // Redirect to dashboard
-        header("Location: dashboard.php");
-        exit();
-
-    } catch (Exception $e) {
-        $response = [
-            'status' => 'error',
-            'message' => $e->getMessage()
-        ];
     }
+}
 
-    // Return JSON response
-    header('Content-Type: application/json');
-    echo json_encode($response);
-    exit();
+// Handle social registration
+if (isset($_GET['provider'])) {
+    try {
+        $socialUser = handleSocialLogin($_GET['provider']);
+        
+        // Check if user exists by email
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$socialUser['email']]);
+        $user = $stmt->fetch();
+        
+        if (!$user) {
+            // Create new user with default role (4 for regular user)
+            $password = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, created_at) VALUES (?, ?, ?, ?, NOW())");
+            $stmt->execute([
+                $socialUser['name'],
+                $socialUser['email'],
+                $password,
+                4 // Default role (regular user)
+            ]);
+            $userId = $pdo->lastInsertId();
+            $roleId = 4;
+        } else {
+            $userId = $user['id'];
+            $roleId = (int)$user['role_id']; // Cast to integer
+        }
+        
+        // Log user in
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['username'] = $socialUser['name'];
+        $_SESSION['role_id'] = $roleId;
+        
+        // Redirect based on role
+        $redirect = ($roleId == 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+        header("Location: " . $redirect);
+        exit();
+    } catch (Exception $e) {
+        $error = "Social registration failed: " . $e->getMessage();
+    }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Register - School CRM</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-
-        .login-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            width: 100%;
+        .register-container {
             max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
-
-        .login-header {
+        .register-title {
             text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-header h1 {
+            margin-bottom: 20px;
             color: #2c3e50;
-            margin-bottom: 0.5rem;
         }
-
-        .login-header p {
-            color: #666;
+        .register-logo {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 48px;
+            color: #3498db;
         }
-
-        .form-group {
-            margin-bottom: 1.5rem;
+        .social-login {
+            margin: 20px 0;
+            text-align: center;
         }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #2c3e50;
-            font-weight: 500;
+        .social-btn {
+            display: inline-block;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin: 0 5px;
+            color: white;
+            font-size: 20px;
+            line-height: 45px;
+            text-align: center;
+            transition: all 0.3s;
         }
-
-        input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            margin-top: 0.5rem;
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-
-        input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        }
-
-        .remember-forgot {
-            display: flex;
-            justify-content: space-between;
-            margin: 1.5rem 0;
-        }
-
-        .remember-me {
+        .google-btn { background: #DB4437; }
+        .facebook-btn { background: #4267B2; }
+        .linkedin-btn { background: #0077B5; }
+        .divider {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            margin: 20px 0;
         }
-
-        .forgot-password {
-            color: #3498db;
-            text-decoration: none;
-            font-size: 0.9rem;
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #ddd;
         }
-
-        .forgot-password:hover {
-            text-decoration: underline;
+        .divider-text {
+            padding: 0 10px;
+            color: #777;
         }
-
-        .login-button {
-            width: 100%;
-            padding: 0.8rem;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .login-button:hover {
-            background: #2980b9;
-        }
-
-        .social-login {
-            margin-top: 2rem;
+        .error-message {
+            color: #e74c3c;
+            background: #fadbd8;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
             text-align: center;
         }
-
-        .social-login p {
-            color: #666;
-            margin-bottom: 1rem;
-        }
-
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-        }
-
-        .social-icon {
-            font-size: 1.5rem;
-            color: #666;
-            transition: color 0.3s;
-        }
-
-        .social-icon:hover {
-            color: #3498db;
-        }
-
-        .register-link {
+        .success-message {
+            color: #16a34a;
+            background: #dcfce7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
             text-align: center;
-            margin-top: 1.5rem;
-        }
-
-        .register-link a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-header">
-            <h1>Welcome Back</h1>
-            <p>Please enter your credentials to login</p>
+    <div class="register-container">
+        <div class="register-logo">
+            <i class="fas fa-graduation-cap"></i>
         </div>
-
-        <form id="loginForm">
+        <h1 class="register-title">School CRM System Registration</h1>
+        
+        <?php if ($error): ?>
+            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="success-message"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
+        <?php endif; ?>
+        
+        <div class="social-login">
+            <a href="register.php?provider=google" class="social-btn google-btn">
+                <i class="fab fa-google"></i>
+            </a>
+            <a href="register.php?provider=facebook" class="social-btn facebook-btn">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="register.php?provider=linkedin" class="social-btn linkedin-btn">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+        </div>
+        
+        <div class="divider">
+            <span class="divider-text">OR</span>
+        </div>
+        
+        <form method="POST">
             <div class="form-group">
-                <label for="username">Username or Email</label>
+                <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
             </div>
-
+            
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-
-            <div class="remember-forgot">
-                <label class="remember-me">
-                    <input type="checkbox" name="remember">
-                    Remember me
-                </label>
-                <a href="forgot-password.php" class="forgot-password">Forgot Password?</a>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
             </div>
-
-            <button type="submit" class="login-button">Login</button>
         </form>
-
-        <div class="social-login">
-            <p>Or login with</p>
-            <div class="social-icons">
-                <a href="#" class="social-icon">
-                    <i class="fab fa-google"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-facebook"></i>
-                </a>
-                <a href="#" class="social-icon">
-                    <i class="fab fa-linkedin"></i>
-                </a>
-            </div>
-        </div>
-
-        <div class="register-link">
-            <p>Don't have an account? <a href="register.php">Register here</a></p>
+        
+        <div class="register-footer">
+            <p>Already have an account? <a href="login.php">Login here</a></p>
         </div>
     </div>
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            
-            // Add your JSON login logic here
-            fetch('login.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    window.location.href = 'dashboard.php';
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        });
-    </script>
+
+    <?php include 'user/includes/footer.php'; ?>
 </body>
 </html>
