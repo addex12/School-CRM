@@ -14,6 +14,7 @@ require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
 // Get available surveys
+$role = $_SESSION['role'] ?? 'guest'; // Provide a default value if 'role' is not set
 $stmt = $pdo->prepare("
     SELECT s.*, 
            (SELECT COUNT(*) FROM survey_responses r 
@@ -27,7 +28,7 @@ $stmt = $pdo->prepare("
 ");
 
 // Execute the survey query
-$stmt->execute([$_SESSION['user_id'], $_SESSION['role']]);
+$stmt->execute([$_SESSION['user_id'], $role]);
 $surveys = $stmt->fetchAll();
 
 // Get completed surveys count
