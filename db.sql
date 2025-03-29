@@ -839,6 +839,11 @@ ALTER TABLE `salary_structures`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL;
+
+ALTER TABLE users 
+ADD COLUMN reset_token VARCHAR(255) NULL AFTER last_activity,
+ADD COLUMN reset_token_expires DATETIME NULL AFTER reset_token;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

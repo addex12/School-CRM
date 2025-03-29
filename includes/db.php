@@ -51,7 +51,9 @@ $pdo->exec("
         role ENUM('admin', 'teacher', 'parent', 'student') NOT NULL DEFAULT 'parent',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_login TIMESTAMP NULL DEFAULT NULL,
-        last_activity TIMESTAMP NULL DEFAULT NULL
+        last_activity TIMESTAMP NULL DEFAULT NULL,
+        reset_token VARCHAR(255) NULL,
+        reset_token_expires DATETIME NULL
     )
 ");
 
