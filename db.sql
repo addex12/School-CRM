@@ -1,0 +1,614 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.2
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost:3306
+-- Generation Time: Mar 30, 2025 at 02:48 AM
+-- Server version: 10.6.21-MariaDB-cll-lve
+-- PHP Version: 8.3.19
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `flipperschool_parent_survey_system`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_log`
+--
+
+CREATE TABLE `activity_log` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `activity_type` enum('survey','ticket','chat','feedback','login','logout') NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `audit_logs`
+--
+
+CREATE TABLE `audit_logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `action` varchar(255) NOT NULL,
+  `details` text DEFAULT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chats`
+--
+
+CREATE TABLE `chats` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `status` enum('open','closed') NOT NULL DEFAULT 'open',
+  `last_activity` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat_messages`
+--
+
+CREATE TABLE `chat_messages` (
+  `id` int(11) NOT NULL,
+  `thread_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `attachment` varchar(255) DEFAULT NULL,
+  `is_admin` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `chat_threads`
+--
+
+CREATE TABLE `chat_threads` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `status` enum('open','closed') NOT NULL DEFAULT 'open',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_requests`
+--
+
+CREATE TABLE `contact_requests` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `contact_requests`
+--
+
+INSERT INTO `contact_requests` (`id`, `user_id`, `name`, `email`, `subject`, `message`, `created_at`) VALUES
+(1, 3, 'aaaa', 'gizawadugna@gmail.com', 'aaaaaaaaaa', 'aaaaaaaaaaa', '2025-03-25 23:55:24');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `contact_responses`
+--
+
+CREATE TABLE `contact_responses` (
+  `id` int(11) NOT NULL,
+  `contact_id` int(11) NOT NULL,
+  `admin_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `rating` tinyint(1) NOT NULL,
+  `status` enum('open','in_progress','resolved') DEFAULT 'open',
+  `admin_notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `feedback`
+--
+
+INSERT INTO `feedback` (`id`, `user_id`, `subject`, `message`, `rating`, `status`, `admin_notes`, `created_at`) VALUES
+(1, 3, 'Regarding Qay of Teaching(example)', 'You are Doing Great', 5, 'open', NULL, '2025-03-26 12:03:54'),
+(2, 3, 'Great', 'Fantastic', 3, 'open', NULL, '2025-03-26 15:06:19'),
+(3, 3, 'goodyes good', 'very good', 3, 'open', NULL, '2025-03-26 16:43:24'),
+(4, 5, 'about meeting', 'have you meet parents today', 1, 'open', NULL, '2025-03-26 18:20:41');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `messages`
+--
+
+CREATE TABLE `messages` (
+  `id` int(11) NOT NULL,
+  `sender_id` int(11) DEFAULT NULL,
+  `receiver_id` int(11) DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `content` text DEFAULT NULL,
+  `sent_at` datetime DEFAULT current_timestamp(),
+  `is_read` tinyint(1) DEFAULT 0,
+  `is_email` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `read_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `questions`
+--
+
+CREATE TABLE `questions` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `question_text` text NOT NULL,
+  `question_type` enum('multiple_choice','text','rating') NOT NULL,
+  `options` text DEFAULT NULL,
+  `is_required` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `responses`
+--
+
+CREATE TABLE `responses` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `question_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `response` text DEFAULT NULL,
+  `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `response_data`
+--
+
+CREATE TABLE `response_data` (
+  `id` int(11) NOT NULL,
+  `response_id` int(11) NOT NULL,
+  `field_id` int(11) NOT NULL,
+  `field_value` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `response_data`
+--
+
+INSERT INTO `response_data` (`id`, `response_id`, `field_id`, `field_value`) VALUES
+(1, 1, 9, 'Very Fine'),
+(2, 1, 10, 'I said'),
+(3, 1, 11, 'Yes'),
+(4, 1, 12, '2'),
+(5, 2, 8, ''),
+(6, 4, 9, 'Very Fine'),
+(7, 4, 10, 'I said'),
+(8, 4, 11, 'No'),
+(9, 4, 12, '5'),
+(10, 5, 13, NULL),
+(11, 5, 14, '7'),
+(12, 6, 8, ''),
+(13, 7, 13, NULL),
+(14, 7, 14, '6');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `id` int(11) NOT NULL,
+  `role_name` varchar(50) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `role_name`, `description`, `created_at`) VALUES
+(1, 'admin', 'System Administrator', '2025-03-28 16:53:20'),
+(2, 'principal', 'School Principal', '2025-03-28 16:01:21'),
+(3, 'teacher', 'Teaching Staff', '2025-03-28 16:52:46'),
+(4, 'parent', 'Student Parent', '2025-03-28 16:53:05'),
+(5, 'student', 'School Student', '2025-03-28 16:53:39'),
+(8, 'HOD', 'Head Of Departments role.', '2025-03-29 11:41:10'),
+(9, 'new', 'New comers!', '2025-03-29 12:24:29');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `support_tickets`
+--
+
+CREATE TABLE `support_tickets` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `ticket_number` varchar(20) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `priority` enum('low','medium','high') DEFAULT 'medium',
+  `status` enum('open','in_progress','on_hold','resolved') DEFAULT 'open',
+  `attachment` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `support_tickets`
+--
+
+INSERT INTO `support_tickets` (`id`, `user_id`, `ticket_number`, `subject`, `message`, `priority`, `status`, `attachment`, `created_at`) VALUES
+(1, 3, 'TKT-67E364962248E', 'Greetings', 'Hello there', 'medium', 'open', NULL, '2025-03-26 02:21:10'),
+(2, 3, 'TKT-67E3EC39228B1', 'I need Help', 'Urgent', 'high', 'open', NULL, '2025-03-26 11:59:53'),
+(3, 3, 'TKT-67E41BDEC5C68', 'Seeking support', 'Other Question', 'low', 'open', NULL, '2025-03-26 15:23:10'),
+(4, 3, 'TKT-67E41C406EB5A', 'next', 'next', 'medium', 'open', NULL, '2025-03-26 15:24:48'),
+(5, 3, 'TKT-67E420C0CB8D8', 'bbbbbbbbbbb', 'c', 'high', 'open', NULL, '2025-03-26 15:44:00'),
+(6, 3, 'TKT-67E4270525ECD', 'dfdfdfdfddf', 'fdfdfdfd', 'medium', 'open', NULL, '2025-03-26 16:10:45'),
+(7, 3, 'TKT-67E427B701943', 'dfdfdfdfddf', 'fdfdfdfd', 'medium', 'open', NULL, '2025-03-26 16:13:43');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `surveys`
+--
+
+CREATE TABLE `surveys` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `target_roles` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`target_roles`)),
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `starts_at` datetime NOT NULL,
+  `ends_at` datetime NOT NULL,
+  `is_anonymous` tinyint(1) DEFAULT 0,
+  `is_active` tinyint(1) DEFAULT 1,
+  `status` enum('draft','active','inactive','archived') NOT NULL DEFAULT 'draft'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `surveys`
+--
+
+INSERT INTO `surveys` (`id`, `title`, `description`, `category_id`, `target_roles`, `created_by`, `created_at`, `starts_at`, `ends_at`, `is_anonymous`, `is_active`, `status`) VALUES
+(1, 'survey 1', 'desc 1', 1, '[\"parent\"]', 4, '2025-03-26 13:41:45', '2025-03-26 11:11:00', '2025-03-28 11:11:00', 0, 1, 'draft'),
+(2, 'Sample Survey', 'Just to check', 1, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-26 19:33:11', '2025-03-26 11:11:00', '2025-03-28 11:11:00', 1, 1, 'inactive'),
+(3, 'Secon Survey For Teachers', 'For Teachers Only', 2, '[\"teacher\"]', 4, '2025-03-26 19:37:05', '2025-03-26 11:11:00', '2025-03-29 11:01:00', 0, 1, 'active'),
+(4, 'Survey for all Three', 'For all', 1, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-26 19:41:38', '2025-03-26 00:00:00', '2025-03-31 11:11:00', 0, 1, 'active'),
+(5, 'LEts Do Survey', 'Yes Lets Do it', 3, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-26 20:54:53', '2025-03-26 11:11:00', '2025-03-28 11:11:00', 0, 1, 'active'),
+(6, 'Formal Survey', 'This is a formal Survey', 1, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-27 17:49:02', '2025-03-27 20:47:00', '2025-04-03 20:47:00', 1, 1, 'active');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_categories`
+--
+
+CREATE TABLE `survey_categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_categories`
+--
+
+INSERT INTO `survey_categories` (`id`, `name`, `description`, `created_at`) VALUES
+(1, 'Behaviour Survey', 'This is to know how behave our employees are.(example)', '2025-03-26 13:36:15'),
+(2, 'Survey on Teachers', 'Description', '2025-03-26 13:38:51'),
+(3, 'Students Performance Survey', 'Descritpion', '2025-03-26 13:40:18'),
+(4, 'contact survey', '', '2025-03-28 16:47:46');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_conditions`
+--
+
+CREATE TABLE `survey_conditions` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `field_id` int(11) NOT NULL,
+  `operator` enum('=','!=','>','<','>=','<=','contains') NOT NULL,
+  `compare_value` varchar(255) NOT NULL,
+  `logic_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_fields`
+--
+
+CREATE TABLE `survey_fields` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `field_type` enum('text','textarea','radio','checkbox','select','number','date','rating','file') NOT NULL,
+  `field_label` varchar(255) NOT NULL,
+  `placeholder` varchar(255) DEFAULT NULL,
+  `field_name` varchar(100) NOT NULL,
+  `field_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`field_options`)),
+  `is_required` tinyint(1) DEFAULT 1,
+  `validation_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`validation_rules`)),
+  `display_order` int(11) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_fields`
+--
+
+INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `placeholder`, `field_name`, `field_options`, `is_required`, `validation_rules`, `display_order`) VALUES
+(5, 3, 'radio', 'Hello', '', 'field_1', '[\"Hi\",\"how are you\",\"hello there\"]', 1, NULL, 0),
+(6, 3, 'radio', 'All good?', '', 'field_2', '[\"Yes\",\"No\"]', 1, NULL, 1),
+(7, 3, 'text', 'If No you want you write why?', '', 'field_3', NULL, 0, NULL, 2),
+(8, 4, 'checkbox', 'Hello', 'Hello,Hello there, how you', 'field_1', '[\"\"]', 1, NULL, 0),
+(9, 2, 'checkbox', 'How Are you?', '', 'field_1', '[\"Fine\",\"Very Fine\",\"Who cares\"]', 1, NULL, 0),
+(10, 2, 'radio', 'What Do you mean?', '', 'field_2', '[\"I said\",\"Who\",\"Cares\"]', 1, NULL, 1),
+(11, 2, 'radio', 'Are you Kidding?', '', 'field_3', '[\"Yes\",\"No\"]', 1, NULL, 2),
+(12, 2, 'rating', 'Okay Final Words?', '', 'field_4', NULL, 1, NULL, 3),
+(13, 5, '', '1+1', '', 'field_1', '[\"2\",\"3\",\"4\",\"5\",\"6\"]', 0, NULL, 0),
+(14, 5, 'checkbox', '5+5', '', 'field_2', '[\"5\",\"6\",\"7\",\"\"]', 0, NULL, 1),
+(15, 6, 'checkbox', 'Surv 1', '', 'field_1', '[\"1\",\"2\",\"3\",\"4\",\"5\"]', 0, NULL, 0),
+(16, 6, 'checkbox', 'Surv2', '', 'field_2', '[\"H1\",\"H2\",\"H3\"]', 0, NULL, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_logic`
+--
+
+CREATE TABLE `survey_logic` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `source_field_id` int(11) NOT NULL,
+  `trigger_value` varchar(255) NOT NULL,
+  `target_field_id` int(11) NOT NULL,
+  `action` enum('show','hide','enable','disable') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_responses`
+--
+
+CREATE TABLE `survey_responses` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_responses`
+--
+
+INSERT INTO `survey_responses` (`id`, `survey_id`, `user_id`, `submitted_at`) VALUES
+(1, 2, 5, '2025-03-26 20:45:25'),
+(2, 4, 5, '2025-03-26 20:47:46'),
+(3, 1, 3, '2025-03-26 20:50:54'),
+(4, 2, 3, '2025-03-26 20:52:24'),
+(5, 5, 3, '2025-03-26 20:58:49'),
+(6, 4, 3, '2025-03-26 20:59:38'),
+(7, 5, 5, '2025-03-26 21:18:55');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `system_settings`
+--
+
+CREATE TABLE `system_settings` (
+  `id` int(11) NOT NULL,
+  `setting_key` varchar(100) NOT NULL,
+  `setting_value` text DEFAULT NULL,
+  `setting_group` varchar(50) DEFAULT 'general',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `system_settings`
+--
+
+INSERT INTO `system_settings` (`id`, `setting_key`, `setting_value`, `setting_group`, `created_at`, `updated_at`) VALUES
+(1, 'site_name', 'School Survey System', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(2, 'site_email', 'adugna.gizaw@flipperschools.com', 'general', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(3, 'timezone', 'Africa/Addis_Ababa', 'general', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(4, 'items_per_page', '10', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(5, 'admin_menu', '[{\"title\":\"Dashboard\",\"url\":\"dashboard.php\",\"icon\":\"fa-home\"}]', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(6, 'site_logo', '', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(7, 'favicon', '', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(8, 'theme_color', '#3498db', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(9, 'smtp_provider', 'gmail', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(10, 'smtp_host', 'smtp.gmail.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(11, 'smtp_port', '587', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(12, 'smtp_username', 'adugna.gizaw@flipperschools.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(13, 'smtp_password', 'SutumaJigi25582067s-', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(14, 'smtp_secure', 'tls', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ticket_replies`
+--
+
+CREATE TABLE `ticket_replies` (
+  `id` int(11) NOT NULL,
+  `ticket_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `created_at` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `ticket_replies`
+--
+
+INSERT INTO `ticket_replies` (`id`, `ticket_id`, `user_id`, `message`, `created_at`) VALUES
+(1, 5, 4, 'D', '0000-00-00 00:00:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ticket_responses`
+--
+
+CREATE TABLE `ticket_responses` (
+  `id` int(11) NOT NULL,
+  `ticket_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `message` text NOT NULL,
+  `is_admin` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `role_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `last_login` timestamp NULL DEFAULT NULL,
+  `last_activity` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `avatar` varchar(255) DEFAULT 'default.jpg',
+  `notification_prefs` longtext DEFAULT '{"email": true, "push": true}',
+  `social_provider` varchar(20) DEFAULT NULL,
+  `social_id` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `created_at`, `last_login`, `last_activity`, `avatar`, `notification_prefs`, `social_provider`, `social_id`) VALUES
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, '2025-03-25 14:50:31', '2025-03-29 12:23:28', '2025-03-29 23:23:28', 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamyohannes@gmail.com', 1, '2025-03-25 22:47:11', '2025-03-28 21:13:37', '2025-03-29 22:43:32', 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(65, 'Adugna1', '$2y$10$.fL331Ih5gEvMFr85kP4YupK/BTFD01Ii5HsnP0n9wOnnEAeZlCyq', 'gizawadugna@gmail.com', 4, '2025-03-29 12:03:37', '2025-03-29 12:20:21', '2025-03-29 23:20:21', 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL);
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `role_name` (`role_name`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `fk_user_role` (`role_id`),
+  ADD KEY `idx_role_id` (`role_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `users`
+--
+ALTER TABLE `users`
+  ADD CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
