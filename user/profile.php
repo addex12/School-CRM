@@ -56,13 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $_SESSION['error'] = "File size must be less than 2MB";
                     } else {
                         $fileExt = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
-                        $fileName = 'avatar_' . $userId . '_' . time() . '.' . $fileExt;
+                        $fileName = 'avatar_' . $user['id'] . '_' . time() . '.' . $fileExt;
                         $targetFile = $uploadDir . $fileName;
                         
                         if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetFile)) {
                             // Delete old avatar if not default
-                            if ($avatar != 'default.jpg' && file_exists($uploadDir . $avatar)) {
-                                @unlink($uploadDir . $avatar);
+                            if (!empty($user['avatar']) && $user['avatar'] !== 'default.jpg' && file_exists($uploadDir . $user['avatar'])) {
+                                @unlink($uploadDir . $user['avatar']);
                             }
                             $avatar = $fileName;
                         } else {
@@ -142,9 +142,9 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
             </div>
             
             <div class="profile-info">
-                <h3><?= htmlspecialchars($user['username']) ?></h3>
-                <p><?= htmlspecialchars($user['email']) ?></p>
-                <p class="role-badge"><?= htmlspecialchars($user['role_name']) ?></p>
+                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
+                <p><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></p>
+                <p class="role-badge"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></p>
             </div>
         </div>
         
