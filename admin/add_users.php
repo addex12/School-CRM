@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Send email (optional)
                     $to = $email;
                     $subject = "Your New Account";
-                    $message = "Welcome To School CRM! Your Account has been created successfully! \n Following are your new credentioals\nUsername: $username\nTemporary Password: $temp_password";
+                    $message = "Dear School CRM Family! As per your request, following are your temporary credentials.\nUsername: $username\nTemporary Password: $temp_password";
                     $headers = "From: adugna.gizaw@flipperschools.com";
                     @mail($to, $subject, $message, $headers);
                 }
@@ -143,8 +143,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Send email (optional)
             $to = $email;
             $subject = "Your New Account";
-            $message = "Dear School CRM Family! As per your request, following are your temporary credentials.\nUsername: $username\nTemporary Password: $temp_password";
-            $headers = "From: no-reply@example.com";
+            $message = "Welcome To School CRM! Your Account has been created successfully! \n Following are your new credentioals\nUsername: $username\nTemporary Password: $temp_password";
+            $headers = "From: adugna.gizaw@flipperschools.com";
             @mail($to, $subject, $message, $headers);
 
             // Display success message
