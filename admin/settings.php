@@ -153,7 +153,7 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
             border: 1px solid #ddd;
             border-radius: var(--border-radius);
             cursor: pointer;
-            background-color: #f1f1f1;
+            background-color:rgb(21, 72, 180);
             transition: var(--transition);
         }
 
