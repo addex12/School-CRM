@@ -2,6 +2,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php'; // Include config to initialize $pdo
+require_once '../includes/setting.json'; // Include the revamped setting functions
 
 $error = '';
 $success = '';
@@ -38,6 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch all settings
 $settings = getAllSystemSettings();
+
+// Fetch all tables from the database
+$tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
 
 // List of common SMTP providers
 $smtp_providers = [
@@ -124,6 +128,14 @@ $smtp_providers = [
                     <select id="smtp_secure" name="settings[smtp_secure]">
                         <option value="tls" <?php echo getSystemSetting('smtp_secure') === 'tls' ? 'selected' : ''; ?>>TLS</option>
                         <option value="ssl" <?php echo getSystemSetting('smtp_secure') === 'ssl' ? 'selected' : ''; ?>>SSL</option>
+                    </select>
+
+                    <h2>Database Tables</h2>
+                    <label for="database_tables">Available Tables:</label>
+                    <select id="database_tables" name="settings[database_tables][]" multiple>
+                        <?php foreach ($tables as $table): ?>
+                            <option value="<?php echo $table; ?>"><?php echo $table; ?></option>
+                        <?php endforeach; ?>
                     </select>
 
                     <button type="submit">Save Settings</button>
