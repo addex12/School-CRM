@@ -9,6 +9,14 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
+// Ensure the email field is fetched correctly
+$user = getCurrentUser();
+if (!$user || empty($user['email'])) {
+    $_SESSION['error'] = "User email not found.";
+    header("Location: ../login.php");
+    exit();
+}
+
 $user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User not found.";
@@ -172,7 +180,7 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
                     <div class="form-group">
                         <label for="email">Email:</label>
                         <input type="email" id="email" name="email" 
-                               value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+                               value="<?= htmlspecialchars($user['email']) ?>" required>
                     </div>
                     
                     <div class="form-group">
