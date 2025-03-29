@@ -35,8 +35,8 @@ $stmt = $pdo->prepare("
     FROM survey_responses sr 
     LEFT JOIN users u ON sr.user_id = u.id 
     WHERE sr.survey_id = ?
-    ORDER BY sr.created_at DESC
-");
+    ORDER BY sr.submitted_at DESC
+"); // Ensure 'submitted_at' is the correct column name in the database
 $stmt->execute([$survey_id]);
 $responses = $stmt->fetchAll();
 
@@ -86,7 +86,7 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                                     ?>
                                         <td><?= htmlspecialchars($answers[$field['field_name']] ?? 'N/A') ?></td>
                                     <?php endforeach; ?>
-                                    <td><?= date('M j, Y g:i A', strtotime($response['created_at'])) ?></td>
+                                    <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
