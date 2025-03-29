@@ -1,7 +1,6 @@
 <?php
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
-require_once 'includes/social_auth.php';
 
 if (isLoggedIn()) {
     $roleId = $_SESSION['role_id'] ?? null; // Ensure role_id exists
@@ -36,32 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
         $error = "Invalid username or password.";
     }
 }
-
-// Handle social login callback
-if (isset($_GET['provider'])) {
-    $provider = $_GET['provider'];
-    try {
-        $socialUser = handleSocialLogin($provider);
-
-        // Check if user exists by email
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-        $stmt->execute([$socialUser['email']]);
-        $user = $stmt->fetch();
-
-        if ($user) {
-            // Log user in
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $socialUser['name'];
-            $_SESSION['role_id'] = (int)$user['role_id'];
-
-            $redirect = ($_SESSION['role_id'] === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
-            header("Location: " . $redirect);
-            exit();
-        }
-    } catch (Exception $e) {
-        $error = $e->getMessage(); // Display error message if email is not registered
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -93,27 +66,6 @@ if (isset($_GET['provider'])) {
             font-size: 48px;
             color: #3498db;
         }
-        .social-login {
-            margin: 20px 0;
-            text-align: center;
-        }
-        .social-btn {
-            display: inline-block;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            margin: 0 5px;
-            color: white;
-            font-size: 20px;
-            line-height: 45px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        .social-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .google-btn { background: #DB4437; }
         .divider {
             display: flex;
             align-items: center;
@@ -148,16 +100,6 @@ if (isset($_GET['provider'])) {
         <?php if ($error): ?>
             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
-        
-        <div class="social-login">
-            <a href="login.php?provider=google" class="social-btn google-btn">
-                <i class="fab fa-google"></i>
-            </a>
-        </div>
-        
-        <div class="divider">
-            <span class="divider-text">OR</span>
-        </div>
         
         <form method="POST">
             <div class="form-group">
