@@ -50,7 +50,7 @@ include __DIR__ . 'includes/header.php';
                             <span class="user-status"></span>
                             <span class="username"><?= htmlspecialchars($user['username']) ?></span>
                             <?php if ($user['role_id']): ?>
-                                <span class="user-role">(<?= getUserRoleName($user['role_id']) ?>)</span>
+                                <span class="user-role">(<?= getUserRoleName($user['role_name']) ?>)</span>
                             <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
