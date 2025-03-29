@@ -35,7 +35,7 @@ try {
     error_log("Error fetching online users: " . $e->getMessage());
 }
 
-include __DIR__ . '/../includes/header.php';
+include __DIR__ . 'includes/header.php';
 ?>
 
 <div class="inbox-container">
