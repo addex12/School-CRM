@@ -56,10 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    if (empty($errors)) {
+if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
-        
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");//-
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, user_role) VALUES (?, ?, ?, ?)");//+
+
         if ($stmt->execute([$username, $email, $hashed_password, $role])) {
             $_SESSION['success'] = "Registration successful! Please login.";
             header("Location: login.php");
@@ -67,8 +68,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $errors['general'] = "Registration failed. Please try again.";
         }
-    }
-}
+    }//-
+    }//+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -171,33 +174,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
             </div>
             
-            <div class="form-group">
-                <label>Account Type:</label>
-                <div class="role-selector">
-                    <div class="role-option">
-                        <input type="radio" id="role_parent" name="role" value="parent" checked>
-                        <label for="role_parent">
-                            <div class="role-icon"><i class="fas fa-user-friends"></i></div>
-                            Parent
-                        </label>
-                    </div>
-                    <div class="role-option">
-                        <input type="radio" id="role_teacher" name="role" value="teacher">
-                        <label for="role_teacher">
-                            <div class="role-icon"><i class="fas fa-chalkboard-teacher"></i></div>
-                            Teacher
-                        </label>
-                    </div>
-                    <div class="role-option">
-                        <input type="radio" id="role_student" name="role" value="student">
-                        <label for="role_student">
-                            <div class="role-icon"><i class="fas fa-user-graduate"></i></div>
-                            Student
-                        </label>
-                    </div>
+            <div class="role-selector">
+                <div class="role-option">
+                    <input type="radio" id="user" name="role" value="user" required>
+                    <label for="user">
+                        <i class="fas fa-user role-icon"></i>
+                        new
+                    </label>
                 </div>
-            </div>
-            
+                </div>
+                           
             <button type="submit" class="btn btn-primary btn-block">Register</button>
         </form>
         
