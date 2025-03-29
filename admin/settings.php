@@ -2,7 +2,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php'; // Include config to initialize $pdo
-
+$pageTitle = 'Settings';
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($_POST['settings'] as $key => $value) {
