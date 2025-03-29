@@ -4,7 +4,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../vendor/autoload.php'; // Include Composer autoloader
 require_once 'db.php';
-require_once '../admin/setting.php'; // Include the file that defines getSystemSetting
+require_once __DIR__ . '/../admin/settings.php'; // Include Composer autoloader
+
 
 // Database connection
 $database = new Database();
