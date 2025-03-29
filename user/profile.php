@@ -36,7 +36,7 @@ if (!$user) {
     exit();
 }
 
-include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/admmin_sidebar.php';
 ?>
 
 <h1>Manage Your Profile</h1>
