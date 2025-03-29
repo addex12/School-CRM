@@ -8,25 +8,10 @@ require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
 $userId = $_SESSION['user_id'];
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-
-    // Update user details
-    $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
-    if ($stmt->execute([$username, $email, $userId])) {
-        $_SESSION['success'] = "Profile updated successfully!";
-        header("Location: profile.php");
-        exit();
-    } else {
-        $_SESSION['error'] = "Failed to update profile.";
-    }
-}
+$isAdmin = ($_SESSION['role_id'] == 1); // Assuming role_id 1 is admin
 
 // Fetch user details
-$stmt = $pdo->prepare("SELECT username, email FROM users WHERE id = ?");
+$stmt = $pdo->prepare("SELECT username, email, avatar, role_id FROM users WHERE id = ?");
 $stmt->execute([$userId]);
 $user = $stmt->fetch();
 
@@ -36,35 +21,334 @@ if (!$user) {
     exit();
 }
 
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Handle profile update
+    if (isset($_POST['update_profile'])) {
+        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
+        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        
+        // Validate email
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $_SESSION['error'] = "Invalid email format";
+        } else {
+            // Check if email already exists (excluding current user)
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+            $stmt->execute([$email, $userId]);
+            if ($stmt->fetch()) {
+                $_SESSION['error'] = "Email already in use by another account";
+            } else {
+                // Handle file upload
+                $avatar = $user['avatar'];
+                if (!empty($_FILES['avatar']['name'])) {
+                    $uploadDir = __DIR__ . '/../uploads/avatars/';
+                    if (!file_exists($uploadDir)) {
+                        mkdir($uploadDir, 0755, true);
+                    }
+                    
+                    $fileExt = pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION);
+                    $fileName = 'avatar_' . $userId . '_' . time() . '.' . $fileExt;
+                    $targetFile = $uploadDir . $fileName;
+                    
+                    // Check if image file is actual image
+                    $check = getimagesize($_FILES['avatar']['tmp_name']);
+                    if ($check !== false) {
+                        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetFile)) {
+                            // Delete old avatar if not default
+                            if ($avatar != 'default.jpg' && file_exists($uploadDir . $avatar)) {
+                                unlink($uploadDir . $avatar);
+                            }
+                            $avatar = $fileName;
+                        } else {
+                            $_SESSION['error'] = "Sorry, there was an error uploading your file.";
+                        }
+                    } else {
+                        $_SESSION['error'] = "File is not an image.";
+                    }
+                }
+                
+                // Update user details
+                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
+                if ($stmt->execute([$username, $email, $avatar, $userId])) {
+                    $_SESSION['success'] = "Profile updated successfully!";
+                    header("Location: profile.php");
+                    exit();
+                } else {
+                    $_SESSION['error'] = "Failed to update profile.";
+                }
+            }
+        }
+    }
+    
+    // Handle password change
+    if (isset($_POST['change_password'])) {
+        $currentPassword = $_POST['current_password'];
+        $newPassword = $_POST['new_password'];
+        $confirmPassword = $_POST['confirm_password'];
+        
+        // Verify current password
+        $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $dbPassword = $stmt->fetchColumn();
+        
+        if (!password_verify($currentPassword, $dbPassword)) {
+            $_SESSION['error'] = "Current password is incorrect";
+        } elseif ($newPassword !== $confirmPassword) {
+            $_SESSION['error'] = "New passwords do not match";
+        } elseif (strlen($newPassword) < 8) {
+            $_SESSION['error'] = "Password must be at least 8 characters";
+        } else {
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+            if ($stmt->execute([$hashedPassword, $userId])) {
+                $_SESSION['success'] = "Password changed successfully!";
+                header("Location: profile.php");
+                exit();
+            } else {
+                $_SESSION['error'] = "Failed to change password";
+            }
+        }
+    }
+}
+
+// Include header
 if (file_exists(__DIR__ . '/../includes/header.php')) {
     include __DIR__ . '/../includes/header.php';
 }
 ?>
 
-<h1>Manage Your Profile</h1>
-
-<?php if (isset($_SESSION['success'])): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
-    <?php unset($_SESSION['success']); ?>
-<?php endif; ?>
-
-<?php if (isset($_SESSION['error'])): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
-    <?php unset($_SESSION['error']); ?>
-<?php endif; ?>
-
-<form method="POST">
-    <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
-    </div>
+<div class="profile-container">
+    <h1>Manage Your Profile</h1>
     
-    <div class="form-group">
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
-    </div>
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
     
-    <button type="submit" class="btn btn-primary">Update Profile</button>
-</form>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+    
+    <div class="profile-section">
+        <div class="profile-sidebar">
+            <div class="profile-avatar">
+                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
+                     alt="Profile Picture" class="avatar-img">
+                <div class="avatar-upload">
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="file" name="avatar" id="avatar" accept="image/*" style="display: none;">
+                        <label for="avatar" class="btn btn-secondary">Change Photo</label>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <h3><?= htmlspecialchars($user['username']) ?></h3>
+                <p><?= htmlspecialchars($user['email']) ?></p>
+                <p class="role-badge"><?= $isAdmin ? 'Administrator' : 'User' ?></p>
+            </div>
+        </div>
+        
+        <div class="profile-content">
+            <div class="profile-card">
+                <h2>Profile Information</h2>
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="update_profile" value="1">
+                    
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" 
+                               value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" 
+                               value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+            
+            <div class="profile-card">
+                <h2>Change Password</h2>
+                <form method="POST">
+                    <input type="hidden" name="change_password" value="1">
+                    
+                    <div class="form-group">
+                        <label for="current_password">Current Password:</label>
+                        <input type="password" id="current_password" name="current_password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new_password">New Password:</label>
+                        <input type="password" id="new_password" name="new_password" required>
+                        <small class="form-text">Minimum 8 characters</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm New Password:</label>
+                        <input type="password" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+            
+            <?php if (!$isAdmin): ?>
+            <div class="profile-card">
+                <h2>Account Actions</h2>
+                <button class="btn btn-danger" onclick="confirmDeactivate()">Deactivate Account</button>
+                <small class="form-text">This will disable your account but preserve your data</small>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDeactivate() {
+    if (confirm('Are you sure you want to deactivate your account? You can reactivate it by logging in again.')) {
+        window.location.href = 'deactivate.php';
+    }
+}
+</script>
+
+<style>
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.profile-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+}
+
+.profile-sidebar {
+    flex: 1;
+    min-width: 300px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-content {
+    flex: 2;
+    min-width: 300px;
+}
+
+.profile-avatar {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.avatar-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #eee;
+}
+
+.avatar-upload {
+    margin-top: 15px;
+}
+
+.profile-info {
+    text-align: center;
+}
+
+.role-badge {
+    display: inline-block;
+    background: #4e79a7;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-card h2 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: #4e79a7;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.alert {
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.8em;
+}
+</style>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>
