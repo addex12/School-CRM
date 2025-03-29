@@ -1,52 +1,43 @@
 <?php
-ob_start(); // Start output buffering
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once 'includes/social_auth.php';
 
 if (isLoggedIn()) {
+    // Fixed: Check role_id instead of role
     header("Location: " . ($_SESSION['role_id'] === 1 ? 'admin/dashboard.php' : 'user/dashboard.php'));
     exit();
 }
 
 $error = '';
 
-// Handle regular form registration
+// Handle regular form login
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'])) {
     $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
     $password = $_POST['password'];
     
-    // Validate form data
-    if (empty($username) || empty($email) || empty($password)) {
-        $error = "All fields are required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Invalid email format.";
-    } else {
-        try {
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
-            $stmt->execute([$username, $email]);
-            if ($stmt->fetchColumn() > 0) {
-                throw new Exception("Username or email already exists.");
-            }
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
+    
+if ($user && password_verify($password, $user['password'])) {
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['role_id'] = (int)$user['role_id']; // Cast to integer
 
-            $password_hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, created_at) VALUES (?, ?, ?, ?, NOW())");
-            $stmt->execute([$username, $email, $password_hash, 4]); // 4 is the default role for regular users
-
-            $_SESSION['success'] = "Registration successful! Please login.";
-            header("Location: login.php");
-            exit();
-        } catch (Exception $e) {
-            $error = $e->getMessage();
-        }
-    }
+    // Update last login
+    $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
+    
+    $redirect = ($_SESSION['role_id'] === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+    header("Location: " . $redirect);
+    exit();
 }
 
-// Handle social registration
+// Handle social login callback
 if (isset($_GET['provider'])) {
+    $provider = $_GET['provider'];
     try {
-        $socialUser = handleSocialLogin($_GET['provider']);
+        $socialUser = handleSocialLogin($provider);
         
         // Check if user exists by email
         $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
@@ -65,7 +56,7 @@ if (isset($_GET['provider'])) {
             ]);
             $userId = $pdo->lastInsertId();
             $roleId = 4;
-        } else {
+        }  else {
             $userId = $user['id'];
             $roleId = (int)$user['role_id']; // Cast to integer
         }
@@ -75,25 +66,27 @@ if (isset($_GET['provider'])) {
         $_SESSION['username'] = $socialUser['name'];
         $_SESSION['role_id'] = $roleId;
         
-        // Redirect based on role
+        // Fixed: Proper role check with role_id
         $redirect = ($roleId == 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
         header("Location: " . $redirect);
         exit();
     } catch (Exception $e) {
-        $error = "Social registration failed: " . $e->getMessage();
+        $error = "Social login failed: " . $e->getMessage();
     }
 }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - School CRM</title>
+    <title>Login - School CRM</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .register-container {
+        .login-container {
             max-width: 400px;
             margin: 50px auto;
             padding: 30px;
@@ -101,12 +94,12 @@ if (isset($_GET['provider'])) {
             border-radius: 8px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
-        .register-title {
+        .login-title {
             text-align: center;
             margin-bottom: 20px;
             color: #2c3e50;
         }
-        .register-logo {
+        .login-logo {
             text-align: center;
             margin-bottom: 20px;
             font-size: 48px;
@@ -157,39 +150,27 @@ if (isset($_GET['provider'])) {
             margin-bottom: 15px;
             text-align: center;
         }
-        .success-message {
-            color: #16a34a;
-            background: #dcfce7;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
-    <div class="register-container">
-        <div class="register-logo">
+    <div class="login-container">
+        <div class="login-logo">
             <i class="fas fa-graduation-cap"></i>
         </div>
-        <h1 class="register-title">School CRM System Registration</h1>
+        <h1 class="login-title">School CRM System Login</h1>
         
         <?php if ($error): ?>
             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
         
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="success-message"><?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
-        <?php endif; ?>
-        
         <div class="social-login">
-            <a href="register.php?provider=google" class="social-btn google-btn">
+            <a href="login.php?provider=google" class="social-btn google-btn">
                 <i class="fab fa-google"></i>
             </a>
-            <a href="register.php?provider=facebook" class="social-btn facebook-btn">
+            <a href="login.php?provider=facebook" class="social-btn facebook-btn">
                 <i class="fab fa-facebook-f"></i>
             </a>
-            <a href="register.php?provider=linkedin" class="social-btn linkedin-btn">
+            <a href="login.php?provider=linkedin" class="social-btn linkedin-btn">
                 <i class="fab fa-linkedin-in"></i>
             </a>
         </div>
@@ -198,21 +179,10 @@ if (isset($_GET['provider'])) {
             <span class="divider-text">OR</span>
         </div>
         
-        <!-- Registration form disabled -->
-        <div class="error-message">
-            Registration is currently disabled. Please contact the administrator for assistance.
-        </div>
-        
-        <!--
         <form method="POST">
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address:</label>
-                <input type="email" id="email" name="email" required>
+                <input type="text" id="username" name="username" required autofocus>
             </div>
             
             <div class="form-group">
@@ -221,19 +191,16 @@ if (isset($_GET['provider'])) {
             </div>
             
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block">Register</button>
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
             </div>
         </form>
-        -->
         
-        <div class="register-footer">
-            <p>Already have an account? <a href="login.php">Login here</a></p>
+        <div class="login-footer">
+            <p>Don't have an account? <a href="register.php">Register here</a></p>
+            <p><a href="forgot_password.php">Forgot your password?</a></p>
         </div>
     </div>
 
     <?php include 'user/includes/footer.php'; ?>
 </body>
 </html>
-<?php
-ob_end_flush(); // End output buffering
-?>

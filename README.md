@@ -1,13 +1,18 @@
 # 🏫 Custom School Parent Survey System
 [![DeepScan grade](https://deepscan.io/api/teams/26555/projects/29184/branches/938393/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=26555&pid=29184&bid=938393)
-![vscode marketplace](https://img.shields.io/badge/vscode%20marketplace-v8.2.3-blue)
-![rating](https://img.shields.io/badge/rating-4.2%2F5%20(264)-green)
-![stars](https://img.shields.io/badge/stars-2.6k-blue)
-![license](https://img.shields.io/badge/license-MIT-green)
-![build](https://img.shields.io/badge/build-passing-brightgreen)
-![contributors](https://img.shields.io/badge/contributors-15-orange)
-![last commit](https://img.shields.io/badge/last%20commit-October%202023-yellow)
-
+![GitHub stars](https://img.shields.io/github/stars/addex12/School-CRM.png)
+![GitHub last commit](https://img.shields.io/github/last-commit/addex12/School-CRM.png)
+![GitHub contributors](https://img.shields.io/github/contributors/addex12/School-CRM.png)
+![GitHub issues](https://img.shields.io/github/issues/addex12/School-CRM.png)
+![GitHub releases](https://img.shields.io/github/releases/addex12/School-CRM.png)
+![GitHub license](https://img.shields.io/github/license/addex12/School-CRM.png)
+![GitHub size](https://img.shields.io/github/size/addex12/School-CRM.png)
+![GitHub forks](https://img.shields.io/github/forks/addex12/School-CRM.png)
+![GitHub watchers](https://img.shields.io/github/watchers/addex12/School-CRM.png)
+![GitHub open issues](https://img.shields.io/github/issues-pr/addex12/School-CRM.png)
+![GitHub closed issues](https://img.shields.io/github/issues-closed/addex12/School-CRM.png)
+![GitHub open PRs](https://img.shields.io/github/issues-pr-closed/addex12/School-CRM.png)
+   
 A web-based system for schools to create, manage, and analyze parent surveys with admin dashboards, automated exports (PDF/Excel), and email integration.
 
 ---
@@ -32,15 +37,15 @@ A web-based system for schools to create, manage, and analyze parent surveys wit
 ### Steps
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/school-survey-system.git
-   ```
+   git clone https://github.com/addex12/School-CRM.git
+   cd School-CRM
 
-2. **Database Setup**:
-   - Import `parent_survey_system.sql`:
-     ```bash
-     mysql -u root -p parent_survey_system < parent_survey_system.sql
-     ```
-   - Update `includes/db.php` with your MySQL credentials.
+
+2. **Database Setup**: 
+   - Create a MySQL database.
+   - Update `config.php` with database credentials.
+   - Run `db.sql` to create the database schema.
+   
 
 3. **Configure PHP**:
    - Ensure `php.ini` has the following extensions enabled:
