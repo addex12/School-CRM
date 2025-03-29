@@ -1,286 +1,394 @@
 <?php
 require_once '../includes/auth.php';
 requireAdmin();
-require_once '../includes/config.php';
-require_once '../includes/setting.php'; // Contains getSystemSetting()
-
-if (session_status() === PHP_SESSION_NONE) session_start();
-
-$error = '';
-$success = '';
-
-// Enhanced file upload handler with validation
-function handleFileUpload($fileInput, $settingKey, $allowedTypes, $maxSize = 2 * 1024 * 1024) {
-    global $pdo;
-    
-    if (!isset($_FILES[$fileInput]) || $_FILES[$fileInput]['error'] !== UPLOAD_ERR_OK) return null;
-
-    $file = $_FILES[$fileInput];
-    $fileExt = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    
-    // Validate file
-    if (!in_array($fileExt, $allowedTypes)) {
-        throw new Exception("Invalid file type for $settingKey. Allowed types: " . implode(', ', $allowedTypes));
-    }
-    
-    if ($file['size'] > $maxSize) {
-        throw new Exception("File size too large for $settingKey. Max size: " . ($maxSize / 1024 / 1024) . "MB");
-    }
-
-    // Generate unique filename and move to uploads
-    $filename = uniqid() . '.' . $fileExt;
-    $uploadPath = '../assets/uploads/' . $filename;
-    
-    if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-        $stmt = $pdo->prepare("REPLACE INTO system_settings (setting_key, setting_value, setting_group) VALUES (?, ?, ?)");
-        $group = ($settingKey === 'og_image') ? 'media' : 'appearance';
-        $stmt->execute([$settingKey, $filename, $group]);
-        return $filename;
-    }
-    
-    throw new Exception("Failed to upload $settingKey file");
-}
+require_once '../includes/config.php'; // Include config to initialize $pdo
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        // Verify CSRF token
-        if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-            throw new Exception("Invalid CSRF token");
+    foreach ($_POST['settings'] as $key => $value) {
+        // Check if setting exists
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM system_settings WHERE setting_key = ?");
+        $stmt->execute([$key]);
+        $exists = $stmt->fetchColumn();
+        
+        if ($exists) {
+            // Update existing setting
+            $stmt = $pdo->prepare("UPDATE system_settings SET setting_value = ? WHERE setting_key = ?");
+            $stmt->execute([$value, $key]);
+        } else {
+            // Insert new setting
+            $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value, setting_group) VALUES (?, ?, 'general')");
+            $stmt->execute([$key, $value]);
         }
-
-        // Process text settings
-        if (isset($_POST['settings'])) {
-            foreach ($_POST['settings'] as $key => $value) {
-                $value = htmlspecialchars(trim($value));
-                
-                // Special validation rules
-                switch ($key) {
-                    case 'site_email':
-                        if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
-                            throw new Exception("Invalid email format");
-                        }
-                        break;
-                        
-                    case 'items_per_page':
-                    case 'login_attempts':
-                    case 'password_expiry':
-                        if (!is_numeric($value) || $value < 1) {
-                            throw new Exception("Invalid value for $key");
-                        }
-                        break;
-                        
-                    case 'theme_color':
-                        if (!preg_match('/^#[a-f0-9]{6}$/i', $value)) {
-                            throw new Exception("Invalid color format");
-                        }
-                        break;
-                }
-                
-                $stmt = $pdo->prepare("REPLACE INTO system_settings (setting_key, setting_value) VALUES (?, ?)");
-                $stmt->execute([$key, $value]);
-            }
-        }
-
-        // Handle file uploads
-        handleFileUpload('site_logo', 'site_logo', ['png', 'jpg', 'jpeg', 'gif']);
-        handleFileUpload('favicon', 'favicon', ['ico', 'png']);
-        handleFileUpload('og_image', 'og_image', ['png', 'jpg', 'jpeg']);
-
-        $_SESSION['success'] = "Settings updated successfully!";
-        header("Location: settings.php");
-        exit();
-
-    } catch (Exception $e) {
-        $error = $e->getMessage();
     }
+    // Get system setting value
+    function getSystemSetting($key, $default = null) {
+        global $pdo;
+        
+        try {
+            $stmt = $pdo->prepare("SELECT value FROM system_settings WHERE setting_key = ?");
+            $stmt->execute([$key]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return $result ? $result['value'] : $default;
+        } catch (PDOException $e) {
+            error_log("Settings Error: " . $e->getMessage());
+            return $default;
+        }
+    }
+    // Handle file uploads (logo, favicon)
+    if (!empty($_FILES['site_logo']['name'])) {
+        $upload_dir = '../assets/images/';
+        $filename = 'logo.' . pathinfo($_FILES['site_logo']['name'], PATHINFO_EXTENSION);
+        $filepath = $upload_dir . $filename;
+        
+        if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $filepath)) {
+            // Update logo setting
+            $stmt = $pdo->prepare("REPLACE INTO system_settings (setting_key, setting_value, setting_group) VALUES ('site_logo', ?, 'appearance')");
+            $stmt->execute([$filename]);
+        }
+    }
+    
+    if (!empty($_FILES['favicon']['name'])) {
+        $upload_dir = '../assets/images/';
+        $filename = 'favicon.' . pathinfo($_FILES['favicon']['name'], PATHINFO_EXTENSION);
+        $filepath = $upload_dir . $filename;
+        
+        if (move_uploaded_file($_FILES['favicon']['tmp_name'], $filepath)) {
+            // Update favicon setting
+            $stmt = $pdo->prepare("REPLACE INTO system_settings (setting_key, setting_value, setting_group) VALUES ('favicon', ?, 'appearance')");
+            $stmt->execute([$filename]);
+        }
+    }
+    
+    $_SESSION['success'] = "Settings updated successfully!";
+    header("Location: settings.php");
+    exit();
 }
 
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
-// Get current settings
+// Get all settings grouped by category
 $settings = [];
-$stmt = $pdo->query("SELECT * FROM system_settings");
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $settings[$row['setting_key']] = $row['setting_value'];
+$stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_group, setting_key");
+while ($row = $stmt->fetch()) {
+    $settings[$row['setting_group']][] = $row;
 }
 
-// Default settings structure
-$settingGroups = [
+// Default settings if not in database
+$default_settings = [
     'general' => [
-        'site_name' => 'School Survey System',
-        'site_email' => 'admin@school.edu',
-        'timezone' => 'UTC',
-        'items_per_page' => 10,
-        'maintenance_mode' => 0
+        ['setting_key' => 'site_name', 'setting_value' => 'School Survey System'],
+        ['setting_key' => 'site_email', 'setting_value' => 'admin@school.edu'],
+        ['setting_key' => 'timezone', 'setting_value' => 'UTC'],
+        ['setting_key' => 'items_per_page', 'setting_value' => '10']
     ],
     'appearance' => [
-        'theme_color' => '#3498db',
-        'font_family' => 'Arial',
-        'dark_mode' => 0,
-        'site_logo' => '',
-        'favicon' => ''
-    ],
-    'security' => [
-        'login_attempts' => 5,
-        'password_expiry' => 90,
-        '2fa_enabled' => 0
-    ],
-    'notifications' => [
-        'email_notifications' => 1,
-        'slack_webhook' => '',
-        'sms_gateway' => ''
-    ],
-    'media' => [
-        'og_image' => ''
+        ['setting_key' => 'site_logo', 'setting_value' => ''],
+        ['setting_key' => 'favicon', 'setting_value' => ''],
+        ['setting_key' => 'theme_color', 'setting_value' => '#3498db']
     ],
     'email' => [
-        'smtp_host' => '',
-        'smtp_port' => 587,
-        'smtp_secure' => 'tls',
-        'smtp_username' => '',
-        'smtp_password' => ''
+        ['setting_key' => 'smtp_provider', 'setting_value' => ''],
+        ['setting_key' => 'smtp_host', 'setting_value' => ''],
+        ['setting_key' => 'smtp_port', 'setting_value' => '587'],
+        ['setting_key' => 'smtp_username', 'setting_value' => ''],
+        ['setting_key' => 'smtp_password', 'setting_value' => ''],
+        ['setting_key' => 'smtp_secure', 'setting_value' => 'tls']
     ]
 ];
 
-// Merge with database values
-foreach ($settingGroups as $group => $keys) {
-    foreach ($keys as $key => $default) {
-        if (isset($settings[$key])) {
-            $settingGroups[$group][$key] = $settings[$key];
+// Merge default settings with database settings
+foreach ($default_settings as $group => $group_settings) {
+    if (!isset($settings[$group])) {
+        $settings[$group] = [];
+    }
+    
+    foreach ($group_settings as $setting) {
+        $found = false;
+        foreach ($settings[$group] as $db_setting) {
+            if ($db_setting['setting_key'] === $setting['setting_key']) {
+                $found = true;
+                break;
+            }
+        }
+        
+        if (!$found) {
+            $settings[$group][] = $setting;
         }
     }
 }
+
+// List of common SMTP providers
+$smtp_providers = [
+    'gmail' => ['host' => 'smtp.gmail.com', 'port' => 587, 'secure' => 'tls'],
+    'yahoo' => ['host' => 'smtp.mail.yahoo.com', 'port' => 465, 'secure' => 'ssl'],
+    'outlook' => ['host' => 'smtp.office365.com', 'port' => 587, 'secure' => 'tls'],
+    'zoho' => ['host' => 'smtp.zoho.com', 'port' => 465, 'secure' => 'ssl']
+];
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Settings - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
-   
-    <div class="admin-container">
+    <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        
-        <main class="settings-main">
-            <h1><i class="fas fa-cog"></i> System Settings</h1>
-            
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-            
-            <?php if (isset($_SESSION['success'])): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
-                <?php unset($_SESSION['success']); ?>
-            <?php endif; ?>
-            
-            <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                
-                <div class="settings-tabs">
-                    <?php foreach ($settingGroups as $group => $settings): ?>
-                        <button type="button" class="tab-btn <?= $group === 'general' ? 'active' : '' ?>" 
-                                data-tab="<?= $group ?>">
-                            <?= ucfirst($group) ?>
-                        </button>
-                    <?php endforeach; ?>
+        <div class="admin-main">
+            <div class="container">
+                <div class="setting-group">
+                    <h3>Admin Menu Configuration</h3>
+                    <div class="setting-item">
+                        <label for="admin_menu">Menu Items (JSON format):</label>
+                        <textarea id="admin_menu" name="settings[admin_menu]" rows="10" 
+                                  style="font-family: monospace;"><?php echo htmlspecialchars(getSettingValue($settings, 'general', 'admin_menu')); ?></textarea>
+                        <p class="help-text">Format: [{"title":"Dashboard","url":"dashboard.php","icon":"fa-home"},...]</p>
+                    </div>
                 </div>
-
-                <?php foreach ($settingGroups as $group => $groupSettings): ?>
-                    <div class="tab-content <?= $group === 'general' ? 'active' : '' ?>" id="<?= $group ?>-tab">
-                        <div class="settings-group">
-                            <h2><?= ucfirst($group) ?> Settings</h2>
-                            
-                            <?php foreach ($groupSettings as $key => $value): ?>
-                                <div class="form-group">
-                                    <label><?= str_replace('_', ' ', ucfirst($key)) ?></label>
-                                    
-                                    <?php if ($key === 'timezone'): ?>
-                                        <select name="settings[<?= $key ?>]" class="form-control">
-                                            <?php foreach (DateTimeZone::listIdentifiers() as $tz): ?>
-                                                <option value="<?= $tz ?>" <?= $value === $tz ? 'selected' : '' ?>>
-                                                    <?= $tz ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    
-                                    <?php elseif (strpos($key, 'password') !== false): ?>
-                                        <input type="password" name="settings[<?= $key ?>]" 
-                                               value="<?= htmlspecialchars($value) ?>" class="form-control">
-                                    
-                                    <?php elseif ($key === 'theme_color'): ?>
-                                        <div class="color-picker">
-                                            <input type="color" name="settings[<?= $key ?>]" 
-                                                   value="<?= htmlspecialchars($value) ?>">
-                                            <span class="color-preview" style="background: <?= htmlspecialchars($value) ?>"></span>
-                                        </div>
-                                    
-                                    <?php elseif (in_array($key, ['site_logo', 'favicon', 'og_image'])): ?>
-                                        <div class="file-upload">
-                                            <input type="file" name="<?= $key ?>" accept="<?= 
-                                                $key === 'favicon' ? 'image/x-icon' : 'image/*' ?>">
-                                            <?php if ($value): ?>
-                                                <div class="current-file">
-                                                    Current: <a href="../assets/uploads/<?= $value ?>" target="_blank"><?= $value ?></a>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    
-                                    <?php elseif (in_array($key, ['2fa_enabled', 'email_notifications', 'dark_mode', 'maintenance_mode'])): ?>
-                                        <label class="switch">
-                                            <input type="checkbox" name="settings[<?= $key ?>]" 
-                                                   <?= $value ? 'checked' : '' ?> value="1">
-                                            <span class="slider"></span>
-                                        </label>
-                                    
-                                    <?php else: ?>
-                                        <input type="text" name="settings[<?= $key ?>]" 
-                                               value="<?= htmlspecialchars($value) ?>" class="form-control">
+                <div class="content">
+                    <?php if (isset($_SESSION['success'])): ?>
+                        <div class="success-message"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                    <?php endif; ?>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="settings-tabs">
+                            <div class="settings-tab active" data-tab="general">General</div>
+                            <div class="settings-tab" data-tab="appearance">Appearance</div>
+                            <div class="settings-tab" data-tab="email">Email</div>
+                        </div>
+                        
+                        <div class="settings-tab-content active" id="general-tab">
+                            <div class="setting-group">
+                                <h3>Site Information</h3>
+                                
+                                <div class="setting-item">
+                                    <label for="site_name">Site Name</label>
+                                    <input type="text" id="site_name" name="settings[site_name]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'general', 'site_name')); ?>">
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="site_email">Site Email</label>
+                                    <input type="email" id="site_email" name="settings[site_email]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'general', 'site_email')); ?>">
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="timezone">Timezone</label>
+                                    <select id="timezone" name="settings[timezone]">
+                                        <?php
+                                        $timezones = DateTimeZone::listIdentifiers();
+                                        $current_tz = getSettingValue($settings, 'general', 'timezone');
+                                        foreach ($timezones as $tz): ?>
+                                            <option value="<?php echo $tz; ?>" <?php echo $tz === $current_tz ? 'selected' : ''; ?>>
+                                                <?php echo $tz; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="items_per_page">Items Per Page</label>
+                                    <input type="number" id="items_per_page" name="settings[items_per_page]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'general', 'items_per_page')); ?>">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-tab-content" id="appearance-tab">
+                            <div class="setting-group">
+                                <h3>Branding</h3>
+                                
+                                <div class="setting-item">
+                                    <label for="site_logo">Site Logo</label>
+                                    <input type="file" id="site_logo" name="site_logo" accept="image/*">
+                                    <?php if ($logo = getSettingValue($settings, 'appearance', 'site_logo')): ?>
+                                        <img src="../assets/images/<?php echo $logo; ?>" class="file-preview">
+                                        <p>Current: <?php echo $logo; ?></p>
                                     <?php endif; ?>
                                 </div>
-                            <?php endforeach; ?>
+                                
+                                <div class="setting-item">
+                                    <label for="favicon">Favicon</label>
+                                    <input type="file" id="favicon" name="favicon" accept="image/x-icon,.ico">
+                                    <?php if ($favicon = getSettingValue($settings, 'appearance', 'favicon')): ?>
+                                        <img src="../assets/images/<?php echo $favicon; ?>" class="file-preview">
+                                        <p>Current: <?php echo $favicon; ?></p>
+                                    <?php endif; ?>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="theme_color">Theme Color</label>
+                                    <input type="color" id="theme_color" name="settings[theme_color]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'appearance', 'theme_color')); ?>">
+                                    <span class="color-preview" id="color-preview" 
+                                          style="background-color: <?php echo htmlspecialchars(getSettingValue($settings, 'appearance', 'theme_color')); ?>"></span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-
-                <div class="form-footer">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Save All Changes
-                    </button>
+                        
+                        <div class="settings-tab-content" id="email-tab">
+                            <div class="setting-group">
+                                <h3>SMTP Settings</h3>
+                                
+                                <div class="setting-item">
+                                    <label for="smtp_provider">SMTP Provider</label>
+                                    <select id="smtp_provider" name="settings[smtp_provider]" onchange="updateSMTPSettings(this.value)">
+                                        <option value="">Custom</option>
+                                        <?php foreach ($smtp_providers as $provider => $details): ?>
+                                            <option value="<?php echo $provider; ?>" <?php echo getSettingValue($settings, 'email', 'smtp_provider') === $provider ? 'selected' : ''; ?>>
+                                                <?php echo ucfirst($provider); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="smtp_host">SMTP Host</label>
+                                    <input type="text" id="smtp_host" name="settings[smtp_host]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'email', 'smtp_host')); ?>">
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="smtp_port">SMTP Port</label>
+                                    <input type="number" id="smtp_port" name="settings[smtp_port]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'email', 'smtp_port')); ?>">
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="smtp_username">SMTP Username</label>
+                                    <input type="text" id="smtp_username" name="settings[smtp_username]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'email', 'smtp_username')); ?>">
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="smtp_password">SMTP Password</label>
+                                    <input type="password" id="smtp_password" name="settings[smtp_password]" 
+                                           value="<?php echo htmlspecialchars(getSettingValue($settings, 'email', 'smtp_password')); ?>">
+                                </div>
+                                
+                                <div class="setting-item">
+                                    <label for="smtp_secure">SMTP Security</label>
+                                    <select id="smtp_secure" name="settings[smtp_secure]">
+                                        <option value="tls" <?php echo getSettingValue($settings, 'email', 'smtp_secure') === 'tls' ? 'selected' : ''; ?>>TLS</option>
+                                        <option value="ssl" <?php echo getSettingValue($settings, 'email', 'smtp_secure') === 'ssl' ? 'selected' : ''; ?>>SSL</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-group">
+                                <h3>Test Email</h3>
+                                <div class="setting-item">
+                                    <label for="test_email">Send test email to:</label>
+                                    <input type="email" id="test_email" name="test_email" placeholder="Enter email address">
+                                    <button type="button" id="send-test-email" class="btn">Send Test Email</button>
+                                    <div id="test-email-result" style="margin-top: 10px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Settings</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-        </main>
+            </div>
+        </div>
     </div>
-
+    
     <script>
-        // Tab functionality
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tab-btn, .tab-content').forEach(el => {
+        // Tab switching
+        document.querySelectorAll('.settings-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.settings-tab, .settings-tab-content').forEach(el => {
                     el.classList.remove('active');
                 });
-                btn.classList.add('active');
-                document.getElementById(`${btn.dataset.tab}-tab`).classList.add('active');
+                
+                // Add active class to clicked tab and corresponding content
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
             });
         });
-
-        // Initialize Choices.js for better select inputs
-        new Choices('[name="settings[timezone]"]', {
-            searchEnabled: true,
-            itemSelectText: '',
-            shouldSort: false,
+        
+        // Color preview
+        document.getElementById('theme_color').addEventListener('input', function() {
+            document.getElementById('color-preview').style.backgroundColor = this.value;
         });
-
-        // Theme color preview
-        document.querySelector('input[name="settings[theme_color]"]').addEventListener('input', function() {
-            document.querySelector('.color-preview').style.backgroundColor = this.value;
-        });
+        
+        // Test email
+        document.getElementById('send-test-email').addEventListener('click', function() {
+            const email = document.getElementById('test_email').value;
+            if (!email) {
+                alert('Please enter an email address');
+                return;
+            }
+            
+            const btn = this;
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            
+            const resultDiv = document.getElementById('test-email-result');
+            resultDiv.textContent = '';
+            resultDiv.className = '';
+            
+            fetch('send_test_email.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `email=${encodeURIComponent(email)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resultDiv.textContent = 'Test email sent successfully!';
+                    resultDiv.className = 'success-message';
+                } else {
+                    resultDiv.textContent = 'Error: ' + (data.message || 'Failed to send email');
+                    resultDiv.className = 'error-message';
+                }
+            })
+            .catch(error => {
+                resultDiv.textContent = 'Error: ' + error.message;
+                resultDiv.className = 'error-message';
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Send Test Email';
+            });
+        });s
+        
+        const smtpProviders = <?php echo json_encode($smtp_providers); ?>;
+        
+        function updateSMTPSettings(provider) {
+            if (smtpProviders[provider]) {
+                document.getElementById('smtp_host').value = smtpProviders[provider].host;
+                document.getElementById('smtp_port').value = smtpProviders[provider].port;
+                document.getElementById('smtp_secure').value = smtpProviders[provider].secure;
+            } else {
+                document.getElementById('smtp_host').value = '';
+                document.getElementById('smtp_port').value = '';
+                document.getElementById('smtp_secure').value = 'tls';
+            }
+        }
     </script>
 </body>
 </html>
+
+<?php
+function getSettingValue($settings, $group, $key): mixed {
+    if (!isset($settings[$group])) return '';
+    
+    foreach ($settings[$group] as $setting) {
+        if ($setting['setting_key'] === $key) {
+            return $setting['setting_value'];
+        }
+    }
+    
+    return '';
+}
+?>
