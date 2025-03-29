@@ -1,5 +1,5 @@
 # 🏫 Custom School Parent Survey System
-
+[![DeepScan grade](https://deepscan.io/api/teams/26555/projects/29184/branches/938393/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=26555&pid=29184&bid=938393)
 ![vscode marketplace](https://img.shields.io/badge/vscode%20marketplace-v8.2.3-blue)
 ![rating](https://img.shields.io/badge/rating-4.2%2F5%20(264)-green)
 ![stars](https://img.shields.io/badge/stars-2.6k-blue)
