@@ -154,10 +154,10 @@ foreach ($defaultSettings as $group => $groupSettings) {
     <script src="../assets/js/admin.js" defer></script>
 </head>
 <body>
-    <?php include 'includes/admin_header.php'; ?>
+    <?php include '../includes/admin_header.php'; ?> <!-- Corrected the path -->
     
     <div class="admin-container">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include '../includes/admin_sidebar.php'; ?> <!-- Ensure this path is also correct -->
         
         <main class="settings-main">
             <h1>System Settings</h1>
