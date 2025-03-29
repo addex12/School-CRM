@@ -118,4 +118,18 @@ function sendResetPasswordEmail($email, $resetToken) {
     }
 }
 
+/**
+ * Get the role name based on the role ID.
+ *
+ * @param int $roleId The role ID.
+ * @return string The role name.
+ */
+function getUserRoleName(int $roleId): string {
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+    $stmt->execute([$roleId]);
+    $role = $stmt->fetchColumn();
+    return $role ?: 'Unknown';
+}
+
 ?>
