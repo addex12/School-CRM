@@ -30,11 +30,16 @@ if (!function_exists('requireLogin')) {
 
 if (!function_exists('getCurrentUser')) {
     function getCurrentUser(): ?array {
-        return isLoggedIn() ? [
-            'id' => $_SESSION['user_id'],
-            'username' => $_SESSION['username'],
-            'role' => $_SESSION['role']
-        ] : null;
+        global $pdo; // Ensure $pdo is accessible
+        if (!isLoggedIn()) {
+            return null;
+        }
+        $stmt = $pdo->prepare("SELECT u.id, u.username, r.role_name 
+                               FROM users u 
+                               JOIN roles r ON u.role_id = r.id 
+                               WHERE u.id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
 

@@ -9,14 +9,7 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
-$userId = $_SESSION['user_id'];
-$isAdmin = ($_SESSION['role_id'] == 1); // Assuming role_id 1 is admin
-
-// Fetch user details
-$stmt = $pdo->prepare("SELECT username, email, avatar, role_id FROM users WHERE id = ?");
-$stmt->execute([$userId]);
-$user = $stmt->fetch();
-
+$user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User not found.";
     header("Location: ../login.php");
@@ -151,7 +144,7 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
             <div class="profile-info">
                 <h3><?= htmlspecialchars($user['username']) ?></h3>
                 <p><?= htmlspecialchars($user['email']) ?></p>
-                <p class="role-badge"><?= $isAdmin ? 'Administrator' : 'User' ?></p>
+                <p class="role-badge"><?= htmlspecialchars($user['role_name']) ?></p>
             </div>
         </div>
         
