@@ -4,31 +4,10 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Debugging: Enable error reporting
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Debugging: Check if required files exist
-if (!file_exists(__DIR__ . '/../includes/db.php')) {
-    die("Database configuration file is missing.");
-}
-if (!file_exists(__DIR__ . '/../includes/auth.php')) {
-    die("Authentication file is missing.");
-}
-
 // Include required files
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
-
-// Ensure the email field is fetched correctly
-$user = getCurrentUser();
-if (!$user || empty($user['email'])) {
-    $_SESSION['error'] = "User email not found.";
-    header("Location: ../login.php");
-    exit();
-}
 
 $user = getCurrentUser();
 if (!$user) {
@@ -44,16 +23,6 @@ if (!$userId) {
     $_SESSION['error'] = "User ID is missing.";
     header("Location: ../login.php");
     exit();
-}
-
-// Debugging: Check session variables
-if (!isset($_SESSION['user_id'])) {
-    die("User is not logged in.");
-}
-
-// Debugging: Check database connection
-if (!$pdo) {
-    die("Database connection failed.");
 }
 
 // Handle form submission
@@ -203,7 +172,7 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
                     <div class="form-group">
                         <label for="email">Email:</label>
                         <input type="email" id="email" name="email" 
-                               value="<?= htmlspecialchars($user['email']) ?>" required>
+                               value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
                     </div>
                     
                     <div class="form-group">
@@ -213,7 +182,6 @@ if (file_exists(__DIR__ . '/../includes/header.php')) {
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Update Profile</button>
-                    <button type="submit" class="btn btn-secondary" name="save_details">Save Details</button>
                 </form>
             </div>
             
