@@ -88,10 +88,12 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                                                 <span class="status-active">Active</span>
                                             <?php endif; ?>
                                         </td>
-                                        <td>
+                                        <>
                                         <a href="survey_preview.php?id=<?= $survey['id'] ?>.php" class="btn btn-primary">Preview</a>
                                         <a href="results.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Results</a>                                        
-                                        <a href="view_survey.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Manage</a>                                        </td>
+                                        <a href="view_survey.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Manage</a>  
+                                        <a href="response_view.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Response</a>                                        </td>
+                                                                        
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
