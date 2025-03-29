@@ -55,6 +55,7 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
     <title><?= $pageTitle ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -66,6 +67,7 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
             </header>
             <div class="content">
                 <?php if (count($responses) > 0): ?>
+                    <div id="chart-container"></div> <!-- Container for charts -->
                     <table class="table">
                         <thead>
                             <tr>
@@ -97,5 +99,11 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
             </div>
         </div>
     </div>
+
+    <!-- Embed survey data for JavaScript -->
+    <script id="survey-results-data" type="application/json">
+        <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
+    </script>
+    <script src="../assets/js/results.js"></script>
 </body>
 </html>
