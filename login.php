@@ -197,6 +197,12 @@ if (isset($_GET['provider'])) {
             <span class="divider-text">OR</span>
         </div>
         
+        <!-- Registration form disabled -->
+        <div class="error-message">
+            Registration is currently disabled. Please contact the administrator for assistance.
+        </div>
+        
+        <!--
         <form method="POST">
             <div class="form-group">
                 <label for="username">Username:</label>
@@ -217,6 +223,7 @@ if (isset($_GET['provider'])) {
                 <button type="submit" class="btn btn-primary btn-block">Register</button>
             </div>
         </form>
+        -->
         
         <div class="register-footer">
             <p>Already have an account? <a href="login.php">Login here</a></p>
