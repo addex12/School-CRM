@@ -72,10 +72,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($stmt->execute([$username, $email, $avatar, $userId])) {
                     $_SESSION['success'] = "Profile updated successfully!";
                     header("Location: profile.php");
-                    exit();
                 } else {
                     $_SESSION['error'] = "Failed to update profile.";
                 }
+                exit();
+
             }
         }
     }
@@ -112,9 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Include header
-if (file_exists(__DIR__ . '/../includes/header.php')) {
-    include __DIR__ . '/../includes/header.php';
-}
+require_once __DIR__ . '/includes/header.php';
+
 ?>
 
 <div class="profile-container">
