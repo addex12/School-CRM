@@ -8,13 +8,12 @@ ini_set('display_errors', 1);
 
 $userId = $_SESSION['user_id'];
 
-// Get messages
+// Fetch messages for the inbox
 $stmt = $pdo->prepare("
-    SELECT m.*, u.username as sender_name 
+    SELECT m.id, m.subject, m.body, m.sender_id, m.receiver_id, m.sent_at 
     FROM messages m
-    JOIN users u ON m.sender_id = u.id
-    WHERE receiver_id = ?
-    ORDER BY m.created_at DESC
+    WHERE m.receiver_id = ?
+    ORDER BY m.sent_at DESC
 ");
 $stmt->execute([$userId]);
 $messages = $stmt->fetchAll();
