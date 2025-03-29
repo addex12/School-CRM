@@ -81,7 +81,7 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                                 <tr>
                                     <td><?= htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
                                     <?php 
-                                    $answers = json_decode($response['answers'], true);
+                                    $answers = !empty($response['answers']) ? json_decode($response['answers'], true) : [];
                                     foreach ($fields as $field): 
                                     ?>
                                         <td><?= htmlspecialchars($answers[$field['field_name']] ?? 'N/A') ?></td>
