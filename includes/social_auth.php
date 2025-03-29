@@ -25,7 +25,7 @@ $socialConfig = [
  * @throws Exception If authentication fails
  */
 function handleSocialLogin($providerName) {
-    global $socialConfig;
+    global $socialConfig, $pdo;
 
     if (!array_key_exists($providerName, $socialConfig)) {
         throw new Exception("Invalid provider");
@@ -47,7 +47,19 @@ function handleSocialLogin($providerName) {
         throw new Exception("Invalid state");
     } else {
         // Step 2: Get access token and user details
-        return fetchUserData($provider, $providerName);
+        $userData = fetchUserData($provider, $providerName);
+
+        // Step 3: Check if the email exists in the database
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$userData['email']]);
+        $user = $stmt->fetch();
+
+        if (!$user) {
+            // Notify the user that their email is not registered
+            throw new Exception("Your email address is not registered in our system. Please contact support.");
+        }
+
+        return $userData;
     }
 }
 

@@ -48,33 +48,18 @@ if (isset($_GET['provider'])) {
         $stmt->execute([$socialUser['email']]);
         $user = $stmt->fetch();
 
-        if (!$user) {
-            // Create new user with default role (4 for regular user)
-            $password = password_hash(bin2hex(random_bytes(8)), PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, created_at) VALUES (?, ?, ?, ?, NOW())");
-            $stmt->execute([
-                $socialUser['name'],
-                $socialUser['email'],
-                $password,
-                4 // Default role (regular user)
-            ]);
-            $userId = $pdo->lastInsertId();
-            $roleId = 4;
-        } else {
-            $userId = $user['id'];
-            $roleId = (int)$user['role_id'];
+        if ($user) {
+            // Log user in
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $socialUser['name'];
+            $_SESSION['role_id'] = (int)$user['role_id'];
+
+            $redirect = ($_SESSION['role_id'] === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
+            header("Location: " . $redirect);
+            exit();
         }
-
-        // Log user in
-        $_SESSION['user_id'] = $userId;
-        $_SESSION['username'] = $socialUser['name'];
-        $_SESSION['role_id'] = $roleId;
-
-        $redirect = ($roleId === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
-        header("Location: " . $redirect);
-        exit();
     } catch (Exception $e) {
-        $error = "Social login failed: " . $e->getMessage();
+        $error = $e->getMessage(); // Display error message if email is not registered
     }
 }
 ?>
