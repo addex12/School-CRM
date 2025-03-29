@@ -1,0 +1,6 @@
+# DeepSource configuration file
+# Learn how to configure: https://docs.deepsource.com/docs/configuration
+version = 1
+
+[[analyzers]]
+name = "php"
