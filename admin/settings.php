@@ -16,10 +16,14 @@ $success = '';
 function handleFileUpload($fileInput, $settingKey, $allowedTypes, $maxSize = 1024000) {
     global $pdo;
     
-    if (!isset($_FILES[$fileInput]) return;
+    if (!isset($_FILES[$fileInput])) {
+        return;
+    }
     
     $file = $_FILES[$fileInput];
-    if ($file['error'] !== UPLOAD_ERR_OK) return;
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return;
+    }
     
     // Validate file
     $fileExt = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
