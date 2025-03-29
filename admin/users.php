@@ -42,10 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['success'] = "User deleted successfully!";
         }
     }
-    
+    $temp_password = bin2hex(random_bytes(8));
+    // Reset password to default and send email notification
+
     if (isset($_POST['reset_password'])) {
         $id = $_POST['id'];
-        $password = password_hash('password123', PASSWORD_DEFAULT);
+        $password = password_hash($temp_password, PASSWORD_DEFAULT);
         
         $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
         $stmt->execute([$password, $id]);
