@@ -645,6 +645,7 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `role_id` int(11) DEFAULT NULL,
+  `active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_login` timestamp NULL DEFAULT NULL,
   `last_activity` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),

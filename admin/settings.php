@@ -54,7 +54,7 @@ while ($row = $stmt->fetch()) {
 // Default settings
 $default_settings = [
     'general' => [
-        ['setting_key' => 'site_name', 'setting_value' => 'School Survey System'],
+        ['setting_key' => 'site_name', 'setting_value' => 'School CRM System'],
         ['setting_key' => 'site_email', 'setting_value' => 'admin@school.edu'],
         ['setting_key' => 'timezone', 'setting_value' => 'UTC'],
         ['setting_key' => 'items_per_page', 'setting_value' => '10']
