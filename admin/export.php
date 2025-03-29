@@ -64,7 +64,7 @@ fputcsv($output, $header);
 foreach ($responses as $response) {
     $row = [];
     $row[] = $response['username'] ?? 'Anonymous';
-    $answers = json_decode($response['answers'], true);
+    $answers = !empty($response['answers']) ? json_decode($response['answers'], true) : [];
     foreach ($fields as $field) {
         $row[] = $answers[$field['field_name']] ?? 'N/A';
     }
@@ -76,4 +76,3 @@ fclose($output);
 exit();
 ?>
 
-<a href="results.php?survey_id=<?= $survey_id ?>" class="btn btn-secondary">Back to Results</a>
