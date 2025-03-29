@@ -5,24 +5,30 @@ require_once 'config.php'; // Your existing config file
 use League\OAuth2\Client\Provider\Google;
 use League\OAuth2\Client\Provider\Facebook;
 use Happyr\LinkedIn\LinkedIn;
-
+use League\OAuth2\Client\Provider\LinkedInResourceOwner;
+use League\OAuth2\Client\Provider\LinkedInResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
+use League\OAuth2\Client\Tool\BearerTokenResponse;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 // Social login configuration
 $socialConfig = [
     'google' => [
         'clientId'     => 'YOUR_GOOGLE_CLIENT_ID',
         'clientSecret' => 'YOUR_GOOGLE_CLIENT_SECRET',
-        'redirectUri'  => 'http://yourdomain.com/login.php?provider=google',
+        'redirectUri'  => 'http://gmail.com/login.php?provider=google',
     ],
     'facebook' => [
         'clientId'     => 'YOUR_FACEBOOK_APP_ID',
         'clientSecret' => 'YOUR_FACEBOOK_APP_SECRET',
-        'redirectUri'  => 'http://yourdomain.com/login.php?provider=facebook',
+        'redirectUri'  => 'http://facebook.com/login.php?provider=facebook',
         'graphApiVersion' => 'v12.0',
     ],
     'linkedin' => [
         'clientId'     => 'YOUR_LINKEDIN_CLIENT_ID',
         'clientSecret' => 'YOUR_LINKEDIN_CLIENT_SECRET',
-        'redirectUri'  => 'http://yourdomain.com/login.php?provider=linkedin',
+        'redirectUri'  => 'http://crm.linkedin.com/login.php?provider=linkedin',
     ]
 ];
 
