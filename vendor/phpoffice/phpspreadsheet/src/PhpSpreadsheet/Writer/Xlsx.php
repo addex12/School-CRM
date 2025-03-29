@@ -477,7 +477,8 @@ class Xlsx extends BaseWriter
         for ($i = 0; $i < $this->getDrawingHashTable()->count(); ++$i) {
             if ($this->getDrawingHashTable()->getByIndex($i) instanceof WorksheetDrawing) {
                 $imageContents = null;
-                $imagePath = $this->getDrawingHashTable()->getByIndex($i)->getPath();
+                $drawing = $this->getDrawingHashTable()->getByIndex($i);
+                $imagePath = ($drawing instanceof WorksheetDrawing) ? $drawing->getPath() : '';
                 if ($imagePath === '') {
                     continue;
                 }
@@ -494,10 +495,17 @@ class Xlsx extends BaseWriter
                     $imageContents = file_get_contents($imagePath);
                 }
 
-                $zipContent['xl/media/' . $this->getDrawingHashTable()->getByIndex($i)->getIndexedFilename()] = $imageContents;
+                $drawing = $this->getDrawingHashTable()->getByIndex($i);
+                $filename = method_exists($drawing, 'getIndexedFilename') ? $drawing->getIndexedFilename() : 'default_filename.png';
+                $zipContent['xl/media/' . $filename] = $imageContents;
             } elseif ($this->getDrawingHashTable()->getByIndex($i) instanceof MemoryDrawing) {
                 ob_start();
-                $callable = $this->getDrawingHashTable()->getByIndex($i)->getRenderingFunction();
+                $drawing = $this->getDrawingHashTable()->getByIndex($i);
+                if ($drawing instanceof MemoryDrawing) {
+                    $callable = $drawing->getRenderingFunction();
+                } else {
+                    throw new WriterException('Invalid drawing type: Rendering function not available.');
+                }
                 call_user_func(
                     $callable,
                     $this->getDrawingHashTable()->getByIndex($i)->getImageResource()

@@ -1,7 +1,5 @@
 <?php
-
 namespace PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
 use Composer\Pcre\Preg;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ErrorValue;
 use PhpOffice\PhpSpreadsheet\Calculation\Information\ExcelError;

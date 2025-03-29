@@ -1,3 +1,11 @@
+<!---
+ * Developer: Adugna Gizawadugna@gmail.com
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceictter.com/eleganceict1
+ * Twitter: https://twitter.com/eleganceict1.com/addex12
+ * GitHub: https://github.com/addex12
+ * 
+ -->
 <?php
 require_once '../includes/auth.php';
 requireAdmin();
@@ -98,66 +106,108 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>System Settings - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($pageTitle) ?> | Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .settings-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
+
         .settings-group {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 5px;
-            background-color: #f9f9f9;
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--box-shadow);
         }
+
         .settings-group h3 {
+            font-size: 20px;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .settings-item {
             margin-bottom: 15px;
         }
-        .settings-item {
-            margin-bottom: 10px;
-        }
+
         .settings-item label {
             display: block;
             font-weight: bold;
             margin-bottom: 5px;
         }
+
         .settings-item input, .settings-item select, .settings-item textarea {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: var(--border-radius);
         }
+
         .settings-tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
+
         .settings-tab {
             padding: 10px 20px;
             border: 1px solid #ddd;
-            border-radius: 5px;
+            border-radius: var(--border-radius);
             cursor: pointer;
             background-color: #f1f1f1;
+            transition: var(--transition);
         }
+
         .settings-tab.active {
-            background-color: #3498db;
-            color: #fff;
+            background-color: var(--primary-color);
+            color: white;
         }
+
         .settings-tab-content {
             display: none;
         }
+
         .settings-tab-content.active {
             display: block;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .form-actions .btn {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .form-actions .btn:hover {
+            background-color: var(--secondary-color);
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
+        
         <div class="admin-main">
-            <div class="container">
+            <header class="admin-header">
+                <h1 class="page-title"><?= htmlspecialchars($pageTitle) ?></h1>
+            </header>
+
+            <div class="content">
                 <form method="POST">
                     <div class="settings-tabs">
                         <div class="settings-tab active" data-tab="general">General</div>
@@ -231,7 +281,7 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
                         <div class="settings-tab-content" id="users-tab">
                             <div class="settings-group">
                                 <h3>User Management</h3>
-                                <table>
+                                <table class="table">
                                     <thead>
                                         <tr>
                                             <th>Username</th>
@@ -272,7 +322,7 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                        <button type="submit" class="btn">Save Settings</button>
                     </div>
                 </form>
             </div>
