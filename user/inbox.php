@@ -10,10 +10,10 @@ $userId = $_SESSION['user_id'];
 
 // Fetch messages for the inbox
 $stmt = $pdo->prepare("
-    SELECT m.id, m.subject, m.content, m.sender_id, m.receiver_id, m.created_at 
+    SELECT m.id, m.subject, m.content, m.sender_id, m.receiver_id, m.sent_at 
     FROM messages m
     WHERE m.receiver_id = ?
-    ORDER BY m.created_at DESC
+    ORDER BY m.sent_at DESC
 ");
 $stmt->execute([$userId]);
 $messages = $stmt->fetchAll();
@@ -38,7 +38,7 @@ include __DIR__ . '/includes/header.php';
             <td><?= htmlspecialchars($message['sender_name']) ?></td>
             <td><?= htmlspecialchars($message['subject']) ?></td>
             <td><?= htmlspecialchars($message['content']) ?></td>
-            <td><?= date('M j, Y g:i a', strtotime($message['created_at'])) ?></td>
+            <td><?= date('M j, Y g:i a', strtotime($message['sent_at'])) ?></td>
         </tr>
         <?php endforeach; ?>
     </tbody>
