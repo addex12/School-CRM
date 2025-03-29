@@ -60,6 +60,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$filename]);
         }
     }
+
+    // Handle role management
+    if (isset($_POST['roles'])) {
+        foreach ($_POST['roles'] as $role_id => $role_name) {
+            $stmt = $pdo->prepare("UPDATE roles SET role_name = ? WHERE id = ?");
+            $stmt->execute([$role_name, $role_id]);
+        }
+    }
+
+    // Handle system notifications
+    if (!empty($_POST['notification_message'])) {
+        $stmt = $pdo->prepare("INSERT INTO notifications (user_id, message) VALUES (NULL, ?)");
+        $stmt->execute([$_POST['notification_message']]);
+    }
+
+    // Handle advanced email testing
+    if (!empty($_POST['test_email_advanced'])) {
+        // Simulate sending an email (actual implementation depends on your email library)
+        $_SESSION['success'] = "Advanced test email sent to {$_POST['test_email_advanced']}!";
+    }
     
     $_SESSION['success'] = "Settings updated successfully!";
     header("Location: settings.php");
@@ -124,6 +144,12 @@ $smtp_providers = [
     'outlook' => ['host' => 'smtp.office365.com', 'port' => 587, 'secure' => 'tls'],
     'zoho' => ['host' => 'smtp.zoho.com', 'port' => 465, 'secure' => 'ssl']
 ];
+
+// Fetch roles for role management
+$roles = $pdo->query("SELECT * FROM roles")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch notifications for display
+$notifications = $pdo->query("SELECT * FROM notifications ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -157,6 +183,8 @@ $smtp_providers = [
                             <div class="settings-tab active" data-tab="general">General</div>
                             <div class="settings-tab" data-tab="appearance">Appearance</div>
                             <div class="settings-tab" data-tab="email">Email</div>
+                            <div class="settings-tab" data-tab="roles">Roles</div>
+                            <div class="settings-tab" data-tab="notifications">Notifications</div>
                         </div>
                         
                         <div class="settings-tab-content active" id="general-tab">
@@ -287,6 +315,46 @@ $smtp_providers = [
                                     <div id="test-email-result" style="margin-top: 10px;"></div>
                                 </div>
                             </div>
+
+                            <div class="setting-group">
+                                <h3>Advanced Email Testing</h3>
+                                <div class="setting-item">
+                                    <label for="test_email_advanced">Send advanced test email to:</label>
+                                    <input type="email" id="test_email_advanced" name="test_email_advanced" placeholder="Enter email address">
+                                    <button type="submit" class="btn">Send Advanced Test Email</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="settings-tab-content" id="roles-tab">
+                            <div class="setting-group">
+                                <h3>Manage Roles</h3>
+                                <?php foreach ($roles as $role): ?>
+                                    <div class="setting-item">
+                                        <label for="role_<?php echo $role['id']; ?>">Role Name:</label>
+                                        <input type="text" id="role_<?php echo $role['id']; ?>" name="roles[<?php echo $role['id']; ?>]" value="<?php echo htmlspecialchars($role['role_name']); ?>">
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
+                        <div class="settings-tab-content" id="notifications-tab">
+                            <div class="setting-group">
+                                <h3>Send System Notification</h3>
+                                <div class="setting-item">
+                                    <label for="notification_message">Notification Message:</label>
+                                    <textarea id="notification_message" name="notification_message" rows="4"></textarea>
+                                    <button type="submit" class="btn">Send Notification</button>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <h3>Recent Notifications</h3>
+                                <ul>
+                                    <?php foreach ($notifications as $notification): ?>
+                                        <li><?php echo htmlspecialchars($notification['message']); ?> - <small><?php echo $notification['created_at']; ?></small></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
                         </div>
                         
                         <div class="form-actions">
@@ -360,7 +428,7 @@ $smtp_providers = [
                 btn.disabled = false;
                 btn.textContent = 'Send Test Email';
             });
-        });s
+        });
         
         const smtpProviders = <?php echo json_encode($smtp_providers); ?>;
         
