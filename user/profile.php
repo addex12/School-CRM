@@ -38,8 +38,6 @@ if (!$user) {
 
 if (file_exists(__DIR__ . '/../includes/header.php')) {
     include __DIR__ . '/../includes/header.php';
-} else {
-    echo "<p>No header Found.</p>";
 }
 ?>
 
