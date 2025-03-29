@@ -12,8 +12,8 @@ use Psr\Http\Message\ServerRequestInterface;
 // Social login configuration
 $socialConfig = [
     'google' => [
-        'clientId'     => 'YOUR_GOOGLE_CLIENT_ID',
-        'clientSecret' => 'YOUR_GOOGLE_CLIENT_SECRET',
+          'clientId'     => '10600416439633-ffocfn132qm4rnp9c44d7i3p3kf5p5jb.apps.googleusercontent.com',
+        'clientSecret' => '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B',
         'redirectUri'  => 'https://crm.flipperschool.com/login.php?provider=google', // Update this to match the Google API Console
     ]
 ];
