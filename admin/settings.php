@@ -1,11 +1,3 @@
-<!---
- * Developer: Adugna Gizawadugna@gmail.com
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceictter.com/eleganceict1
- * Twitter: https://twitter.com/eleganceict1.com/addex12
- * GitHub: https://github.com/addex12
- * 
- -->
 <?php
 require_once '../includes/auth.php';
 requireAdmin();
