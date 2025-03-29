@@ -70,7 +70,7 @@ function applySystemSettings() {
     define('THEME_COLOR', getSystemSetting('theme_color', '#3498db'));
     
     // Base URL
-    define('BASE_URL', getSystemSetting('base_url', 'http://cdrm.flipperschool.com'));
+    define('BASE_URL', getSystemSetting('base_url', 'http://crm.flipperschool.com'));
 }
 
 function sanitizeInput($input) {
