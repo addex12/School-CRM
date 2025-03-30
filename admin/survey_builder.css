@@ -336,3 +336,15 @@ input, textarea, select {
         align-items: flex-start;
     }
 }
+/* Add to existing CSS */
+.error input,
+.error select,
+.error textarea {
+    border-color: var(--danger-color) !important;
+}
+
+.error-message {
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}

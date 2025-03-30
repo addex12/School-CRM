@@ -277,6 +277,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </main>
     </div>
 
-    <script src="survey_builder.js"></script>
-</body>
+    <script src="../assets/js/survey_builder.js"></script></body>
 </html>
