@@ -215,11 +215,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label>Target Audience</label>
                             <select name="target_roles[]" multiple required>
                                 <?php
-                                 $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : [];
-                                 $targetRoles = is_array($targetRoles) ? $targetRoles : []; // Force array type
-?> 
-                                <?= in_array($role['id'], (array)$targetRoles) ? 'checked' : '' ?>                             
-                               
+                                // Fix: Ensure $targetRoles is always an array
+                                $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : [];
+                                $targetRoles = is_array($targetRoles) ? $targetRoles : []; // Force array type
+                                ?>
                                 <?php foreach ($roles as $role): ?>
                                     <option value="<?= $role['id'] ?>" <?= in_array($role['id'], $targetRoles) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($role['role_name']) ?>
@@ -288,13 +287,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </main>
     </div>
 
-    <script src="../assets/js/survey_builder.js"></script></body>
-    <div class="form-actions">
-                    <button type="submit" form="survey-form" class="btn btn-success">
-                        <i class="fas fa-save"></i> Save Survey
-                    </button>
-                    <a href="surveys.php" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </a>
-                </div>
+    <script src="../assets/js/survey_builder.js"></script>
+</body>
 </html>
