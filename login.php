@@ -1,37 +1,48 @@
 <?php
 session_start();
+
+// Check if session is already active
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 
-if (isLoggedIn()) {
-    $roleId = $_SESSION['role_id'] ?? null; // Ensure role_id exists
-    $redirect = ($roleId === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
-    header("Location: " . $redirect);
-    exit();
-}
+// ... (rest of the code remains the same)
 
-$error = '';
-
-// Handle regular form login
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['password'])) {
-    $username = trim($_POST['username']);
+// Check if user is logging in
+if (isset($_POST['username']) && isset($_POST['password'])) {
+    $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
+    // Query database to check user credentials and role
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = :username");
+    $stmt->bindParam(':username', $username);
+    $stmt->execute();
+
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
-        session_start(); // Ensure session is started
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
-        $_SESSION['role'] = $user['role'];
-        header("Location: /user/dashboard.php");
-        exit();
+        // Check role and redirect accordingly
+        $role = $user['role_name'];
+
+        // Dynamically redirect to user's dashboard
+        if ($role == 'admin') {
+            $_SESSION['role'] = 'admin';
+            header('Location: admin/dashboard.php');
+            exit;
+        } else {
+            // For other roles, redirect to users/dashboard.php
+            $_SESSION['role'] = $role;
+            header('Location: users/dashboard.php?role=' . $role);
+            exit;
+        }
     } else {
-        $error = "Invalid username or password.";
+        $error = 'Invalid username or password';
     }
 }
+
 ?>
 
 <!DOCTYPE html>
