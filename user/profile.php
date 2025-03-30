@@ -150,87 +150,110 @@ function sendPasswordChangeNotification($email) {
 include __DIR__ . '/../includes/header.php';
 ?>
 
-<div class="profile-container">
-    <h1>Manage Your Profile</h1>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Manage Your Profile</h1>
 
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success'] ?? '') ?></div>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error'] ?? '') ?></div>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
-    <div class="profile-section">
-        <div class="profile-sidebar">
-            <div class="profile-avatar">
-                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
-                     alt="Profile Picture" 
-                     class="avatar-img"
-                     onerror="this.src='../uploads/avatars/default.jpg'">
-            </div>
-            <div class="profile-info">
-                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
-                <p><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></p>
-                <p class="role-badge"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></p>
-                <p>Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></p>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="profile-avatar mb-3">
+                        <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
+                             alt="Profile Picture" 
+                             class="rounded-circle img-fluid"
+                             onerror="this.src='../uploads/avatars/default.jpg'">
+                    </div>
+                    <h3 class="card-title"><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
+                    <p class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></p>
+                    <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                    <p class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></p>
+                </div>
             </div>
         </div>
 
-        <div class="profile-content">
-            <div class="profile-card">
-                <h2>Profile Information</h2>
-                <form method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    <input type="hidden" name="update_profile" value="1">
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" 
-                               value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
-                               required
-                               pattern="[a-zA-Z0-9_]{3,30}"
-                               title="3-30 characters (letters, numbers, underscores)">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" 
-                               value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
-                               required>
-                    </div>
-                    <div class="form-group">
-                        <label for="avatar">Profile Picture:</label>
-                        <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif">
-                        <small class="form-text">Max 2MB (JPG, PNG, GIF only)</small>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                </form>
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <input type="hidden" name="update_profile" value="1">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username:</label>
+                            <input type="text" id="username" name="username" 
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
+                                   required
+                                   pattern="[a-zA-Z0-9_]{3,30}"
+                                   title="3-30 characters (letters, numbers, underscores)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" id="email" name="email" 
+                                   class="form-control"
+                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="avatar" class="form-label">Profile Picture:</label>
+                            <input type="file" id="avatar" name="avatar" 
+                                   class="form-control"
+                                   accept="image/jpeg,image/png,image/gif">
+                            <small class="form-text text-muted">Max 2MB (JPG, PNG, GIF only)</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                    </form>
+                </div>
             </div>
 
-            <div class="profile-card">
-                <h2>Change Password</h2>
-                <form method="POST">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                    <input type="hidden" name="change_password" value="1">
-                    <div class="form-group">
-                        <label for="current_password">Current Password:</label>
-                        <input type="password" id="current_password" name="current_password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="new_password">New Password:</label>
-                        <input type="password" id="new_password" name="new_password" 
-                               required
-                               pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
-                               title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
-                        <small class="form-text">Minimum 8 characters with at least one number and uppercase letter</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm_password">Confirm New Password:</label>
-                        <input type="password" id="confirm_password" name="confirm_password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
-                </form>
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <input type="hidden" name="change_password" value="1">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password:</label>
+                            <input type="password" id="current_password" name="current_password" 
+                                   class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password:</label>
+                            <input type="password" id="new_password" name="new_password" 
+                                   class="form-control"
+                                   required
+                                   pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
+                                   title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
+                            <small class="form-text text-muted">Minimum 8 characters with at least one number and uppercase letter</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password:</label>
+                            <input type="password" id="confirm_password" name="confirm_password" 
+                                   class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary w-100">Change Password</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
