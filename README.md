@@ -130,10 +130,14 @@ MIT License. See LICENSE for details.
 
 ---
 
-### How to Use This README:
-1. Replace `yourusername` in the clone URL with your GitHub username.
-2. Add actual screenshots to a `/screenshots` folder and update paths.
-3. Customize the license if needed.
+## 📞 Contact
 
-This README provides clear setup instructions, usage guidelines, and credits all dependencies. Let me know if you need adjustments! 🚀
-<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
+- Email: gizawadugna@gmail.com
+- LinkedIn: https://www.linkedin.com/in/eleganceict
+
+
+---
+<div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="light" data-type="VERTICAL" data-vanity="eleganceict" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://www.linkedin.com/in/eleganceict?trk=profile-badge">Adugna Gizaw</a>
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script></div>
+
+</div>
