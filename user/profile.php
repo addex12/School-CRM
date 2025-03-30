@@ -1,11 +1,10 @@
 <?php
 ob_start();
-session_start();
 
 // Error reporting - consider logging to file in production
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
-ini_set('log_errors', 1);
+ini_set('log_errors', value: 1);
 ini_set('error_log', __DIR__ . '/../logs/error.log');
 
 // Include required files
