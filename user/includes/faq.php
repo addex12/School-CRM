@@ -5,15 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ - Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .faq-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .faq-section {
+            margin-top: 20px;
+        }
+        .faq-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        .faq-item h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .faq-item p {
+            font-size: 1em;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
     <header>
         <?php include __DIR__ . '/header.php'; ?>
     </header>
     <main>
-        <h1>Frequently Asked Questions (FAQ)</h1>
-        <div id="faq-section" class="faq-section">
-            <!-- FAQ content will be loaded dynamically -->
+        <div class="faq-container">
+            <h1>Frequently Asked Questions (FAQ)</h1>
+            <div id="faq-section" class="faq-section">
+                <!-- FAQ content will be loaded dynamically -->
+            </div>
         </div>
     </main>
     <footer>

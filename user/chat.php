@@ -30,21 +30,9 @@ $messages = $stmt->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Chat</title>
+    <title>Live Chat - Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        /* Updated styles for consistency and better design */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
         .chat-container {
             max-width: 800px;
             margin: 20px auto;
@@ -85,9 +73,6 @@ $messages = $stmt->fetchAll();
             font-size: 0.8em;
             color: #666;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
         textarea {
             width: 100%;
             padding: 10px;
@@ -108,20 +93,6 @@ $messages = $stmt->fetchAll();
         }
         .btn-primary:hover {
             background: #2980b9;
-        }
-        .success-message, .error-message {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .success-message {
-            background: #d4edda;
-            color: #155724;
-        }
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
         }
     </style>
 </head>

@@ -5,15 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Service - Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .terms-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .terms-section {
+            margin-top: 20px;
+        }
+        .terms-section h2 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .terms-section p {
+            font-size: 1em;
+            color: #555;
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
     <header>
         <?php include __DIR__ . '/header.php'; ?>
     </header>
     <main>
-        <h1>Terms of Service</h1>
-        <div id="terms-section" class="terms-section">
-            <!-- Terms content will be loaded dynamically -->
+        <div class="terms-container">
+            <h1>Terms of Service</h1>
+            <div id="terms-section" class="terms-section">
+                <!-- Terms content will be loaded dynamically -->
+            </div>
         </div>
     </main>
     <footer>
