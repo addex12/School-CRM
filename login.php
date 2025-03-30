@@ -41,7 +41,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
             } else {
                 // For other roles, redirect to users/dashboard.php
                 $_SESSION['role'] = $role;
-                header('Location: users/dashboard.php?role=' . $role);
+                header('Location: user/dashboard.php?role=' . $role);
                 exit;
             }
         } else {
