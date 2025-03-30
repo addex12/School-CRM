@@ -58,6 +58,6 @@ $user_email = $_SESSION['email'] ?? '';
         
         <button type="submit" class="btn btn-primary">Submit Ticket</button>
     </form>
+    <?php include_once __DIR__ . '/includes/footer.php'; ?>
 </div>
 
-<?php require_once '/includes/footer.php'; ?>
