@@ -31,7 +31,7 @@ $fields = $stmt->fetchAll();
 $target_roles = json_decode($survey['target_roles'], true);
 
 // Fetch roles from the database
-$stmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+$stmt = $pdo->prepare("SELECT role_name FROM roles WHERE role_id = ?");
 $stmt->execute([$role_id]);
 $role = $stmt->fetch();
 
