@@ -23,7 +23,6 @@ $stmt = $pdo->prepare("
 
 // Execute the survey query
 $stmt->execute([$_SESSION['user_id'], $role]);
-$stmt->execute([$_SESSION['user_id'], $role]);
 $surveys = $stmt->fetchAll();
 
 // Debug output to check retrieved surveys
