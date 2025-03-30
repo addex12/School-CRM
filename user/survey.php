@@ -15,7 +15,7 @@ $stmt = $pdo->prepare("
     AND s.ends_at >= NOW()
     AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(?))
 ");
-$stmt->execute([$survey_id, $_SESSION['role']]);
+$stmt->execute([$survey_id, $_SESSION['role_id']]);
 $survey = $stmt->fetch();
 
 if (!$survey) {
