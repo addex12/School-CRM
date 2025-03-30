@@ -21,15 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['p
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
+        session_start(); // Ensure session is started
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
-        $_SESSION['role_id'] = (int)$user['role_id']; // Ensure role_id is set
-
-        // Update last login
-        $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
-
-        $redirect = ($_SESSION['role_id'] === 1) ? 'admin/dashboard.php' : 'user/dashboard.php';
-        header("Location: " . $redirect);
+        $_SESSION['role'] = $user['role'];
+        header("Location: /user/dashboard.php");
         exit();
     } else {
         $error = "Invalid username or password.";
