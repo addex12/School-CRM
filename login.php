@@ -25,7 +25,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     if ($user && is_array($user) && password_verify($password, $user['password'])) {
         // Check if role_name exists in the user data
-        if (!empty($user['role_name'])) {
+        if (array_key_exists('role_name', $user) && !empty($user['role_name'])) {
             $role = $user['role_name'];
 
             // Dynamically redirect to user's dashboard
