@@ -39,15 +39,21 @@ $survey = null;
 $fields = [];
 
 if ($survey_id) {
+    // Validate survey exists first
     $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
     $stmt->execute([$survey_id]);
     $survey = $stmt->fetch();
 
-    if ($survey) {
-        $stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
-        $stmt->execute([$survey_id]);
-        $fields = $stmt->fetchAll();
+    if (!$survey) {
+        $_SESSION['error'] = "Survey not found!";
+        header("Location: surveys.php");
+        exit();
     }
+
+    // Load survey fields if survey exists
+    $stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
+    $stmt->execute([$survey_id]);
+    $fields = $stmt->fetchAll();
 }
 
 // Form submission handling
@@ -55,47 +61,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        // Generate a unique random survey ID for new surveys
-        if (!$survey_id) {
-            do {
-                $randomSurveyId = bin2hex(random_bytes(4)); // Generate a random 8-character ID
-                $stmt = $pdo->prepare("SELECT COUNT(*) FROM surveys WHERE id = ?");
-                $stmt->execute([$randomSurveyId]);
-                $isUnique = $stmt->fetchColumn() == 0;
-            } while (!$isUnique);
-        }
-
+        // Prepare form data
         $formData = [
-            'id' => $randomSurveyId ?? $survey_id,
             'title' => htmlspecialchars($_POST['title']),
             'description' => htmlspecialchars($_POST['description']),
             'category_id' => intval($_POST['category_id']),
-            'target_roles' => json_encode(is_array($_POST['target_roles'] ?? null) ? $_POST['target_roles'] : []), // Ensure target_roles is an array
+            'target_roles' => json_encode(is_array($_POST['target_roles'] ?? null) ? $_POST['target_roles'] : []),
             'status' => in_array($_POST['status'], array_column($statusOptions, 'value')) ? $_POST['status'] : 'draft',
-            'starts_at' => date('Y-m-d 00:00:00', strtotime($_POST['starts_at'])), // Set time to midnight
-            'ends_at' => date('Y-m-d 23:59:59', strtotime($_POST['ends_at'])),   // Set time to end of the day
+            'starts_at' => date('Y-m-d 00:00:00', strtotime($_POST['starts_at'])),
+            'ends_at' => date('Y-m-d 23:59:59', strtotime($_POST['ends_at'])),
             'is_anonymous' => isset($_POST['is_anonymous']) ? 1 : 0
         ];
 
+        // Validate dates
         if ($formData['starts_at'] >= $formData['ends_at']) {
             throw new Exception("Start date must be before end date.");
         }
 
         if ($survey_id) {
+            // Update existing survey
             $stmt = $pdo->prepare("UPDATE surveys SET 
                 title = ?, description = ?, category_id = ?, target_roles = ?, status = ?, 
                 starts_at = ?, ends_at = ?, is_anonymous = ? WHERE id = ?");
-            $stmt->execute(array_values($formData));
+            $stmt->execute(array_values($formData + ['id' => $survey_id]));
         } else {
+            // Create new survey
             $stmt = $pdo->prepare("INSERT INTO surveys 
-                (id, title, description, category_id, target_roles, status, starts_at, ends_at, is_anonymous, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                (title, description, category_id, target_roles, status, starts_at, ends_at, is_anonymous, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute(array_values($formData + [$_SESSION['user_id']]));
-            $survey_id = $formData['id'];
+            $survey_id = $pdo->lastInsertId();
         }
 
-        // Process questions
+        // Process questions - first delete existing ones
         $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?")->execute([$survey_id]);
+        
+        // Insert new questions
         foreach ($_POST['questions'] as $index => $question) {
             $options = in_array($_POST['field_types'][$index], ['radio', 'checkbox', 'select']) 
                 ? json_encode(array_map('trim', explode(',', $_POST['options'][$index])))
@@ -157,6 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <form id="survey-form" method="POST">
                 <input type="hidden" name="survey_id" value="<?= htmlspecialchars($survey_id) ?>">
+                
                 <!-- Basic Information Section -->
                 <section class="form-section">
                     <h2><i class="fas fa-info-circle text-primary"></i> Basic Information</h2>
@@ -215,9 +217,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label>Target Audience</label>
                             <select name="target_roles[]" multiple required>
                                 <?php
-                                // Fix: Ensure $targetRoles is always an array
                                 $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : [];
-                                $targetRoles = is_array($targetRoles) ? $targetRoles : []; // Force array type
+                                $targetRoles = is_array($targetRoles) ? $targetRoles : [];
                                 ?>
                                 <?php foreach ($roles as $role): ?>
                                     <option value="<?= $role['id'] ?>" <?= in_array($role['id'], $targetRoles) ? 'selected' : '' ?>>
@@ -261,7 +262,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             <div class="form-group options-group" style="<?= !in_array($field['field_type'], ['radio', 'checkbox', 'select']) ? 'display:none' : '' ?>">
                                 <label>Options (comma-separated)</label>
-                                <input type="text" name="options[]" value="<?= htmlspecialchars($field['field_options'] ?? '') ?>">
+                                <input type="text" name="options[]" value="<?= 
+                                    $field['field_options'] ? htmlspecialchars(implode(',', json_decode($field['field_options']))) : '' 
+                                ?>">
                             </div>
                             <div class="form-group">
                                 <label>Placeholder</label>
