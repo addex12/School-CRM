@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-group">
                             <label>Start Date</label>
                             <input type="date" name="starts_at" required
-                                   value="<?= isset($survey['starts_at']) ? date('Y-m-d', strtotime($survey['starts_at'])) : '' ?>">
+                                   value="<?= isset($survey['starts_at']) ? date('Y-m-d', strtotime($survey['starts_at'])) : date('Y-m-d') ?>">
                         </div>
                         <div class="form-group">
                             <label>End Date</label>
