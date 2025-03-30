@@ -1,5 +1,5 @@
 <?php
-require_once '../includes/db.php';
+require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
@@ -7,8 +7,8 @@ $response_id = $_GET['id'] ?? 0;
 
 // Get response info
 $stmt = $pdo->prepare("
-    SELECT r.*, u.username, u.email, u.role, s.title as survey_title
-    FROM survey_responses r
+    SELECT r.*, u.username, u.email, u.role_name, s.title AS survey_title
+    FROM responses r
     JOIN users u ON r.user_id = u.id
     JOIN surveys s ON r.survey_id = s.id
     WHERE r.id = ?
@@ -88,7 +88,7 @@ $response_data = $stmt->fetchAll();
         <div class="content">
             <div class="response-info">
                 <h2><?php echo htmlspecialchars($response['survey_title']); ?></h2>
-                <p><strong>Respondent:</strong> <?php echo htmlspecialchars($response['username']); ?> (<?php echo ucfirst($response['role']); ?>)</p>
+                <p><strong>Respondent:</strong> <?php echo htmlspecialchars($response['username']); ?> (<?php echo ucfirst($response['role_name']); ?>)</p>
                 <p><strong>Email:</strong> <?php echo htmlspecialchars($response['email']); ?></p>
                 <p><strong>Submitted:</strong> <?php echo date('M j, Y g:i A', strtotime($response['submitted_at'])); ?></p>
             </div>
