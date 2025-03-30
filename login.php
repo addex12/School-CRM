@@ -23,9 +23,9 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password'])) {
+    if ($user && is_array($user) && password_verify($password, $user['password'])) {
         // Check if role_name exists in the user data
-        if (isset($user['role_name'])) {
+        if (!empty($user['role_name'])) {
             $role = $user['role_name'];
 
             // Dynamically redirect to user's dashboard
