@@ -55,7 +55,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
+        // Generate a unique random survey ID for new surveys
+        if (!$survey_id) {
+            do {
+                $randomSurveyId = bin2hex(random_bytes(4)); // Generate a random 8-character ID
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM surveys WHERE id = ?");
+                $stmt->execute([$randomSurveyId]);
+                $isUnique = $stmt->fetchColumn() == 0;
+            } while (!$isUnique);
+        }
+
         $formData = [
+            'id' => $randomSurveyId ?? $survey_id,
             'title' => htmlspecialchars($_POST['title']),
             'description' => htmlspecialchars($_POST['description']),
             'category_id' => intval($_POST['category_id']),
@@ -74,13 +85,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("UPDATE surveys SET 
                 title = ?, description = ?, category_id = ?, target_roles = ?, status = ?, 
                 starts_at = ?, ends_at = ?, is_anonymous = ? WHERE id = ?");
-            $stmt->execute(array_values($formData + [$survey_id]));
+            $stmt->execute(array_values($formData));
         } else {
             $stmt = $pdo->prepare("INSERT INTO surveys 
-                (title, description, category_id, target_roles, status, starts_at, ends_at, is_anonymous, created_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                (id, title, description, category_id, target_roles, status, starts_at, ends_at, is_anonymous, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute(array_values($formData + [$_SESSION['user_id']]));
-            $survey_id = $pdo->lastInsertId();
+            $survey_id = $formData['id'];
         }
 
         // Process questions

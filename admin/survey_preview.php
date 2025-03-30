@@ -135,7 +135,13 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
         .form-check {
             margin-bottom: 8px;
         }
+
+        .response-chart {
+            max-width: 100%;
+            height: auto;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -236,6 +242,41 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                     <small class="form-text text-muted">File upload preview</small>
                                 </div>
 
+                            <?php endif; ?>
+
+                            <?php if (in_array($field['field_type'], ['radio', 'checkbox', 'select'])): ?>
+                                <canvas id="chart-<?= $field['id'] ?>" class="response-chart"></canvas>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function () {
+                                        fetch(`../api/response_data.php?field_id=<?= $field['id'] ?>`)
+                                            .then(response => response.json())
+                                            .then(data => {
+                                                const ctx = document.getElementById('chart-<?= $field['id'] ?>').getContext('2d');
+                                                new Chart(ctx, {
+                                                    type: 'bar',
+                                                    data: {
+                                                        labels: Object.keys(data),
+                                                        datasets: [{
+                                                            label: 'Responses',
+                                                            data: Object.values(data),
+                                                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                                            borderWidth: 1
+                                                        }]
+                                                    },
+                                                    options: {
+                                                        responsive: true,
+                                                        plugins: {
+                                                            legend: { display: false },
+                                                            tooltip: { enabled: true }
+                                                        }
+                                                    }
+                                                });
+                                            });
+                                    });
+                                </script>
+                            <?php else: ?>
+                                <p>No graphical representation available for this field type.</p>
                             <?php endif; ?>
 
                             <div class="field-meta">

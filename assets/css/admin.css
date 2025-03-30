@@ -323,3 +323,9 @@
     color: #6c757d;
     margin-top: 5px;
 }
+
+.response-chart {
+    max-width: 100%;
+    height: 300px;
+    margin: 20px 0;
+}
