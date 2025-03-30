@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
 
 // Get target audience roles from the database
-$roles = $pdo->query("SELECT id, name FROM roles ORDER BY name")->fetchAll();
+$roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
 ?>
 
 <!DOCTYPE html>
