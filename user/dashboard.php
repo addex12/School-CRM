@@ -11,7 +11,6 @@ $stmt = $pdo->prepare("SELECT role_id FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $role_id = $stmt->fetchColumn();
 
-// Get available surveys
 $stmt = $pdo->prepare("
     SELECT s.*, 
            (SELECT COUNT(*) FROM survey_responses r 
@@ -20,7 +19,7 @@ $stmt = $pdo->prepare("
     WHERE s.is_active = TRUE 
     AND s.starts_at <= NOW() 
     AND s.ends_at >= NOW()
-    AND JSON_CONTAINS(s.target_roles, ?)
+    AND JSON_CONTAINS(s.target_roles, CAST(? AS JSON))
     ORDER BY s.ends_at ASC
 ");
 $stmt->execute([$_SESSION['user_id'], $role_id]);
