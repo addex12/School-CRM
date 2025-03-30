@@ -136,3 +136,4 @@ MIT License. See LICENSE for details.
 3. Customize the license if needed.
 
 This README provides clear setup instructions, usage guidelines, and credits all dependencies. Let me know if you need adjustments! 🚀
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
