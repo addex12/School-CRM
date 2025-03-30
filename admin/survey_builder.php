@@ -34,7 +34,7 @@ $fieldTypes = [
 ];
 
 // Survey data handling
-$survey_id = $_GET['survey_id'] ?? null;
+$survey_id = $_GET['survey_id'] ?? $_POST['survey_id'] ?? null;
 $survey = null;
 $fields = [];
 
@@ -156,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php include 'includes/alerts.php'; ?>
 
             <form id="survey-form" method="POST">
+                <input type="hidden" name="survey_id" value="<?= htmlspecialchars($survey_id) ?>">
                 <!-- Basic Information Section -->
                 <section class="form-section">
                     <h2><i class="fas fa-info-circle text-primary"></i> Basic Information</h2>

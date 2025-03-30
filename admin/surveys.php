@@ -60,13 +60,12 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                 <!-- Display all surveys -->
                 <div class="table-section">
                     <h2>All Surveys</h2>
-                    <?php if (count(value: $surveys) > 0): ?>
+                    <?php if (count($surveys) > 0): ?>
                         <table class="table">
                             <thead>
-                                <tr></tr>
+                                <tr>
                                     <th>Title</th>
                                     <th>Description</th>
-                                    <th>Created By</th>
                                     <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -76,24 +75,21 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                                     <tr>
                                         <td><?= htmlspecialchars($survey['title']) ?></td>
                                         <td><?= htmlspecialchars($survey['description']) ?></td>
-                                        <td><?= htmlspecialchars($survey['created_by']) ?></td>
                                         <td>
-                                            <?php if (!$survey['is_active']): ?>
-                                                <span class="status-inactive">Inactive</span>
-                                            <?php elseif (strtotime($survey['starts_at']) > time()): ?>
-                                                <span class="status-upcoming">Upcoming</span>
-                                            <?php elseif (strtotime($survey['ends_at']) < time()): ?>
-                                                <span class="status-ended">Ended</span>
-                                            <?php else: ?>
+                                            <?php if ($survey['status'] === 'active'): ?>
                                                 <span class="status-active">Active</span>
+                                            <?php elseif ($survey['status'] === 'inactive'): ?>
+                                                <span class="status-inactive">Inactive</span>
+                                            <?php elseif ($survey['status'] === 'archived'): ?>
+                                                <span class="status-archived">Archived</span>
+                                            <?php else: ?>
+                                                <span class="status-draft">Draft</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                        <a href="survey_preview.php?id=<?= $survey['id'] ?>.php" class="btn btn-primary">Preview</a>
-                                        <a href="results.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Results</a>                                        
-                                        <a href="view_survey.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Manage</a>  
-                                        <a href="response_view.php?survey_id=<?= $survey['id'] ?>" class="btn btn-secondary">Response</a>                                        </td>
-                                                                        
+                                            <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
+                                            <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -105,6 +101,7 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
             </div>
         </div>
     </div>
-</body>    <?php require_once 'includes/footer.php'; ?>
+</body>    
+<?php require_once 'includes/footer.php'; ?>
 
 </html>
