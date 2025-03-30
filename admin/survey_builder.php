@@ -189,7 +189,7 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
                                     <input type="checkbox" name="target_roles[]" value="<?php echo $role['id']; ?>" <?php 
                                         echo in_array($role['id'], $targetRoles) ? 'checked' : ''; 
                                     ?>>
-                                    <?php echo htmlspecialchars($role['name']); ?>
+                                    <?php echo htmlspecialchars($role['role_name']); ?> - <?php echo htmlspecialchars($role['role_name']); ?>
                                 </label>
                             <?php endforeach; ?>
                         </div>
