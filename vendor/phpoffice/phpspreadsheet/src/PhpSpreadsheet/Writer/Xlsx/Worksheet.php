@@ -1553,6 +1553,9 @@ class Worksheet extends WriterPart
 
     private function parseRef(string $coordinate, string $ref): string
     {
+        // Ensure $matches is initialized before use
+        $matches = [];
+
         if (!Preg::isMatch('/^([A-Z]{1,3})([0-9]{1,7})(:([A-Z]{1,3})([0-9]{1,7}))?$/', $ref, $matches)) {
             return $ref;
         }
