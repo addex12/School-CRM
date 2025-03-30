@@ -30,11 +30,6 @@ $fields = $stmt->fetchAll();
 // Get target roles
 $target_roles = json_decode($survey['target_roles'], true);
 
-// Fetch roles from the database
-$stmt = $pdo->prepare("SELECT role_name FROM roles WHERE role_id = ?");
-$stmt->execute([$role_id]);
-$role = $stmt->fetch();
-
 $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
 ?>
 
@@ -167,11 +162,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                             </div>
                             <div class="meta-item">
                                 <label>Target Audience:</label>
-                                <p>
-                                    <?php
-                                    echo implode(', ', array_map(fn($role) => $roles[$role] ?? ucfirst($role), $target_roles));
-                                    ?>
-                                </p>
+                                <p id="target-roles">Loading...</p>
                             </div>
                             <div class="meta-item">
                                 <label>Status:</label>
@@ -281,6 +272,21 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                     behavior: 'smooth'
                 });
             });
+        });
+
+        // Fetch roles dynamically and update the target audience
+        document.addEventListener('DOMContentLoaded', function () {
+            const targetRoles = <?= json_encode($target_roles) ?>;
+            fetch('../api/roles.php')
+                .then(response => response.json())
+                .then(data => {
+                    const roles = targetRoles.map(roleId => data[roleId] || `Unknown Role (${roleId})`);
+                    document.getElementById('target-roles').textContent = roles.join(', ');
+                })
+                .catch(error => {
+                    console.error('Error fetching roles:', error);
+                    document.getElementById('target-roles').textContent = 'Error loading roles.';
+                });
         });
     </script>
 </body>
