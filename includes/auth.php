@@ -23,8 +23,7 @@ if (!function_exists('requireLogin')) {
     function requireLogin() {
         if (!isLoggedIn()) {
             header("Location: ../login.php");
-                exit();
-            }
+            exit();
         }
     }
 }
@@ -50,6 +49,5 @@ if (!function_exists('requireAdmin')) {
             header("Location: /user/dashboard.php");
             exit();
         }
-    
     }
 }
