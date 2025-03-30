@@ -278,4 +278,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="../assets/js/survey_builder.js"></script></body>
+    <div class="form-actions">
+                    <button type="submit" form="survey-form" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save Survey
+                    </button>
+                    <a href="surveys.php" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
 </html>

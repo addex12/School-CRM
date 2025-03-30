@@ -31,9 +31,9 @@ $fields = $stmt->fetchAll();
 $target_roles = json_decode($survey['target_roles'], true);
 
 // Fetch roles from the database
-$stmt = $pdo->prepare("SELECT role_key, role_name FROM roles");
-$stmt->execute();
-$roles = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+$stmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+$stmt->execute([$role_id]);
+$role = $stmt->fetch();
 
 $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
 ?>
