@@ -9,7 +9,7 @@ require_once 'includes/db.php';
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 
-// ... (rest of the code remains the same)
+$error = ''; // Initialize error variable to avoid undefined variable notice
 
 // Check if user is logging in
 if (isset($_POST['username']) && isset($_POST['password'])) {
@@ -24,27 +24,31 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
-        // Check role and redirect accordingly
-        $role = $user['role_name'];
+        // Check if role_name exists in the user data
+        if (isset($user['role_name'])) {
+            $role = $user['role_name'];
 
-        // Dynamically redirect to user's dashboard
-        if ($role == 'admin') {
-            $_SESSION['role'] = 'admin';
-            header('Location: admin/dashboard.php');
-            exit;
+            // Dynamically redirect to user's dashboard
+            if ($role == 'admin') {
+                $_SESSION['role'] = 'admin';
+                header('Location: admin/dashboard.php');
+                exit;
+            } else {
+                // For other roles, redirect to users/dashboard.php
+                $_SESSION['role'] = $role;
+                header('Location: users/dashboard.php?role=' . $role);
+                exit;
+            }
         } else {
-            // For other roles, redirect to users/dashboard.php
-            $_SESSION['role'] = $role;
-            header('Location: users/dashboard.php?role=' . $role);
-            exit;
+            $error = 'User role is not defined.';
         }
     } else {
         $error = 'Invalid username or password';
     }
 }
 
+// Prevent any output before this point
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
