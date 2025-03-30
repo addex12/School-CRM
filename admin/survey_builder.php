@@ -7,31 +7,34 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
-// Database configurations
-$roles = $pdo->query("SELECT id, role_name FROM roles WHERE id NOT IN (1) ORDER BY role_name")->fetchAll();
+// Fetch roles excluding admin
+$roles = $pdo->query("SELECT id, role_name FROM roles WHERE role_name != 'admin' ORDER BY role_name")->fetchAll();
+
+// Fetch categories
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
 
-// Form configurations
+// Define status options
 $statusOptions = [
-    ['value' => 'draft', 'label' => '📝 Draft'],
-    ['value' => 'active', 'label' => '✅ Active'],
-    ['value' => 'inactive', 'label' => '⏸️ Inactive'],
-    ['value' => 'archived', 'label' => '🗄️ Archived']
+    ['value' => 'draft', 'label' => 'Draft'],
+    ['value' => 'active', 'label' => 'Active'],
+    ['value' => 'inactive', 'label' => 'Inactive'],
+    ['value' => 'archived', 'label' => 'Archived']
 ];
 
+// Define field types
 $fieldTypes = [
-    'text' => ['icon' => 'fa-font', 'label' => 'Text Input'],
-    'textarea' => ['icon' => 'fa-paragraph', 'label' => 'Text Area'],
-    'radio' => ['icon' => 'fa-dot-circle', 'label' => 'Multiple Choice'],
-    'checkbox' => ['icon' => 'fa-check-square', 'label' => 'Checkboxes'],
-    'select' => ['icon' => 'fa-caret-down', 'label' => 'Dropdown'],
-    'number' => ['icon' => 'fa-hashtag', 'label' => 'Number'],
-    'date' => ['icon' => 'fa-calendar', 'label' => 'Date'],
-    'rating' => ['icon' => 'fa-star', 'label' => 'Rating'],
-    'file' => ['icon' => 'fa-file-upload', 'label' => 'File Upload']
+    'text' => 'Text Input',
+    'textarea' => 'Text Area',
+    'radio' => 'Multiple Choice',
+    'checkbox' => 'Checkboxes',
+    'select' => 'Dropdown',
+    'number' => 'Number',
+    'date' => 'Date',
+    'rating' => 'Rating',
+    'file' => 'File Upload'
 ];
 
-// Survey handling
+// Fetch survey and fields if editing
 $survey_id = $_GET['survey_id'] ?? null;
 $survey = null;
 $fields = [];
@@ -48,6 +51,7 @@ if ($survey_id) {
     }
 }
 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
@@ -65,15 +69,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
 
         if ($formData['starts_at'] >= $formData['ends_at']) {
-            throw new Exception("Start date must be before end date");
+            throw new Exception("Start date must be before end date.");
         }
 
         if ($survey_id) {
+            // Update survey
             $stmt = $pdo->prepare("UPDATE surveys SET 
                 title = ?, description = ?, category_id = ?, target_roles = ?, status = ?, 
                 starts_at = ?, ends_at = ?, is_anonymous = ? WHERE id = ?");
             $stmt->execute(array_values($formData + [$survey_id]));
         } else {
+            // Insert new survey
             $stmt = $pdo->prepare("INSERT INTO surveys 
                 (title, description, category_id, target_roles, status, starts_at, ends_at, is_anonymous, created_by)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
@@ -81,12 +87,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $survey_id = $pdo->lastInsertId();
         }
 
-        // Process questions
+        // Save survey fields
         $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?")->execute([$survey_id]);
-        
         foreach ($_POST['questions'] as $index => $question) {
             $options = in_array($_POST['field_types'][$index], ['radio', 'checkbox', 'select']) 
-                ? json_encode(array_map('trim', explode(',', $_POST['options'][$index])))
+                ? json_encode(array_map('trim', explode(',', $_POST['options'][$index]))) 
                 : null;
 
             $stmt = $pdo->prepare("INSERT INTO survey_fields 
@@ -96,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $survey_id,
                 $_POST['field_types'][$index],
                 htmlspecialchars($question),
-                'field_'.($index+1),
+                'field_' . ($index + 1),
                 $_POST['placeholders'][$index] ?? '',
                 $options,
                 isset($_POST['required'][$index]) ? 1 : 0,
@@ -178,9 +183,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="grid-col-3">
                         <div class="form-group">
                             <label>Status</label>
-                            <select name="status" class="select-icons" required>
+                            <select name="status" required>
                                 <?php foreach ($statusOptions as $opt): ?>
-                                <option value="<?= $opt['value'] ?>" data-icon="fas fa-<?= $opt['value'] ?>" <?= ($survey['status'] ?? 'draft') === $opt['value'] ? 'selected' : '' ?>>
+                                <option value="<?= $opt['value'] ?>" <?= ($survey['status'] ?? 'draft') === $opt['value'] ? 'selected' : '' ?>>
                                     <?= $opt['label'] ?>
                                 </option>
                                 <?php endforeach; ?>
@@ -211,7 +216,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                            id="role-<?= $role['id'] ?>" value="<?= $role['id'] ?>"
                                            <?= in_array($role['id'], $targetRoles) ? 'checked' : '' ?>>
                                     <label for="role-<?= $role['id'] ?>">
-                                        <i class="fas fa-users"></i>
                                         <?= htmlspecialchars($role['role_name']) ?>
                                     </label>
                                 </div>
@@ -220,13 +224,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
 
                         <div class="form-group">
-                            <div class="switch-container">
-                                <label>
-                                    <input type="checkbox" name="is_anonymous" <?= ($survey['is_anonymous'] ?? 0) ? 'checked' : '' ?>>
-                                    <span class="switch"></span>
-                                    <span class="label-text">Anonymous Responses</span>
-                                </label>
-                            </div>
+                            <label>
+                                <input type="checkbox" name="is_anonymous" <?= ($survey['is_anonymous'] ?? 0) ? 'checked' : '' ?>>
+                                Anonymous Responses
+                            </label>
                         </div>
                     </div>
                 </section>
