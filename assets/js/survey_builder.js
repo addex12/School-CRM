@@ -84,25 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Reindex all questions before submission
     document.getElementById('survey-form').addEventListener('submit', function(e) {
         reindexQuestions();
-        let isValid = true;
-
-        // Validate all questions
-        questionsContainer.querySelectorAll('[name="questions[]"]').forEach((input, index) => {
-            const group = input.closest('.form-group');
-            if (!input.value.trim()) {
-                group.classList.add('error');
-                group.querySelector('.error-message').textContent = 'This field is required';
-                isValid = false;
-            } else {
-                group.classList.remove('error');
-                group.querySelector('.error-message').textContent = '';
-            }
-        });
-
-        if (!isValid) {
-            e.preventDefault();
-            alert('Please fill in all required question fields!');
-        }
     });
 
     function reindexQuestions() {
