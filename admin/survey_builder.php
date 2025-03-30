@@ -10,10 +10,6 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
-// Load configuration from JSON
-$configPath = '../assets/config/survey-config.json';
-$config = json_decode(file_get_contents($configPath), true);
-
 // Check if editing an existing survey
 $survey_id = $_GET['survey_id'] ?? null;
 $survey = null;
@@ -40,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
 
-        $status = $_POST['status'] ?? $config['defaultSettings']['status'];
+        $status = $_POST['status'] ?? 'draft';
         $is_anonymous = isset($_POST['is_anonymous']) ? 1 : 0;
 
         // Validate survey dates
@@ -123,6 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Get categories
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
+
+// Get target audience roles from the database
+$roles = $pdo->query("SELECT id, name FROM roles ORDER BY name")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -185,12 +184,12 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                         <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                             <?php 
                             $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : [];
-                            foreach ($config['targetRoles'] as $role): ?>
+                            foreach ($roles as $role): ?>
                                 <label class="checkbox-label">
-                                    <input type="checkbox" name="target_roles[]" value="<?php echo $role['value']; ?>" <?php 
-                                        echo in_array($role['value'], $targetRoles) ? 'checked' : ''; 
+                                    <input type="checkbox" name="target_roles[]" value="<?php echo $role['id']; ?>" <?php 
+                                        echo in_array($role['id'], $targetRoles) ? 'checked' : ''; 
                                     ?>>
-                                    <?php echo $role['label']; ?>
+                                    <?php echo htmlspecialchars($role['name']); ?>
                                 </label>
                             <?php endforeach; ?>
                         </div>
@@ -212,13 +211,8 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                     <div class="form-group">
                         <label for="status">Status</label>
                         <select id="status" name="status" class="form-control" required>
-                            <?php foreach ($config['statusOptions'] as $option): ?>
-                                <option value="<?php echo $option['value']; ?>" <?php 
-                                    echo isset($survey['status']) && $survey['status'] === $option['value'] ? 'selected' : ''; 
-                                ?>>
-                                    <?php echo $option['label']; ?>
-                                </option>
-                            <?php endforeach; ?>
+                            <option value="draft" <?php echo isset($survey['status']) && $survey['status'] === 'draft' ? 'selected' : ''; ?>>Draft</option>
+                            <option value="published" <?php echo isset($survey['status']) && $survey['status'] === 'published' ? 'selected' : ''; ?>>Published</option>
                         </select>
                     </div>
                     
@@ -247,13 +241,10 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                                     <div class="form-group">
                                         <label>Field Type</label>
                                         <select name="field_types[]" class="form-control field-type-selector" required>
-                                            <?php foreach ($config['fieldTypes'] as $type => $label): ?>
-                                                <option value="<?php echo $type; ?>" <?php 
-                                                    echo $field['field_type'] === $type ? 'selected' : ''; 
-                                                ?>>
-                                                    <?php echo $label; ?>
-                                                </option>
-                                            <?php endforeach; ?>
+                                            <option value="text" <?php echo $field['field_type'] === 'text' ? 'selected' : ''; ?>>Text</option>
+                                            <option value="radio" <?php echo $field['field_type'] === 'radio' ? 'selected' : ''; ?>>Radio</option>
+                                            <option value="checkbox" <?php echo $field['field_type'] === 'checkbox' ? 'selected' : ''; ?>>Checkbox</option>
+                                            <option value="dropdown" <?php echo $field['field_type'] === 'dropdown' ? 'selected' : ''; ?>>Dropdown</option>
                                         </select>
                                     </div>
                                     
@@ -297,9 +288,10 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                                 <div class="form-group">
                                     <label>Field Type</label>
                                     <select name="field_types[]" class="form-control field-type-selector" required>
-                                        <?php foreach ($config['fieldTypes'] as $type => $label): ?>
-                                            <option value="<?php echo $type; ?>"><?php echo $label; ?></option>
-                                        <?php endforeach; ?>
+                                        <option value="text">Text</option>
+                                        <option value="radio">Radio</option>
+                                        <option value="checkbox">Checkbox</option>
+                                        <option value="dropdown">Dropdown</option>
                                     </select>
                                 </div>
                                 
@@ -369,9 +361,10 @@ $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetc
                     <div class="form-group">
                         <label>Field Type</label>
                         <select name="field_types[]" class="form-control field-type-selector" required>
-                            <?php foreach ($config['fieldTypes'] as $type => $label): ?>
-                                <option value="<?php echo $type; ?>"><?php echo $label; ?></option>
-                            <?php endforeach; ?>
+                            <option value="text">Text</option>
+                            <option value="radio">Radio</option>
+                            <option value="checkbox">Checkbox</option>
+                            <option value="dropdown">Dropdown</option>
                         </select>
                     </div>
                     
