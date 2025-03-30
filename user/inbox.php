@@ -42,8 +42,10 @@ function getUserRoleName($roleId) {
     return $roles[$roleId] ?? 'Unknown';
 }
 ?>
+<div class="container">
+<?php include_once __DIR__ . '/includes/header.php';
+?>
             <?php require_once 'includes/header.php'; // Add header.php inclusion?>
-
 <div class="inbox-container">
     <div class="inbox-layout">
         <div class="inbox-sidebar">
@@ -119,6 +121,8 @@ function getUserRoleName($roleId) {
             <button type="submit" class="btn btn-primary">Send</button>
         </form>
     </div>
+</div>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
 </div>
 
 <script>
@@ -495,4 +499,3 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 </style>
 
-<?php require_once __DIR__ . '/includes/footer.php'; 
