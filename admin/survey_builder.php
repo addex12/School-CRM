@@ -213,20 +213,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="grid-2">
                         <div class="form-group">
                             <label>Target Audience</label>
-                            <div class="role-grid">
+                            <select name="target_roles[]" multiple required>
                                 <?php $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : []; ?>
                                 <?php foreach ($roles as $role): ?>
-                                <div class="role-card">
-                                    <input type="checkbox" name="target_roles[]" 
-                                           id="role-<?= $role['id'] ?>" value="<?= $role['id'] ?>"
-                                           <?= in_array($role['id'], $targetRoles) ? 'checked' : '' ?>>
-                                    <label for="role-<?= $role['id'] ?>">
-                                        <i class="fas fa-users"></i>
+                                    <option value="<?= $role['id'] ?>" <?= in_array($role['id'], $targetRoles) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($role['role_name']) ?>
-                                    </label>
-                                </div>
+                                    </option>
                                 <?php endforeach; ?>
-                            </div>
+                            </select>
                         </div>
 
                         <div class="form-group">
