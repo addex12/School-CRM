@@ -6,6 +6,12 @@ requireAdmin();
 
 $response_id = $_GET['id'] ?? 0;
 
+if (!$response_id) {
+    $_SESSION['error'] = "Response ID is required.";
+    header("Location: results.php");
+    exit();
+}
+
 // Get response info
 $stmt = $pdo->prepare("
     SELECT r.*, u.username, u.email, ro.role_name, s.title AS survey_title
@@ -19,6 +25,7 @@ $stmt->execute([$response_id]);
 $response = $stmt->fetch();
 
 if (!$response) {
+    $_SESSION['error'] = "Response not found.";
     header("Location: results.php");
     exit();
 }
