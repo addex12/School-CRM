@@ -336,7 +336,6 @@ input, textarea, select {
         align-items: flex-start;
     }
 }
-/* Add to existing CSS */
 .error input,
 .error select,
 .error textarea {

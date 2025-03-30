@@ -1,13 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const questionsContainer = document.getElementById('questions-container');
     const addQuestionBtn = document.getElementById('add-question');
+    let questionCount = questionsContainer.children.length;
 
     // Add new question
     addQuestionBtn.addEventListener('click', () => {
-        const questionIndex = questionsContainer.children.length;
-        const newQuestion = createQuestionElement(questionIndex);
+        const newQuestion = createQuestionElement(questionCount);
         questionsContainer.appendChild(newQuestion);
         initQuestionEvents(newQuestion);
+        questionCount++;
     });
 
     // Initialize existing questions
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="form-group">
                 <label>Question</label>
                 <input type="text" name="questions[]" required placeholder="Enter your question">
+                <div class="error-message"></div>
             </div>
             <div class="form-group">
                 <label>Field Type</label>
@@ -47,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="form-group">
                 <label class="required-check">
-                    <input type="checkbox" name="required[${index}]">
+                    <input type="checkbox" name="required[]">
                     Required
                 </label>
             </div>
@@ -75,21 +77,45 @@ document.addEventListener('DOMContentLoaded', function() {
         // Remove question handler
         question.querySelector('.remove-question').addEventListener('click', () => {
             question.remove();
+            reindexQuestions();
         });
     }
 
-    // Form validation
+    // Reindex all questions before submission
     document.getElementById('survey-form').addEventListener('submit', function(e) {
-        let valid = true;
-        document.querySelectorAll('[name="questions[]"]').forEach(input => {
+        reindexQuestions();
+        let isValid = true;
+
+        // Validate all questions
+        questionsContainer.querySelectorAll('[name="questions[]"]').forEach((input, index) => {
+            const group = input.closest('.form-group');
             if (!input.value.trim()) {
-                valid = false;
-                input.closest('.form-group').classList.add('error');
+                group.classList.add('error');
+                group.querySelector('.error-message').textContent = 'This field is required';
+                isValid = false;
+            } else {
+                group.classList.remove('error');
+                group.querySelector('.error-message').textContent = '';
             }
         });
-        if (!valid) {
+
+        if (!isValid) {
             e.preventDefault();
             alert('Please fill in all required question fields!');
         }
     });
+
+    function reindexQuestions() {
+        questionsContainer.querySelectorAll('.question-card').forEach((question, index) => {
+            // Update all names with current index
+            question.querySelector('[name="questions[]"]').name = `questions[${index}]`;
+            question.querySelector('[name="field_types[]"]').name = `field_types[${index}]`;
+            question.querySelector('[name="options[]"]').name = `options[${index}]`;
+            question.querySelector('[name="placeholders[]"]').name = `placeholders[${index}]`;
+            
+            // Handle required checkbox
+            const requiredCheckbox = question.querySelector('[name="required[]"]');
+            requiredCheckbox.name = `required[${index}]`;
+        });
+    }
 });
