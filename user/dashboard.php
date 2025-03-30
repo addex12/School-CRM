@@ -2,13 +2,16 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Include necessary files
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 
+// Get user's role ID
+$stmt = $pdo->prepare("SELECT role_id FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$role_id = $stmt->fetchColumn();
+
 // Get available surveys
-$role = $_SESSION['role'] ?? 'guest'; // Provide a default value if 'role' is not set
 $stmt = $pdo->prepare("
     SELECT s.*, 
            (SELECT COUNT(*) FROM survey_responses r 
@@ -17,12 +20,10 @@ $stmt = $pdo->prepare("
     WHERE s.is_active = TRUE 
     AND s.starts_at <= NOW() 
     AND s.ends_at >= NOW()
-    AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(?))
+    AND JSON_CONTAINS(s.target_roles, ?)
     ORDER BY s.ends_at ASC
 ");
-
-// Execute the survey query
-$stmt->execute([$_SESSION['user_id'], $role]);
+$stmt->execute([$_SESSION['user_id'], $role_id]);
 $surveys = $stmt->fetchAll();
 
 // Get completed surveys count
