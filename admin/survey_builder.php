@@ -123,240 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $survey_id ? 'Edit Survey' : 'New Survey' ?> - Survey Builder</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #4a90e2;
-            --success-color: #34d399;
-            --danger-color: #ef4444;
-            --background-color: #f8fafc;
-            --card-shadow: 0 1px 3px rgba(0,0,0,0.12);
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--background-color);
-            margin: 0;
-            color: #1e293b;
-        }
-
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .survey-builder {
-            flex: 1;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .builder-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .form-section {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem 2rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--card-shadow);
-            transition: transform 0.2s ease;
-        }
-
-        .form-section:hover {
-            transform: translateY(-2px);
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #475569;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            transition: border-color 0.2s ease;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-        }
-
-        .role-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1rem;
-            padding: 1rem 0;
-        }
-
-        .role-card {
-            position: relative;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .role-card:hover {
-            border-color: var(--primary-color);
-            background: #f8fafc;
-        }
-
-        .role-card input {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .role-card label {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-            margin: 0;
-        }
-
-        .role-card i {
-            color: #64748b;
-            font-size: 1.1rem;
-        }
-
-        .role-card input:checked + label {
-            color: var(--primary-color);
-        }
-
-        .role-card input:checked + label i {
-            color: var(--primary-color);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-success {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .btn-success:hover {
-            opacity: 0.9;
-        }
-
-        .btn-secondary {
-            background: #64748b;
-            color: white;
-        }
-
-        .switch-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: #f8fafc;
-            border-radius: 8px;
-        }
-
-        .question-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        .question-card:hover {
-            border-color: var(--primary-color);
-        }
-
-        .remove-question {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            color: var(--danger-color);
-            cursor: pointer;
-        }
-
-        .field-type-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 1rem;
-            padding: 1rem 0;
-        }
-
-        .field-type-option {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .field-type-option:hover {
-            border-color: var(--primary-color);
-        }
-
-        .field-type-option i {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #64748b;
-        }
-
-        .status-option {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            border-radius: 8px;
-            background: #f8fafc;
-        }
-
-        .status-option i {
-            width: 24px;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="survey_builder.css">
 </head>
 <body>
     <div class="admin-layout">
@@ -474,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             <div class="form-group">
                                 <label>Field Type</label>
-                                <select name="field_types[]" required>
+                                <select name="field_types[]" class="field-type-select" required>
                                     <?php foreach ($fieldTypes as $type => $details): ?>
                                     <option value="<?= $type ?>" <?= $field['field_type'] === $type ? 'selected' : '' ?>>
                                         <?= $details['label'] ?>
@@ -482,8 +249,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Options (comma-separated, for applicable types)</label>
+                            <div class="form-group options-group" style="<?= !in_array($field['field_type'], ['radio', 'checkbox', 'select']) ? 'display:none' : '' ?>">
+                                <label>Options (comma-separated)</label>
                                 <input type="text" name="options[]" value="<?= htmlspecialchars($field['field_options'] ?? '') ?>">
                             </div>
                             <div class="form-group">
@@ -491,7 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input type="text" name="placeholders[]" value="<?= htmlspecialchars($field['placeholder'] ?? '') ?>">
                             </div>
                             <div class="form-group">
-                                <label>
+                                <label class="required-check">
                                     <input type="checkbox" name="required[<?= $index ?>]" <?= $field['is_required'] ? 'checked' : '' ?>>
                                     Required
                                 </label>
@@ -510,6 +277,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </main>
     </div>
 
-    <script src="../assets/js/survey-builder.js"></script>
+    <script src="survey_builder.js"></script>
 </body>
 </html>
