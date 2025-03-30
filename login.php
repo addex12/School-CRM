@@ -43,7 +43,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $updateStmt->execute();
 
         // Redirect based on role
-        if (strtolower($user['role_name']) === 'admin') {
+        if ($user['role_name'] === 'admin') { // Fixed condition
             header('Location: admin/dashboard.php');
             exit;
         } else {
