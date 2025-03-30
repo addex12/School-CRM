@@ -1,4 +1,16 @@
 <?php
+echo "Profile page loaded successfully.<br>";
+
+// Debugging: Check database connection
+require_once __DIR__ . '/../includes/db.php';
+$stmt = $pdo->query("SELECT 1");
+echo "Database connection successful.<br>";
+
+// Debugging: Check session variables
+session_start();
+var_dump($_SESSION);
+exit();
+
 // Start session and error reporting at the very top
 session_start();
 error_reporting(E_ALL);
