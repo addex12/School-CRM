@@ -63,6 +63,7 @@ function getUserRoleName($roleId) {
                             <?php if ($user['role_id']): ?>
                                 <span class="user-role">(<?= getUserRoleName($user['role_id']) ?>)</span>
                             <?php endif; ?>
+                            <button class="btn btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -108,6 +109,20 @@ function getUserRoleName($roleId) {
                 <?php endif; ?>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Chat Modal -->
+<div id="chatModal" class="chat-modal">
+    <div class="chat-modal-content">
+        <span class="close-chat">&times;</span>
+        <h3>Chat with <span id="chatUserName"></span></h3>
+        <div class="chat-messages" id="chatMessages"></div>
+        <form id="chatForm">
+            <input type="hidden" id="chatUserId">
+            <textarea id="chatInput" placeholder="Type your message..." required></textarea>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
     </div>
 </div>
 
@@ -181,6 +196,65 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             const messageId = button.dataset.id;
             window.location.href = `/view-message.php?id=${messageId}`;
+        });
+    });
+
+    const chatModal = document.getElementById('chatModal');
+    const chatUserName = document.getElementById('chatUserName');
+    const chatUserId = document.getElementById('chatUserId');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+
+    // Open chat modal
+    document.querySelectorAll('.btn-chat').forEach(button => {
+        button.addEventListener('click', () => {
+            const userId = button.dataset.userId;
+            const username = button.previousElementSibling.textContent;
+
+            chatUserName.textContent = username;
+            chatUserId.value = userId;
+            chatMessages.innerHTML = ''; // Clear previous messages
+            chatModal.style.display = 'block';
+
+            // Fetch chat history
+            fetch(`/api/chat_history.php?user_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(message => {
+                        const messageElement = document.createElement('div');
+                        messageElement.textContent = message.content;
+                        chatMessages.appendChild(messageElement);
+                    });
+                });
+        });
+    });
+
+    // Close chat modal
+    document.querySelector('.close-chat').addEventListener('click', () => {
+        chatModal.style.display = 'none';
+    });
+
+    // Send chat message
+    chatForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const message = chatInput.value;
+        const userId = chatUserId.value;
+
+        fetch('/api/send_message.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, content: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const messageElement = document.createElement('div');
+                messageElement.textContent = message;
+                chatMessages.appendChild(messageElement);
+                chatInput.value = '';
+            }
         });
     });
 });
@@ -369,6 +443,60 @@ document.addEventListener('DOMContentLoaded', () => {
     .inbox-sidebar {
         width: 100%;
     }
+}
+
+/* Chat Modal Styles */
+.chat-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.chat-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+}
+
+.close-chat {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+}
+
+.chat-messages {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: #f9f9f9;
+}
+
+#chatInput {
+    width: calc(100% - 80px);
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#chatForm button {
+    padding: 10px 20px;
 }
 </style>
 
