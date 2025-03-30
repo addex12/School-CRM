@@ -18,7 +18,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
     // Query database to check user credentials and role
     $stmt = $pdo->prepare("
-        SELECT users.*, roles.role_name 
+        SELECT users.*, roles.role_name, roles.id AS role_id 
         FROM users 
         LEFT JOIN roles ON users.role_id = roles.id 
         WHERE users.username = :username
@@ -34,7 +34,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['email'] = $user['email'];
-        $_SESSION['role'] = $user['role_name'];
+        $_SESSION['role_id'] = $user['role_id'];
         $_SESSION['avatar'] = $user['avatar'];
         
         // Update last login time
@@ -42,8 +42,8 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
         $updateStmt->bindParam(':id', $user['id']);
         $updateStmt->execute();
 
-        // Redirect based on role
-        if ($user['role_name'] === 'admin') { // Fixed condition
+        // Redirect based on role_id
+        if ($user['role_id'] == 1) { // Role ID 1 is for admin
             header('Location: admin/dashboard.php');
             exit;
         } else {
