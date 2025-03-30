@@ -37,65 +37,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    // Handle profile update
     if (isset($_POST['update_profile'])) {
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        handleProfileUpdate($pdo, $user, $userId);
+    }
 
-        // Validate username
-        if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
-            $_SESSION['error'] = "Username must be 3-30 characters (letters, numbers, underscores only).";
-        } 
-        // Validate email
-        elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['error'] = "Invalid email format.";
+    // Handle password change
+    if (isset($_POST['change_password'])) {
+        handleChangePassword($pdo, $user, $userId);
+    }
+}
+
+// Function to handle profile updates
+function handleProfileUpdate($pdo, $user, $userId) {
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+
+    // Validate username
+    if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+        $_SESSION['error'] = "Username must be 3-30 characters (letters, numbers, underscores only).";
+    } 
+    // Validate email
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = "Invalid email format.";
+    } else {
+        // Check if email is already in use
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
+        $stmt->execute([$email, $userId]);
+        if ($stmt->fetch()) {
+            $_SESSION['error'] = "Email is already in use by another account.";
         } else {
-            // Check if email is already in use
-            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
-            $stmt->execute([$email, $userId]);
-            if ($stmt->fetch()) {
-                $_SESSION['error'] = "Email is already in use by another account.";
-            } else {
-                // Handle avatar upload
-                $avatar = $user['avatar'] ?? 'default.jpg';
-                if (!empty($_FILES['avatar']['name'])) {
-                    $uploadDir = __DIR__ . '/../uploads/avatars/';
-                    if (!file_exists($uploadDir)) {
-                        mkdir($uploadDir, 0755, true);
-                    }
-
-                    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-                    $fileType = $_FILES['avatar']['type'];
-                    $fileSize = $_FILES['avatar']['size'];
-                    $maxSize = 2 * 1024 * 1024; // 2MB
-
-                    // Verify file is actually an image
-                    $fileInfo = getimagesize($_FILES['avatar']['tmp_name']);
-                    if (!$fileInfo || !in_array($fileInfo['mime'], $allowedTypes)) {
-                        $_SESSION['error'] = "Only JPG, PNG, and GIF files are allowed.";
-                    } elseif ($fileSize > $maxSize) {
-                        $_SESSION['error'] = "File size must be less than 2MB.";
-                    } else {
-                        $fileExt = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
-                        $fileName = 'avatar_' . $userId . '_' . bin2hex(random_bytes(8)) . '.' . $fileExt;
-                        $targetFile = $uploadDir . $fileName;
-
-                        if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetFile)) {
-                            // Delete old avatar if it's not the default
-                            if (!empty($user['avatar']) && $user['avatar'] !== 'default.jpg' && file_exists($uploadDir . $user['avatar'])) {
-                                unlink($uploadDir . $user['avatar']);
-                            }
-                            $avatar = $fileName;
-                        } else {
-                            $_SESSION['error'] = "Error uploading your file.";
-                        }
-                    }
-                }
-
+            $avatar = handleAvatarUpload($user, $userId);
+            if ($avatar !== false) {
                 // Update user details
                 $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
                 if ($stmt->execute([$username, $email, $avatar, $userId])) {
                     $_SESSION['success'] = "Profile updated successfully!";
-                    // Regenerate session ID after profile update
                     session_regenerate_id(true);
                     header("Location: profile.php");
                     exit();
@@ -105,85 +82,119 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+}
 
-    if (isset($_POST['change_password'])) {
-        $currentPassword = $_POST['current_password'];
-        $newPassword = $_POST['new_password'];
-        $confirmPassword = $_POST['confirm_password'];
+// Function to handle avatar upload
+function handleAvatarUpload($user, $userId) {
+    $avatar = $user['avatar'] ?? 'default.jpg';
+    if (!empty($_FILES['avatar']['name'])) {
+        $uploadDir = __DIR__ . '/../uploads/avatars/';
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
 
-        // Verify current password
-        $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $dbPassword = $stmt->fetchColumn();
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $fileType = $_FILES['avatar']['type'];
+        $fileSize = $_FILES['avatar']['size'];
+        $maxSize = 2 * 1024 * 1024; // 2MB
 
-        if (!password_verify($currentPassword, $dbPassword)) {
-            $_SESSION['error'] = "Current password is incorrect.";
-            // Log failed password attempt
-            error_log("Failed password change attempt for user ID: $userId");
-        } elseif ($newPassword !== $confirmPassword) {
-            $_SESSION['error'] = "New passwords do not match.";
-        } elseif (strlen($newPassword) < 8 || !preg_match('/[A-Z]/', $newPassword) || !preg_match('/[0-9]/', $newPassword)) {
-            $_SESSION['error'] = "Password must be at least 8 characters with at least one number and one uppercase letter.";
+        $fileInfo = getimagesize($_FILES['avatar']['tmp_name']);
+        if (!$fileInfo || !in_array($fileInfo['mime'], $allowedTypes)) {
+            $_SESSION['error'] = "Only JPG, PNG, and GIF files are allowed.";
+            return false;
+        } elseif ($fileSize > $maxSize) {
+            $_SESSION['error'] = "File size must be less than 2MB.";
+            return false;
         } else {
-            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-            if ($stmt->execute([$hashedPassword, $userId])) {
-                $_SESSION['success'] = "Password changed successfully!";
-                // Send email notification
-                sendPasswordChangeNotification($user['email']);
-                header("Location: profile.php");
-                exit();
+            $fileExt = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+            $fileName = 'avatar_' . $userId . '_' . bin2hex(random_bytes(8)) . '.' . $fileExt;
+            $targetFile = $uploadDir . $fileName;
+
+            if (move_uploaded_file($_FILES['avatar']['tmp_name'], $targetFile)) {
+                if (!empty($user['avatar']) && $user['avatar'] !== 'default.jpg' && file_exists($uploadDir . $user['avatar'])) {
+                    unlink($uploadDir . $user['avatar']);
+                }
+                return $fileName;
             } else {
-                $_SESSION['error'] = "Failed to change password.";
+                $_SESSION['error'] = "Error uploading your file.";
+                return false;
             }
+        }
+    }
+    return $avatar;
+}
+
+// Function to handle password changes
+function handleChangePassword($pdo, $user, $userId) {
+    $currentPassword = $_POST['current_password'];
+    $newPassword = $_POST['new_password'];
+    $confirmPassword = $_POST['confirm_password'];
+
+    $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+    $stmt->execute([$userId]);
+    $dbPassword = $stmt->fetchColumn();
+
+    if (!password_verify($currentPassword, $dbPassword)) {
+        $_SESSION['error'] = "Current password is incorrect.";
+        error_log("Failed password change attempt for user ID: $userId");
+    } elseif ($newPassword !== $confirmPassword) {
+        $_SESSION['error'] = "New passwords do not match.";
+    } elseif (strlen($newPassword) < 8 || !preg_match('/[A-Z]/', $newPassword) || !preg_match('/[0-9]/', $newPassword)) {
+        $_SESSION['error'] = "Password must be at least 8 characters with at least one number and one uppercase letter.";
+    } else {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+        if ($stmt->execute([$hashedPassword, $userId])) {
+            $_SESSION['success'] = "Password changed successfully!";
+            sendPasswordChangeNotification($user['email']);
+            header("Location: profile.php");
+            exit();
+        } else {
+            $_SESSION['error'] = "Failed to change password.";
         }
     }
 }
 
 // Function to send password change notification
 function sendPasswordChangeNotification($email) {
-    // In a real implementation, you would send an email here
-    // This is just a placeholder
     error_log("Password changed notification sent to: $email");
 }
 
 ?>
 
 <div class="container">
-<?php include_once __DIR__ . '/includes/header.php';
-?>
-<main>
-    <div class="container mt-5">
-        <h1 class="text-center mb-4">Manage Your Profile</h1>
+    <?php include_once __DIR__ . '/includes/header.php'; ?>
+    <main>
+        <div class="container mt-5">
+            <h1 class="text-center mb-4">Manage Your Profile</h1>
 
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <?php unset($_SESSION['success']); ?>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <?php unset($_SESSION['error']); ?>
-        <?php endif; ?>
-
-        <div class="row">
-                    <div class="profile-avatar mb-3">
-                        <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
-                             alt="Profile Picture" 
-                             class="rounded-circle img-fluid"
-                             onerror="this.src='../uploads/avatars/default.jpg'">
-                    </div>
-                    <h3 class="card-title"><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
-                    <p class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></p>
-                    <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
-                    <p class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></p>
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+                <?php unset($_SESSION['success']); ?>
+            <?php endif; ?>
+
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <?php unset($_SESSION['error']); ?>
+            <?php endif; ?>
+
+            <div class="row">
+                <div class="profile-avatar mb-3">
+                    <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
+                         alt="Profile Picture" 
+                         class="rounded-circle img-fluid"
+                         onerror="this.src='../uploads/avatars/default.jpg'">
+                </div>
+                <h3 class="card-title"><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
+                <p class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></p>
+                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                <p class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></p>
             </div>
         </div>
 
@@ -256,16 +267,12 @@ function sendPasswordChangeNotification($email) {
                 </div>
             </div>
         </div>
-    </div>
-    <?php include_once __DIR__ . '/includes/footer.php';
-    ?>  </div>
-<?php
-ob_end_flush(); ?>
-
+    </main>
+    <?php include_once __DIR__ . '/includes/footer.php'; ?>
 </div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script src="js/profile.js"></script>
-</body> </html>
+</body>
+</html>
