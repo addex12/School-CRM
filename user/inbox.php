@@ -67,6 +67,7 @@ function getUserRoleName($roleId) {
 
         <div class="inbox-main">
             <h1>Your Inbox</h1>
+           <?php require_once 'includes/header.php'; // Add header.php inclusion?>
 
             <div class="inbox-controls">
                 <input type="text" id="search" placeholder="Search messages..." class="search-bar">
