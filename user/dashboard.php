@@ -39,14 +39,56 @@ $completedSurveys = $completedCount->fetchColumn();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Dashboard - Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        /* Additional styles for new features */
+        /* Updated styles for a more attractive layout */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stats-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            flex: 1;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .stat-card p {
+            font-size: 1.5em;
+            color: #3498db;
+            font-weight: bold;
+        }
+        .quick-access {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
         .main-menu {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            justify-content: space-around;
+            margin-top: 15px;
         }
         .menu-item {
             padding: 10px 20px;
@@ -59,18 +101,73 @@ $completedSurveys = $completedCount->fetchColumn();
         .menu-item:hover {
             background: #2980b9;
         }
-        .quick-access {
-            margin-top: 30px;
+        .survey-list {
+            background: #ffffff;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .survey-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .survey-card {
             background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .survey-card.completed {
+            background: #d4edda;
+        }
+        .survey-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .survey-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .survey-meta {
+            font-size: 0.8em;
+            color: #555;
+        }
+        .survey-status.completed {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #28a745;
+            font-size: 1.2em;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
             border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .no-surveys {
+            text-align: center;
+            color: #888;
+            font-size: 1em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-    <?php include 'includes/header.php'; ?>
+        <?php include 'includes/header.php'; ?>
+        
         <div class="stats-grid">
+            <!-- Updated stats section -->
             <div class="stat-card">
                 <h3>Available Surveys</h3>
                 <p><?= count($surveys) ?></p>
@@ -92,7 +189,6 @@ $completedSurveys = $completedCount->fetchColumn();
 
         <div class="survey-list">
             <h2>Available Surveys</h2>
-            
             <?php if (count($surveys) > 0): ?>
                 <div class="survey-cards">
                     <?php foreach ($surveys as $survey): ?>
@@ -109,12 +205,11 @@ $completedSurveys = $completedCount->fetchColumn();
                                     ?>
                                 </p>
                             </div>
-                            
                             <?= $survey['completed'] ? 
                                 '<div class="survey-status completed">
                                     <i class="fas fa-check-circle"></i> Completed
                                 </div>' : 
-                                '<a href="survey.php?id='.$survey['id'].'" class="btn btn-primary">Take Survey</a>'
+                                '<a href="survey.php?id='.$survey['id'].'" class="btn-primary">Take Survey</a>'
                             ?>
                         </div>
                     <?php endforeach; ?>
@@ -123,6 +218,7 @@ $completedSurveys = $completedCount->fetchColumn();
                 <p class="no-surveys">No surveys available at this time.</p>
             <?php endif; ?>
         </div>
+
         <?php include 'includes/footer.php'; ?>
     </div>
 
