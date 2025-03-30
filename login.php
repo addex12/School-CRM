@@ -35,7 +35,7 @@ if (isset($_POST['username']) && isset($_POST['password'])) {
 
             // Dynamically redirect to user's dashboard
             if ($role == 'administrator') {
-                $_SESSION['role'] = $role;
+                $_SESSION['role'] = 'administrator';
                 header('Location: admin/dashboard.php');
                 exit;
             } else {
