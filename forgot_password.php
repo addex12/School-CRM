@@ -19,7 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
         $resetToken = bin2hex(random_bytes(16));
         $stmt = $pdo->prepare("UPDATE users SET reset_token = ?, reset_token_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email = ?");
         $stmt->execute([$resetToken, $email]);
-
+        function sendResetPasswordEmail($email, $resetToken) {
+            $resetLink = "https://yourdomain.com/reset_password.php?token=" . urlencode($resetToken);
+            $subject = "Password Reset Request";
+            $message = "Hello,\n\nWe received a request to reset your password. Click the link below to reset it:\n\n" . $resetLink . "\n\nIf you did not request this, please ignore this email.";
+            $headers = "From: no-reply@yourdomain.com";
+        
+            return mail($email, $subject, $message, $headers);
+        }
         // Send the reset email
         if (sendResetPasswordEmail($email, $resetToken)) {
             $success = "A password reset email has been sent to your email address.";

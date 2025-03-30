@@ -1559,9 +1559,11 @@ class Worksheet extends WriterPart
         if (!Preg::isMatch('/^([A-Z]{1,3})([0-9]{1,7})(:([A-Z]{1,3})([0-9]{1,7}))?$/', $ref, $matches)) {
             return $ref;
         }
+
         if (!isset($matches[3])) { // single cell, not range
             return $coordinate;
         }
+
         $minRow = (int) $matches[2];
         $maxRow = (int) $matches[5];
         $rows = $maxRow - $minRow + 1;
