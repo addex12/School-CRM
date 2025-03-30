@@ -149,9 +149,9 @@ function sendPasswordChangeNotification($email) {
 
 ?>
 
-<header>
-    <?php include 'includes/header.php'; ?>
-</header>
+<div class="container">
+<?php include_once __DIR__ . '/includes/header.php';
+?>
 <main>
     <div class="container mt-5">
         <h1 class="text-center mb-4">Manage Your Profile</h1>
@@ -259,6 +259,7 @@ function sendPasswordChangeNotification($email) {
     </div>
 </div>
 
-<?php require_once 'includes/footer.php'; 
+<?php include_once __DIR__ . '/includes/footer.php';
 ob_end_flush();
 ?>
+</div>
