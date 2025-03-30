@@ -29,16 +29,33 @@ $messages = $stmt->fetchAll();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Chat</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
+        /* Updated styles for consistency and better design */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
         .chat-container {
             max-width: 800px;
             margin: 20px auto;
             padding: 20px;
-            background: white;
+            background: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .chat-header {
+            text-align: center;
+            margin-bottom: 20px;
         }
         .chat-messages {
             height: 400px;
@@ -46,12 +63,65 @@ $messages = $stmt->fetchAll();
             border: 1px solid #ddd;
             padding: 15px;
             margin-bottom: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
         }
         .message {
             margin-bottom: 15px;
             padding: 10px;
-            background: #f5f5f5;
-            border-radius: 4px;
+            background: #e9ecef;
+            border-radius: 8px;
+            position: relative;
+        }
+        .message strong {
+            display: block;
+            font-size: 0.9em;
+            color: #333;
+        }
+        .message small {
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: none;
+            font-size: 1em;
+        }
+        .btn-primary {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .success-message, .error-message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
         }
     </style>
 </head>
@@ -60,18 +130,20 @@ $messages = $stmt->fetchAll();
         <?php include 'includes/header.php'; ?>
 
         <div class="chat-container">
-            <h2>Live Chat Support</h2>
+            <div class="chat-header">
+                <h2>Live Chat Support</h2>
+            </div>
             
-            <?php if(isset($success)): ?>
+            <?php if (isset($success)): ?>
                 <div class="success-message"><?= $success ?></div>
             <?php endif; ?>
             
-            <?php if(isset($error)): ?>
+            <?php if (isset($error)): ?>
                 <div class="error-message"><?= $error ?></div>
             <?php endif; ?>
 
             <div class="chat-messages">
-                <?php foreach($messages as $message): ?>
+                <?php foreach ($messages as $message): ?>
                     <div class="message">
                         <strong><?= htmlspecialchars($message['username']) ?>:</strong>
                         <?= htmlspecialchars($message['message']) ?>
@@ -84,7 +156,7 @@ $messages = $stmt->fetchAll();
                 <div class="form-group">
                     <textarea name="message" rows="3" placeholder="Type your message..." required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Send Message</button>
+                <button type="submit" class="btn-primary">Send Message</button>
             </form>
         </div>
 
