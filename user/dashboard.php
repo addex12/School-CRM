@@ -8,11 +8,6 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Start session and debug session data
-session_start();
-var_dump($_SESSION); // Debugging output
-exit();
-
 // Include necessary files
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
