@@ -40,6 +40,8 @@ $fields = $stmt->fetchAll();
         <div class="admin-main">
             <h1>Survey: <?= htmlspecialchars($survey['title']) ?></h1>
             <p><?= htmlspecialchars($survey['description']) ?></p>
+            <p><strong>Start Date:</strong> <?= date('M j, Y', strtotime($survey['starts_at'])) ?></p>
+            <p><strong>End Date:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
             <table class="table">
                 <thead>
                     <tr>

@@ -72,8 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'category_id' => intval($_POST['category_id']),
             'target_roles' => json_encode(is_array($_POST['target_roles'] ?? null) ? $_POST['target_roles'] : []), // Ensure target_roles is an array
             'status' => in_array($_POST['status'], array_column($statusOptions, 'value')) ? $_POST['status'] : 'draft',
-            'starts_at' => date('Y-m-d H:i:s', strtotime($_POST['starts_at'])),
-            'ends_at' => date('Y-m-d H:i:s', strtotime($_POST['ends_at'])),
+            'starts_at' => date('Y-m-d 00:00:00', strtotime($_POST['starts_at'])), // Set time to midnight
+            'ends_at' => date('Y-m-d 23:59:59', strtotime($_POST['ends_at'])),   // Set time to end of the day
             'is_anonymous' => isset($_POST['is_anonymous']) ? 1 : 0
         ];
 
@@ -200,13 +200,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                         <div class="form-group">
                             <label>Start Date</label>
-                            <input type="datetime-local" name="starts_at" required
-                                   value="<?= isset($survey['starts_at']) ? date('Y-m-d\TH:i', strtotime($survey['starts_at'])) : '' ?>">
+                            <input type="date" name="starts_at" required
+                                   value="<?= isset($survey['starts_at']) ? date('Y-m-d', strtotime($survey['starts_at'])) : '' ?>">
                         </div>
                         <div class="form-group">
                             <label>End Date</label>
-                            <input type="datetime-local" name="ends_at" required
-                                   value="<?= isset($survey['ends_at']) ? date('Y-m-d\TH:i', strtotime($survey['ends_at'])) : '' ?>">
+                            <input type="date" name="ends_at" required
+                                   value="<?= isset($survey['ends_at']) ? date('Y-m-d', strtotime($survey['ends_at'])) : '' ?>">
                         </div>
                     </div>
 

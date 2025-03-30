@@ -187,8 +187,8 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                             <div class="meta-item">
                                 <label>Schedule:</label>
                                 <p>
-                                    <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> - 
-                                    <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?>
+                                    <?= date('M j, Y', strtotime($survey['starts_at'])) ?> - 
+                                    <?= date('M j, Y', strtotime($survey['ends_at'])) ?>
                                 </p>
                             </div>
                         </div>
