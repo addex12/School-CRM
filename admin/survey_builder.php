@@ -120,8 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Get categories
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
 
-// Get target audience roles from the database
-$roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
+// Get target audience roles from the database, excluding the "admin" role
+$roles = $pdo->query("SELECT id, role_name FROM roles WHERE role_name != 'admin' ORDER BY role_name")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -189,7 +189,7 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
                                     <input type="checkbox" name="target_roles[]" value="<?php echo $role['id']; ?>" <?php 
                                         echo in_array($role['id'], $targetRoles) ? 'checked' : ''; 
                                     ?>>
-                                    <?php echo htmlspecialchars($role['role_name']); ?> - <?php echo htmlspecialchars($role['role_name']); ?>
+                                    <?php echo htmlspecialchars($role['role_name']); ?>
                                 </label>
                             <?php endforeach; ?>
                         </div>
