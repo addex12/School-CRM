@@ -42,12 +42,12 @@ function getUserRoleName($roleId) {
     return $roles[$roleId] ?? 'Unknown';
 }
 ?>
+            <?php require_once 'includes/header.php'; // Add header.php inclusion?>
 
 <div class="inbox-container">
     <div class="inbox-layout">
         <div class="inbox-sidebar">
             <h3>Online Users</h3>
-            <?php require_once 'includes/header.php'; // Add header.php inclusion?>
 
             <div class="online-users-list">
                 <?php if (count($onlineUsers) > 0): ?>
