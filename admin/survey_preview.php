@@ -30,6 +30,11 @@ $fields = $stmt->fetchAll();
 // Get target roles
 $target_roles = json_decode($survey['target_roles'], true);
 
+// Fetch roles from the database
+$stmt = $pdo->prepare("SELECT role_key, role_name FROM roles");
+$stmt->execute();
+$roles = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+
 $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
 ?>
 
@@ -164,12 +169,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                 <label>Target Audience:</label>
                                 <p>
                                     <?php
-                                    $roleNames = [
-                                        'student' => 'Students',
-                                        'teacher' => 'Teachers',
-                                        'parent' => 'Parents'
-                                    ];
-                                    echo implode(', ', array_map(fn($role) => $roleNames[$role] ?? ucfirst($role), $target_roles));
+                                    echo implode(', ', array_map(fn($role) => $roles[$role] ?? ucfirst($role), $target_roles));
                                     ?>
                                 </p>
                             </div>
