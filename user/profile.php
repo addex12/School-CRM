@@ -259,6 +259,6 @@ include __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
-<?php include __DIR__ . '/includes/footer.php'; 
+<?php require_once 'includes/footer.php'; 
 ob_end_flush();
 ?>
