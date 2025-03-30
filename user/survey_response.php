@@ -6,12 +6,12 @@ $survey_id = $_GET['id'] ?? 0;
 
 // Get survey info
 $stmt = $pdo->prepare("
-    SELECT s.*, GROUP_CONCAT(f.field_name) as field_names 
+    SELECT s.* 
     FROM surveys s
-    LEFT JOIN survey_fields f ON s.id = f.survey_id
-    WHERE s.id = ? AND s.is_active = TRUE 
-    AND (s.starts_at <= NOW() AND s.ends_at >= NOW())
-    GROUP BY s.id
+    WHERE s.id = ? 
+    AND s.is_active = TRUE 
+    AND s.starts_at <= NOW() 
+    AND s.ends_at >= NOW()
 ");
 $stmt->execute([$survey_id]);
 $survey = $stmt->fetch();
@@ -21,9 +21,13 @@ if (!$survey) {
     exit();
 }
 
-// Check if user has permission to take this survey
+// Check permission using role ID
 $allowed_roles = json_decode($survey['target_roles'], true);
-if (!in_array($_SESSION['role'], $allowed_roles)) {
+$stmt = $pdo->prepare("SELECT role_id FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user_role_id = $stmt->fetchColumn();
+
+if (!in_array($user_role_id, $allowed_roles)) {
     header("Location: dashboard.php?error=not_authorized");
     exit();
 }
