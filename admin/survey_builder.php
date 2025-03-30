@@ -2,6 +2,9 @@
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
  */
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -72,6 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Start date must be before end date.");
         }
 
+        if (empty($formData['title']) || empty($formData['category_id'])) {
+            throw new Exception("Title and category are required.");
+        }
+
         if ($survey_id) {
             // Update survey
             $stmt = $pdo->prepare("UPDATE surveys SET 
@@ -90,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Save survey fields
         $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?")->execute([$survey_id]);
         foreach ($_POST['questions'] as $index => $question) {
+            if (empty($question)) continue;
+
             $options = in_array($_POST['field_types'][$index], ['radio', 'checkbox', 'select']) 
                 ? json_encode(array_map('trim', explode(',', $_POST['options'][$index]))) 
                 : null;

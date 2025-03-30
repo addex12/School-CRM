@@ -74,5 +74,3 @@ foreach ($responses as $response) {
 
 fclose($output);
 exit();
-?>
-
