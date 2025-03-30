@@ -56,6 +56,10 @@ if (!$pdo) {
     die("Database connection failed.");
 }
 
+// Debugging: Check user data
+var_dump($user);
+exit();
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle profile update
