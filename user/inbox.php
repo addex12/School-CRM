@@ -47,6 +47,8 @@ function getUserRoleName($roleId) {
     <div class="inbox-layout">
         <div class="inbox-sidebar">
             <h3>Online Users</h3>
+            <?php require_once 'includes/header.php'; // Add header.php inclusion?>
+
             <div class="online-users-list">
                 <?php if (count($onlineUsers) > 0): ?>
                     <?php foreach ($onlineUsers as $user): ?>
@@ -67,7 +69,6 @@ function getUserRoleName($roleId) {
 
         <div class="inbox-main">
             <h1>Your Inbox</h1>
-           <?php require_once 'includes/header.php'; // Add header.php inclusion?>
 
             <div class="inbox-controls">
                 <input type="text" id="search" placeholder="Search messages..." class="search-bar">
