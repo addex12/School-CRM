@@ -51,6 +51,30 @@ if (!function_exists('requireAdmin')) {
         }
     }
 }
+// Ensure $user_id is set and valid
+$user_id = $_SESSION['user_id'] ?? null;
+
+if (!$user_id) {
+    $_SESSION['error'] = "You must be logged in to access this page.";
+    header("Location: /login.php");
+    exit();
+}
+
+// Fetch user details
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
+
+if (!$user) {
+    $_SESSION['error'] = "User not found.";
+    header("Location: /login.php");
+    exit();
+}
+
+// Access user details safely
+$user_role = $user['role'] ?? null;
+$user_email = $user['email'] ?? null;
+
 // After successful login
 $stmt = $pdo->prepare("
     SELECT users.*, roles.role_name 
