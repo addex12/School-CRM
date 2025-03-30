@@ -1,11 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
-
 requireLogin();
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 $userId = $_SESSION['user_id'];
 
@@ -36,6 +32,10 @@ try {
     error_log("Error fetching online users: " . $e->getMessage());
 }
 
+function getUserRoleName($roleId) {
+    global $pdo;
+    static $roles = [];
+    if (empty($roles)) {
 include __DIR__ . '/includes/header.php';
 function getUserRoleName($roleId) {
     global $pdo;
