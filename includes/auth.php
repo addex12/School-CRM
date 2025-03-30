@@ -51,3 +51,15 @@ if (!function_exists('requireAdmin')) {
         }
     }
 }
+// After successful login
+$stmt = $pdo->prepare("
+    SELECT users.*, roles.role_name 
+    FROM users 
+    JOIN roles ON users.role_id = roles.id 
+    WHERE users.id = ?
+");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
+
+$_SESSION['role_id'] = $user['role_id'];
+$_SESSION['role'] = $user['role_name'];
