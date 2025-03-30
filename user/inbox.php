@@ -36,17 +36,9 @@ function getUserRoleName($roleId) {
     global $pdo;
     static $roles = [];
     if (empty($roles)) {
-include __DIR__ . '/includes/header.php';
-function getUserRoleName($roleId) {
-    global $pdo;
-    
-    static $roles = [];
-    
-    if (empty($roles)) {
         $stmt = $pdo->query("SELECT id, role_name FROM roles");
         $roles = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     }
-    
     return $roles[$roleId] ?? 'Unknown';
 }
 ?>
