@@ -22,7 +22,16 @@ if (!$survey) {
     header("Location: dashboard.php?error=survey_not_found");
     exit();
 }
+$stmt = $pdo->prepare("SELECT role_id FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user_role_id = $stmt->fetchColumn();
 
+// Check against target_roles
+$allowed_roles = json_decode($survey['target_roles'], true);
+if (!in_array($user_role_id, $allowed_roles)) {
+    header("Location: dashboard.php?error=not_authorized");
+    exit();
+}
 // Check if user has already completed this survey
 $stmt = $pdo->prepare("SELECT id FROM survey_responses WHERE survey_id = ? AND user_id = ?");
 $stmt->execute([$survey_id, $_SESSION['user_id']]);
