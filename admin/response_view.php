@@ -8,9 +8,10 @@ $response_id = $_GET['id'] ?? 0;
 
 // Get response info
 $stmt = $pdo->prepare("
-    SELECT r.*, u.username, u.email, u.role_name, s.title AS survey_title
+    SELECT r.*, u.username, u.email, roles.role_name, s.title AS survey_title
     FROM responses r
     JOIN users u ON r.user_id = u.id
+    JOIN roles ON u.role_id = roles.id
     JOIN surveys s ON r.survey_id = s.id
     WHERE r.id = ?
 ");
