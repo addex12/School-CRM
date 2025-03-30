@@ -111,19 +111,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include __DIR__ . '/../includes/header.php';
+include __DIR__ . '/../includes/header.php'; // Ensure this file exists
 ?>
 
 <div class="profile-container">
     <h1>Manage Your Profile</h1>
 
     <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success']) ?></div>
+        <div class="alert alert-success"><?= htmlspecialchars($_SESSION['success'] ?? '') ?></div>
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
     <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error']) ?></div>
+        <div class="alert alert-danger"><?= htmlspecialchars($_SESSION['error'] ?? '') ?></div>
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
@@ -133,8 +133,8 @@ include __DIR__ . '/../includes/header.php';
                 <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" alt="Profile Picture" class="avatar-img">
             </div>
             <div class="profile-info">
-                <h3><?= htmlspecialchars($user['username']) ?></h3>
-                <p><?= htmlspecialchars($user['email']) ?></p>
+                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
+                <p><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></p>
                 <p class="role-badge"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></p>
             </div>
         </div>
@@ -146,11 +146,11 @@ include __DIR__ . '/../includes/header.php';
                     <input type="hidden" name="update_profile" value="1">
                     <div class="form-group">
                         <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username']) ?>" required>
+                        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
                     </div>
                     <div class="form-group">
                         <label for="avatar">Profile Picture:</label>

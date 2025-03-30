@@ -34,7 +34,7 @@ if (!function_exists('getCurrentUser')) {
         if (!isLoggedIn()) {
             return null;
         }
-        $stmt = $pdo->prepare("SELECT u.id, u.username, r.role_name 
+        $stmt = $pdo->prepare("SELECT u.id, u.username, u.email, r.role_name 
                                FROM users u 
                                JOIN roles r ON u.role_id = r.id 
                                WHERE u.id = ?");
