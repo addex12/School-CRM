@@ -192,6 +192,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const addQuestionButton = document.getElementById('add-question');
     const questionsContainer = document.getElementById('questions-container');
 
+    if (!addQuestionButton || !questionsContainer) {
+        console.error("Add Question button or Questions container not found.");
+        return;
+    }
+
     addQuestionButton.addEventListener('click', function () {
         const questionIndex = questionsContainer.children.length;
 

@@ -468,7 +468,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div id="questions-container">
                         <?php foreach ($fields as $index => $field): ?>
                         <div class="question-card">
-                            <!-- Question fields here -->
+                            <div class="form-group">
+                                <label>Question</label>
+                                <input type="text" name="questions[]" value="<?= htmlspecialchars($field['field_label']) ?>" required />
+                            </div>
+                            <div class="form-group">
+                                <label>Field Type</label>
+                                <select name="field_types[]" required>
+                                    <?php foreach ($fieldTypes as $type => $details): ?>
+                                    <option value="<?= $type ?>" <?= $field['field_type'] === $type ? 'selected' : '' ?>>
+                                        <?= $details['label'] ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Options (comma-separated, for applicable types)</label>
+                                <input type="text" name="options[]" value="<?= htmlspecialchars($field['field_options'] ?? '') ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>Placeholder</label>
+                                <input type="text" name="placeholders[]" value="<?= htmlspecialchars($field['placeholder'] ?? '') ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" name="required[<?= $index ?>]" <?= $field['is_required'] ? 'checked' : '' ?>>
+                                    Required
+                                </label>
+                            </div>
+                            <button type="button" class="remove-question btn btn-danger">
+                                <i class="fas fa-trash"></i> Remove Question
+                            </button>
                         </div>
                         <?php endforeach; ?>
                     </div>
