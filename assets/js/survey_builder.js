@@ -187,3 +187,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
     builder.init();
 });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const addQuestionButton = document.getElementById('add-question');
+        const questionsContainer = document.getElementById('questions-container');
+
+        addQuestionButton.addEventListener('click', function () {
+            const questionIndex = questionsContainer.children.length;
+
+            // Create a new question card
+            const questionCard = document.createElement('div');
+            questionCard.classList.add('question-card');
+
+            questionCard.innerHTML = `
+                <div class="form-group">
+                    <label>Question</label>
+                    <input type="text" name="questions[]" placeholder="Enter your question" required />
+                </div>
+                <div class="form-group">
+                    <label>Field Type</label>
+                    <select name="field_types[]" required>
+                        <option value="text">Text Input</option>
+                        <option value="textarea">Text Area</option>
+                        <option value="radio">Multiple Choice</option>
+                        <option value="checkbox">Checkboxes</option>
+                        <option value="select">Dropdown</option>
+                        <option value="number">Number</option>
+                        <option value="date">Date</option>
+                        <option value="rating">Rating</option>
+                        <option value="file">File Upload</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Options (comma-separated, for applicable types)</label>
+                    <input type="text" name="options[]" placeholder="Option1, Option2, Option3">
+                </div>
+                <div class="form-group">
+                    <label>Placeholder</label>
+                    <input type="text" name="placeholders[]" placeholder="Enter a placeholder">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="required[${questionIndex}]"> Required
+                    </label>
+                </div>
+                <button type="button" class="remove-question btn btn-danger">
+                    <i class="fas fa-trash"></i> Remove Question
+                </button>
+            `;
+
+            // Add remove functionality
+            questionCard.querySelector('.remove-question').addEventListener('click', function () {
+                questionCard.remove();
+            });
+
+            // Append the new question card to the container
+            questionsContainer.appendChild(questionCard);
+        });
+    });

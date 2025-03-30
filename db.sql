@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Mar 30, 2025 at 03:22 AM
+-- Generation Time: Mar 31, 2025 at 03:11 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -97,6 +97,13 @@ CREATE TABLE `chat_messages` (
   `is_admin` tinyint(1) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `chat_messages`
+--
+
+INSERT INTO `chat_messages` (`id`, `thread_id`, `user_id`, `message`, `attachment`, `is_admin`, `created_at`) VALUES
+(0, 0, 65, 'Hello\r\n', NULL, 0, '2025-03-30 09:56:10');
 
 -- --------------------------------------------------------
 
@@ -443,7 +450,7 @@ INSERT INTO `surveys` (`id`, `title`, `description`, `category_id`, `target_role
 (2, 'Sample Survey', 'Just to check', 1, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-26 19:33:11', '2025-03-26 11:11:00', '2025-03-28 11:11:00', 1, 1, 'inactive'),
 (3, 'Secon Survey For Teachers', 'For Teachers Only', 2, '[\"teacher\"]', 4, '2025-03-26 19:37:05', '2025-03-26 11:11:00', '2025-03-29 11:01:00', 0, 1, 'active'),
 (4, 'Survey for all Three', 'For all', 1, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-26 19:41:38', '2025-03-26 00:00:00', '2025-03-31 11:11:00', 0, 1, 'active'),
-(5, 'LEts Do Survey', 'Yes Lets Do it', 3, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-26 20:54:53', '2025-03-26 11:11:00', '2025-03-28 11:11:00', 0, 1, 'active'),
+(5, 'LEts Do Survey', 'Yes Lets Do it', 3, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-26 20:54:53', '2025-03-26 11:11:00', '2025-04-01 11:11:00', 0, 1, 'active'),
 (6, 'Formal Survey', 'This is a formal Survey', 1, '[\"student\",\"teacher\",\"parent\"]', 4, '2025-03-27 17:49:02', '2025-03-27 20:47:00', '2025-04-03 20:47:00', 1, 1, 'active');
 
 -- --------------------------------------------------------
@@ -516,10 +523,10 @@ INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `pl
 (10, 2, 'radio', 'What Do you mean?', '', 'field_2', '[\"I said\",\"Who\",\"Cares\"]', 1, NULL, 1),
 (11, 2, 'radio', 'Are you Kidding?', '', 'field_3', '[\"Yes\",\"No\"]', 1, NULL, 2),
 (12, 2, 'rating', 'Okay Final Words?', '', 'field_4', NULL, 1, NULL, 3),
-(13, 5, '', '1+1', '', 'field_1', '[\"2\",\"3\",\"4\",\"5\",\"6\"]', 0, NULL, 0),
-(14, 5, 'checkbox', '5+5', '', 'field_2', '[\"5\",\"6\",\"7\",\"\"]', 0, NULL, 1),
 (15, 6, 'checkbox', 'Surv 1', '', 'field_1', '[\"1\",\"2\",\"3\",\"4\",\"5\"]', 0, NULL, 0),
-(16, 6, 'checkbox', 'Surv2', '', 'field_2', '[\"H1\",\"H2\",\"H3\"]', 0, NULL, 1);
+(16, 6, 'checkbox', 'Surv2', '', 'field_2', '[\"H1\",\"H2\",\"H3\"]', 0, NULL, 1),
+(0, 5, 'radio', '1+1', '', 'field_1', '[\"2\",\"3\",\"4\",\"5\",\"6\"]', 1, NULL, 0),
+(0, 5, 'checkbox', '5+5', '', 'field_2', '[\"5\",\"6\",\"7\"]', 1, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -533,7 +540,8 @@ CREATE TABLE `survey_logic` (
   `source_field_id` int(11) NOT NULL,
   `trigger_value` varchar(255) NOT NULL,
   `target_field_id` int(11) NOT NULL,
-  `action` enum('show','hide','enable','disable') NOT NULL
+  `action` enum('show','hide','enable','disable') NOT NULL,
+  `condition` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
@@ -645,10 +653,12 @@ CREATE TABLE `users` (
   `password` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
   `role_id` int(11) DEFAULT NULL,
-  `active` TINYINT(1) NOT NULL DEFAULT 1,
+  `active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_login` timestamp NULL DEFAULT NULL,
   `last_activity` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `reset_token` varchar(255) DEFAULT NULL,
+  `reset_token_expires` datetime DEFAULT NULL,
   `avatar` varchar(255) DEFAULT 'default.jpg',
   `notification_prefs` longtext DEFAULT '{"email": true, "push": true}',
   `social_provider` varchar(20) DEFAULT NULL,
@@ -659,10 +669,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `created_at`, `last_login`, `last_activity`, `avatar`, `notification_prefs`, `social_provider`, `social_id`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, '2025-03-25 14:50:31', '2025-03-29 12:23:28', '2025-03-29 23:23:28', 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
-(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamyohannes@gmail.com', 1, '2025-03-25 22:47:11', '2025-03-28 21:13:37', '2025-03-29 22:43:32', 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
-(65, 'Adugna1', '$2y$10$.fL331Ih5gEvMFr85kP4YupK/BTFD01Ii5HsnP0n9wOnnEAeZlCyq', 'gizawadugna@gmail.com', 4, '2025-03-29 12:03:37', '2025-03-29 12:20:21', '2025-03-29 23:20:21', 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL);
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `active`, `created_at`, `last_login`, `last_activity`, `reset_token`, `reset_token_expires`, `avatar`, `notification_prefs`, `social_provider`, `social_id`) VALUES
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, 1, '2025-03-25 14:50:31', '2025-03-30 15:36:47', '2025-03-31 02:36:47', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamyohannes@gmail.com', 1, 1, '2025-03-25 22:47:11', '2025-03-28 21:13:37', '2025-03-29 22:43:32', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(65, 'Adugna1', '$2y$10$H.mSTrcOoWO1azAEZ0HBvuEs5x1jpKGw29wvVxPtM/s..FsqHQ6lG', 'gizawadugna@gmail.com', 5, 1, '2025-03-29 12:03:37', '2025-03-30 12:13:23', '2025-03-30 23:13:23', 'bc8bcd5e47b94c4d751529ad4165b83d', '2025-03-30 07:07:30', 'avatar_65_d1bb19e4e9524942.jpeg', '{\"email\": true, \"push\": true}', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -840,11 +850,6 @@ ALTER TABLE `salary_structures`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL;
-
-ALTER TABLE users 
-ADD COLUMN reset_token VARCHAR(255) NULL AFTER last_activity,
-ADD COLUMN reset_token_expires DATETIME NULL AFTER reset_token;
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
