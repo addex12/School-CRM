@@ -214,7 +214,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="form-group">
                             <label>Target Audience</label>
                             <select name="target_roles[]" multiple required>
-                                <?php $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : []; ?>
+                                <?php
+                                 $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : [];
+                                 $targetRoles = is_array($targetRoles) ? $targetRoles : []; // Force array type
+?> 
+                                <?= in_array($role['id'], (array)$targetRoles) ? 'checked' : '' ?>                             
+                               
                                 <?php foreach ($roles as $role): ?>
                                     <option value="<?= $role['id'] ?>" <?= in_array($role['id'], $targetRoles) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($role['role_name']) ?>
