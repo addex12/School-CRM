@@ -42,11 +42,3 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
-//                     modal.style.display = 'block';
-//                 })
-//                 .catch(error => {
-//                     console.error('Error loading ticket details:', error);
-//                 });
-//         });
-//     });
-// });

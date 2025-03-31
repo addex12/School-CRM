@@ -51,7 +51,7 @@ foreach ($widgets as &$widget) {
         $stmt = $pdo->query($widget['count_query']);
         $widget['count'] = $stmt->fetchColumn() ?? 0;
     } catch (Exception $e) {
-        $widget['count'] = "Error";
+        $widget['count'] = "Error"; // Default to "Error" if query fails
     }
 }
 
@@ -61,7 +61,7 @@ foreach ($sections as &$section) {
         $stmt = $pdo->query($section['query']);
         $section['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
-        $section['rows'] = [];
+        $section['rows'] = []; // Default to an empty array if query fails
     }
 }
 ?>
