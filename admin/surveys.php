@@ -44,7 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_survey'])) {
 }
 
 // Fetch all surveys for display
-$surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchAll();
+$activeSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'active' ORDER BY created_at DESC")->fetchAll();
+$inactiveSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'inactive' ORDER BY created_at DESC")->fetchAll();
+$archivedSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'archived' ORDER BY created_at DESC")->fetchAll();
+$draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER BY created_at DESC")->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -67,10 +70,10 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                     <div class="error-message"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
-                <!-- Display all surveys -->
+                <!-- Display active surveys -->
                 <div class="table-section">
-                    <h2>All Surveys</h2>
-                    <?php if (count($surveys) > 0): ?>
+                    <h2>Active Surveys</h2>
+                    <?php if (count($activeSurveys) > 0): ?>
                         <table class="table">
                             <thead>
                                 <tr>
@@ -81,20 +84,12 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($surveys as $survey): ?>
+                                <?php foreach ($activeSurveys as $survey): ?>
                                     <tr>
                                         <td><?= htmlspecialchars($survey['title']) ?></td>
                                         <td><?= htmlspecialchars($survey['description']) ?></td>
                                         <td>
-                                            <?php if ($survey['status'] === 'active'): ?>
-                                                <span class="status-active">Active</span>
-                                            <?php elseif ($survey['status'] === 'inactive'): ?>
-                                                <span class="status-inactive">Inactive</span>
-                                            <?php elseif ($survey['status'] === 'archived'): ?>
-                                                <span class="status-archived">Archived</span>
-                                            <?php else: ?>
-                                                <span class="status-draft">Draft</span>
-                                            <?php endif; ?>
+                                            <span class="status-active">Active</span>
                                         </td>
                                         <td>
                                             <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
@@ -109,7 +104,121 @@ $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchA
                             </tbody>
                         </table>
                     <?php else: ?>
-                        <p>No surveys found.</p>
+                        <p>No active surveys found.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Display inactive surveys -->
+                <div class="table-section">
+                    <h2>Inactive Surveys</h2>
+                    <?php if (count($inactiveSurveys) > 0): ?>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($inactiveSurveys as $survey): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($survey['title']) ?></td>
+                                        <td><?= htmlspecialchars($survey['description']) ?></td>
+                                        <td>
+                                            <span class="status-inactive">Inactive</span>
+                                        </td>
+                                        <td>
+                                            <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
+                                            <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
+                                            <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
+                                                <button type="submit" name="delete_survey" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this survey?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No inactive surveys found.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Display archived surveys -->
+                <div class="table-section">
+                    <h2>Archived Surveys</h2>
+                    <?php if (count($archivedSurveys) > 0): ?>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($archivedSurveys as $survey): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($survey['title']) ?></td>
+                                        <td><?= htmlspecialchars($survey['description']) ?></td>
+                                        <td>
+                                            <span class="status-archived">Archived</span>
+                                        </td>
+                                        <td>
+                                            <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
+                                            <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
+                                            <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
+                                                <button type="submit" name="delete_survey" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this survey?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No archived surveys found.</p>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Display draft surveys -->
+                <div class="table-section">
+                    <h2>Draft Surveys</h2>
+                    <?php if (count($draftSurveys) > 0): ?>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($draftSurveys as $survey): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($survey['title']) ?></td>
+                                        <td><?= htmlspecialchars($survey['description']) ?></td>
+                                        <td>
+                                            <span class="status-draft">Draft</span>
+                                        </td>
+                                        <td>
+                                            <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
+                                            <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
+                                            <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
+                                                <button type="submit" name="delete_survey" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this survey?')">Delete</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p>No draft surveys found.</p>
                     <?php endif; ?>
                 </div>
             </div>

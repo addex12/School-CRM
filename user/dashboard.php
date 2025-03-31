@@ -15,6 +15,7 @@ $stmt = $pdo->prepare("
             WHERE r.survey_id = s.id AND r.user_id = ?) as completed
     FROM surveys s
     WHERE s.is_active = TRUE 
+    AND s.status = 'active' -- Ensure only active surveys are shown
     AND s.starts_at <= NOW() 
     AND s.ends_at >= NOW()
     AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(CAST(? AS CHAR)))
