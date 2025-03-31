@@ -506,7 +506,7 @@ CREATE TABLE `survey_fields` (
   `field_name` varchar(100) NOT NULL,
   `field_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`field_options`)),
   `is_required` tinyint(1) DEFAULT 1,
-  `validation_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`validation_rules`)),
+  `validation_rules` longtext CHARACTER SET utf8mb4 COLLATE=utf8mb4_bin DEFAULT NULL CHECK (json_valid(`validation_rules`)),
   `display_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -878,11 +878,6 @@ MODIFY COLUMN id INT(11) NOT NULL;
 -- Ensure `id` column in `users` matches the foreign key column
 ALTER TABLE users
 MODIFY COLUMN id INT(11) NOT NULL;
-
--- Add foreign key relationships for `survey_responses`
-ALTER TABLE survey_responses
-ADD CONSTRAINT fk_survey_responses_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
-ADD CONSTRAINT fk_survey_responses_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 -- Add foreign key relationships for `survey_responses`
 ALTER TABLE survey_responses
