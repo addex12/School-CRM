@@ -139,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title><?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?> - Admin Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="survey_builder.css">
@@ -152,7 +153,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <div class="admin-layout">
         <header class="admin-header">
-            <h1>Survey Builder</h1>
             <div class="user-info">
                 <span><?= htmlspecialchars($_SESSION['username']) ?></span>
                 <a href="logout.php" class="btn btn-danger">Logout</a>
