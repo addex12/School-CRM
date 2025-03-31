@@ -145,20 +145,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="survey_builder.css">
 </head>
 <body>
-    <div class="admin-layout">
-        <div class="admin-content"> 
-            <?php include 'includes/admin_sidebar.php'; ?>
-        </div>
-    </div>
-    
-    <div class="admin-layout">
-        <header class="admin-header">
-            <div class="user-info">
+<div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
                 <span><?= htmlspecialchars($_SESSION['username']) ?></span>
                 <a href="logout.php" class="btn btn-danger">Logout</a>
             </div>
         </header>
-        <div class="admin-main">
+
+        <div class="content">
         <main class="survey-builder">
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
