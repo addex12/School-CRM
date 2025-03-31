@@ -858,24 +858,32 @@ ALTER TABLE `users`
 ALTER TABLE surveys MODIFY COLUMN target_roles JSON NOT NULL;
 
 -- Add column `answers` to `survey_responses` table if it does not already exist
-SET @column_exists = (
-    SELECT COUNT(*)
-    FROM information_schema.columns
-    WHERE table_name = 'survey_responses'
-    AND table_schema = DATABASE()
-    AND column_name = 'answers'
-);
-
-IF @column_exists = 0 THEN
-    ALTER TABLE survey_responses ADD COLUMN answers JSON DEFAULT NULL;
-END IF;
+ALTER TABLE survey_responses 
+ADD COLUMN IF NOT EXISTS answers JSON DEFAULT NULL;
 
 --
 -- Ensure `answers` column in `survey_responses` table is properly defined as a JSON column
 --
 ALTER TABLE survey_responses MODIFY COLUMN answers JSON DEFAULT NULL;
 
---
+-- Ensure `survey_id` and `user_id` columns in `survey_responses` match the referenced columns
+ALTER TABLE survey_responses
+MODIFY COLUMN survey_id INT(11) NOT NULL,
+MODIFY COLUMN user_id INT(11) NOT NULL;
+
+-- Ensure `id` column in `surveys` matches the foreign key column
+ALTER TABLE surveys
+MODIFY COLUMN id INT(11) NOT NULL;
+
+-- Ensure `id` column in `users` matches the foreign key column
+ALTER TABLE users
+MODIFY COLUMN id INT(11) NOT NULL;
+
+-- Add foreign key relationships for `survey_responses`
+ALTER TABLE survey_responses
+ADD CONSTRAINT fk_survey_responses_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_survey_responses_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
 -- Add foreign key relationships for `survey_responses`
 ALTER TABLE survey_responses
 ADD CONSTRAINT fk_survey_responses_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
