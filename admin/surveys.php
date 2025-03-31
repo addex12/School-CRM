@@ -16,33 +16,29 @@ $pageTitle = "Manage Surveys";
 // Initialize variables
 $error = null;
 $survey_id = $_GET['survey_id'] ?? null;
+
 $survey = Survey::model()->findByPk($survey_id);
-if ($survey === null) {
+if (!$survey) {
     $error = "Survey not found.";
-} else if ($survey->status == Survey::STATUS_ACTIVE) {
-    $error = "This survey is active.";
-} else if ($survey->status == Survey::STATUS_INACTIVE) {
-    $error = "This survey is inactive.";
-} else if ($survey->status == Survey::STATUS_PENDING) {
-    $error = "This survey is pending.";
-} else if ($survey->status == Survey::STATUS_SUSPENDED) {
-    $error = "This survey is suspended.";
-} else if ($survey->status == Survey::STATUS_PENDING_REVIEW) {    
-    $error = "This survey is pending review.";
-} else if ($survey->status == Survey::STATUS_SUSPENDED_REVIEW) {
-    $error = "This survey is suspended.";
-} else if ($survey->status == Survey::STATUS_ARCHIVED) {
-    $error = "This survey is archived.";    
-}   else if ($survey->status == Survey::STATUS_PENDING_REVIEW) {
-    $error = "This survey is pending review.";
-} else if ($survey->status == Survey::STATUS_SUSPENDED_REVIEW) {
-    $error = "This survey is suspended.";
-} else if ($survey->status == Survey::STATUS_PENDING_REVIEW) {
-    $error = "This survey is pending review.";
-} else if ($survey->status == Survey::STATUS_SUSPENDED_REVIEW) {
-    $error = "This survey is suspended.";    
-} else if ($survey->status == Survey::STATUS_ARCHIVED) {
-    $error = "This survey is archived.";    
+} else {
+    $statuses = Survey::getStatuses();
+    $statusLabels = array_column($statuses, 'label', 'status');
+
+    if ($survey->status === 'active') {
+        $error = "This survey is active.";
+    } elseif ($survey->status === 'inactive') {
+        $error = "This survey is inactive.";
+    } elseif ($survey->status === 'pending') {
+        $error = "This survey is pending.";
+    } elseif ($survey->status === 'suspended') {
+        $error = "This survey is suspended.";
+    } elseif ($survey->status === 'archived') {
+        $error = "This survey is archived.";
+    } elseif ($survey->status === 'pending_review') {
+        $error = "This survey is pending review.";
+    } elseif ($survey->status === 'suspended_review') {
+        $error = "This survey is suspended for review.";
+    }
 }
 
 // Handle delete survey request
