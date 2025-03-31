@@ -148,6 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="admin-content"> 
             <?php include 'includes/admin_sidebar.php'; ?>
         </div>
+</div>
+    <div class="admin-main-content">
         <header class="admin-header">
             <h1>Survey Builder</h1>
             <div class="user-info">
