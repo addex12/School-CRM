@@ -7,8 +7,12 @@ requireAdmin();
 $pageTitle = "Survey Builder";
 
 try {
-    $roles = $pdo->query("SELECT id, role_name FROM roles WHERE role_name != 'admin' ORDER BY role_name")->fetchAll();
-    $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
+    $rolesStmt = $pdo->query("SELECT id, role_name FROM roles WHERE role_name != 'admin' ORDER BY role_name");
+    $roles = $rolesStmt->fetchAll();
+
+    $categoriesStmt = $pdo->query("SELECT * FROM survey_categories ORDER BY name");
+    $categories = $categoriesStmt->fetchAll();
+
     $statusOptions = Survey::getStatuses();
 } catch (PDOException $e) {
     error_log("Database error: " . $e->getMessage());
@@ -93,17 +97,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
             $stmt = $pdo->prepare("UPDATE surveys SET 
                 title = ?, description = ?, category_id = ?, target_roles = ?, status = ?, 
                 starts_at = ?, ends_at = ?, is_anonymous = ? WHERE id = ?");
-            $stmt->execute(array_merge(array_values($formData), [$survey_id]);
+            $stmt->execute(array_merge(array_values($formData), [$survey_id]));
         } else {
             $stmt = $pdo->prepare("INSERT INTO surveys 
                 (title, description, category_id, target_roles, status, starts_at, ends_at, is_anonymous, created_by)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute(array_merge(array_values($formData), [$_SESSION['user_id']]);
+            $stmt->execute(array_merge(array_values($formData), [$_SESSION['user_id']]));
             $survey_id = $pdo->lastInsertId();
         }
 
         // Process questions
-        $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?")->execute([$survey_id]);
+        $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
+        $stmt->execute([$survey_id]);
         
         if (isset($_POST['questions'])) {
             foreach ($_POST['questions'] as $index => $question) {
@@ -112,8 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
                     : null;
 
                 $stmt = $pdo->prepare("INSERT INTO survey_fields 
-                    (survey_id, field_type, field_label, field_name, placeholder, field_options, is_required, display_order)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                    (survey_id, field_type, field_label, field_name, field_options, is_required, display_order)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $survey_id,
                     $_POST['field_types'][$index],
@@ -210,7 +215,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
                             <select name="status" required>
                                 <?php foreach ($statusOptions as $opt): ?>
                                     <option value="<?= $opt['value'] ?>" <?= ($survey['status'] ?? 'draft') === $opt['value'] ? 'selected' : '' ?>>
-                                        <i class="fas <?= $opt['icon'] ?>"></i>
                                         <?= htmlspecialchars($opt['label']) ?>
                                     </option>
                                 <?php endforeach; ?>

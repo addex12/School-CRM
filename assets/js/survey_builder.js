@@ -1,10 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('survey_builder.js loaded'); // Check if the script is loaded
+
     const questionsContainer = document.getElementById('questions-container');
     const addQuestionBtn = document.getElementById('add-question');
+    
+    if (!questionsContainer || !addQuestionBtn) {
+        console.error('questions-container or add-question button not found');
+        return;
+    }
+
     let questionCount = questionsContainer.children.length;
 
     // Add new question
     addQuestionBtn.addEventListener('click', () => {
+        console.log('Add question button clicked'); // Check if the event listener is working
         const newQuestion = createQuestionElement(questionCount);
         questionsContainer.appendChild(newQuestion);
         initQuestionEvents(newQuestion);
