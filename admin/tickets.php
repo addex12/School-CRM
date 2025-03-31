@@ -99,24 +99,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <tbody>
                                 <?php foreach ($tickets as $ticket): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($ticket['id']) ?></td>
-                                        <td><?= htmlspecialchars($ticket['username']) ?></td>
-                                        <td><?= htmlspecialchars($ticket['subject']) ?></td>
+                                        <td><?= htmlspecialchars($ticket['id'] ?? '') ?></td>
+                                        <td><?= htmlspecialchars($ticket['username'] ?? 'N/A') ?></td>
+                                        <td><?= htmlspecialchars($ticket['subject'] ?? 'N/A') ?></td>
                                         <td>
-                                            <span style="color: <?= $ticketsConfig['statuses'][array_search($ticket['status'], array_column($ticketsConfig['statuses'], 'value'))]['color'] ?>">
-                                                <?= ucfirst(htmlspecialchars($ticket['status'])) ?>
+                                            <span style="color: <?= htmlspecialchars($ticketsConfig['statuses'][array_search($ticket['status'], array_column($ticketsConfig['statuses'], 'value'))]['color'] ?? 'black') ?>">
+                                                <?= ucfirst(htmlspecialchars($ticket['status'] ?? 'N/A')) ?>
                                             </span>
                                         </td>
                                         <td>
                                             <?php 
-                                            $priority = array_filter($ticketPriorities, fn($p) => $p['value'] === $ticket['priority']);
+                                            $priority = array_filter($ticketPriorities, fn($p) => $p['value'] === ($ticket['priority'] ?? ''));
                                             $priority = reset($priority);
                                             ?>
                                             <span style="color: <?= htmlspecialchars($priority['color'] ?? 'black') ?>">
-                                                <?= htmlspecialchars($priority['label'] ?? ucfirst($ticket['priority'])) ?>
+                                                <?= htmlspecialchars($priority['label'] ?? ucfirst($ticket['priority'] ?? 'N/A')) ?>
                                             </span>
                                         </td>
-                                        <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
+                                        <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'] ?? 'now')) ?></td>
                                         <td>
                                             <button class="btn btn-secondary view-ticket" data-ticket-id="<?= $ticket['id'] ?>">View</button>
                                             <?php foreach ($ticketsConfig['actions'] as $action): ?>
