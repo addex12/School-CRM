@@ -58,14 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $field_name = $field['field_name'];
         if (isset($_POST[$field_name])) {
             $answers[$field_name] = is_array($_POST[$field_name]) 
-                ? implode(',', $_POST[$field_name]) 
-                : $_POST[$field_name];
+                ? $_POST[$field_name] // Keep array for checkboxes
+                : htmlspecialchars($_POST[$field_name]); // Sanitize input
         } else {
             $answers[$field_name] = null; // Handle unanswered fields
         }
     }
 
-    $encoded_answers = json_encode($answers); // Encode the answers as JSON
+    $encoded_answers = json_encode($answers, JSON_UNESCAPED_UNICODE); // Encode the answers as JSON
 
     // Insert the response into the database
     $stmt = $pdo->prepare("

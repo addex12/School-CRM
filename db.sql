@@ -504,13 +504,29 @@ CREATE TABLE `survey_fields` (
   `field_label` varchar(255) NOT NULL,
   `placeholder` varchar(255) DEFAULT NULL,
   `field_name` varchar(100) NOT NULL,
-  `field_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `field_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`field_options`)),
   `is_required` tinyint(1) DEFAULT 1,
-  `validation_rules` longtext CHARACTER SET utf8mb4 COLLATE=utf8mb4_bin DEFAULT NULL,
-  `display_order` int(11) NOT NULL DEFAULT 0,
-  CHECK (json_valid(`field_options`)),
-  CHECK (json_valid(`validation_rules`))
+  `validation_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`validation_rules`)),
+  `display_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_fields`
+--
+
+INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `placeholder`, `field_name`, `field_options`, `is_required`, `validation_rules`, `display_order`) VALUES
+(5, 3, 'radio', 'Hello', '', 'field_1', '[\"Hi\",\"how are you\",\"hello there\"]', 1, NULL, 0),
+(6, 3, 'radio', 'All good?', '', 'field_2', '[\"Yes\",\"No\"]', 1, NULL, 1),
+(7, 3, 'text', 'If No you want you write why?', '', 'field_3', NULL, 0, NULL, 2),
+(8, 4, 'checkbox', 'Hello', 'Hello,Hello there, how you', 'field_1', '[\"\"]', 1, NULL, 0),
+(9, 2, 'checkbox', 'How Are you?', '', 'field_1', '[\"Fine\",\"Very Fine\",\"Who cares\"]', 1, NULL, 0),
+(10, 2, 'radio', 'What Do you mean?', '', 'field_2', '[\"I said\",\"Who\",\"Cares\"]', 1, NULL, 1),
+(11, 2, 'radio', 'Are you Kidding?', '', 'field_3', '[\"Yes\",\"No\"]', 1, NULL, 2),
+(12, 2, 'rating', 'Okay Final Words?', '', 'field_4', NULL, 1, NULL, 3),
+(15, 6, 'checkbox', 'Surv 1', '', 'field_1', '[\"1\",\"2\",\"3\",\"4\",\"5\"]', 0, NULL, 0),
+(16, 6, 'checkbox', 'Surv2', '', 'field_2', '[\"H1\",\"H2\",\"H3\"]', 0, NULL, 1),
+(0, 5, 'radio', '1+1', '', 'field_1', '[\"2\",\"3\",\"4\",\"5\",\"6\"]', 1, NULL, 0),
+(0, 5, 'checkbox', '5+5', '', 'field_2', '[\"5\",\"6\",\"7\"]', 1, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -850,19 +866,7 @@ ADD COLUMN IF NOT EXISTS answers JSON DEFAULT NULL;
 --
 ALTER TABLE survey_responses MODIFY COLUMN answers JSON DEFAULT NULL;
 
--- Ensure `survey_id` and `user_id` columns in `survey_responses` match the referenced columns
-ALTER TABLE survey_responses
-MODIFY COLUMN survey_id INT(11) NOT NULL,
-MODIFY COLUMN user_id INT(11) NOT NULL;
-
--- Ensure `id` column in `surveys` matches the foreign key column
-ALTER TABLE surveys
-MODIFY COLUMN id INT(11) NOT NULL;
-
--- Ensure `id` column in `users` matches the foreign key column
-ALTER TABLE users
-MODIFY COLUMN id INT(11) NOT NULL;
-
+--
 -- Add foreign key relationships for `survey_responses`
 ALTER TABLE survey_responses
 ADD CONSTRAINT fk_survey_responses_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
