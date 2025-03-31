@@ -156,6 +156,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </header>
         </div>
+        <div class="admin-main">
+            <div class="admin-breadcrumbs">
+                <a href="index.php">Dashboard</a> &gt; 
+                <a href="surveys.php">Surveys</a> &gt; 
+                <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?>
+            </div>
+        </div>
         <main class="survey-builder">
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
@@ -309,9 +316,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="surveys.php" class="btn btn-secondary">Cancel</a>
             </section>
             </form>
-        </main>
+            </div>
+        </div>
+        <div class="admin-footer">
+<?php require_once 'includes/footer.php'  ?>      
+</main>
+
     </div>
 
     <script src="../assets/js/survey_builder.js"></script>
+    <script src="../assets/js/field_type.js"></script>
+    <script src="../assets/js/validation.js"></script>
+    <script src="../assets/js/alerts.js"></script>
+    <script src="../assets/js/survey_preview.js"></script>
 </body>
 </html>
