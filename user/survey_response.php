@@ -51,13 +51,28 @@ $fields = $stmt->fetchAll();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $survey_id = $_POST['survey_id'];
     $user_id = $_SESSION['user_id'];
-    $answers = json_encode($_POST['answers']); // Encode the answers as JSON
+    $answers = [];
 
+    // Collect and validate answers
+    foreach ($fields as $field) {
+        $field_name = $field['field_name'];
+        if (isset($_POST[$field_name])) {
+            $answers[$field_name] = is_array($_POST[$field_name]) 
+                ? implode(',', $_POST[$field_name]) 
+                : $_POST[$field_name];
+        } else {
+            $answers[$field_name] = null; // Handle unanswered fields
+        }
+    }
+
+    $encoded_answers = json_encode($answers); // Encode the answers as JSON
+
+    // Insert the response into the database
     $stmt = $pdo->prepare("
         INSERT INTO survey_responses (survey_id, user_id, answers, submitted_at) 
         VALUES (?, ?, ?, NOW())
     ");
-    $stmt->execute([$survey_id, $user_id, $answers]);
+    $stmt->execute([$survey_id, $user_id, $encoded_answers]);
 
     $_SESSION['success'] = "Your responses have been submitted successfully!";
     header("Location: thank_you.php");
