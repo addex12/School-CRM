@@ -53,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_SESSION['user_id'];
     $answers = [];
 
+
     // Collect and validate answers
     foreach ($fields as $field) {
         $field_name = $field['field_name'];
@@ -79,12 +80,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 ?>
-
+<!DOCTYPE html>
+<html lang="en">
 <?php include 'includes/header.php'; ?>
+<body>
+
 
 <div class="container">
     <header>
         <h1>Survey: <?php echo htmlspecialchars($survey['title']); ?></h1>
+        <p><?php echo htmlspecialchars($survey['description']); ?></p>
+        <p>Available from <?php echo date('M j, Y g:i A', strtotime($survey['starts_at'])); ?> to <?php echo date('M j, Y g:i A', strtotime($survey['ends_at'])); ?></p>
+        <p>Created on <?php echo date('M j, Y', strtotime($survey['created_at'])); ?></p>
+        <p>Created by <?php echo htmlspecialchars($survey['created_by']); ?></p>
+        <p>Target Roles: <?php echo htmlspecialchars(implode(', ', json_decode($survey['target_roles'], true))); ?></p>
         <nav>
             <a href="dashboard.php">Back to Dashboard</a>
             <a href="../logout.php">Logout</a>
@@ -92,9 +101,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </header>
     
     <div class="survey-content">
+        <h2>Survey Questions</h2>
+        <p>Please fill out the survey below. Your responses are anonymous.</p>
+        <form method="POST" action="">
+            <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
+            <input type="hidden" name="user_id" value="<?= $_SESSION['user_id'] ?>">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+        </form>
         <div class="survey-header">
             <h2 class="survey-title"><?= htmlspecialchars($survey['title']) ?></h2>
             <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
+            <div class="survey-status <?= $survey['is_anonymous'] ? 'anonymous' : 'non-anonymous' ?>">
+                <i class="fas fa-user-secret"></i> <?= $survey['is_anonymous'] ? 'Anonymous' : 'Non-Anonymous' ?>
+            </div>
+            <div class="survey-status <?= $survey['is_active'] ? 'active' : 'inactive' ?>">
+                <i class="fas fa-clock"></i> <?= $survey['is_active'] ? 'Active' : 'Inactive' ?>
             <div class="survey-meta">
                 <p>Available from <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> to <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?></p>
             </div>
@@ -196,9 +217,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 reader.readAsDataURL(file);
+            } else {
+                // Remove existing preview if not an image
+                const existingPreview = input.nextElementSibling;
+                if (existingPreview && existingPreview.classList.contains('file-preview')) {
+                    existingPreview.remove();
+                }
+                alert('Please select an image file.');
+                input.value = '';
+                input.classList.add('is-invalid');
+                input.focus();
+                return false;
+                }
+            });
+    });
+    
+    // Clear invalid class on input focus
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('focus', function() {
+            if (input.classList.contains('is-invalid')) {
+                input.classList.remove('is-invalid');
+            }
+            });
+        input.addEventListener('blur', function() {
+            if (input.classList.contains('is-invalid')) {
+                input.classList.remove('is-invalid');
             }
         });
+        
     });
+
 </script>
 </body>
 </html>
