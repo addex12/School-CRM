@@ -317,8 +317,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </section>
             </form>
             </div>
+
         </div>
-<?php require_once 'includes/footer.php'  ?>      
 </main>
 
     </div>
@@ -330,3 +330,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="../assets/js/survey_preview.js"></script>
 </body>
 </html>
+<?php require_once 'includes/footer.php'  ?>      
