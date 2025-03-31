@@ -1,40 +1,52 @@
 {
     "widgets": [
         {
-            "title": "Total Users",
-            "query": "SELECT COUNT(*) FROM users",
-            "icon": "fas fa-users",
-            "color": "primary"
-        },
-        {
             "title": "Active Surveys",
-            "query": "SELECT COUNT(*) FROM surveys WHERE is_active = 1",
-            "icon": "fas fa-poll-h",
-            "color": "success"
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'active'",
+            "icon": "fa-rocket",
+            "color": "green"
         },
         {
-            "title": "Total Responses",
-            "query": "SELECT COUNT(*) FROM survey_responses",
-            "icon": "fas fa-chart-line",
-            "color": "info"
+            "title": "Inactive Surveys",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'inactive'",
+            "icon": "fa-pause",
+            "color": "orange"
+        },
+        {
+            "title": "Archived Surveys",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'archived'",
+            "icon": "fa-archive",
+            "color": "gray"
+        },
+        {
+            "title": "Draft Surveys",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'draft'",
+            "icon": "fa-file",
+            "color": "blue"
+        },
+        {
+            "title": "Total Users",
+            "count_query": "SELECT COUNT(*) FROM users",
+            "icon": "fa-users",
+            "color": "purple"
+        },
+        {
+            "title": "Active Users (Last 15 Minutes)",
+            "count_query": "SELECT COUNT(*) FROM users WHERE last_activity >= NOW() - INTERVAL 15 MINUTE",
+            "icon": "fa-user-clock",
+            "color": "teal"
+        },
+        {
+            "title": "Feedback Received",
+            "count_query": "SELECT COUNT(*) FROM feedback",
+            "icon": "fa-comment-dots",
+            "color": "yellow"
         },
         {
             "title": "Open Tickets",
-            "query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
-            "icon": "fas fa-ticket-alt",
-            "color": "warning"
-        },
-        {
-            "title": "Pending Feedback",
-            "query": "SELECT COUNT(*) FROM feedback WHERE status = 'pending'",
-            "icon": "fas fa-comment-alt",
-            "color": "danger"
-        },
-        {
-            "title": "Active Chats",
-            "query": "SELECT COUNT(*) FROM chats WHERE status = 'active'",
-            "icon": "fas fa-comments",
-            "color": "primary"
+            "count_query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
+            "icon": "fa-ticket-alt",
+            "color": "red"
         }
     ],
     "sections": [

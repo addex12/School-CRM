@@ -139,41 +139,11 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                         </tbody>
                     </table>
                 <?php else: ?>
-                    <p>No responses found for this survey.</p>
+                    <p>No responses found for this survey. Please check back later.</p>
                 <?php endif; ?>
-                <?php if (count($responses) > 0): ?>
-                    <div id="chart-container"></div> <!-- Container for charts -->
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Respondent</th>
-                                <?php foreach ($fields as $field): ?>
-                                    <th><?= htmlspecialchars($field['field_label']) ?></th>
-                                <?php endforeach; ?>
-                                <th>Submitted At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($responses as $response): ?>
-                                <?php if ($survey['is_anonymous'] && !$response['username']) {
-                                    $response['username'] = 'Anonymous';
-                                } ?>
-                                <tr>    
-                                    <td><?= $survey['is_anonymous'] ? 'Anonymous' : htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
-                                    <?php 
-                                    $answers = safe_json_decode($response['answers']); // Use helper function
-                                    foreach ($fields as $field): ?>
-                                        <td><?= isset($answers[$field['field_name']]) ? htmlspecialchars($answers[$field['field_name']]) : 'N/A' ?></td>
-                                    <?php endforeach; ?>
-                                    <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
-                                </tr>
-                            <?php endforeach; ?>    
-                        </tbody>
-                    </table>
-                <?php else: ?>     ‬
-                    <p>No responses found for this survey.</p> ‬
-                <?php endif; ?>
-            </div> ‬
-        </div> ‬
-    </div> ‬
-<?php include 'includes/footer.php'; ?> ‬
+            </div>
+        </div>
+    </div>
+<?php include 'includes/footer.php'; ?>
+</body>
+</html>
