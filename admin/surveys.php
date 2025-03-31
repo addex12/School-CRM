@@ -63,6 +63,8 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
         <div class="admin-main">
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <div class="export-dropdown">
+                    <a href="survey_builder.php" class="btn btn-primary">Create New Survey</a>
             </header>
             <div class="content">
                 <!-- Display error messages -->
