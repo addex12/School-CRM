@@ -5,6 +5,9 @@ require_once '../includes/config.php';
 
 $pageTitle = "Audit Log";
 
+// Load audit log configuration
+$auditConfig = json_decode(file_get_contents(__DIR__ . '/audit_log.json'), true);
+
 // Fetch audit logs
 $stmt = $pdo->query("
     SELECT a.*, u.username 
@@ -22,6 +25,7 @@ $auditLogs = $stmt->fetchAll();
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <script src="../assets/js/audit_log.js" defer></script>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -35,8 +39,12 @@ $auditLogs = $stmt->fetchAll();
 
                 <section class="table-section">
                     <h2>Audit Logs</h2>
+                    <div class="search-container">
+                        <input type="text" id="audit-log-search" placeholder="Search logs..." class="form-control">
+                        <button id="export-audit-log" class="btn btn-primary">Export as CSV</button>
+                    </div>
                     <?php if (count($auditLogs) > 0): ?>
-                        <table class="table">
+                        <table class="audit-log-table table">
                             <thead>
                                 <tr>
                                     <th>ID</th>

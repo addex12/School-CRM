@@ -1,0 +1,40 @@
+{
+    "activities": [
+        {
+            "type": "login",
+            "description": "User logged in"
+        },
+        {
+            "type": "logout",
+            "description": "User logged out"
+        },
+        {
+            "type": "survey",
+            "description": "Survey created, updated, or deleted"
+        },
+        {
+            "type": "user_management",
+            "description": "User account created, updated, or deleted"
+        },
+        {
+            "type": "feedback",
+            "description": "Feedback submitted or managed"
+        },
+        {
+            "type": "settings",
+            "description": "System settings updated"
+        },
+        {
+            "type": "backup",
+            "description": "System backup created or restored"
+        },
+        {
+            "type": "chat",
+            "description": "Chat message sent or managed"
+        },
+        {
+            "type": "ticket",
+            "description": "Support ticket created, updated, or resolved"
+        }
+    ]
+}
