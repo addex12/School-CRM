@@ -12,3 +12,7 @@ $pdo = $database->getConnection();
 // Base configuration
 define(constant_name: 'BASE_URL', value: 'https://crm.flipperschool.com');
 define(constant_name: 'UPLOAD_DIR', value: __DIR__ . '/../uploads');
+
+function safe_json_decode($json) {
+    return $json ? json_decode($json, true) : [];
+}

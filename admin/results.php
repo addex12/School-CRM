@@ -90,7 +90,7 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                                 <tr>
                                     <td><?= htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
                                     <?php 
-                                    $answers = json_decode($response['answers'], true); // Decode the JSON answers
+                                    $answers = safe_json_decode($response['answers']); // Use helper function; // Ensure answers is not null
                                     foreach ($fields as $field): ?>
                                         <td><?= isset($answers[$field['field_name']]) ? htmlspecialchars($answers[$field['field_name']]) : 'N/A' ?></td>
                                     <?php endforeach; ?>
@@ -115,14 +115,19 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
 </script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-    function toggleExportMenu() {
+<script>const table = document.querySelector('.table');
+    function toggleExportMenu() {anvas => {
         document.getElementById('exportMenu').style.display = 
             document.getElementById('exportMenu').style.display === 'block' ? 'none' : 'block';
-    }
-</script>
-<!-- Keep the existing scripts that follow -->
+    }       const imgWidth = 190; // Adjust to fit PDF width
+</script>   const imgHeight = (canvas.height * imgWidth) / canvas.width;
+<!-- Keep the existing scripts that follow -->0, imgWidth, imgHeight);
 <script id="survey-results-data" type="application/json">
+    <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
+</script>
+<script src="../assets/js/results.js"></script>
+</body>ep the existing scripts that follow -->
+</html> id="survey-results-data" type="application/json">
     <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
 </script>
 <script src="../assets/js/results.js"></script>

@@ -138,4 +138,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         pdf.save(`survey-results-${Date.now()}.pdf`);
     });
+
+    document.getElementById('export-pdf').addEventListener('click', function () {
+        const table = document.querySelector('.table');
+        html2canvas(table).then(canvas => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+            const imgWidth = 190; // Adjust to fit PDF width
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+            pdf.save('survey_results.pdf');
+        });
+    });
 });
