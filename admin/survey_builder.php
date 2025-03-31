@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="admin-layout">
         <div class="admin-content"> 
-            <?php include 'includes/admin_header.php'; ?>
+            <?php include 'includes/admin_sidebar.php'; ?>
         </div>
         <header class="admin-header">
             <h1>Survey Builder</h1>
