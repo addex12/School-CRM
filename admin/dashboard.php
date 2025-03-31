@@ -12,9 +12,18 @@ require_once '../includes/config.php';
 
 $pageTitle = "Admin Dashboard";
 
-// Load dashboard configuration
-$dashboardConfig = json_decode(file_get_contents(__DIR__ . '/dashboard.json'), true);
+// Ensure database connection is established
+if (!isset($pdo) || !$pdo) {
+    die("Database connection not established.");
+}
 
+// Load dashboard configuration
+$dashboardConfigPath = __DIR__ . '/dashboard.json';
+if (!file_exists($dashboardConfigPath)) {
+    die("Dashboard configuration file not found.");
+}
+
+$dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
 if (!$dashboardConfig || !isset($dashboardConfig['widgets'])) {
     die("Invalid dashboard configuration.");
 }
@@ -42,7 +51,11 @@ try {
     $highRatings = array_sum(array_filter($counts, fn($key) => $ratings[$key] >= 4, ARRAY_FILTER_USE_KEY));
     $lowRatings = array_sum(array_filter($counts, fn($key) => $ratings[$key] <= 2, ARRAY_FILTER_USE_KEY));
 } catch (Exception $e) {
+    error_log("Feedback Query Error: " . $e->getMessage());
     $feedbackRatings = [];
+    $ratings = [];
+    $counts = [];
+    $totalFeedback = $highRatings = $lowRatings = 0;
 }
 
 // Fetch widget counts dynamically
