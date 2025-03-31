@@ -156,10 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </header>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1 class="page-title"><?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
-                <div class="header-actions">
-            <div class="admin-main-content"></div>
+            <div></div>
             <div class="admin-breadcrumbs">
                 <a href="index.php">Dashboard</a> &gt; 
                 <a href="surveys.php">Surveys</a> &gt; 
