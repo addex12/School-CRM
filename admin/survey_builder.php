@@ -156,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </header>
 
         <div class="content">
-        <main class="survey-builder">
+            
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
                 <div class="form-actions">
