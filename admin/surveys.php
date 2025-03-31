@@ -225,6 +225,5 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
         </div>
     </div>
 </body>    
-<?php require_once 'includes/footer.php'; ?>
-
 </html>
+<?php require_once 'includes/footer.php'; ?>
