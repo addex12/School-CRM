@@ -1,0 +1,63 @@
+{
+    "priorities": [
+        {
+            "value": "low",
+            "label": "Low",
+            "color": "green"
+        },
+        {
+            "value": "medium",
+            "label": "Medium",
+            "color": "orange"
+        },
+        {
+            "value": "high",
+            "label": "High",
+            "color": "red"
+        }
+    ],
+    "statuses": [
+        {
+            "value": "open",
+            "label": "Open",
+            "color": "blue"
+        },
+        {
+            "value": "in_progress",
+            "label": "In Progress",
+            "color": "orange"
+        },
+        {
+            "value": "on_hold",
+            "label": "On Hold",
+            "color": "gray"
+        },
+        {
+            "value": "resolved",
+            "label": "Resolved",
+            "color": "green"
+        }
+    ],
+    "actions": [
+        {
+            "value": "reply",
+            "label": "Reply",
+            "icon": "fa-reply"
+        },
+        {
+            "value": "close",
+            "label": "Close",
+            "icon": "fa-check-circle"
+        },
+        {
+            "value": "reopen",
+            "label": "Reopen",
+            "icon": "fa-redo"
+        },
+        {
+            "value": "delete",
+            "label": "Delete",
+            "icon": "fa-trash"
+        }
+    ]
+}

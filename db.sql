@@ -987,6 +987,20 @@ INSERT INTO `survey_statuses` (`status`, `label`, `icon`) VALUES
 ALTER TABLE `surveys`
   ADD CONSTRAINT `fk_surveys_status` FOREIGN KEY (`status`) REFERENCES `survey_statuses` (`status`) ON DELETE SET NULL;
 
+-- Add table for ticket priorities
+CREATE TABLE `ticket_priorities` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `value` VARCHAR(50) NOT NULL UNIQUE,
+    `label` VARCHAR(100) NOT NULL,
+    `color` VARCHAR(20) NOT NULL
+);
+
+-- Insert default priorities
+INSERT INTO `ticket_priorities` (`value`, `label`, `color`) VALUES
+('low', 'Low', 'green'),
+('medium', 'Medium', 'orange'),
+('high', 'High', 'red');
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
