@@ -155,14 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="logout.php" class="btn btn-danger">Logout</a>
             </div>
         </header>
-        <div class="admin-main">
-            <div class="admin-breadcrumbs">
-                <a href="index.php">Dashboard</a> &gt; 
-                <a href="surveys.php">Surveys</a> &gt; 
-                <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?>
-            </div>
-        </div>
-        <main class="survey-builder">
+
+        <main class="admin-main">
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
                 <div class="form-actions">
