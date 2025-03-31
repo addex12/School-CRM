@@ -318,7 +318,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
             </div>
         </div>
-        <div class="admin-footer">
 <?php require_once 'includes/footer.php'  ?>      
 </main>
 
