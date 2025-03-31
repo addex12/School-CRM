@@ -60,6 +60,16 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-content">
+            <h1><?= $pageTitle ?></h1>
+            <p>Results for the survey: <strong><?= htmlspecialchars($survey['title']) ?></strong></p>
+            <p><?= htmlspecialchars($survey['description']) ?></p>
+            <p>Created on: <?= date('M j, Y', strtotime($survey['created_at'])) ?></p>
+            <p>Available from <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> to <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?></p>
+            <p>Respondents: <?= count($responses) ?></p>
+            <p>Anonymous: <?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></p>
+            <p>Allow Multiple Responses: <?= $survey['allow_multiple'] ? 'Yes' : 'No' ?></p>
+        </div>
         <div class="admin-main">
         <header class="admin-header">
     <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
@@ -69,6 +79,11 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
             <a href="export.php?survey_id=<?= $survey_id ?>" class="export-option">Export as CSV</a>
             <a href="#" id="export-pdf" class="export-option">Export as PDF</a>
         </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+        <script src="../js/export.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="../js/chart.js"></script>
+        <script src="../js/survey-results.js"></script>
     </div>
     <a href="surveys.php" class="btn btn-secondary">Back to Surveys</a>
 </header>
@@ -87,6 +102,9 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                         </thead>
                         <tbody>
                             <?php foreach ($responses as $response): ?>
+                                <?php if ($survey['is_anonymous'] && !$response['username']) {
+                                    $response['username'] = 'Anonymous';
+                                } ?>
                                 <tr>
                                     <td><?= $survey['is_anonymous'] ? 'Anonymous' : htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
                                     <?php 
@@ -102,40 +120,39 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                 <?php else: ?>
                     <p>No responses found for this survey.</p>
                 <?php endif; ?>
-            </div>
-        </div>
-    </div>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-    function toggleExportMenu() {
-        document.getElementById('exportMenu').style.display = 
-            document.getElementById('exportMenu').style.display === 'block' ? 'none' : 'block';
-    }
-</script>
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script>
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const chartContainer = document.getElementById('chart-container');
-    const table = document.querySelector('.table');
-    function toggleExportMenu() {
-        document.getElementById('exportMenu').style.display = 
-            document.getElementById('exportMenu').style.display === 'block' ? 'none' : 'block';
-    }
-    const imgWidth = 190; // Adjust to fit PDF width
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-</script>
-<!-- Keep the existing scripts that follow -->0, imgWidth, imgHeight);
-<script id="survey-results-data" type="application/json">
-    <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
-</script>
-<script src="../assets/js/results.js"></script>
-</body>ep the existing scripts that follow -->
-</html> id="survey-results-data" type="application/json">
-    <?= json_encode(['fields' => $fields, 'responses' => $responses]) ?>
-</script>
-<script src="../assets/js/results.js"></script>
-</body>
-</html>
+                <?php if (count($responses) > 0): ?>
+                    <div id="chart-container"></div> <!-- Container for charts -->
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Respondent</th>
+                                <?php foreach ($fields as $field): ?>
+                                    <th><?= htmlspecialchars($field['field_label']) ?></th>
+                                <?php endforeach; ?>
+                                <th>Submitted At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($responses as $response): ?>
+                                <?php if ($survey['is_anonymous'] && !$response['username']) {
+                                    $response['username'] = 'Anonymous';
+                                } ?>
+                                <tr>    
+                                    <td><?= $survey['is_anonymous'] ? 'Anonymous' : htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
+                                    <?php 
+                                    $answers = safe_json_decode($response['answers']); // Use helper function
+                                    foreach ($fields as $field): ?>
+                                        <td><?= isset($answers[$field['field_name']]) ? htmlspecialchars($answers[$field['field_name']]) : 'N/A' ?></td>
+                                    <?php endforeach; ?>
+                                    <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                                </tr>
+                            <?php endforeach; ?>    
+                        </tbody>
+                    </table>
+                <?php else: ?>     ‬
+                    <p>No responses found for this survey.</p> ‬
+                <?php endif; ?>
+            </div> ‬
+        </div> ‬
+    </div> ‬
+<?php include 'includes/footer.php'; ?> ‬

@@ -101,8 +101,8 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                             <tbody>
                                 <?php foreach ($activeSurveys as $survey): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($survey['title']) ?></td>
-                                        <td><?= htmlspecialchars($survey['description']) ?></td>
+                                        <td><?= htmlspecialchars($survey['title'] ?? '') ?></td>
+                                        <td><?= htmlspecialchars($survey['description'] ?? '') ?></td>
                                         <td>
                                             <span class="status-active">Active</span>
                                         </td>
@@ -139,8 +139,8 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                             <tbody>
                                 <?php foreach ($inactiveSurveys as $survey): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($survey['title']) ?></td>
-                                        <td><?= htmlspecialchars($survey['description']) ?></td>
+                                        <td><?= htmlspecialchars($survey['title'] ?? '') ?></td>
+                                        <td><?= htmlspecialchars($survey['description'] ?? '') ?></td>
                                         <td>
                                             <span class="status-inactive">Inactive</span>
                                         </td>
@@ -177,8 +177,8 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                             <tbody>
                                 <?php foreach ($archivedSurveys as $survey): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($survey['title']) ?></td>
-                                        <td><?= htmlspecialchars($survey['description']) ?></td>
+                                        <td><?= htmlspecialchars($survey['title'] ?? '') ?></td>
+                                        <td><?= htmlspecialchars($survey['description'] ?? '') ?></td>
                                         <td>
                                             <span class="status-archived">Archived</span>
                                         </td>
@@ -215,8 +215,8 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                             <tbody>
                                 <?php foreach ($draftSurveys as $survey): ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($survey['title']) ?></td>
-                                        <td><?= htmlspecialchars($survey['description']) ?></td>
+                                        <td><?= htmlspecialchars($survey['title'] ?? '') ?></td>
+                                        <td><?= htmlspecialchars($survey['description'] ?? '') ?></td>
                                         <td>
                                             <span class="status-draft">Draft</span>
                                         </td>
@@ -239,6 +239,20 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
             </div>
         </div>
     </div>
+    <script src="../assets/js/script.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/survey.js"></script>
+    <script src="../assets/js/admin.js"></script>
+    <script src="../assets/js/notifications.js"></script>
+    <script src="../assets/js/export.js"></script>
+    <script src="../assets/js/chart.js"></script>
+    <script src="../assets/js/survey-results.js"></script>
+    <script src="../assets/js/survey.js"></script>
+    <script src="../assets/js/admin.js"></script>
+    <script src="../assets/js/notifications.js"></script>   
+                        
 </body>    
 </html>
 <?php require_once 'includes/footer.php'; ?>
+
