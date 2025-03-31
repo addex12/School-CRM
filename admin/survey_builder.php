@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     
-    <div class="admin-content">
+    <div class="admin-layout">
         <header class="admin-header">
             <h1>Survey Builder</h1>
             <div class="user-info">
