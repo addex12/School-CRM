@@ -48,20 +48,28 @@ try {
 // Fetch widget counts dynamically
 foreach ($widgets as &$widget) {
     try {
+        if (!isset($widget['count_query']) || empty($widget['count_query'])) {
+            throw new Exception("Invalid query for widget: " . htmlspecialchars($widget['title']));
+        }
         $stmt = $pdo->query($widget['count_query']);
         $widget['count'] = $stmt->fetchColumn() ?? 0;
     } catch (Exception $e) {
         $widget['count'] = "Error"; // Default to "Error" if query fails
+        error_log("Widget Error: " . $e->getMessage());
     }
 }
 
 // Fetch section data dynamically
 foreach ($sections as &$section) {
     try {
+        if (!isset($section['query']) || empty($section['query'])) {
+            throw new Exception("Invalid query for section: " . htmlspecialchars($section['title']));
+        }
         $stmt = $pdo->query($section['query']);
         $section['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $section['rows'] = []; // Default to an empty array if query fails
+        error_log("Section Error: " . $e->getMessage());
     }
 }
 ?>
