@@ -1001,6 +1001,19 @@ INSERT INTO `ticket_priorities` (`value`, `label`, `color`) VALUES
 ('medium', 'Medium', 'orange'),
 ('high', 'High', 'red');
 
+-- Add table for templates
+CREATE TABLE `templates` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(255) NOT NULL,
+    `content` TEXT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Insert default templates (optional)
+INSERT INTO `templates` (`name`, `content`) VALUES
+('Welcome Email', 'Dear [Name], Welcome to our platform!'),
+('Password Reset', 'Click the link below to reset your password: [Reset Link]');
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
