@@ -857,15 +857,123 @@ ALTER TABLE `users`
 --
 ALTER TABLE surveys MODIFY COLUMN target_roles JSON NOT NULL;
 
---
--- Add column `answers` to `survey_responses` table
---
-ALTER TABLE survey_responses ADD COLUMN answers JSON DEFAULT NULL;
+-- Add column `answers` to `survey_responses` table if it does not already exist
+SET @column_exists = (
+    SELECT COUNT(*)
+    FROM information_schema.columns
+    WHERE table_name = 'survey_responses'
+    AND table_schema = DATABASE()
+    AND column_name = 'answers'
+);
+
+IF @column_exists = 0 THEN
+    ALTER TABLE survey_responses ADD COLUMN answers JSON DEFAULT NULL;
+END IF;
 
 --
 -- Ensure `answers` column in `survey_responses` table is properly defined as a JSON column
 --
 ALTER TABLE survey_responses MODIFY COLUMN answers JSON DEFAULT NULL;
+
+--
+-- Add foreign key relationships for `survey_responses`
+ALTER TABLE survey_responses
+ADD CONSTRAINT fk_survey_responses_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_survey_responses_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `survey_fields`
+ALTER TABLE survey_fields
+ADD CONSTRAINT fk_survey_fields_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `surveys`
+ALTER TABLE surveys
+ADD CONSTRAINT fk_surveys_category_id FOREIGN KEY (category_id) REFERENCES survey_categories(id) ON DELETE SET NULL,
+ADD CONSTRAINT fk_surveys_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL;
+
+-- Add foreign key relationships for `response_data`
+ALTER TABLE response_data
+ADD CONSTRAINT fk_response_data_response_id FOREIGN KEY (response_id) REFERENCES responses(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_response_data_field_id FOREIGN KEY (field_id) REFERENCES survey_fields(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `responses`
+ALTER TABLE responses
+ADD CONSTRAINT fk_responses_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_responses_question_id FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_responses_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `questions`
+ALTER TABLE questions
+ADD CONSTRAINT fk_questions_survey_id FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `audit_logs`
+ALTER TABLE audit_logs
+ADD CONSTRAINT fk_audit_logs_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL;
+
+-- Add foreign key relationships for `contact_requests`
+ALTER TABLE contact_requests
+ADD CONSTRAINT fk_contact_requests_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `contact_responses`
+ALTER TABLE contact_responses
+ADD CONSTRAINT fk_contact_responses_contact_id FOREIGN KEY (contact_id) REFERENCES contact_requests(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_contact_responses_admin_id FOREIGN KEY (admin_id) REFERENCES users(id) ON DELETE SET NULL;
+
+-- Add foreign key relationships for `feedback`
+ALTER TABLE feedback
+ADD CONSTRAINT fk_feedback_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `roles`
+ALTER TABLE users
+ADD CONSTRAINT fk_users_role_id FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL;
+
+-- Add foreign key relationships for `chat_messages`
+ALTER TABLE chat_messages
+ADD CONSTRAINT fk_chat_messages_thread_id FOREIGN KEY (thread_id) REFERENCES chat_threads(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_chat_messages_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `chat_threads`
+ALTER TABLE chat_threads
+ADD CONSTRAINT fk_chat_threads_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `support_tickets`
+ALTER TABLE support_tickets
+ADD CONSTRAINT fk_support_tickets_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `ticket_replies`
+ALTER TABLE ticket_replies
+ADD CONSTRAINT fk_ticket_replies_ticket_id FOREIGN KEY (ticket_id) REFERENCES support_tickets(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_ticket_replies_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `ticket_responses`
+ALTER TABLE ticket_responses
+ADD CONSTRAINT fk_ticket_responses_ticket_id FOREIGN KEY (ticket_id) REFERENCES support_tickets(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_ticket_responses_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `notifications`
+ALTER TABLE notifications
+ADD CONSTRAINT fk_notifications_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `departments`
+ALTER TABLE departments
+ADD CONSTRAINT fk_departments_manager_user_id FOREIGN KEY (manager_user_id) REFERENCES users(id) ON DELETE SET NULL;
+
+-- Add foreign key relationships for `positions`
+ALTER TABLE positions
+ADD CONSTRAINT fk_positions_department_id FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `employees`
+ALTER TABLE employees
+ADD CONSTRAINT fk_employees_user_id FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_employees_position_id FOREIGN KEY (position_id) REFERENCES positions(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `salary_structures`
+ALTER TABLE salary_structures
+ADD CONSTRAINT fk_salary_structures_employee_id FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
+
+-- Add foreign key relationships for `payroll_items`
+ALTER TABLE payroll_items
+ADD CONSTRAINT fk_payroll_items_payroll_id FOREIGN KEY (payroll_id) REFERENCES payrolls(id) ON DELETE CASCADE,
+ADD CONSTRAINT fk_payroll_items_employee_id FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
 
 COMMIT;
 
