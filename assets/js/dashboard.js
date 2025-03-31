@@ -41,4 +41,4 @@ document.addEventListener('DOMContentLoaded', function () {
                 tbody.innerHTML = '<tr><td colspan="100%">Error loading data</td></tr>';
             });
     });
-});
+}); // Ensure this closing brace matches the opening function declaration
