@@ -1,6 +1,5 @@
 <?php
 require_once 'auth.php';
-requireAdmin();
 ?>
 <!DOCTYPE html>
 <html lang="en">

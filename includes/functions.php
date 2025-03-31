@@ -9,17 +9,27 @@ function registerUser($username, $email, $password, $role = 'parent') {
     
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     
-    $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
-    return $stmt->execute([$username, $email, $hashed_password, $role]);
+    try {
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
+        return $stmt->execute([$username, $email, $hashed_password, $role]);
+    } catch (PDOException $e) {
+        error_log("Error registering user: " . $e->getMessage());
+        return false;
+    }
 }
 
 // Login user
 function loginUser($username, $password) {
     global $pdo;
     
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+    } catch (PDOException $e) {
+        error_log("Error fetching user: " . $e->getMessage());
+        return false;
+    }
     
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
@@ -34,17 +44,27 @@ function loginUser($username, $password) {
 function getActiveSurveys() {
     global $pdo;
     
-    $stmt = $pdo->query("SELECT * FROM surveys WHERE is_active = TRUE");
-    return $stmt->fetchAll();
+    try {
+        $stmt = $pdo->query("SELECT * FROM surveys WHERE is_active = TRUE");
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log("Error fetching active surveys: " . $e->getMessage());
+        return [];
+    }
 }
 
 // Get survey questions
 function getSurveyQuestions($survey_id) {
     global $pdo;
     
-    $stmt = $pdo->prepare("SELECT * FROM questions WHERE survey_id = ?");
-    $stmt->execute([$survey_id]);
-    return $stmt->fetchAll();
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM questions WHERE survey_id = ?");
+        $stmt->execute([$survey_id]);
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log("Error fetching survey questions: " . $e->getMessage());
+        return [];
+    }
 }
 
 // Apply system settings to the application
