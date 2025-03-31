@@ -261,16 +261,113 @@ $sections = $dashboardConfig['sections'] ?? [];
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
-                                    <tr><td colspan="<?= count($section['columns']) ?>">Loading...</td></tr>
-                                </tbody>
-                            </table>
+                        // Execute the count query
+                        try {
+                            $stmt = $pdo->query($widget['count_query']);
+                            $count = $stmt->fetchColumn();
+                        } catch (Exception $e) {
+                            $count = "Error";
+                        }
+                        ?>
+                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
+                            <i class="<?= htmlspecialchars($widget['icon']) ?>"></i>
+                            <h3><?= htmlspecialchars($count) ?></h3>
+                            <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
-                        <a href="<?= htmlspecialchars($section['link']) ?>" class="btn">
-                            <i class="fas fa-arrow-right"></i>
-                            <?= htmlspecialchars($section['link_text']) ?>
-                        </a>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Sections -->
+                <?php foreach ($sections as $section): ?>
+                    <?php
+                    // Ensure the query key exists and is not empty
+                    if (!isset($section['query']) || empty($section['query'])) {
+                        continue;
+                    }
+
+                    // Execute the section query
+                    try {
+                        $stmt = $pdo->query($section['query']);
+                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    } catch (Exception $e) {
+                        $rows = [];
+                    }
+                    ?>
+                    <div class="dashboard-section">
+                        <h2><?= htmlspecialchars($section['title']) ?></h2>
+                        
+                        <?php if (!empty($rows)): ?>
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <?php foreach ($section['columns'] as $column): ?>
+                                                <th><?= htmlspecialchars($column) ?></th>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($rows as $row): ?>
+                                            <tr>
+                                                <?php foreach ($section['fields'] as $field): ?>
+                                                    <td><?= htmlspecialchars($row[$field] ?? 'N/A') ?></td>
+                                                <?php endforeach; ?>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <a href="<?= htmlspecialchars($section['link']) ?>" class="btn">
+                                <i class="fas fa-arrow-right"></i>
+                                <?= htmlspecialchars($section['link_text']) ?>
+                            </a>
+                        <?php else: ?>
+                            <div class="no-data">
+                                <p>No data available</p>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
+
+                <!-- Feedback Overview Section -->
+                <section class="dashboard-section">
+                    <h2>Feedback Overview</h2>
+                    <div class="feedback-summary">
+                        <p>Total Feedback: <strong><?= $totalFeedback ?></strong></p>
+                        <p>High Ratings (4-5): <strong><?= $highRatings ?></strong></p>
+                        <p>Low Ratings (1-2): <strong><?= $lowRatings ?></strong></p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="feedbackChart"></canvas>
+                    </div>
+                </section>
+
+                <!-- Feedback Details Section -->
+                <section class="dashboard-section">
+                    <h2>Feedback Details</h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Rating</th>
+                                <th>Count</th>
+                                <th>Stars</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($feedbackRatings as $rating): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($rating['rating']) ?></td>
+                                    <td><?= htmlspecialchars($rating['count']) ?></td>
+                                    <td>
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <i class="fa<?= $i <= $rating['rating'] ? 's' : 'r' ?> fa-star" style="color: <?= $i <= $rating['rating'] ? 'gold' : '#ccc' ?>;"></i>
+                                        <?php endfor; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </section>
             </div>
         </div>
     </div>
