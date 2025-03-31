@@ -55,6 +55,9 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
@@ -79,7 +82,11 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                 <p>Here you can manage all your surveys. You can create, edit, delete, and view survey results.</p>
                 <p>Use the buttons above to create a new survey or export existing surveys.</p>
                 <!-- Display error messages -->
-                <?php if ($error): ?>
+                <?php if (is_array($error)): ?>
+                    <?php foreach ($error as $err): ?>
+                        <p class="error-message"><?= htmlspecialchars($err) ?></p>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <p class="error-message"><?= htmlspecialchars($error) ?></p>
                 <?php endif; ?>
                     <div class="error-message"><?= htmlspecialchars($error) ?></div>
