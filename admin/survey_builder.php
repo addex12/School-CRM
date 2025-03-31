@@ -145,7 +145,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="admin-layout">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-content"> 
+            <?php include 'includes/admin_header.php'; ?>
+        </div>
+        <header class="admin-header">
+            <h1>Survey Builder</h1>
+            <div class="user-info">
+                <span><?= htmlspecialchars($_SESSION['username']) ?></span>
+                <a href="logout.php" class="btn btn-danger">Logout</a>
+            </div>
+        </header>
         
         <main class="survey-builder">
             <header class="builder-header">
