@@ -159,13 +159,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </header>
         <div class="admin-main">
-            <div></div>
-            <div class="admin-breadcrumbs">
-                <a href="index.php">Dashboard</a> &gt; 
-                <a href="surveys.php">Surveys</a> &gt; 
-                <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?>
-            </div>
-        </div>
         <main class="survey-builder">
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
