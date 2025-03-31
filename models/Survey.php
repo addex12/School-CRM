@@ -12,6 +12,12 @@ class Survey {
         return new self();
     }
 
+    public static function getStatuses() {
+        global $pdo;
+        $stmt = $pdo->query("SELECT * FROM survey_statuses ORDER BY id");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findByPk($id) {
         global $pdo;
         $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
