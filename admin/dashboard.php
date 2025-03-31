@@ -15,33 +15,13 @@ $pageTitle = "Admin Dashboard";
 // Load dashboard configuration
 $dashboardConfig = json_decode(file_get_contents(__DIR__ . '/dashboard.json'), true);
 
-// Fetch widget data
-$widgets = [];
-foreach ($dashboardConfig['widgets'] as $widget) {
-    $stmt = $pdo->query($widget['query']);
-    $value = $stmt->fetchColumn();
-    $widgets[] = [
-        'title' => $widget['title'],
-        'value' => $value,
-        'icon' => $widget['icon'],
-        'color' => $widget['color']
-    ];
+if (!$dashboardConfig || !isset($dashboardConfig['widgets'])) {
+    die("Invalid dashboard configuration.");
 }
 
-// Fetch section data
-$sections = [];
-foreach ($dashboardConfig['sections'] as $section) {
-    $stmt = $pdo->query($section['query']);
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $sections[] = [
-        'title' => $section['title'],
-        'columns' => $section['columns'],
-        'fields' => $section['fields'],
-        'data' => $data,
-        'link' => $section['link'],
-        'link_text' => $section['link_text']
-    ];
-}
+$widgets = $dashboardConfig['widgets'];
+$sections = $dashboardConfig['sections'] ?? [];
+
 ?>
 
 <!DOCTYPE html>
@@ -243,20 +223,48 @@ foreach ($dashboardConfig['sections'] as $section) {
                 <!-- Widgets Section -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
+                        <?php
+                        // Ensure the count_query key exists and is not empty
+                        if (!isset($widget['count_query']) || empty($widget['count_query'])) {
+                            continue;
+                        }
+
+                        // Execute the count query
+                        try {
+                            $stmt = $pdo->query($widget['count_query']);
+                            $count = $stmt->fetchColumn();
+                        } catch (Exception $e) {
+                            $count = "Error";
+                        }
+                        ?>
                         <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
                             <i class="<?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= htmlspecialchars($widget['title']) ?></h3>
-                            <p><?= htmlspecialchars($widget['value']) ?></p>
+                            <h3><?= htmlspecialchars($count) ?></h3>
+                            <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
                     <?php endforeach; ?>
                 </div>
 
                 <!-- Sections -->
                 <?php foreach ($sections as $section): ?>
+                    <?php
+                    // Ensure the query key exists and is not empty
+                    if (!isset($section['query']) || empty($section['query'])) {
+                        continue;
+                    }
+
+                    // Execute the section query
+                    try {
+                        $stmt = $pdo->query($section['query']);
+                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    } catch (Exception $e) {
+                        $rows = [];
+                    }
+                    ?>
                     <div class="dashboard-section">
                         <h2><?= htmlspecialchars($section['title']) ?></h2>
                         
-                        <?php if (count($section['data']) > 0): ?>
+                        <?php if (!empty($rows)): ?>
                             <div class="table-container">
                                 <table class="table">
                                     <thead>
@@ -267,7 +275,7 @@ foreach ($dashboardConfig['sections'] as $section) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php foreach ($section['data'] as $row): ?>
+                                        <?php foreach ($rows as $row): ?>
                                             <tr>
                                                 <?php foreach ($section['fields'] as $field): ?>
                                                     <td><?= htmlspecialchars($row[$field] ?? 'N/A') ?></td>
