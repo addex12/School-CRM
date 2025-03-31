@@ -10,7 +10,7 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 require_once '../models/Survey.php'; // Corrected path to the Survey class
 requireAdmin();
-
+$pageTitle = "Survey Builder";
 // Database queries and configurations
 $roles = $pdo->query("SELECT id, role_name FROM roles WHERE role_name != 'admin' ORDER BY role_name")->fetchAll();
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
