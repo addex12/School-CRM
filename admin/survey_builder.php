@@ -13,7 +13,9 @@ try {
     $categoriesStmt = $pdo->query("SELECT * FROM survey_categories ORDER BY name");
     $categories = $categoriesStmt->fetchAll();
 
-    $statusOptions = Survey::getStatuses();
+    // Fetch survey statuses from the database
+    $statusStmt = $pdo->query("SELECT status, label FROM survey_statuses ORDER BY id");
+    $statusOptions = $statusStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Database error: " . $e->getMessage());
     $_SESSION['error'] = "Failed to load survey data. Please try again.";
@@ -83,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
             'description' => htmlspecialchars($_POST['description'] ?? ''),
             'category_id' => intval($_POST['category_id']),
             'target_roles' => json_encode($_POST['target_roles'] ?? []),
-            'status' => in_array($_POST['status'], array_column($statusOptions, 'value')) ? $_POST['status'] : 'draft',
+            'status' => in_array($_POST['status'], array_column($statusOptions, 'status')) ? $_POST['status'] : 'draft',
             'starts_at' => date('Y-m-d 00:00:00', strtotime($_POST['starts_at'])),
             'ends_at' => date('Y-m-d 23:59:59', strtotime($_POST['ends_at'])),
             'is_anonymous' => isset($_POST['is_anonymous']) ? 1 : 0
@@ -214,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
                             <label>Status</label>
                             <select name="status" required>
                                 <?php foreach ($statusOptions as $opt): ?>
-                                    <option value="<?= $opt['value'] ?>" <?= ($survey['status'] ?? 'draft') === $opt['value'] ? 'selected' : '' ?>>
+                                    <option value="<?= htmlspecialchars($opt['status']) ?>" <?= ($survey['status'] ?? 'draft') === $opt['status'] ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($opt['label']) ?>
                                     </option>
                                 <?php endforeach; ?>
