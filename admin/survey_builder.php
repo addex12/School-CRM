@@ -155,7 +155,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="logout.php" class="btn btn-danger">Logout</a>
             </div>
         </header>
-        </div>
         <div class="admin-main">
             <div class="admin-breadcrumbs">
                 <a href="index.php">Dashboard</a> &gt; 
@@ -317,8 +316,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </section>
             </form>
             </div>
+        
+        </div>
 
         </div>
+
 </main>
 
     </div>
