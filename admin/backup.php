@@ -3,28 +3,53 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-$pageTitle = "Database Backup";
+$pageTitle = "System Backup & Restore";
 
 // Handle backup request
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_database'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {
     try {
-        $backupFile = __DIR__ . '/../backups/db_backup_' . date('Y-m-d_H-i-s') . '.sql';
+        $backupDir = __DIR__ . '/../backups';
+        $timestamp = date('Y-m-d_H-i-s');
+        $backupFile = $backupDir . "/full_backup_$timestamp.zip";
+
+        // Create a zip archive
+        $zip = new ZipArchive();
+        if ($zip->open($backupFile, ZipArchive::CREATE) !== true) {
+            throw new Exception("Failed to create backup archive.");
+        }
+
+        // Add database dump to the archive
+        $dbDumpFile = $backupDir . "/db_backup_$timestamp.sql";
         $command = sprintf(
             'mysqldump --user=%s --password=%s --host=%s %s > %s',
             escapeshellarg($config['DB_USER']),
             escapeshellarg($config['DB_PASSWORD']),
             escapeshellarg($config['DB_HOST']),
             escapeshellarg($config['DB_NAME']),
-            escapeshellarg($backupFile)
+            escapeshellarg($dbDumpFile)
         );
-
         exec($command, $output, $returnVar);
-
         if ($returnVar !== 0) {
-            throw new Exception("Failed to create database backup. Please check server permissions.");
+            throw new Exception("Failed to create database dump.");
+        }
+        $zip->addFile($dbDumpFile, "db_backup_$timestamp.sql");
+
+        // Add system files to the archive
+        $rootDir = realpath(__DIR__ . '/..');
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($rootDir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($files as $file) {
+            $filePath = $file->getRealPath();
+            $relativePath = substr($filePath, strlen($rootDir) + 1);
+            $zip->addFile($filePath, $relativePath);
         }
 
-        $_SESSION['success'] = "Database backup created successfully!";
+        $zip->close();
+        unlink($dbDumpFile); // Remove the temporary database dump file
+
+        $_SESSION['success'] = "System backup created successfully!";
         header("Location: backup.php");
         exit();
     } catch (Exception $e) {
@@ -32,9 +57,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_database'])) {
     }
 }
 
-// Fetch existing backups
+// Ensure the backups directory exists
 $backupDir = __DIR__ . '/../backups';
-$backups = array_diff(scandir($backupDir), ['.', '..']);
+if (!is_dir($backupDir)) {
+    mkdir($backupDir, 0755, true); // Create the directory if it doesn't exist
+}
+
+// Fetch existing backups
+$backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [];
 ?>
 
 <!DOCTYPE html>
@@ -56,9 +86,9 @@ $backups = array_diff(scandir($backupDir), ['.', '..']);
                 <?php include 'includes/alerts.php'; ?>
 
                 <section class="form-section">
-                    <h2>Create New Backup</h2>
+                    <h2>Create Full System Backup</h2>
                     <form method="POST">
-                        <button type="submit" name="backup_database" class="btn btn-primary">Backup Now</button>
+                        <button type="submit" name="backup_system" class="btn btn-primary">Backup Now</button>
                     </form>
                 </section>
 
@@ -80,9 +110,9 @@ $backups = array_diff(scandir($backupDir), ['.', '..']);
                                         <td><?= date('M j, Y g:i A', filemtime($backupDir . '/' . $backup)) ?></td>
                                         <td>
                                             <a href="../backups/<?= urlencode($backup) ?>" class="btn btn-secondary" download>Download</a>
-                                            <form method="POST" action="delete_backup.php" style="display:inline;">
+                                            <form method="POST" action="restore.php" style="display:inline;">
                                                 <input type="hidden" name="backup_file" value="<?= htmlspecialchars($backup) ?>">
-                                                <button type="submit" name="delete_backup" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this backup?')">Delete</button>
+                                                <button type="submit" name="restore_backup" class="btn btn-warning" onclick="return confirm('Are you sure you want to restore this backup?')">Restore</button>
                                             </form>
                                         </td>
                                     </tr>

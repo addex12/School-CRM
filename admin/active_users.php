@@ -5,12 +5,13 @@ require_once '../includes/config.php';
 
 $pageTitle = "Active Users";
 
-// Fetch active users
+// Fetch active users (last activity within 15 minutes)
 $stmt = $pdo->query("
-    SELECT id, username, email, role, last_activity 
-    FROM users 
-    WHERE last_activity >= NOW() - INTERVAL 15 MINUTE
-    ORDER BY last_activity DESC
+    SELECT u.id, u.username, u.email, r.role_name, u.last_activity 
+    FROM users u
+    LEFT JOIN roles r ON u.role_id = r.id
+    WHERE u.last_activity >= NOW() - INTERVAL 15 MINUTE
+    ORDER BY u.last_activity DESC
 ");
 $activeUsers = $stmt->fetchAll();
 
@@ -84,7 +85,7 @@ include 'includes/admin_sidebar.php';
                                     <td><?= htmlspecialchars($user['id']) ?></td>
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
-                                    <td><?= htmlspecialchars(ucfirst($user['role'])) ?></td>
+                                    <td><?= htmlspecialchars($user['role_name'] ?? 'N/A') ?></td>
                                     <td><?= date('M j, Y g:i A', strtotime($user['last_activity'])) ?></td>
                                 </tr>
                             <?php endforeach; ?>
