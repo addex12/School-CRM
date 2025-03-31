@@ -8,7 +8,7 @@
  */
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
-require_once '../includes/Survey.php'; 
+require_once '../models/Survey.php'; // Corrected path to the Survey class
 requireAdmin();
 
 // Database queries and configurations
