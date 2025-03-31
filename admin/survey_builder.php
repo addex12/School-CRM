@@ -156,19 +156,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </header>
 
-        <main class="admin-main">
-            <form action="" method="post" id="survey-form">
+        <main class="survey-builder">
             <div class="container">
-                <div class="builder-container">
+                <div class="builder-content">
                     <div class="builder-sidebar">
                         <h2>Survey Builder</h2>
-                        <p>Use the form below to create or edit your survey.</p>
+                        <ul class="nav-list">
+                            <li><a href="#basic-info">Basic Info</a></li>
+                            <li><a href="#settings">Settings</a></li>
+                            <li><a href="#questions">Questions</a></li>
+                        </ul>
                     </div>
-                    <div class="builder-content">
-                        <div class="builder-form">
-                            <h2><?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h2>
-                            <p>Fill in the details below to create a new survey or edit an existing one.</p>
+                    <div class="builder-main">
+                        <div class="builder-header">
+                            <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
                         </div>
+                        <div class="builder-content">
+                            <div class="builder-form">
+                                <form id="survey-form" method="POST" action="<?= htmlspecialchars($_SERVER['PHP_SELF']) ?>">
+                                    <input type="hidden" name="survey_id" value="<?= htmlspecialchars($survey_id) ?>">
+                                    <?php include 'includes/alerts.php'; ?>
+                                    <!-- Form content goes here -->
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="survey-builder">
+        <div class="builder-content">
+            <div class="builder-sidebar">
+                <h2>Survey Builder</h2>
+                <ul class="nav-list">
+                    <li><a href="#basic-info">Basic Info</a></li>
+                    <li><a href="#settings">Settings</a></li>
+                    <li><a href="#questions">Questions</a></li>
+                </ul>
+            </div>
+            <div class="builder-main">  </div>
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
                 <div class="form-actions">
