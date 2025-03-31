@@ -148,8 +148,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="admin-content"> 
             <?php include 'includes/admin_sidebar.php'; ?>
         </div>
-</div>
-    <div class="admin-main-content">
         <header class="admin-header">
             <h1>Survey Builder</h1>
             <div class="user-info">
@@ -157,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <a href="logout.php" class="btn btn-danger">Logout</a>
             </div>
         </header>
-        
+        </div>
         <main class="survey-builder">
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
