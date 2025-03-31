@@ -8,14 +8,27 @@ $pageTitle = "Audit Log";
 // Load audit log configuration
 $auditConfig = json_decode(file_get_contents(__DIR__ . '/audit_log.json'), true);
 
-// Fetch audit logs
-$stmt = $pdo->query("
+// Fetch audit logs with pagination
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$perPage = 20;
+$offset = ($page - 1) * $perPage;
+
+$stmt = $pdo->prepare("
     SELECT a.*, u.username 
     FROM audit_logs a 
     LEFT JOIN users u ON a.user_id = u.id 
     ORDER BY a.created_at DESC
+    LIMIT :offset, :perPage
 ");
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->bindValue(':perPage', $perPage, PDO::PARAM_INT);
+$stmt->execute();
 $auditLogs = $stmt->fetchAll();
+
+// Get total count for pagination
+$totalStmt = $pdo->query("SELECT COUNT(*) FROM audit_logs");
+$totalLogs = $totalStmt->fetchColumn();
+$totalPages = ceil($totalLogs / $perPage);
 ?>
 
 <!DOCTYPE html>
@@ -68,6 +81,19 @@ $auditLogs = $stmt->fetchAll();
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination">
+                            <?php if ($page > 1): ?>
+                                <a href="?page=<?= $page - 1 ?>" class="btn btn-secondary">Previous</a>
+                            <?php endif; ?>
+                            
+                            <span>Page <?= $page ?> of <?= $totalPages ?></span>
+                            
+                            <?php if ($page < $totalPages): ?>
+                                <a href="?page=<?= $page + 1 ?>" class="btn btn-secondary">Next</a>
+                            <?php endif; ?>
+                        </div>
                     <?php else: ?>
                         <p>No audit logs found.</p>
                     <?php endif; ?>
