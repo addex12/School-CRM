@@ -862,6 +862,11 @@ ALTER TABLE surveys MODIFY COLUMN target_roles JSON NOT NULL;
 --
 ALTER TABLE survey_responses ADD COLUMN answers JSON DEFAULT NULL;
 
+--
+-- Ensure `answers` column in `survey_responses` table is properly defined as a JSON column
+--
+ALTER TABLE survey_responses MODIFY COLUMN answers JSON DEFAULT NULL;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

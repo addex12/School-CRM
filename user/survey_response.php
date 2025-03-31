@@ -49,131 +49,19 @@ $fields = $stmt->fetchAll();
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $errors = [];
-    $response_data = [];
-    
-    // Validate all required fields
-    foreach ($fields as $field) {
-        $field_name = $field['field_name'];
-        $field_value = $_POST[$field_name] ?? null;
-        
-        // Check required fields
-        if ($field['is_required'] && empty($field_value)) {
-            $errors[$field_name] = "This field is required";
-            continue;
-        }
-        
-        // Validate based on field type
-        $validation_rules = json_decode($field['validation_rules'], true);
-        
-        if ($validation_rules) {
-            // Min length/value validation
-            if (isset($validation_rules['min']) && $field_value) {
-                if ($field['field_type'] === 'number' && $field_value < $validation_rules['min']) {
-                    $errors[$field_name] = "Value must be at least {$validation_rules['min']}";
-                } elseif (in_array($field['field_type'], ['text', 'textarea']) && strlen($field_value) < $validation_rules['min']) {
-                    $errors[$field_name] = "Must be at least {$validation_rules['min']} characters";
-                }
-            }
-            
-            // Max length/value validation
-            if (isset($validation_rules['max']) && $field_value) {
-                if ($field['field_type'] === 'number' && $field_value > $validation_rules['max']) {
-                    $errors[$field_name] = "Value must be at most {$validation_rules['max']}";
-                } elseif (in_array($field['field_type'], ['text', 'textarea']) && strlen($field_value) > $validation_rules['max']) {
-                    $errors[$field_name] = "Must be at most {$validation_rules['max']} characters";
-                }
-            }
-            
-            // Regex validation
-            if (isset($validation_rules['regex']) && $field_value) {
-                if (!preg_match("/{$validation_rules['regex']}/", $field_value)) {
-                    $errors[$field_name] = "Invalid format";
-                }
-            }
-        }
-        
-        // Handle file uploads
-        if ($field['field_type'] === 'file' && isset($_FILES[$field_name])) {
-            $file = $_FILES[$field_name];
-            
-            if ($file['error'] === UPLOAD_ERR_OK) {
-                // Create uploads directory if it doesn't exist
-                $upload_dir = "../uploads/survey_{$survey_id}";
-                if (!file_exists($upload_dir)) {
-                    mkdir($upload_dir, 0755, true);
-                }
-                
-                // Generate unique filename
-                $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-                $filename = "user_{$_SESSION['user_id']}_" . uniqid() . ".$ext";
-                $filepath = "$upload_dir/$filename";
-                
-                if (move_uploaded_file($file['tmp_name'], $filepath)) {
-                    $field_value = $filename;
-                } else {
-                    $errors[$field_name] = "Failed to upload file";
-                }
-            } elseif ($file['error'] !== UPLOAD_ERR_NO_FILE) {
-                $errors[$field_name] = "File upload error";
-            }
-        }
-        
-        // For checkbox fields, handle array values
-        if ($field['field_type'] === 'checkbox' && isset($_POST[$field_name]) && is_array($_POST[$field_name])) {
-            $field_value = implode(', ', $_POST[$field_name]);
-        }
-        
-        // For radio/select fields, ensure value is in options
-        if (in_array($field['field_type'], ['radio', 'select']) && $field_value) {
-            $options = json_decode($field['field_options'], true);
-            if (!in_array($field_value, $options)) {
-                $errors[$field_name] = "Invalid selection";
-            }
-        }
-        
-        // For rating fields, validate range
-        if ($field['field_type'] === 'rating' && $field_value) {
-            $rating = intval($field_value);
-            if ($rating < 1 || $rating > 5) {
-                $errors[$field_name] = "Invalid rating value";
-            }
-        }
-        
-        if (!isset($errors[$field_name])) {
-            $response_data[] = [
-                'field_id' => $field['id'],
-                'field_value' => $field_value
-            ];
-        }
-    }
-    
-    if (empty($errors)) {
-        try {
-            $pdo->beginTransaction();
-            
-            // Create survey response
-            $stmt = $pdo->prepare("INSERT INTO survey_responses (survey_id, user_id) VALUES (?, ?)");
-            $stmt->execute([$survey_id, $_SESSION['user_id']]);
-            $response_id = $pdo->lastInsertId();
-            
-            // Save response data
-            foreach ($response_data as $data) {
-                if ($data['field_value'] !== null) {
-                    $stmt = $pdo->prepare("INSERT INTO response_data (response_id, field_id, field_value) VALUES (?, ?, ?)");
-                    $stmt->execute([$response_id, $data['field_id'], $data['field_value']]);
-                }
-            }
-            
-            $pdo->commit();
-            
-            header("Location: dashboard.php?survey_completed=$survey_id");
-            exit();
-        } catch (Exception $e) {
-            $pdo->rollBack();
-            $errors['system'] = "An error occurred while saving your response. Please try again.";
-        }
-    }
+    $survey_id = $_POST['survey_id'];
+    $user_id = $_SESSION['user_id'];
+    $answers = json_encode($_POST['answers']); // Encode the answers as JSON
+
+    $stmt = $pdo->prepare("
+        INSERT INTO survey_responses (survey_id, user_id, answers, submitted_at) 
+        VALUES (?, ?, ?, NOW())
+    ");
+    $stmt->execute([$survey_id, $user_id, $answers]);
+
+    $_SESSION['success'] = "Your responses have been submitted successfully!";
+    header("Location: thank_you.php");
+    exit();
 }
 ?>
 

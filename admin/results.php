@@ -90,9 +90,9 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                                 <tr>
                                     <td><?= htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
                                     <?php 
-                                    $answers = json_decode($response['answers'], true);
+                                    $answers = json_decode($response['answers'], true); // Decode the JSON answers
                                     foreach ($fields as $field): ?>
-                                        <td><?= htmlspecialchars($answers[$field['field_name']] ?? 'N/A') ?></td>
+                                        <td><?= isset($answers[$field['field_name']]) ? htmlspecialchars($answers[$field['field_name']]) : 'N/A' ?></td>
                                     <?php endforeach; ?>
                                     <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                 </tr>
