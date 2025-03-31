@@ -6,8 +6,13 @@ require_once '../includes/config.php';
 $pageTitle = "Manage Categories";
 
 // Fetch all categories
-$stmt = $pdo->query("SELECT * FROM survey_categories ORDER BY created_at DESC");
-$categories = $stmt->fetchAll();
+try {
+    $stmt = $pdo->query("SELECT * FROM survey_categories ORDER BY created_at DESC");
+    $categories = $stmt->fetchAll();
+} catch (Exception $e) {
+    $_SESSION['error'] = "Failed to fetch categories: " . $e->getMessage();
+    $categories = [];
+}
 
 // Handle form submission for adding a new category
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {

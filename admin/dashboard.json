@@ -2,25 +2,25 @@
     "widgets": [
         {
             "title": "Active Surveys",
-            "count_query": "SELECT COUNT(*) AS count FROM surveys WHERE status = 'active'",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'active'",
             "icon": "fa-rocket",
             "color": "green"
         },
         {
             "title": "Inactive Surveys",
-            "count_query": "SELECT COUNT(*) AS count FROM surveys WHERE status = 'inactive'",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'inactive'",
             "icon": "fa-pause",
             "color": "orange"
         },
         {
             "title": "Archived Surveys",
-            "count_query": "SELECT COUNT(*) AS count FROM surveys WHERE status = 'archived'",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'archived'",
             "icon": "fa-archive",
             "color": "gray"
         },
         {
             "title": "Total Users",
-            "count_query": "SELECT COUNT(*) AS count FROM users",
+            "count_query": "SELECT COUNT(*) FROM users",
             "icon": "fa-users",
             "color": "blue"
         }

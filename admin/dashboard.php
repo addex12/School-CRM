@@ -14,18 +14,24 @@ $pageTitle = "Admin Dashboard";
 
 // Ensure database connection is established
 if (!isset($pdo) || !$pdo) {
-    die("Database connection not established.");
+    $_SESSION['error'] = "Database connection not established.";
+    header("Location: ../error.php");
+    exit();
 }
 
 // Load dashboard configuration
 $dashboardConfigPath = __DIR__ . '/dashboard.json';
 if (!file_exists($dashboardConfigPath)) {
-    die("Dashboard configuration file not found.");
+    $_SESSION['error'] = "Dashboard configuration file not found.";
+    header("Location: ../error.php");
+    exit();
 }
 
 $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
 if (!$dashboardConfig || !isset($dashboardConfig['widgets'])) {
-    die("Invalid dashboard configuration.");
+    $_SESSION['error'] = "Invalid dashboard configuration.";
+    header("Location: ../error.php");
+    exit();
 }
 
 $widgets = $dashboardConfig['widgets'];
