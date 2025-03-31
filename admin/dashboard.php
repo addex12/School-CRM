@@ -22,6 +22,48 @@ if (!$dashboardConfig || !isset($dashboardConfig['widgets'])) {
 $widgets = $dashboardConfig['widgets'];
 $sections = $dashboardConfig['sections'] ?? [];
 
+// Initialize variables to avoid undefined warnings
+$totalFeedback = $highRatings = $lowRatings = 0;
+$feedbackRatings = [];
+
+// Fetch feedback data for charts
+try {
+    $stmt = $pdo->query("
+        SELECT rating, COUNT(*) as count 
+        FROM feedback 
+        GROUP BY rating 
+        ORDER BY rating ASC
+    ");
+    $feedbackRatings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $ratings = array_column($feedbackRatings, 'rating');
+    $counts = array_column($feedbackRatings, 'count');
+    $totalFeedback = array_sum($counts);
+    $highRatings = array_sum(array_filter($counts, fn($key) => $ratings[$key] >= 4, ARRAY_FILTER_USE_KEY));
+    $lowRatings = array_sum(array_filter($counts, fn($key) => $ratings[$key] <= 2, ARRAY_FILTER_USE_KEY));
+} catch (Exception $e) {
+    $feedbackRatings = [];
+}
+
+// Fetch widget counts dynamically
+foreach ($widgets as &$widget) {
+    try {
+        $stmt = $pdo->query($widget['count_query']);
+        $widget['count'] = $stmt->fetchColumn() ?? 0;
+    } catch (Exception $e) {
+        $widget['count'] = "Error";
+    }
+}
+
+// Fetch section data dynamically
+foreach ($sections as &$section) {
+    try {
+        $stmt = $pdo->query($section['query']);
+        $section['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $section['rows'] = [];
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -241,7 +283,7 @@ $sections = $dashboardConfig['sections'] ?? [];
                     <?php foreach ($widgets as $widget): ?>
                         <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>" data-query="<?= htmlspecialchars($widget['count_query']) ?>">
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3 class="widget-count">Loading...</h3>
+                            <h3 class="widget-count"><?= htmlspecialchars($widget['count']) ?></h3>
                             <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
                     <?php endforeach; ?>
@@ -260,72 +302,23 @@ $sections = $dashboardConfig['sections'] ?? [];
                                         <?php endforeach; ?>
                                     </tr>
                                 </thead>
-                                <tbody></tbody>
-                        // Execute the count query
-                        try {
-                            $stmt = $pdo->query($widget['count_query']);
-                            $count = $stmt->fetchColumn();
-                        } catch (Exception $e) {
-                            $count = "Error";
-                        }
-                        ?>
-                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
-                            <i class="<?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= htmlspecialchars($count) ?></h3>
-                            <p><?= htmlspecialchars($widget['title']) ?></p>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-
-                <!-- Sections -->
-                <?php foreach ($sections as $section): ?>
-                    <?php
-                    // Ensure the query key exists and is not empty
-                    if (!isset($section['query']) || empty($section['query'])) {
-                        continue;
-                    }
-
-                    // Execute the section query
-                    try {
-                        $stmt = $pdo->query($section['query']);
-                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    } catch (Exception $e) {
-                        $rows = [];
-                    }
-                    ?>
-                    <div class="dashboard-section">
-                        <h2><?= htmlspecialchars($section['title']) ?></h2>
-                        
-                        <?php if (!empty($rows)): ?>
-                            <div class="table-container">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <?php foreach ($section['columns'] as $column): ?>
-                                                <th><?= htmlspecialchars($column) ?></th>
-                                            <?php endforeach; ?>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($rows as $row): ?>
+                                <tbody>
+                                    <?php if (!empty($section['rows'])): ?>
+                                        <?php foreach ($section['rows'] as $row): ?>
                                             <tr>
-                                                <?php foreach ($section['fields'] as $field): ?>
-                                                    <td><?= htmlspecialchars($row[$field] ?? 'N/A') ?></td>
+                                                <?php foreach ($section['columns'] as $column): ?>
+                                                    <td><?= htmlspecialchars($row[$column] ?? 'N/A') ?></td>
                                                 <?php endforeach; ?>
                                             </tr>
                                         <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <a href="<?= htmlspecialchars($section['link']) ?>" class="btn">
-                                <i class="fas fa-arrow-right"></i>
-                                <?= htmlspecialchars($section['link_text']) ?>
-                            </a>
-                        <?php else: ?>
-                            <div class="no-data">
-                                <p>No data available</p>
-                            </div>
-                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="<?= count($section['columns']) ?>">No data available</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 <?php endforeach; ?>
 
@@ -354,17 +347,23 @@ $sections = $dashboardConfig['sections'] ?? [];
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($feedbackRatings as $rating): ?>
+                            <?php if (!empty($feedbackRatings)): ?>
+                                <?php foreach ($feedbackRatings as $rating): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($rating['rating']) ?></td>
+                                        <td><?= htmlspecialchars($rating['count']) ?></td>
+                                        <td>
+                                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                <i class="fa<?= $i <= $rating['rating'] ? 's' : 'r' ?> fa-star" style="color: <?= $i <= $rating['rating'] ? 'gold' : '#ccc' ?>;"></i>
+                                            <?php endfor; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($rating['rating']) ?></td>
-                                    <td><?= htmlspecialchars($rating['count']) ?></td>
-                                    <td>
-                                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <i class="fa<?= $i <= $rating['rating'] ? 's' : 'r' ?> fa-star" style="color: <?= $i <= $rating['rating'] ? 'gold' : '#ccc' ?>;"></i>
-                                        <?php endfor; ?>
-                                    </td>
+                                    <td colspan="3">No feedback data available</td>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </section>
