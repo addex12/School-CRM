@@ -1,8 +1,26 @@
 <?php
+class Database {
+    private $host = 'localhost';
+    private $db_name = 'school_crm';
+    private $username = 'username'; // Replace with actual username
+    private $password = 'password'; // Replace with actual password
+    private $conn;
+
+    public function getConnection() {
+        $this->conn = null;
+        try {
+            $this->conn = new PDO("mysql:host={$this->host};dbname={$this->db_name}", $this->username, $this->password);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            die("Database connection failed: " . $e->getMessage());
+        }
+        return $this->conn;
+    }
+}
+
 // Initialize the connection globally
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=school_crm', 'username', 'password');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = (new Database())->getConnection();
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }

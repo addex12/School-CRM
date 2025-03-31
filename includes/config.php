@@ -7,7 +7,12 @@ require_once __DIR__ . '/db.php'; // Ensure the correct path to the db.php file
 require_once __DIR__ . '/functions.php'; // Ensure the correct path to the functions.php file
 
 // Database connection
-
+try {
+    $pdo = new PDO('mysql:host=localhost;dbname=school_crm', 'username', 'password'); // Replace with actual credentials
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
 
 // Base configuration
 define(constant_name: 'BASE_URL', value: 'https://crm.flipperschool.com');
