@@ -142,118 +142,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $survey_id ? 'Edit Survey' : 'New Survey' ?> - Survey Builder</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .admin-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-        .admin-sidebar {
-            width: 250px;
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-        }
-        .admin-main {
-            flex: 1;
-            padding: 20px;
-            background-color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .builder-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .builder-header h1 {
-            font-size: 1.8em;
-            color: #333;
-        }
-        .form-section {
-            margin-bottom: 30px;
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .form-section h2 {
-            font-size: 1.5em;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: #fff;
-        }
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        .grid-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 20px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .btn:hover {
-            background: #2980b9;
-        }
-        .btn-secondary {
-            background: #6c757d;
-        }
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        .btn-danger {
-            background: #dc3545;
-        }
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        .question-card {
-            background: #ffffff;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 15px;
-        }
-        .question-card .remove-question {
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="survey_builder.css">
 </head>
 <body>
     <div class="admin-layout">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-content"> 
+            <?php include 'includes/admin_sidebar.php'; ?>
+        </div>
+        <header class="admin-header">
+            <h1>Survey Builder</h1>
+            <div class="user-info">
+                <span><?= htmlspecialchars($_SESSION['username']) ?></span>
+                <a href="logout.php" class="btn btn-danger">Logout</a>
+            </div>
+        </header>
         <div class="admin-main">
+            <div></div>
+            <div class="admin-breadcrumbs">
+                <a href="index.php">Dashboard</a> &gt; 
+                <a href="surveys.php">Surveys</a> &gt; 
+                <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?>
+            </div>
+        </div>
+        <main class="survey-builder">
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
                 <div class="form-actions">
@@ -287,7 +198,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="<?= $cat['id'] ?>" <?= ($survey['category_id'] ?? '') == $cat['id'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($cat['name']) ?>
                                 </option>
-                                <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
@@ -306,8 +216,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <select name="status" required>
                                 <?php foreach ($statusOptions as $opt): ?>
                                 <option value="<?= $opt['status'] ?>" <?= ($survey['status'] ?? 'draft') === $opt['status'] ? 'selected' : '' ?>>
+                                    <i class="fas <?= $opt['icon'] ?>"></i>
                                     <?= htmlspecialchars($opt['label']) ?>
                                 </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -322,6 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                    value="<?= isset($survey['ends_at']) ? date('Y-m-d', strtotime($survey['ends_at'])) : '' ?>">
                         </div>
                     </div>
+
                     <div class="grid-2">
                         <div class="form-group">
                             <label>Target Audience</label>
@@ -337,9 +253,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <?php endforeach; ?>
                             </select>
                         </div>
+
                         <div class="form-group">
-                            <label>Anonymous Responses</label>
-                            <input type="checkbox" name="is_anonymous" <?= ($survey['is_anonymous'] ?? 0) ? 'checked' : '' ?>>
+                            <div class="switch-container">
+                                <label class="switch">
+                                    <input type="checkbox" name="is_anonymous" <?= ($survey['is_anonymous'] ?? 0) ? 'checked' : '' ?>>
+                                    <span class="slider"></span>
+                                    <span class="switch-label">Anonymous</span>
+                                    <span class="switch-description">Allow users to submit responses anonymously.</span
+                                </label>
+                                <span>Anonymous Responses</span>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -388,14 +312,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <button type="button" id="add-question" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Add Question
-
                     </button>
                     <button type="submit" class="btn btn-success">Save Survey</button>
                     <a href="surveys.php" class="btn btn-secondary">Cancel</a>
-                </section>
+            </section>
             </form>
         </div>
+
+</main>
+
     </div>
+
+    <script src="../assets/js/survey_builder.js"></script>
+    <script src="../assets/js/field_type.js"></script>
+    <script src="../assets/js/validation.js"></script>
+    <script src="../assets/js/alerts.js"></script>
+    <script src="../assets/js/survey_preview.js"></script>
 </body>
 </html>
-<?php require_once 'includes/footer.php'  ?>
+<?php require_once 'includes/footer.php'  ?>      
