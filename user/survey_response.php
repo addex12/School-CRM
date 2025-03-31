@@ -157,6 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
+            <button type="button" id="preview-button" class="btn btn-secondary">Preview Responses</button>
             <button type="submit" class="btn btn-primary">Submit Response</button>
         </form>
     </div>
@@ -247,6 +248,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
     });
 
+    document.getElementById('preview-button').addEventListener('click', function () {
+        const form = document.querySelector('form');
+        const formData = new FormData(form);
+        let previewContent = '<h3>Preview Your Responses</h3><ul>';
+        formData.forEach((value, key) => {
+            previewContent += `<li><strong>${key}:</strong> ${value}</li>`;
+        });
+        previewContent += '</ul>';
+        const previewWindow = window.open('', 'Preview', 'width=600,height=400');
+        previewWindow.document.write(previewContent);
+    });
 </script>
 </body>
 </html>

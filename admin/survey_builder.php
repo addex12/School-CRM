@@ -14,12 +14,8 @@ requireAdmin();
 $roles = $pdo->query("SELECT id, role_name FROM roles WHERE role_name != 'admin' ORDER BY role_name")->fetchAll();
 $categories = $pdo->query("SELECT * FROM survey_categories ORDER BY name")->fetchAll();
 
-$statusOptions = [
-    ['value' => 'draft', 'label' => 'Draft', 'icon' => 'fa-file'],
-    ['value' => 'active', 'label' => 'Active', 'icon' => 'fa-rocket'],
-    ['value' => 'inactive', 'label' => 'Inactive', 'icon' => 'fa-pause'],
-    ['value' => 'archived', 'label' => 'Archived', 'icon' => 'fa-archive']
-];
+// Fetch statuses dynamically
+$statusOptions = Survey::getStatuses();
 
 $fieldTypes = [
     'text' => ['icon' => 'fa-font', 'label' => 'Text Input'],
@@ -184,7 +180,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="<?= $cat['id'] ?>" <?= ($survey['category_id'] ?? '') == $cat['id'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($cat['name']) ?>
                                 </option>
-                                <?php endforeach; ?>
                             </select>
                         </div>
                     </div>
@@ -202,10 +197,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <label>Status</label>
                             <select name="status" required>
                                 <?php foreach ($statusOptions as $opt): ?>
-                                <option value="<?= $opt['value'] ?>" <?= ($survey['status'] ?? 'draft') === $opt['value'] ? 'selected' : '' ?>>
+                                <option value="<?= $opt['status'] ?>" <?= ($survey['status'] ?? 'draft') === $opt['status'] ? 'selected' : '' ?>>
                                     <i class="fas <?= $opt['icon'] ?>"></i>
-                                    <?= $opt['label'] ?>
+                                    <?= htmlspecialchars($opt['label']) ?>
                                 </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group">
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -242,6 +241,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label class="switch">
                                     <input type="checkbox" name="is_anonymous" <?= ($survey['is_anonymous'] ?? 0) ? 'checked' : '' ?>>
                                     <span class="slider"></span>
+                                    <span class="switch-label">Anonymous</span>
+                                    <span class="switch-description">Allow users to submit responses anonymously.</span
                                 </label>
                                 <span>Anonymous Responses</span>
                             </div>

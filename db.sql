@@ -966,6 +966,26 @@ ALTER TABLE payroll_items
 ADD CONSTRAINT fk_payroll_items_payroll_id FOREIGN KEY (payroll_id) REFERENCES payrolls(id) ON DELETE CASCADE,
 ADD CONSTRAINT fk_payroll_items_employee_id FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
 
+-- Add new table `survey_statuses`
+CREATE TABLE `survey_statuses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` varchar(50) NOT NULL UNIQUE,
+  `label` varchar(100) NOT NULL,
+  `icon` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Insert default statuses
+INSERT INTO `survey_statuses` (`status`, `label`, `icon`) VALUES
+('draft', 'Draft', 'fa-file'),
+('active', 'Active', 'fa-rocket'),
+('inactive', 'Inactive', 'fa-pause'),
+('archived', 'Archived', 'fa-archive');
+
+-- Update `surveys` table to reference `survey_statuses`
+ALTER TABLE `surveys`
+  ADD CONSTRAINT `fk_surveys_status` FOREIGN KEY (`status`) REFERENCES `survey_statuses` (`status`) ON DELETE SET NULL;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
