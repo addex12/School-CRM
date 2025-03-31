@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'title' => htmlspecialchars($_POST['title']),
             'description' => htmlspecialchars($_POST['description']),
             'category_id' => intval($_POST['category_id']),
-            'target_roles' => json_encode(is_array($_POST['target_roles'] ?? null) ? $_POST['target_roles'] : []),
+            'target_roles' => json_encode($_POST['target_roles'] ?? []), // Ensure role IDs are stored
             'status' => in_array($_POST['status'], array_column($statusOptions, 'value')) ? $_POST['status'] : 'draft',
             'starts_at' => date('Y-m-d 00:00:00', strtotime($_POST['starts_at'])),
             'ends_at' => date('Y-m-d 23:59:59', strtotime($_POST['ends_at'])),

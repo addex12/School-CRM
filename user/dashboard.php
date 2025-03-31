@@ -17,12 +17,12 @@ $stmt = $pdo->prepare("
     WHERE s.is_active = TRUE 
     AND s.starts_at <= NOW() 
     AND s.ends_at >= NOW()
-    AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(?))
+    AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(CAST(? AS CHAR)))
     ORDER BY s.ends_at ASC
 ");
 
 // Execute the survey query
-$stmt->execute([$_SESSION['user_id'], $role]);
+$stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]); // Use role ID instead of role name
 $surveys = $stmt->fetchAll();
 
 // Debug output to check retrieved surveys

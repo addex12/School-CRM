@@ -850,6 +850,12 @@ ALTER TABLE `salary_structures`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL;
+
+--
+-- Modify column type for `target_roles` in `surveys` table
+--
+ALTER TABLE surveys MODIFY COLUMN target_roles JSON NOT NULL;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
