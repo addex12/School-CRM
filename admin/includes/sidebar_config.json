@@ -25,6 +25,11 @@
                     "title": "User Roles",
                     "link": "user_roles.php",
                     "icon": "user-tag"
+                },
+                {
+                    "title": "Active Users",
+                    "link": "active_users.php",
+                    "icon": "user-check"
                 }
             ]
         },
@@ -47,6 +52,11 @@
                     "title": "Results",
                     "link": "results.php",
                     "icon": "chart-bar"
+                },
+                {
+                    "title": "Survey Categories",
+                    "link": "categories.php",
+                    "icon": "folder"
                 }
             ]
         },
@@ -55,11 +65,6 @@
             "icon": "folder-open",
             "id": "contentManagement",
             "items": [
-                {
-                    "title": "Categories",
-                    "link": "categories.php",
-                    "icon": "folder"
-                },
                 {
                     "title": "Templates",
                     "link": "templates.php",
@@ -113,7 +118,6 @@
         },
         {
             "title": "Reports",
-            "link": "reports.php",
             "icon": "file-chart-line",
             "id": "reports",
             "items": [

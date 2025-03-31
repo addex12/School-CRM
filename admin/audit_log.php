@@ -6,12 +6,13 @@ require_once '../includes/config.php';
 $pageTitle = "Audit Log";
 
 // Fetch audit logs
-$logs = $pdo->query("
+$stmt = $pdo->query("
     SELECT a.*, u.username 
     FROM audit_logs a 
     LEFT JOIN users u ON a.user_id = u.id 
     ORDER BY a.created_at DESC
-")->fetchAll();
+");
+$auditLogs = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -20,6 +21,7 @@ $logs = $pdo->query("
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
     <div class="admin-dashboard">
@@ -29,12 +31,15 @@ $logs = $pdo->query("
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <div class="table-section">
+                <?php include 'includes/alerts.php'; ?>
+
+                <section class="table-section">
                     <h2>Audit Logs</h2>
-                    <?php if (count($logs) > 0): ?>
+                    <?php if (count($auditLogs) > 0): ?>
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>User</th>
                                     <th>Action</th>
                                     <th>Details</th>
@@ -43,8 +48,9 @@ $logs = $pdo->query("
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($logs as $log): ?>
+                                <?php foreach ($auditLogs as $log): ?>
                                     <tr>
+                                        <td><?= htmlspecialchars($log['id']) ?></td>
                                         <td><?= htmlspecialchars($log['username'] ?? 'System') ?></td>
                                         <td><?= htmlspecialchars($log['action']) ?></td>
                                         <td><?= htmlspecialchars($log['details'] ?? 'N/A') ?></td>
@@ -57,9 +63,10 @@ $logs = $pdo->query("
                     <?php else: ?>
                         <p>No audit logs found.</p>
                     <?php endif; ?>
-                </div>
+                </section>
             </div>
         </div>
     </div>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
