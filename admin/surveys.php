@@ -67,8 +67,7 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                     <a href="survey_builder.php" class="btn btn-primary">Create New Survey</a>
                     <a href="export_surveys.php" class="btn btn-secondary">Export Surveys</a>
                 </div>
-                \begin{itemize}
-                    <li><a href="logout.php">Logout</a></li>
+                <ul class="admin-menu"></ul>                    <li><a href="logout.php">Logout</a></li>
                 </ul>
             </header>
             <div class="content">
@@ -77,6 +76,8 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                 <p>Use the buttons above to create a new survey or export existing surveys.</p>
                 <!-- Display error messages -->
                 <?php if ($error): ?>
+                    <p class="error-message"><?= htmlspecialchars($error) ?></p>
+                <?php endif; ?>
                     <div class="error-message"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
