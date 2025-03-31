@@ -19,68 +19,26 @@
             "color": "gray"
         },
         {
-            "title": "Draft Surveys",
-            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'draft'",
-            "icon": "fa-file",
-            "color": "blue"
-        },
-        {
             "title": "Total Users",
             "count_query": "SELECT COUNT(*) FROM users",
             "icon": "fa-users",
-            "color": "purple"
-        },
-        {
-            "title": "Active Users (Last 15 Minutes)",
-            "count_query": "SELECT COUNT(*) FROM users WHERE last_activity >= NOW() - INTERVAL 15 MINUTE",
-            "icon": "fa-user-clock",
-            "color": "teal"
-        },
-        {
-            "title": "Feedback Received",
-            "count_query": "SELECT COUNT(*) FROM feedback",
-            "icon": "fa-comment-dots",
-            "color": "yellow"
-        },
-        {
-            "title": "Open Tickets",
-            "count_query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
-            "icon": "fa-ticket-alt",
-            "color": "red"
+            "color": "blue"
         }
     ],
     "sections": [
         {
             "title": "Recent User Activities",
-            "query": "SELECT a.*, u.username, u.email FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 8",
-            "columns": ["User", "Email", "Action", "Details", "Timestamp"],
-            "fields": ["username", "email", "action", "details", "created_at"],
+            "query": "SELECT a.id, u.username, a.action, a.details, a.created_at FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 5",
+            "columns": ["ID", "User", "Action", "Details", "Timestamp"],
             "link": "audit_log.php",
             "link_text": "View Full Activity Log"
         },
         {
-            "title": "Recent Support Tickets",
-            "query": "SELECT t.id, t.subject, u.username, t.status, t.priority, t.created_at FROM support_tickets t LEFT JOIN users u ON t.user_id = u.id ORDER BY t.created_at DESC LIMIT 6",
-            "columns": ["ID", "Subject", "User", "Status", "Priority", "Created"],
-            "fields": ["id", "subject", "username", "status", "priority", "created_at"],
-            "link": "tickets.php",
-            "link_text": "Manage Support Tickets"
-        },
-        {
-            "title": "Latest User Feedback",
-            "query": "SELECT f.id, u.username, SUBSTRING(f.message, 1, 50) as preview, f.rating, f.created_at FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC LIMIT 5",
-            "columns": ["ID", "User", "Preview", "Rating", "Date"],
-            "fields": ["id", "username", "preview", "rating", "created_at"],
+            "title": "Recent Feedback",
+            "query": "SELECT f.id, u.username, f.message, f.rating, f.created_at FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC LIMIT 5",
+            "columns": ["ID", "User", "Message", "Rating", "Date"],
             "link": "feedback_mgmt.php",
             "link_text": "View All Feedback"
-        },
-        {
-            "title": "Survey Timeline",
-            "query": "SELECT title, description, starts_at, ends_at, status FROM surveys WHERE starts_at > NOW() OR ends_at > NOW() ORDER BY starts_at ASC LIMIT 4",
-            "columns": ["Title", "Description", "Starts", "Ends", "Status"],
-            "fields": ["title", "description", "starts_at", "ends_at", "status"],
-            "link": "surveys.php",
-            "link_text": "Manage Surveys"
         }
     ]
 }

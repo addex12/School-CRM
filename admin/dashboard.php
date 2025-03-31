@@ -34,7 +34,7 @@ $sections = $dashboardConfig['sections'] ?? [];
         <link rel="stylesheet" href="../../assets/css/admin.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="../../assets/js/admin.js"></script>
+        <script src="../../assets/js/dashboard.js" defer></script>
     <style>
   :root {
             --sidebar-width: 280px;
@@ -204,6 +204,22 @@ $sections = $dashboardConfig['sections'] ?? [];
             background-color: #f8f9fa;
             border-radius: var(--border-radius);
         }
+
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .feedback-summary {
+            margin-bottom: 20px;
+        }
+        .feedback-summary p {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+        .fa-star {
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
@@ -223,23 +239,9 @@ $sections = $dashboardConfig['sections'] ?? [];
                 <!-- Widgets Section -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
-                        <?php
-                        // Ensure the count_query key exists and is not empty
-                        if (!isset($widget['count_query']) || empty($widget['count_query'])) {
-                            continue;
-                        }
-
-                        // Execute the count query
-                        try {
-                            $stmt = $pdo->query($widget['count_query']);
-                            $count = $stmt->fetchColumn();
-                        } catch (Exception $e) {
-                            $count = "Error";
-                        }
-                        ?>
-                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
-                            <i class="<?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= htmlspecialchars($count) ?></h3>
+                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>" data-query="<?= htmlspecialchars($widget['count_query']) ?>">
+                            <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
+                            <h3 class="widget-count">Loading...</h3>
                             <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
                     <?php endforeach; ?>
@@ -247,53 +249,26 @@ $sections = $dashboardConfig['sections'] ?? [];
 
                 <!-- Sections -->
                 <?php foreach ($sections as $section): ?>
-                    <?php
-                    // Ensure the query key exists and is not empty
-                    if (!isset($section['query']) || empty($section['query'])) {
-                        continue;
-                    }
-
-                    // Execute the section query
-                    try {
-                        $stmt = $pdo->query($section['query']);
-                        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    } catch (Exception $e) {
-                        $rows = [];
-                    }
-                    ?>
                     <div class="dashboard-section">
                         <h2><?= htmlspecialchars($section['title']) ?></h2>
-                        
-                        <?php if (!empty($rows)): ?>
-                            <div class="table-container">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <?php foreach ($section['columns'] as $column): ?>
-                                                <th><?= htmlspecialchars($column) ?></th>
-                                            <?php endforeach; ?>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($rows as $row): ?>
-                                            <tr>
-                                                <?php foreach ($section['fields'] as $field): ?>
-                                                    <td><?= htmlspecialchars($row[$field] ?? 'N/A') ?></td>
-                                                <?php endforeach; ?>
-                                            </tr>
+                        <div class="table-container">
+                            <table class="table" data-query="<?= htmlspecialchars($section['query']) ?>">
+                                <thead>
+                                    <tr>
+                                        <?php foreach ($section['columns'] as $column): ?>
+                                            <th><?= htmlspecialchars($column) ?></th>
                                         <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <a href="<?= htmlspecialchars($section['link']) ?>" class="btn">
-                                <i class="fas fa-arrow-right"></i>
-                                <?= htmlspecialchars($section['link_text']) ?>
-                            </a>
-                        <?php else: ?>
-                            <div class="no-data">
-                                <p>No data available</p>
-                            </div>
-                        <?php endif; ?>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                    <tr><td colspan="<?= count($section['columns']) ?>">Loading...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <a href="<?= htmlspecialchars($section['link']) ?>" class="btn">
+                            <i class="fas fa-arrow-right"></i>
+                            <?= htmlspecialchars($section['link_text']) ?>
+                        </a>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -311,6 +286,39 @@ $sections = $dashboardConfig['sections'] ?? [];
                     group.classList.toggle('active');
                 });
             });
+        });
+
+        // Render feedback chart
+        const ctx = document.getElementById('feedbackChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($ratings) ?>,
+                datasets: [{
+                    label: 'Feedback Count',
+                    data: <?= json_encode($counts) ?>,
+                    backgroundColor: ['#4caf50', '#ff9800', '#f44336', '#2196f3', '#9c27b0'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const percentage = ((context.raw / <?= $totalFeedback ?>) * 100).toFixed(1);
+                                return `${context.raw} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Ratings' } },
+                    y: { title: { display: true, text: 'Count' }, beginAtZero: true }
+                }
+            }
         });
     </script>
             <?php include 'includes/footer.php';?>
