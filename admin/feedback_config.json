@@ -1,0 +1,30 @@
+{
+    "ratings": [
+        {
+            "value": 1,
+            "label": "Very Poor",
+            "color": "red"
+        },
+        {
+            "value": 2,
+            "label": "Poor",
+            "color": "orange"
+        },
+        {
+            "value": 3,
+            "label": "Average",
+            "color": "yellow"
+        },
+        {
+            "value": 4,
+            "label": "Good",
+            "color": "lightgreen"
+        },
+        {
+            "value": 5,
+            "label": "Excellent",
+            "color": "green"
+        }
+    ]
+}
+
