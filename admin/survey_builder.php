@@ -38,8 +38,18 @@ $survey_id = $_GET['survey_id'] ?? $_POST['survey_id'] ?? null;
 $survey = null;
 $fields = [];
 
+// Handle delete survey
+if (isset($_POST['delete_survey'])) {
+    $survey_id = $_POST['survey_id'];
+    $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
+    $stmt->execute([$survey_id]);
+    $_SESSION['success'] = "Survey deleted successfully!";
+    header("Location: surveys.php");
+    exit();
+}
+
+// Fetch survey data for editing
 if ($survey_id) {
-    // Validate survey exists first
     $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
     $stmt->execute([$survey_id]);
     $survey = $stmt->fetch();
@@ -50,7 +60,6 @@ if ($survey_id) {
         exit();
     }
 
-    // Load survey fields if survey exists
     $stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
     $stmt->execute([$survey_id]);
     $fields = $stmt->fetchAll();

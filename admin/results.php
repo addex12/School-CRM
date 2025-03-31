@@ -6,9 +6,9 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
+require_once '../includes/config.php';
 
 $survey_id = $_GET['survey_id'] ?? null;
 
@@ -29,6 +29,11 @@ if (!$survey) {
     exit();
 }
 
+// Fetch survey fields
+$stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
+$stmt->execute([$survey_id]);
+$fields = $stmt->fetchAll();
+
 // Fetch survey responses
 $stmt = $pdo->prepare("
     SELECT sr.*, u.username 
@@ -36,14 +41,9 @@ $stmt = $pdo->prepare("
     LEFT JOIN users u ON sr.user_id = u.id 
     WHERE sr.survey_id = ?
     ORDER BY sr.submitted_at DESC
-"); // Ensure 'submitted_at' is the correct column name in the database
+");
 $stmt->execute([$survey_id]);
 $responses = $stmt->fetchAll();
-
-// Fetch survey fields
-$stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
-$stmt->execute([$survey_id]);
-$fields = $stmt->fetchAll();
 
 $pageTitle = "Results: " . htmlspecialchars($survey['title']);
 ?>
