@@ -116,6 +116,9 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const chartContainer = document.getElementById('chart-container');
     const table = document.querySelector('.table');
     function toggleExportMenu() {
         document.getElementById('exportMenu').style.display = 
