@@ -33,6 +33,16 @@ if ($survey_id !== null) {
     }
 }
 
+// Handle delete survey request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_survey'])) {
+    $survey_id = $_POST['survey_id'];
+    $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
+    $stmt->execute([$survey_id]);
+    $_SESSION['success'] = "Survey deleted successfully!";
+    header("Location: surveys.php");
+    exit();
+}
+
 // Fetch all surveys for display
 $surveys = $pdo->query("SELECT * FROM surveys ORDER BY created_at DESC")->fetchAll();
 ?>

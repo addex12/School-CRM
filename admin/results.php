@@ -36,7 +36,7 @@ $fields = $stmt->fetchAll();
 
 // Fetch survey responses
 $stmt = $pdo->prepare("
-    SELECT sr.*, u.username 
+    SELECT sr.*, u.username, sr.answers 
     FROM survey_responses sr 
     LEFT JOIN users u ON sr.user_id = u.id 
     WHERE sr.survey_id = ?
@@ -90,9 +90,8 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
                                 <tr>
                                     <td><?= htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
                                     <?php 
-                                    $answers = !empty($response['answers']) ? json_decode($response['answers'], true) : [];
-                                    foreach ($fields as $field): 
-                                    ?>
+                                    $answers = json_decode($response['answers'], true);
+                                    foreach ($fields as $field): ?>
                                         <td><?= htmlspecialchars($answers[$field['field_name']] ?? 'N/A') ?></td>
                                     <?php endforeach; ?>
                                     <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>

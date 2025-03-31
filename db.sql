@@ -554,7 +554,8 @@ CREATE TABLE `survey_responses` (
   `id` int(11) NOT NULL,
   `survey_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `submitted_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `submitted_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `answers` JSON DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -855,6 +856,11 @@ ALTER TABLE `users`
 -- Modify column type for `target_roles` in `surveys` table
 --
 ALTER TABLE surveys MODIFY COLUMN target_roles JSON NOT NULL;
+
+--
+-- Add column `answers` to `survey_responses` table
+--
+ALTER TABLE survey_responses ADD COLUMN answers JSON DEFAULT NULL;
 
 COMMIT;
 
