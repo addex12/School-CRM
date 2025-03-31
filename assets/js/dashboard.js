@@ -3,7 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.dashboard-widget').forEach(widget => {
         const query = widget.dataset.query;
         fetch(`../api/widget_data.php?query=${encodeURIComponent(query)}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch widget data: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 widget.querySelector('.widget-count').textContent = data.count || 0;
             })
@@ -17,7 +22,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.table').forEach(table => {
         const query = table.dataset.query;
         fetch(`../api/section_data.php?query=${encodeURIComponent(query)}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch section data: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 const tbody = table.querySelector('tbody');
                 tbody.innerHTML = '';
@@ -41,4 +51,4 @@ document.addEventListener('DOMContentLoaded', function () {
                 tbody.innerHTML = '<tr><td colspan="100%">Error loading data</td></tr>';
             });
     });
-}); // Ensure this closing brace matches the opening function declaration
+});
