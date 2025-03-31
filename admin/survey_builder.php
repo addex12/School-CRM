@@ -296,7 +296,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="button" id="add-question" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Add Question
                     </button>
-                </section>
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-success">Save Survey</button>
