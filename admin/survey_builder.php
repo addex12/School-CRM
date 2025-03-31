@@ -157,6 +157,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </header>
 
         <main class="admin-main">
+            <form action="" method="post" id="survey-form">
+            <div class="container">
+                <div class="builder-container">
+                    <div class="builder-sidebar">
+                        <h2>Survey Builder</h2>
+                        <p>Use the form below to create or edit your survey.</p>
+                    </div>
+                    <div class="builder-content">
+                        <div class="builder-form">
+                            <h2><?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h2>
+                            <p>Fill in the details below to create a new survey or edit an existing one.</p>
+                        </div>
             <header class="builder-header">
                 <h1><i class="fas fa-poll-h"></i> <?= $survey_id ? 'Edit Survey' : 'Create New Survey' ?></h1>
                 <div class="form-actions">
