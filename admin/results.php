@@ -34,15 +34,36 @@ $stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY 
 $stmt->execute([$survey_id]);
 $fields = $stmt->fetchAll();
 
-// Fetch survey responses
+// Add a date range filter form
+?>
+<form method="GET" class="filter-form">
+    <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
+    <label for="start_date">Start Date:</label>
+    <input type="date" name="start_date" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>">
+    <label for="end_date">End Date:</label>
+    <input type="date" name="end_date" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>">
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+<?php
+// Modify the query to filter responses by date range
+$whereClause = "sr.survey_id = ?";
+$params = [$survey_id];
+if (!empty($_GET['start_date'])) {
+    $whereClause .= " AND sr.submitted_at >= ?";
+    $params[] = $_GET['start_date'];
+}
+if (!empty($_GET['end_date'])) {
+    $whereClause .= " AND sr.submitted_at <= ?";
+    $params[] = $_GET['end_date'];
+}
 $stmt = $pdo->prepare("
     SELECT sr.*, u.username, sr.answers 
     FROM survey_responses sr 
     LEFT JOIN users u ON sr.user_id = u.id 
-    WHERE sr.survey_id = ?
+    WHERE $whereClause
     ORDER BY sr.submitted_at DESC
 ");
-$stmt->execute([$survey_id]);
+$stmt->execute($params);
 $responses = $stmt->fetchAll();
 
 $pageTitle = "Results: " . htmlspecialchars($survey['title']);

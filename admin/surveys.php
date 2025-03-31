@@ -8,6 +8,7 @@
  */
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
+require_once '../models/Survey.php'; // Adjust the path to where the Survey class is defined
 requireAdmin();
 
 $pageTitle = "Manage Surveys";
@@ -15,7 +16,57 @@ $pageTitle = "Manage Surveys";
 // Initialize variables
 $error = null;
 $survey_id = $_GET['survey_id'] ?? null;
+$survey = Survey::model()->findByPk($survey_id);
+if ($survey === null) {
+    $error = "Survey not found.";
+} else if ($survey->status == Survey::STATUS_ACTIVE) {
+    $error = "This survey is active.";
+} else if ($survey->status == Survey::STATUS_INACTIVE) {
+    $error = "This survey is inactive.";
+} else if ($survey->status == Survey::STATUS_PENDING) {
+    $error = "This survey is pending.";
+} else if ($survey->status == Survey::STATUS_SUSPENDED) {
+    $error = "This survey is suspended.";
+} else if ($survey->status == Survey::STATUS_PENDING_REVIEW) {    
+    $error = "This survey is pending review.";
+} else if ($survey->status == Survey::STATUS_SUSPENDED_REVIEW) {
+    $error = "This survey is suspended.";
+} else if ($survey->status == Survey::STATUS_ARCHIVED) {
+    $error = "This survey is archived.";    
+}   else if ($survey->status == Survey::STATUS_PENDING_REVIEW) {
+    $error = "This survey is pending review.";
+} else if ($survey->status == Survey::STATUS_SUSPENDED_REVIEW) {
+    $error = "This survey is suspended.";
+} else if ($survey->status == Survey::STATUS_PENDING_REVIEW) {
+    $error = "This survey is pending review.";
+} else if ($survey->status == Survey::STATUS_SUSPENDED_REVIEW) {
+    $error = "This survey is suspended.";    
+} else if ($survey->status == Survey::STATUS_ARCHIVED) {
+    $error = "This survey is archived.";    
+}
 
+// Handle delete survey request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_survey'])) {
+    if (!validateCsrfToken($_POST['csrf_token'])) {
+        $_SESSION['error'] = "Invalid CSRF token.";
+        header("Location: surveys.php");
+        exit();
+    }
+    $survey_id = intval($_POST['survey_id']);
+    $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
+    $stmt->execute([$survey_id]);    
+    $_SESSION['success'] = "Survey deleted successfully!";
+    header("Location: surveys.php");
+    exit();
+}
+if ($_SERVER["REQUEST_METHOD"] === "POST"&& isset($_POST[""])) {
+    $survey_id = $_POST["survey_id"];
+    $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
+    $stmt->execute([$survey_id]);
+    $_SESSION['success'] = "Survey deleted successfully!";
+    header("Location: surveys.php");
+    exit();
+}   
 // Validate survey_id if provided
 if ($survey_id !== null) {
     $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
@@ -35,12 +86,31 @@ if ($survey_id !== null) {
 
 // Handle delete survey request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_survey'])) {
+    if (!validateCsrfToken($_POST['csrf_token'])) {
+        $_SESSION['error'] = "Invalid CSRF token.";
+        header("Location: surveys.php");
+        exit();
+    }
     $survey_id = $_POST['survey_id'];
     $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
     $stmt->execute([$survey_id]);
     $_SESSION['success'] = "Survey deleted successfully!";
     header("Location: surveys.php");
     exit();
+}
+if ($_SERVER["REQUEST_METHOD"] === "POST"&& isset($_POST[""]))
+{
+    $survey_id = $_POST["survey_id"];
+    $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
+    $stmt->execute([$survey_id]);
+    $_SESSION['success'] = "Survey deleted successfully!";
+    header("Location: surveys.php");
+    exit();
+}
+if (isset($_POST['delete_survey']) &&
+    ($survey_id = $_POST['survey_id'])) {
+    $stmt = $pdo->prepare('DELETE FROM surveys WHERE id = ?');
+    $stmt->execute([$survey_id]);
 }
 
 // Fetch all surveys for display
@@ -117,6 +187,7 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                                             <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
                                             <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
                                             <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
                                                 <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
                                                 <button type="submit" name="delete_survey" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this survey?')">Delete</button>
                                             </form>
@@ -155,6 +226,7 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                                             <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
                                             <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
                                             <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
                                                 <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
                                                 <button type="submit" name="delete_survey" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this survey?')">Delete</button>
                                             </form>
@@ -193,6 +265,7 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                                             <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
                                             <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
                                             <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
                                                 <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
                                                 <button type="submit" name="delete_survey" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this survey?')">Delete</button>
                                             </form>
@@ -231,6 +304,7 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                                             <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">Edit</a>
                                             <a href="survey_preview.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Preview</a>
                                             <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="csrf_token" value="<?= generateCsrfToken() ?>">
                                                 <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
                                                 <button type="submit" name="delete_survey" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this survey?')">Delete</button>
                                             </form>
