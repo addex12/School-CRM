@@ -297,6 +297,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <i class="fas fa-plus"></i> Add Question
                     </button>
                 </section>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success">Save Survey</button>
+                    <a href="surveys.php" class="btn btn-secondary">Cancel</a>
+                </div>
+            </section>
             </form>
         </main>
     </div>
