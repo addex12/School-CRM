@@ -67,11 +67,15 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
                     <a href="survey_builder.php" class="btn btn-primary">Create New Survey</a>
                     <a href="export_surveys.php" class="btn btn-secondary">Export Surveys</a>
                 </div>
-                <ul class="admin-menu"></ul>                    <li><a href="logout.php">Logout</a></li>
+                  <li><a href="logout.php">Logout</a></li>
                 </ul>
             </header>
             <div class="content">
+                <?php if ($error) : ?>
+                    <div class="error-message"><?= htmlspecialchars($error) ?></div>
+                <?php else: ?>
                 <h2>Manage Surveys</h2>
+
                 <p>Here you can manage all your surveys. You can create, edit, delete, and view survey results.</p>
                 <p>Use the buttons above to create a new survey or export existing surveys.</p>
                 <!-- Display error messages -->
