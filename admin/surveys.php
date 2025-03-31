@@ -316,6 +316,8 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
             </div>
         </div>
     </div>
+    </div>
+    <script src="../assets/js/jquery.min.js"></script>
     <script src="../assets/js/script.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
