@@ -396,3 +396,29 @@ input, textarea, select {
     font-weight: 600;
     color: #475569;
 }
+
+/* AI-Generated Questions */
+.ai-questions {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.ai-questions h3 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+.ai-questions ul {
+    list-style: disc;
+    padding-left: 20px;
+}
+
+.ai-questions li {
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: #555;
+}

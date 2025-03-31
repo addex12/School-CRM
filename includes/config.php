@@ -13,6 +13,9 @@ $pdo = $database->getConnection();
 define(constant_name: 'BASE_URL', value: 'https://crm.flipperschool.com');
 define(constant_name: 'UPLOAD_DIR', value: __DIR__ . '/../uploads');
 
+// OpenAI API Key
+define('OPENAI_API_KEY', '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'); // Replace with your actual API key
+
 function safe_json_decode($json) {
     return $json ? json_decode($json, true) : [];
 }
@@ -29,3 +32,4 @@ function generateCsrfToken() {
 function validateCsrfToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
+?>

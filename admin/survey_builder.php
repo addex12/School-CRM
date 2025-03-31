@@ -144,6 +144,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
         $_SESSION['error'] = "Error: " . $e->getMessage();
     }
 }
+
+// Handle AI-generated survey questions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate_ai_survey'])) {
+    $title = htmlspecialchars($_POST['title']);
+    $description = htmlspecialchars($_POST['description']);
+    $category = htmlspecialchars($_POST['category_id']);
+
+    // Call the AI model to generate questions
+    $aiQuestions = generateSurveyQuestions($title, $description, $category);
+}
+
+// Function to generate survey questions using AI
+function generateSurveyQuestions($title, $description, $category) {
+    $apiUrl = "https://api.openai.com/v1/completions"; // Replace with your AI API endpoint
+    $apiKey = "your_openai_api_key"; // Replace with your API key
+
+    $prompt = "Generate survey questions based on the following details:\n\n" .
+              "Title: $title\n" .
+              "Description: $description\n" .
+              "Category: $category\n\n" .
+              "Questions:";
+
+    $data = [
+        "model" => "text-davinci-003",
+        "prompt" => $prompt,
+        "max_tokens" => 150,
+        "temperature" => 0.7
+    ];
+
+    $options = [
+        "http" => [
+            "header" => "Content-Type: application/json\r\n" .
+                        "Authorization: Bearer $apiKey\r\n",
+            "method" => "POST",
+            "content" => json_encode($data)
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $response = file_get_contents($apiUrl, false, $context);
+
+    if ($response === false) {
+        error_log("Error calling AI API");
+        return [];
+    }
+
+    $responseData = json_decode($response, true);
+    $questions = explode("\n", trim($responseData['choices'][0]['text']));
+
+    return array_filter($questions); // Remove empty lines
+}
 ?>
 
 <!DOCTYPE html>
@@ -206,6 +257,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
                         <label>Description</label>
                         <textarea name="description" rows="3"><?= htmlspecialchars($survey['description'] ?? '') ?></textarea>
                     </div>
+                </section>
+
+                <!-- AI Survey Generation Section -->
+                <section class="form-section">
+                    <h2><i class="fas fa-robot text-primary"></i> Generate Survey with AI</h2>
+                    <button type="submit" name="generate_ai_survey" class="btn btn-primary">
+                        <i class="fas fa-magic"></i> Generate Survey Questions
+                    </button>
+                    <?php if (!empty($aiQuestions)): ?>
+                        <div class="ai-questions">
+                            <h3>AI-Generated Questions</h3>
+                            <ul>
+                                <?php foreach ($aiQuestions as $question): ?>
+                                    <li><?= htmlspecialchars($question) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif; ?>
                 </section>
 
                 <!-- Settings Section -->
