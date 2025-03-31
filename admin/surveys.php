@@ -126,7 +126,7 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
     <link rel="stylesheet" href="../assets/css/font-awesome.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
-<body>
+<bo>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
@@ -316,11 +316,13 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
             </div>
         </div>
     </div>
+    
   </div>
   <?php require_once 'includes/footer.php'; ?>
 </body>
+                    </div>
+                    
 </html>
-<?php include 'includes/footer.php'; ?>
     <script src="../assets/js/bootstrap.min.js"></script>
     <script src="../assets/js/jquery.min.js"></script>
     <script src="../assets/js/script.js"></script>
