@@ -336,25 +336,5 @@ $draftSurveys = $pdo->query("SELECT * FROM surveys WHERE status = 'draft' ORDER 
 </body>
 
 </html>
-<?php include 'includes/footer.php'; ?>
-    <script src="../assets/js/bootstrap.min.js"></script>
-<script src="../assets/js/jquery.min.js"></script>
-    <script src="../assets/js/script.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/survey.js"></script>
-    <script src="../assets/js/admin.js"></script>
-    <script src="../assets/js/notifications.js"></script>
-    <script src="../assets/js/export.js"></script>
-    <script src="../assets/js/chart.js"></script>
-    <script src="../assets/js/survey-results.js"></script>
-    <script src="../assets/js/survey.js"></script>
-    <script src="../assets/js/admin.js"></script>
-    <script src="../assets/js/notifications.js"></script>   
 
-
-                        
-</body>   
-
-</html>
 
