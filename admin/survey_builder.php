@@ -232,31 +232,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
                         </div>
                     </div>
 
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label>Target Audience</label>
-                            <select name="target_roles[]" multiple required>
-                                <?php
-                                $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : [];
-                                $targetRoles = is_array($targetRoles) ? $targetRoles : [];
-                                ?>
-                                <?php foreach ($roles as $role): ?>
-                                    <option value="<?= $role['id'] ?>" <?= in_array($role['id'], $targetRoles) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($role['role_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label>Target Audience</label>
+                        <select name="target_roles[]" multiple class="multi-select" required>
+                            <?php
+                            $targetRoles = isset($survey['target_roles']) ? json_decode($survey['target_roles'], true) : [];
+                            $targetRoles = is_array($targetRoles) ? $targetRoles : [];
+                            ?>
+                            <?php foreach ($roles as $role): ?>
+                                <option value="<?= $role['id'] ?>" <?= in_array($role['id'], $targetRoles) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($role['role_name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                        <div class="form-group">
-                            <div class="switch-container">
-                                <label class="switch">
-                                    <input type="checkbox" name="is_anonymous" <?= ($survey['is_anonymous'] ?? 0) ? 'checked' : '' ?>>
-                                    <span class="slider"></span>
-                                    <span class="switch-label">Anonymous</span>
-                                    <span class="switch-description">Allow users to submit responses anonymously.</span>
-                                </label>
-                            </div>
+                    <div class="form-group">
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" name="is_anonymous" <?= ($survey['is_anonymous'] ?? 0) ? 'checked' : '' ?>>
+                                <span class="slider"></span>
+                                <span class="switch-label">Anonymous</span>
+                                <span class="switch-description">Allow users to submit responses anonymously.</span>
+                            </label>
                         </div>
                     </div>
                 </section>
@@ -291,8 +289,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['title'])) {
                                 <label>Placeholder</label>
                                 <input type="text" name="placeholders[]" value="<?= htmlspecialchars($field['placeholder'] ?? '') ?>">
                             </div>
-                            <div class="form-group">
-                                <label class="required-check">
+                            <div class="form-group required-check">
+                                <label>
                                     <input type="checkbox" name="required[<?= $index ?>]" <?= $field['is_required'] ? 'checked' : '' ?>>
                                     Required
                                 </label>

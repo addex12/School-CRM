@@ -347,3 +347,52 @@ input, textarea, select {
     font-size: 0.875rem;
     margin-top: 0.25rem;
 }
+
+/* Center Alignment */
+.admin-main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.content {
+    width: 100%;
+    max-width: 1200px;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Multi-Select Styling */
+.multi-select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 16px;
+    color: #475569;
+    appearance: none;
+    height: auto;
+}
+
+.multi-select option {
+    padding: 5px;
+}
+
+/* Required Checkbox Alignment */
+.required-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.required-check label {
+    font-weight: 600;
+    color: #475569;
+}
