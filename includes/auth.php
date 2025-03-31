@@ -1,7 +1,6 @@
 <?php
 // Start output buffering to prevent unintended output
 if (session_status() === PHP_SESSION_NONE) {
-    ob_start();
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
@@ -81,3 +80,4 @@ if (!function_exists('setUserSession')) {
         }
     }
 }
+?>
