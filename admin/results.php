@@ -89,7 +89,7 @@ $pageTitle = "Results: " . htmlspecialchars($survey['title']);
             <p>Available from <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> to <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?></p>
             <p>Respondents: <?= count($responses) ?></p>
             <p>Anonymous: <?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></p>
-            <p>Allow Multiple Responses: <?= $survey['allow_multiple'] ? 'Yes' : 'No' ?></p>
+            <p>Allow Multiple Responses: <?= isset($survey['allow_multiple']) && $survey['allow_multiple'] ? 'Yes' : 'No' ?></p>
         </div>
         <div class="admin-main">
         <header class="admin-header">
