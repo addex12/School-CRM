@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="form-group">
                 <label>Question</label>
                 <input type="text" name="questions[]" value="${questionText}" required placeholder="Enter your question">
-                <div class="error-message"></div>
             </div>
             <div class="form-group">
                 <label>Field Type</label>
@@ -149,4 +148,47 @@ document.addEventListener('DOMContentLoaded', function () {
             requiredCheckbox.name = `required[${index}]`;
         });
     }
-});
+    // Initial setup for existing questions
+    document.querySelectorAll('.question-card').forEach((question) => {
+        initQuestionEvents(question);
+    });
+    // Add new question handler
+    addQuestionBtn.addEventListener('click', () => {
+        const newQuestion = createQuestionElement(questionCount);
+        questionsContainer.appendChild(newQuestion);
+        initQuestionEvents(newQuestion);
+        questionCount++;
+    });
+    // Initial question count setup     
+    questionCount = questionsContainer.children.length;
+    // AI question generation handler
+    generateQuestionBtn.addEventListener('click', async () => {
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const aiOutput = document.getElementById('ai-output');
+        if (!title || !description) {
+            alert('Please provide a title and description for the survey.');
+            return;
+        }
+        aiOutput.innerHTML = 'Generating questions...'; // Show loading message
+        try {
+            const response = await fetch('/generate-questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title,
+                    description,
+                }),
+            });
+            const data = await response.json(); // Parse the response as JSON
+            if (data.suggestions) {
+                aiOutput.innerHTML = data.suggestions; // Display the suggestions
+            } else {
+                aiOutput.innerHTML = 'No suggestions available.'; // Handle case where no suggestions are received  
+            }
+        } catch (error) {
+            console.error('Error fetching AI suggestions:', error); // Log the error
+            aiOutput.innerHTML = 'Failed to fetch AI suggestions.'; // Display error message
+            }
+            });
+        });

@@ -8,19 +8,19 @@
         },
         {
             "title": "Active Surveys",
-            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'active'",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = (SELECT id FROM survey_statuses WHERE status = 'active')",
             "icon": "fa-rocket",
             "color": "success"
         },
         {
             "title": "Draft Surveys",
-            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'draft'",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = (SELECT id FROM survey_statuses WHERE status = 'draft')",
             "icon": "fa-pencil-alt",
             "color": "warning"
         },
         {
             "title": "Archived Surveys",
-            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'archived'",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = (SELECT id FROM survey_statuses WHERE status = 'archived')",
             "icon": "fa-archive",
             "color": "danger"
         },

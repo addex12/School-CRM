@@ -34,7 +34,7 @@ try {
 
 // Fetch statuses dynamically from the database
 try {
-    $statusesStmt = $pdo->query("SELECT status, label FROM survey_statuses ORDER BY id");
+    $statusesStmt = $pdo->query("SELECT id, status, label FROM survey_statuses ORDER BY id");
     $statuses = $statusesStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Error fetching statuses: " . $e->getMessage());
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $category_id = $_POST['category_id'] ?? null;
-    $status = $_POST['status'] ?? 'draft';
+    $status_id = $_POST['status'] ?? null;
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
     // Validate and encode target_roles
@@ -54,12 +54,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!is_array($target_roles)) {
         $target_roles = [];
     }
-
+    if (!in_array($status_id, $target_roles)) {
+        $target_roles[] = $status_id;
+    }
     try {
+        $pdo->beginTransaction();
+
         if ($survey_id) {
             // Update existing survey
+            $survey = Survey::model()->findByPk($survey_id);
+            $survey->status = $status_id;
+            $survey->save();
             $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, status = ?, is_active = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $category_id, $status, $is_active, $survey_id]);
+            $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $survey_id]);
 
             // Update survey roles
             $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?")->execute([$survey_id]);
@@ -71,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Create new survey
             $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, created_by) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $category_id, $status, $is_active, $_SESSION['user_id']]);
+            $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $_SESSION['user_id']]);
             $survey_id = $pdo->lastInsertId();
 
             // Assign roles to the new survey
@@ -81,6 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $_SESSION['success'] = "Survey created successfully!";
         }
+        $stmt = $pdo->prepare("");
+        $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $_SESSION["user_id"]]);
+        $_SESSION["success"] = "Survey saved successfully!";
 
         // Save survey questions
         if (isset($_POST['questions'])) {
@@ -98,9 +108,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        $pdo->commit();
         header("Location: surveys.php");
         exit();
     } catch (PDOException $e) {
+        $pdo->rollBack();
         error_log("Error saving survey: " . $e->getMessage());
         $_SESSION['error'] = "Failed to save survey. Please try again.";
     }
