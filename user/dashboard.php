@@ -6,28 +6,20 @@ ini_set('display_errors', 1);
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
+require_once '../includes/config.php';
 
-// Get available surveys
-$role = $_SESSION['role'] ?? 'guest'; // Provide a default value if 'role' is not set
+$pageTitle = "User Dashboard";
+
+// Fetch assigned surveys
 $stmt = $pdo->prepare("
-    SELECT s.*, 
-           (SELECT COUNT(*) FROM survey_responses r 
-            WHERE r.survey_id = s.id AND r.user_id = ?) as completed
+    SELECT s.* 
     FROM surveys s
-    WHERE s.is_active = TRUE 
-    AND s.status = 'active' -- Ensure only active surveys are shown
-    AND s.starts_at <= NOW() 
-    AND s.ends_at >= NOW()
-    AND JSON_CONTAINS(s.target_roles, JSON_QUOTE(CAST(? AS CHAR)))
-    ORDER BY s.ends_at ASC
+    JOIN survey_roles sr ON s.id = sr.survey_id
+    WHERE sr.role_id = ? AND s.is_active = TRUE
+    ORDER BY s.starts_at DESC
 ");
-
-// Execute the survey query
-$stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]); // Use role ID instead of role name
-$surveys = $stmt->fetchAll();
-
-// Debug output to check retrieved surveys
-error_log(print_r($surveys, true));
+$stmt->execute([$_SESSION['role_id']]);
+$surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get completed surveys count
 $completedCount = $pdo->prepare("
@@ -44,7 +36,7 @@ $completedSurveys = $completedCount->fetchColumn();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard - Survey System</title>
+    <title><?= htmlspecialchars($pageTitle) ?> - School CRM</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         /* Updated styles for a more attractive layout */
@@ -192,7 +184,7 @@ $completedSurveys = $completedCount->fetchColumn();
         </div>
 
         <div class="survey-list">
-            <h2>Available Surveys</h2>
+            <h2>Assigned Surveys</h2>
             <?php if (count($surveys) > 0): ?>
                 <div class="survey-cards">
                     <?php foreach ($surveys as $survey): ?>
@@ -219,7 +211,7 @@ $completedSurveys = $completedCount->fetchColumn();
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <p class="no-surveys">No surveys available at this time.</p>
+                <p class="no-surveys">No surveys assigned to you at the moment.</p>
             <?php endif; ?>
         </div>
 
