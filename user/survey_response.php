@@ -8,12 +8,14 @@ $survey_id = $_GET['id'] ?? 0;
 $stmt = $pdo->prepare("
     SELECT s.* 
     FROM surveys s
+    JOIN survey_roles sr ON s.id = sr.survey_id
     WHERE s.id = ? 
     AND s.is_active = TRUE 
     AND s.starts_at <= NOW() 
     AND s.ends_at >= NOW()
+    AND sr.role_id = ?
 ");
-$stmt->execute([$survey_id]);
+$stmt->execute([$survey_id, $_SESSION['role_id']]);
 $survey = $stmt->fetch();
 
 if (!$survey) {
@@ -21,23 +23,12 @@ if (!$survey) {
     exit();
 }
 
-// Check permission using role ID
-$allowed_roles = json_decode($survey['target_roles'], true);
-$stmt = $pdo->prepare("SELECT role_id FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user_role_id = $stmt->fetchColumn();
-
-if (!in_array($user_role_id, $allowed_roles)) {
-    header("Location: dashboard.php?error=not_authorized");
-    exit();
-}
-
 // Check if user has already completed this survey
 $stmt = $pdo->prepare("SELECT id FROM survey_responses WHERE survey_id = ? AND user_id = ?");
 $stmt->execute([$survey_id, $_SESSION['user_id']]);
-$completed = $stmt->fetch();
+$response = $stmt->fetch();
 
-if ($completed) {
+if ($response) {
     header("Location: dashboard.php?error=already_completed");
     exit();
 }
@@ -52,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $survey_id = $_POST['survey_id'];
     $user_id = $_SESSION['user_id'];
     $answers = [];
-
 
     // Collect and validate answers
     foreach ($fields as $field) {
