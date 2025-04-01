@@ -1,22 +1,28 @@
 {
     "widgets": [
         {
+            "title": "Total Surveys",
+            "count_query": "SELECT COUNT(*) FROM surveys",
+            "icon": "fa-file-alt",
+            "color": "primary"
+        },
+        {
             "title": "Active Surveys",
             "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'active'",
             "icon": "fa-rocket",
-            "color": "green"
+            "color": "success"
         },
         {
-            "title": "Inactive Surveys",
-            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'inactive'",
-            "icon": "fa-pause",
-            "color": "orange"
+            "title": "Draft Surveys",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'draft'",
+            "icon": "fa-pencil-alt",
+            "color": "warning"
         },
         {
             "title": "Archived Surveys",
             "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'archived'",
             "icon": "fa-archive",
-            "color": "gray"
+            "color": "danger"
         },
         {
             "title": "Total Users",
@@ -26,6 +32,16 @@
         }
     ],
     "sections": [
+        {
+            "title": "Recent Surveys",
+            "query": "SELECT title, status, created_at FROM surveys ORDER BY created_at DESC LIMIT 5",
+            "columns": ["title", "status", "created_at"]
+        },
+        {
+            "title": "Top Categories",
+            "query": "SELECT sc.name, COUNT(s.id) AS survey_count FROM survey_categories sc LEFT JOIN surveys s ON sc.id = s.category_id GROUP BY sc.name ORDER BY survey_count DESC LIMIT 5",
+            "columns": ["name", "survey_count"]
+        },
         {
             "title": "Recent User Activities",
             "query": "SELECT a.id, u.username, a.action, a.details, a.created_at FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ORDER BY a.created_at DESC LIMIT 5",
