@@ -95,7 +95,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Save survey questions
         if (isset($_POST['questions'])) {
             $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
+            $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $_SESSION["user_id"]]);
+            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, created_by) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$survey_id]);
+            $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+            foreach ($target_roles as $role_id) {
+                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                $stmt->execute([$survey_id, $role_id]);
+            }
+            foreach ($target_roles as $role_id) {
+                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                $stmt->execute([$survey_id, $role_id]);
+            }
 
             foreach ($_POST['questions'] as $index => $question) {
                 $field_type = $_POST['field_types'][$index];
@@ -128,6 +139,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <style>
         .admin-dashboard {
             display: flex;

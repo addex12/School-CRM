@@ -19,15 +19,11 @@ if (!isset($pdo) || !$pdo) {
     exit();
 }
 
-
 // Load dashboard configuration
 $dashboardConfigPath = __DIR__ . '/dashboard.json';
-
 if (!file_exists($dashboardConfigPath)) {
-
     $_SESSION['error'] = "Dashboard configuration file not found.";
     header("Location: ../error.php");
-
     exit();
 }
 
@@ -38,15 +34,14 @@ if (!$dashboardConfig || !isset($dashboardConfig['widgets'])) {
     exit();
 }
 
-
 $widgets = $dashboardConfig['widgets'];
 $sections = $dashboardConfig['sections'] ?? [];
 
 // Fetch widget counts dynamically
 foreach ($widgets as &$widget) {
     try {
-        if (!isset($widget['count_query']) || empty($widget['count_query'])) {
-            throw new Exception("Invalid query for widget: " . htmlspecialchars($widget['title']));
+        if (empty($widget['count_query'])) {
+            throw new Exception("Invalid or empty query for widget: " . htmlspecialchars($widget['title']));
         }
         $stmt = $pdo->query($widget['count_query']);
         $widget['count'] = $stmt->fetchColumn() ?? 0;
@@ -54,34 +49,19 @@ foreach ($widgets as &$widget) {
         $widget['count'] = "Error"; // Default to "Error" if query fails
         error_log("Widget Error: " . $e->getMessage());
     }
-    $widget["count"] = $widget["count"] ??0;
-    $widget["icon"] = $widget["icon"] ?? "fa fa-question"; $widget["color"] = $widget["color"] ?? "bg-primary"; $widget["title"] = $widget["title"] ?? "Unknown"; $widget["link"] = $widget["link"] ?? "#"; $widget["count_query"] = $widget[""] ??"";
-    $widget["icon"] = $widget["icon"] ?? "fa fa-question"; $widget["color"] = $widget["color"] ?? "bg-primary"; $widget["title"] = $widget["title"] ?? "Unknown"; $widget["link"] = $widget["link"] ?? "#"; $widget["count_query"] = $widget[""] ??"";
-    $widget["count"] = $widget["count"] ??0; $widget["icon"] = $widget["icon"] ?? "fa fa-question"; $widget["color"] = $widget["color"] ?? "bg-primary"; $widget["title"] = $widget["title"] ?? "Unknown"; $widget["link"] = $widget["link"] ?? "#"; $widget["count_query"] = $widget[""] ??"";
-    $widget["icon"] = $widget["icon"] ?? "fa fa-question"; $widget["color"] = $widget["color"] ?? "bg-primary"; $widget["title"] = $widget["title"] ?? "Unknown"; $widget["link"] = $widget["link"] ?? "#"; $widget["count_query"] = $widget[""] ??"";
-    $widget["count"] = $widget["count"] ??0; $widget["icon"] = $widget["icon"] ?? "fa fa-question"; $widget["color"] = $widget["color"] ?? "bg-primary"; $widget["title"] = $widget["title"] ?? "Unknown"; $widget["link"] = $widget["link"] ?? "#"; $widget["count_query"] = $widget[""] ??"";}
- 
+}
 
 // Fetch section data dynamically
 foreach ($sections as &$section) {
     try {
-        if (!isset($section['query']) || empty($section['query'])) {
-            throw new Exception("Invalid query for section: " . htmlspecialchars($section['title']));
+        if (empty($section['query'])) {
+            throw new Exception("Invalid or empty query for section: " . htmlspecialchars($section['title']));
         }
         $stmt = $pdo->query($section['query']);
         $section['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $section['rows'] = []; // Default to an empty array if query fails
         error_log("Section Error: " . $e->getMessage());
-    }
-}
-foreach ($widgets as &$widget) {
-    try {
-        $stmt = $pdo->query($widget['count_query']);
-        $widget['count'] = $stmt->fetchColumn() ?? 0;
-    } catch (Exception $e) {
-        $widget['count'] = "Error"; // Default to "Error" if query fails
-        error_log("Widget Error: " . $e->getMessage());
     }
 }
 ?>

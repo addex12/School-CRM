@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const addQuestionBtn = document.getElementById('add-question');
     const generateAIQuestionsBtn = document.getElementById('generate-ai-questions');
     const aiOutput = document.getElementById('ai-output');
+    const aiSuggestionsContainer = document.getElementById('ai-suggestions-container');
+    const generateQuestionBtn = document.getElementById('generate-question-btn');
+    // Check if the required elements are present in the DOM
 
     if (!questionsContainer || !addQuestionBtn || !generateAIQuestionsBtn) {
         console.error('Required elements not found');
@@ -12,7 +15,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     let questionCount = questionsContainer.children.length;
-
+    console.log('Initial question count:', questionCount); // Debugging log
+    // Initialize existing questions        
     // Add new question
     addQuestionBtn.addEventListener('click', () => {
         console.log('Add question button clicked'); // Debugging log
@@ -60,6 +64,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error fetching AI suggestions:', error);
             aiOutput.textContent = 'Failed to fetch AI suggestions.';
         }
+
+        
     });
 
     // Initialize existing questions
@@ -192,3 +198,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             });
         });
+        
