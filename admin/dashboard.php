@@ -45,6 +45,9 @@ foreach ($widgets as &$widget) {
             throw new Exception("Invalid or empty query for widget: " . htmlspecialchars($widget['title']));
         }
         $stmt = $pdo->query($widget['count_query']);
+        if ($stmt === false) {
+            throw new Exception("Query execution failed for widget: " . htmlspecialchars($widget['title']));
+        }
         $widget['count'] = $stmt->fetchColumn() ?? 0;
     } catch (Exception $e) {
         $widget['count'] = "Error"; // Default to "Error" if query fails
@@ -59,6 +62,9 @@ foreach ($sections as &$section) {
             throw new Exception("Invalid or empty query for section: " . htmlspecialchars($section['title']));
         }
         $stmt = $pdo->query($section['query']);
+        if ($stmt === false) {
+            throw new Exception("Query execution failed for section: " . htmlspecialchars($section['title']));
+        }
         $section['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $section['rows'] = []; // Default to an empty array if query fails
@@ -76,8 +82,12 @@ try {
         GROUP BY sc.name
         ORDER BY survey_count DESC
     ");
+    if ($stmt === false) {
+        throw new Exception("Chart data query execution failed.");
+    }
     $chartData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
+    $chartData = []; // Default to an empty array if query fails
     error_log("Chart Data Error: " . $e->getMessage());
 }
 ?>

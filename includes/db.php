@@ -21,15 +21,19 @@ class Database {
 
 // Initialize the connection globally
 try {
-    $pdo = new PDO(
-        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
-        $dbUser,
-        $dbPassword,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
+    $dsn = "mysql:host=your_host;dbname=your_database;charset=utf8mb4";
+    $username = "your_username";
+    $password = "your_password";
+
+    $pdo = new PDO($dsn, $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
 } catch (PDOException $e) {
-    error_log("Database connection error: " . $e->getMessage());
-    die("Database connection failed."); // Ensure no HTML or whitespace is output here
+    error_log("Database Connection Error: " . $e->getMessage());
+    $_SESSION['error'] = "Database connection failed.";
+    header("Location: ../error.php");
+    exit();
 }
 
 // Create necessary tables
