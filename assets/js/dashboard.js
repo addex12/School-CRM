@@ -2,16 +2,33 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Dashboard.js loaded');
 
     // Initialize charts
-    const chartContainers = document.querySelectorAll('.chart-container');
-    chartContainers.forEach(container => {
-        const ctx = container.querySelector('canvas').getContext('2d');
-        const chartData = JSON.parse(container.getAttribute('data-chart'));
-        new Chart(ctx, {
-            type: chartData.type,
-            data: chartData.data,
-            options: chartData.options,
+    const chartCanvas = document.getElementById('surveyChart');
+    if (chartCanvas) {
+        const chartData = JSON.parse(chartCanvas.getAttribute('data-chart'));
+        const labels = chartData.map(item => item.category);
+        const data = chartData.map(item => item.survey_count);
+
+        new Chart(chartCanvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Survey Count',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
+                }
+            }
         });
-    });
+    }
 
     // Refresh widgets dynamically
     const refreshWidgets = async () => {
@@ -130,5 +147,5 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
-                 
+
 

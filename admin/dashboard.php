@@ -64,6 +64,21 @@ foreach ($sections as &$section) {
         error_log("Section Error: " . $e->getMessage());
     }
 }
+
+// Prepare chart data
+$chartData = [];
+try {
+    $stmt = $pdo->query("
+        SELECT sc.name AS category, COUNT(s.id) AS survey_count
+        FROM survey_categories sc
+        LEFT JOIN surveys s ON sc.id = s.category_id
+        GROUP BY sc.name
+        ORDER BY survey_count DESC
+    ");
+    $chartData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Chart Data Error: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -76,10 +91,6 @@ foreach ($sections as &$section) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../assets/js/dashboard.js" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha384-DyZv3g6c1f1e
 </head>
 <body>
     <div class="admin-dashboard">
@@ -98,6 +109,12 @@ foreach ($sections as &$section) {
                             <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
                     <?php endforeach; ?>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="chart-container">
+                    <h2>Survey Categories Overview</h2>
+                    <canvas id="surveyChart" data-chart='<?= json_encode($chartData) ?>'></canvas>
                 </div>
 
                 <!-- Sections -->
