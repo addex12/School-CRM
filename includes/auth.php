@@ -82,4 +82,3 @@ if (!function_exists('setUserSession')) {
         }
     }
 }
-?>
