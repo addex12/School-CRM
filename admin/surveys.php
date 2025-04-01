@@ -26,6 +26,15 @@ try {
     error_log("Error fetching surveys: " . $e->getMessage());
     $surveys = [];
 }
+
+// Fetch survey statuses dynamically
+try {
+    $statusesStmt = $pdo->query("SELECT status, label FROM survey_statuses ORDER BY id");
+    $statuses = $statusesStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error fetching survey statuses: " . $e->getMessage());
+    $statuses = [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -47,10 +56,11 @@ try {
                     <input type="text" id="search-surveys" placeholder="Search surveys..." class="form-control">
                     <select id="filter-status" class="form-control">
                         <option value="">All Statuses</option>
-                        <option value="draft">Draft</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="archived">Archived</option>
+                        <?php foreach ($statuses as $status): ?>
+                            <option value="<?= htmlspecialchars($status['status']) ?>">
+                                <?= htmlspecialchars($status['label']) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </header>
@@ -81,6 +91,7 @@ try {
                                                     <a href="survey_builder.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Edit</a>
                                                     <a href="view_survey.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">View</a>
                                                     <a href="results.php?survey_id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Results</a>
+                                                    <a href="delete_survey.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-danger">Delete</a>──
                                                 <?php else: ?>
                                                     <span class="text-muted">No ID</span>
                                                 <?php endif; ?>
