@@ -279,10 +279,10 @@ CREATE TABLE `response_data` (
 --
 
 CREATE TABLE IF NOT EXISTS `roles` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `role_name` VARCHAR(50) NOT NULL,
-  `description` TEXT DEFAULT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_name` varchar(50) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -341,18 +341,18 @@ CREATE TABLE `support_tickets` (
 --
 
 CREATE TABLE IF NOT EXISTS `surveys` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(255) NOT NULL,
-  `description` TEXT DEFAULT NULL,
-  `category_id` INT(11) DEFAULT NULL,
-  `target_roles` INT(10) NOT NULL,
-  `created_by` INT(11) NOT NULL,
-  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `starts_at` DATETIME NOT NULL,
-  `ends_at` DATETIME NOT NULL,
-  `is_anonymous` TINYINT(1) DEFAULT 0,
-  `is_active` TINYINT(1) DEFAULT 1,
-  `status` INT(10) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `target_roles` int(10) NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `starts_at` datetime NOT NULL,
+  `ends_at` datetime NOT NULL,
+  `is_anonymous` tinyint(1) DEFAULT 0,
+  `is_active` tinyint(1) DEFAULT 1,
+  `status` int(10) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -450,12 +450,12 @@ CREATE TABLE `survey_responses` (
 --
 
 CREATE TABLE IF NOT EXISTS `survey_roles` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `survey_id` INT(11) NOT NULL,
-  `role_id` INT(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `survey_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
