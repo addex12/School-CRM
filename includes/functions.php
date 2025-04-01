@@ -1,6 +1,13 @@
 <?php
+// Check if the autoload file exists
+$autoloadPath = __DIR__ . '/../vendor/autoload.php';
+if (!file_exists($autoloadPath)) {
+    die("Error: Composer autoload file not found. Please run 'composer install' in the project root directory.");
+}
+
+require_once $autoloadPath;
+
 require_once 'db.php';
-require_once '../vendor/autoload.php'; // Ensure PHPMailer is loaded
 
 // Register new user
 function registerUser($username, $email, $password, $role = 'parent') {
@@ -134,4 +141,5 @@ function formatBytes($bytes, $precision = 2) {
     $pow = min($pow, count($units) - 1);
     $bytes /= pow(1024, $pow);
     return round($bytes, $precision) . ' ' . $units[$pow];
-}   
+}
+?>
