@@ -1,4 +1,5 @@
 <?php
+// Ensure no output before this point
 class Database {
     private $host = 'localhost';
     private $db_name = 'school_crm';
@@ -20,9 +21,15 @@ class Database {
 
 // Initialize the connection globally
 try {
-    $pdo = (new Database())->getConnection();
+    $pdo = new PDO(
+        "mysql:host=$dbHost;dbname=$dbName;charset=utf8mb4",
+        $dbUser,
+        $dbPassword,
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    );
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    error_log("Database connection error: " . $e->getMessage());
+    die("Database connection failed."); // Ensure no HTML or whitespace is output here
 }
 
 // Create necessary tables
