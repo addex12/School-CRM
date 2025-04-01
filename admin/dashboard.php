@@ -14,10 +14,9 @@ require_once '../includes/db.php';
 
 $pageTitle = "Admin Dashboard";
 
-// Ensure database connection is established
-if (!isset($pdo) || !$pdo) {
-    $_SESSION['error'] = "Database connection not established.";
-    header("Location: ../error.php");
+// Check if user is logged in
+if (!isLoggedIn()) {
+    header("Location: ../login.php");
     exit();
 }
 
@@ -25,14 +24,12 @@ if (!isset($pdo) || !$pdo) {
 $dashboardConfigPath = __DIR__ . '../assets/js/dashboard.json';
 if (!file_exists($dashboardConfigPath)) {
     $_SESSION['error'] = "Dashboard configuration file not found.";
-    header("Location: ../error.php");
     exit();
 }
 
 $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
 if (!$dashboardConfig || !isset($dashboardConfig['widgets'])) {
     $_SESSION['error'] = "Invalid dashboard configuration.";
-    header("Location: ../error.php");
     exit();
 }
 
