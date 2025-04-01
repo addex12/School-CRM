@@ -15,7 +15,7 @@ $pageTitle = "Manage Surveys";
 // Fetch surveys grouped by status
 try {
     $stmt = $pdo->query("
-        SELECT s.*, sc.name AS category_name, u.username AS created_by_user
+        SELECT s.id, s.title, s.status, s.created_at, sc.name AS category_name, u.username AS created_by_user
         FROM surveys s
         LEFT JOIN survey_categories sc ON s.category_id = sc.id
         LEFT JOIN users u ON s.created_by = u.id
@@ -77,7 +77,7 @@ try {
                                             <td><?= htmlspecialchars($survey['created_by_user'] ?? 'N/A') ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($survey['created_at'])) ?></td>
                                             <td>
-                                                <?php if (isset($survey['id']) && $survey['id'] !== null): ?>
+                                                <?php if (!empty($survey['id'])): ?>
                                                     <a href="survey_builder.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Edit</a>
                                                     <a href="view_survey.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">View</a>
                                                     <a href="results.php?survey_id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Results</a>
