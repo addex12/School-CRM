@@ -29,7 +29,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Create new survey
         $stmt = $pdo->prepare("INSERT INTO surveys (title, description, is_active, created_by) VALUES (?, ?, ?, ?)");
         $stmt->execute([$title, $description, $is_active, $_SESSION['user_id']]);
+        $survey_id = $pdo->lastInsertId();
         $_SESSION['success'] = "Survey created successfully!";
+    }
+
+    // Save survey questions
+    if (isset($_POST['questions'])) {
+        $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
+        $stmt->execute([$survey_id]);
+
+        foreach ($_POST['questions'] as $index => $question) {
+            $field_type = $_POST['field_types'][$index];
+            $options = in_array($field_type, ['radio', 'checkbox', 'select']) ? $_POST['options'][$index] : null;
+            $placeholder = $_POST['placeholders'][$index];
+            $is_required = isset($_POST['required'][$index]) ? 1 : 0;
+
+            $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_type, field_label, field_options, is_required, display_order) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$survey_id, $field_type, $question, $options, $is_required, $index]);
+        }
     }
 
     header("Location: surveys.php");
@@ -45,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .admin-dashboard {
             display: flex;
@@ -124,6 +142,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-secondary:hover {
             background-color: #5a6268;
         }
+
+        .ai-suggestions {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -137,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="form-container">
                 <h2><?= $survey ? "Edit Survey" : "Create New Survey" ?></h2>
-                <form method="POST">
+                <form id="survey-form" method="POST">
                     <div class="form-group">
                         <label for="title">Survey Title</label>
                         <input type="text" id="title" name="title" value="<?= htmlspecialchars($survey['title'] ?? '') ?>" required>
@@ -152,14 +178,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             Active
                         </label>
                     </div>
+                    <div id="questions-container">
+                        <!-- Questions will be dynamically added here -->
+                    </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn-primary"><?= $survey ? "Update Survey" : "Create Survey" ?></button>
+                        <button type="button" id="add-question" class="btn-primary">Add Question</button>
+                        <button type="submit" class="btn-primary">Save Survey</button>
                         <a href="surveys.php" class="btn-secondary">Cancel</a>
                     </div>
                 </form>
+
+                <div class="ai-suggestions">
+                    <h3>AI Suggestions</h3>
+                    <button id="generate-ai-questions" class="btn-primary">Generate Questions</button>
+                    <div id="ai-output"></div>
+                </div>
             </div>
         </div>
     </div>
+    <script src="../assets/js/survey_builder.js"></script>
 </body>
 </html>
 <?php include 'includes/footer.php'; ?>

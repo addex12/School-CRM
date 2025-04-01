@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const questionsContainer = document.getElementById('questions-container');
     const addQuestionBtn = document.getElementById('add-question');
+    const generateAIQuestionsBtn = document.getElementById('generate-ai-questions');
+    const aiOutput = document.getElementById('ai-output');
     
     if (!questionsContainer || !addQuestionBtn) {
         console.error('questions-container or add-question button not found');
@@ -20,18 +22,57 @@ document.addEventListener('DOMContentLoaded', function() {
         questionCount++;
     });
 
+    // Generate AI questions
+    generateAIQuestionsBtn.addEventListener('click', async () => {
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+
+        if (!title || !description) {
+            alert('Please provide a title and description for the survey.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/getAISuggestions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    codeSnippet: '',
+                    context: `Generate survey questions for a survey titled "${title}" with the description "${description}".`,
+                }),
+            });
+
+            const data = await response.json();
+            if (data.suggestions) {
+                aiOutput.textContent = data.suggestions;
+                const questions = data.suggestions.split('\n').filter((q) => q.trim());
+                questions.forEach((question) => {
+                    const newQuestion = createQuestionElement(questionCount, question);
+                    questionsContainer.appendChild(newQuestion);
+                    initQuestionEvents(newQuestion);
+                    questionCount++;
+                });
+            } else {
+                aiOutput.textContent = 'No suggestions received from AI.';
+            }
+        } catch (error) {
+            console.error('Error fetching AI suggestions:', error);
+            aiOutput.textContent = 'Failed to fetch AI suggestions.';
+        }
+    });
+
     // Initialize existing questions
     document.querySelectorAll('.question-card').forEach(question => {
         initQuestionEvents(question);
     });
 
-    function createQuestionElement(index) {
+    function createQuestionElement(index, questionText = '') {
         const div = document.createElement('div');
         div.className = 'question-card';
         div.innerHTML = `
             <div class="form-group">
                 <label>Question</label>
-                <input type="text" name="questions[]" required placeholder="Enter your question">
+                <input type="text" name="questions[]" value="${questionText}" required placeholder="Enter your question">
                 <div class="error-message"></div>
             </div>
             <div class="form-group">
