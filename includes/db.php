@@ -277,8 +277,9 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS survey_logic (
     trigger_value VARCHAR(255) NOT NULL,
     target_field_id INT NOT NULL,
     action ENUM('show','hide','enable','disable') NOT NULL,
-    condition VARCHAR(20) DEFAULT NULL,
-    FOREIGN KEY (source_field_id) REFERENCES survey_fields(id) ON DELETE CASCADE ON UPDATE CASCADE
+    `condition` VARCHAR(20) DEFAULT NULL, -- Escaped the column name
+    FOREIGN KEY (source_field_id) REFERENCES survey_fields(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (target_field_id) REFERENCES survey_fields(id) ON DELETE CASCADE ON UPDATE CASCADE
 )");
 
 $pdo->exec("CREATE TABLE IF NOT EXISTS survey_roles (
