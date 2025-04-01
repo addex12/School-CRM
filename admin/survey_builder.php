@@ -14,10 +14,10 @@ if ($survey_id) {
     $survey = $stmt->fetch();
 }
 
-// Fetch target roles dynamically from the database
+// Fetch roles dynamically from the database
 try {
-    $rolesStmt = $pdo->query("SELECT role_name FROM roles ORDER BY role_name");
-    $roles = $rolesStmt->fetchAll(PDO::FETCH_COLUMN);
+    $rolesStmt = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name");
+    $roles = $rolesStmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Error fetching roles: " . $e->getMessage());
     $roles = [];
@@ -182,6 +182,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .roles-grid label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .roles-grid input[type="checkbox"] {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -217,13 +238,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="form-group">
                         <label for="target_roles">Target Roles</label>
-                        <select id="target_roles" name="target_roles[]" multiple>
+                        <div class="roles-grid">
                             <?php foreach ($roles as $role): ?>
-                                <option value="<?= htmlspecialchars($role) ?>" <?= in_array($role, json_decode($survey['target_roles'] ?? '[]', true)) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars(ucfirst($role)) ?>
-                                </option>
+                                <label>
+                                    <input type="checkbox" name="target_roles[]" value="<?= htmlspecialchars($role['id']) ?>" <?= in_array($role['id'], json_decode($survey['target_roles'] ?? '[]', true)) ? 'checked' : '' ?>>
+                                    <?= htmlspecialchars($role['role_name']) ?>
+                                </label>
                             <?php endforeach; ?>
-                        </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>
