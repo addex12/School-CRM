@@ -65,7 +65,11 @@ try {
                                             <td><?= htmlspecialchars($survey['created_by']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($survey['created_at'])) ?></td>
                                             <td>
-                                                <a href="survey_builder.php?id=<?= $survey['id'] ?>" class="btn btn-secondary">Edit</a>
+                                                <?php if (isset($survey['id'])): ?>
+                                                    <a href="survey_builder.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Edit</a>
+                                                <?php else: ?>
+                                                    <span class="text-muted">No ID</span>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
