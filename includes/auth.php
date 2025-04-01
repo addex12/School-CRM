@@ -1,15 +1,13 @@
 <?php
-// Start output buffering to prevent unintended output
-ob_start();
-
+// Ensure no output before this point
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'domain' => '',
-        'secure' => true,
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => isset($_SERVER['HTTPS']),
         'httponly' => true,
-        'samesite' => 'Strict',
+        'samesite' => 'Strict'
     ]);
     session_start();
 }
@@ -51,8 +49,9 @@ if (!function_exists('getCurrentUser')) {
 
 if (!function_exists('requireAdmin')) {
     function requireAdmin() {
-        if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] !== 1) {
-            header("Location: /user/dashboard.php");
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+            $_SESSION['error'] = "Access denied. Admins only.";
+            header("Location: ../error.php");
             exit();
         }
     }
