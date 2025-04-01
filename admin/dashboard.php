@@ -91,6 +91,30 @@ foreach ($sections as &$section) {
         error_log("Section Error: " . $e->getMessage());
     }
 }
+
+// Prepare data for AI insights
+$aiContext = [
+    'widgets' => $widgets,
+    'sections' => $sections,
+];
+$aiSuggestions = null;
+
+try {
+    $ch = curl_init('http://localhost:3000/api/getAISuggestions');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        'codeSnippet' => '',
+        'context' => json_encode($aiContext),
+    ]));
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    $aiSuggestions = json_decode($response, true)['suggestions'] ?? null;
+} catch (Exception $e) {
+    error_log("AI Integration Error: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -394,6 +418,16 @@ foreach ($sections as &$section) {
                         </tbody>
                     </table>
                 </section>
+
+                <!-- AI Suggestions Section -->
+                <?php if ($aiSuggestions): ?>
+                    <section class="dashboard-section">
+                        <h2>AI Suggestions</h2>
+                        <div class="ai-suggestions">
+                            <pre><?= htmlspecialchars($aiSuggestions) ?></pre>
+                        </div>
+                    </section>
+                <?php endif; ?>
             </div>
         </div>
     </div>
