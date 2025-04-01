@@ -32,11 +32,21 @@ try {
     $categories = [];
 }
 
+// Fetch statuses dynamically from the database
+try {
+    $statusesStmt = $pdo->query("SELECT status, label FROM survey_statuses ORDER BY id");
+    $statuses = $statusesStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error fetching statuses: " . $e->getMessage());
+    $statuses = [];
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
     $category_id = $_POST['category_id'] ?? null;
+    $status = $_POST['status'] ?? 'draft';
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
     // Validate and encode target_roles
@@ -49,13 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if ($survey_id) {
             // Update existing survey
-            $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, is_active = ?, target_roles = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $category_id, $is_active, $target_roles_json, $survey_id]);
+            $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, status = ?, is_active = ?, target_roles = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $category_id, $status, $is_active, $target_roles_json, $survey_id]);
             $_SESSION['success'] = "Survey updated successfully!";
         } else {
             // Create new survey
-            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, is_active, target_roles, created_by) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $category_id, $is_active, $target_roles_json, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, target_roles, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $category_id, $status, $is_active, $target_roles_json, $_SESSION['user_id']]);
             $survey_id = $pdo->lastInsertId();
             $_SESSION['success'] = "Survey created successfully!";
         }
@@ -232,6 +242,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php foreach ($categories as $category): ?>
                                 <option value="<?= htmlspecialchars($category['id']) ?>" <?= $category['id'] == ($survey['category_id'] ?? '') ? 'selected' : '' ?> >
                                     <?= htmlspecialchars($category['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select id="status" name="status" required>
+                            <?php foreach ($statuses as $status): ?>
+                                <option value="<?= htmlspecialchars($status['status']) ?>" <?= $status['status'] == ($survey['status'] ?? 'draft') ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($status['label']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
