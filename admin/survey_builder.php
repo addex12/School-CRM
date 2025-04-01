@@ -54,19 +54,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!is_array($target_roles)) {
         $target_roles = [];
     }
-    $target_roles_json = json_encode($target_roles);
 
     try {
         if ($survey_id) {
             // Update existing survey
-            $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, status = ?, is_active = ?, target_roles = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $category_id, $status, $is_active, $target_roles_json, $survey_id]);
+            $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, status = ?, is_active = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $category_id, $status, $is_active, $survey_id]);
+
+            // Update survey roles
+            $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?")->execute([$survey_id]);
+            foreach ($target_roles as $role_id) {
+                $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)")->execute([$survey_id, $role_id]);
+            }
+
             $_SESSION['success'] = "Survey updated successfully!";
         } else {
             // Create new survey
-            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, target_roles, created_by) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $category_id, $status, $is_active, $target_roles_json, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, created_by) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $category_id, $status, $is_active, $_SESSION['user_id']]);
             $survey_id = $pdo->lastInsertId();
+
+            // Assign roles to the new survey
+            foreach ($target_roles as $role_id) {
+                $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)")->execute([$survey_id, $role_id]);
+            }
+
             $_SESSION['success'] = "Survey created successfully!";
         }
 

@@ -68,7 +68,8 @@ try {
                                                 <?php if (isset($survey['id'])): ?>
                                                     <a href="survey_builder.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Edit</a>
                                                 <?php else: ?>
-                                                    <span class="text-muted">No ID</span>
+                                                    <a href="view_survey.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">View</a>
+                                                    <a href="results.php?survey_id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Results</a
                                                 <?php endif; ?>
                                             </td>
                                         </tr>
