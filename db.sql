@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 01, 2025 at 11:48 AM
+-- Generation Time: Apr 01, 2025 at 01:15 PM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -185,16 +185,6 @@ CREATE TABLE `feedback` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Dumping data for table `feedback`
---
-
-INSERT INTO `feedback` (`id`, `user_id`, `subject`, `message`, `rating`, `status`, `admin_notes`, `created_at`) VALUES
-(1, 3, 'Regarding Qay of Teaching(example)', 'You are Doing Great', 5, 'open', NULL, '2025-03-26 12:03:54'),
-(2, 3, 'Great', 'Fantastic', 3, 'open', NULL, '2025-03-26 15:06:19'),
-(3, 3, 'goodyes good', 'very good', 3, 'open', NULL, '2025-03-26 16:43:24'),
-(4, 5, 'about meeting', 'have you meet parents today', 1, 'open', NULL, '2025-03-26 18:20:41');
-
 -- --------------------------------------------------------
 
 --
@@ -282,28 +272,6 @@ CREATE TABLE `response_data` (
   `field_value` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `response_data`
---
-
-INSERT INTO `response_data` (`id`, `response_id`, `field_id`, `field_value`) VALUES
-(1, 1, 9, 'Very Fine'),
-(2, 1, 10, 'I said'),
-(3, 1, 11, 'Yes'),
-(4, 1, 12, '2'),
-(5, 2, 8, ''),
-(6, 4, 9, 'Very Fine'),
-(7, 4, 10, 'I said'),
-(8, 4, 11, 'No'),
-(9, 4, 12, '5'),
-(10, 5, 13, NULL),
-(11, 5, 14, '7'),
-(12, 6, 8, ''),
-(13, 7, 13, NULL),
-(14, 7, 14, '6'),
-(0, 0, 0, '1, 2, 3'),
-(0, 0, 0, 'H1, H2');
-
 -- --------------------------------------------------------
 
 --
@@ -365,19 +333,6 @@ CREATE TABLE `support_tickets` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Dumping data for table `support_tickets`
---
-
-INSERT INTO `support_tickets` (`id`, `user_id`, `ticket_number`, `subject`, `message`, `priority`, `status`, `attachment`, `created_at`) VALUES
-(1, 3, 'TKT-67E364962248E', 'Greetings', 'Hello there', 'medium', 'open', NULL, '2025-03-26 02:21:10'),
-(2, 3, 'TKT-67E3EC39228B1', 'I need Help', 'Urgent', 'high', 'open', NULL, '2025-03-26 11:59:53'),
-(3, 3, 'TKT-67E41BDEC5C68', 'Seeking support', 'Other Question', 'low', 'open', NULL, '2025-03-26 15:23:10'),
-(4, 3, 'TKT-67E41C406EB5A', 'next', 'next', 'medium', 'open', NULL, '2025-03-26 15:24:48'),
-(5, 3, 'TKT-67E420C0CB8D8', 'bbbbbbbbbbb', 'c', 'high', 'open', NULL, '2025-03-26 15:44:00'),
-(6, 3, 'TKT-67E4270525ECD', 'dfdfdfdfddf', 'fdfdfdfd', 'medium', 'open', NULL, '2025-03-26 16:10:45'),
-(7, 3, 'TKT-67E427B701943', 'dfdfdfdfddf', 'fdfdfdfd', 'medium', 'open', NULL, '2025-03-26 16:13:43');
-
 -- --------------------------------------------------------
 
 --
@@ -389,14 +344,14 @@ CREATE TABLE `surveys` (
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
-  `target_roles` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`target_roles`)),
+  `target_roles` int(10) NOT NULL,
   `created_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `starts_at` datetime NOT NULL,
   `ends_at` datetime NOT NULL,
   `is_anonymous` tinyint(1) DEFAULT 0,
   `is_active` tinyint(1) DEFAULT 1,
-  `status` enum('draft','active','inactive','archived') NOT NULL DEFAULT 'draft'
+  `status` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -489,6 +444,18 @@ CREATE TABLE `survey_responses` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `survey_roles`
+--
+
+CREATE TABLE `survey_roles` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `survey_statuses`
 --
 
@@ -524,6 +491,26 @@ CREATE TABLE `system_settings` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+--
+-- Dumping data for table `system_settings`
+--
+
+INSERT INTO `system_settings` (`id`, `setting_key`, `setting_value`, `setting_group`, `created_at`, `updated_at`) VALUES
+(1, 'site_name', 'School Survey System', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(2, 'site_email', 'adugna.gizaw@flipperschools.com', 'general', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(3, 'timezone', 'Africa/Addis_Ababa', 'general', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(4, 'items_per_page', '10', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(5, 'admin_menu', '[{\"title\":\"Dashboard\",\"url\":\"dashboard.php\",\"icon\":\"fa-home\"}]', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(6, 'site_logo', '', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(7, 'favicon', '', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(8, 'theme_color', '#3498db', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(9, 'smtp_provider', 'gmail', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(10, 'smtp_host', 'smtp.gmail.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(11, 'smtp_port', '587', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
+(12, 'smtp_username', 'adugna.gizaw@flipperschools.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(13, 'smtp_password', 'SutumaJigi25582067s-', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(14, 'smtp_secure', 'tls', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42');
+
 -- --------------------------------------------------------
 
 --
@@ -536,6 +523,14 @@ CREATE TABLE `templates` (
   `content` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `templates`
+--
+
+INSERT INTO `templates` (`id`, `name`, `content`, `created_at`) VALUES
+(1, 'Welcome Email', 'Dear [Name], Welcome to our platform!', '2025-03-31 22:03:48'),
+(2, 'Password Reset', 'Click the link below to reset your password: [Reset Link]', '2025-03-31 22:03:48');
 
 -- --------------------------------------------------------
 
@@ -550,6 +545,15 @@ CREATE TABLE `ticket_priorities` (
   `color` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+--
+-- Dumping data for table `ticket_priorities`
+--
+
+INSERT INTO `ticket_priorities` (`id`, `value`, `label`, `color`) VALUES
+(1, 'low', 'Low', 'green'),
+(2, 'medium', 'Medium', 'orange'),
+(3, 'high', 'High', 'red');
+
 -- --------------------------------------------------------
 
 --
@@ -563,6 +567,13 @@ CREATE TABLE `ticket_replies` (
   `message` text NOT NULL,
   `created_at` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `ticket_replies`
+--
+
+INSERT INTO `ticket_replies` (`id`, `ticket_id`, `user_id`, `message`, `created_at`) VALUES
+(1, 5, 4, 'D', '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -608,13 +619,19 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `active`, `created_at`, `last_login`, `last_activity`, `reset_token`, `reset_token_expires`, `avatar`, `notification_prefs`, `social_provider`, `social_id`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, 1, '2025-03-25 14:50:31', '2025-04-01 00:31:54', '2025-04-01 11:31:54', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, 1, '2025-03-25 14:50:31', '2025-04-01 02:11:40', '2025-04-01 13:11:40', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
 (5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamyohannes@gmail.com', 1, 1, '2025-03-25 22:47:11', '2025-03-28 21:13:37', '2025-03-29 22:43:32', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
-(65, 'Adugna1', '$2y$10$H.mSTrcOoWO1azAEZ0HBvuEs5x1jpKGw29wvVxPtM/s..FsqHQ6lG', 'gizawadugna@gmail.com', 5, 1, '2025-03-29 12:03:37', '2025-03-31 19:20:00', '2025-04-01 06:20:00', 'bc8bcd5e47b94c4d751529ad4165b83d', '2025-03-30 07:07:30', 'avatar_65_d1bb19e4e9524942.jpeg', '{\"email\": true, \"push\": true}', NULL, NULL);
+(65, 'Adugna1', '$2y$10$2y2N.D0KNj3vfPTQBeM4NOYGnsK3i4eu11I1fHg3aI3jWB2GQqe0e', 'gizawadugna@gmail.com', 5, 1, '2025-03-29 12:03:37', '2025-03-31 19:20:00', '2025-04-01 13:11:59', 'bc8bcd5e47b94c4d751529ad4165b83d', '2025-03-30 07:07:30', 'avatar_65_d1bb19e4e9524942.jpeg', '{\"email\": true, \"push\": true}', NULL, NULL);
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activity_log`
+--
+ALTER TABLE `activity_log`
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `attendance`
@@ -622,6 +639,46 @@ INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `active`,
 ALTER TABLE `attendance`
   ADD PRIMARY KEY (`id`),
   ADD KEY `employee_id` (`employee_id`);
+
+--
+-- Indexes for table `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `chats`
+--
+ALTER TABLE `chats`
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `thread_id` (`thread_id`,`user_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `chat_threads`
+--
+ALTER TABLE `chat_threads`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `contact_requests`
+--
+ALTER TABLE `contact_requests`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `contact_responses`
+--
+ALTER TABLE `contact_responses`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `departments`
@@ -637,6 +694,29 @@ ALTER TABLE `employees`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `user_id` (`user_id`),
   ADD KEY `position_id` (`position_id`);
+
+--
+-- Indexes for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `messages`
+--
+ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `sender_id` (`sender_id`,`receiver_id`),
+  ADD KEY `receiver_id` (`receiver_id`);
+
+--
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `user_id_2` (`user_id`);
 
 --
 -- Indexes for table `payrolls`
@@ -660,6 +740,13 @@ ALTER TABLE `positions`
   ADD KEY `department_id` (`department_id`);
 
 --
+-- Indexes for table `response_data`
+--
+ALTER TABLE `response_data`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `response_id` (`response_id`,`field_id`);
+
+--
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
@@ -672,6 +759,71 @@ ALTER TABLE `roles`
 ALTER TABLE `salary_structures`
   ADD PRIMARY KEY (`id`),
   ADD KEY `employee_id` (`employee_id`);
+
+--
+-- Indexes for table `support_tickets`
+--
+ALTER TABLE `support_tickets`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`,`ticket_number`);
+
+--
+-- Indexes for table `surveys`
+--
+ALTER TABLE `surveys`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `category_id` (`category_id`),
+  ADD KEY `status` (`status`),
+  ADD KEY `target_roles` (`target_roles`);
+
+--
+-- Indexes for table `survey_categories`
+--
+ALTER TABLE `survey_categories`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `name` (`name`),
+  ADD KEY `name_2` (`name`);
+
+--
+-- Indexes for table `survey_conditions`
+--
+ALTER TABLE `survey_conditions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `survey_id` (`survey_id`,`field_id`,`logic_id`),
+  ADD KEY `field_id` (`field_id`),
+  ADD KEY `logic_id` (`logic_id`);
+
+--
+-- Indexes for table `survey_fields`
+--
+ALTER TABLE `survey_fields`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `survey_id` (`survey_id`);
+
+--
+-- Indexes for table `survey_logic`
+--
+ALTER TABLE `survey_logic`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `survey_id` (`survey_id`),
+  ADD KEY `target_field_id` (`target_field_id`),
+  ADD KEY `source_field_id` (`source_field_id`);
+
+--
+-- Indexes for table `survey_responses`
+--
+ALTER TABLE `survey_responses`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `survey_id` (`survey_id`,`user_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `survey_roles`
+--
+ALTER TABLE `survey_roles`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `survey_id` (`survey_id`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- Indexes for table `survey_statuses`
@@ -756,6 +908,18 @@ ALTER TABLE `salary_structures`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `surveys`
+--
+ALTER TABLE `surveys`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `survey_roles`
+--
+ALTER TABLE `survey_roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `survey_statuses`
 --
 ALTER TABLE `survey_statuses`
@@ -765,13 +929,13 @@ ALTER TABLE `survey_statuses`
 -- AUTO_INCREMENT for table `templates`
 --
 ALTER TABLE `templates`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `ticket_priorities`
 --
 ALTER TABLE `ticket_priorities`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -784,10 +948,47 @@ ALTER TABLE `users`
 --
 
 --
+-- Constraints for table `activity_log`
+--
+ALTER TABLE `activity_log`
+  ADD CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `attendance`
 --
 ALTER TABLE `attendance`
   ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  ADD CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `chats`
+--
+ALTER TABLE `chats`
+  ADD CONSTRAINT `chats_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `chat_messages`
+--
+ALTER TABLE `chat_messages`
+  ADD CONSTRAINT `chat_messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `chat_messages_ibfk_2` FOREIGN KEY (`thread_id`) REFERENCES `chat_threads` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `chat_threads`
+--
+ALTER TABLE `chat_threads`
+  ADD CONSTRAINT `chat_threads_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `contact_requests`
+--
+ALTER TABLE `contact_requests`
+  ADD CONSTRAINT `contact_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `departments`
@@ -801,6 +1002,25 @@ ALTER TABLE `departments`
 ALTER TABLE `employees`
   ADD CONSTRAINT `employees_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `employees_ibfk_2` FOREIGN KEY (`position_id`) REFERENCES `positions` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `feedback`
+--
+ALTER TABLE `feedback`
+  ADD CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `messages`
+--
+ALTER TABLE `messages`
+  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `payroll_items`
@@ -822,21 +1042,59 @@ ALTER TABLE `salary_structures`
   ADD CONSTRAINT `salary_structures_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `support_tickets`
+--
+ALTER TABLE `support_tickets`
+  ADD CONSTRAINT `support_tickets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `surveys`
+--
+ALTER TABLE `surveys`
+  ADD CONSTRAINT `surveys_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `survey_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `surveys_ibfk_2` FOREIGN KEY (`status`) REFERENCES `survey_statuses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `surveys_ibfk_3` FOREIGN KEY (`target_roles`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `survey_conditions`
+--
+ALTER TABLE `survey_conditions`
+  ADD CONSTRAINT `survey_conditions_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `survey_fields` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `survey_conditions_ibfk_2` FOREIGN KEY (`logic_id`) REFERENCES `survey_logic` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `survey_conditions_ibfk_3` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `survey_fields`
+--
+ALTER TABLE `survey_fields`
+  ADD CONSTRAINT `survey_fields_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `survey_logic`
+--
+ALTER TABLE `survey_logic`
+  ADD CONSTRAINT `survey_logic_ibfk_1` FOREIGN KEY (`source_field_id`) REFERENCES `survey_fields` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `survey_responses`
+--
+ALTER TABLE `survey_responses`
+  ADD CONSTRAINT `survey_responses_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `support_tickets` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `survey_responses_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `survey_roles`
+--
+ALTER TABLE `survey_roles`
+  ADD CONSTRAINT `survey_roles_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `survey_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
   ADD CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL;
 COMMIT;
-
-ALTER TABLE surveys MODIFY target_roles JSON NOT NULL;
-
-CREATE TABLE IF NOT EXISTS survey_roles (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    survey_id INT NOT NULL,
-    role_id INT NOT NULL,
-    FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE,
-    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
-);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
