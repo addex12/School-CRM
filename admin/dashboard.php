@@ -10,7 +10,7 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 require_once '../includes/functions.php';
-require_once __DIR__.'../includes/db.php';
+require_once  '../includes/db.php';
 $pageTitle = "Admin Dashboard";
 
 // Ensure database connection is established
