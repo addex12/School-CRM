@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 01, 2025 at 09:52 AM
+-- Generation Time: Apr 01, 2025 at 11:48 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -185,6 +185,16 @@ CREATE TABLE `feedback` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+--
+-- Dumping data for table `feedback`
+--
+
+INSERT INTO `feedback` (`id`, `user_id`, `subject`, `message`, `rating`, `status`, `admin_notes`, `created_at`) VALUES
+(1, 3, 'Regarding Qay of Teaching(example)', 'You are Doing Great', 5, 'open', NULL, '2025-03-26 12:03:54'),
+(2, 3, 'Great', 'Fantastic', 3, 'open', NULL, '2025-03-26 15:06:19'),
+(3, 3, 'goodyes good', 'very good', 3, 'open', NULL, '2025-03-26 16:43:24'),
+(4, 5, 'about meeting', 'have you meet parents today', 1, 'open', NULL, '2025-03-26 18:20:41');
+
 -- --------------------------------------------------------
 
 --
@@ -272,6 +282,28 @@ CREATE TABLE `response_data` (
   `field_value` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `response_data`
+--
+
+INSERT INTO `response_data` (`id`, `response_id`, `field_id`, `field_value`) VALUES
+(1, 1, 9, 'Very Fine'),
+(2, 1, 10, 'I said'),
+(3, 1, 11, 'Yes'),
+(4, 1, 12, '2'),
+(5, 2, 8, ''),
+(6, 4, 9, 'Very Fine'),
+(7, 4, 10, 'I said'),
+(8, 4, 11, 'No'),
+(9, 4, 12, '5'),
+(10, 5, 13, NULL),
+(11, 5, 14, '7'),
+(12, 6, 8, ''),
+(13, 7, 13, NULL),
+(14, 7, 14, '6'),
+(0, 0, 0, '1, 2, 3'),
+(0, 0, 0, 'H1, H2');
+
 -- --------------------------------------------------------
 
 --
@@ -284,6 +316,21 @@ CREATE TABLE `roles` (
   `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `roles`
+--
+
+INSERT INTO `roles` (`id`, `role_name`, `description`, `created_at`) VALUES
+(1, 'admin', 'System Administrator', '2025-03-28 16:53:20'),
+(2, 'principal', 'School Principal', '2025-03-28 16:01:21'),
+(3, 'teacher', 'Teaching Staff', '2025-03-28 16:52:46'),
+(4, 'parent', 'Student Parent', '2025-03-28 16:53:05'),
+(5, 'student', 'School Student', '2025-03-28 16:53:39'),
+(8, 'HOD', 'Head Of Departments role.', '2025-03-29 11:41:10'),
+(9, 'new', 'New comers!', '2025-03-29 12:24:29'),
+(10, 'hr', 'Human Resources Manager', '2025-03-29 16:22:06'),
+(11, 'payroll_manager', 'Payroll Manager', '2025-03-29 16:22:06');
 
 -- --------------------------------------------------------
 
@@ -318,6 +365,19 @@ CREATE TABLE `support_tickets` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+--
+-- Dumping data for table `support_tickets`
+--
+
+INSERT INTO `support_tickets` (`id`, `user_id`, `ticket_number`, `subject`, `message`, `priority`, `status`, `attachment`, `created_at`) VALUES
+(1, 3, 'TKT-67E364962248E', 'Greetings', 'Hello there', 'medium', 'open', NULL, '2025-03-26 02:21:10'),
+(2, 3, 'TKT-67E3EC39228B1', 'I need Help', 'Urgent', 'high', 'open', NULL, '2025-03-26 11:59:53'),
+(3, 3, 'TKT-67E41BDEC5C68', 'Seeking support', 'Other Question', 'low', 'open', NULL, '2025-03-26 15:23:10'),
+(4, 3, 'TKT-67E41C406EB5A', 'next', 'next', 'medium', 'open', NULL, '2025-03-26 15:24:48'),
+(5, 3, 'TKT-67E420C0CB8D8', 'bbbbbbbbbbb', 'c', 'high', 'open', NULL, '2025-03-26 15:44:00'),
+(6, 3, 'TKT-67E4270525ECD', 'dfdfdfdfddf', 'fdfdfdfd', 'medium', 'open', NULL, '2025-03-26 16:10:45'),
+(7, 3, 'TKT-67E427B701943', 'dfdfdfdfddf', 'fdfdfdfd', 'medium', 'open', NULL, '2025-03-26 16:13:43');
+
 -- --------------------------------------------------------
 
 --
@@ -351,6 +411,16 @@ CREATE TABLE `survey_categories` (
   `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_categories`
+--
+
+INSERT INTO `survey_categories` (`id`, `name`, `description`, `created_at`) VALUES
+(1, 'Behaviour Survey', 'This is to know how behave our employees are.(example)', '2025-03-26 13:36:15'),
+(2, 'Survey on Teachers', 'Description', '2025-03-26 13:38:51'),
+(3, 'Students Performance Survey', 'Descritpion', '2025-03-26 13:40:18'),
+(4, 'contact survey', '', '2025-03-28 16:47:46');
 
 -- --------------------------------------------------------
 
@@ -428,6 +498,16 @@ CREATE TABLE `survey_statuses` (
   `label` varchar(100) NOT NULL,
   `icon` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_statuses`
+--
+
+INSERT INTO `survey_statuses` (`id`, `status`, `label`, `icon`) VALUES
+(1, 'draft', 'Draft', 'fa-file'),
+(2, 'active', 'Active', 'fa-rocket'),
+(3, 'inactive', 'Inactive', 'fa-pause'),
+(4, 'archived', 'Archived', 'fa-archive');
 
 -- --------------------------------------------------------
 
@@ -522,6 +602,15 @@ CREATE TABLE `users` (
   `social_provider` varchar(20) DEFAULT NULL,
   `social_id` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `active`, `created_at`, `last_login`, `last_activity`, `reset_token`, `reset_token_expires`, `avatar`, `notification_prefs`, `social_provider`, `social_id`) VALUES
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, 1, '2025-03-25 14:50:31', '2025-04-01 00:31:54', '2025-04-01 11:31:54', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamyohannes@gmail.com', 1, 1, '2025-03-25 22:47:11', '2025-03-28 21:13:37', '2025-03-29 22:43:32', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(65, 'Adugna1', '$2y$10$H.mSTrcOoWO1azAEZ0HBvuEs5x1jpKGw29wvVxPtM/s..FsqHQ6lG', 'gizawadugna@gmail.com', 5, 1, '2025-03-29 12:03:37', '2025-03-31 19:20:00', '2025-04-01 06:20:00', 'bc8bcd5e47b94c4d751529ad4165b83d', '2025-03-30 07:07:30', 'avatar_65_d1bb19e4e9524942.jpeg', '{\"email\": true, \"push\": true}', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -658,7 +747,7 @@ ALTER TABLE `positions`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `salary_structures`
@@ -670,7 +759,7 @@ ALTER TABLE `salary_structures`
 -- AUTO_INCREMENT for table `survey_statuses`
 --
 ALTER TABLE `survey_statuses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `templates`
@@ -688,7 +777,7 @@ ALTER TABLE `ticket_priorities`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- Constraints for dumped tables
