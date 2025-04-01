@@ -23,10 +23,20 @@ try {
     $roles = [];
 }
 
+// Fetch categories dynamically from the database
+try {
+    $categoriesStmt = $pdo->query("SELECT id, name FROM survey_categories ORDER BY name");
+    $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error fetching categories: " . $e->getMessage());
+    $categories = [];
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
     $description = trim($_POST['description']);
+    $category_id = $_POST['category_id'] ?? null;
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
     // Validate and encode target_roles
@@ -39,13 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if ($survey_id) {
             // Update existing survey
-            $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, is_active = ?, target_roles = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $is_active, $target_roles_json, $survey_id]);
+            $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, is_active = ?, target_roles = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $category_id, $is_active, $target_roles_json, $survey_id]);
             $_SESSION['success'] = "Survey updated successfully!";
         } else {
             // Create new survey
-            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, is_active, target_roles, created_by) VALUES (?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $is_active, $target_roles_json, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, is_active, target_roles, created_by) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$title, $description, $category_id, $is_active, $target_roles_json, $_SESSION['user_id']]);
             $survey_id = $pdo->lastInsertId();
             $_SESSION['success'] = "Survey created successfully!";
         }
@@ -122,7 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .form-group input,
-        .form-group textarea {
+        .form-group textarea,
+        .form-group select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -192,6 +203,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="description">Survey Description</label>
                         <textarea id="description" name="description" rows="5"><?= htmlspecialchars($survey['description'] ?? '') ?></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="category_id">Category</label>
+                        <select id="category_id" name="category_id" required>
+                            <option value="">Select a category</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= htmlspecialchars($category['id']) ?>" <?= $category['id'] == ($survey['category_id'] ?? '') ? 'selected' : '' ?> >
+                                    <?= htmlspecialchars($category['name']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="target_roles">Target Roles</label>
