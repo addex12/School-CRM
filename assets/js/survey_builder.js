@@ -1,13 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('survey_builder.js loaded'); // Check if the script is loaded
 
     const questionsContainer = document.getElementById('questions-container');
     const addQuestionBtn = document.getElementById('add-question');
     const generateAIQuestionsBtn = document.getElementById('generate-ai-questions');
     const aiOutput = document.getElementById('ai-output');
-    
-    if (!questionsContainer || !addQuestionBtn) {
-        console.error('questions-container or add-question button not found');
+
+    if (!questionsContainer || !addQuestionBtn || !generateAIQuestionsBtn) {
+        console.error('Required elements not found');
         return;
     }
 
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add new question
     addQuestionBtn.addEventListener('click', () => {
-        console.log('Add question button clicked'); // Check if the event listener is working
+        console.log('Add question button clicked'); // Debugging log
         const newQuestion = createQuestionElement(questionCount);
         questionsContainer.appendChild(newQuestion);
         initQuestionEvents(newQuestion);
@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
+            aiOutput.textContent = 'Generating questions...'; // Show loading message
             const response = await fetch('/api/getAISuggestions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
             if (data.suggestions) {
-                aiOutput.textContent = data.suggestions;
+                aiOutput.textContent = 'AI Suggestions:';
                 const questions = data.suggestions.split('\n').filter((q) => q.trim());
                 questions.forEach((question) => {
                     const newQuestion = createQuestionElement(questionCount, question);
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Initialize existing questions
-    document.querySelectorAll('.question-card').forEach(question => {
+    document.querySelectorAll('.question-card').forEach((question) => {
         initQuestionEvents(question);
     });
 
@@ -118,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function() {
         typeSelect.addEventListener('change', () => {
             const showOptions = ['radio', 'checkbox', 'select'].includes(typeSelect.value);
             optionsGroup.style.display = showOptions ? 'block' : 'none';
-            optionsGroup.classList.toggle('visible', showOptions);
         });
 
         // Trigger initial state
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Reindex all questions before submission
-    document.getElementById('survey-form').addEventListener('submit', function(e) {
+    document.getElementById('survey-form').addEventListener('submit', function () {
         reindexQuestions();
     });
 
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             question.querySelector('[name="field_types[]"]').name = `field_types[${index}]`;
             question.querySelector('[name="options[]"]').name = `options[${index}]`;
             question.querySelector('[name="placeholders[]"]').name = `placeholders[${index}]`;
-            
+
             // Handle required checkbox
             const requiredCheckbox = question.querySelector('[name="required[]"]');
             requiredCheckbox.name = `required[${index}]`;
