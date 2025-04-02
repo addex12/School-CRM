@@ -22,7 +22,7 @@ if (!isset($pdo) || !$pdo) {
 }
 
 // Load widgets from JSON
-$widgetsConfig = json_decode(file_get_contents('../config/dashboard.json'), true);
+$widgetsConfig = json_decode(file_get_contents('../assets/config/dashboard.json'), true);
 $widgets = $widgetsConfig['widgets'];
 
 foreach ($widgets as &$widget) {
