@@ -8,7 +8,7 @@
  */
 require_once '../includes/auth.php';
 requireAdmin();
-require_once '../assets/config.php';
+require_once '../includes/config.php';
 require_once '../includes/functions.php';
 require_once '../includes/db.php';
 
@@ -33,7 +33,7 @@ $chartData = [
 ];
 
 // Load widgets from JSON with error handling
-$widgetsConfigFile = '../config/dashboard.json';
+$widgetsConfigFile = '../assets/config/dashboard.json';
 if (file_exists($widgetsConfigFile)) {
     $widgetsConfig = json_decode(file_get_contents($widgetsConfigFile), true);
     
