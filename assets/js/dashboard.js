@@ -71,3 +71,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Run on scroll
     window.addEventListener('scroll', animateOnScroll);
 });
+
+const notificationsDropdown = document.querySelector('.notifications-dropdown');
+if (notificationsDropdown) {
+    const toggle = notificationsDropdown.querySelector('.notifications-toggle');
+    
+    toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationsDropdown.classList.toggle('active');
+    });
+    
+    // Close when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!notificationsDropdown.contains(e.target)) {
+            notificationsDropdown.classList.remove('active');
+        }
+    });
+}
