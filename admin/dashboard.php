@@ -62,17 +62,24 @@ try {
 // Fetch recent feedback
 $feedback = [];
 try {
-    $stmt = $pdo->query("
-        SELECT f.*, u.username 
-        FROM feedback f
-        LEFT JOIN users u ON f.user_id = u.id
-        ORDER BY f.created_at DESC 
-        LIMIT 5
-    ");
-    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $tableExists = $pdo->query("SHOW TABLES LIKE 'feedback'")->rowCount() > 0;
+    
+    if ($tableExists) {
+        $stmt = $pdo->query("
+            SELECT f.*, COALESCE(u.username, 'Anonymous') as username 
+            FROM feedback f
+            LEFT JOIN users u ON f.user_id = u.id
+            ORDER BY f.created_at DESC 
+            LIMIT 5
+        ");
+        $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        error_log("Feedback table doesn't exist");
+        $feedback = [['error' => 'Table not available']];
+    }
 } catch (Exception $e) {
     error_log("Feedback Error: " . $e->getMessage());
-    $feedback = []; // Ensure empty array on error
+    $feedback = [['error' => 'Failed to load data']];
 }
 
 // Fetch recent support tickets
