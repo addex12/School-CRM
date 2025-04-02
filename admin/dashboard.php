@@ -48,6 +48,7 @@ try {
     $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Activity Log Error: " . $e->getMessage());
+    $activityLog = []; // Ensure empty array on error
 }
 
 // Fetch recent feedback
@@ -63,6 +64,7 @@ try {
     $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Feedback Error: " . $e->getMessage());
+    $feedback = []; // Ensure empty array on error
 }
 
 // Fetch recent support tickets
@@ -79,6 +81,7 @@ try {
     $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Tickets Error: " . $e->getMessage());
+    $tickets = []; // Ensure empty array on error
 }
 
 // Fetch data for charts
