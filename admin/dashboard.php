@@ -11,6 +11,7 @@ requireAdmin();
 require_once '../includes/config.php';
 require_once '../includes/functions.php';
 require_once '../includes/db.php';
+
 $pageTitle = "Admin Dashboard";
 
 // Ensure database connection is established
@@ -21,7 +22,8 @@ if (!isset($pdo) || !$pdo) {
 }
 
 // Load widgets from JSON
-$widgets = json_decode(file_get_contents('dashboard.json'), true)['widgets'];
+$widgetsConfig = json_decode(file_get_contents('../config/dashboard.json'), true);
+$widgets = $widgetsConfig['widgets'];
 
 foreach ($widgets as &$widget) {
     try {
@@ -59,6 +61,24 @@ try {
 } catch (Exception $e) {
     error_log("Tickets Error: " . $e->getMessage());
 }
+
+// Fetch data for charts
+$chartData = [];
+try {
+    // User registration chart data (last 7 days)
+    $stmt = $pdo->query("SELECT DATE(created_at) as date, COUNT(*) as count FROM users WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(created_at)");
+    $chartData['userRegistrations'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Survey status data
+    $stmt = $pdo->query("SELECT ss.label, COUNT(s.id) as count FROM surveys s JOIN survey_statuses ss ON s.status_id = ss.id GROUP BY s.status_id");
+    $chartData['surveyStatus'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Ticket priority data
+    $stmt = $pdo->query("SELECT tp.label, COUNT(st.id) as count FROM support_tickets st JOIN ticket_priorities tp ON st.priority_id = tp.id GROUP BY st.priority_id");
+    $chartData['ticketPriority'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Chart Data Error: " . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -69,41 +89,84 @@ try {
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
+    <script src="../assets/js/charts.js" defer></script>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <div class="header-left">
+                    <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                    <p class="welcome-message">Welcome back, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin') ?></p>
+                </div>
+                <div class="header-right">
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="../uploads/avatars/default.jpg" alt="Profile">
+                    </div>
+                </div>
             </header>
+            
             <div class="content">
-                <!-- Widgets Section -->
+                <!-- Summary Widgets Section -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
                         <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
-                            <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                            <p><?= htmlspecialchars($widget['title']) ?></p>
+                            <div class="widget-icon">
+                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
+                            </div>
+                            <div class="widget-content">
+                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
+                                <p><?= htmlspecialchars($widget['title']) ?></p>
+                            </div>
+                            <div class="widget-action">
+                                <a href="<?= htmlspecialchars($widget['link'] ?? '#') ?>">View All <i class="fas fa-arrow-right"></i></a>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
 
+                <!-- Charts Section -->
+                <div class="dashboard-section">
+                    <div class="chart-container">
+                        <div class="chart-card">
+                            <h3>User Registrations (Last 7 Days)</h3>
+                            <canvas id="userRegistrationsChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Survey Status Distribution</h3>
+                            <canvas id="surveyStatusChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>Ticket Priority Distribution</h3>
+                            <canvas id="ticketPriorityChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Activity Log Section -->
                 <div class="dashboard-section">
-                    <h2>Recent Activity Log</h2>
+                    <div class="section-header">
+                        <h2><i class="fas fa-history"></i> Recent Activity Log</h2>
+                        <a href="activity_log.php" class="view-all">View All</a>
+                    </div>
                     <div class="table-container">
                         <table class="table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>User ID</th>
+                                    <th>User</th>
                                     <th>Activity Type</th>
                                     <th>Description</th>
                                     <th>IP Address</th>
-                                    <th>Created At</th>
+                                    <th>Date</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -112,15 +175,15 @@ try {
                                         <tr>
                                             <td><?= htmlspecialchars($log['id']) ?></td>
                                             <td><?= htmlspecialchars($log['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($log['activity_type']) ?></td>
+                                            <td><span class="badge badge-activity"><?= htmlspecialchars($log['activity_type']) ?></span></td>
                                             <td><?= htmlspecialchars($log['description']) ?></td>
                                             <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                            <td><?= htmlspecialchars($log['created_at']) ?></td>
+                                            <td><?= formatDate(htmlspecialchars($log['created_at'])) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6">No recent activity found.</td>
+                                        <td colspan="6" class="no-data">No recent activity found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -128,81 +191,95 @@ try {
                     </div>
                 </div>
 
-                <!-- Feedback Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Feedback</h2>
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Message</th>
-                                    <th>Rating</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($feedback)): ?>
-                                    <?php foreach ($feedback as $item): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($item['id']) ?></td>
-                                            <td><?= htmlspecialchars($item['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($item['subject']) ?></td>
-                                            <td><?= htmlspecialchars($item['message']) ?></td>
-                                            <td><?= htmlspecialchars($item['rating']) ?></td>
-                                            <td><?= htmlspecialchars($item['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                <!-- Recent Items Section -->
+                <div class="recent-items-grid">
+                    <!-- Feedback Section -->
+                    <div class="recent-item-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-comment-dots"></i> Recent Feedback</h2>
+                            <a href="feedback.php" class="view-all">View All</a>
+                        </div>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td colspan="6">No feedback found.</td>
+                                        <th>User</th>
+                                        <th>Subject</th>
+                                        <th>Rating</th>
+                                        <th>Date</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($feedback)): ?>
+                                        <?php foreach ($feedback as $item): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($item['user_id']) ?></td>
+                                                <td><?= htmlspecialchars($item['subject']) ?></td>
+                                                <td>
+                                                    <div class="rating-stars">
+                                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                            <i class="fas fa-star <?= $i <= $item['rating'] ? 'filled' : '' ?>"></i>
+                                                        <?php endfor; ?>
+                                                    </div>
+                                                </td>
+                                                <td><?= formatDate(htmlspecialchars($item['created_at'])) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4" class="no-data">No feedback found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Support Tickets Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Support Tickets</h2>
-                    <div class="table-container">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Status</th>
-                                    <th>Priority</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($tickets)): ?>
-                                    <?php foreach ($tickets as $ticket): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($ticket['id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['status']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['priority']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                    <!-- Support Tickets Section -->
+                    <div class="recent-item-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-ticket-alt"></i> Recent Support Tickets</h2>
+                            <a href="tickets.php" class="view-all">View All</a>
+                        </div>
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td colspan="6">No tickets found.</td>
+                                        <th>Ticket #</th>
+                                        <th>User</th>
+                                        <th>Subject</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($tickets)): ?>
+                                        <?php foreach ($tickets as $ticket): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($ticket['ticket_number']) ?></td>
+                                                <td><?= htmlspecialchars($ticket['user_id']) ?></td>
+                                                <td><?= htmlspecialchars($ticket['subject']) ?></td>
+                                                <td><span class="badge badge-<?= str_replace('_', '-', $ticket['status']) ?>"><?= ucwords(str_replace('_', ' ', $ticket['status'])) ?></span></td>
+                                                <td><?= formatDate(htmlspecialchars($ticket['created_at'])) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="5" class="no-data">No tickets found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <script>
+        // Pass PHP data to JavaScript
+        const chartData = <?= json_encode($chartData) ?>;
+    </script>
 </body>
 </html>

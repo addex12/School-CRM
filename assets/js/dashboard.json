@@ -1,0 +1,64 @@
+{
+    "widgets": [
+        {
+            "title": "Total Users",
+            "icon": "fa-users",
+            "color": "blue",
+            "count_query": "SELECT COUNT(*) FROM users",
+            "link": "users.php"
+        },
+        {
+            "title": "Active Surveys",
+            "icon": "fa-poll",
+            "color": "green",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE is_active = 1",
+            "link": "surveys.php"
+        },
+        {
+            "title": "Feedback Received",
+            "icon": "fa-comments",
+            "color": "orange",
+            "count_query": "SELECT COUNT(*) FROM feedback",
+            "link": "feedback.php"
+        },
+        {
+            "title": "Open Tickets",
+            "icon": "fa-ticket-alt",
+            "color": "red",
+            "count_query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
+            "link": "tickets.php"
+        },
+        {
+            "title": "New This Week",
+            "icon": "fa-calendar-week",
+            "color": "purple",
+            "count_query": "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
+            "link": "users.php?filter=recent"
+        },
+        {
+            "title": "Pending Actions",
+            "icon": "fa-tasks",
+            "color": "yellow",
+            "count_query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
+            "link": "tickets.php"
+        }
+    ],
+    "charts": {
+        "userRegistrations": {
+            "type": "line",
+            "title": "User Registrations (Last 7 Days)",
+            "backgroundColor": "rgba(54, 162, 235, 0.2)",
+            "borderColor": "rgba(54, 162, 235, 1)"
+        },
+        "surveyStatus": {
+            "type": "doughnut",
+            "title": "Survey Status Distribution",
+            "colors": ["#4BC0C0", "#36A2EB", "#FFCE56", "#FF6384"]
+        },
+        "ticketPriority": {
+            "type": "bar",
+            "title": "Ticket Priority Distribution",
+            "colors": ["#4BC0C0", "#FFCE56", "#FF6384"]
+        }
+    }
+}
