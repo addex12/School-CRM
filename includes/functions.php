@@ -142,4 +142,84 @@ function formatBytes($bytes, $precision = 2) {
     $bytes /= pow(1024, $pow);
     return round($bytes, $precision) . ' ' . $units[$pow];
 }
-?>
+
+/**
+ * Clean input data
+ */
+function clean_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+}
+
+/**
+ * Log activity
+ */
+function log_activity($user_id, $activity_type, $description) {
+    global $pdo;
+    
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO activity_log 
+            (user_id, activity_type, description, ip_address) 
+            VALUES (:user_id, :activity_type, :description, :ip_address)
+        ");
+        
+        $stmt->execute([
+            ':user_id' => $user_id,
+            ':activity_type' => $activity_type,
+            ':description' => $description,
+            ':ip_address' => $_SERVER['REMOTE_ADDR']
+        ]);
+        
+        return true;
+    } catch (PDOException $e) {
+        error_log("Activity log error: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Redirect with message
+ */
+function redirect_with_message($url, $type, $message) {
+    $_SESSION['flash'] = [
+        'type' => $type,
+        'message' => $message
+    ];
+    header("Location: $url");
+    exit();
+}
+
+/**
+ * Get hashed password
+ */
+function get_hashed_password($password) {
+    return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+}
+
+/**
+ * Verify password
+ */
+function verify_password($password, $hash) {
+    return password_verify($password, $hash);
+}
+
+/**
+ * Generate CSRF token
+ */
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/**
+ * Verify CSRF token
+ */
+function verify_csrf_token($token) {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
