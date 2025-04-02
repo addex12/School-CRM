@@ -1,151 +1,73 @@
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('Dashboard.js loaded');
-
-    // Initialize charts
-    const chartCanvas = document.getElementById('surveyChart');
-    if (chartCanvas) {
-        const chartData = JSON.parse(chartCanvas.getAttribute('data-chart'));
-        const labels = chartData.map(item => item.category);
-        const data = chartData.map(item => item.survey_count);
-
-        new Chart(chartCanvas, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Survey Count',
-                    data: data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: true }
-                }
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle sidebar on mobile
+    const sidebarToggle = document.createElement('div');
+    sidebarToggle.className = 'sidebar-toggle';
+    sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    document.querySelector('.admin-header').prepend(sidebarToggle);
+    
+    sidebarToggle.addEventListener('click', function() {
+        document.querySelector('.admin-dashboard').classList.toggle('sidebar-collapsed');
+    });
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Notification dropdown
+    const notifications = document.querySelector('.notifications');
+    if (notifications) {
+        notifications.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
         });
     }
-
-    // Refresh widgets dynamically
-    const refreshWidgets = async () => {
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function() {
+        if (notifications) notifications.classList.remove('active');
+    });
+    
+    // User profile dropdown
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        userProfile.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.classList.toggle('active');
+        });
+    }
+    
+    // Initialize charts
+    if (typeof initCharts === 'function') {
+        initCharts();
+    }
+    
+    // Add animation to widgets on scroll
+    const animateOnScroll = function() {
         const widgets = document.querySelectorAll('.dashboard-widget');
-        widgets.forEach(async widget => {
-            const query = widget.getAttribute('data-query');
-            try {
-                const response = await fetch('/api/widget-data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query }),
-                });
-                const data = await response.json();
-                widget.querySelector('h3').textContent = data.count || 'Error';
-            } catch (error) {
-                console.error('Error refreshing widget:', error);
+        widgets.forEach(widget => {
+            const widgetPosition = widget.getBoundingClientRect().top;
+            const screenPosition = window.innerHeight / 1.3;
+            
+            if (widgetPosition < screenPosition) {
+                widget.style.opacity = '1';
+                widget.style.transform = 'translateY(0)';
             }
         });
     };
-
-    // Refresh widgets every 5 minutes
-    setInterval(refreshWidgets, 300000);
-
-    // Add interactivity to sections
-    const sectionHeaders = document.querySelectorAll('.dashboard-section h2');
-    sectionHeaders.forEach(header => {
-        header.addEventListener('click', () => {
-            const section = header.parentElement;
-            section.classList.toggle('collapsed');
-        });
+    
+    // Set initial state for animation
+    const widgets = document.querySelectorAll('.dashboard-widget');
+    widgets.forEach(widget => {
+        widget.style.opacity = '0';
+        widget.style.transform = 'translateY(20px)';
+        widget.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
     });
-
-    // Load widget counts dynamically
-    document.querySelectorAll('.dashboard-widget').forEach(widget => {
-        const query = widget.dataset.query;
-        fetch(`../api/widget_data.php?query=${encodeURIComponent(query)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch widget data: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                widget.querySelector('.widget-count').textContent = data.count || 0;
-            })
-            .catch(error => {
-                console.error('Error loading widget data:', error);
-                widget.querySelector('.widget-count').textContent = 'Error';
-            });
-    });
-
-    // Load section table data dynamically
-    document.querySelectorAll('.table').forEach(table => {
-        const query = table.dataset.query;
-        fetch(`../api/section_data.php?query=${encodeURIComponent(query)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch section data: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const tbody = table.querySelector('tbody');
-                tbody.innerHTML = '';
-                if (data.rows && data.rows.length > 0) {
-                    data.rows.forEach(row => {
-                        const tr = document.createElement('tr');
-                        data.columns.forEach(column => {
-                            const td = document.createElement('td');
-                            td.textContent = row[column] || 'N/A';
-                            tr.appendChild(td);
-                        });
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="' + data.columns.length + '">No data available</td></tr>';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading section data:', error);
-                const tbody = table.querySelector('tbody');
-                tbody.innerHTML = '<tr><td colspan="100%">Error loading data</td></tr>';
-            });
-    });
-    // Load recent activity data dynamically
-    document.querySelectorAll('.recent-activity').forEach(table => {
-        const query = table.dataset.query;
-        fetch(`../api/recent_activity.php?query=${encodeURIComponent(query)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch recent activity data: ${response.statusText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                const tbody = table.querySelector('tbody');
-                tbody.innerHTML = '';
-                if (data.rows && data.rows.length > 0) {
-                    data.rows.forEach(row => {
-                        const tr = document.createElement('tr');
-                        data.columns.forEach(column => {
-                            const td = document.createElement('td');
-                            td.textContent = row[column] || 'N/A';
-                            tr.appendChild(td);
-                        });
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="' + data.columns.length + '">No data available</td></tr>';
-                }
-            })
-            .catch(error => {
-                console.error('Error loading recent activity data:', error);
-                const tbody = table.querySelector('tbody');
-                tbody.innerHTML = '<tr><td colspan="100%">Error loading data</td></tr>';
-            });
-    });
+    
+    // Run once on load
+    animateOnScroll();
+    
+    // Run on scroll
+    window.addEventListener('scroll', animateOnScroll);
 });
-
-
