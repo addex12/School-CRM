@@ -6,6 +6,9 @@
 -- Generation Time: Apr 01, 2025 at 01:15 PM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
+--
+-- This line is intentionally commented out to avoid execution
+-- SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
