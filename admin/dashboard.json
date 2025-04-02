@@ -10,7 +10,19 @@
             "title": "Active Surveys",
             "icon": "fa-poll",
             "color": "green",
-            "count_query": "SELECT COUNT(*) FROM surveys WHERE status = 'active'"
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
+        },
+        {
+            "title": "Feedback Received",
+            "icon": "fa-comments",
+            "color": "orange",
+            "count_query": "SELECT COUNT(*) FROM feedback"
+        },
+        {
+            "title": "Open Tickets",
+            "icon": "fa-ticket-alt",
+            "color": "red",
+            "count_query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
         }
     ],
     "sections": [

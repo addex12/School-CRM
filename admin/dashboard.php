@@ -20,37 +20,12 @@ if (!isset($pdo) || !$pdo) {
     exit();
 }
 
-// Fetch widget data
-$widgets = [
-    [
-        "title" => "Total Users",
-        "icon" => "fa-users",
-        "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM users"
-    ],
-    [
-        "title" => "Active Surveys",
-        "icon" => "fa-poll",
-        "color" => "green",
-        "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
-    ],
-    [
-        "title" => "Feedback Received",
-        "icon" => "fa-comments",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM feedback"
-    ],
-    [
-        "title" => "Open Tickets",
-        "icon" => "fa-ticket-alt",
-        "color" => "red",
-        "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
-    ]
-];
+// Load widgets from JSON
+$widgets = json_decode(file_get_contents('dashboard.json'), true)['widgets'];
 
 foreach ($widgets as &$widget) {
     try {
-        $stmt = $pdo->query($widget['query']);
+        $stmt = $pdo->query($widget['count_query']);
         $widget['count'] = $stmt->fetchColumn() ?? 0;
     } catch (Exception $e) {
         $widget['count'] = "Error";
