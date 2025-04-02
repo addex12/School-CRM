@@ -223,3 +223,20 @@ function verify_csrf_token($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
 
+/**
+ * Execute a database query with error handling
+ */
+function executeQuery($query, $params = []) {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        return $stmt;
+    } catch (PDOException $e) {
+        error_log("Database Query Error: " . $e->getMessage());
+        $_SESSION['error'] = "A system error occurred. Please try again later.";
+        header("Location: ../error.php");
+        exit();
+    }
+}
+

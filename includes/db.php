@@ -31,7 +31,7 @@ try {
     ]);
 } catch (PDOException $e) {
     error_log("Database Connection Error: " . $e->getMessage());
-    $_SESSION['error'] = "Database connection failed.";
+    $_SESSION['error'] = "Database connection failed. Please contact the administrator.";
     header("Location: ../error.php");
     exit();
 }

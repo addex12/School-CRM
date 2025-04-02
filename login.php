@@ -22,47 +22,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($username) || empty($password)) {
         $error = 'Please enter both username and password';
     } else {
-        try {
-            // Check user credentials
-            $stmt = $pdo->prepare("
-                SELECT u.*, r.dashboard_path, r.name as role_name 
-                FROM users u 
-                JOIN roles r ON u.role_id = r.id 
-                WHERE (u.username = :username OR u.email = :username)
-                AND u.active = 1
-                LIMIT 1
-            ");
-            $stmt->execute([':username' => $username]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $query = "
+            SELECT u.*, r.dashboard_path, r.role_name 
+            FROM users u 
+            JOIN roles r ON u.role_id = r.id 
+            WHERE (u.username = :username OR u.email = :username)
+            AND u.active = 1
+            LIMIT 1
+        ";
+        $stmt = executeQuery($query, [':username' => $username]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password'])) {
+            // Regenerate session ID to prevent fixation
+            session_regenerate_id(true);
             
-            if ($user && password_verify($password, $user['password'])) {
-                // Regenerate session ID to prevent fixation
-                session_regenerate_id(true);
-                
-                // Set session variables
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['role_id'] = $user['role_id'];
-                $_SESSION['role'] = $user['role_name']; // Ensure role is set correctly
-                $_SESSION['dashboard_path'] = $user['dashboard_path'];
-                
-                // Update last login
-                $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = :id");
-                $updateStmt->execute([':id' => $user['id']]);
-                
-                // Log activity
-                log_activity($user['id'], 'login', "User logged in");
-                
-                // Redirect to dashboard
-                header("Location: " . ($user['role_name'] === 'admin' ? '/admin/dashboard.php' : $user['dashboard_path']));
-                exit();
-            } else {
-                $error = 'Invalid username or password';
-                log_activity(null, 'login_failed', "Failed login attempt for username: $username");
-            }
-        } catch (PDOException $e) {
-            error_log("Database error in login.php: " . $e->getMessage());
-            $error = 'A system error occurred. Please try again later.';
+            // Set session variables
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role_id'] = $user['role_id'];
+            $_SESSION['role'] = $user['role_name']; // Ensure role is set correctly
+            $_SESSION['dashboard_path'] = $user['dashboard_path'];
+            
+            // Update last login
+            $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = :id");
+            $updateStmt->execute([':id' => $user['id']]);
+            
+            // Log activity
+            log_activity($user['id'], 'login', "User logged in");
+            
+            // Redirect to dashboard
+            header("Location: " . ($user['role_name'] === 'admin' ? '/admin/dashboard.php' : $user['dashboard_path']));
+            exit();
+        } else {
+            $error = 'Invalid username or password';
+            log_activity(null, 'login_failed', "Failed login attempt for username: $username");
         }
     }
 }

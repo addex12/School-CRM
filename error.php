@@ -15,7 +15,7 @@ unset($_SESSION['error']);
     <div class="error-container">
         <h1>Error</h1>
         <p><?= htmlspecialchars($error_message) ?></p>
-        <a href="admin/dashboard.php" class="btn">Go Back to Dashboard</a>
+        <a href="index.php" class="btn">Go Back to Home</a>
     </div>
 </body>
 </html>
