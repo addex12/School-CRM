@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             // Check user credentials
             $stmt = $pdo->prepare("
-                SELECT u.*, r.dashboard_path 
+                SELECT u.*, r.dashboard_path, r.name as role_name 
                 FROM users u 
                 JOIN roles r ON u.role_id = r.id 
                 WHERE (u.username = :username OR u.email = :username)
@@ -43,6 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['role'] = $user['role_name']; // Ensure role is set correctly
                 $_SESSION['dashboard_path'] = $user['dashboard_path'];
                 
                 // Update last login
@@ -53,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 log_activity($user['id'], 'login', "User logged in");
                 
                 // Redirect to dashboard
-                header("Location: " . ($user['id'] == 1 ? '/admin/dashboard.php' : $user['dashboard_path']));
+                header("Location: " . ($user['role_name'] === 'admin' ? '/admin/dashboard.php' : $user['dashboard_path']));
                 exit();
             } else {
                 $error = 'Invalid username or password';
