@@ -21,61 +21,85 @@ if (!isset($pdo) || !$pdo) {
     exit();
 }
 
-// Load widgets from JSON
-$widgetsConfig = json_decode(file_get_contents('../config/dashboard.json'), true);
-$widgets = $widgetsConfig['widgets'];
+// Initialize variables with default values
+$widgets = [];
+$activityLog = [];
+$feedback = [];
+$tickets = [];
+$chartData = [
+    'userRegistrations' => [],
+    'surveyStatus' => [],
+    'ticketPriority' => []
+];
 
-foreach ($widgets as &$widget) {
-    try {
-        $stmt = $pdo->query($widget['count_query']);
-        $widget['count'] = $stmt->fetchColumn() ?? 0;
-    } catch (Exception $e) {
-        $widget['count'] = "Error";
-        error_log("Widget Error: " . $e->getMessage());
+// Load widgets from JSON with error handling
+$widgetsConfigFile = '../config/dashboard.json';
+if (file_exists($widgetsConfigFile)) {
+    $widgetsConfig = json_decode(file_get_contents($widgetsConfigFile), true);
+    
+    if (json_last_error() === JSON_ERROR_NONE && isset($widgetsConfig['widgets']) && is_array($widgetsConfig['widgets'])) {
+        $widgets = $widgetsConfig['widgets'];
+        
+        foreach ($widgets as &$widget) {
+            try {
+                if (isset($widget['count_query'])) {
+                    $stmt = $pdo->query($widget['count_query']);
+                    $widget['count'] = $stmt->fetchColumn() ?? 0;
+                } else {
+                    $widget['count'] = 0;
+                }
+            } catch (Exception $e) {
+                $widget['count'] = "Error";
+                error_log("Widget Error: " . $e->getMessage());
+            }
+        }
+    } else {
+        error_log("Invalid JSON format in dashboard.json");
     }
+} else {
+    error_log("Dashboard config file not found: " . $widgetsConfigFile);
 }
 
-// Fetch recent activity log
-$activityLog = [];
+// Fetch recent activity log with error handling
 try {
     $stmt = $pdo->query("SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10");
-    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Exception $e) {
     error_log("Activity Log Error: " . $e->getMessage());
+    $activityLog = [];
 }
 
-// Fetch recent feedback
-$feedback = [];
+// Fetch recent feedback with error handling
 try {
     $stmt = $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 5");
-    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Exception $e) {
     error_log("Feedback Error: " . $e->getMessage());
+    $feedback = [];
 }
 
-// Fetch recent support tickets
-$tickets = [];
+// Fetch recent support tickets with error handling
 try {
     $stmt = $pdo->query("SELECT * FROM support_tickets ORDER BY created_at DESC LIMIT 5");
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Exception $e) {
     error_log("Tickets Error: " . $e->getMessage());
+    $tickets = [];
 }
 
-// Fetch data for charts
-$chartData = [];
+// Fetch data for charts with error handling
 try {
     // User registration chart data (last 7 days)
     $stmt = $pdo->query("SELECT DATE(created_at) as date, COUNT(*) as count FROM users WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(created_at)");
-    $chartData['userRegistrations'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $chartData['userRegistrations'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     
     // Survey status data
     $stmt = $pdo->query("SELECT ss.label, COUNT(s.id) as count FROM surveys s JOIN survey_statuses ss ON s.status_id = ss.id GROUP BY s.status_id");
-    $chartData['surveyStatus'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $chartData['surveyStatus'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     
     // Ticket priority data
     $stmt = $pdo->query("SELECT tp.label, COUNT(st.id) as count FROM support_tickets st JOIN ticket_priorities tp ON st.priority_id = tp.id GROUP BY st.priority_id");
-    $chartData['ticketPriority'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $chartData['ticketPriority'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 } catch (Exception $e) {
     error_log("Chart Data Error: " . $e->getMessage());
 }
@@ -116,15 +140,16 @@ try {
             
             <div class="content">
                 <!-- Summary Widgets Section -->
+                <?php if (!empty($widgets)): ?>
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
-                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
+                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color'] ?? 'blue') ?>">
                             <div class="widget-icon">
-                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
+                                <i class="fas <?= htmlspecialchars($widget['icon'] ?? 'fa-question-circle') ?>"></i>
                             </div>
                             <div class="widget-content">
-                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                                <p><?= htmlspecialchars($widget['title']) ?></p>
+                                <h3><?= htmlspecialchars($widget['count'] ?? 0) ?></h3>
+                                <p><?= htmlspecialchars($widget['title'] ?? 'Widget') ?></p>
                             </div>
                             <div class="widget-action">
                                 <a href="<?= htmlspecialchars($widget['link'] ?? '#') ?>">View All <i class="fas fa-arrow-right"></i></a>
@@ -132,7 +157,10 @@ try {
                         </div>
                     <?php endforeach; ?>
                 </div>
-
+                <?php else: ?>
+                <div class="alert alert-warning">No widgets configured. Please check your dashboard.json file.</div>
+                <?php endif; ?>
+            
                 <!-- Charts Section -->
                 <div class="dashboard-section">
                     <div class="chart-container">
@@ -280,6 +308,10 @@ try {
     <script>
         // Pass PHP data to JavaScript
         const chartData = <?= json_encode($chartData) ?>;
-    </script>
+        const userRegistrations = chartData.userRegistrations.map(item => ({
+            date: item.date,
+            count: item.count
+        }));
+</script>
 </body>
 </html>
