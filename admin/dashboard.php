@@ -38,17 +38,25 @@ foreach ($widgets as &$widget) {
 // Fetch recent activity log
 $activityLog = [];
 try {
-    $stmt = $pdo->query("
-        SELECT al.*, u.username 
-        FROM activity_log al
-        LEFT JOIN users u ON al.user_id = u.id
-        ORDER BY al.created_at DESC 
-        LIMIT 10
-    ");
-    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // First check if table exists
+    $tableExists = $pdo->query("SHOW TABLES LIKE 'activity_log'")->rowCount() > 0;
+    
+    if ($tableExists) {
+        $stmt = $pdo->query("
+            SELECT al.*, COALESCE(u.username, 'System') as username 
+            FROM activity_log al
+            LEFT JOIN users u ON al.user_id = u.id
+            ORDER BY al.created_at DESC 
+            LIMIT 10
+        ");
+        $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        error_log("Activity Log table doesn't exist");
+        $activityLog = [['error' => 'Table not available']];
+    }
 } catch (Exception $e) {
     error_log("Activity Log Error: " . $e->getMessage());
-    $activityLog = []; // Ensure empty array on error
+    $activityLog = [['error' => 'Failed to load data']];
 }
 
 // Fetch recent feedback
