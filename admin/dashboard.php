@@ -188,7 +188,44 @@ foreach ($widgets as &$widget) {
                 <div class="header-right">
                     <div class="notifications">
                         <i class="fas fa-bell"></i>
-                        <span class="badge">3</span>
+<!-- In dashboard.php, replace the notifications div with this: -->
+    <div class="notifications-toggle">
+        <i class="fas fa-bell"></i>
+        <span class="badge">3</span>
+    </div>
+    <div class="notifications-menu">
+        <div class="notifications-header">
+            <h4>Notifications</h4>
+            <a href="notifications.php">View All</a>
+        </div>
+        <div class="notifications-list">
+            <?php
+            // Fetch recent notifications
+            try {
+                $stmt = $pdo->query("SELECT * FROM notifications WHERE user_id = " . $_SESSION['user_id'] . " ORDER BY created_at DESC LIMIT 5");
+                $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                if (!empty($notifications)) {
+                    foreach ($notifications as $notification) {
+                        echo '<div class="notification-item ' . ($notification['is_read'] ? 'read' : 'unread') . '">';
+                        echo '<div class="notification-icon"><i class="fas fa-bell"></i></div>';
+                        echo '<div class="notification-content">';
+                        echo '<p>' . htmlspecialchars($notification['message']) . '</p>';
+                        echo '<small>' . formatDate($notification['created_at']) . '</small>';
+                        echo '</div>';
+                        echo '</div>';
+                    }
+                } else {
+                    echo '<div class="no-notifications">No new notifications</div>';
+                }
+            } catch (Exception $e) {
+                error_log("Notifications Error: " . $e->getMessage());
+                echo '<div class="no-notifications">Error loading notifications</div>';
+            }
+            ?>
+        </div>
+    </div>
+</div>
                     </div>
                     <div class="user-profile">
                         <img src="../uploads/avatars/default.jpg" alt="Profile">
