@@ -71,7 +71,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 }
 
 // Load configuration
-$feedbackConfig = json_decode(file_get_contents('../config/feedback.json'), true);
+$feedbackConfig = json_decode(file_get_contents('../assets/config/feedback.json'), true);
 ?>
 
 <!DOCTYPE html>
