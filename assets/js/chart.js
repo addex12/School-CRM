@@ -125,3 +125,24 @@ function initCharts() {
 
 // Initialize charts when DOM is loaded
 document.addEventListener('DOMContentLoaded', initCharts);
+// Example chartData object
+const chartData = {
+    userRegistrations: [
+        { date: '2023-01-01', count: 10 },
+        { date: '2023-01-02', count: 15 },
+        { date: '2023-01-03', count: 8 },
+        { date: '2023-01-04', count: 12 },
+        { date: '2023-01-05', count: 20 }
+    ],
+    surveyStatus: [
+        { label: 'Completed', count: 10 },
+        { label: 'In Progress', count: 5 },
+        { label: 'Pending', count: 3 },
+        { label: 'Cancelled', count: 2 }
+    ],
+    ticketPriority: [
+        { label: 'Low', count: 10 },
+        { label: 'Medium', count: 5 },
+        { label: 'High', count: 3 }
+    ]
+}

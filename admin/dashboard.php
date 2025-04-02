@@ -366,6 +366,9 @@ foreach ($widgets as &$widget) {
     <script>
         // Pass PHP data to JavaScript
         const chartData = <?= json_encode($chartData) ?>;
+        const activityLog = <?= json_encode($activityLog) ?>;    
+        const feedback = <?= json_encode($feedback) ?>;    
+        const tickets = <?= json_encode($tickets) ?>;   
     </script>
 </body>
 </html>
