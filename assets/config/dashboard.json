@@ -1,0 +1,61 @@
+{
+    "widgets": [
+        {
+            "title": "Total Users",
+            "icon": "fa-users",
+            "color": "blue",
+            "count_query": "SELECT COUNT(*) FROM users",
+            "link": "users.php"
+        },
+        {
+            "title": "Active Surveys",
+            "icon": "fa-poll",
+            "color": "green",
+            "count_query": "SELECT COUNT(*) FROM surveys WHERE is_active = 1",
+            "link": "surveys.php"
+        },
+        {
+            "title": "Completed Surveys",
+            "icon": "fa-check-circle",
+            "color": "teal",
+            "count_query": "SELECT COUNT(*) FROM survey_responses WHERE status = 'completed'",
+            "link": "surveys.php?filter=completed"
+        },
+        {
+            "title": "Pending Surveys",
+            "icon": "fa-clock",
+            "color": "orange",
+            "count_query": "SELECT COUNT(*) FROM survey_responses WHERE status = 'pending'",
+            "link": "surveys.php?filter=pending"
+        },
+        {
+            "title": "New This Week",
+            "icon": "fa-calendar-week",
+            "color": "purple",
+            "count_query": "SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)",
+            "link": "users.php?filter=recent"
+        },
+        {
+            "title": "Pending Actions",
+            "icon": "fa-tasks",
+            "color": "yellow",
+            "count_query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
+            "link": "tickets.php"
+        },
+        {
+            "title": "Feedback Received",
+            "icon": "fa-comments",
+            "color": "orange",
+            "count_query": "SELECT COUNT(*) FROM feedback",
+            "link": "feedback.php"
+        },
+        {
+            "title": "Open Tickets",
+            "icon": "fa-ticket-alt",
+            "color": "red",
+            "count_query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'",
+            "link": "tickets.php"
+        }
+    ]
+        
+}
