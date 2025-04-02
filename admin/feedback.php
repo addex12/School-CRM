@@ -44,16 +44,22 @@ $stmt = $pdo->prepare($countQuery);
 $stmt->execute($params);
 $totalItems = $stmt->fetchColumn();
 
-// Add sorting and pagination
+// Add sorting and pagination - fixed version
 $query .= " ORDER BY f.created_at DESC LIMIT ? OFFSET ?";
-$params[] = $itemsPerPage;
-$params[] = $offset;
+$params[] = (int)$itemsPerPage;  // Explicitly cast to integer
+$params[] = (int)$offset;        // Explicitly cast to integer
 
 // Fetch feedback
 $stmt = $pdo->prepare($query);
-$stmt->execute($params);
-$feedbackItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Bind parameters with explicit type for LIMIT/OFFSET
+foreach ($params as $key => $value) {
+    $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+    $stmt->bindValue($key + 1, $value, $paramType);
+}
+
+$stmt->execute();
+$feedbackItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Status counts for filters
 $statusCounts = [];
 $statusQuery = "SELECT status, COUNT(*) as count FROM feedback GROUP BY status";
