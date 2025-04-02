@@ -21,87 +21,117 @@ if (!isset($pdo) || !$pdo) {
     exit();
 }
 
-// Initialize variables with default values
-$widgets = [];
-$activityLog = [];
-$feedback = [];
-$tickets = [];
-$chartData = [
-    'userRegistrations' => [],
-    'surveyStatus' => [],
-    'ticketPriority' => []
-];
+// Load widgets from JSON
+$widgetsConfig = json_decode(file_get_contents('../config/dashboard.json'), true);
+$widgets = $widgetsConfig['widgets'];
 
-// Load widgets from JSON with error handling
-$widgetsConfigFile = '../assets/config/dashboard.json';
-if (file_exists($widgetsConfigFile)) {
-    $widgetsConfig = json_decode(file_get_contents($widgetsConfigFile), true);
-    
-    if (json_last_error() === JSON_ERROR_NONE && isset($widgetsConfig['widgets']) && is_array($widgetsConfig['widgets'])) {
-        $widgets = $widgetsConfig['widgets'];
-        
-        foreach ($widgets as &$widget) {
-            try {
-                if (isset($widget['count_query'])) {
-                    $stmt = $pdo->query($widget['count_query']);
-                    $widget['count'] = $stmt->fetchColumn() ?? 0;
-                } else {
-                    $widget['count'] = 0;
-                }
-            } catch (Exception $e) {
-                $widget['count'] = "Error";
-                error_log("Widget Error: " . $e->getMessage());
-            }
-        }
-    } else {
-        error_log("Invalid JSON format in dashboard.json");
+foreach ($widgets as &$widget) {
+    try {
+        $stmt = $pdo->query($widget['count_query']);
+        $widget['count'] = $stmt->fetchColumn() ?? 0;
+    } catch (Exception $e) {
+        $widget['count'] = "Error";
+        error_log("Widget Error: " . $e->getMessage());
     }
-} else {
-    error_log("Dashboard config file not found: " . $widgetsConfigFile);
 }
 
-// Fetch recent activity log with error handling
+// Fetch recent activity log
+$activityLog = [];
 try {
-    $stmt = $pdo->query("SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10");
-    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $stmt = $pdo->query("
+        SELECT al.*, u.username 
+        FROM activity_log al
+        LEFT JOIN users u ON al.user_id = u.id
+        ORDER BY al.created_at DESC 
+        LIMIT 10
+    ");
+    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Activity Log Error: " . $e->getMessage());
-    $activityLog = [];
 }
 
-// Fetch recent feedback with error handling
+// Fetch recent feedback
+$feedback = [];
 try {
-    $stmt = $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 5");
-    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $stmt = $pdo->query("
+        SELECT f.*, u.username 
+        FROM feedback f
+        LEFT JOIN users u ON f.user_id = u.id
+        ORDER BY f.created_at DESC 
+        LIMIT 5
+    ");
+    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Feedback Error: " . $e->getMessage());
-    $feedback = [];
 }
 
-// Fetch recent support tickets with error handling
+// Fetch recent support tickets
+$tickets = [];
 try {
-    $stmt = $pdo->query("SELECT * FROM support_tickets ORDER BY created_at DESC LIMIT 5");
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $stmt = $pdo->query("
+        SELECT st.*, u.username, tp.label as priority_label
+        FROM support_tickets st
+        LEFT JOIN users u ON st.user_id = u.id
+        LEFT JOIN ticket_priorities tp ON st.priority_id = tp.id
+        ORDER BY st.created_at DESC 
+        LIMIT 5
+    ");
+    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Tickets Error: " . $e->getMessage());
-    $tickets = [];
 }
 
-// Fetch data for charts with error handling
+// Fetch data for charts
+$chartData = [];
 try {
     // User registration chart data (last 7 days)
-    $stmt = $pdo->query("SELECT DATE(created_at) as date, COUNT(*) as count FROM users WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) GROUP BY DATE(created_at)");
-    $chartData['userRegistrations'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $stmt = $pdo->query("
+        SELECT DATE(created_at) as date, COUNT(*) as count 
+        FROM users 
+        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY) 
+        GROUP BY DATE(created_at)
+    ");
+    $chartData['userRegistrations'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Survey status data
-    $stmt = $pdo->query("SELECT ss.label, COUNT(s.id) as count FROM surveys s JOIN survey_statuses ss ON s.status_id = ss.id GROUP BY s.status_id");
-    $chartData['surveyStatus'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $stmt = $pdo->query("
+        SELECT ss.label, COUNT(s.id) as count 
+        FROM surveys s 
+        JOIN survey_statuses ss ON s.status_id = ss.id 
+        GROUP BY s.status_id
+    ");
+    $chartData['surveyStatus'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Ticket priority data
-    $stmt = $pdo->query("SELECT tp.label, COUNT(st.id) as count FROM support_tickets st JOIN ticket_priorities tp ON st.priority_id = tp.id GROUP BY st.priority_id");
-    $chartData['ticketPriority'] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $stmt = $pdo->query("
+        SELECT tp.label, COUNT(st.id) as count 
+        FROM support_tickets st 
+        JOIN ticket_priorities tp ON st.priority_id = tp.id 
+        GROUP BY st.priority_id
+    ");
+    $chartData['ticketPriority'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Completed vs pending surveys
+    $stmt = $pdo->query("
+        SELECT 
+            SUM(CASE WHEN status_id = (SELECT id FROM survey_statuses WHERE status = 'active') THEN 1 ELSE 0 END) as active_count,
+            SUM(CASE WHEN status_id = (SELECT id FROM survey_statuses WHERE status = 'draft') THEN 1 ELSE 0 END) as draft_count
+        FROM surveys
+    ");
+    $surveyCounts = $stmt->fetch(PDO::FETCH_ASSOC);
+    $chartData['surveyCounts'] = $surveyCounts;
+    
 } catch (Exception $e) {
     error_log("Chart Data Error: " . $e->getMessage());
+}
+
+// Add survey counts to widgets
+foreach ($widgets as &$widget) {
+    if ($widget['title'] === 'Completed Surveys') {
+        $widget['count'] = $chartData['surveyCounts']['active_count'] ?? 0;
+    } elseif ($widget['title'] === 'Pending Surveys') {
+        $widget['count'] = $chartData['surveyCounts']['draft_count'] ?? 0;
+    }
 }
 ?>
 
@@ -140,16 +170,15 @@ try {
             
             <div class="content">
                 <!-- Summary Widgets Section -->
-                <?php if (!empty($widgets)): ?>
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
-                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color'] ?? 'blue') ?>">
+                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
                             <div class="widget-icon">
-                                <i class="fas <?= htmlspecialchars($widget['icon'] ?? 'fa-question-circle') ?>"></i>
+                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
                             </div>
                             <div class="widget-content">
-                                <h3><?= htmlspecialchars($widget['count'] ?? 0) ?></h3>
-                                <p><?= htmlspecialchars($widget['title'] ?? 'Widget') ?></p>
+                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
+                                <p><?= htmlspecialchars($widget['title']) ?></p>
                             </div>
                             <div class="widget-action">
                                 <a href="<?= htmlspecialchars($widget['link'] ?? '#') ?>">View All <i class="fas fa-arrow-right"></i></a>
@@ -157,10 +186,7 @@ try {
                         </div>
                     <?php endforeach; ?>
                 </div>
-                <?php else: ?>
-                <div class="alert alert-warning">No widgets configured. Please check your dashboard.json file.</div>
-                <?php endif; ?>
-            
+
                 <!-- Charts Section -->
                 <div class="dashboard-section">
                     <div class="chart-container">
@@ -202,7 +228,7 @@ try {
                                     <?php foreach ($activityLog as $log): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($log['id']) ?></td>
-                                            <td><?= htmlspecialchars($log['user_id']) ?></td>
+                                            <td><?= htmlspecialchars($log['username'] ?? 'System') ?></td>
                                             <td><span class="badge badge-activity"><?= htmlspecialchars($log['activity_type']) ?></span></td>
                                             <td><?= htmlspecialchars($log['description']) ?></td>
                                             <td><?= htmlspecialchars($log['ip_address']) ?></td>
@@ -234,6 +260,7 @@ try {
                                         <th>User</th>
                                         <th>Subject</th>
                                         <th>Rating</th>
+                                        <th>Status</th>
                                         <th>Date</th>
                                     </tr>
                                 </thead>
@@ -241,7 +268,7 @@ try {
                                     <?php if (!empty($feedback)): ?>
                                         <?php foreach ($feedback as $item): ?>
                                             <tr>
-                                                <td><?= htmlspecialchars($item['user_id']) ?></td>
+                                                <td><?= htmlspecialchars($item['username'] ?? 'Anonymous') ?></td>
                                                 <td><?= htmlspecialchars($item['subject']) ?></td>
                                                 <td>
                                                     <div class="rating-stars">
@@ -250,12 +277,13 @@ try {
                                                         <?php endfor; ?>
                                                     </div>
                                                 </td>
+                                                <td><span class="badge badge-<?= str_replace('_', '-', $item['status']) ?>"><?= ucwords(str_replace('_', ' ', $item['status'])) ?></span></td>
                                                 <td><?= formatDate(htmlspecialchars($item['created_at'])) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="4" class="no-data">No feedback found.</td>
+                                            <td colspan="5" class="no-data">No feedback found.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -276,6 +304,7 @@ try {
                                         <th>Ticket #</th>
                                         <th>User</th>
                                         <th>Subject</th>
+                                        <th>Priority</th>
                                         <th>Status</th>
                                         <th>Date</th>
                                     </tr>
@@ -285,15 +314,16 @@ try {
                                         <?php foreach ($tickets as $ticket): ?>
                                             <tr>
                                                 <td><?= htmlspecialchars($ticket['ticket_number']) ?></td>
-                                                <td><?= htmlspecialchars($ticket['user_id']) ?></td>
+                                                <td><?= htmlspecialchars($ticket['username']) ?></td>
                                                 <td><?= htmlspecialchars($ticket['subject']) ?></td>
+                                                <td><span class="badge badge-priority"><?= htmlspecialchars($ticket['priority_label']) ?></span></td>
                                                 <td><span class="badge badge-<?= str_replace('_', '-', $ticket['status']) ?>"><?= ucwords(str_replace('_', ' ', $ticket['status'])) ?></span></td>
                                                 <td><?= formatDate(htmlspecialchars($ticket['created_at'])) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="5" class="no-data">No tickets found.</td>
+                                            <td colspan="6" class="no-data">No tickets found.</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
@@ -308,10 +338,6 @@ try {
     <script>
         // Pass PHP data to JavaScript
         const chartData = <?= json_encode($chartData) ?>;
-        const userRegistrations = chartData.userRegistrations.map(item => ({
-            date: item.date,
-            count: item.count
-        }));
-</script>
+    </script>
 </body>
 </html>
