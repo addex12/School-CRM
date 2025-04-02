@@ -186,9 +186,8 @@ foreach ($widgets as &$widget) {
                     <p class="welcome-message">Welcome back, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin') ?></p>
                 </div>
                 <div class="header-right">
-                    <div class="notifications">
-                        <i class="fas fa-bell"></i>
-<!-- In dashboard.php, replace the notifications div with this: -->
+ <!-- In dashboard.php, replace the notifications div with this: -->
+<div class="notifications-dropdown">
     <div class="notifications-toggle">
         <i class="fas fa-bell"></i>
         <span class="badge">3</span>
@@ -226,11 +225,6 @@ foreach ($widgets as &$widget) {
         </div>
     </div>
 </div>
-                    </div>
-                    <div class="user-profile">
-                        <img src="../uploads/avatars/default.jpg" alt="Profile">
-                    </div>
-                </div>
             </header>
             
             <div class="content">
