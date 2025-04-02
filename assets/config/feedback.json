@@ -1,0 +1,27 @@
+{
+    "status_options": {
+        "open": "Open",
+        "in_progress": "In Progress",
+        "resolved": "Resolved",
+        "archived": "Archived"
+    },
+    "export_options": {
+        "csv": {
+            "include_columns": ["id", "user_id", "username", "subject", "rating", "status", "created_at"],
+            "filename_prefix": "feedback_export_"
+        },
+        "pdf": {
+            "title": "Feedback Report",
+            "columns": [
+                {"title": "ID", "dataKey": "id"},
+                {"title": "User", "dataKey": "username"},
+                {"title": "Subject", "dataKey": "subject"},
+                {"title": "Rating", "dataKey": "rating"},
+                {"title": "Status", "dataKey": "status"},
+                {"title": "Date", "dataKey": "created_at"}
+            ],
+            "filename_prefix": "feedback_report_"
+        }
+    },
+    "default_notes": "No admin notes available"
+}
