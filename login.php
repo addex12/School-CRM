@@ -8,13 +8,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Define root path if not defined
-defined('ROOT_PATH') or define('ROOT_PATH', dirname(__DIR__));
 
 // Check if required files exist before including
 $required_files = [
-    ROOT_PATH . '/includes/db.php',
-    ROOT_PATH . '/includes/functions.php'
+    require_once 'includes/db.php',
+    require_once 'includes/functions.php'
 ];
 
 foreach ($required_files as $file) {
@@ -24,8 +22,8 @@ foreach ($required_files as $file) {
 }
 
 // Include required files
-require_once ROOT_PATH . '/includes/db.php';
-require_once ROOT_PATH . '/includes/functions.php';
+require_once 'includes/db.php';
+require_once  'includes/functions.php';
 
 // Initialize variables
 $error = '';
