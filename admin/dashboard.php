@@ -85,18 +85,28 @@ try {
 // Fetch recent support tickets
 $tickets = [];
 try {
-    $stmt = $pdo->query("
-        SELECT st.*, u.username, tp.label as priority_label
-        FROM support_tickets st
-        LEFT JOIN users u ON st.user_id = u.id
-        LEFT JOIN ticket_priorities tp ON st.priority_id = tp.id
-        ORDER BY st.created_at DESC 
-        LIMIT 5
-    ");
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $tableExists = $pdo->query("SHOW TABLES LIKE 'support_tickets'")->rowCount() > 0;
+    
+    if ($tableExists) {
+        $stmt = $pdo->query("
+            SELECT 
+                st.*, 
+                COALESCE(u.username, 'Unknown') as username,
+                COALESCE(tp.label, 'Medium') as priority_label
+            FROM support_tickets st
+            LEFT JOIN users u ON st.user_id = u.id
+            LEFT JOIN ticket_priorities tp ON st.priority_id = tp.id
+            ORDER BY st.created_at DESC 
+            LIMIT 5
+        ");
+        $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+        error_log("Support Tickets table doesn't exist");
+        $tickets = [['error' => 'Table not available']];
+    }
 } catch (Exception $e) {
     error_log("Tickets Error: " . $e->getMessage());
-    $tickets = []; // Ensure empty array on error
+    $tickets = [['error' => 'Failed to load data']];
 }
 
 // Fetch data for charts
