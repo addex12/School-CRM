@@ -116,7 +116,7 @@ $ui_config = json_decode(file_get_contents(__DIR__ . '/assets/config/ui.json'), 
                         <input type="checkbox" name="remember" id="remember">
                         <span>Remember me</span>
                     </label>
-                    <a href="/forgot-password.php" class="forgot-password">Forgot password?</a>
+                    <a href="/forgot_password.php" class="forgot-password">Forgot password?</a>
                 </div>
                 
                 <button type="submit" class="login-button">

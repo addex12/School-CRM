@@ -6,35 +6,43 @@ require_once 'includes/functions.php';
 $error = '';
 $success = '';
 
+function sendResetPasswordEmail($email, $resetToken) {
+    $resetLink = "https://crm.flipperschool.com/reset_password.php?token=" . urlencode($resetToken);
+    $subject = "Password Reset Request";
+    $message = "Hello,\n\nWe received a request to reset your password. Click the link below to reset it:\n\n" . $resetLink . "\n\nIf you did not request this, please ignore this email.";
+    $headers = "From: no-reply@yourdomain.com\r\n";
+    $headers .= "Reply-To: no-reply@yourdomain.com\r\n";
+    $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+
+    return mail($email, $subject, $message, $headers);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
     $email = trim($_POST['email']);
 
-    // Check if the email exists in the database
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
+    try {
+        // Check if the email exists in the database
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
 
-    if ($user) {
-        // Generate a reset token
-        $resetToken = bin2hex(random_bytes(16));
-        $stmt = $pdo->prepare("UPDATE users SET reset_token = ?, reset_token_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email = ?");
-        $stmt->execute([$resetToken, $email]);
-        function sendResetPasswordEmail($email, $resetToken) {
-            $resetLink = "https://crm.flipperschool.com/reset_password.php?token=" . urlencode($resetToken);
-            $subject = "Password Reset Request";
-            $message = "Hello,\n\nWe received a request to reset your password. Click the link below to reset it:\n\n" . $resetLink . "\n\nIf you did not request this, please ignore this email.";
-            $headers = "From: no-reply@yourdomain.com";
-        
-            return mail($email, $subject, $message, $headers);
-        }
-        // Send the reset email
-        if (sendResetPasswordEmail($email, $resetToken)) {
-            $success = "A password reset email has been sent to your email address.";
+        if ($user) {
+            // Generate a reset token
+            $resetToken = bin2hex(random_bytes(16));
+            $stmt = $pdo->prepare("UPDATE users SET reset_token = ?, reset_token_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email = ?");
+            $stmt->execute([$resetToken, $email]);
+
+            // Send the reset email
+            if (sendResetPasswordEmail($email, $resetToken)) {
+                $success = "A password reset email has been sent to your email address.";
+            } else {
+                $error = "Failed to send the reset email. Please try again later.";
+            }
         } else {
-            $error = "Failed to send the reset email. Please try again later.";
+            $error = "No account found with that email address.";
         }
-    } else {
-        $error = "No account found with that email address.";
+    } catch (Exception $e) {
+        $error = "An error occurred. Please try again later.";
     }
 }
 ?>
