@@ -5,7 +5,8 @@ requireLogin();
 
 // Handle chat message submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    $message = filter_input(INPUT_POST, 'message', FILTER_UNSAFE_RAW);
+    $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
     $thread_id = filter_input(INPUT_POST, 'thread_id', FILTER_VALIDATE_INT);
 
     if ($thread_id && $message) {
