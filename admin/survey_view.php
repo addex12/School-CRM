@@ -290,7 +290,7 @@ if ($survey['is_active'] == 0) {
                                             <strong>Options:</strong>
                                             <?php 
                                             $options = $field['field_options'] ? json_decode($field['field_options'], true) : [];
-                                            echo htmlspecialchars(implode(', ', $options));
+                                            echo is_array($options) ? htmlspecialchars(implode(', ', $options)) : 'Invalid options';
                                             ?>
                                         </div>
                                     <?php endif; ?>
