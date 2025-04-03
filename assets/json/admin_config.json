@@ -1,0 +1,9 @@
+{
+    "title": "Admin Dashboard",
+    "widgets": ["User Management", "System Settings", "Audit Logs"],
+    "links": [
+        {"label": "Manage Users", "url": "/admin/users.php"},
+        {"label": "System Settings", "url": "/admin/settings.php"},
+        {"label": "View Audit Logs", "url": "/admin/audit_log.php"}
+    ]
+}

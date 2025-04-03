@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['dashboard_path'] = validate_dashboard_path($user['dashboard_path']);
+            $_SESSION['dashboard_path'] = validate_dashboard_path($user['dashboard_path']); // Validate path
 
             // Update last login
             $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")

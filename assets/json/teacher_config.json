@@ -1,0 +1,9 @@
+{
+    "title": "Teacher Dashboard",
+    "widgets": ["Classroom Management", "Schedule", "Assignments"],
+    "links": [
+        {"label": "View Schedule", "url": "/user/schedule.php"},
+        {"label": "Manage Classrooms", "url": "/user/classroom.php"},
+        {"label": "Assignments", "url": "/user/assignments.php"}
+    ]
+}

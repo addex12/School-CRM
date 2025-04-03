@@ -1,0 +1,9 @@
+{
+    "title": "Parent Dashboard",
+    "widgets": ["Child Performance", "Attendance Records", "Feedback"],
+    "links": [
+        {"label": "View Child Performance", "url": "/user/child_performance.php"},
+        {"label": "Attendance Records", "url": "/user/attendance.php"},
+        {"label": "Provide Feedback", "url": "/user/feedback.php"}
+    ]
+}

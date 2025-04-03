@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    console.log("Admin dashboard loaded.");
 $(document).ready(function() {
     // Sidebar Toggle Functionality
     $('#sidebarToggle').click(function() {

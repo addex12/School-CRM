@@ -1,0 +1,8 @@
+{
+    "title": "User Dashboard",
+    "widgets": ["Welcome", "General Information"],
+    "links": [
+        {"label": "Profile", "url": "/user/profile.php"},
+        {"label": "Contact Support", "url": "/user/contact.php"}
+    ]
+}
