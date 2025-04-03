@@ -190,7 +190,18 @@ foreach ($widgets as &$widget) {
 <div class="notifications-dropdown">
     <div class="notifications-toggle">
         <i class="fas fa-bell"></i>
-        <span class="badge">3</span>
+        <span class="badge">
+            <?php
+            try {
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = 0");
+                $stmt->execute([':user_id' => $_SESSION['user_id']]);
+                echo $stmt->fetchColumn();
+            } catch (Exception $e) {
+                error_log("Notification Count Error: " . $e->getMessage());
+                echo 0;
+            }
+            ?>
+        </span>
     </div>
     <div class="notifications-menu">
         <div class="notifications-header">
