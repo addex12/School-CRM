@@ -1,6 +1,8 @@
 <?php
 /**
  * View Support Ticket
+ * This page is specifically for viewing the details of a single ticket.
+ * It is not intended for browsing or listing multiple tickets.
  */
 require_once '../includes/auth.php';
 requireAdmin();
