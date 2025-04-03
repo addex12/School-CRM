@@ -2,7 +2,9 @@
 session_start();
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/functions.php';
-
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Pragma: no-cache");
+header("Expires: 0");
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
     header("Location: " . ($_SESSION['role'] === 'admin' ? '/admin/dashboard.php' : '/user/dashboard.php'));
