@@ -69,6 +69,25 @@ if (isset($_GET['thread_id'])) {
         error_log("Active thread error: " . $e->getMessage());
     }
 }
+
+// Handle admin message submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'], $_POST['thread_id'])) {
+    $message = filter_input(INPUT_POST, 'message', FILTER_UNSAFE_RAW);
+    $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
+    $thread_id = filter_input(INPUT_POST, 'thread_id', FILTER_VALIDATE_INT);
+
+    if ($thread_id && $message) {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO chat_messages (thread_id, user_id, message, is_admin) VALUES (?, ?, ?, 1)");
+            $stmt->execute([$thread_id, $_SESSION['user_id'], $message]);
+            $success = "Message sent successfully!";
+        } catch (PDOException $e) {
+            $error = "Error sending message: " . $e->getMessage();
+        }
+    } else {
+        $error = "Invalid thread or message.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -211,20 +230,12 @@ if (isset($_GET['thread_id'])) {
                             </div>
                             
                             <div class="chat-input">
-                                <form id="chat-form">
-                                    <input type="hidden" name="thread_id" value="<?= $activeThread['id'] ?>">
+                                <form method="POST">
+                                    <input type="hidden" name="thread_id" value="<?= $activeThread['id'] ?? '' ?>">
                                     <div class="message-input">
-                                        <textarea name="message" placeholder="Type your message here..." rows="1"></textarea>
+                                        <textarea name="message" placeholder="Type your message here..." rows="1" required></textarea>
                                         <button type="submit" class="btn-send">
                                             <i class="fas fa-paper-plane"></i>
-                                        </button>
-                                    </div>
-                                    <div class="input-actions">
-                                        <button type="button" class="btn-input-action" title="Attach File">
-                                            <i class="fas fa-paperclip"></i>
-                                        </button>
-                                        <button type="button" class="btn-input-action" title="Insert Quick Response">
-                                            <i class="fas fa-comment-dots"></i>
                                         </button>
                                     </div>
                                 </form>

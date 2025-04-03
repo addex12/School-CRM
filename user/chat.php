@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($thread_id && $message) {
         try {
-            $stmt = $pdo->prepare("INSERT INTO chat_messages (user_id, thread_id, message) VALUES (?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO chat_messages (user_id, thread_id, message, is_admin) VALUES (?, ?, ?, 0)");
             $stmt->execute([$_SESSION['user_id'], $thread_id, $message]);
             $success = "Message sent successfully!";
         } catch (PDOException $e) {
