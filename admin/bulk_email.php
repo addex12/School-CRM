@@ -30,84 +30,88 @@ try {
 } catch (Exception $e) {
     error_log("Template fetch error: " . $e->getMessage());
 }
-
-// Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate CSRF token (should be implemented)
     
-    $recipients = [];
     $subject = trim($_POST['subject']);
     $message = trim($_POST['message']);
     $template_id = $_POST['template_id'] ?? null;
     $send_to = $_POST['send_to'] ?? 'selected';
+    $role_id = $_POST['role_id'] ?? null;
     
-    // Get recipients based on selection method
-    if ($send_to === 'selected') {
-        // Process imported CSV file
-        if (isset($_FILES['recipients_file']) && $_FILES['recipients_file']['error'] === UPLOAD_ERR_OK) {
-            $file = $_FILES['recipients_file']['tmp_name'];
-            $recipients = processRecipientsFile($file);
-        } else {
-            $_SESSION['error'] = "Please upload a valid recipients file.";
-        }
-    } elseif ($send_to === 'role') {
-        $role_id = $_POST['role_id'];
-        $recipients = getUsersByRole($pdo, $role_id);
-    } elseif ($send_to === 'all') {
-        $recipients = getAllUsers($pdo);
+    // Validate inputs
+    if (empty($subject) || empty($message)) {
+        $_SESSION['error'] = "Subject and message are required";
+        header("Location: bulk_email.php");
+        exit();
     }
     
-    // If we have recipients and message content, send emails
-    if (!empty($recipients) && !empty($subject) && !empty($message)) {
-        $successCount = 0;
-        $errorCount = 0;
-        $errorRecipients = [];
+    try {
+        // Start transaction
+        $pdo->beginTransaction();
+        
+        // Create bulk email log
+        $stmt = $pdo->prepare("INSERT INTO bulk_email_logs 
+                              (user_id, subject, total_recipients, success_count, error_count, 
+                               template_id, send_method, send_to_role)
+                              VALUES (?, ?, 0, 0, 0, ?, ?, ?)");
+        $stmt->execute([
+            $_SESSION['user_id'],
+            $subject,
+            $template_id,
+            $send_to,
+            $send_to === 'role' ? $role_id : null
+        ]);
+        $bulk_email_id = $pdo->lastInsertId();
+        
+        // Get recipients based on selection method
+        $recipients = [];
+        if ($send_to === 'selected') {
+            if (isset($_FILES['recipients_file']) && $_FILES['recipients_file']['error'] === UPLOAD_ERR_OK) {
+                $recipients = processRecipientsFile($_FILES['recipients_file']['tmp_name']);
+            }
+        } elseif ($send_to === 'role') {
+            $recipients = getUsersByRole($pdo, $role_id);
+        } elseif ($send_to === 'all') {
+            $recipients = getAllUsers($pdo);
+        }
+        
+        // Add recipients to queue
+        $recipientCount = 0;
+        $stmt = $pdo->prepare("INSERT INTO bulk_email_recipients 
+                              (bulk_email_id, email, status)
+                              VALUES (?, ?, 'pending')");
         
         foreach ($recipients as $recipient) {
             $email = $recipient['email'];
-            $name = $recipient['name'] ?? $recipient['username'] ?? 'User';
-            
-            // Personalize message
-            $personalizedMessage = personalizeMessage($message, $recipient);
-            
-            try {
-                if (sendEmail($email, $subject, $personalizedMessage)) {
-                    $successCount++;
-                } else {
-                    $errorCount++;
-                    $errorRecipients[] = $email;
-                }
-            } catch (Exception $e) {
-                error_log("Email send error for $email: " . $e->getMessage());
-                $errorCount++;
-                $errorRecipients[] = $email;
+            if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $stmt->execute([$bulk_email_id, $email]);
+                $recipientCount++;
             }
         }
         
-        // Store results in session
-        $_SESSION['bulk_email_result'] = [
-            'success' => $successCount,
-            'errors' => $errorCount,
-            'error_recipients' => $errorRecipients,
-            'subject' => $subject
-        ];
+        // Update total recipients count
+        $pdo->prepare("UPDATE bulk_email_logs SET total_recipients = ? WHERE id = ?")
+            ->execute([$recipientCount, $bulk_email_id]);
         
-        // Redirect to prevent form resubmission
-        header("Location: bulk_email.php?success=1");
+        $pdo->commit();
+        
+        // Store message content (simplified - in practice you might store this differently)
+        file_put_contents("../bulk_emails/{$bulk_email_id}.txt", $message);
+        
+        // Redirect to results page
+        $_SESSION['bulk_email_id'] = $bulk_email_id;
+        header("Location: bulk_email_results.php");
         exit();
-    } else {
-        $_SESSION['error'] = "Please provide all required information.";
+        
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log("Bulk email error: " . $e->getMessage());
+        $_SESSION['error'] = "Failed to initiate bulk email. Please try again.";
+        header("Location: bulk_email.php");
+        exit();
     }
-}
-
-// Get roles for role-based sending
-$roles = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM roles");
-    $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Roles fetch error: " . $e->getMessage());
-}
+} 
 ?>
 
 <!DOCTYPE html>
