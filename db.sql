@@ -111,24 +111,6 @@ INSERT INTO `activity_log` (`id`, `user_id`, `activity_type`, `description`, `ip
 -- --------------------------------------------------------
 
 --
--- Table structure for table `attendance`
---
-
-CREATE TABLE `attendance` (
-  `id` int(11) NOT NULL,
-  `employee_id` int(11) NOT NULL,
-  `date` date NOT NULL,
-  `check_in` time DEFAULT NULL,
-  `check_out` time DEFAULT NULL,
-  `hours_worked` decimal(5,2) DEFAULT NULL,
-  `status` enum('present','absent','late','leave') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `audit_logs`
 --
 
@@ -1244,7 +1226,7 @@ ALTER TABLE `users`
 -- Constraints for table `activity_log`
 --
 ALTER TABLE `activity_log`
-  ADD CONSTRAINT `fk_activitylog_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_activitylog_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `attendance`
@@ -1415,6 +1397,36 @@ ALTER TABLE `ticket_replies`
 ALTER TABLE `users`
   ADD CONSTRAINT `fk_user_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
 COMMIT;
+
+-- Remove tables related to employees, attendance, payrolls, surveys, and other roles.
+DROP TABLE IF EXISTS `attendance`, `audit_logs`, `bulk_email_logs`, `bulk_email_recipients`, 
+`chat_messages`, `chat_status`, `chat_threads`, `contact_requests`, `contact_responses`, 
+`departments`, `email_templates`, `employees`, `feedback`, `messages`, `payrolls`, 
+`payroll_items`, `positions`, `response_data`, `salary_structures`, `support_tickets`, 
+`survey_categories`, `survey_fields`, `survey_responses`, `survey_roles`, `survey_statuses`, 
+`surveys`, `ticket_priorities`, `ticket_replies`;
+
+-- Modify the `roles` table to include only Admin and Parent roles.
+DELETE FROM `roles` WHERE `role_name` NOT IN ('admin', 'parent');
+
+-- Modify the `users` table to ensure only Admin and Parent users exist.
+DELETE FROM `users` WHERE `role_id` NOT IN (SELECT `id` FROM `roles`);
+
+-- Remove foreign key constraints and columns referencing removed tables.
+ALTER TABLE `activity_log` DROP FOREIGN KEY `fk_activitylog_user`;
+ALTER TABLE `activity_log` ADD CONSTRAINT `fk_activitylog_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+-- Remove unused settings from `system_settings`.
+DELETE FROM `system_settings` WHERE `setting_key` IN ('smtp_provider', 'smtp_host', 'smtp_port', 'smtp_username', 'smtp_password', 'smtp_secure');
+
+-- Remove unused templates.
+DELETE FROM `templates`;
+
+-- Update the `roles` table to reflect only Admin and Parent roles.
+UPDATE `roles` SET `description` = 'System Administrator with full access' WHERE `role_name` = 'admin';
+UPDATE `roles` SET `description` = 'Parent with limited access' WHERE `role_name` = 'parent';
+
+-- Remove unnecessary indexes and constraints from the database;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
