@@ -11,31 +11,37 @@ use Ratchet\WebSocket\WsServer;
 class Chat implements MessageComponentInterface {
     protected $clients;
     protected $userConnections;
+    protected $adminConnections;
 
     public function __construct() {
         $this->clients = new \SplObjectStorage;
         $this->userConnections = [];
+        $this->adminConnections = [];
     }
 
     public function onOpen(ConnectionInterface $conn) {
         $this->clients->attach($conn);
         parse_str($conn->httpRequest->getUri()->getQuery(), $query);
         
-        if (isset($query['user_id'])) {
+        if (isset($query['user_id']) && isset($query['role'])) {
             $userId = (int)$query['user_id'];
-            $this->userConnections[$userId] = $conn;
+            $role = $query['role'];
             
-            // Update online status
-            $stmt = $GLOBALS['pdo']->prepare("UPDATE chat_status SET is_online = 1 WHERE user_id = ?");
-            $stmt->execute([$userId]);
+            if ($role === 'admin') {
+                $this->adminConnections[$userId] = $conn;
+            } else {
+                $this->userConnections[$userId] = $conn;
+                $stmt = $GLOBALS['pdo']->prepare("UPDATE chat_status SET is_online = 1, last_active = NOW() WHERE user_id = ?");
+                $stmt->execute([$userId]);
+            }
         }
     }
 
     public function onMessage(ConnectionInterface $from, $msg) {
         $data = json_decode($msg, true);
         
-        // Broadcast message to relevant parties
         if ($data['type'] === 'message') {
+            // Save message to database
             $stmt = $GLOBALS['pdo']->prepare("INSERT INTO chat_messages 
                 (thread_id, user_id, message, is_admin, created_at)
                 VALUES (?, ?, ?, ?, NOW())");
@@ -46,10 +52,16 @@ class Chat implements MessageComponentInterface {
                 $data['is_admin']
             ]);
 
-            // Notify all admins and the recipient
-            foreach ($this->userConnections as $userId => $client) {
-                if ($userId == $data['recipient_id'] || $_SESSION['role'] === 'admin') {
-                    $client->send(json_encode($data));
+            // Notify recipients
+            if ($data['is_admin']) {
+                // Admin message to user
+                if (isset($this->userConnections[$data['recipient_id']])) {
+                    $this->userConnections[$data['recipient_id']]->send(json_encode($data));
+                }
+            } else {
+                // User message to all admins
+                foreach ($this->adminConnections as $adminConn) {
+                    $adminConn->send(json_encode($data));
                 }
             }
         }
@@ -57,13 +69,16 @@ class Chat implements MessageComponentInterface {
 
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
-        foreach ($this->userConnections as $userId => $client) {
-            if ($client === $conn) {
-                $stmt = $GLOBALS['pdo']->prepare("UPDATE chat_status SET is_online = 0 WHERE user_id = ?");
-                $stmt->execute([$userId]);
-                unset($this->userConnections[$userId]);
-                break;
-            }
+        
+        // Remove from connections
+        if (($userId = array_search($conn, $this->userConnections)) !== false) {
+            unset($this->userConnections[$userId]);
+            $stmt = $GLOBALS['pdo']->prepare("UPDATE chat_status SET is_online = 0 WHERE user_id = ?");
+            $stmt->execute([$userId]);
+        }
+        
+        if (($adminId = array_search($conn, $this->adminConnections)) !== false) {
+            unset($this->adminConnections[$adminId]);
         }
     }
 
