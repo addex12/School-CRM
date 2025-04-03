@@ -72,16 +72,19 @@ $totalItems = $stmt->fetchColumn();
 $totalPages = ceil($totalItems / $itemsPerPage);
 
 // Get paginated results
+// Get paginated results - convert limit/offset to integers
 $query .= " LIMIT ? OFFSET ?";
-$params[] = $itemsPerPage;
-$params[] = $offset;
+$params[] = (int)$itemsPerPage;
+$params[] = (int)$offset;
 
+// Prepare and execute with proper parameter types
 $stmt = $pdo->prepare($query);
-$stmt->execute($params);
+foreach ($params as $key => $value) {
+    $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+    $stmt->bindValue($key + 1, $value, $paramType);
+}
+$stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Get notification types for filter dropdown
-$types = $pdo->query("SELECT DISTINCT notification_type FROM notifications")->fetchAll(PDO::FETCH_COLUMN);
 ?>
 
 <!DOCTYPE html>
