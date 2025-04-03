@@ -520,3 +520,56 @@ function sanitizeFilename($filename) {
     $filename = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $filename);
     return substr($filename, 0, 50);
 }
+
+function fetchAllUsers($pdo) {
+    try {
+        $stmt = $pdo->query("SELECT * FROM users");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error fetching all users: " . $e->getMessage());
+        return [];
+    }
+}
+function personalizeMessage($message, $recipient) {
+    $placeholders = [
+        '{name}' => $recipient['name'] ?? 'User',
+        '{email}' => $recipient['email'] ?? '',
+        '{username}' => $recipient['username'] ?? ''
+    ];
+    return strtr($message, $placeholders);
+}
+function processRecipientsFile($filePath) {
+    $recipients = [];
+    if (($handle = fopen($filePath, 'r')) !== false) {
+        while (($data = fgetcsv($handle, 1000, ',')) !== false) {
+            if (filter_var($data[0], FILTER_VALIDATE_EMAIL)) {
+                $recipients[] = [
+                    'email' => $data[0],
+                    'name' => $data[1] ?? null,
+                ];
+            }
+        }
+        fclose($handle);
+    }
+    return $recipients;
+}
+function getUsersByRole(PDO $pdo, int $role_id): array {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE role_id = :role_id");
+        $stmt->bindParam(':role_id', $role_id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error fetching users by role: " . $e->getMessage());
+        return [];
+    }
+}
+function getAllUsers(PDO $pdo) {
+    try {
+        $stmt = $pdo->query("SELECT id, email, name, username FROM users");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error fetching all users: " . $e->getMessage());
+        return [];
+    }
+}
