@@ -372,8 +372,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <?php if (in_array($field['field_type'], ['radio', 'checkbox', 'select', 'rating'])): ?>
                                                 <div class="form-group options-group">
                                                     <label>Options (one per line) *</label>
-                                                    <textarea name="fields[<?= $index ?>][options]" rows="4"><?= 
-                                                        $field['field_options'] ? implode("\n", json_decode($field['field_options'], true)) : '' 
+                                                    <textarea name="fields[<?= $index ?>][options]" rows="4"><?php
+                                                        $options = $field['field_options'] ? json_decode($field['field_options'], true) : [];
+                                                        echo is_array($options) ? implode("\n", $options) : 'Invalid options';
                                                     ?></textarea>
                                                 </div>
                                             <?php endif; ?>
