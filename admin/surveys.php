@@ -165,7 +165,7 @@ $statuses = $pdo->query("SELECT * FROM survey_statuses")->fetchAll(PDO::FETCH_AS
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h2><i class="fas fa-poll"></i> Survey List</h2>
-                        <a href="survey_create.php" class="btn btn-primary">
+                        <a href="survey-builder.php" class="btn btn-primary">
                             <i class="fas fa-plus"></i> Create Survey
                         </a>
                     </div>
@@ -274,7 +274,7 @@ $statuses = $pdo->query("SELECT * FROM survey_statuses")->fetchAll(PDO::FETCH_AS
                                         <i class="fas fa-undo"></i> Reset Filters
                                     </a>
                                 <?php endif; ?>
-                                <a href="survey_create.php" class="btn btn-primary">
+                                <a href="survey_builder.php" class="btn btn-primary">
                                     <i class="fas fa-plus"></i> Create New Survey
                                 </a>
                             </div>
