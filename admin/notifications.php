@@ -83,7 +83,7 @@ foreach ($params as $key => $value) {
     $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
     $stmt->bindValue($key + 1, $value, $paramType);
 }
-$stmt->execute($params);
+$stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
