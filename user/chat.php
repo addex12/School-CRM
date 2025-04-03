@@ -62,7 +62,7 @@ if (!$thread) {
     <script>
         const userId = <?= $_SESSION['user_id'] ?>;
         const threadId = <?= $thread_id ?>;
-        const ws = new WebSocket('ws://your-domain:8080?user_id=' + userId);
+        const ws = new WebSocket('ws://crm.flipperschool?user_id=' + userId);
 
         ws.onopen = () => {
             $('#connection-status').text('Online').addClass('connected');
