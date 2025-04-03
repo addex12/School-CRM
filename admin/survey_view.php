@@ -92,10 +92,10 @@ try {
 }
 
 // Format dates for display
-$survey['starts_at'] = formatDate($survey['starts_at']);
-$survey['ends_at'] = formatDate($survey['ends_at']);
-$survey['created_at'] = formatDate($survey['created_at']);
-$survey['updated_at'] = formatDate($survey['updated_at']);
+$survey['starts_at'] = !empty($survey['starts_at']) ? formatDate($survey['starts_at'], 'Y-m-d H:i:s') : null;
+$survey['ends_at'] = !empty($survey['ends_at']) ? formatDate($survey['ends_at'], 'Y-m-d H:i:s') : null;
+$survey['created_at'] = !empty($survey['created_at']) ? formatDate($survey['created_at'], 'Y-m-d H:i:s') : null;
+$survey['updated_at'] = !empty($survey['updated_at']) ? formatDate($survey['updated_at'], 'Y-m-d H:i:s') : null;
 
 // Determine survey status
 $now = new DateTime();
@@ -173,7 +173,7 @@ if ($survey['is_active'] == 0) {
                             </div>
                             <div class="summary-row">
                                 <span class="summary-label">Category:</span>
-                                <span class="summary-value"><?= htmlspecialchars($survey['category_name'] ?: 'Uncategorized') ?></span>
+                                <span class="summary-value"><?= htmlspecialchars($survey['category_name'] ?: 'Not Categorized') ?></span>
                             </div>
                             <div class="summary-row">
                                 <span class="summary-label">Status:</span>
@@ -325,7 +325,7 @@ if ($survey['is_active'] == 0) {
                                             <tr>
                                                 <td><?= $response['id'] ?></td>
                                                 <td><?= $response['username'] ? htmlspecialchars($response['username']) : ($survey['is_anonymous'] ? 'Anonymous' : 'N/A') ?></td>
-                                                <td><?= formatDate($response['submitted_at']) ?></td>
+                                                <td><?= formatDate($response['submitted_at'], 'Y-m-d H:i:s') ?></td>
                                                 <td><?= htmlspecialchars($response['ip_address']) ?></td>
                                                 <td>
                                                     <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-view">
