@@ -86,18 +86,17 @@ function redirectWithMessage($url, $message, $type = 'success') {
 /**
  * Format date for display
  */
-function formatDate($dateString, $date, $format = 'M j, Y g:i A') {
-    return date($format, strtotime($date));
+function formatDate($dateString, $format = 'M j, Y g:i A') {
+    if (empty($dateString) || $dateString === '0000-00-00 00:00:00') {
+        return 'N/A';
+    }
+    $date = new DateTime($dateString);
+    return $date->format($format);
 }
+
 if (!defined('DATETIMEFORMAT')) {
     define('DATETIMEFORMAT', 'Y-m-d H:i:s'); // Default datetime format
 }
-if (empty($dateString) || $dateString === '0000-00-00 00:00:00') {
-    return 'N/A';
-}
-$date = new DateTime($dateString);
-return $date->format('M j, Y g:i a');
-
 
 function formatNumber($number, $decimals = 2) {
     return number_format($number, $decimals);
