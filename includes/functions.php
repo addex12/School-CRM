@@ -97,7 +97,7 @@ if (empty($dateString) || $dateString === '0000-00-00 00:00:00') {
 }
 $date = new DateTime($dateString);
 return $date->format('M j, Y g:i a');
-}
+
 
 function formatNumber($number, $decimals = 2) {
     return number_format($number, $decimals);
