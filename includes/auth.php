@@ -1,99 +1,46 @@
 <?php
-session_start(); // Ensure session is started
+session_start();
+require 'db_connect.php'; // Database connection file
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => $_SERVER['HTTP_HOST'],
-        'secure' => isset($_SERVER['HTTPS']),
-        'httponly' => false,
-        'samesite' => 'Strict'
-    ]);
-}
-
-// Debugging: Log session data
-error_log("Session Data: " . json_encode($_SESSION));
-error_log("Session ID: " . session_id());
-
-if (!function_exists('isLoggedIn')) {
-    function isLoggedIn(): bool {
-        return isset($_SESSION['user_id']);
-    }
-}
-
-if (!function_exists('requireLogin')) {
-    function requireLogin() {
-        if (!isset($_SESSION['user_id'])) {
-            header("Location: /login.php");
-            exit();
-        }
-    }
-}
-
-if (!function_exists('getCurrentUser')) {
-    function getCurrentUser(): ?array {
-        global $pdo;
-        if (!isLoggedIn()) {
-            return null;
-        }
-        try {
-            $stmt = $pdo->prepare("SELECT u.id, u.username, u.email, r.role_name 
-                                 FROM users u 
-                                 JOIN roles r ON u.role_id = r.id 
-                                 WHERE u.id = ?");
-            $stmt->execute([$_SESSION['user_id']]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            error_log("Database error in getCurrentUser: " . $e->getMessage());
-            return null;
-        }
-    }
-}
-
-if (!function_exists('requireAdmin')) {
-    function requireAdmin() {
-        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-            header("Location: /login.php");
-            exit();
-        }
-    }
-}
-
-if (!function_exists('setUserSession')) {
-    function setUserSession(int $user_id): bool {
-        global $pdo;
-        try {
-            $stmt = $pdo->prepare("SELECT users.*, roles.role_name 
-                                 FROM users 
-                                 JOIN roles ON users.role_id = roles.id 
-                                 WHERE users.id = ?");
-            $stmt->execute([$user_id]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($user) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['role_id'] = $user['role_id'];
-                $_SESSION['role'] = $user['role_name'];
-                return true;
-            }
-            return false;
-        } catch (PDOException $e) {
-            error_log("Database error in setUserSession: " . $e->getMessage());
-            return false;
-        }
-    }
-}
-
-if (!function_exists('debugSession')) {
-    function debugSession() {
-        error_log("Session Data: " . json_encode($_SESSION));
-        error_log("Session ID: " . session_id());
-    }
-}
-
-// Call debugSession after setting session variables
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    debugSession();
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+
+    try {
+        // Get user with role information
+        $stmt = $pdo->prepare("
+            SELECT u.*, r.dashboard_path 
+            FROM users u
+            JOIN roles r ON u.role_id = r.id 
+            WHERE u.username = ? AND u.active = 1
+        ");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($user && password_verify($password, $user['password'])) {
+            // Set session variables
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role_id'];
+            $_SESSION['dashboard'] = $user['dashboard_path'];
+            
+            // Update last login
+            $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+            $updateStmt->execute([$user['id']]);
+            
+            // Redirect to appropriate dashboard
+            header("Location: " . $user['dashboard_path']);
+            exit();
+        } else {
+            header("Location: login.php?error=1");
+            exit();
+        }
+    } catch (PDOException $e) {
+        error_log("Database error: " . $e->getMessage());
+        header("Location: login.php?error=1");
+        exit();
+    }
+} else {
+    header("Location: login.php");
+    exit();
 }
-?>
