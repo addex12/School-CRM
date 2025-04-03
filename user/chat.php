@@ -6,23 +6,36 @@ requireLogin();
 // Handle chat message submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
-    
-    try {
-        $stmt = $pdo->prepare("INSERT INTO chat_messages (user_id, message) VALUES (?, ?)");
-        $stmt->execute([$_SESSION['user_id'], $message]);
-        $success = "Message sent successfully!";
-    } catch (PDOException $e) {
-        $error = "Error sending message: " . $e->getMessage();
+    $thread_id = filter_input(INPUT_POST, 'thread_id', FILTER_VALIDATE_INT);
+
+    if ($thread_id && $message) {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO chat_messages (user_id, thread_id, message) VALUES (?, ?, ?)");
+            $stmt->execute([$_SESSION['user_id'], $thread_id, $message]);
+            $success = "Message sent successfully!";
+        } catch (PDOException $e) {
+            $error = "Error sending message: " . $e->getMessage();
+        }
+    } else {
+        $error = "Invalid thread or message.";
     }
 }
 
 // Get chat history
-$stmt = $pdo->query("SELECT c.*, u.username 
-                    FROM chat_messages c 
-                    JOIN users u ON c.user_id = u.id 
-                    ORDER BY c.created_at DESC 
-                    LIMIT 50");
-$messages = $stmt->fetchAll();
+$thread_id = filter_input(INPUT_GET, 'thread_id', FILTER_VALIDATE_INT);
+if ($thread_id) {
+    $stmt = $pdo->prepare("SELECT c.*, u.username 
+                           FROM chat_messages c 
+                           JOIN users u ON c.user_id = u.id 
+                           WHERE c.thread_id = ? 
+                           ORDER BY c.created_at DESC 
+                           LIMIT 50");
+    $stmt->execute([$thread_id]);
+    $messages = $stmt->fetchAll();
+} else {
+    $messages = [];
+    $error = "Invalid thread.";
+}
 ?>
 
 <!DOCTYPE html>
@@ -124,6 +137,7 @@ $messages = $stmt->fetchAll();
             </div>
 
             <form method="POST">
+                <input type="hidden" name="thread_id" value="<?= htmlspecialchars($thread_id) ?>">
                 <div class="form-group">
                     <textarea name="message" rows="3" placeholder="Type your message..." required></textarea>
                 </div>
