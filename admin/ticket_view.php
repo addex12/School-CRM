@@ -78,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
                 $ticket['status'] = $_POST['status'];
             }
             
+            // Remove any references to admin_notes
+            // Ensure no code is trying to update or use the non-existent column
+            
             $pdo->commit();
             $_SESSION['success'] = "Reply added successfully";
             
