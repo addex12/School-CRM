@@ -1,5 +1,8 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/functions.php';
 
@@ -41,24 +44,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Redirect to dashboard
             header("Location: " . $_SESSION['dashboard_path']);
-            exit();
+            exit(); // Ensure no further code is executed
         } else {
             log_activity(null, 'login_failed', "Failed login attempt for username: $username");
             header("Location: login.php?error=invalid");
-            exit();
+            exit(); // Ensure no further code is executed
         }
     } catch (PDOException $e) {
         error_log("Database error: " . $e->getMessage());
         header("Location: login.php?error=system");
-        exit();
+        exit(); // Ensure no further code is executed
     }
 } else {
     header("Location: login.php");
-    exit();
+    exit(); // Ensure no further code is executed
 }
+
 function requireLogin() {
     if (!isset($_SESSION['user_id'])) {
         header('Location: ../login.php');
-        exit();
+        exit(); // Ensure no further code is executed
     }
 }
