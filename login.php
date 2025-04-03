@@ -67,6 +67,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Login - <?= htmlspecialchars($ui_config['site_name']) ?></title>
     <link rel="stylesheet" href="/assets/css/login.css">
     <link rel="icon" href="<?= htmlspecialchars($ui_config['favicon']) ?>">
+    <style>
+        /* Responsive Design */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            border-radius: 8px;
+        }
+        .login-header img {
+            max-width: 100%;
+            height: auto;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .login-btn:hover {
+            background-color: #2980b9;
+        }
+        .alert.error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
@@ -144,6 +206,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </main>
     </div>
 
-    <script src="assets/js/login.js"></script>
+    <script>
+        document.querySelector('.toggle-password').addEventListener('click', function () {
+            const passwordField = document.getElementById('password');
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+    </script>
 </body>
 </html>
