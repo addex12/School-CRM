@@ -39,10 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!password) {
                 document.getElementById('password').classList.add('is-invalid');
                 isValid = false;
-            } else if (password.length < 8) {
-                document.getElementById('password').classList.add('is-invalid');
-                showToast('Password must be at least 8 characters long', 'error');
-                isValid = false;
             }
             
             if (!isValid) {
@@ -52,8 +48,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Show loading state
                 const submitButton = loginForm.querySelector('button[type="submit"]');
                 if (submitButton) {
-                    submitButton.disabled = true;
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+                    setTimeout(() => {
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+                    }, 0);
                 }
                 
                 // Save remember me preference
