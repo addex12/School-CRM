@@ -83,17 +83,22 @@ function redirectWithMessage($url, $message, $type = 'success') {
     header("Location: $url");
     exit();
 }
-
-function formatDate($date, $format = 'M j, Y g:i A') {
+/**
+ * Format date for display
+ */
+function formatDate($dateString, $date, $format = 'M j, Y g:i A') {
     return date($format, strtotime($date));
 }
 if (!defined('DATETIMEFORMAT')) {
     define('DATETIMEFORMAT', 'Y-m-d H:i:s'); // Default datetime format
 }
-
-function formatDatetime($date, $format = DATETIMEFORMAT) {
-    return date($format, strtotime($date));
+if (empty($dateString) || $dateString === '0000-00-00 00:00:00') {
+    return 'N/A';
 }
+$date = new DateTime($dateString);
+return $date->format('M j, Y g:i a');
+}
+
 function formatNumber($number, $decimals = 2) {
     return number_format($number, $decimals);
 }
@@ -252,3 +257,21 @@ function logActivity(PDO $pdo, string $message, string $type, int $userId): void
         error_log("Failed to log activity: " . $e->getMessage());
     }
 }
+/**
+ * Get icon class for field type
+ */
+function getFieldTypeIcon($type) {
+    $icons = [
+        'text' => 'fa-font',
+        'textarea' => 'fa-align-left',
+        'radio' => 'fa-dot-circle',
+        'checkbox' => 'fa-check-square',
+        'select' => 'fa-caret-square-down',
+        'number' => 'fa-hashtag',
+        'date' => 'fa-calendar-alt',
+        'rating' => 'fa-star',
+        'file' => 'fa-file-upload'
+    ];
+    return $icons[$type] ?? 'fa-question-circle';
+}
+
