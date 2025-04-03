@@ -93,10 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                           field_label = ?, field_type = ?, is_required = ?,
                                           display_order = ?, field_options = ?
                                           WHERE id = ? AND survey_id = ?");
-                    $options = json_encode(explode("\n", trim($fieldData['options'])));
+                    $options = isset($fieldData['options']) ? explode("\n", trim($fieldData['options'])) : [];
                     $stmt->execute([
                         $fieldData['label'], $fieldData['type'], isset($fieldData['required']) ? 1 : 0,
-                        $fieldData['order'], $options, $fieldId, $surveyId
+                        $fieldData['order'], json_encode($options), $fieldId, $surveyId
                     ]);
                 }
             }
@@ -109,11 +109,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                               (survey_id, field_label, field_type, is_required, 
                                               display_order, field_options)
                                               VALUES (?, ?, ?, ?, ?, ?)");
-                        $options = json_encode(explode("\n", trim($newField['options'])));
+                        $options = isset($newField['options']) ? explode("\n", trim($newField['options'])) : [];
                         $stmt->execute([
                             $surveyId, $newField['label'], $newField['type'], 
                             isset($newField['required']) ? 1 : 0,
-                            $newField['order'], $options
+                            $newField['order'], json_encode($options)
                         ]);
                     }
                 }
