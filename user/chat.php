@@ -34,7 +34,7 @@ if ($thread_id) {
     $messages = $stmt->fetchAll();
 } else {
     $messages = [];
-    $error = "Invalid thread.";
+    $error = "Please select a valid chat thread to view messages.";
 }
 ?>
 
@@ -126,23 +126,27 @@ if ($thread_id) {
                 <div class="error-message"><?= $error ?></div>
             <?php endif; ?>
 
-            <div class="chat-messages">
-                <?php foreach ($messages as $message): ?>
-                    <div class="message">
-                        <strong><?= htmlspecialchars($message['username']) ?>:</strong>
-                        <?= htmlspecialchars($message['message']) ?>
-                        <small><?= date('M j, g:i a', strtotime($message['created_at'])) ?></small>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-
-            <form method="POST">
-                <input type="hidden" name="thread_id" value="<?= htmlspecialchars($thread_id) ?>">
-                <div class="form-group">
-                    <textarea name="message" rows="3" placeholder="Type your message..." required></textarea>
+            <?php if ($thread_id): ?>
+                <div class="chat-messages">
+                    <?php foreach ($messages as $message): ?>
+                        <div class="message">
+                            <strong><?= htmlspecialchars($message['username']) ?>:</strong>
+                            <?= htmlspecialchars($message['message']) ?>
+                            <small><?= date('M j, g:i a', strtotime($message['created_at'])) ?></small>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
-                <button type="submit" class="btn-primary">Send Message</button>
-            </form>
+
+                <form method="POST">
+                    <input type="hidden" name="thread_id" value="<?= htmlspecialchars($thread_id) ?>">
+                    <div class="form-group">
+                        <textarea name="message" rows="3" placeholder="Type your message..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Send Message</button>
+                </form>
+            <?php else: ?>
+                <p>Please select a chat thread to start messaging.</p>
+            <?php endif; ?>
         </div>
 
         <?php include 'includes/footer.php'; ?>
