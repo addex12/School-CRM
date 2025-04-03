@@ -8,7 +8,7 @@ require_once __DIR__ . '/functions.php';
 
 // Prevent logged-in users from accessing the login page
 if (basename($_SERVER['PHP_SELF']) === 'login.php' && isset($_SESSION['user_id'])) {
-    header("Location: " . ($_SESSION['dashboard_path'] ?? 'index.php'));
+    header("Location: " . ($_SESSION['dashboard_path'] ?? '/index.php'));
     exit();
 }
 
