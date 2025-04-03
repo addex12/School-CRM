@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message = trim($_POST['message'] ?? '');
     $status = $_POST['status'] ?? 'open';
     $priorityId = (int)($_POST['priority_id'] ?? 2); // Default to medium
-    $adminNotes = trim($_POST['admin_notes'] ?? '');
+    $adminNotes = trim($_POST['admin_notes'] ?? ''); // Optional field
 
     // Basic validation
     if (empty($subject) || empty($message)) {
@@ -84,19 +84,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                message = :message, 
                                status = :status, 
                                priority_id = :priority_id, 
-                               admin_notes = :admin_notes,
-                               updated_at = NOW()
-                           WHERE id = :id";
+                               updated_at = NOW()";
+            
+            // Include admin_notes only if it exists in the database
+            if (columnExists($pdo, 'support_tickets', 'admin_notes')) {
+                $updateQuery .= ", admin_notes = :admin_notes";
+            }
+            
+            $updateQuery .= " WHERE id = :id";
             
             $stmt = $pdo->prepare($updateQuery);
-            $stmt->execute([
+            $params = [
                 ':subject' => $subject,
                 ':message' => $message,
                 ':status' => $status,
                 ':priority_id' => $priorityId,
-                ':admin_notes' => $adminNotes,
                 ':id' => $ticketId
-            ]);
+            ];
+            
+            if (columnExists($pdo, 'support_tickets', 'admin_notes')) {
+                $params[':admin_notes'] = $adminNotes;
+            }
+            
+            $stmt->execute($params);
             
             // Check if any rows were affected
             $rowCount = $stmt->rowCount();
@@ -122,6 +132,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Ticket update error: " . $e->getMessage());
             $_SESSION['error'] = "Failed to update ticket. Error: " . $e->getMessage();
         }
+    }
+}
+
+// Helper function to check if a column exists in a table
+function columnExists($pdo, $table, $column) {
+    try {
+        $result = $pdo->query("SHOW COLUMNS FROM `$table` LIKE '$column'");
+        return $result && $result->rowCount() > 0;
+    } catch (Exception $e) {
+        error_log("Error checking column existence: " . $e->getMessage());
+        return false;
     }
 }
 
