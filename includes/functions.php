@@ -239,4 +239,8 @@ function executeQuery($query, $params = []) {
         exit();
     }
 }
-
+function countUnreadNotifications(PDO $pdo, int $userId): int {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+    $stmt->execute([$userId]);
+    return (int) $stmt->fetchColumn();
+}
