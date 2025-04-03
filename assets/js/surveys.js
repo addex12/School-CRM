@@ -137,26 +137,14 @@ function deleteSurvey(surveyId) {
     }
 }
 
-// Function to handle survey duplication
-function duplicateSurvey(surveyId) {
-    if (confirm('Are you sure you want to duplicate this survey?')) {
-        // Perform duplicate action
-        console.log('Duplicating survey:', surveyId);
-        // Add AJAX request to duplicate survey
-    }
-}
+
 // Function to handle survey activation
 function activateSurvey(surveyId) {
     // Perform activation action
     console.log('Activating survey:', surveyId);
     // Add AJAX request to activate survey
 }
-// Function to handle survey deactivation
-function deactivateSurvey(surveyId) {
-    // Perform deactivation action
-    console.log('Deactivating survey:', surveyId);
-    // Add AJAX request to deactivate survey
-}
+
 // Function to handle survey preview
 function previewSurvey(surveyId) {
     // Perform preview action
@@ -228,24 +216,14 @@ function deleteSurvey(surveyId) {
     console.log('Deleting survey:', surveyId);
     // Add AJAX request to delete the survey
 }
-// Function to handle survey duplication
-function duplicateSurvey(surveyId) {
-    // Perform duplication action
-    console.log('Duplicating survey:', surveyId);
-    // Add AJAX request to duplicate the survey
-}
+
 // Function to handle survey editing
 function editSurvey(surveyId) {
     // Perform editing action
     console.log('Editing survey:', surveyId);
     // Add AJAX request to fetch and display survey editing form
 }
-// Function to handle survey activation
-function activateSurvey(surveyId) {
-    // Perform activation action
-    console.log('Activating survey:', surveyId);
-    // Add AJAX request to activate the survey
-}
+
 // Function to handle survey deactivation
 function deactivateSurvey(surveyId) {
     // Perform deactivation action
@@ -270,30 +248,14 @@ function deleteSurvey(surveyId) {
     console.log('Deleting survey:', surveyId);
     // Add AJAX request to delete the survey
 }
-// Function to handle survey duplication
-function duplicateSurvey(surveyId) {
-    // Perform duplication action
-    console.log('Duplicating survey:', surveyId);
-    // Add AJAX request to duplicate the survey
-}
 // Function to handle survey editing
 function editSurvey(surveyId) {
     // Perform editing action
     console.log('Editing survey:', surveyId);
     // Add AJAX request to fetch and display survey editing form
 }
-// Function to handle survey activation
-function activateSurvey(surveyId) {
-    // Perform activation action
-    console.log('Activating survey:', surveyId);
-    // Add AJAX request to activate the survey
-}
-// Function to handle survey deactivation
-function deactivateSurvey(surveyId) {
-    // Perform deactivation action
-    console.log('Deactivating survey:', surveyId);
-    // Add AJAX request to deactivate the survey
-}
+
+
 // Function to handle survey sharing
 function shareSurvey(surveyId) {
     // Perform sharing action
