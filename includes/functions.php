@@ -9,6 +9,9 @@ require_once $autoloadPath;
 
 require_once 'db.php';
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 // Register new user
 function registerUser($username, $email, $password, $role = 'parent') {
     global $pdo;
@@ -556,5 +559,29 @@ function getAllUsers(PDO $pdo) {
     } catch (Exception $e) {
         error_log("Error fetching all users: " . $e->getMessage());
         return [];
+    }
+}
+
+function sendEmail($to, $subject, $body, $from = 'gizawadugna@gmail.com', $fromName = 'Admin') {
+    $mail = new PHPMailer(true);
+
+    try {
+        // Use the system's default mail configuration
+        $mail->isMail();
+
+        // Recipients
+        $mail->setFrom($from, $fromName);
+        $mail->addAddress($to);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $body;
+
+        // Send email
+        return $mail->send();
+    } catch (Exception $e) {
+        error_log("Email could not be sent to $to. Error: " . $mail->ErrorInfo);
+        return false;
     }
 }
