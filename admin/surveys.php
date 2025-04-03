@@ -74,9 +74,7 @@ $totalItems = $stmt->fetchColumn();
 $totalPages = ceil($totalItems / $itemsPerPage);
 
 // Get paginated results
-$query .= " LIMIT ? OFFSET ?";
-$params[] = $itemsPerPage;
-$params[] = $offset;
+$query .= " LIMIT $itemsPerPage OFFSET $offset"; // Embed LIMIT and OFFSET directly into the query string
 
 $stmt = $pdo->prepare($query);
 $stmt->execute($params);
