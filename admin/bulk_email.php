@@ -8,9 +8,7 @@ require_once '../includes/config.php';
 require_once '../includes/functions.php';
 require_once '../includes/recipients_helper.php'; // Ensure this file contains the processRecipientsFile function
 require_once '../includes/db.php';
-require_once '../includes/PHPMailer/PHPMailer.php';
-require_once '../includes/PHPMailer/SMTP.php';
-require_once '../includes/PHPMailer/Exception.php';
+require_once '../vendor/autoload.php'; // Use Composer's autoloader if PHPMailer is installed via Composer
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
