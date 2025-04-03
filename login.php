@@ -1,6 +1,8 @@
 <?php
 // Ensure no output before this point
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once 'includes/db.php';
 require_once 'includes/config.php';
@@ -25,10 +27,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Redirect based on role
             if ($user['role_name'] === 'admin') {
                 header("Location: admin/dashboard.php");
+                exit(); // Ensure no further code is executed
             } else {
                 header("Location: user/dashboard.php");
+                exit(); // Ensure no further code is executed
             }
-            exit();
         } else {
             $_SESSION['error'] = "Invalid username or password.";
         }
