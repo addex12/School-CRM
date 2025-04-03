@@ -10,6 +10,11 @@ require_once '../includes/db.php';
 
 $pageTitle = "Edit Ticket";
 
+// Debugging: Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Ensure database connection is established
 if (!isset($pdo) || !$pdo) {
     $_SESSION['error'] = "Database connection not established.";
@@ -52,6 +57,9 @@ $priorities = $pdo->query("SELECT * FROM ticket_priorities")->fetchAll(PDO::FETC
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Debugging: Log POST data
+    error_log("POST data: " . print_r($_POST, true));
+    
     // Validate and sanitize input
     $subject = trim($_POST['subject'] ?? '');
     $message = trim($_POST['message'] ?? '');
@@ -64,21 +72,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = "Subject and message are required.";
     } else {
         try {
+            // Debugging: Before update
+            error_log("Attempting to update ticket $ticketId with: subject=$subject, status=$status, priority=$priorityId");
+            
+            // Start transaction for atomic update
+            $pdo->beginTransaction();
+            
             // Update ticket
-            $stmt = $pdo->prepare("UPDATE support_tickets 
-                                  SET subject = ?, message = ?, status = ?, priority_id = ?, admin_notes = ?
-                                  WHERE id = ?");
-            $stmt->execute([$subject, $message, $status, $priorityId, $adminNotes, $ticketId]);
+            $updateQuery = "UPDATE support_tickets 
+                           SET subject = :subject, 
+                               message = :message, 
+                               status = :status, 
+                               priority_id = :priority_id, 
+                               admin_notes = :admin_notes,
+                               updated_at = NOW()
+                           WHERE id = :id";
             
-            // Log activity
-            logActivity($pdo, "Ticket #{$ticket['ticket_number']} updated", 'ticket', $_SESSION['user_id']);
+            $stmt = $pdo->prepare($updateQuery);
+            $stmt->execute([
+                ':subject' => $subject,
+                ':message' => $message,
+                ':status' => $status,
+                ':priority_id' => $priorityId,
+                ':admin_notes' => $adminNotes,
+                ':id' => $ticketId
+            ]);
             
-            $_SESSION['success'] = "Ticket updated successfully.";
+            // Check if any rows were affected
+            $rowCount = $stmt->rowCount();
+            
+            if ($rowCount > 0) {
+                // Log activity
+                logActivity($pdo, "Ticket #{$ticket['ticket_number']} updated", 'ticket', $_SESSION['user_id']);
+                
+                $pdo->commit();
+                $_SESSION['success'] = "Ticket updated successfully.";
+                error_log("Ticket $ticketId updated successfully");
+            } else {
+                $pdo->rollBack();
+                $_SESSION['error'] = "No changes were made to the ticket.";
+                error_log("No rows affected when updating ticket $ticketId");
+            }
+            
             header("Location: ticket_view.php?id=$ticketId");
             exit();
-        } catch (Exception $e) {
+            
+        } catch (PDOException $e) {
+            $pdo->rollBack();
             error_log("Ticket update error: " . $e->getMessage());
-            $_SESSION['error'] = "Failed to update ticket.";
+            $_SESSION['error'] = "Failed to update ticket. Error: " . $e->getMessage();
         }
     }
 }
