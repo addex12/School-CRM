@@ -56,3 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: login.php");
     exit();
 }
+function requireLogin() {
+    if (!isset($_SESSION['user_id'])) {
+        header('Location: ../login.php');
+        exit();
+    }
+}
