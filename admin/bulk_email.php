@@ -8,9 +8,9 @@ require_once '../includes/config.php';
 require_once '../includes/functions.php';
 require_once '../includes/recipients_helper.php'; // Ensure this file contains the processRecipientsFile function
 require_once '../includes/db.php';
-require_once '../includes/phpmailer/PHPMailer.php';
-require_once '../includes/phpmailer/SMTP.php';
-require_once '../includes/phpmailer/Exception.php';
+require_once '../includes/PHPMailer/PHPMailer.php';
+require_once '../includes/PHPMailer/SMTP.php';
+require_once '../includes/PHPMailer/Exception.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
