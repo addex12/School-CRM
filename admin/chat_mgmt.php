@@ -288,57 +288,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'], $_POST['th
     <script src="../assets/js/dashboard.js"></script>
     <script src="../assets/js/chat.js"></script>
     <script>
-        // Initialize chat with current thread
-        <?php if ($activeThread): ?>
-            const activeThreadId = <?= $activeThread['id'] ?>;
-            const currentUserId = <?= $_SESSION['user_id'] ?>;
-            
-            // Load messages for active thread
-            loadChatMessages(activeThreadId);
-            
-            // Initialize WebSocket for real-time updates
-            initChatSocket(activeThreadId, currentUserId);
-        <?php endif; ?>
-// Initialize WebSocket connection
 const adminId = <?= $_SESSION['user_id'] ?>;
-const ws = new WebSocket('ws://crm.flipperschool:80?user_id=' + adminId);
+const ws = new WebSocket('ws://<?= $_SERVER['HTTP_HOST'] ?>:8080?user_id=' + adminId + '&role=admin');
 
-// Handle incoming messages
+// WebSocket handlers
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     
     if (data.type === 'message') {
-        if (data.thread_id === activeThreadId) {
+        if (activeThreadId === data.thread_id) {
             appendMessage(data);
         }
         updateUnreadCounts();
-    }
-    
-    if (data.type === 'status_update') {
-        updateOnlineUsers();
+        updateThreadList();
     }
 };
 
 // Send message function
-function sendAdminMessage(message, threadId) {
+function sendAdminMessage(message, threadId, recipientId) {
     const msgData = {
         type: 'message',
         thread_id: threadId,
         user_id: adminId,
         message: message,
         is_admin: true,
-        recipient_id: data.user_id
+        recipient_id: recipientId
     };
     ws.send(JSON.stringify(msgData));
-}
-
-// Update online users list
-function updateOnlineUsers() {
-    fetch('chat_actions.php?action=get_online_users')
-        .then(response => response.json())
-        .then(data => {
-            // Update online users list UI
-        });
 }
 
 // Update unread counts
@@ -346,9 +322,75 @@ function updateUnreadCounts() {
     fetch('chat_actions.php?action=get_unread_counts')
         .then(response => response.json())
         .then(data => {
-            // Update UI badges
+            // Update UI with new counts
+            if (data.total_unread > 0) {
+                $('.unread-badge').text(data.total_unread).show();
+            } else {
+                $('.unread-badge').hide();
+            }
         });
 }
+
+// Update thread list
+function updateThreadList() {
+    fetch('chat_actions.php?action=get_threads')
+        .then(response => response.json())
+        .then(data => {
+            // Update thread list UI
+        });
+}
+
+// Initialize for active thread
+<?php if ($activeThread): ?>
+    let activeThreadId = <?= $activeThread['id'] ?>;
+    let recipientId = <?= $activeThread['user_id'] ?>;
+    
+    // Load initial messages
+    loadMessages(activeThreadId);
+    
+    // Message submit handler
+    $('.chat-input form').submit(function(e) {
+        e.preventDefault();
+        const message = $(this).find('textarea').val().trim();
+        if (message) {
+            sendAdminMessage(message, activeThreadId, recipientId);
+            $(this).find('textarea').val('');
+        }
+    });
+<?php endif; ?>
+
+// Load messages function
+function loadMessages(threadId) {
+    fetch(`chat_actions.php?action=get_messages&thread_id=${threadId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update messages UI
+        });
+}
+
+// Append new message
+function appendMessage(data) {
+    const messageHtml = `
+        <div class="message ${data.is_admin ? 'admin' : 'user'}">
+            <div class="message-header">
+                <span class="username">${data.is_admin ? 'You' : data.username}</span>
+                <span class="time">${new Date().toLocaleTimeString()}</span>
+            </div>
+            <div class="message-content">${data.message}</div>
+        </div>
+    `;
+    $('#chat-messages').append(messageHtml);
+    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+}
+
+// Update online users every 10 seconds
+setInterval(() => {
+    fetch('chat_actions.php?action=get_online_users')
+        .then(response => response.json())
+        .then(data => {
+            // Update online users UI
+        });
+}, 10000);
 </script>
 </body>
 </html>

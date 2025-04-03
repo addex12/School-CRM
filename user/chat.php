@@ -22,14 +22,14 @@ if (!$thread) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Chat - Survey System</title>
+    <title>Live Chat</title>
     <link rel="stylesheet" href="../assets/css/chat.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h2>Live Support Chat</h2>
+            <h2>Live Support</h2>
             <div class="chat-status" id="connection-status">Connecting...</div>
         </div>
         
@@ -62,7 +62,7 @@ if (!$thread) {
     <script>
         const userId = <?= $_SESSION['user_id'] ?>;
         const threadId = <?= $thread_id ?>;
-        const ws = new WebSocket('ws://crm.flipperschool:80?user_id=' + userId);
+        const ws = new WebSocket('ws://<?= $_SERVER['HTTP_HOST'] ?>:8080?user_id=' + userId + '&role=user');
 
         ws.onopen = () => {
             $('#connection-status').text('Online').addClass('connected');
@@ -83,8 +83,7 @@ if (!$thread) {
                     thread_id: threadId,
                     user_id: userId,
                     message: message,
-                    is_admin: false,
-                    recipient_id: 'admin'
+                    is_admin: false
                 };
                 
                 ws.send(JSON.stringify(msgData));
@@ -96,7 +95,7 @@ if (!$thread) {
             const messageHtml = `
                 <div class="message ${data.is_admin ? 'admin' : 'user'}">
                     <div class="message-header">
-                        <span class="username">${data.is_admin ? 'Support Agent' : 'You'}</span>
+                        <span class="username">${data.is_admin ? 'Support' : 'You'}</span>
                         <span class="time">${new Date().toLocaleTimeString()}</span>
                     </div>
                     <div class="message-content">${data.message}</div>
