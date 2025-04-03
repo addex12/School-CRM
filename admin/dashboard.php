@@ -6,6 +6,7 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
+session_start();
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';

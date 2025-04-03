@@ -2,6 +2,9 @@
 session_start();
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/functions.php';
+requireLogin();
+
+$pageTitle = "User Dashboard";
 
 // Ensure the user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -24,12 +27,13 @@ $config = json_decode(file_get_contents($config_file), true);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($config['title'] ?? 'Dashboard') ?></title>
+    <title><?= htmlspecialchars($pageTitle) ?></title>
     <link rel="stylesheet" href="/assets/css/dashboard.css">
     <link rel="stylesheet" href="/assets/css/<?= htmlspecialchars($role_name) ?>.css">
     <script src="/assets/js/<?= htmlspecialchars($role_name) ?>.js" defer></script>
 </head>
 <body>
+    <?php include 'includes/header.php'; ?>
     <header>
         <h1><?= htmlspecialchars($config['title'] ?? 'Dashboard') ?></h1>
         <nav>
@@ -37,6 +41,10 @@ $config = json_decode(file_get_contents($config_file), true);
         </nav>
     </header>
     <main>
+        <div class="content">
+            <h1>Welcome, <?= htmlspecialchars($_SESSION['username']) ?>!</h1>
+            <p>This is the user dashboard. Add user-specific features here.</p>
+        </div>
         <section class="widgets">
             <h2>Widgets</h2>
             <ul>

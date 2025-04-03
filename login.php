@@ -1,44 +1,28 @@
 <?php
-// Ensure no output before this point
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/config.php';
-require_once __DIR__ . '/includes/auth.php';
+session_start();
+require_once 'includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']); // Use email instead of username
-    $password = trim($_POST['password']);
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-    try {
-        $stmt = $pdo->prepare("SELECT u.*, r.role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare("SELECT id, username, role_id, password FROM users WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch();
 
-        if ($user && password_verify($password, $user['password'])) {
-            // Set session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['email'] = $user['email'];
-            $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['role_name'] = $user['role_name'];
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['user_id'] = $user['id'];
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role_id'] = $user['role_id'];
 
-            // Redirect based on role
-            if ($user['role_name'] === 'admin') {
-                header("Location: /admin/dashboard.php");
-            } elseif ($user['role_name'] === 'user') {
-                header("Location: /user/dashboard.php");
-            } else {
-                header("Location: /index.php"); // Default fallback
-            }
-            exit(); // Ensure no further code is executed
+        if ($user['role_id'] == 1) {
+            header("Location: admin/dashboard.php");
         } else {
-            $_SESSION['error'] = "Invalid email or password.";
+            header("Location: user/dashboard.php");
         }
-    } catch (PDOException $e) {
-        error_log("Login error: " . $e->getMessage());
-        $_SESSION['error'] = "An error occurred. Please try again.";
+        exit;
+    } else {
+        $error = "Invalid email or password.";
     }
 }
 ?>
@@ -46,126 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - School CRM System</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .login-container {
-            max-width: 400px;
-            margin: 5% auto;
-            padding: 30px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.1);
-        }
-        .login-title {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #2c3e50;
-            font-weight: 600;
-        }
-        .login-logo {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 48px;
-            color: #3498db;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #495057;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        .form-group input:focus {
-            border-color: #3498db;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .btn-primary:hover {
-            background-color: #2980b9;
-        }
-        .error-message {
-            color: #e74c3c;
-            background: #fadbd8;
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 14px;
-        }
-        .login-footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #6c757d;
-        }
-        .login-footer a {
-            color: #3498db;
-            text-decoration: none;
-        }
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>Login</title>
+    <link rel="stylesheet" href="assets/css/login.css">
 </head>
 <body>
     <div class="login-container">
-        <div class="login-logo">
-            <i class="fas fa-graduation-cap"></i>
-        </div>
-        <h1 class="login-title">School CRM System Login</h1>
-        
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="error-message"><?php echo htmlspecialchars($_SESSION['error']); ?></div>
-            <?php unset($_SESSION['error']); ?>
-        <?php endif; ?>
-        
-        <form method="POST" autocomplete="off">
-            <div class="form-group">
-                <label for="email">Email:</label> <!-- Updated label -->
-                <input type="email" id="email" name="email" required autofocus> <!-- Updated input name -->
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            
-            <div class="form-group">
-                <button type="submit" class="btn-primary">Login</button>
-            </div>
+        <h1>Login</h1>
+        <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+        <form method="POST">
+            <label>Email</label>
+            <input type="email" name="email" required>
+            <label>Password</label>
+            <input type="password" name="password" required>
+            <button type="submit">Login</button>
         </form>
-        
-        <div class="login-footer">
-            <p><a href="forgot_password.php">Forgot your password?</a></p>
-        </div>
     </div>
 </body>
 </html>

@@ -1,86 +1,16 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/functions.php';
-
-// Prevent logged-in users from accessing the login page
-if (basename($_SERVER['PHP_SELF']) === 'login.php' && isset($_SESSION['user_id'])) {
-    if ($_SESSION['role_name'] === 'admin') {
-        header("Location: /admin/dashboard.php");
-    } elseif ($_SESSION['role_name'] === 'user') {
-        header("Location: /user/dashboard.php");
-    } else {
-        header("Location: /index.php"); // Default fallback
-    }
-    exit();
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Validate CSRF token
-    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
-        header("Location: login.php?error=csrf");
-        exit();
-    }
-
-    // Sanitize inputs
-    $username = clean_input($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    try {
-        // Fetch user with role information
-        $stmt = $pdo->prepare("
-            SELECT u.*, r.role_name 
-            FROM users u
-            JOIN roles r ON u.role_id = r.id 
-            WHERE (u.username = :username OR u.email = :username) AND u.active = 1
-        ");
-        $stmt->execute([':username' => $username]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($user && password_verify($password, $user['password'])) {
-            // Regenerate session ID
-            session_regenerate_id(true);
-
-            // Set session variables
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['role_name'] = $user['role_name'];
-
-            // Update last login
-            $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")
-                ->execute([$user['id']]);
-
-            // Redirect to dashboard based on role
-            if ($_SESSION['role_name'] === 'admin') {
-                header("Location: /admin/dashboard.php");
-            } elseif ($_SESSION['role_name'] === 'user') {
-                header("Location: /user/dashboard.php");
-            } else {
-                header("Location: /index.php"); // Default fallback
-            }
-            exit(); // Ensure no further code is executed
-        } else {
-            log_activity(null, 'login_failed', "Failed login attempt for username: $username");
-            header("Location: login.php?error=invalid");
-            exit(); // Ensure no further code is executed
-        }
-    } catch (PDOException $e) {
-        error_log("Database error: " . $e->getMessage());
-        header("Location: login.php?error=system");
-        exit(); // Ensure no further code is executed
-    }
-} else {
-    header("Location: login.php");
-    exit(); // Ensure no further code is executed
-}
-
 function requireLogin() {
     if (!isset($_SESSION['user_id'])) {
-        header('Location: ../login.php');
-        exit(); // Ensure no further code is executed
+        header("Location: /login.php");
+        exit();
     }
 }
+
+function requireAdmin() {
+    requireLogin();
+    if ($_SESSION['role_id'] != 1) {
+        header("Location: /user/dashboard.php");
+        exit();
+    }
+}
+?>
