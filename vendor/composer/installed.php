@@ -3,7 +3,7 @@
         'name' => 'school/survey-system',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '9d2d7fb730ef21fcb5cb9fe9c301769a2eefae1c',
+        'reference' => '9daa8c33134d7252e33a3c1e523dfac634d04ea6',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -280,7 +280,7 @@
         'school/survey-system' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '9d2d7fb730ef21fcb5cb9fe9c301769a2eefae1c',
+            'reference' => '9daa8c33134d7252e33a3c1e523dfac634d04ea6',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
