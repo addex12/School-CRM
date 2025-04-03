@@ -9,31 +9,27 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username']);
+    $email = trim($_POST['email']); // Use email instead of username
     $password = trim($_POST['password']);
 
     try {
-        $stmt = $pdo->prepare("SELECT u.*, r.role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.username = ?");
-        $stmt->execute([$username]);
+        $stmt = $pdo->prepare("SELECT u.*, r.role_name, r.dashboard_path FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.email = ?");
+        $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, $user['password'])) {
             // Set session variables
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
             $_SESSION['role_id'] = $user['role_id'];
             $_SESSION['role_name'] = $user['role_name'];
+            $_SESSION['dashboard_path'] = $user['dashboard_path'];
 
             // Redirect based on role
-            if ($user['role_name'] === 'admin') {
-                header("Location: admin/dashboard.php");
-                exit(); // Ensure no further code is executed
-            } else {
-                header("Location: user/dashboard.php");
-                exit(); // Ensure no further code is executed
-            }
+            header("Location: " . $_SESSION['dashboard_path']);
+            exit(); // Ensure no further code is executed
         } else {
-            $_SESSION['error'] = "Invalid username or password.";
+            $_SESSION['error'] = "Invalid email or password.";
         }
     } catch (PDOException $e) {
         error_log("Login error: " . $e->getMessage());
@@ -148,8 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         <form method="POST" autocomplete="off">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required autofocus>
+                <label for="email">Email:</label> <!-- Updated label -->
+                <input type="email" id="email" name="email" required autofocus> <!-- Updated input name -->
             </div>
             
             <div class="form-group">
