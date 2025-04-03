@@ -215,8 +215,8 @@ $statuses = $pdo->query("SELECT * FROM survey_statuses")->fetchAll(PDO::FETCH_AS
                                             </td>
                                             <td><?= $survey['response_count'] ?></td>
                                             <td><?= htmlspecialchars($survey['creator_name']) ?></td>
-                                            <td><?= formatDate($survey['starts_at']) ?></td>
-                                            <td><?= formatDate($survey['ends_at']) ?></td>
+                                            <td><?= formatDate($survey['starts_at'], 'Y-m-d H:i:s') ?></td>
+                                            <td><?= formatDate($survey['ends_at'], 'Y-m-d') ?></td>
                                             <td>
                                                 <div class="action-buttons">
                                                     <a href="survey_view.php?id=<?= $survey['id'] ?>" class="btn btn-sm btn-view" title="View">
