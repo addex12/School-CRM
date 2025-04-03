@@ -14,13 +14,15 @@ $pageTitle = "View Ticket";
 
 // Ensure database connection is established
 if (!isset($pdo) || !$pdo) {
+    error_log("Database connection not established."); // Log the error for debugging
     $_SESSION['error'] = "Database connection not established.";
     header("Location: ../error.php");
     exit();
 }
 
-// Check if ticket ID is provided
-if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+// Check if ticket ID is provided and valid
+if (!isset($_GET['id']) || !is_numeric($_GET['id']) || (int)$_GET['id'] <= 0) {
+    error_log("Invalid or missing ticket ID: " . ($_GET['id'] ?? 'null')); // Log the error for debugging
     $_SESSION['error'] = "Invalid ticket ID.";
     header("Location: tickets.php");
     exit();
@@ -42,12 +44,13 @@ try {
     $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$ticket) {
+        error_log("Ticket not found for ID: $ticketId"); // Log the error for debugging
         $_SESSION['error'] = "Ticket not found.";
         header("Location: tickets.php");
         exit();
     }
 } catch (Exception $e) {
-    error_log("Ticket fetch error: " . $e->getMessage());
+    error_log("Ticket fetch error: " . $e->getMessage()); // Log the exception for debugging
     $_SESSION['error'] = "Failed to fetch ticket details.";
     header("Location: tickets.php");
     exit();
