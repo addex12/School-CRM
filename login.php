@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/functions.php';
 
 // Redirect logged-in users
 if (isset($_SESSION['user_id'])) {
-    header("Location: " . ($_SESSION['dashboard_path'] ?? '/user/dashboard.php')); // Updated fallback path
+    header("Location: " . ($_SESSION['dashboard_path'] ?? '/user/dashboard.php'));
     exit();
 }
 
@@ -15,43 +15,48 @@ $error = '';
 $username = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = clean_input($_POST['username'] ?? '');
-    $password = $_POST['password'] ?? '';
+    // Validate CSRF token
+    if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error = 'Invalid CSRF token. Please try again.';
+    } else {
+        $username = clean_input($_POST['username'] ?? '');
+        $password = $_POST['password'] ?? '';
 
-    try {
-        $stmt = $pdo->prepare("
-            SELECT u.*, r.dashboard_path 
-            FROM users u
-            JOIN roles r ON u.role_id = r.id
-            WHERE (u.username = :id OR u.email = :id)
-            AND u.active = 1
-            LIMIT 1
-        ");
-        $stmt->execute([':id' => $username]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            $stmt = $pdo->prepare("
+                SELECT u.*, r.dashboard_path 
+                FROM users u
+                JOIN roles r ON u.role_id = r.id
+                WHERE (u.username = :id OR u.email = :id)
+                AND u.active = 1
+                LIMIT 1
+            ");
+            $stmt->execute([':id' => $username]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user && password_verify($password, $user['password'])) {
-            session_regenerate_id(true);
+            if ($user && password_verify($password, $user['password'])) {
+                session_regenerate_id(true);
 
-            // Set session data
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['dashboard_path'] = validate_dashboard_path($user['dashboard_path'] ?? '/user/dashboard.php'); // Validate path
+                // Set session data
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['dashboard_path'] = validate_dashboard_path($user['dashboard_path'] ?? '/user/dashboard.php');
 
-            // Update last login
-            $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")
-                ->execute([$user['id']]);
+                // Update last login
+                $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")
+                    ->execute([$user['id']]);
 
-            // Redirect to dashboard
-            header("Location: " . $_SESSION['dashboard_path']);
-            exit();
-        } else {
-            $error = 'Invalid username or password.';
+                // Redirect to dashboard
+                header("Location: " . $_SESSION['dashboard_path']);
+                exit();
+            } else {
+                $error = 'Invalid username or password.';
+            }
+        } catch (PDOException $e) {
+            error_log("Login error: " . $e->getMessage());
+            $error = 'System error. Please try again later.';
         }
-    } catch (PDOException $e) {
-        error_log("Login error: " . $e->getMessage());
-        $error = 'System error. Please try again later.';
     }
 }
 ?>
@@ -70,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if ($error): ?>
                 <div class="error"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
+            <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
             <label for="username">Username/Email</label>
             <input type="text" id="username" name="username" value="<?= htmlspecialchars($username) ?>" required>
             <label for="password">Password</label>

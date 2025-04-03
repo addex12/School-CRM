@@ -9,11 +9,10 @@
 
 require_once 'includes/auth.php';
 
-// Destroy the session
+session_start();
 session_unset();
 session_destroy();
 
-// Redirect to login page
-header(header: "Location: login.php");
+header("Location: /login.php");
 exit();
 ?>
