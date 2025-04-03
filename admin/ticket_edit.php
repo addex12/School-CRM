@@ -22,6 +22,21 @@ if (!isset($pdo) || !$pdo) {
     exit();
 }
 
+// Ensure the admin_notes column exists in the support_tickets table
+function ensureAdminNotesColumnExists($pdo) {
+    try {
+        if (!columnExists($pdo, 'support_tickets', 'admin_notes')) {
+            $pdo->exec("ALTER TABLE support_tickets ADD COLUMN admin_notes TEXT NULL");
+            error_log("Added admin_notes column to support_tickets table.");
+        }
+    } catch (Exception $e) {
+        error_log("Error adding admin_notes column: " . $e->getMessage());
+    }
+}
+
+// Call the function to ensure the column exists
+ensureAdminNotesColumnExists($pdo);
+
 // Check if ticket ID is provided
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['error'] = "Invalid ticket ID.";
