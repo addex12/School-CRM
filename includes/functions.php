@@ -566,6 +566,12 @@ function sendEmail($to, $subject, $body, $from = 'gizawadugna@gmail.com', $fromN
     $mail = new PHPMailer(true);
 
     try {
+        // Enable verbose debug output
+        $mail->SMTPDebug = 2; // Set to 2 for detailed debug output
+        $mail->Debugoutput = function ($str, $level) {
+            error_log("PHPMailer [Level $level]: $str");
+        };
+
         // Use the system's default mail configuration
         $mail->isMail();
 
