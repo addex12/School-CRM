@@ -151,18 +151,7 @@ function previewSurvey(surveyId) {
     console.log('Previewing survey:', surveyId);
     // Add AJAX request to fetch and display survey preview
 }
-// Function to handle survey editing
-function editSurvey(surveyId) {
-    // Perform edit action
-    console.log('Editing survey:', surveyId);
-    // Add AJAX request to fetch and display survey edit form
-}
-// Function to handle survey sharing
-function shareSurvey(surveyId) {
-    // Perform share action
-    console.log('Sharing survey:', surveyId);
-    // Add AJAX request to fetch and display survey sharing options
-}
+
 // Function to handle survey exporting
 function exportSurvey(surveyId) {
     // Perform export action
@@ -186,42 +175,12 @@ function importSurvey() {
     console.log('Importing survey:', file.name);
     // Add AJAX request to upload and process the file
 }
-// Function to handle survey analytics
-function viewSurveyAnalytics(surveyId) {
-    // Perform analytics action
-    console.log('Viewing analytics for survey:', surveyId);
-    // Add AJAX request to fetch and display survey analytics
-}
+
 // Function to handle survey settings
 function editSurveySettings(surveyId) {
     // Perform settings action
     console.log('Editing settings for survey:', surveyId);
     // Add AJAX request to fetch and display survey settings form
-}
-// Function to handle survey responses
-function viewSurveyResponses(surveyId) {
-    // Perform responses action
-    console.log('Viewing responses for survey:', surveyId);
-    // Add AJAX request to fetch and display survey responses
-}
-// Function to handle survey sharing
-function shareSurvey(surveyId) {
-    // Perform sharing action
-    console.log('Sharing survey:', surveyId);
-    // Add AJAX request to generate and display sharing link
-}
-// Function to handle survey deletion
-function deleteSurvey(surveyId) {
-    // Perform deletion action
-    console.log('Deleting survey:', surveyId);
-    // Add AJAX request to delete the survey
-}
-
-// Function to handle survey editing
-function editSurvey(surveyId) {
-    // Perform editing action
-    console.log('Editing survey:', surveyId);
-    // Add AJAX request to fetch and display survey editing form
 }
 
 // Function to handle survey deactivation
@@ -230,24 +189,14 @@ function deactivateSurvey(surveyId) {
     console.log('Deactivating survey:', surveyId);
     // Add AJAX request to deactivate the survey
 }
-// Function to handle survey preview
-function previewSurvey(surveyId) {
-    // Perform preview action
-    console.log('Previewing survey:', surveyId);
-    // Add AJAX request to fetch and display survey preview
-}
+
 // Function to handle survey analytics
 function viewSurveyAnalytics(surveyId) {
     // Perform analytics action
     console.log('Viewing analytics for survey:', surveyId);
     // Add AJAX request to fetch and display survey analytics
 }
-// Function to handle survey deletion
-function deleteSurvey(surveyId) {
-    // Perform deletion action
-    console.log('Deleting survey:', surveyId);
-    // Add AJAX request to delete the survey
-}
+
 // Function to handle survey editing
 function editSurvey(surveyId) {
     // Perform editing action
@@ -256,30 +205,13 @@ function editSurvey(surveyId) {
 }
 
 
-// Function to handle survey sharing
-function shareSurvey(surveyId) {
-    // Perform sharing action
-    console.log('Sharing survey:', surveyId);
-    // Add AJAX request to share the survey
-}
-// Function to handle survey deletion
-function deleteSurvey(surveyId) {
-    // Perform deletion action
-    console.log('Deleting survey:', surveyId);
-    // Add AJAX request to delete the survey
-}
 // Function to handle survey duplication
 function duplicateSurvey(surveyId) {
     // Perform duplication action
     console.log('Duplicating survey:', surveyId);
     // Add AJAX request to duplicate the survey
 }
-// Function to handle survey editing
-function editSurvey(surveyId) {
-    // Perform editing action
-    console.log('Editing survey:', surveyId);
-    // Add AJAX request to fetch and display survey editing form
-}
+
    // Add event listeners for survey actions
     document.querySelectorAll('.deactivate-survey').forEach(button => {
         button.addEventListener('click', () => {
