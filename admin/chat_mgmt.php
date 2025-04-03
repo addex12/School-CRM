@@ -51,3 +51,23 @@ function updateUnreadCounts() {
         });
 }
 </script>
+    
+    <script src="../assets/js/dashboard.js"></script>
+    <script src="../assets/js/chat.js"></script>
+    <script>
+        // Initialize chat with current thread
+        <?php if ($activeThread): ?>
+            const activeThreadId = <?= $activeThread['id'] ?>;
+            const currentUserId = <?= $_SESSION['user_id'] ?>;
+            
+            // Load messages for active thread
+            loadChatMessages(activeThreadId);
+            
+            // Initialize WebSocket for real-time updates
+            initChatSocket(activeThreadId, currentUserId);
+        <?php endif; ?>
+    </script>
+</body>
+</html>
+
+<?php include 'includes/footer.php'; ?>
