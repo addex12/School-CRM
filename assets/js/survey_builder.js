@@ -87,7 +87,6 @@ document.addEventListener('DOMContentLoaded', function() {
             typeSelect.addEventListener('change', function() {
                 const optionsGroup = field.querySelector('.options-group');
                 const icon = field.querySelector('.field-type i');
-                const typeLabel = field.querySelector('.field-type');
                 
                 // Update icon
                 const selectedOption = typeSelect.options[typeSelect.selectedIndex];
