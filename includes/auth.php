@@ -6,6 +6,12 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/functions.php';
 
+// Prevent logged-in users from accessing the login page
+if (basename($_SERVER['PHP_SELF']) === 'login.php' && isset($_SESSION['user_id'])) {
+    header("Location: " . ($_SESSION['dashboard_path'] ?? 'index.php'));
+    exit();
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate CSRF token
     if (!verify_csrf_token($_POST['csrf_token'] ?? '')) {
