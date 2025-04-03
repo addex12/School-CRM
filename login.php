@@ -11,6 +11,9 @@ if (isset($_SESSION['user_id'])) {
     header("Location: " . ($_SESSION['role'] === 'admin' ? '/admin/dashboard.php' : '/user/dashboard.php'));
     exit();
 }
+// After setting $_SESSION
+error_log("MOBILE DEBUG: Session set for user " . $user['id'] . " | Role: " . $_SESSION['role']);
+error_log("MOBILE DEBUG: Redirecting to: " . $user['dashboard_path']);
 
 // Initialize variables
 $error = '';
