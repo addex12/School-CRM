@@ -612,5 +612,5 @@ function validate_dashboard_path($path) {
         '/user/dashboard.php',
         '/dashboard.php'
     ];
-    return in_array($path, $allowed_paths) ? $path : '/dashboard.php';
+    return in_array($path, $allowed_paths) ? $path : '/user/dashboard.php'; // Updated fallback path
 }

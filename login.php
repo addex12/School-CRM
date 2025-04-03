@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/functions.php';
 
 // Redirect logged-in users
 if (isset($_SESSION['user_id'])) {
-    header("Location: " . ($_SESSION['dashboard_path'] ?? '/default-dashboard.php'));
+    header("Location: " . ($_SESSION['dashboard_path'] ?? '/user/dashboard.php')); // Updated fallback path
     exit();
 }
 
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['dashboard_path'] = $user['dashboard_path'] ?? '/default-dashboard.php';
+            $_SESSION['dashboard_path'] = validate_dashboard_path($user['dashboard_path'] ?? '/user/dashboard.php'); // Validate path
 
             // Update last login
             $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")
