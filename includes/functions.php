@@ -538,21 +538,6 @@ function personalizeMessage($message, $recipient) {
     ];
     return strtr($message, $placeholders);
 }
-function processRecipientsFile($filePath) {
-    $recipients = [];
-    if (($handle = fopen($filePath, 'r')) !== false) {
-        while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-            if (filter_var($data[0], FILTER_VALIDATE_EMAIL)) {
-                $recipients[] = [
-                    'email' => $data[0],
-                    'name' => $data[1] ?? null,
-                ];
-            }
-        }
-        fclose($handle);
-    }
-    return $recipients;
-}
 function getUsersByRole(PDO $pdo, int $role_id): array {
     try {
         $stmt = $pdo->prepare("SELECT * FROM users WHERE role_id = :role_id");
