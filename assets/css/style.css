@@ -365,3 +365,51 @@ nav a.active {
 .export-menu a:hover {
     background: #f8f9fa;
 }
+/* assets/css/style.css */
+:root {
+    --primary-color: #2c3e50;
+    --secondary-color: #3498db;
+    --accent-color: #e74c3c;
+}
+
+.login-container {
+    display: flex;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.login-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+}
+
+.school-brand {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.school-brand img {
+    height: 80px;
+    margin-bottom: 1rem;
+}
+
+.btn-login {
+    background: var(--secondary-color);
+    color: white;
+    padding: 0.75rem 2rem;
+    width: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+}
