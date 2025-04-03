@@ -303,3 +303,220 @@ function getStatusColor($status) {
         default: return '#7f8c8d';
     }
 }
+/**
+ * Export data as CSV
+ */
+function exportAsCSV($data, $surveyTitle) {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . sanitizeFilename($surveyTitle) . '_export_' . date('Y-m-d') . '.csv"');
+    
+    $output = fopen('php://output', 'w');
+    
+    // Export survey info
+    fputcsv($output, ['Survey Information']);
+    foreach ($data['survey'] as $key => $value) {
+        fputcsv($output, [ucwords(str_replace('_', ' ', $key)), $value]);
+    }
+    fputcsv($output, []); // Empty row
+    
+    // Export questions if available
+    if (isset($data['questions'])) {
+        fputcsv($output, ['Survey Questions']);
+        fputcsv($output, ['ID', 'Question Text', 'Field Type', 'Required', 'Display Order']);
+        
+        foreach ($data['questions'] as $question) {
+            fputcsv($output, [
+                $question['id'],
+                $question['field_label'],
+                $question['field_type'],
+                $question['is_required'] ? 'Yes' : 'No',
+                $question['display_order']
+            ]);
+        }
+        fputcsv($output, []); // Empty row
+    }
+    
+    // Export responses if available
+    if (isset($data['responses'])) {
+        fputcsv($output, ['Survey Responses']);
+        
+        // Prepare headers
+        $headers = ['Response ID', 'Respondent', 'Submission Date'];
+        if (isset($data['questions'])) {
+            foreach ($data['questions'] as $question) {
+                $headers[] = $question['field_label'];
+            }
+        }
+        fputcsv($output, $headers);
+        
+        // Export each response
+        foreach ($data['responses'] as $response) {
+            $row = [
+                $response['id'],
+                $response['respondent_name'] ?? ($data['survey']['is_anonymous'] ? 'Anonymous' : 'N/A'),
+                $response['submitted_at_formatted']
+            ];
+            
+            if (isset($data['questions'])) {
+                // Map answers to questions
+                $answers = [];
+                foreach ($response['answers'] as $answer) {
+                    $answers[$answer['field_id']] = $answer['field_value'];
+                }
+                
+                foreach ($data['questions'] as $question) {
+                    $row[] = $answers[$question['id']] ?? '';
+                }
+            }
+            
+            fputcsv($output, $row);
+        }
+    }
+    
+    fclose($output);
+    exit();
+}
+
+/**
+ * Export data as JSON
+ */
+function exportAsJSON($data, $surveyTitle) {
+    header('Content-Type: application/json; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . sanitizeFilename($surveyTitle) . '_export_' . date('Y-m-d') . '.json"');
+    
+    echo json_encode($data, JSON_PRETTY_PRINT);
+    exit();
+}
+
+/**
+ * Export data as Excel (using PHPExcel or PhpSpreadsheet)
+ */
+function exportAsExcel($data, $surveyTitle) {
+    // Check if PhpSpreadsheet is available
+    if (!class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+        throw new Exception("PhpSpreadsheet library not installed");
+    }
+    
+    require_once 'vendor/autoload.php';
+    
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    
+    // Set document properties
+    $spreadsheet->getProperties()
+        ->setCreator($_SESSION['username'] ?? 'Admin')
+        ->setTitle($surveyTitle . ' Export')
+        ->setSubject('Survey Data Export')
+        ->setDescription('Exported survey data from ' . date('Y-m-d'));
+    
+    // Add survey information
+    $sheet->setTitle('Survey Info');
+    $sheet->setCellValue('A1', 'Survey Information');
+    $sheet->mergeCells('A1:B1');
+    $sheet->getStyle('A1')->getFont()->setBold(true);
+    
+    $row = 2;
+    foreach ($data['survey'] as $key => $value) {
+        $sheet->setCellValue('A' . $row, ucwords(str_replace('_', ' ', $key)));
+        $sheet->setCellValue('B' . $row, $value);
+        $row++;
+    }
+    $row++;
+    
+    // Add questions if available
+    if (isset($data['questions'])) {
+        $sheet->setCellValue('A' . $row, 'Survey Questions');
+        $sheet->mergeCells('A' . $row . ':E' . $row);
+        $sheet->getStyle('A' . $row)->getFont()->setBold(true);
+        $row++;
+        
+        $sheet->setCellValue('A' . $row, 'ID');
+        $sheet->setCellValue('B' . $row, 'Question Text');
+        $sheet->setCellValue('C' . $row, 'Field Type');
+        $sheet->setCellValue('D' . $row, 'Required');
+        $sheet->setCellValue('E' . $row, 'Display Order');
+        $sheet->getStyle('A' . $row . ':E' . $row)->getFont()->setBold(true);
+        $row++;
+        
+        foreach ($data['questions'] as $question) {
+            $sheet->setCellValue('A' . $row, $question['id']);
+            $sheet->setCellValue('B' . $row, $question['field_label']);
+            $sheet->setCellValue('C' . $row, $question['field_type']);
+            $sheet->setCellValue('D' . $row, $question['is_required'] ? 'Yes' : 'No');
+            $sheet->setCellValue('E' . $row, $question['display_order']);
+            $row++;
+        }
+    }
+    
+    // Add responses if available
+    if (isset($data['responses'])) {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Responses');
+        
+        $row = 1;
+        $sheet->setCellValue('A' . $row, 'Survey Responses');
+        $sheet->mergeCells('A' . $row . ':C' . $row);
+        $sheet->getStyle('A' . $row)->getFont()->setBold(true);
+        $row++;
+        
+        // Prepare headers
+        $headers = ['Response ID', 'Respondent', 'Submission Date'];
+        if (isset($data['questions'])) {
+            foreach ($data['questions'] as $question) {
+                $headers[] = $question['field_label'];
+            }
+        }
+        
+        // Write headers
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue($col . $row, $header);
+            $col++;
+        }
+        $sheet->getStyle('A' . $row . ':' . $col . $row)->getFont()->setBold(true);
+        $row++;
+        
+        // Write response data
+        foreach ($data['responses'] as $response) {
+            $col = 'A';
+            $sheet->setCellValue($col++ . $row, $response['id']);
+            $sheet->setCellValue($col++ . $row, $response['respondent_name'] ?? ($data['survey']['is_anonymous'] ? 'Anonymous' : 'N/A'));
+            $sheet->setCellValue($col++ . $row, $response['submitted_at_formatted']);
+            
+            if (isset($data['questions'])) {
+                // Map answers to questions
+                $answers = [];
+                foreach ($response['answers'] as $answer) {
+                    $answers[$answer['field_id']] = $answer['field_value'];
+                }
+                
+                foreach ($data['questions'] as $question) {
+                    $sheet->setCellValue($col++ . $row, $answers[$question['id']] ?? '');
+                }
+            }
+            
+            $row++;
+        }
+    }
+    
+    // Set the first sheet as active
+    $spreadsheet->setActiveSheetIndex(0);
+    
+    // Generate file
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . sanitizeFilename($surveyTitle) . '_export_' . date('Y-m-d') . '.xlsx"');
+    header('Cache-Control: max-age=0');
+    
+    $writer->save('php://output');
+    exit();
+}
+
+/**
+ * Sanitize filename
+ */
+function sanitizeFilename($filename) {
+    $filename = preg_replace('/[^a-zA-Z0-9\-_]/', '_', $filename);
+    return substr($filename, 0, 50);
+}

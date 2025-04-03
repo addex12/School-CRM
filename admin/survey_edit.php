@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                           field_label = ?, field_type = ?, is_required = ?,
                                           display_order = ?, field_options = ?
                                           WHERE id = ? AND survey_id = ?");
-                    $options = isset($fieldData['options']) ? explode("\n", trim($fieldData['options'])) : [];
+                    $options = isset($fieldData['options']) ? explode(',', trim($fieldData['options'])) : [];
                     $stmt->execute([
                         $fieldData['label'], $fieldData['type'], isset($fieldData['required']) ? 1 : 0,
                         $fieldData['order'], json_encode($options), $fieldId, $surveyId
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                               (survey_id, field_label, field_type, is_required, 
                                               display_order, field_options)
                                               VALUES (?, ?, ?, ?, ?, ?)");
-                        $options = isset($newField['options']) ? explode("\n", trim($newField['options'])) : [];
+                        $options = isset($newField['options']) ? explode(',', trim($newField['options'])) : [];
                         $stmt->execute([
                             $surveyId, $newField['label'], $newField['type'], 
                             isset($newField['required']) ? 1 : 0,
@@ -290,9 +290,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     
                                     <div class="form-group options-group" 
                                          style="<?= in_array($field['field_type'], ['radio', 'checkbox', 'select']) ? '' : 'display: none;' ?>">
-                                        <label>Options (one per line)*</label>
+                                        <label>Options (comma-separated)*</label>
                                         <textarea name="fields[<?= $field['id'] ?>][options]" rows="3"><?= 
-                                            !empty($field['field_options']) ? implode("\n", json_decode($field['field_options'])) : '' 
+                                            !empty($field['field_options']) ? implode(',', json_decode($field['field_options'], true)) : '' 
                                         ?></textarea>
                                     </div>
                                 </div>
@@ -359,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             
             <div class="form-group options-group" style="display: none;">
-                <label>Options (one per line)*</label>
+                <label>Options (comma-separated)*</label>
                 <textarea name="new_fields[][options]" rows="3"></textarea>
             </div>
         </div>
