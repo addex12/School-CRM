@@ -2,6 +2,8 @@
     "recommendations": [
         "github.copilot-chat",
         "github.copilot",
-        "codeium.codeium"
+        "codeium.codeium",
+        "vsls-contrib.gitdoc"
     ]
+    
 }
