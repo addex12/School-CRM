@@ -31,13 +31,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         } else {
             $_SESSION['error'] = "Invalid credentials";
-            header('Location: ../login.php');
+            header('Location: ../../login.php');
             exit();
         }
     } catch (PDOException $e) {
         error_log($e->getMessage());
         $_SESSION['error'] = "Database error";
-        header('Location: ../login.php');
+        header('Location: ../../login.php');
         exit();
     }
 }
