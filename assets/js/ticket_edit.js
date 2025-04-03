@@ -2,13 +2,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Status change confirmation
     const statusSelect = document.getElementById('status');
     if (statusSelect) {
+        const originalStatus = statusSelect.dataset.originalStatus; // Get original status from data attribute
         statusSelect.addEventListener('change', function() {
             if (this.value === 'resolved') {
-                if (!confirm('Are you sure you want to mark this ticket as resolved?')) {
-                    this.value = '<?= $ticket['status'] ?>'; // Revert to original value
+                    this.value = originalStatus; // Revert to original value
+                    this.value = originalStatus; // Revert to original value
                 }
             }
-        });
+        );
     }
 
     // Priority color indicator
