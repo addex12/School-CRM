@@ -35,7 +35,7 @@ if ($thread_id) {
     $messages = $stmt->fetchAll();
 } else {
     $messages = [];
-    $error = "Please select a valid chat thread to view messages.";
+    $error = "Please select a chat thread to start messaging.";
 }
 ?>
 
@@ -146,7 +146,7 @@ if ($thread_id) {
                     <button type="submit" class="btn-primary">Send Message</button>
                 </form>
             <?php else: ?>
-                <p>Please select a chat thread to start messaging.</p>
+                <p><?= $error ?></p>
             <?php endif; ?>
         </div>
 
