@@ -13,6 +13,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Debugging: Log session data
+error_log("Session Data: " . json_encode($_SESSION));
+error_log("Session ID: " . session_id());
+
 if (!function_exists('isLoggedIn')) {
     function isLoggedIn(): bool {
         return isset($_SESSION['user_id']);

@@ -5,7 +5,7 @@ require_once __DIR__ . '/includes/functions.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header("Location: " . ($_SESSION['user_id'] == 1 ? '/admin/dashboard.php' : '/user/dashboard.php'));
+    header("Location: " . ($_SESSION['role'] === 'admin' ? '/admin/dashboard.php' : '/user/dashboard.php'));
     exit();
 }
 
@@ -37,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
+            // Debugging: Log successful login
+            error_log("Login successful for user ID: " . $user['id']);
+
             // Regenerate session ID to prevent fixation
             session_regenerate_id(true);
             
@@ -63,6 +66,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Debugging: Log session data
+error_log("Session Data: " . json_encode($_SESSION));
 
 // Load UI configuration
 $ui_config = json_decode(file_get_contents(__DIR__ . '/assets/config/ui.json'), true);
