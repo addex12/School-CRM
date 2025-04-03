@@ -7,7 +7,7 @@ if (session_status() === PHP_SESSION_NONE) {
         'path' => '/',
         'domain' => $_SERVER['HTTP_HOST'],
         'secure' => isset($_SERVER['HTTPS']),
-        'httponly' => true,
+        'httponly' => false,
         'samesite' => 'Strict'
     ]);
 }
