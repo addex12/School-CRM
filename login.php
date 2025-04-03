@@ -10,7 +10,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Load UI configuration
-$ui_config = json_decode(file_get_contents(__DIR__ . '/assets/config/ui.json'), true);
+$ui_config = json_decode(file_get_contents(__DIR__ . '/assets/js/ui.json'), true);
 $error = '';
 $username = '';
 
