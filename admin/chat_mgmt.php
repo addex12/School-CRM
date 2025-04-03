@@ -291,7 +291,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'], $_POST['th
 const adminId = <?= $_SESSION['user_id'] ?>;
 const ws = new WebSocket('ws://<?= $_SERVER['HTTP_HOST'] ?>:8080?user_id=' + adminId + '&role=admin');
 
-// WebSocket handlers
+ws.onopen = () => {
+    console.log('WebSocket connected');
+};
+
+ws.onerror = (error) => {
+    console.error('WebSocket Error:', error);
+};
+
+ws.onclose = () => {
+    console.log('WebSocket disconnected');
+};
+
 ws.onmessage = (event) => {
     const data = JSON.parse(event.data);
     

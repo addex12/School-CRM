@@ -68,6 +68,15 @@ if (!$thread) {
             $('#connection-status').text('Online').addClass('connected');
         };
 
+        ws.onerror = (error) => {
+            console.error('WebSocket Error:', error);
+            $('#connection-status').text('Connection Error').removeClass('connected');
+        };
+
+        ws.onclose = () => {
+            $('#connection-status').text('Disconnected').removeClass('connected');
+        };
+
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             if (data.thread_id === threadId) {
