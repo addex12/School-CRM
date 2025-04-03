@@ -244,3 +244,11 @@ function countUnreadNotifications(PDO $pdo, int $userId): int {
     $stmt->execute([$userId]);
     return (int) $stmt->fetchColumn();
 }
+function logActivity(PDO $pdo, string $message, string $type, int $userId): void {
+    try {
+        $stmt = $pdo->prepare("INSERT INTO activity_logs (message, type, user_id, created_at) VALUES (?, ?, ?, NOW())");
+        $stmt->execute([$message, $type, $userId]);
+    } catch (Exception $e) {
+        error_log("Failed to log activity: " . $e->getMessage());
+    }
+}
