@@ -82,10 +82,10 @@ $stmt = $pdo->prepare($query);
 
 // Bind parameters properly
 foreach ($params as $key => $value) {
-    if (is_int($value)) {
-        $stmt->bindValue($key, $value, PDO::PARAM_INT);
-    } else {
-        $stmt->bindValue($key, $value);
+    if (is_int($key)) {
+        $stmt->bindValue($key + 1, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR); // Adjust for numeric keys
+    } elseif (strpos($key, ':') === 0) {
+        $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR); // Handle named placeholders
     }
 }
 
