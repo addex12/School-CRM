@@ -6,13 +6,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT id, username, role_id, password FROM users WHERE email = ?");
+    // Adjust the query to match the actual column names in the database
+    $stmt = $pdo->prepare("SELECT id, full_name AS username, role_id, password FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
+        $_SESSION['username'] = $user['username']; // Use 'full_name' as 'username'
         $_SESSION['role_id'] = $user['role_id'];
 
         if ($user['role_id'] == 1) {
