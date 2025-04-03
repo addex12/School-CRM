@@ -301,7 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'], $_POST['th
         <?php endif; ?>
 // Initialize WebSocket connection
 const adminId = <?= $_SESSION['user_id'] ?>;
-const ws = new WebSocket('ws://your-domain:8080?user_id=' + adminId);
+const ws = new WebSocket('ws://crm.flipperschool:80?user_id=' + adminId);
 
 // Handle incoming messages
 ws.onmessage = (event) => {
