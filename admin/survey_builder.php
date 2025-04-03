@@ -495,5 +495,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="../assets/js/survey_builder.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addFieldButton = document.getElementById('add-field');
+        const fieldsContainer = document.getElementById('fields-container');
+        const fieldTemplate = document.getElementById('field-template').innerHTML;
+
+        let fieldIndex = <?= count($surveyFields) ?>; // Start index after existing fields
+
+        addFieldButton.addEventListener('click', function () {
+            const newFieldHtml = fieldTemplate.replace(/__INDEX__/g, fieldIndex);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = newFieldHtml.trim();
+            fieldsContainer.appendChild(tempDiv.firstChild);
+            fieldIndex++;
+        });
+
+        fieldsContainer.addEventListener('click', function (event) {
+            if (event.target.closest('.btn-delete-field')) {
+                const fieldCard = event.target.closest('.field-card');
+                fieldCard.remove();
+            }
+        });
+    });
+</script>
 </body>
 </html>
