@@ -8,7 +8,13 @@ require_once __DIR__ . '/functions.php';
 
 // Prevent logged-in users from accessing the login page
 if (basename($_SERVER['PHP_SELF']) === 'login.php' && isset($_SESSION['user_id'])) {
-    header("Location: " . ($_SESSION['dashboard_path'] ?? '/index.php'));
+    if ($_SESSION['role_name'] === 'admin') {
+        header("Location: /admin/dashboard.php");
+    } elseif ($_SESSION['role_name'] === 'user') {
+        header("Location: /user/dashboard.php");
+    } else {
+        header("Location: /index.php"); // Default fallback
+    }
     exit();
 }
 
@@ -26,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Fetch user with role information
         $stmt = $pdo->prepare("
-            SELECT u.*, r.dashboard_path 
+            SELECT u.*, r.role_name 
             FROM users u
             JOIN roles r ON u.role_id = r.id 
             WHERE (u.username = :username OR u.email = :username) AND u.active = 1
@@ -42,14 +48,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['dashboard_path'] = validate_dashboard_path($user['dashboard_path']); // Validate path
+            $_SESSION['role_name'] = $user['role_name'];
 
             // Update last login
             $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")
                 ->execute([$user['id']]);
 
-            // Redirect to dashboard
-            header("Location: " . $_SESSION['dashboard_path']);
+            // Redirect to dashboard based on role
+            if ($_SESSION['role_name'] === 'admin') {
+                header("Location: /admin/dashboard.php");
+            } elseif ($_SESSION['role_name'] === 'user') {
+                header("Location: /user/dashboard.php");
+            } else {
+                header("Location: /index.php"); // Default fallback
+            }
             exit(); // Ensure no further code is executed
         } else {
             log_activity(null, 'login_failed', "Failed login attempt for username: $username");

@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password']);
 
     try {
-        $stmt = $pdo->prepare("SELECT u.*, r.role_name, r.dashboard_path FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.email = ?");
+        $stmt = $pdo->prepare("SELECT u.*, r.role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -23,10 +23,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['email'] = $user['email'];
             $_SESSION['role_id'] = $user['role_id'];
             $_SESSION['role_name'] = $user['role_name'];
-            $_SESSION['dashboard_path'] = $user['dashboard_path'];
 
             // Redirect based on role
-            header("Location: " . $_SESSION['dashboard_path']);
+            if ($user['role_name'] === 'admin') {
+                header("Location: /admin/dashboard.php");
+            } elseif ($user['role_name'] === 'user') {
+                header("Location: /user/dashboard.php");
+            } else {
+                header("Location: /index.php"); // Default fallback
+            }
             exit(); // Ensure no further code is executed
         } else {
             $_SESSION['error'] = "Invalid email or password.";
