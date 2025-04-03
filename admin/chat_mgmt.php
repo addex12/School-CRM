@@ -292,4 +292,4 @@ if (isset($_GET['thread_id'])) {
 </body>
 </html>
 
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
