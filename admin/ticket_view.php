@@ -1,79 +1,75 @@
 <?php
 /**
- * View Support Ticket
- * This page is specifically for viewing the details of a single ticket.
- * It is not intended for browsing or listing multiple tickets.
+ * View Support Ticket - Working Version
  */
-require_once '../includes/auth.php';
-requireAdmin();
-require_once '../includes/config.php';
-require_once '../includes/functions.php';
-require_once '../includes/db.php';
+session_start();
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/functions.php';
 
-$pageTitle = "View Ticket";
-
-// Ensure database connection is established
-if (!isset($pdo) || !$pdo) {
-    error_log("Database connection not established."); // Log the error for debugging
-    $_SESSION['error'] = "Database connection not established.";
-    header("Location: ../error.php");
+// Verify admin access
+if (!isset($_SESSION['user_id']) || $_SESSION['role_id'] != 1) {
+    header("Location: ../login.php");
     exit();
 }
 
-// Check if ticket ID is provided and valid
-if (!isset($_GET['id']) || !is_numeric($_GET['id']) || (int)$_GET['id'] <= 0) {
-    error_log("Invalid or missing ticket ID: " . ($_GET['id'] ?? 'null')); // Log the error for debugging
-    $_SESSION['error'] = "Invalid ticket ID.";
+// Database connection
+try {
+    $pdo = new PDO(
+        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME,
+        DB_USER,
+        DB_PASSWORD,
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+    );
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
+}
+
+// Get ticket ID
+if (!isset($_GET['id']) || !ctype_digit($_GET['id'])) {
+    $_SESSION['error'] = "Invalid ticket ID";
     header("Location: tickets.php");
     exit();
 }
 
 $ticketId = (int)$_GET['id'];
 
-// Fetch ticket details
-try {
-    $stmt = $pdo->prepare("SELECT st.*, tp.label as priority_label, tp.color as priority_color, 
-                          u.username as user_name, u.email as user_email, u.avatar as user_avatar,
-                          a.username as assigned_to_name, a.email as assigned_to_email, a.avatar as assigned_to_avatar
-                          FROM support_tickets st
-                          JOIN ticket_priorities tp ON st.priority_id = tp.id
-                          JOIN users u ON st.user_id = u.id
-                          LEFT JOIN users a ON st.assigned_to = a.id
-                          WHERE st.id = ?");
-    $stmt->execute([$ticketId]);
-    $ticket = $stmt->fetch(PDO::FETCH_ASSOC);
+// Fetch ticket
+$stmt = $pdo->prepare("SELECT 
+    t.*, 
+    p.label as priority, 
+    p.color as priority_color,
+    u.username as user_name,
+    u.email as user_email
+    FROM support_tickets t
+    JOIN ticket_priorities p ON t.priority_id = p.id
+    JOIN users u ON t.user_id = u.id
+    WHERE t.id = ?");
+$stmt->execute([$ticketId]);
+$ticket = $stmt->fetch();
 
-    if (!$ticket) {
-        error_log("Ticket not found for ID: $ticketId"); // Log the error for debugging
-        $_SESSION['error'] = "Ticket not found.";
-        header("Location: tickets.php");
-        exit();
-    }
-} catch (Exception $e) {
-    error_log("Ticket fetch error: " . $e->getMessage()); // Log the exception for debugging
-    $_SESSION['error'] = "Failed to fetch ticket details.";
+if (!$ticket) {
+    $_SESSION['error'] = "Ticket not found";
     header("Location: tickets.php");
     exit();
 }
 
-// Fetch ticket replies
-try {
-    $stmt = $pdo->prepare("SELECT tr.*, u.username, u.avatar, u.role_id, r.role_name
-                          FROM ticket_replies tr
-                          JOIN users u ON tr.user_id = u.id
-                          JOIN roles r ON u.role_id = r.id
-                          WHERE tr.ticket_id = ?
-                          ORDER BY tr.created_at ASC");
-    $stmt->execute([$ticketId]);
-    $replies = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Ticket replies fetch error: " . $e->getMessage());
-    $replies = [];
-}
+// Fetch replies
+$stmt = $pdo->prepare("SELECT 
+    r.*, 
+    u.username,
+    u.avatar,
+    u.role_id
+    FROM ticket_replies r
+    JOIN users u ON r.user_id = u.id
+    WHERE r.ticket_id = ?
+    ORDER BY r.created_at ASC");
+$stmt->execute([$ticketId]);
+$replies = $stmt->fetchAll();
 
 // Handle reply submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message'])) {
-    $message = trim($_POST['reply_message']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message'])) {
+    $message = trim($_POST['message']);
     
     if (!empty($message)) {
         try {
@@ -81,199 +77,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reply_message'])) {
             
             // Add reply
             $stmt = $pdo->prepare("INSERT INTO ticket_replies 
-                                  (ticket_id, user_id, message, is_admin, created_at)
-                                  VALUES (?, ?, ?, 1, NOW())");
+                (ticket_id, user_id, message, is_admin, created_at)
+                VALUES (?, ?, ?, 1, NOW())");
             $stmt->execute([$ticketId, $_SESSION['user_id'], $message]);
             
-            // Update ticket status if needed
-            if (isset($_POST['update_status'])) {
-                $newStatus = $_POST['ticket_status'];
+            // Update status if changed
+            if (isset($_POST['status']) && $_POST['status'] !== $ticket['status']) {
                 $stmt = $pdo->prepare("UPDATE support_tickets SET status = ? WHERE id = ?");
-                $stmt->execute([$newStatus, $ticketId]);
-                $ticket['status'] = $newStatus;
+                $stmt->execute([$_POST['status'], $ticketId]);
+                $ticket['status'] = $_POST['status'];
             }
             
-            // Add activity log
-            $activityDesc = "Replied to ticket #" . $ticket['ticket_number'];
-            $stmt = $pdo->prepare("INSERT INTO activity_log 
-                                  (user_id, activity_type, description, ip_address, created_at)
-                                  VALUES (?, 'ticket', ?, ?, NOW())");
-            $stmt->execute([$_SESSION['user_id'], $activityDesc, $_SERVER['REMOTE_ADDR']]);
-            
             $pdo->commit();
+            $_SESSION['success'] = "Reply added successfully";
             
-            $_SESSION['success'] = "Reply added successfully.";
+            // Refresh to show new reply
             header("Location: ticket_view.php?id=$ticketId");
             exit();
+            
         } catch (Exception $e) {
             $pdo->rollBack();
-            error_log("Ticket reply error: " . $e->getMessage());
-            $_SESSION['error'] = "Failed to add reply. Please try again.";
+            $_SESSION['error'] = "Error adding reply: " . $e->getMessage();
         }
     } else {
-        $_SESSION['error'] = "Reply message cannot be empty.";
+        $_SESSION['error'] = "Message cannot be empty";
     }
 }
-
-// Get available statuses
-$statuses = ['open', 'in_progress', 'on_hold', 'resolved'];
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <title>View Ticket - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <link rel="stylesheet" href="../assets/css/tickets.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .ticket-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .ticket-header { background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px; }
+        .ticket-meta { display: flex; gap: 15px; margin-bottom: 10px; flex-wrap: wrap; }
+        .ticket-priority { padding: 3px 10px; border-radius: 4px; color: white; font-weight: bold; font-size: 0.9em; }
+        .ticket-status { padding: 3px 10px; border-radius: 4px; background: #e9ecef; text-transform: capitalize; }
+        .ticket-body { padding: 20px; background: white; border-radius: 5px; margin-bottom: 30px; }
+        .reply { background: white; padding: 15px; margin-bottom: 15px; border-radius: 5px; border-left: 3px solid #ddd; }
+        .reply.admin { border-left-color: #3498db; }
+        .reply-form { background: #f8f9fa; padding: 20px; border-radius: 5px; }
+        .reply-form textarea { width: 100%; min-height: 100px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .status-select { padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
+        
         <div class="admin-main">
             <header class="admin-header">
-                <div class="header-left">
-                    <h1><?= htmlspecialchars($pageTitle) ?></h1>
-                    <p class="welcome-message">Viewing ticket #<?= htmlspecialchars($ticket['ticket_number']) ?></p>
-                </div>
-                <div class="header-right">
-                    <div class="notifications-dropdown">
-                        <div class="notifications-toggle">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge">3</span>
-                        </div>
-                        <div class="notifications-menu">
-                            <!-- Notifications dropdown content -->
-                        </div>
-                    </div>
-                    <div class="user-profile">
-                        <img src="../uploads/avatars/default.jpg" alt="Profile">
-                    </div>
+                <h1>Ticket #<?= htmlspecialchars($ticket['ticket_number']) ?></h1>
+                <div class="header-actions">
+                    <a href="tickets.php" class="btn">Back to Tickets</a>
                 </div>
             </header>
             
             <div class="content">
-                <!-- Ticket Details Section -->
-                <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-ticket-alt"></i> Ticket Details</h2>
-                        <div class="ticket-actions">
-                            <a href="tickets.php" class="btn btn-outline">
-                                <i class="fas fa-arrow-left"></i> Back to Tickets
-                            </a>
-                            <a href="ticket_edit.php?id=<?= $ticketId ?>" class="btn btn-edit">
-                                <i class="fas fa-edit"></i> Edit Ticket
-                            </a>
+                <div class="ticket-container">
+                    <!-- Display any messages -->
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="alert alert-error"><?= $_SESSION['error'] ?></div>
+                        <?php unset($_SESSION['error']); ?>
+                    <?php endif; ?>
+                    
+                    <?php if (isset($_SESSION['success'])): ?>
+                        <div class="alert alert-success"><?= $_SESSION['success'] ?></div>
+                        <?php unset($_SESSION['success']); ?>
+                    <?php endif; ?>
+                    
+                    <!-- Ticket Header -->
+                    <div class="ticket-header">
+                        <div class="ticket-meta">
+                            <div class="ticket-priority" style="background: <?= $ticket['priority_color'] ?>">
+                                <?= htmlspecialchars($ticket['priority']) ?>
+                            </div>
+                            <div class="ticket-status">
+                                <?= htmlspecialchars($ticket['status']) ?>
+                            </div>
+                            <div>Created: <?= date('M j, Y g:i a', strtotime($ticket['created_at'])) ?></div>
                         </div>
+                        <h2><?= htmlspecialchars($ticket['subject']) ?></h2>
+                        <p>From: <?= htmlspecialchars($ticket['user_name']) ?> (<?= htmlspecialchars($ticket['user_email']) ?>)</p>
                     </div>
                     
-                    <div class="ticket-details">
-                        <div class="ticket-header">
-                            <div class="ticket-meta">
-                                <div class="ticket-priority" style="background-color: <?= $ticket['priority_color'] ?>">
-                                    <?= htmlspecialchars($ticket['priority_label']) ?>
-                                </div>
-                                <div class="ticket-status badge-<?= str_replace('_', '-', $ticket['status']) ?>">
-                                    <?= ucwords(str_replace('_', ' ', $ticket['status'])) ?>
-                                </div>
-                                <div class="ticket-date">
-                                    <i class="far fa-calendar-alt"></i> <?= formatDate($ticket['created_at']) ?>
-                                </div>
-                            </div>
-                            <h3 class="ticket-subject"><?= htmlspecialchars($ticket['subject']) ?></h3>
-                        </div>
+                    <!-- Ticket Content -->
+                    <div class="ticket-body">
+                        <?= nl2br(htmlspecialchars($ticket['message'])) ?>
                         
-                        <div class="ticket-body">
-                            <div class="ticket-author">
-                                <div class="author-avatar">
-                                    <img src="../uploads/avatars/<?= htmlspecialchars($ticket['user_avatar'] ?: 'default.jpg') ?>" alt="User Avatar">
-                                </div>
-                                <div class="author-info">
-                                    <h4><?= htmlspecialchars($ticket['user_name']) ?></h4>
-                                    <p><?= htmlspecialchars($ticket['user_email']) ?></p>
-                                </div>
-                            </div>
-                            <div class="ticket-content">
-                                <?= nl2br(htmlspecialchars($ticket['message'])) ?>
-                                
-                                <?php if (!empty($ticket['attachment'])): ?>
-                                    <div class="ticket-attachment">
-                                        <h5><i class="fas fa-paperclip"></i> Attachment:</h5>
-                                        <a href="../uploads/tickets/<?= htmlspecialchars($ticket['attachment']) ?>" target="_blank" class="attachment-link">
-                                            <i class="fas fa-file-download"></i> Download File
-                                        </a>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Ticket Replies Section -->
-                <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-comments"></i> Conversation</h2>
-                        <span class="reply-count"><?= count($replies) ?> replies</span>
-                    </div>
-                    
-                    <div class="ticket-replies">
-                        <?php if (!empty($replies)): ?>
-                            <?php foreach ($replies as $reply): ?>
-                                <div class="reply-item <?= $reply['is_admin'] ? 'admin-reply' : 'user-reply' ?>">
-                                    <div class="reply-author">
-                                        <div class="author-avatar">
-                                            <img src="../uploads/avatars/<?= htmlspecialchars($reply['avatar'] ?: 'default.jpg') ?>" alt="User Avatar">
-                                        </div>
-                                        <div class="author-info">
-                                            <h4><?= htmlspecialchars($reply['username']) ?></h4>
-                                            <p class="role-badge role-<?= $reply['role_id'] ?>">
-                                                <?= htmlspecialchars($reply['role_name']) ?>
-                                            </p>
-                                            <small><?= formatDate($reply['created_at']) ?></small>
-                                        </div>
-                                    </div>
-                                    <div class="reply-content">
-                                        <?= nl2br(htmlspecialchars($reply['message'])) ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="no-replies">
-                                <i class="fas fa-comment-slash"></i>
-                                <p>No replies yet</p>
+                        <?php if (!empty($ticket['attachment'])): ?>
+                            <div class="ticket-attachment">
+                                <strong>Attachment:</strong>
+                                <a href="../uploads/tickets/<?= htmlspecialchars($ticket['attachment']) ?>" download>
+                                    Download File
+                                </a>
                             </div>
                         <?php endif; ?>
                     </div>
                     
-                    <!-- Reply Form -->
-                    <div class="reply-form-section">
-                        <h3><i class="fas fa-reply"></i> Add Reply</h3>
-                        <form method="POST" class="reply-form">
-                            <div class="form-group">
-                                <textarea name="reply_message" id="reply_message" rows="5" placeholder="Type your reply here..." required></textarea>
-                            </div>
-                            <div class="form-footer">
-                                <div class="form-actions">
-                                    <div class="status-update">
-                                        <label for="ticket_status">Update Status:</label>
-                                        <select name="ticket_status" id="ticket_status">
-                                            <?php foreach ($statuses as $status): ?>
-                                                <option value="<?= $status ?>" <?= $ticket['status'] === $status ? 'selected' : '' ?>>
-                                                    <?= ucwords(str_replace('_', ' ', $status)) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                        <input type="checkbox" name="update_status" id="update_status">
-                                        <label for="update_status" class="checkbox-label">Apply</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-paper-plane"></i> Submit Reply
-                                    </button>
+                    <!-- Replies -->
+                    <h3>Replies (<?= count($replies) ?>)</h3>
+                    
+                    <?php if (empty($replies)): ?>
+                        <p>No replies yet</p>
+                    <?php else: ?>
+                        <?php foreach ($replies as $reply): ?>
+                            <div class="reply <?= $reply['is_admin'] ? 'admin' : '' ?>">
+                                <div class="reply-meta">
+                                    <strong><?= htmlspecialchars($reply['username']) ?></strong>
+                                    <span><?= date('M j, Y g:i a', strtotime($reply['created_at'])) ?></span>
+                                </div>
+                                <div class="reply-content">
+                                    <?= nl2br(htmlspecialchars($reply['message'])) ?>
                                 </div>
                             </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    
+                    <!-- Reply Form -->
+                    <div class="reply-form">
+                        <h3>Add Reply</h3>
+                        <form method="POST">
+                            <div class="form-group">
+                                <textarea name="message" required placeholder="Type your reply here..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="status">Update Status:</label>
+                                <select name="status" id="status" class="status-select">
+                                    <option value="open" <?= $ticket['status'] === 'open' ? 'selected' : '' ?>>Open</option>
+                                    <option value="in_progress" <?= $ticket['status'] === 'in_progress' ? 'selected' : '' ?>>In Progress</option>
+                                    <option value="on_hold" <?= $ticket['status'] === 'on_hold' ? 'selected' : '' ?>>On Hold</option>
+                                    <option value="resolved" <?= $ticket['status'] === 'resolved' ? 'selected' : '' ?>>Resolved</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Reply</button>
                         </form>
                     </div>
                 </div>
@@ -281,7 +223,12 @@ $statuses = ['open', 'in_progress', 'on_hold', 'resolved'];
         </div>
     </div>
     
-    <script src="../assets/js/dashboard.js"></script>
-    <script src="../assets/js/ticket_view.js"></script>
+    <script>
+    // Simple textarea auto-resize
+    document.querySelector('textarea').addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+    </script>
 </body>
 </html>
