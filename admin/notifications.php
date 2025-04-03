@@ -35,45 +35,29 @@ if (isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
 }
 
 // Build query
-$query = "SELECT * FROM notifications WHERE user_id = ?";
-$params = [$_SESSION['user_id']];
+$query = "SELECT * FROM notifications WHERE user_id = :user_id";
+$params = [':user_id' => $_SESSION['user_id']];
 
 // Apply filters
 if ($status !== 'all') {
-    $query .= " AND is_read = ?";
-    $params[] = ($status === 'read') ? 1 : 0;
+    $query .= " AND is_read = :is_read";
+    $params[':is_read'] = ($status === 'read') ? 1 : 0;
 }
 
 if ($type !== 'all') {
-    $query .= " AND notification_type = ?";
-    $params[] = $type;
+    $query .= " AND notification_type = :notification_type";
+    $params[':notification_type'] = $type;
 }
 
 if (!empty($search)) {
-    $query .= " AND (title LIKE ? OR message LIKE ?)";
-    $params[] = "%$search%";
-    $params[] = "%$search%";
+    $query .= " AND (title LIKE :search OR message LIKE :search)";
+    $params[':search'] = "%$search%";
 }
 
 // Add sorting
 $query .= " ORDER BY created_at DESC";
 
 // Add pagination
-
-// Pagination
-$itemsPerPage = 15;
-$currentPage = $_GET['page'] ?? 1;
-$offset = ($currentPage - 1) * $itemsPerPage;
-
-// Get total count
-$countQuery = "SELECT COUNT(*) FROM ($query) as total";
-$stmt = $pdo->prepare($countQuery);
-$stmt->execute($params);
-$totalItems = $stmt->fetchColumn();
-
-$totalPages = ceil($totalItems / $itemsPerPage);
-
-// Get paginated results
 $query .= " LIMIT :limit OFFSET :offset";
 $params[':limit'] = (int)$itemsPerPage;
 $params[':offset'] = (int)$offset;
@@ -82,11 +66,7 @@ $stmt = $pdo->prepare($query);
 
 // Bind parameters properly
 foreach ($params as $key => $value) {
-    if (is_int($key)) {
-        $stmt->bindValue($key + 1, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR); // Adjust for numeric keys
-    } elseif (strpos($key, ':') === 0) {
-        $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR); // Handle named placeholders
-    }
+    $stmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
 }
 
 $stmt->execute();
