@@ -1,4 +1,4 @@
-# 🏫 Custom School Parent Survey System
+# 🏫 Custom School CRM System
 ![DeepScan grade](https://deepscan.io/api/teams/26555/projects/29184/branches/938393/badge/grade.svg)
 ![GitHub stars](https://img.shields.io/github/stars/addex12/School-CRM.png)
 ![GitHub last commit](https://img.shields.io/github/last-commit/addex12/School-CRM.png)
