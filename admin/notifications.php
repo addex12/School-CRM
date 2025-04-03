@@ -58,6 +58,8 @@ if (!empty($search)) {
 // Add sorting
 $query .= " ORDER BY created_at DESC";
 
+// Add pagination
+
 // Pagination
 $itemsPerPage = 15;
 $currentPage = $_GET['page'] ?? 1;
@@ -72,17 +74,21 @@ $totalItems = $stmt->fetchColumn();
 $totalPages = ceil($totalItems / $itemsPerPage);
 
 // Get paginated results
-// Get paginated results - convert limit/offset to integers
 $query .= " LIMIT :limit OFFSET :offset";
 $params[':limit'] = (int)$itemsPerPage;
 $params[':offset'] = (int)$offset;
 
-// Prepare and execute with proper parameter types
 $stmt = $pdo->prepare($query);
+
+// Bind parameters properly
 foreach ($params as $key => $value) {
-    $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
-    $stmt->bindValue($key + 1, $value, $paramType);
+    if (is_int($value)) {
+        $stmt->bindValue($key, $value, PDO::PARAM_INT);
+    } else {
+        $stmt->bindValue($key, $value);
+    }
 }
+
 $stmt->execute();
 $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
