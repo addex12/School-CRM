@@ -1,5 +1,6 @@
 <?php
-// Ensure no output before this point
+session_start(); // Ensure session is started
+
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
@@ -20,8 +21,8 @@ if (!function_exists('isLoggedIn')) {
 
 if (!function_exists('requireLogin')) {
     function requireLogin() {
-        if (!isLoggedIn()) {
-            header("Location: ../login.php");
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login.php");
             exit();
         }
     }
@@ -49,9 +50,8 @@ if (!function_exists('getCurrentUser')) {
 
 if (!function_exists('requireAdmin')) {
     function requireAdmin() {
-        if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-            $_SESSION['error'] = "Access denied. Admins only.";
-            header("Location: ../error.php");
+        if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+            header("Location: /login.php");
             exit();
         }
     }
