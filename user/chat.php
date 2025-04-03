@@ -3,39 +3,17 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 requireLogin();
 
-// Handle chat message submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $message = filter_input(INPUT_POST, 'message', FILTER_UNSAFE_RAW);
-    $message = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
-    $thread_id = filter_input(INPUT_POST, 'thread_id', FILTER_VALIDATE_INT);
+// Get or create chat thread
+$stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE user_id = ? AND status = 'open' LIMIT 1");
+$stmt->execute([$_SESSION['user_id']]);
+$thread = $stmt->fetch();
 
-    if ($thread_id && $message) {
-        try {
-            $stmt = $pdo->prepare("INSERT INTO chat_messages (user_id, thread_id, message, is_admin) VALUES (?, ?, ?, 0)");
-            $stmt->execute([$_SESSION['user_id'], $thread_id, $message]);
-            $success = "Message sent successfully!";
-        } catch (PDOException $e) {
-            $error = "Error sending message: " . $e->getMessage();
-        }
-    } else {
-        $error = "Invalid thread or message.";
-    }
-}
-
-// Get chat history
-$thread_id = filter_input(INPUT_GET, 'thread_id', FILTER_VALIDATE_INT);
-if ($thread_id) {
-    $stmt = $pdo->prepare("SELECT c.*, u.username 
-                           FROM chat_messages c 
-                           JOIN users u ON c.user_id = u.id 
-                           WHERE c.thread_id = ? 
-                           ORDER BY c.created_at DESC 
-                           LIMIT 50");
-    $stmt->execute([$thread_id]);
-    $messages = $stmt->fetchAll();
+if (!$thread) {
+    $pdo->prepare("INSERT INTO chat_threads (user_id, subject, status) VALUES (?, 'Support Request', 'open')")
+       ->execute([$_SESSION['user_id']]);
+    $thread_id = $pdo->lastInsertId();
 } else {
-    $messages = [];
-    $error = "Please select a chat thread to start messaging.";
+    $thread_id = $thread['id'];
 }
 ?>
 
@@ -45,112 +23,90 @@ if ($thread_id) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Chat - Survey System</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        .chat-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .chat-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .chat-messages {
-            height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 20px;
-            background: #f5f5f5;
-            border-radius: 8px;
-        }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            background: #e9ecef;
-            border-radius: 8px;
-            position: relative;
-        }
-        .message strong {
-            display: block;
-            font-size: 0.9em;
-            color: #333;
-        }
-        .message small {
-            position: absolute;
-            bottom: 5px;
-            right: 10px;
-            font-size: 0.8em;
-            color: #666;
-        }
-        textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            resize: none;
-            font-size: 1em;
-        }
-        .btn-primary {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .btn-primary:hover {
-            background: #2980b9;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/chat.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <?php include 'includes/header.php'; ?>
-
-        <div class="chat-container">
-            <div class="chat-header">
-                <h2>Live Chat Support</h2>
-            </div>
-            
-            <?php if (isset($success)): ?>
-                <div class="success-message"><?= $success ?></div>
-            <?php endif; ?>
-            
-            <?php if (isset($error)): ?>
-                <div class="error-message"><?= $error ?></div>
-            <?php endif; ?>
-
-            <?php if ($thread_id): ?>
-                <div class="chat-messages">
-                    <?php foreach ($messages as $message): ?>
-                        <div class="message">
-                            <strong><?= htmlspecialchars($message['username']) ?>:</strong>
-                            <?= htmlspecialchars($message['message']) ?>
-                            <small><?= date('M j, g:i a', strtotime($message['created_at'])) ?></small>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-
-                <form method="POST">
-                    <input type="hidden" name="thread_id" value="<?= htmlspecialchars($thread_id) ?>">
-                    <div class="form-group">
-                        <textarea name="message" rows="3" placeholder="Type your message..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary">Send Message</button>
-                </form>
-            <?php else: ?>
-                <p><?= $error ?></p>
-            <?php endif; ?>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Live Support Chat</h2>
+            <div class="chat-status" id="connection-status">Connecting...</div>
         </div>
-
-        <?php include 'includes/footer.php'; ?>
+        
+        <div class="chat-messages" id="chat-messages">
+            <?php
+            $stmt = $pdo->prepare("SELECT cm.*, u.username 
+                                  FROM chat_messages cm
+                                  JOIN users u ON cm.user_id = u.id
+                                  WHERE thread_id = ?
+                                  ORDER BY created_at ASC");
+            $stmt->execute([$thread_id]);
+            while ($message = $stmt->fetch()):
+            ?>
+            <div class="message <?= $message['is_admin'] ? 'admin' : 'user' ?>">
+                <div class="message-header">
+                    <span class="username"><?= htmlspecialchars($message['username']) ?></span>
+                    <span class="time"><?= date('H:i', strtotime($message['created_at'])) ?></span>
+                </div>
+                <div class="message-content"><?= htmlspecialchars($message['message']) ?></div>
+            </div>
+            <?php endwhile; ?>
+        </div>
+        
+        <div class="chat-input">
+            <textarea id="message-input" placeholder="Type your message..."></textarea>
+            <button id="send-button">Send</button>
+        </div>
     </div>
+
+    <script>
+        const userId = <?= $_SESSION['user_id'] ?>;
+        const threadId = <?= $thread_id ?>;
+        const ws = new WebSocket('ws://your-domain:8080?user_id=' + userId);
+
+        ws.onopen = () => {
+            $('#connection-status').text('Online').addClass('connected');
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.thread_id === threadId) {
+                appendMessage(data);
+            }
+        };
+
+        $('#send-button').click(() => {
+            const message = $('#message-input').val().trim();
+            if (message) {
+                const msgData = {
+                    type: 'message',
+                    thread_id: threadId,
+                    user_id: userId,
+                    message: message,
+                    is_admin: false,
+                    recipient_id: 'admin'
+                };
+                
+                ws.send(JSON.stringify(msgData));
+                $('#message-input').val('');
+            }
+        });
+
+        function appendMessage(data) {
+            const messageHtml = `
+                <div class="message ${data.is_admin ? 'admin' : 'user'}">
+                    <div class="message-header">
+                        <span class="username">${data.is_admin ? 'Support Agent' : 'You'}</span>
+                        <span class="time">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <div class="message-content">${data.message}</div>
+                </div>
+            `;
+            $('#chat-messages').append(messageHtml);
+            $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+        }
+    </script>
 </body>
 </html>
+
+<?php include 'includes/footer.php'; ?>
