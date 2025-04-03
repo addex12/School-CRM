@@ -1,201 +1,238 @@
-document.addEventListener('DOMContentLoaded', function () {
-    console.log('survey_builder.js loaded'); // Check if the script is loaded
-
-    const questionsContainer = document.getElementById('questions-container');
-    const addQuestionBtn = document.getElementById('add-question');
-    const generateAIQuestionsBtn = document.getElementById('generate-ai-questions');
-    const aiOutput = document.getElementById('ai-output');
-    const aiSuggestionsContainer = document.getElementById('ai-suggestions-container');
-    const generateQuestionBtn = document.getElementById('generate-question-btn');
-    // Check if the required elements are present in the DOM
-
-    if (!questionsContainer || !addQuestionBtn || !generateAIQuestionsBtn) {
-        console.error('Required elements not found');
-        return;
-    }
-
-    let questionCount = questionsContainer.children.length;
-    console.log('Initial question count:', questionCount); // Debugging log
-    // Initialize existing questions        
-    // Add new question
-    addQuestionBtn.addEventListener('click', () => {
-        console.log('Add question button clicked'); // Debugging log
-        const newQuestion = createQuestionElement(questionCount);
-        questionsContainer.appendChild(newQuestion);
-        initQuestionEvents(newQuestion);
-        questionCount++;
+document.addEventListener('DOMContentLoaded', function() {
+    const fieldsContainer = document.getElementById('fields-container');
+    const addFieldBtn = document.getElementById('add-field');
+    const fieldTemplate = document.getElementById('field-template');
+    const form = document.getElementById('survey-form');
+    
+    // Initialize date pickers
+    flatpickr('#starts_at', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        minDate: 'today'
     });
-
-    // Generate AI questions
-    generateAIQuestionsBtn.addEventListener('click', async () => {
-        const title = document.getElementById('title').value;
-        const description = document.getElementById('description').value;
-
-        if (!title || !description) {
-            alert('Please provide a title and description for the survey.');
-            return;
-        }
-
-        try {
-            aiOutput.textContent = 'Generating questions...'; // Show loading message
-            const response = await fetch('/api/getAISuggestions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    codeSnippet: '',
-                    context: `Generate survey questions for a survey titled "${title}" with the description "${description}".`,
-                }),
-            });
-
-            const data = await response.json();
-            if (data.suggestions) {
-                aiOutput.textContent = 'AI Suggestions:';
-                const questions = data.suggestions.split('\n').filter((q) => q.trim());
-                questions.forEach((question) => {
-                    const newQuestion = createQuestionElement(questionCount, question);
-                    questionsContainer.appendChild(newQuestion);
-                    initQuestionEvents(newQuestion);
-                    questionCount++;
-                });
-            } else {
-                aiOutput.textContent = 'No suggestions received from AI.';
-            }
-        } catch (error) {
-            console.error('Error fetching AI suggestions:', error);
-            aiOutput.textContent = 'Failed to fetch AI suggestions.';
-        }
-
+    
+    flatpickr('#ends_at', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        minDate: 'today'
+    });
+    
+    // Add new field
+    addFieldBtn.addEventListener('click', function() {
+        const index = fieldsContainer.children.length;
+        const newField = createField(index);
+        fieldsContainer.appendChild(newField);
+        updateFieldIndexes();
+    });
+    
+    // Create a new field from template
+    function createField(index) {
+        const newField = fieldTemplate.cloneNode(true);
+        newField.style.display = '';
+        newField.dataset.index = index;
         
-    });
-
-    // Initialize existing questions
-    document.querySelectorAll('.question-card').forEach((question) => {
-        initQuestionEvents(question);
-    });
-
-    function createQuestionElement(index, questionText = '') {
-        const div = document.createElement('div');
-        div.className = 'question-card';
-        div.innerHTML = `
-            <div class="form-group">
-                <label>Question</label>
-                <input type="text" name="questions[]" value="${questionText}" required placeholder="Enter your question">
-            </div>
-            <div class="form-group">
-                <label>Field Type</label>
-                <select name="field_types[]" class="field-type-select" required>
-                    <option value="text">Text Input</option>
-                    <option value="textarea">Text Area</option>
-                    <option value="radio">Multiple Choice</option>
-                    <option value="checkbox">Checkboxes</option>
-                    <option value="select">Dropdown</option>
-                    <option value="number">Number</option>
-                    <option value="date">Date</option>
-                    <option value="rating">Rating</option>
-                    <option value="file">File Upload</option>
-                </select>
-            </div>
-            <div class="form-group options-group">
-                <label>Options (comma-separated)</label>
-                <input type="text" name="options[]" placeholder="Option 1, Option 2, Option 3">
-            </div>
-            <div class="form-group">
-                <label>Placeholder</label>
-                <input type="text" name="placeholders[]" placeholder="Enter placeholder text">
-            </div>
-            <div class="form-group">
-                <label class="required-check">
-                    <input type="checkbox" name="required[]">
-                    Required
-                </label>
-            </div>
-            <button type="button" class="remove-question btn btn-danger">
-                <i class="fas fa-trash"></i> Remove Question
-            </button>
-        `;
-        return div;
-    }
-
-    function initQuestionEvents(question) {
-        // Field type change handler
-        const typeSelect = question.querySelector('.field-type-select');
-        const optionsGroup = question.querySelector('.options-group');
-
-        typeSelect.addEventListener('change', () => {
-            const showOptions = ['radio', 'checkbox', 'select'].includes(typeSelect.value);
-            optionsGroup.style.display = showOptions ? 'block' : 'none';
-        });
-
-        // Trigger initial state
-        typeSelect.dispatchEvent(new Event('change'));
-
-        // Remove question handler
-        question.querySelector('.remove-question').addEventListener('click', () => {
-            question.remove();
-            reindexQuestions();
-        });
-    }
-
-    // Reindex all questions before submission
-    document.getElementById('survey-form').addEventListener('submit', function () {
-        reindexQuestions();
-    });
-
-    function reindexQuestions() {
-        questionsContainer.querySelectorAll('.question-card').forEach((question, index) => {
-            // Update all names with current index
-            question.querySelector('[name="questions[]"]').name = `questions[${index}]`;
-            question.querySelector('[name="field_types[]"]').name = `field_types[${index}]`;
-            question.querySelector('[name="options[]"]').name = `options[${index}]`;
-            question.querySelector('[name="placeholders[]"]').name = `placeholders[${index}]`;
-
-            // Handle required checkbox
-            const requiredCheckbox = question.querySelector('[name="required[]"]');
-            requiredCheckbox.name = `required[${index}]`;
-        });
-    }
-    // Initial setup for existing questions
-    document.querySelectorAll('.question-card').forEach((question) => {
-        initQuestionEvents(question);
-    });
-    // Add new question handler
-    addQuestionBtn.addEventListener('click', () => {
-        const newQuestion = createQuestionElement(questionCount);
-        questionsContainer.appendChild(newQuestion);
-        initQuestionEvents(newQuestion);
-        questionCount++;
-    });
-    // Initial question count setup     
-    questionCount = questionsContainer.children.length;
-    // AI question generation handler
-    generateQuestionBtn.addEventListener('click', async () => {
-        const title = document.getElementById('title').value;
-        const description = document.getElementById('description').value;
-        const aiOutput = document.getElementById('ai-output');
-        if (!title || !description) {
-            alert('Please provide a title and description for the survey.');
-            return;
-        }
-        aiOutput.innerHTML = 'Generating questions...'; // Show loading message
-        try {
-            const response = await fetch('/generate-questions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title,
-                    description,
-                }),
-            });
-            const data = await response.json(); // Parse the response as JSON
-            if (data.suggestions) {
-                aiOutput.innerHTML = data.suggestions; // Display the suggestions
-            } else {
-                aiOutput.innerHTML = 'No suggestions available.'; // Handle case where no suggestions are received  
-            }
-        } catch (error) {
-            console.error('Error fetching AI suggestions:', error); // Log the error
-            aiOutput.innerHTML = 'Failed to fetch AI suggestions.'; // Display error message
-            }
-            });
+        // Update all names and IDs with the new index
+        const elements = newField.querySelectorAll('[name], [id]');
+        elements.forEach(el => {
+            if (el.name) el.name = el.name.replace('__INDEX__', index);
+            if (el.id) el.id = el.id.replace('__INDEX__', index);
         });
         
+        // Add event listeners
+        addFieldEventListeners(newField);
+        
+        return newField;
+    }
+    
+    // Add event listeners to a field
+    function addFieldEventListeners(field) {
+        // Delete button
+        const deleteBtn = field.querySelector('.btn-delete-field');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to delete this question?')) {
+                    field.remove();
+                    updateFieldIndexes();
+                }
+            });
+        }
+        
+        // Move up button
+        const moveUpBtn = field.querySelector('.btn-move-up');
+        if (moveUpBtn) {
+            moveUpBtn.addEventListener('click', function() {
+                const prev = field.previousElementSibling;
+                if (prev) {
+                    fieldsContainer.insertBefore(field, prev);
+                    updateFieldIndexes();
+                }
+            });
+        }
+        
+        // Move down button
+        const moveDownBtn = field.querySelector('.btn-move-down');
+        if (moveDownBtn) {
+            moveDownBtn.addEventListener('click', function() {
+                const next = field.nextElementSibling;
+                if (next) {
+                    fieldsContainer.insertBefore(next, field);
+                    updateFieldIndexes();
+                }
+            });
+        }
+        
+        // Field type change
+        const typeSelect = field.querySelector('.field-type-select');
+        if (typeSelect) {
+            typeSelect.addEventListener('change', function() {
+                const optionsGroup = field.querySelector('.options-group');
+                const icon = field.querySelector('.field-type i');
+                const typeLabel = field.querySelector('.field-type');
+                
+                // Update icon
+                const selectedOption = typeSelect.options[typeSelect.selectedIndex];
+                const type = selectedOption.value;
+                const iconClass = getIconForType(type);
+                icon.className = `fas ${iconClass}`;
+                
+                // Show/hide options
+                if (['radio', 'checkbox', 'select', 'rating'].includes(type)) {
+                    optionsGroup.style.display = 'block';
+                } else {
+                    optionsGroup.style.display = 'none';
+                }
+            });
+        }
+    }
+    
+    // Get icon class for field type
+    function getIconForType(type) {
+        const icons = {
+            'text': 'fa-font',
+            'textarea': 'fa-align-left',
+            'radio': 'fa-dot-circle',
+            'checkbox': 'fa-check-square',
+            'select': 'fa-caret-square-down',
+            'number': 'fa-hashtag',
+            'date': 'fa-calendar-alt',
+            'rating': 'fa-star',
+            'file': 'fa-file-upload'
+        };
+        return icons[type] || 'fa-font';
+    }
+    
+    // Update field indexes after reordering
+    function updateFieldIndexes() {
+        const fields = fieldsContainer.querySelectorAll('.field-card');
+        fields.forEach((field, index) => {
+            field.dataset.index = index;
+            
+            // Update order input
+            const orderInput = field.querySelector('input[name$="[order]"]');
+            if (orderInput) {
+                orderInput.value = index;
+                orderInput.name = `fields[${index}][order]`;
+            }
+            
+            // Update other inputs
+            const inputs = field.querySelectorAll('[name^="fields["]');
+            inputs.forEach(input => {
+                const name = input.name.replace(/fields\[\d+\]/, `fields[${index}]`);
+                input.name = name;
+            });
+        });
+    }
+    
+    // Initialize drag and drop
+    let draggedItem = null;
+    
+    fieldsContainer.addEventListener('dragstart', function(e) {
+        if (e.target.classList.contains('field-card')) {
+            draggedItem = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+        }
+    });
+    
+    fieldsContainer.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        
+        const targetItem = e.target.closest('.field-card');
+        if (targetItem && targetItem !== draggedItem) {
+            const rect = targetItem.getBoundingClientRect();
+            const midpoint = rect.top + rect.height / 2;
+            
+            if (e.clientY < midpoint) {
+                fieldsContainer.insertBefore(draggedItem, targetItem);
+            } else {
+                fieldsContainer.insertBefore(draggedItem, targetItem.nextSibling);
+            }
+        }
+    });
+    
+    fieldsContainer.addEventListener('dragend', function(e) {
+        if (e.target.classList.contains('field-card')) {
+            e.target.classList.remove('dragging');
+            updateFieldIndexes();
+        }
+    });
+    
+    fieldsContainer.addEventListener('drop', function(e) {
+        e.preventDefault();
+    });
+    
+    // Make fields draggable
+    const fields = fieldsContainer.querySelectorAll('.field-card');
+    fields.forEach(field => {
+        field.draggable = true;
+        addFieldEventListeners(field);
+    });
+    
+    // Form validation
+    form.addEventListener('submit', function(e) {
+        // Check for at least one role selected
+        const roleCheckboxes = form.querySelectorAll('input[name="roles[]"]:checked');
+        if (roleCheckboxes.length === 0) {
+            e.preventDefault();
+            alert('Please select at least one role that can access this survey');
+            return;
+        }
+        
+        // Check for at least one field
+        const fields = fieldsContainer.querySelectorAll('.field-card');
+        if (fields.length === 0) {
+            e.preventDefault();
+            alert('Please add at least one question to the survey');
+            return;
+        }
+        
+        // Validate field options for radio/checkbox/select
+        let isValid = true;
+        fields.forEach(field => {
+            const typeSelect = field.querySelector('.field-type-select');
+            const optionsTextarea = field.querySelector('textarea[name$="[options]"]');
+            
+            if (typeSelect && optionsTextarea && optionsTextarea.style.display !== 'none') {
+                const options = optionsTextarea.value.trim().split('\n').filter(opt => opt.trim() !== '');
+                if (options.length === 0) {
+                    isValid = false;
+                    optionsTextarea.focus();
+                    alert('Please provide at least one option for this question');
+                    return false;
+                }
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+    
+    // Initialize field type change handlers for existing fields
+    const typeSelects = document.querySelectorAll('.field-type-select');
+    typeSelects.forEach(select => {
+        select.dispatchEvent(new Event('change'));
+    });
+});
