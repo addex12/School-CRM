@@ -34,6 +34,11 @@ if (isset($_GET['mark_read']) && $_GET['mark_read'] == 'all') {
     }
 }
 
+// Pagination
+$itemsPerPage = 15; // Default number of items per page
+$currentPage = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1; // Current page number
+$offset = ($currentPage - 1) * $itemsPerPage; // Calculate offset for SQL query
+
 // Build query
 $query = "SELECT * FROM notifications WHERE user_id = :user_id";
 $params = [':user_id' => $_SESSION['user_id']];
