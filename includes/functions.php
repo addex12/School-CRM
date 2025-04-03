@@ -274,4 +274,33 @@ function getFieldTypeIcon($type) {
     ];
     return $icons[$type] ?? 'fa-question-circle';
 }
+/**
+ * Build sort query string
+ */
+function buildSortQuery($column) {
+    $query = $_GET;
+    $currentSort = $_GET['sort'] ?? '';
+    $currentOrder = $_GET['order'] ?? 'asc';
+    
+    if ($currentSort === $column) {
+        $query['order'] = $currentOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+        $query['sort'] = $column;
+        $query['order'] = 'asc';
+    }
+    
+    return http_build_query($query);
+}
 
+/**
+ * Get color for survey status
+ */
+function getStatusColor($status) {
+    switch (strtolower($status)) {
+        case 'active': return '#2ecc71';
+        case 'draft': return '#3498db';
+        case 'inactive': return '#f39c12';
+        case 'archived': return '#95a5a6';
+        default: return '#7f8c8d';
+    }
+}
