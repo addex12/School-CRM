@@ -15,6 +15,9 @@ $username = '';
 
 // Process login form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Debugging: Log POST data for troubleshooting
+    error_log("Login attempt: " . json_encode($_POST));
+
     $username = clean_input($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     

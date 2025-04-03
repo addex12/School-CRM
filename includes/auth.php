@@ -81,4 +81,16 @@ if (!function_exists('setUserSession')) {
         }
     }
 }
+
+if (!function_exists('debugSession')) {
+    function debugSession() {
+        error_log("Session Data: " . json_encode($_SESSION));
+        error_log("Session ID: " . session_id());
+    }
+}
+
+// Call debugSession after setting session variables
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    debugSession();
+}
 ?>
