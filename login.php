@@ -5,7 +5,11 @@ require_once __DIR__ . '/includes/functions.php';
 
 // Redirect logged-in users
 if (isset($_SESSION['user_id'])) {
-    header("Location: " . $_SESSION['dashboard_path']);
+    if (!empty($_SESSION['dashboard_path'])) {
+        header("Location: " . $_SESSION['dashboard_path']);
+    } else {
+        header("Location: /dashboard.php"); // Fallback if dashboard_path is not set
+    }
     exit();
 }
 
@@ -39,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'username' => $user['username'],
                 'role_id' => $user['role_id'],
                 'role_name' => $user['role_name'],
-                'dashboard_path' => $user['dashboard_path']
+                'dashboard_path' => $user['dashboard_path'] ?? '/default-dashboard.php' // Ensure fallback
             ];
             
             // Update last login
@@ -47,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ->execute([$user['id']]);
             
             // Redirect to dashboard
-            header("Location: " . $user['dashboard_path']);
+            header("Location: " . $_SESSION['dashboard_path']);
             exit();
         } else {
             $error = 'Invalid credentials';
@@ -63,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="viewport" content="width=device-width, initial-scale=5.0">
     <title>Login - <?= htmlspecialchars($ui_config['site_name']) ?></title>
     <link rel="stylesheet" href="/assets/css/login.css">
     <link rel="icon" href="<?= htmlspecialchars($ui_config['favicon']) ?>">

@@ -605,3 +605,12 @@ function timeAgo($timestamp) {
         return floor($diff / 86400) . ' days ago';
     }
 }
+
+function validate_dashboard_path($path) {
+    $allowed_paths = [
+        '/admin/dashboard.php',
+        '/user/dashboard.php',
+        '/dashboard.php'
+    ];
+    return in_array($path, $allowed_paths) ? $path : '/dashboard.php';
+}

@@ -1,8 +1,8 @@
 {
-    "site_name": "School CRM System",
+    "site_name": "School Survey System",
     "logo": "/assets/images/logo.png",
     "favicon": "/assets/images/favicon.ico",
-    "welcome_message": "Welcome Back!",
+    "welcome_message": "Welcome to the School Survey System",
     "login_prompt": "Please sign in to access your account",
     "show_social_login": true,
     "social_providers": ["Google", "Facebook", "Microsoft"],
@@ -14,5 +14,6 @@
         "background_color": "#f8f9fa",
         "error_color": "#e74c3c",
         "success_color": "#2ecc71"
-    }
+    },
+    "default_dashboard_path": "dashboard.php"
 }
