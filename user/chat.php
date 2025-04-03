@@ -62,7 +62,7 @@ if (!$thread) {
     <script>
         const userId = <?= $_SESSION['user_id'] ?>;
         const threadId = <?= $thread_id ?>;
-        const ws = new WebSocket('ws://<?= $_SERVER['HTTP_HOST'] ?>:8080?user_id=' + userId + '&role=user');
+        const ws = new WebSocket('ws://<?= $_SERVER['HTTP_HOST'] ?>:?user_id=' + userId + '&role=user');
 
         ws.onopen = () => {
             $('#connection-status').text('Online').addClass('connected');
