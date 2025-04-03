@@ -6,11 +6,14 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-// Ensure the user is an admin
+// Debugging: Check session variables
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    // Log session data for debugging (remove in production)
+    error_log("Access denied. Session data: " . print_r($_SESSION, true));
     header("Location: login.php");
     exit;
 }
+
 // Check if an error message is set in the session
 if (isset($_SESSION['error'])) {
     $error_message = $_SESSION['error'];
@@ -20,9 +23,6 @@ if (isset($_SESSION['error'])) {
     header("Location: index.php");
     exit;
 }
-
-$error_message = $_SESSION['error'] ?? "An unexpected error occurred.";
-unset($_SESSION['error']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
