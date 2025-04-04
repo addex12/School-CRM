@@ -6,25 +6,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'];
     $password = $_POST['password'];
 
+    // Debugging: Log the email being checked
+    error_log("Attempting login for email: $email");
+
     // Adjust the query to match the actual column names in the database
     $stmt = $pdo->prepare("SELECT id, full_name AS username, role_id, password FROM users WHERE email = ?");
     $stmt->execute([$email]);
     $user = $stmt->fetch();
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username']; // Use 'full_name' as 'username'
-        $_SESSION['role_id'] = $user['role_id'];
+    if ($user) {
+        // Debugging: Log if the user was found
+        error_log("User found for email: $email");
 
-        if ($user['role_id'] == 1) {
-            header("Location: admin/dashboard.php");
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username']; // Use 'full_name' as 'username'
+            $_SESSION['role_id'] = $user['role_id'];
+
+            if ($user['role_id'] == 1) {
+                header("Location: admin/dashboard.php");
+            } else {
+                header("Location: user/dashboard.php");
+            }
+            exit;
         } else {
-            header("Location: user/dashboard.php");
+            // Debugging: Log if the password verification failed
+            error_log("Password verification failed for email: $email");
         }
-        exit;
     } else {
-        $error = "Invalid email or password.";
+        // Debugging: Log if no user was found
+        error_log("No user found for email: $email");
     }
+
+    $error = "Invalid email or password.";
 }
 ?>
 <!DOCTYPE html>

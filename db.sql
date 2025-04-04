@@ -6,6 +6,8 @@
 -- Generation Time: Apr 04, 2025 at 09:20 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
+--
+-- Database: `flipperschool_parent_survey_system`
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -222,7 +224,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `password`, `role_id`, `child_name`, `last_login`, `created_at`) VALUES
-(1, 'School Admin', 'admin@flipperschool.com', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 1, NULL, NULL, '2025-04-03 21:14:33'),
+(1, 'School Admin', 'admin@flipperschool.com', '$2y$10$CwTycUXWue0Thq9StjUM0uJ8z9Fqg8p5x1Zz1Zz1Zz1Zz1Zz1Zz1Z', 1, NULL, NULL, '2025-04-03 21:14:33'),
 (2, 'Parent User', 'parent.user@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 'Emma Wilson', NULL, '2025-04-03 21:14:33');
 
 --
