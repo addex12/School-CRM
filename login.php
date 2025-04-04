@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         // Debugging: Log if the user was found
         error_log("User found for email: $email");
+        error_log("Role ID: " . $user['role_id']); // Log the role ID
+        error_log("Database password hash: " . $user['password']); // Log the hashed password
 
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
