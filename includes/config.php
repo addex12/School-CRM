@@ -6,6 +6,12 @@ require_once __DIR__ . '/../vendor/autoload.php'; // Include Composer autoloader
 require_once __DIR__ . '/db.php'; // Ensure the correct path to the db.php file
 require_once __DIR__ . '/functions.php'; // Ensure the correct path to the functions.php file
 
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+ini_set('log_errors', '1');
+ini_set('error_log', __DIR__ . '/../php_error.log');
+
 // Database connection
 try {
     $pdo = new PDO('mysql:host=localhost;dbname=school_crm', 'username', 'password'); // Replace with actual credentials

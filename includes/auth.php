@@ -12,5 +12,9 @@ function requireAdmin() {
         header("Location: /user/dashboard.php");
         exit();
     }
+    else {
+        // Admin is logged in, continue execution
+        return true;
+    }
 }
 ?>

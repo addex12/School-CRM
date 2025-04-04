@@ -1,4 +1,8 @@
 <?php
+// Enable error reporting for this script
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
 session_start();
 require_once 'includes/config.php';
 
