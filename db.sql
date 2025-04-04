@@ -224,7 +224,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `password`, `role_id`, `child_name`, `last_login`, `created_at`) VALUES
-(1, 'School Admin', 'admin@flipperschool.com', '$2y$10$CwTycUXWue0Thq9StjUM0uJ8z9Fqg8p5x1Zz1Zz1Zz1Zz1Zz1Zz1Z', 1, NULL, NULL, '2025-04-03 21:14:33'),
+(1, 'School Admin', 'admin@flipperschool.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, NULL, NULL, '2025-04-03 21:14:33'),
 (2, 'Parent User', 'parent.user@example.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, 'Emma Wilson', NULL, '2025-04-03 21:14:33');
 
 --
