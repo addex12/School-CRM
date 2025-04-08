@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                                         <td><?= date('M j, Y g:i A', strtotime($survey['created_at'])) ?></td>
                                         <td>
                                             <div class="action-buttons">
-                                                <a href="survey_builder.php?id=<?= $survey['id'] ?>" class="btn btn-sm btn-primary" title="Edit">
+                                                <a href="edit_survey.php?id=<?= $survey['id'] ?>" class="btn btn-sm btn-primary" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <button type="button" class="btn btn-sm btn-danger delete-survey" 
