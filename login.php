@@ -38,24 +38,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Update last login
             $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
             
-            // Set session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            
-            // Get user role
-            $stmt = $pdo->prepare("SELECT role_id FROM users WHERE id = ?");
+            // Get user role and set session
+            $stmt = $pdo->prepare("SELECT users.*, roles.role_name 
+                                FROM users 
+                                JOIN roles ON users.role_id = roles.id 
+                                WHERE users.id = ?");
             $stmt->execute([$user['id']]);
-            $role = $stmt->fetch();
+            $userData = $stmt->fetch();
             
-            // Redirect based on role
-            if ($role['role_id'] == 1) { 
-                header("Location: " . BASE_URL . "admin/dashboard.php");
-            } else if ($role['role_id'] >= 2) { 
-                header("Location: " . BASE_URL . "user/dashboard.php");
-            } else {
-                header("Location: " . BASE_URL . "index.php");
+            if ($userData) {
+                $_SESSION['user_id'] = $userData['id'];
+                $_SESSION['username'] = $userData['username'];
+                $_SESSION['role_id'] = $userData['role_id'];
+                $_SESSION['role'] = $userData['role_name'];
+                
+                // Redirect based on role
+                if ($userData['role_id'] == 1) { 
+                    header("Location: " . BASE_URL . "admin/dashboard.php");
+                } else if ($userData['role_id'] >= 2) { 
+                    header("Location: " . BASE_URL . "user/dashboard.php");
+                } else {
+                    header("Location: " . BASE_URL . "index.php");
+                }
+                exit();
             }
-            exit();
         } else {
             $error = "Invalid username or password.";
         }

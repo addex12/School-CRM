@@ -7,14 +7,14 @@ require_once __DIR__ . '/db.php'; // Ensure the correct path to the db.php file
 require_once __DIR__ . '/functions.php'; // Ensure the correct path to the functions.php file
 
 // Base configuration
-define('BASE_URL', 'http://localhost/School-CRM/');
+define('BASE_URL', 'http:/crm.flipperschool.com/');
 define('UPLOAD_DIR', __DIR__ . '/../uploads');
 
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'school_crm');
-define('DB_USER', 'root');
-define('DB_PASS', 'password123');
+define('DB_USER', 'flipperschool');
+define('DB_PASS', '');
 
 // Database connection
 try {
