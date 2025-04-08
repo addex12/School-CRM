@@ -220,7 +220,7 @@ $completedSurveys = $completedCount->fetchColumn();
                                     <i class="fas fa-check-circle"></i> Completed
                                 </div>
                             <?php else: ?>
-                                <a href="user/survey_response.php?id=<?= $survey['id'] ?>" class="btn-primary">
+                                <a href="/user/survey_response.php?id=<?= $survey['id'] ?>" class="btn-primary">
                                     <i class="fas fa-file-alt"></i> Take Survey
                                 </a>
                             <?php endif; ?>
