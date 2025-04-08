@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 10px;
         }
 
-        .roles-grid label {
+        .role-checkbox {
             display: flex;
             align-items: center;
             gap: 5px;
@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
         }
 
-        .roles-grid input[type="checkbox"] {
+        .role-checkbox input[type="checkbox"] {
             margin: 0;
         }
     </style>
@@ -239,19 +239,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="target_roles">Target Roles</label>
                         <div class="roles-grid">
                             <?php foreach ($roles as $role): ?>
-                                <label>
-                                    <input type="checkbox" name="target_roles[]" value="<?= htmlspecialchars($role['id']) ?>" <?= in_array($role['id'], $survey['target_roles'] ?? []) ? 'checked' : '' ?>>
-                                    <?= htmlspecialchars($role['role_name']) ?>
-                                </label>
+                                <div class="role-checkbox">
+                                    <label>
+                                        <input type="checkbox" name="target_roles[]" value="<?= htmlspecialchars($role['id']) ?>" 
+                                               <?= in_array($role['id'], $survey['target_roles'] ?? []) ? 'checked' : '' ?>>
+                                        <?= htmlspecialchars($role['role_name']) ?>
+                                    </label>
+                                </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label>
                             <input type="checkbox" name="is_active" <?= isset($survey['is_active']) && $survey['is_active'] ? 'checked' : '' ?>>
                             Active
                         </label>
                     </div>
+
                     <div class="form-group">
                         <label>
                             <input type="checkbox" name="is_anonymous" <?= isset($survey['is_anonymous']) && $survey['is_anonymous'] ? 'checked' : '' ?>>
