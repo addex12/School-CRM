@@ -10,20 +10,40 @@ $pageTitle = "Survey Builder";
 $survey_id = $_GET['id'] ?? null;
 $survey = null;
 if ($survey_id) {
-    $stmt = $pdo->prepare("
-        SELECT s.*, 
-               GROUP_CONCAT(DISTINCT r.role_name) as target_roles
-        FROM surveys s
-        LEFT JOIN survey_roles sr ON s.id = sr.survey_id
-        LEFT JOIN roles r ON sr.role_id = r.id
-        WHERE s.id = ?
-        GROUP BY s.id
-    ");
-    $stmt->execute([$survey_id]);
-    $survey = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($survey) {
-        $survey['target_roles'] = array_map('intval', explode(',', $survey['target_roles']));
+    try {
+        // Get survey details and roles
+        $stmt = $pdo->prepare("
+            SELECT s.*, 
+                   GROUP_CONCAT(DISTINCT r.role_name) as target_roles
+            FROM surveys s
+            LEFT JOIN survey_roles sr ON s.id = sr.survey_id
+            LEFT JOIN roles r ON sr.role_id = r.id
+            WHERE s.id = ?
+            GROUP BY s.id
+        ");
+        $stmt->execute([$survey_id]);
+        $survey = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($survey) {
+            $survey['target_roles'] = array_map('intval', explode(',', $survey['target_roles']));
+            
+            // Get questions for this survey
+            $questionStmt = $pdo->prepare("
+                SELECT sf.*, 
+                       COALESCE(sf.field_options, '') as field_options,
+                       sf.is_required as required
+                FROM survey_fields sf
+                WHERE sf.survey_id = ?
+                ORDER BY sf.sort_order
+            ");
+            $questionStmt->execute([$survey_id]);
+            $survey['questions'] = $questionStmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } catch (PDOException $e) {
+        error_log("Error fetching survey data: " . $e->getMessage());
+        $_SESSION['error'] = "Failed to load survey data: " . $e->getMessage();
+        header("Location: surveys.php");
+        exit();
     }
 }
 
@@ -385,15 +405,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <div id="questions-container">
                         <?php if (isset($survey['questions'])): ?>
-                            <?php foreach ($survey['questions'] as $index => $question): ?>
+                            <?php foreach ($survey['questions'] as $question): ?>
                                 <div class="question-box">
                                     <div class="question-header">
-                                        <span>Question <?= $index + 1 ?></span>
+                                        <span>Question <?= $question['sort_order'] + 1 ?></span>
                                         <button type="button" class="remove-question">Remove</button>
                                     </div>
                                     <div class="question-content">
                                         <input type="text" name="questions[]" 
-                                               value="<?= htmlspecialchars($question['question']) ?>" 
+                                               value="<?= htmlspecialchars($question['field_label']) ?>" 
                                                required>
                                         <select name="field_types[]" required>
                                             <option value="text" <?= $question['field_type'] == 'text' ? 'selected' : '' ?>>Text</option>
@@ -405,8 +425,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <input type="checkbox" name="required[]" 
                                                <?= $question['required'] ? 'checked' : '' ?>>
                                         <label>Required</label>
-                                        <textarea name="options[]" placeholder="Enter options separated by new line (for radio, checkbox, select)">
-                                            <?= htmlspecialchars($question['options'] ?? '') ?>
+                                        <textarea name="options[]" 
+                                                  placeholder="Enter options separated by new line (for radio, checkbox, select)">
+                                            <?= htmlspecialchars($question['field_options'] ?? '') ?>
                                         </textarea>
                                     </div>
                                 </div>
