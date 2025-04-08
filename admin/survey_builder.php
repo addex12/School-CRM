@@ -2,6 +2,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
+require_once '../models/Survey.php';
 
 $pageTitle = "Survey Builder";
 
@@ -9,9 +10,7 @@ $pageTitle = "Survey Builder";
 $survey_id = $_GET['id'] ?? null;
 $survey = null;
 if ($survey_id) {
-    $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
-    $stmt->execute([$survey_id]);
-    $survey = $stmt->fetch();
+    $survey = Survey::model()->findByPk($survey_id);
 }
 
 // Fetch roles dynamically from the database
@@ -43,87 +42,32 @@ try {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $title = trim($_POST['title']);
-    $description = trim($_POST['description']);
-    $category_id = $_POST['category_id'] ?? null;
-    $status_id = $_POST['status'] ?? null;
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
+    $survey_data = [
+        'title' => trim($_POST['title'] ?? ''),
+        'description' => trim($_POST['description'] ?? ''),
+        'category_id' => $_POST['category_id'] ?? null,
+        'status' => $_POST['status'] ?? null,
+        'is_active' => isset($_POST['is_active']),
+        'is_anonymous' => isset($_POST['is_anonymous']),
+        'target_roles' => $_POST['target_roles'] ?? [],
+        'questions' => $_POST['questions'] ?? [],
+        'field_types' => $_POST['field_types'] ?? [],
+        'options' => $_POST['options'] ?? [],
+        'required' => $_POST['required'] ?? []
+    ];
 
-    // Validate and encode target_roles
-    $target_roles = $_POST['target_roles'] ?? [];
-    if (!is_array($target_roles)) {
-        $target_roles = [];
+    if ($survey_id) {
+        $survey_data['id'] = $survey_id;
     }
-    if (!in_array($status_id, $target_roles)) {
-        $target_roles[] = $status_id;
-    }
-    try {
-        $pdo->beginTransaction();
 
-        if ($survey_id) {
-            // Update existing survey
-            $survey = Survey::model()->findByPk($survey_id);
-            if (!$survey) {
-                throw new Exception("Survey not found");
-            }
-            $survey->status = $status_id;
-            $survey->save();
+    $result = Survey::model()->save($survey_data);
 
-            // Update survey details
-            $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, status = ?, is_active = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $survey_id]);
-
-            // Update survey roles
-            $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?")->execute([$survey_id]);
-            foreach ($target_roles as $role_id) {
-                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
-                $stmt->execute([$survey_id, $role_id]);
-            }
-
-            $_SESSION['success'] = "Survey updated successfully!";
-        } else {
-            // Create new survey
-            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, created_by) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $_SESSION['user_id']]);
-            $survey_id = $pdo->lastInsertId();
-
-            // Assign roles to the new survey
-            foreach ($target_roles as $role_id) {
-                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
-                $stmt->execute([$survey_id, $role_id]);
-            }
-
-            $_SESSION['success'] = "Survey created successfully!";
-        }
-
-        // Save survey questions if any
-        if (isset($_POST['questions'])) {
-            // Delete existing questions
-            $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
-            $stmt->execute([$survey_id]);
-
-            // Insert new questions
-            foreach ($_POST['questions'] as $index => $question) {
-                $field_type = $_POST['field_types'][$index];
-                $options = in_array($field_type, ['radio', 'checkbox', 'select']) ? $_POST['options'][$index] : null;
-                $is_required = isset($_POST['required'][$index]) ? 1 : 0;
-
-                $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_type, question, options, is_required, sort_order) VALUES (?, ?, ?, ?, ?, ?)");
-                $stmt->execute([$survey_id, $field_type, $question, $options, $is_required, $index]);
-            }
-        }
-
-        $pdo->commit();
+    if ($result['success']) {
+        $_SESSION['success'] = $survey_id ? "Survey updated successfully!" : "Survey created successfully!";
         header("Location: surveys.php");
         exit();
-    } catch (PDOException $e) {
-        $pdo->rollBack();
-        error_log("Database error saving survey: " . $e->getMessage());
-        $_SESSION['error'] = "Database error: " . $e->getMessage();
-    } catch (Exception $e) {
-        $pdo->rollBack();
-        error_log("Error saving survey: " . $e->getMessage());
-        $_SESSION['error'] = $e->getMessage();
+    } else {
+        $_SESSION['error'] = implode("\n", $result['errors']);
     }
 }
 ?>
@@ -136,7 +80,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
@@ -276,7 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select id="category_id" name="category_id" required>
                             <option value="">Select a category</option>
                             <?php foreach ($categories as $category): ?>
-                                <option value="<?= htmlspecialchars($category['id']) ?>" <?= $category['id'] == ($survey['category_id'] ?? '') ? 'selected' : '' ?> >
+                                <option value="<?= htmlspecialchars($category['id']) ?>" <?= $category['id'] == ($survey['category_id'] ?? '') ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($category['name']) ?>
                                 </option>
                             <?php endforeach; ?>
@@ -297,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="roles-grid">
                             <?php foreach ($roles as $role): ?>
                                 <label>
-                                    <input type="checkbox" name="target_roles[]" value="<?= htmlspecialchars($role['id']) ?>" <?= in_array($role['id'], json_decode($survey['target_roles'] ?? '[]', true)) ? 'checked' : '' ?>>
+                                    <input type="checkbox" name="target_roles[]" value="<?= htmlspecialchars($role['id']) ?>" <?= in_array($role['id'], $survey['target_roles'] ?? []) ? 'checked' : '' ?>>
                                     <?= htmlspecialchars($role['role_name']) ?>
                                 </label>
                             <?php endforeach; ?>
@@ -309,9 +252,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             Active
                         </label>
                     </div>
-                    <div id="questions-container">
-                        <!-- Questions will be dynamically added here -->
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="is_anonymous" <?= isset($survey['is_anonymous']) && $survey['is_anonymous'] ? 'checked' : '' ?>>
+                            Allow Anonymous Responses
+                        </label>
                     </div>
+                    <div id="questions-container">
+                        <?php if ($survey && isset($survey['questions'])): ?>
+                            <?php foreach ($survey['questions'] as $index => $question): ?>
+                                <div class="question-row" data-index="<?= $index ?>">
+                                    <div class="form-group">
+                                        <input type="text" name="questions[<?= $index ?>]" 
+                                               value="<?= htmlspecialchars($question['question']) ?>" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <select name="field_types[<?= $index ?>]" required>
+                                            <option value="text" <?= $question['field_type'] == 'text' ? 'selected' : '' ?>>Text</option>
+                                            <option value="radio" <?= $question['field_type'] == 'radio' ? 'selected' : '' ?>>Multiple Choice (Single)</option>
+                                            <option value="checkbox" <?= $question['field_type'] == 'checkbox' ? 'selected' : '' ?>>Multiple Choice (Multiple)</option>
+                                            <option value="select" <?= $question['field_type'] == 'select' ? 'selected' : '' ?>>Dropdown</option>
+                                        </select>
+                                    </div>
+                                    <?php if (in_array($question['field_type'], ['radio', 'checkbox', 'select'])): ?>
+                                        <div class="form-group options-group">
+                                            <label>Options:</label>
+                                            <textarea name="options[<?= $index ?>]" rows="3"><?= htmlspecialchars($question['options'] ?? '') ?></textarea>
+                                            <p class="help-text">Enter each option on a new line</p>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" name="required[<?= $index ?>]" <?= isset($question['is_required']) && $question['is_required'] ? 'checked' : '' ?>>
+                                            Required
+                                        </label>
+                                    </div>
+                                    <button type="button" class="remove-question btn-danger">Remove Question</button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="form-actions">
                         <button type="button" id="add-question" class="btn-primary">Add Question</button>
                         <button type="submit" class="btn-primary">Save Survey</button>
@@ -319,12 +300,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </form>
 
-                <div class="ai-suggestions">
-                    <h3>AI Suggestions</h3>
-                    <button id="generate-ai-questions" class="btn-primary">Generate Questions</button>
-                    <div id="ai-output"></div>
-                </div>
-            </div>
+                
         </div>
     </div>
     <script src="../assets/js/survey_builder.js"></script>

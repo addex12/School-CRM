@@ -1,254 +1,259 @@
 <?php
+require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireLogin();
+require_once '../models/Survey.php';
 
 $survey_id = $_GET['id'] ?? 0;
 
-// Get survey info
-$stmt = $pdo->prepare("
-    SELECT s.* 
-    FROM surveys s
-    JOIN survey_roles sr ON s.id = sr.survey_id
-    WHERE s.id = ? 
-    AND s.is_active = TRUE 
-    AND s.starts_at <= NOW() 
-    AND s.ends_at >= NOW()
-    AND sr.role_id = ?
-");
-$stmt->execute([$survey_id, $_SESSION['role_id']]);
-$survey = $stmt->fetch();
-
-if (!$survey) {
-    header("Location: dashboard.php?error=survey_not_found");
-    exit();
-}
-
-// Check if user has already completed this survey
-$stmt = $pdo->prepare("SELECT id FROM survey_responses WHERE survey_id = ? AND user_id = ?");
-$stmt->execute([$survey_id, $_SESSION['user_id']]);
-$response = $stmt->fetch();
-
-if ($response) {
-    header("Location: dashboard.php?error=already_completed");
-    exit();
-}
-
-// Get survey fields
-$stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
-$stmt->execute([$survey_id]);
-$fields = $stmt->fetchAll();
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $survey_id = $_POST['survey_id'];
-    $user_id = $_SESSION['user_id'];
-    $answers = [];
-
-    // Collect and validate answers
-    foreach ($fields as $field) {
-        $field_name = $field['field_name'];
-        if (isset($_POST[$field_name])) {
-            $answers[$field_name] = is_array($_POST[$field_name]) 
-                ? $_POST[$field_name] // Keep array for checkboxes
-                : htmlspecialchars($_POST[$field_name]); // Sanitize input
-        } else {
-            $answers[$field_name] = null; // Handle unanswered fields
-        }
-    }
-
-    $encoded_answers = json_encode($answers, JSON_UNESCAPED_UNICODE); // Encode the answers as JSON
-
-    // Insert the response into the database
+// Validate survey access
+try {
     $stmt = $pdo->prepare("
-        INSERT INTO survey_responses (survey_id, user_id, answers, submitted_at) 
-        VALUES (?, ?, ?, NOW())
+        SELECT s.*, 
+               sf.*
+        FROM surveys s
+        JOIN survey_fields sf ON s.id = sf.survey_id
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE s.id = ? 
+        AND s.is_active = TRUE 
+        AND s.starts_at <= NOW() 
+        AND s.ends_at >= NOW()
+        AND sr.role_id = ?
+        ORDER BY sf.sort_order
     ");
-    $stmt->execute([$survey_id, $user_id, $encoded_answers]);
-
-    $_SESSION['success'] = "Your responses have been submitted successfully!";
-    header("Location: thank_you.php");
+    $stmt->execute([$survey_id, $_SESSION['role_id']]);
+    $survey = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    if (empty($survey)) {
+        $_SESSION['error'] = "This survey is not available for your role or is not active.";
+        header("Location: dashboard.php");
+        exit();
+    }
+    
+    // Check if user has already responded
+    $stmt = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM survey_responses sr
+        WHERE sr.survey_id = ? AND sr.user_id = ?
+    ");
+    $stmt->execute([$survey_id, $_SESSION['user_id']]);
+    $hasResponded = $stmt->fetchColumn() > 0;
+    
+    if ($hasResponded && !$survey[0]['is_anonymous']) {
+        $_SESSION['error'] = "You have already responded to this survey.";
+        header("Location: dashboard.php");
+        exit();
+    }
+} catch (PDOException $e) {
+    error_log("Error validating survey access: " . $e->getMessage());
+    $_SESSION['error'] = "An error occurred. Please try again later.";
+    header("Location: dashboard.php");
     exit();
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $pdo->beginTransaction();
+        
+        // Insert survey response
+        $stmt = $pdo->prepare("
+            INSERT INTO survey_responses 
+            (survey_id, user_id, response_time, anonymous) 
+            VALUES (?, ?, NOW(), ?)
+        ");
+        $anonymous = isset($_POST['anonymous']) ? 1 : 0;
+        $stmt->execute([$survey_id, $anonymous ? null : $_SESSION['user_id'], $anonymous]);
+        $response_id = $pdo->lastInsertId();
+        
+        // Process each question response
+        foreach ($survey as $question) {
+            $field_type = $question['field_type'];
+            $field_id = $question['id'];
+            
+            if ($question['is_required'] && !isset($_POST[$field_id])) {
+                throw new Exception("Question " . $question['question'] . " is required");
+            }
+            
+            $value = $_POST[$field_id] ?? null;
+            
+            // Handle different field types
+            switch ($question['field_type']) {
+                case 'text':
+                    echo '<div class="form-group">
+                        <input type="text" 
+                               name="' . htmlspecialchars($question['id']) . '" 
+                               required="' . ($question['is_required'] ? 'required' : '') . '">
+                    </div>';
+                    break;
+                    
+                case 'radio':
+                    $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                    foreach ($options as $option) {
+                        echo '<div class="form-group">
+                            <label>
+                                <input type="radio" 
+                                       name="' . htmlspecialchars($question['id']) . '" 
+                                       value="' . htmlspecialchars(trim($option)) . '" 
+                                       required="' . ($question['is_required'] ? 'required' : '') . '">
+                                ' . htmlspecialchars(trim($option)) . '
+                            </label>
+                        </div>';
+                    }
+                    break;
+                    
+                case 'checkbox':
+                    $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                    foreach ($options as $option) {
+                        echo '<div class="form-group">
+                            <label>
+                                <input type="checkbox" 
+                                       name="' . htmlspecialchars($question['id']) . '[]" 
+                                       value="' . htmlspecialchars(trim($option)) . '">
+                                ' . htmlspecialchars(trim($option)) . '
+                            </label>
+                        </div>';
+                    }
+                    break;
+                    
+                case 'select':
+                    echo '<div class="form-group">
+                        <select name="' . htmlspecialchars($question['id']) . '" 
+                                required="' . ($question['is_required'] ? 'required' : '') . '">
+                            <option value="">Select an option</option>';
+                    
+                    $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                    foreach ($options as $option) {
+                        echo '<option value="' . htmlspecialchars(trim($option)) . '">
+                            ' . htmlspecialchars(trim($option)) . '
+                        </option>';
+                    }
+                    
+                    echo '</select>
+                    </div>';
+                    break;
+            }
+        }
+        
+        $pdo->commit();
+        $_SESSION['success'] = "Thank you for completing the survey!";
+        header("Location: dashboard.php");
+        exit();
+        
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Database error saving survey response: " . $e->getMessage());
+        $_SESSION['error'] = "Database error: " . $e->getMessage();
+        header("Location: dashboard.php");
+        exit();
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        error_log("Error saving survey response: " . $e->getMessage());
+        $_SESSION['error'] = $e->getMessage();
+        header("Location: dashboard.php");
+        exit();
+    }
+}
+
+// Display survey form
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<?php include 'includes/header.php'; ?>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($survey[0]['title']) ?> - Take Survey</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
 <body>
-
-
-<div class="container">
-    <header>
-        <h1>Survey: <?php echo htmlspecialchars($survey['title']); ?></h1>
-        <p><?php echo htmlspecialchars($survey['description']); ?></p>
-        <p>Available from <?php echo date('M j, Y g:i A', strtotime($survey['starts_at'])); ?> to <?php echo date('M j, Y g:i A', strtotime($survey['ends_at'])); ?></p>
-        <p>Created on <?php echo date('M j, Y', strtotime($survey['created_at'])); ?></p>
-        <p>Created by <?php echo htmlspecialchars($survey['created_by']); ?></p>
-        <p>Target Roles: <?php echo htmlspecialchars(implode(', ', json_decode($survey['target_roles'], true))); ?></p>
-        <nav>
-            <a href="dashboard.php">Back to Dashboard</a>
-            <a href="../logout.php">Logout</a>
-        </nav>
-    </header>
-    
-    <div class="survey-content">
-        <h2>Survey Questions</h2>
-        <p>Please fill out the survey below. Your responses are anonymous.</p>
-        <form method="POST" action="">
-            <input type="hidden" name="survey_id" value="<?= $survey['id'] ?>">
-            <input type="hidden" name="user_id" value="<?= $_SESSION['user_id'] ?>">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-        </form>
-        <div class="survey-header">
-            <h2 class="survey-title"><?= htmlspecialchars($survey['title']) ?></h2>
-            <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
-            <div class="survey-status <?= $survey['is_anonymous'] ? 'anonymous' : 'non-anonymous' ?>">
-                <i class="fas fa-user-secret"></i> <?= $survey['is_anonymous'] ? 'Anonymous' : 'Non-Anonymous' ?>
-            </div>
-            <div class="survey-status <?= $survey['is_active'] ? 'active' : 'inactive' ?>">
-                <i class="fas fa-clock"></i> <?= $survey['is_active'] ? 'Active' : 'Inactive' ?>
-            <div class="survey-meta">
-                <p>Available from <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> to <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?></p>
-            </div>
-        </div>
-        <?php if (isset($errors['system'])): ?>
-            <div class="error-message"><?= $errors['system'] ?></div>
-        <?php endif; ?>
-        <form method="POST" enctype="multipart/form-data">
-            <?php foreach ($fields as $field): ?>
-                <div class="form-field">
-                    <!-- Render input fields dynamically -->
-                    <?php if ($field['field_type'] === 'text'): ?>
-                        <input type="text" name="<?= $field['field_name'] ?>" class="form-control"
-                               value="<?= htmlspecialchars($_POST[$field['field_name']] ?? '') ?>">
-                    <?php elseif ($field['field_type'] === 'textarea'): ?>
-                        <textarea name="<?= $field['field_name'] ?>" class="form-control" rows="4"><?= 
-                            htmlspecialchars($_POST[$field['field_name']] ?? '') ?></textarea>
-                    <?php elseif ($field['field_type'] === 'radio'): ?>
-                        <?php foreach (json_decode($field['field_options']) as $option): ?>
-                            <div class="form-check">
-                                <input type="radio" name="<?= $field['field_name'] ?>" 
-                                       value="<?= htmlspecialchars($option) ?>" class="form-check-input">
-                                <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php elseif ($field['field_type'] === 'checkbox'): ?>
-                        <?php foreach (json_decode($field['field_options']) as $option): ?>
-                            <div class="form-check">
-                                <input type="checkbox" name="<?= $field['field_name'] ?>[]" 
-                                       value="<?= htmlspecialchars($option) ?>" class="form-check-input">
-                                <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php elseif ($field['field_type'] === 'file'): ?>
-                        <input type="file" name="<?= $field['field_name'] ?>" class="form-control">
+    <div class="survey-container">
+        <h1><?= htmlspecialchars($survey[0]['title']) ?></h1>
+        <p><?= htmlspecialchars($survey[0]['description']) ?></p>
+        
+        <form method="POST" class="survey-form">
+            <?php if (!$survey[0]['is_anonymous']): ?>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="anonymous" value="1">
+                        Submit anonymously
+                    </label>
+                </div>
+            <?php endif; ?>
+            
+            <?php 
+            function renderField($question) {
+                switch ($question['field_type']) {
+                    case 'text':
+                        echo '<div class="form-group">
+                            <input type="text" 
+                                   name="' . htmlspecialchars($question['id']) . '" 
+                                   required="' . ($question['is_required'] ? 'required' : '') . '">
+                        </div>';
+                        break;
+                        
+                    case 'radio':
+                        $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                        foreach ($options as $option) {
+                            echo '<div class="form-group">
+                                <label>
+                                    <input type="radio" 
+                                           name="' . htmlspecialchars($question['id']) . '" 
+                                           value="' . htmlspecialchars(trim($option)) . '" 
+                                           required="' . ($question['is_required'] ? 'required' : '') . '">
+                                    ' . htmlspecialchars(trim($option)) . '
+                                </label>
+                            </div>';
+                        }
+                        break;
+                        
+                    case 'checkbox':
+                        $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                        foreach ($options as $option) {
+                            echo '<div class="form-group">
+                                <label>
+                                    <input type="checkbox" 
+                                           name="' . htmlspecialchars($question['id']) . '[]" 
+                                           value="' . htmlspecialchars(trim($option)) . '">
+                                    ' . htmlspecialchars(trim($option)) . '
+                                </label>
+                            </div>';
+                        }
+                        break;
+                        
+                    case 'select':
+                        echo '<div class="form-group">
+                            <select name="' . htmlspecialchars($question['id']) . '" 
+                                    required="' . ($question['is_required'] ? 'required' : '') . '">
+                                <option value="">Select an option</option>';
+                        
+                        $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                        foreach ($options as $option) {
+                            echo '<option value="' . htmlspecialchars(trim($option)) . '">
+                                ' . htmlspecialchars(trim($option)) . '
+                            </option>';
+                        }
+                        
+                        echo '</select>
+                        </div>';
+                        break;
+                }
+            }
+            
+            foreach ($survey as $question): ?>
+                <div class="question-group">
+                    <h3><?= htmlspecialchars($question['question']) ?></h3>
+                    
+                    <?php if ($question['is_required']): ?>
+                        <p class="required">* Required</p>
                     <?php endif; ?>
-                    <?php if (isset($errors[$field['field_name']])): ?>
-                        <div class="error"><?= $errors[$field['field_name']] ?></div>
-                    <?php endif; ?>
+                    
+                    <?php renderField($question); ?>
                 </div>
             <?php endforeach; ?>
-            <button type="button" id="preview-button" class="btn btn-secondary">Preview Responses</button>
-            <button type="submit" class="btn btn-primary">Submit Response</button>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">Submit Survey</button>
+            </div>
         </form>
     </div>
-</div>
-
-<?php include 'includes/footer.php'; ?>
-
-<script>
-    // Initialize rating fields
-    document.querySelectorAll('.rating-container').forEach(container => {
-        const stars = container.querySelectorAll('.rating-star');
-        const hiddenInput = container.querySelector('input[type="hidden"]');
-        
-        // Set initial stars if value exists
-        if (hiddenInput.value) {
-            const value = parseInt(hiddenInput.value);
-            stars.forEach((star, i) => {
-                if (i < value) {
-                    star.classList.add('active');
-                }
-            });
-        }
-        
-        stars.forEach(star => {
-            star.addEventListener('click', function() {
-                const value = parseInt(this.dataset.value);
-                stars.forEach((s, i) => {
-                    if (i < value) {
-                        s.classList.add('active');
-                    } else {
-                        s.classList.remove('active');
-                    }
-                });
-                hiddenInput.value = value;
-            });
-        });
-    });
-    
-    // Preview image before upload
-    document.querySelectorAll('input[type="file"]').forEach(input => {
-        input.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file && file.type.match('image.*')) {
-                const reader = new FileReader();
-                
-                reader.onload = function(readerEvent) {
-                    // Remove existing preview if any
-                    const existingPreview = input.nextElementSibling;
-                    if (existingPreview && existingPreview.classList.contains('file-preview')) {
-                        existingPreview.remove();
-                    }
-                    
-                    // Create new preview
-                    const preview = document.createElement('img');
-                    preview.src = readerEvent.target.result;
-                    preview.className = 'file-preview';
-                    input.parentNode.insertBefore(preview, input.nextSibling);
-                }
-                
-                reader.readAsDataURL(file);
-            } else {
-                // Remove existing preview if not an image
-                const existingPreview = input.nextElementSibling;
-                if (existingPreview && existingPreview.classList.contains('file-preview')) {
-                    existingPreview.remove();
-                }
-                alert('Please select an image file.');
-                input.value = '';
-                input.classList.add('is-invalid');
-                input.focus();
-                return false;
-                }
-            });
-    });
-    
-    // Clear invalid class on input focus
-    document.querySelectorAll('input').forEach(input => {
-        input.addEventListener('focus', function() {
-            if (input.classList.contains('is-invalid')) {
-                input.classList.remove('is-invalid');
-            }
-            });
-        input.addEventListener('blur', function() {
-            if (input.classList.contains('is-invalid')) {
-                input.classList.remove('is-invalid');
-            }
-        });
-        
-    });
-
-    document.getElementById('preview-button').addEventListener('click', function () {
-        const form = document.querySelector('form');
-        const formData = new FormData(form);
-        let previewContent = '<h3>Preview Your Responses</h3><ul>';
-        formData.forEach((value, key) => {
-            previewContent += `<li><strong>${key}:</strong> ${value}</li>`;
-        });
-        previewContent += '</ul>';
-        const previewWindow = window.open('', 'Preview', 'width=600,height=400');
-        previewWindow.document.write(previewContent);
-    });
-</script>
 </body>
 </html>
