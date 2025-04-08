@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'status' => $_POST['status'] ?? null,
         'is_active' => isset($_POST['is_active']),
         'is_anonymous' => isset($_POST['is_anonymous']),
-        'target_roles' => $_POST['target_roles'] ?? [],
+        'target_roles' => isset($_POST['target_roles']) ? array_map('intval', $_POST['target_roles']) : [],
         'questions' => $_POST['questions'] ?? [],
         'field_types' => $_POST['field_types'] ?? [],
         'options' => $_POST['options'] ?? [],

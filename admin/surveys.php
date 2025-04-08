@@ -9,41 +9,48 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
+require_once '../models/Survey.php';
 
-$pageTitle = "Manage Surveys";
+$pageTitle = "Surveys";
 
-// Fetch all surveys
-$stmt = $pdo->query("
-    SELECT s.*, GROUP_CONCAT(r.role_name SEPARATOR ', ') AS assigned_roles
-    FROM surveys s
-    LEFT JOIN survey_roles sr ON s.id = sr.survey_id
-    LEFT JOIN roles r ON sr.role_id = r.id
-    GROUP BY s.id
-    ORDER BY s.starts_at DESC
-");
-$surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Handle delete request
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_survey'])) {
-    $survey_id = $_POST['survey_id'];
-    try {
-        $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
-        $stmt->execute([$survey_id]);
-        $_SESSION['success'] = "Survey deleted successfully!";
-        header("Location: surveys.php");
-        exit();
-    } catch (Exception $e) {
-        $_SESSION['error'] = "Error deleting survey: " . $e->getMessage();
-    }
+// Get all surveys with their roles
+$surveys = [];
+try {
+    $stmt = $pdo->prepare("
+        SELECT s.*, 
+               sc.name as category_name,
+               u.username as created_by_user,
+               GROUP_CONCAT(DISTINCT r.role_name) as target_roles
+        FROM surveys s
+        LEFT JOIN survey_categories sc ON s.category_id = sc.id
+        LEFT JOIN users u ON s.created_by = u.id
+        LEFT JOIN survey_roles sr ON s.id = sr.survey_id
+        LEFT JOIN roles r ON sr.role_id = r.id
+        GROUP BY s.id
+        ORDER BY s.created_at DESC
+    ");
+    $stmt->execute();
+    $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    error_log("Error fetching surveys: " . $e->getMessage());
+    $surveys = [];
 }
 
-// Fetch survey statuses dynamically
-try {
-    $statusesStmt = $pdo->query("SELECT status, label FROM survey_statuses ORDER BY id");
-    $statuses = $statusesStmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    error_log("Error fetching survey statuses: " . $e->getMessage());
-    $statuses = [];
+// Handle delete action
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $survey_id = $_POST['survey_id'] ?? null;
+    if ($survey_id) {
+        try {
+            $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
+            $stmt->execute([$survey_id]);
+            $_SESSION['success'] = "Survey deleted successfully!";
+            header("Location: surveys.php");
+            exit();
+        } catch (PDOException $e) {
+            error_log("Error deleting survey: " . $e->getMessage());
+            $_SESSION['error'] = "Failed to delete survey";
+        }
+    }
 }
 ?>
 
@@ -51,10 +58,11 @@ try {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <script src="../assets/js/surveys.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="admin-dashboard">
@@ -62,61 +70,104 @@ try {
         <div class="admin-main">
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
-                <div class="filter-container">
-                    <input type="text" id="search-surveys" placeholder="Search surveys..." class="form-control">
-                    <select id="filter-status" class="form-control">
-                        <option value="">All Statuses</option>
-                        <?php foreach ($statuses as $status): ?>
-                            <option value="<?= htmlspecialchars($status['status']) ?>">
-                                <?= htmlspecialchars($status['label']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="header-actions">
+                    <a href="survey_builder.php" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Survey</a>
                 </div>
             </header>
+            
             <div class="content">
-                <?php if (isset($_SESSION['success'])): ?>
-                    <div class="success-message"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                <?php if (!empty($surveys)): ?>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Target Roles</th>
+                                    <th>Status</th>
+                                    <th>Created By</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($surveys as $survey): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($survey['title']) ?></td>
+                                        <td><?= htmlspecialchars($survey['category_name'] ?? 'N/A') ?></td>
+                                        <td><?= htmlspecialchars($survey['target_roles'] ?? 'N/A') ?></td>
+                                        <td>
+                                            <span class="status-badge <?= strtolower($survey['status']) ?>">
+                                                <?= htmlspecialchars($survey['status']) ?>
+                                            </span>
+                                        </td>
+                                        <td><?= htmlspecialchars($survey['created_by_user'] ?? 'N/A') ?></td>
+                                        <td><?= date('M j, Y g:i A', strtotime($survey['created_at'])) ?></td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="survey_builder.php?id=<?= $survey['id'] ?>" class="btn btn-sm btn-primary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-danger delete-survey" 
+                                                        data-survey-id="<?= $survey['id'] ?>" 
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <p class="no-results">No surveys found. <a href="survey_builder.php">Create your first survey</a>.</p>
                 <?php endif; ?>
-                <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
-                <?php endif; ?>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Description</th>
-                            <th>Category</th>
-                            <th>Assigned Roles</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($surveys as $survey): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($survey['title']); ?></td>
-                                <td><?= htmlspecialchars($survey['description']); ?></td>
-                                <td><?= htmlspecialchars($survey['category_id']); ?></td>
-                                <td><?= htmlspecialchars($survey['assigned_roles']); ?></td>
-                                <td><?= htmlspecialchars($survey['starts_at']); ?></td>
-                                <td><?= htmlspecialchars($survey['ends_at']); ?></td>
-                                <td>
-                                    <a href="edit_survey.php?id=<?= $survey['id']; ?>">Edit</a>
-                                    <form method="POST" style="display:inline;">
-                                        <input type="hidden" name="survey_id" value="<?= $survey['id']; ?>">
-                                        <button type="submit" name="delete_survey" onclick="return confirm('Are you sure?')">Delete</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Delete Survey</h3>
+            <p>Are you sure you want to delete this survey? This action cannot be undone.</p>
+            <form id="deleteForm" method="POST">
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="survey_id" id="deleteSurveyId">
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelDelete">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Delete survey confirmation
+            document.querySelectorAll('.delete-survey').forEach(button => {
+                button.addEventListener('click', function() {
+                    const surveyId = this.dataset.surveyId;
+                    document.getElementById('deleteSurveyId').value = surveyId;
+                    document.getElementById('deleteModal').style.display = 'block';
+                });
+            });
+
+            // Close modal
+            document.getElementById('cancelDelete').addEventListener('click', function() {
+                document.getElementById('deleteModal').style.display = 'none';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('deleteModal');
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-<script src="../assets/js/surveys.js"></script>
-
+<?php include 'includes/footer.php'; ?>
