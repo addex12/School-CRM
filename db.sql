@@ -614,7 +614,7 @@ CREATE TABLE `users` (
   `reset_token` varchar(255) DEFAULT NULL,
   `reset_token_expires` datetime DEFAULT NULL,
   `avatar` varchar(255) DEFAULT 'default.jpg',
-  `notification_prefs` longtext DEFAULT '{"email": true, "push": true}',
+  `notification_prefs` longtext,
   `social_provider` varchar(20) DEFAULT NULL,
   `social_id` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -1104,3 +1104,5 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+

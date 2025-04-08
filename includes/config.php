@@ -1,5 +1,5 @@
 <?php
-// Add at the top of includes/config.php
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../vendor/autoload.php'; // Include Composer autoloader
@@ -8,18 +8,16 @@ require_once __DIR__ . '/functions.php'; // Ensure the correct path to the funct
 
 // Database connection
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=school_crm', 'username', 'password'); // Replace with actual credentials
+    $pdo = new PDO('mysql:host=localhost;dbname=school_crm', 'root', 'password123'); // Replace with actual credentials
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
 
 // Base configuration
-define(constant_name: 'BASE_URL', value: 'https://crm.flipperschool.com');
+define(constant_name: 'BASE_URL', value: 'https://localhost/school_crm/');
 define(constant_name: 'UPLOAD_DIR', value: __DIR__ . '/../uploads');
 
-// OpenAI API Key
-define('OPENAI_API_KEY', 'key'); // Replace with your actual API key
 
 function safe_json_decode($json) {
     return $json ? json_decode($json, true) : [];
