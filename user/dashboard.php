@@ -15,11 +15,13 @@ $stmt = $pdo->prepare("
     SELECT s.* 
     FROM surveys s
     JOIN survey_roles sr ON s.id = sr.survey_id
-    WHERE sr.role_id = ? AND s.is_active = TRUE
+    WHERE sr.role_id = ? AND s.is_active = 1
+      AND s.starts_at <= NOW() AND s.ends_at >= NOW()
     ORDER BY s.starts_at DESC
 ");
 $stmt->execute([$_SESSION['role_id']]);
-$surveys = $stmt->fetchAll();
+$surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Get completed surveys count
 $completedCount = $pdo->prepare("

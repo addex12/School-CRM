@@ -96,17 +96,18 @@ class Survey {
     }
 
     public function save($data) {
+        global $pdo; // Ensure $pdo is available
         $errors = $this->validate($data);
         if (!empty($errors)) {
             return ['success' => false, 'errors' => $errors];
         }
 
         try {
-            $this->pdo->beginTransaction();
+            $pdo->beginTransaction();
 
             if (isset($data['id'])) {
                 // Update existing survey
-                $stmt = $this->pdo->prepare("
+                $stmt = $pdo->prepare("
                     UPDATE surveys 
                     SET title = ?, 
                         description = ?,
@@ -127,16 +128,16 @@ class Survey {
                 ]);
 
                 // Update survey roles
-                $stmt = $this->pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?");
+                $stmt = $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?");
                 $stmt->execute([$data['id']]);
 
                 foreach ($data['target_roles'] as $role_id) {
-                    $stmt = $this->pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                    $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
                     $stmt->execute([$data['id'], $role_id]);
                 }
             } else {
                 // Create new survey
-                $stmt = $this->pdo->prepare("
+                $stmt = $pdo->prepare("
                     INSERT INTO surveys 
                     (title, description, category_id, status, is_active, is_anonymous, created_by) 
                     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -150,43 +151,122 @@ class Survey {
                     isset($data['is_anonymous']) ? 1 : 0,
                     $_SESSION['user_id']
                 ]);
-                $data['id'] = $this->pdo->lastInsertId();
+                $survey_id = $pdo->lastInsertId(); // Assign the new survey ID
 
                 // Assign roles to the new survey
                 foreach ($data['target_roles'] as $role_id) {
-                    $stmt = $this->pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
-                    $stmt->execute([$data['id'], $role_id]);
+                    $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                    $stmt->execute([$survey_id, $role_id]);
                 }
             }
 
-            // Save survey questions
-            if (isset($data['questions'])) {
-                $stmt = $this->pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
-                $stmt->execute([$data['id']]);
-
+            // Save questions (survey_fields table)
+            $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
+            $stmt->execute([$data['id'] ?? $survey_id]); // Use $survey_id for new surveys
+            if (!empty($data['questions'])) {
+                $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_label, field_type, field_options, is_required, display_order) VALUES (?, ?, ?, ?, ?, ?)");
+                $display_order = 0;
                 foreach ($data['questions'] as $index => $question) {
-                    $stmt = $this->pdo->prepare("
-                        INSERT INTO survey_fields 
-                        (survey_id, field_type, question, options, is_required, sort_order) 
-                        VALUES (?, ?, ?, ?, ?, ?)
-                    ");
+                    $options = in_array($data['field_types'][$index], ['radio', 'checkbox', 'select']) 
+                                ? json_encode(explode("\n", $data['options'][$index])) 
+                                : null;
                     $stmt->execute([
-                        $data['id'],
-                        $data['field_types'][$index],
+                        $data['id'] ?? $survey_id, // Use $survey_id for new surveys
                         $question,
-                        isset($data['options'][$index]) ? $data['options'][$index] : null,
+                        $data['field_types'][$index],
+                        $options,
                         isset($data['required'][$index]) ? 1 : 0,
-                        $index
+                        $display_order++
                     ]);
                 }
             }
 
-            $this->pdo->commit();
-            return ['success' => true, 'id' => $data['id']];
-        } catch (PDOException $e) {
-            $this->pdo->rollBack();
-            error_log("Error saving survey: " . $e->getMessage());
-            return ['success' => false, 'errors' => ['Database error: ' . $e->getMessage()]];
+            $pdo->commit();
+            $_SESSION['success'] = isset($data['id']) ? "Survey updated!" : "Survey created!";
+            return ['success' => true];
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $_SESSION['error'] = "Error saving survey: " . $e->getMessage();
+            return ['success' => false, 'errors' => [$e->getMessage()]];
         }
     }
-}
+
+    // Handle form submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        try {
+            $pdo->beginTransaction();
+
+            // Save survey main data
+            $surveyData = [
+                'title' => trim($_POST['title']),
+                'description' => trim($_POST['description']),
+                'category_id' => $_POST['category_id'],
+                'status' => $_POST['status'],
+                'is_active' => isset($_POST['is_active']) ? 1 : 0,
+                'is_anonymous' => isset($_POST['is_anonymous']) ? 1 : 0,
+                'target_roles' => json_encode($_POST['target_roles'] ?? []),
+                'created_by' => $_SESSION['user_id'],
+                'starts_at' => date('Y-m-d H:i:s'), // Adjust as needed
+                'ends_at' => date('Y-m-d H:i:s', strtotime('+1 month')) // Adjust as needed
+            ];
+
+            if ($survey_id) {
+                $stmt = $pdo->prepare("UPDATE surveys SET title=?, description=?, category_id=?, status=?, is_active=?, is_anonymous=?, target_roles=? WHERE id=?");
+                $stmt->execute(array_values(array_merge($surveyData, [$survey_id])));
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, is_anonymous, target_roles, created_by, starts_at, ends_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute(array_values($surveyData));
+                $survey_id = $pdo->lastInsertId();
+            }
+
+            // Save target roles (survey_roles table)
+            $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?")->execute([$survey_id]);
+            if (!empty($_POST['target_roles'])) {
+                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                foreach ($_POST['target_roles'] as $role_id) {
+                    $stmt->execute([$survey_id, $role_id]);
+                }
+            }
+
+            // Save questions (survey_fields table)
+            $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?")->execute([$survey_id]);
+            if (!empty($_POST['questions'])) {
+                $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_label, field_type, field_options, is_required, display_order) VALUES (?, ?, ?, ?, ?, ?)");
+                $display_order = 0;
+                foreach ($_POST['questions'] as $index => $question) {
+                    $options = in_array($_POST['field_types'][$index], ['radio', 'checkbox', 'select']) 
+                                ? json_encode(explode("\n", $_POST['options'][$index])) 
+                                : null;
+                    $stmt->execute([
+                        $survey_id,
+                        $question,
+                        $_POST['field_types'][$index],
+                        $options,
+                        isset($_POST['required'][$index]) ? 1 : 0,
+                        $display_order++
+                    ]);
+                }
+            }
+
+            $pdo->commit();
+            $_SESSION['success'] = $survey_id ? "Survey updated!" : "Survey created!";
+            header("Location: surveys.php");
+            exit();
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            $_SESSION['error'] = "Error saving survey: " . $e->getMessage();
+        }
+    } // Close save method
+
+    public function deleteSurvey($survey_id) {
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM surveys WHERE id = ?");
+            $stmt->execute([$survey_id]);
+            $_SESSION['success'] = "Survey deleted!";
+            header("Location: surveys.php");
+            exit();
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Error deleting survey: " . $e->getMessage();
+        }
+    }
+} // Close Survey class
