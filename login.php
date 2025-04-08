@@ -1,17 +1,25 @@
 <?php
+// Ensure no output before this point
+ob_start();
+
+// Start the session
 session_start();
 $error = '';
+
+// Define BASE_URL
+define('BASE_URL', 'http://example.com/'); // Replace with your actual base URL
+
+// Include configuration first
+require_once __DIR__ . '/includes/config.php';
+
 // Include required files
-require_once 'includes/db.php';
-require_once 'includes/auth.php';
-require_once 'includes/config.php';
-require_once 'includes/functions.php';
-
-
+require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/functions.php';
 
 // Check if the user is already logged in
 if (isLoggedIn()) {
-    header("Location: index.php");
+    header("Location: " . BASE_URL . "index.php");
     exit();
 }
 
@@ -41,11 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Redirect based on role
             if ($role['role_id'] == 1) { 
-                header("Location: " . $base_url . "admin/dashboard.php");                
+                header("Location: " . BASE_URL . "admin/dashboard.php");
             } else if ($role['role_id'] >= 2) { 
-                header("Location: " . $base_url . "user/dashboard.php");                
+                header("Location: " . BASE_URL . "user/dashboard.php");
             } else {
-                header("Location: " . $base_url . "index.php");
+                header("Location: " . BASE_URL . "index.php");
             }
             exit();
         } else {
@@ -55,6 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Login error: " . $e->getMessage());
         $error = "An error occurred. Please try again later.";
     }
+}
+
+// Start output buffering if not already started
+if (!ob_get_level()) {
+    ob_start();
 }
 ?>
 
@@ -69,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="login-container">
         <h1>Login to School CRM</h1>
-        <?php if (isset($error)): ?>
+        <?php if ($error): ?>
             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
         <form method="POST" action="">
@@ -92,3 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 </html>
+
+<?php
+// Flush output buffer
+ob_end_flush();
+?>

@@ -1,6 +1,4 @@
 <?php
-// filepath: /home/orbalia/School-CRM/index.php
-
 // Start the session
 session_start();
 

@@ -18,13 +18,7 @@ try {
 define(constant_name: 'BASE_URL', value: 'https://crm.flipperschools.com/');
 define(constant_name: 'UPLOAD_DIR', value: __DIR__ . '/../uploads');
 
-/**
- * Decodes a JSON string into a PHP array.
- *
- * @param string $json The JSON string to decode.
- *
- * @return array The decoded JSON as a PHP array.
- */
+
 function safe_json_decode($json) {
     return $json ? json_decode($json, true) : [];
 }
