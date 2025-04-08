@@ -63,15 +63,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($survey_id) {
             // Update existing survey
             $survey = Survey::model()->findByPk($survey_id);
+            if (!$survey) {
+                throw new Exception("Survey not found");
+            }
             $survey->status = $status_id;
             $survey->save();
+
+            // Update survey details
             $stmt = $pdo->prepare("UPDATE surveys SET title = ?, description = ?, category_id = ?, status = ?, is_active = ? WHERE id = ?");
             $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $survey_id]);
 
             // Update survey roles
             $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?")->execute([$survey_id]);
             foreach ($target_roles as $role_id) {
-                $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)")->execute([$survey_id, $role_id]);
+                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                $stmt->execute([$survey_id, $role_id]);
             }
 
             $_SESSION['success'] = "Survey updated successfully!";
@@ -83,38 +89,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Assign roles to the new survey
             foreach ($target_roles as $role_id) {
-                $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)")->execute([$survey_id, $role_id]);
+                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                $stmt->execute([$survey_id, $role_id]);
             }
 
             $_SESSION['success'] = "Survey created successfully!";
         }
-        $stmt = $pdo->prepare("");
-        $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $_SESSION["user_id"]]);
-        $_SESSION["success"] = "Survey saved successfully!";
 
-        // Save survey questions
+        // Save survey questions if any
         if (isset($_POST['questions'])) {
+            // Delete existing questions
             $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
-            $stmt->execute([$title, $description, $category_id, $status_id, $is_active, $_SESSION["user_id"]]);
-            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, status, is_active, created_by) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([$survey_id]);
-            $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
-            foreach ($target_roles as $role_id) {
-                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
-                $stmt->execute([$survey_id, $role_id]);
-            }
-            foreach ($target_roles as $role_id) {
-                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
-                $stmt->execute([$survey_id, $role_id]);
-            }
 
+            // Insert new questions
             foreach ($_POST['questions'] as $index => $question) {
                 $field_type = $_POST['field_types'][$index];
                 $options = in_array($field_type, ['radio', 'checkbox', 'select']) ? $_POST['options'][$index] : null;
-                $placeholder = $_POST['placeholders'][$index];
                 $is_required = isset($_POST['required'][$index]) ? 1 : 0;
 
-                $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_type, field_label, field_options, is_required, display_order) VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_type, question, options, is_required, sort_order) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$survey_id, $field_type, $question, $options, $is_required, $index]);
             }
         }
@@ -124,8 +118,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } catch (PDOException $e) {
         $pdo->rollBack();
+        error_log("Database error saving survey: " . $e->getMessage());
+        $_SESSION['error'] = "Database error: " . $e->getMessage();
+    } catch (Exception $e) {
+        $pdo->rollBack();
         error_log("Error saving survey: " . $e->getMessage());
-        $_SESSION['error'] = "Failed to save survey. Please try again.";
+        $_SESSION['error'] = $e->getMessage();
     }
 }
 ?>
