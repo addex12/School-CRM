@@ -7,7 +7,7 @@ require_once __DIR__ . '/db.php'; // Ensure the correct path to the db.php file
 require_once __DIR__ . '/functions.php'; // Ensure the correct path to the functions.php file
 
 // Base configuration
-define('BASE_URL', 'http://crm.flipperschool.com/');
+define('BASE_URL', 'http:/crm.flipperschool.com/');
 define('UPLOAD_DIR', __DIR__ . '/../uploads');
 
 // Database configuration
