@@ -6,6 +6,7 @@
 -- Generation Time: Apr 01, 2025 at 01:15 PM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
+--
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -345,7 +346,6 @@ CREATE TABLE IF NOT EXISTS `surveys` (
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
   `category_id` int(11) DEFAULT NULL,
-  `target_roles` int(10) NOT NULL,
   `created_by` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `starts_at` datetime NOT NULL,
@@ -778,8 +778,7 @@ ALTER TABLE `support_tickets`
 ALTER TABLE `surveys`
   ADD PRIMARY KEY (`id`),
   ADD KEY `category_id` (`category_id`),
-  ADD KEY `status` (`status`),
-  ADD KEY `target_roles` (`target_roles`);
+  ADD KEY `status` (`status`);
 
 --
 -- Indexes for table `survey_categories`
@@ -1057,8 +1056,7 @@ ALTER TABLE `support_tickets`
 --
 ALTER TABLE `surveys`
   ADD CONSTRAINT `surveys_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `survey_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `surveys_ibfk_2` FOREIGN KEY (`status`) REFERENCES `survey_statuses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `surveys_ibfk_3` FOREIGN KEY (`target_roles`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `surveys_ibfk_2` FOREIGN KEY (`status`) REFERENCES `survey_statuses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `survey_conditions`
@@ -1104,5 +1102,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-

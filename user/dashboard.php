@@ -12,23 +12,31 @@ $pageTitle = "User Dashboard";
 
 // Fetch assigned surveys
 $stmt = $pdo->prepare("
-    SELECT s.* 
+    SELECT s.*, 
+           GROUP_CONCAT(DISTINCT r.role_name) as assigned_roles,
+           sr.role_id,
+           COALESCE(
+               (SELECT 1 
+                FROM survey_responses sr 
+                WHERE sr.survey_id = s.id 
+                AND sr.user_id = ?), 
+               0
+           ) as completed
     FROM surveys s
     JOIN survey_roles sr ON s.id = sr.survey_id
-    WHERE sr.role_id = ? AND s.is_active = 1
-      AND s.starts_at <= NOW() AND s.ends_at >= NOW()
+    JOIN roles r ON sr.role_id = r.id
+    WHERE sr.role_id = ? 
+      AND s.is_active = 1
+      AND s.starts_at <= NOW() 
+      AND s.ends_at >= NOW()
+    GROUP BY s.id
     ORDER BY s.starts_at DESC
 ");
-$stmt->execute([$_SESSION['role_id']]);
+$stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]);
 $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 // Get completed surveys count
-$completedCount = $pdo->prepare("
-    SELECT COUNT(DISTINCT survey_id) 
-    FROM survey_responses 
-    WHERE user_id = ?
-");
+$completedCount = $pdo->prepare("SELECT COUNT(DISTINCT survey_id) FROM survey_responses WHERE user_id = ?");
 $completedCount->execute([$_SESSION['user_id']]);
 $completedSurveys = $completedCount->fetchColumn();
 ?>
@@ -194,26 +202,36 @@ $completedSurveys = $completedCount->fetchColumn();
                             <h3><?= htmlspecialchars($survey['title']) ?></h3>
                             <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
                             <div class="survey-meta">
+                                <p><strong>Target Roles:</strong> <?= htmlspecialchars($survey['assigned_roles']) ?></p>
                                 <p><strong>Deadline:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
                                 <p><strong>Time Left:</strong> 
                                     <?php 
                                     $now = new DateTime();
                                     $end = new DateTime($survey['ends_at']);
-                                    echo $now->diff($end)->format('%a days %h hours');
+                                    $diff = $now->diff($end);
+                                    $days = $diff->format('%a');
+                                    $hours = $diff->format('%h');
+                                    echo "{$days} days {$hours} hours";
                                     ?>
                                 </p>
                             </div>
-                            <?= $survey['completed'] ? 
-                                '<div class="survey-status completed">
+                            <?php if ($survey['completed']): ?>
+                                <div class="survey-status completed">
                                     <i class="fas fa-check-circle"></i> Completed
-                                </div>' : 
-                                '<a href="survey.php?id='.$survey['id'].'" class="btn-primary">Take Survey</a>'
-                            ?>
+                                </div>
+                            <?php else: ?>
+                                <a href="survey.php?id=<?= $survey['id'] ?>" class="btn-primary">
+                                    <i class="fas fa-file-alt"></i> Take Survey
+                                </a>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <p class="no-surveys">No surveys assigned to you at the moment.</p>
+                <p class="no-surveys">
+                    <i class="fas fa-info-circle"></i>
+                    No surveys assigned to you at the moment.
+                </p>
             <?php endif; ?>
         </div>
 
