@@ -31,7 +31,8 @@ if ($survey_id) {
             $questionStmt = $pdo->prepare("
                 SELECT sq.*, 
                        COALESCE(sq.field_options, '') as field_options,
-                       sq.is_required as required
+                       sq.is_required as required,
+                       sq.sort_order
                 FROM survey_questions sq
                 WHERE sq.survey_id = ?
                 ORDER BY sq.sort_order
@@ -434,7 +435,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php foreach ($survey['questions'] as $question): ?>
                                 <div class="question-box">
                                     <div class="question-header">
-                                        <span>Question <?= $question['sort_order'] + 1 ?></span>
+                                        <span>Question <?= htmlspecialchars($question['sort_order']) ?></span>
                                         <button type="button" class="remove-question">Remove</button>
                                     </div>
                                     <div class="question-content">
