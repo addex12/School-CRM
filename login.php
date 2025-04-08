@@ -1,10 +1,13 @@
 <?php
 session_start();
-$base_url = '/crm.flipperschool.com/';
 $error = '';
 // Include required files
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
+require_once 'includes/config.php';
+require_once 'includes/functions.php';
+
+
 
 // Check if the user is already logged in
 if (isLoggedIn()) {
