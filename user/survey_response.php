@@ -10,16 +10,16 @@ $survey_id = $_GET['id'] ?? 0;
 try {
     $stmt = $pdo->prepare("
         SELECT s.*, 
-               sf.*
+               sq.*
         FROM surveys s
-        JOIN survey_fields sf ON s.id = sf.survey_id
+        JOIN survey_questions sq ON s.id = sq.survey_id
         JOIN survey_roles sr ON s.id = sr.survey_id
         WHERE s.id = ? 
         AND s.is_active = TRUE 
         AND s.starts_at <= NOW() 
         AND s.ends_at >= NOW()
         AND sr.role_id = ?
-        ORDER BY sf.sort_order
+        ORDER BY sq.sort_order
     ");
     $stmt->execute([$survey_id, $_SESSION['role_id']]);
     $survey = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -71,8 +71,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $field_type = $question['field_type'];
             $field_id = $question['id'];
             
-            if ($question['is_required'] && !isset($_POST[$field_id])) {
-                throw new Exception("Question " . $question['question'] . " is required");
+            if ($question['required'] && !isset($_POST[$field_id])) {
+                throw new Exception("Question " . $question['field_label'] . " is required");
             }
             
             $value = $_POST[$field_id] ?? null;
@@ -177,6 +177,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-primary:hover {
             background: #0056b3;
         }
+        .form-check {
+            margin-bottom: 5px;
+        }
+        .form-check-label {
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -197,25 +203,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php 
             function renderField($question) {
                 $field_id = $question['id'];
-                $is_required = $question['is_required'] ? 'required' : '';
+                $is_required = $question['required'] ? 'required' : '';
+                $field_label = htmlspecialchars($question['field_label']);
                 
                 switch ($question['field_type']) {
                     case 'text':
-                        echo '<input type="text" 
+                        echo '<div class="form-group">
+                            <input type="text" 
                                    name="' . htmlspecialchars($field_id) . '" 
                                    class="form-control" 
-                                   ' . $is_required . '>';
+                                   placeholder="' . $field_label . '" 
+                                   ' . $is_required . '>
+                        </div>';
                         break;
                         
                     case 'textarea':
-                        echo '<textarea name="' . htmlspecialchars($field_id) . '" 
-                                   class="form-control" 
-                                   rows="3" 
-                                   ' . $is_required . '></textarea>';
+                        echo '<div class="form-group">
+                            <textarea name="' . htmlspecialchars($field_id) . '" 
+                                      class="form-control" 
+                                      rows="3" 
+                                      placeholder="' . $field_label . '" 
+                                      ' . $is_required . '></textarea>
+                        </div>';
                         break;
                         
                     case 'radio':
-                        $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                        $options = !empty($question['field_options']) ? explode("\n", $question['field_options']) : [];
                         foreach ($options as $option) {
                             $option = trim($option);
                             if (!empty($option)) {
@@ -236,7 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                         
                     case 'checkbox':
-                        $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                        $options = !empty($question['field_options']) ? explode("\n", $question['field_options']) : [];
                         foreach ($options as $option) {
                             $option = trim($option);
                             if (!empty($option)) {
@@ -256,12 +269,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         break;
                         
                     case 'select':
-                        echo '<select name="' . htmlspecialchars($field_id) . '" 
-                               class="form-control" 
-                               ' . $is_required . '>';
+                        echo '<div class="form-group">
+                            <select name="' . htmlspecialchars($field_id) . '" 
+                                    class="form-control" 
+                                    ' . $is_required . '>';
                         echo '<option value="">Select an option</option>';
                         
-                        $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
+                        $options = !empty($question['field_options']) ? explode("\n", $question['field_options']) : [];
                         foreach ($options as $option) {
                             $option = trim($option);
                             if (!empty($option)) {
@@ -269,7 +283,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                      htmlspecialchars($option) . '</option>';
                             }
                         }
-                        echo '</select>';
+                        echo '</select>
+                        </div>';
                         break;
                 }
             }
@@ -277,7 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             foreach ($survey as $question): ?>
                 <div class="question-group">
                     <h3><?= htmlspecialchars($question['field_label']) ?></h3>
-                    <?php if ($question['is_required']): ?>
+                    <?php if ($question['required']): ?>
                         <p class="required">* Required</p>
                     <?php endif; ?>
                     <div class="form-group">
