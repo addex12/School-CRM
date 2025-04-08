@@ -473,19 +473,42 @@ $availableLanguages = [
         </div>
     </template>
     
+    <template id="question-template">
+        <div class="question-item" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="text" name="questions[]" placeholder="Enter your question" required style="width: 80%; margin-right: 10px;">
+            <button type="button" class="btn btn-delete-question" style="background: red; color: white; border: none; padding: 5px 10px; cursor: pointer;">Delete</button>
+        </div>
+    </template>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="../assets/js/survey_builder.js"></script>
     <script>
-        // Initialize date/time inputs with current time
-        document.addEventListener('DOMContentLoaded', function() {
-            const now = new Date();
-            const timezoneOffset = now.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
-            
-            document.getElementById('starts_at').value = localISOTime;
-            document.getElementById('ends_at').value = localISOTime;
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+        const timezoneOffset = now.getTimezoneOffset() * 60000;
+        const localISOTime = (new Date(now - timezoneOffset)).toISOString().slice(0, 16);
+
+        document.getElementById('starts_at').value = localISOTime;
+        document.getElementById('ends_at').value = localISOTime;
+
+        const addOptionButton = document.getElementById('add-option');
+        const optionTemplate = document.getElementById('option-template').content;
+        const optionItemsContainer = document.getElementById('option-items');
+
+        // Add option functionality
+        addOptionButton.addEventListener('click', function () {
+            const optionClone = optionTemplate.cloneNode(true);
+            optionItemsContainer.appendChild(optionClone);
         });
-    </script>
+
+        // Handle delete option functionality
+        optionItemsContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-delete-option')) {
+                e.target.closest('.option-item').remove();
+            }
+        });
+    });
+</script>
 </body>
 </html>

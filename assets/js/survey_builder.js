@@ -69,3 +69,22 @@ document.addEventListener('DOMContentLoaded', function () {
         addQuestion();
     }
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const addQuestionButton = document.getElementById('add-question');
+    const questionTemplate = document.getElementById('question-template').content;
+    const questionContainer = document.getElementById('question-container');
+
+    // Add question functionality
+    addQuestionButton.addEventListener('click', function () {
+        const questionClone = questionTemplate.cloneNode(true);
+        questionContainer.appendChild(questionClone);
+    });
+
+    // Handle delete question functionality
+    questionContainer.addEventListener('click', function (e) {
+        if (e.target.classList.contains('btn-delete-question')) {
+            e.target.closest('.question-item').remove();
+        }
+    });
+});
