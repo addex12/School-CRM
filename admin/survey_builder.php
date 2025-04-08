@@ -10,7 +10,7 @@ $pageTitle = "Survey Builder";
 $survey_id = $_GET['id'] ?? null;
 $survey = null;
 if ($survey_id) {
-    $survey = Survey::model()->findByPk($survey_id);
+    $survey = Survey::model($pdo)->findByPk($survey_id);
 }
 
 // Fetch roles dynamically from the database
@@ -40,6 +40,9 @@ try {
     $statuses = [];
 }
 
+// Initialize survey model with PDO connection
+$surveyModel = Survey::model($pdo);
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $survey_data = [
@@ -60,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $survey_data['id'] = $survey_id;
     }
 
-    $result = Survey::model()->save($survey_data);
+    $result = $surveyModel->save($survey_data);
 
     if ($result['success']) {
         $_SESSION['success'] = $survey_id ? "Survey updated successfully!" : "Survey created successfully!";
