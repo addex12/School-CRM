@@ -312,6 +312,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <script src="../assets/js/survey_builder.js"></script>
+    <script>
+        $(document).ready(function() {
+            let questionIndex = <?= isset($survey['questions']) ? count($survey['questions']) : 0 ?>;
+
+            // Add question button click handler
+            $('#add-question').click(function() {
+                const questionRow = `
+                    <div class="question-row" data-index="${questionIndex}">
+                        <div class="form-group">
+                            <input type="text" name="questions[${questionIndex}]" required placeholder="Enter question text">
+                        </div>
+                        <div class="form-group">
+                            <select name="field_types[${questionIndex}]" required>
+                                <option value="text">Text</option>
+                                <option value="radio">Multiple Choice (Single)</option>
+                                <option value="checkbox">Multiple Choice (Multiple)</option>
+                                <option value="select">Dropdown</option>
+                            </select>
+                        </div>
+                        <div class="form-group options-group">
+                            <label>Options:</label>
+                            <textarea name="options[${questionIndex}]" rows="3" placeholder="Enter each option on a new line"></textarea>
+                            <p class="help-text">Enter each option on a new line</p>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" name="required[${questionIndex}]">
+                                Required
+                            </label>
+                        </div>
+                        <button type="button" class="remove-question btn-danger">Remove Question</button>
+                    </div>
+                `;
+
+                $('#questions-container').append(questionRow);
+                questionIndex++;
+            });
+
+            // Remove question button click handler
+            $(document).on('click', '.remove-question', function() {
+                $(this).closest('.question-row').remove();
+            });
+
+            // Show/hide options textarea based on field type
+            $(document).on('change', '[name^="field_types"]', function() {
+                const fieldType = $(this).val();
+                const optionsGroup = $(this).closest('.question-row').find('.options-group');
+                
+                if (['radio', 'checkbox', 'select'].includes(fieldType)) {
+                    optionsGroup.show();
+                } else {
+                    optionsGroup.hide();
+                }
+            });
+
+            // Initialize existing options groups
+            $('[name^="field_types"]').trigger('change');
+        });
+    </script>
 </body>
 </html>
 <?php include 'includes/footer.php'; ?>
