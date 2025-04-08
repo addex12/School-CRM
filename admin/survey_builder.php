@@ -29,12 +29,12 @@ if ($survey_id) {
             
             // Get questions for this survey
             $questionStmt = $pdo->prepare("
-                SELECT sf.*, 
-                       COALESCE(sf.field_options, '') as field_options,
-                       sf.is_required as required
-                FROM survey_fields sf
-                WHERE sf.survey_id = ?
-                ORDER BY sf.sort_order
+                SELECT sq.*, 
+                       COALESCE(sq.field_options, '') as field_options,
+                       sq.is_required as required
+                FROM survey_questions sq
+                WHERE sq.survey_id = ?
+                ORDER BY sq.sort_order
             ");
             $questionStmt->execute([$survey_id]);
             $survey['questions'] = $questionStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -102,7 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'field_type' => $_POST['field_types'][$index],
                 'field_label' => $question,
                 'field_options' => $_POST['options'][$index] ?? null,
-                'is_required' => isset($_POST['required'][$index])
+                'is_required' => isset($_POST['required'][$index]),
+                'sort_order' => $index + 1
             ];
         }
     }
@@ -116,26 +117,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->beginTransaction();
 
         // Save survey
-        $stmt = $pdo->prepare("
-            INSERT INTO surveys (title, description, category_id, status, is_active, 
-                               is_anonymous, starts_at, ends_at, created_by, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
-            ON DUPLICATE KEY UPDATE 
-                title = VALUES(title),
-                description = VALUES(description),
-                category_id = VALUES(category_id),
-                status = VALUES(status),
-                is_active = VALUES(is_active),
-                is_anonymous = VALUES(is_anonymous),
-                starts_at = VALUES(starts_at),
-                ends_at = VALUES(ends_at)
-        ");
-        
-        $survey_data['created_by'] = $_SESSION['user_id'];
-        $stmt->execute(array_values($survey_data));
-        $survey_id = $survey_id ?? $pdo->lastInsertId();
+        if ($survey_id) {
+            $stmt = $pdo->prepare("
+                UPDATE surveys 
+                SET title = ?, 
+                    description = ?, 
+                    category_id = ?, 
+                    status = ?, 
+                    is_active = ?, 
+                    is_anonymous = ?,
+                    starts_at = ?,
+                    ends_at = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([
+                $survey_data['title'],
+                $survey_data['description'],
+                $survey_data['category_id'],
+                $survey_data['status'],
+                $survey_data['is_active'],
+                $survey_data['is_anonymous'],
+                $survey_data['starts_at'],
+                $survey_data['ends_at'],
+                $survey_id
+            ]);
+        } else {
+            $stmt = $pdo->prepare("
+                INSERT INTO surveys 
+                (title, description, category_id, status, is_active, is_anonymous, starts_at, ends_at, created_at, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
+            ");
+            $stmt->execute([
+                $survey_data['title'],
+                $survey_data['description'],
+                $survey_data['category_id'],
+                $survey_data['status'],
+                $survey_data['is_active'],
+                $survey_data['is_anonymous'],
+                $survey_data['starts_at'],
+                $survey_data['ends_at'],
+                $_SESSION['user_id']
+            ]);
+            $survey_id = $pdo->lastInsertId();
+        }
 
-        // Delete existing roles and add new ones
+        // Update target roles
         $stmt = $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?");
         $stmt->execute([$survey_id]);
 
@@ -147,24 +173,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Delete existing questions and add new ones
-        $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
+        $stmt = $pdo->prepare("DELETE FROM survey_questions WHERE survey_id = ?");
         $stmt->execute([$survey_id]);
 
         if (!empty($questions)) {
             $stmt = $pdo->prepare("
-                INSERT INTO survey_fields (survey_id, field_type, field_label, 
-                                         field_options, is_required, sort_order)
+                INSERT INTO survey_questions 
+                (survey_id, field_type, field_label, field_options, is_required, sort_order) 
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
             
-            foreach ($questions as $index => $question) {
+            foreach ($questions as $question) {
                 $stmt->execute([
                     $survey_id,
                     $question['field_type'],
                     $question['field_label'],
                     $question['field_options'],
                     $question['is_required'],
-                    $index
+                    $question['sort_order']
                 ]);
             }
         }
