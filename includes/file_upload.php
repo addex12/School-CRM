@@ -13,35 +13,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $title = $_POST['title'];
             $description = $_POST['description'];
             $category_id = $_POST['category_id'];
-            $target_roles = json_encode($_POST['target_roles'] ?? []);
+            $target_roles = $_POST['target_roles'] ?? [];
             $starts_at = $_POST['starts_at'];
             $ends_at = $_POST['ends_at'];
-            $languages = json_encode($_POST['languages'] ?? ['en']);
             
-            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, target_roles, created_by, starts_at, ends_at, languages) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$title, $description, $category_id, $target_roles, $_SESSION['user_id'], $starts_at, $ends_at, $languages]);
+            $stmt = $pdo->prepare("INSERT INTO surveys (title, description, category_id, created_by, starts_at, ends_at, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)");
+            $stmt->execute([$title, $description, $category_id, $_SESSION['user_id'], $starts_at, $ends_at]);
             $survey_id = $pdo->lastInsertId();
+            
+            // Save survey roles
+            foreach ($target_roles as $role_id) {
+                $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
+                $stmt->execute([$survey_id, $role_id]);
+            }
             
             // Save fields
             if (!empty($_POST['fields'])) {
                 $order = 1;
                 foreach ($_POST['fields'] as $field) {
                     $options = null;
-                    if (in_array($field['type'], ['radio', 'checkbox', 'select', 'rating'])) {
+                    if (in_array($field['type'], ['radio', 'checkbox', 'select'])) {
                         $options = json_encode($field['options']);
                     }
                     
-                    $validation = null;
-                    if (!empty($field['validation'])) {
-                        $validation = json_encode($field['validation']);
-                    }
-                    
-                    $translations = null;
-                    if (!empty($field['translations'])) {
-                        $translations = json_encode($field['translations']);
-                    }
-                    
-                    $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_type, field_label, field_name, field_options, is_required, validation_rules, display_order, translations) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt = $pdo->prepare("INSERT INTO survey_fields (survey_id, field_type, field_label, field_name, field_options, is_required, display_order) VALUES (?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([
                         $survey_id,
                         $field['type'],
@@ -49,16 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $field['name'],
                         $options,
                         $field['required'] ? 1 : 0,
-                        $validation,
-                        $order++,
-                        $translations
+                        $order++
                     ]);
                 }
             }
             
             $pdo->commit();
             $_SESSION['success'] = "Survey created successfully!";
-            header("Location: survey_preview.php?id=$survey_id");
+            header("Location: ../admin/surveys.php");
             exit();
         } catch (Exception $e) {
             $pdo->rollBack();

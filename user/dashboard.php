@@ -19,7 +19,7 @@ $stmt = $pdo->prepare("
     ORDER BY s.starts_at DESC
 ");
 $stmt->execute([$_SESSION['role_id']]);
-$surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$surveys = $stmt->fetchAll();
 
 // Get completed surveys count
 $completedCount = $pdo->prepare("
