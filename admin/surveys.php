@@ -12,19 +12,29 @@ require_once '../includes/config.php';
 
 $pageTitle = "Manage Surveys";
 
-// Fetch surveys grouped by status
-try {
-    $stmt = $pdo->query("
-        SELECT s.id, s.title, s.status, s.created_at, sc.name AS category_name, u.username AS created_by_user
-        FROM surveys s
-        LEFT JOIN survey_categories sc ON s.category_id = sc.id
-        LEFT JOIN users u ON s.created_by = u.id
-        ORDER BY s.status, s.created_at DESC
-    ");
-    $surveys = $stmt->fetchAll(PDO::FETCH_GROUP | PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    error_log("Error fetching surveys: " . $e->getMessage());
-    $surveys = [];
+// Fetch all surveys
+$stmt = $pdo->query("
+    SELECT s.*, GROUP_CONCAT(r.role_name SEPARATOR ', ') AS assigned_roles
+    FROM surveys s
+    LEFT JOIN survey_roles sr ON s.id = sr.survey_id
+    LEFT JOIN roles r ON sr.role_id = r.id
+    GROUP BY s.id
+    ORDER BY s.starts_at DESC
+");
+$surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Handle delete request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_survey'])) {
+    $survey_id = $_POST['survey_id'];
+    try {
+        $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
+        $stmt->execute([$survey_id]);
+        $_SESSION['success'] = "Survey deleted successfully!";
+        header("Location: surveys.php");
+        exit();
+    } catch (Exception $e) {
+        $_SESSION['error'] = "Error deleting survey: " . $e->getMessage();
+    }
 }
 
 // Fetch survey statuses dynamically
@@ -65,46 +75,44 @@ try {
                 </div>
             </header>
             <div class="content">
-                <?php foreach ($surveys as $status => $statusSurveys): ?>
-                    <section class="survey-section" data-status="<?= htmlspecialchars($status) ?>">
-                        <h2><?= htmlspecialchars(ucfirst($status)) ?> Surveys</h2>
-                        <?php if (!empty($statusSurveys)): ?>
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Category</th>
-                                        <th>Created By</th>
-                                        <th>Created At</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($statusSurveys as $survey): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($survey['title']) ?></td>
-                                            <td><?= htmlspecialchars($survey['category_name'] ?? 'N/A') ?></td>
-                                            <td><?= htmlspecialchars($survey['created_by_user'] ?? 'N/A') ?></td>
-                                            <td><?= date('M j, Y g:i A', strtotime($survey['created_at'])) ?></td>
-                                            <td>
-                                                <?php if (!empty($survey['id'])): ?>
-                                                    <a href="survey_builder.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Edit</a>
-                                                    <a href="view_survey.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">View</a>
-                                                    <a href="results.php?survey_id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-secondary">Results</a>
-                                                    <a href="delete_survey.php?id=<?= htmlspecialchars($survey['id']) ?>" class="btn btn-danger">Delete</a>──
-                                                <?php else: ?>
-                                                    <span class="text-muted">No ID</span>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        <?php else: ?>
-                            <p>No surveys found in this status.</p>
-                        <?php endif; ?>
-                    </section>
-                <?php endforeach; ?>
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="success-message"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                <?php endif; ?>
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="error-message"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                <?php endif; ?>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Assigned Roles</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($surveys as $survey): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($survey['title']); ?></td>
+                                <td><?= htmlspecialchars($survey['description']); ?></td>
+                                <td><?= htmlspecialchars($survey['category_id']); ?></td>
+                                <td><?= htmlspecialchars($survey['assigned_roles']); ?></td>
+                                <td><?= htmlspecialchars($survey['starts_at']); ?></td>
+                                <td><?= htmlspecialchars($survey['ends_at']); ?></td>
+                                <td>
+                                    <a href="edit_survey.php?id=<?= $survey['id']; ?>">Edit</a>
+                                    <form method="POST" style="display:inline;">
+                                        <input type="hidden" name="survey_id" value="<?= $survey['id']; ?>">
+                                        <button type="submit" name="delete_survey" onclick="return confirm('Are you sure?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
