@@ -15,10 +15,16 @@ try {
 }
 
 // Base configuration
-define(constant_name: 'BASE_URL', value: 'https://localhost/school_crm/');
+define(constant_name: 'BASE_URL', value: 'https://crm.flipperschools.com/');
 define(constant_name: 'UPLOAD_DIR', value: __DIR__ . '/../uploads');
 
-
+/**
+ * Decodes a JSON string into a PHP array.
+ *
+ * @param string $json The JSON string to decode.
+ *
+ * @return array The decoded JSON as a PHP array.
+ */
 function safe_json_decode($json) {
     return $json ? json_decode($json, true) : [];
 }
@@ -35,4 +41,3 @@ function generateCsrfToken() {
 function validateCsrfToken($token) {
     return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
 }
-

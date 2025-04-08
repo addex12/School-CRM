@@ -30,8 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             
-            // Redirect to appropriate dashboard based on role
-            header("Location: index.php");
+            // Get user role
+            $stmt = $pdo->prepare("SELECT role_id FROM users WHERE id = ?");
+            $stmt->execute([$user['id']]);
+            $role = $stmt->fetch();
+            
+            // Redirect based on role
+            if ($role['role_id'] == 1) { 
+                header("Location: admin/dashboard.php");
+            } else if ($role['role_id'] >= 2) { 
+                header("Location: user/dashboard.php");
+            } else {
+                header("Location: index.php");
+            }
             exit();
         } else {
             $error = "Invalid username or password.";
