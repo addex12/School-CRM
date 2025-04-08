@@ -6,7 +6,6 @@ ob_start();
 session_start();
 $error = '';
 
-// Include configuration first
 require_once __DIR__ . '/includes/config.php';
 
 // Include required files
