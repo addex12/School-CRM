@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else if ($userData['role_id'] >= 2) { 
                     header("Location: " . BASE_URL . "user/dashboard.php");
                 } else {
-                    header("Location: " . BASE_URL . "index.php");
+                    header("Location: " . BASE_URL . "error.php");
                 }
                 exit();
             }
