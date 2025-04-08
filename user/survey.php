@@ -38,7 +38,7 @@ if (!$surveys) {
         <div class="survey-container">
             <h1><?= htmlspecialchars($survey['title']) ?></h1>
             <p><?= htmlspecialchars($survey['description']) ?></p>
-            <a href="survey_response.php?id=<?= $survey['id'] ?>" class="btn">Take Survey</a>
+            <a href="/user/survey_response.php?id=<?= $survey['id'] ?>" class="btn">Take Survey</a>
         </div>
     <?php endforeach; ?>
 </body>
