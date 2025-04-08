@@ -1,6 +1,7 @@
 <?php
 session_start();
-
+$base_url = '/crm.flipperschool.com/';
+$error = '';
 // Include required files
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
@@ -37,11 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Redirect based on role
             if ($role['role_id'] == 1) { 
-                header("Location: admin/dashboard.php");
+                header("Location: " . $base_url . "admin/dashboard.php");                
             } else if ($role['role_id'] >= 2) { 
-                header("Location: user/dashboard.php");
+                header("Location: " . $base_url . "user/dashboard.php");                
             } else {
-                header("Location: index.php");
+                header("Location: " . $base_url . "index.php");
             }
             exit();
         } else {
