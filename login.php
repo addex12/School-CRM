@@ -6,9 +6,6 @@ ob_start();
 session_start();
 $error = '';
 
-// Define BASE_URL
-define('BASE_URL', 'http://example.com/'); // Replace with your actual base URL
-
 // Include configuration first
 require_once __DIR__ . '/includes/config.php';
 
