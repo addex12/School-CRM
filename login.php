@@ -2,10 +2,6 @@
 // Ensure no output before this point
 ob_start();
 
-// Start the session
-session_start();
-$error = '';
-
 // Include configuration first
 require_once __DIR__ . '/includes/config.php';
 
