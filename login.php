@@ -50,11 +50,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Redirect based on role
                 if ($userData['role_id'] == 1) { 
-                    header("Location: " . BASE_URL . "admin/dashboard.php");
+                    header("Location: " . BASE_URL . "/admin/dashboard.php");
                 } else if ($userData['role_id'] >= 2) { 
-                    header("Location: " . BASE_URL . "user/dashboard.php");
+                    header("Location: " . BASE_URL . "/user/dashboard.php");
                 } else {
-                    header("Location: " . BASE_URL . "error.php");
+                    header("Location: " . BASE_URL . "/error.php");
                 }
                 exit();
             }
