@@ -51,6 +51,7 @@ try {
     exit();
 }
 
+// Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
@@ -77,59 +78,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $value = $_POST[$field_id] ?? null;
             
             // Handle different field types
-            switch ($question['field_type']) {
-                case 'text':
-                    echo '<div class="form-group">
-                        <input type="text" 
-                               name="' . htmlspecialchars($question['id']) . '" 
-                               required="' . ($question['is_required'] ? 'required' : '') . '">
-                    </div>';
-                    break;
-                    
-                case 'radio':
-                    $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
-                    foreach ($options as $option) {
-                        echo '<div class="form-group">
-                            <label>
-                                <input type="radio" 
-                                       name="' . htmlspecialchars($question['id']) . '" 
-                                       value="' . htmlspecialchars(trim($option)) . '" 
-                                       required="' . ($question['is_required'] ? 'required' : '') . '">
-                                ' . htmlspecialchars(trim($option)) . '
-                            </label>
-                        </div>';
-                    }
-                    break;
-                    
+            switch ($field_type) {
                 case 'checkbox':
-                    $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
-                    foreach ($options as $option) {
-                        echo '<div class="form-group">
-                            <label>
-                                <input type="checkbox" 
-                                       name="' . htmlspecialchars($question['id']) . '[]" 
-                                       value="' . htmlspecialchars(trim($option)) . '">
-                                ' . htmlspecialchars(trim($option)) . '
-                            </label>
-                        </div>';
+                    // Checkbox fields can have multiple values
+                    $values = is_array($value) ? $value : [$value];
+                    foreach ($values as $val) {
+                        if (!empty($val)) {
+                            $stmt = $pdo->prepare("
+                                INSERT INTO survey_field_responses 
+                                (response_id, field_id, value) 
+                                VALUES (?, ?, ?)
+                            ");
+                            $stmt->execute([$response_id, $field_id, $val]);
+                        }
                     }
                     break;
                     
-                case 'select':
-                    echo '<div class="form-group">
-                        <select name="' . htmlspecialchars($question['id']) . '" 
-                                required="' . ($question['is_required'] ? 'required' : '') . '">
-                            <option value="">Select an option</option>';
-                    
-                    $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
-                    foreach ($options as $option) {
-                        echo '<option value="' . htmlspecialchars(trim($option)) . '">
-                            ' . htmlspecialchars(trim($option)) . '
-                        </option>';
+                default:
+                    if (!empty($value)) {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO survey_field_responses 
+                            (response_id, field_id, value) 
+                            VALUES (?, ?, ?)
+                        ");
+                        $stmt->execute([$response_id, $field_id, $value]);
                     }
-                    
-                    echo '</select>
-                    </div>';
                     break;
             }
         }
@@ -163,14 +136,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($survey[0]['title']) ?> - Take Survey</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .survey-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        .required {
+            color: #dc3545;
+            font-size: 0.9em;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-actions {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="survey-container">
         <h1><?= htmlspecialchars($survey[0]['title']) ?></h1>
-        <p><?= htmlspecialchars($survey[0]['description']) ?></p>
+        <p class="description"><?= htmlspecialchars($survey[0]['description']) ?></p>
         
-        <form method="POST" class="survey-form">
-            <?php if (!$survey[0]['is_anonymous']): ?>
+        <form method="POST">
+            <?php if ($survey[0]['is_anonymous']): ?>
                 <div class="form-group">
                     <label>
                         <input type="checkbox" name="anonymous" value="1">
@@ -181,72 +196,93 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <?php 
             function renderField($question) {
+                $field_id = $question['id'];
+                $is_required = $question['is_required'] ? 'required' : '';
+                
                 switch ($question['field_type']) {
                     case 'text':
-                        echo '<div class="form-group">
-                            <input type="text" 
-                                   name="' . htmlspecialchars($question['id']) . '" 
-                                   required="' . ($question['is_required'] ? 'required' : '') . '">
-                        </div>';
+                        echo '<input type="text" 
+                                   name="' . htmlspecialchars($field_id) . '" 
+                                   class="form-control" 
+                                   ' . $is_required . '>';
+                        break;
+                        
+                    case 'textarea':
+                        echo '<textarea name="' . htmlspecialchars($field_id) . '" 
+                                   class="form-control" 
+                                   rows="3" 
+                                   ' . $is_required . '></textarea>';
                         break;
                         
                     case 'radio':
                         $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
                         foreach ($options as $option) {
-                            echo '<div class="form-group">
-                                <label>
+                            $option = trim($option);
+                            if (!empty($option)) {
+                                echo '<div class="form-check">
                                     <input type="radio" 
-                                           name="' . htmlspecialchars($question['id']) . '" 
-                                           value="' . htmlspecialchars(trim($option)) . '" 
-                                           required="' . ($question['is_required'] ? 'required' : '') . '">
-                                    ' . htmlspecialchars(trim($option)) . '
-                                </label>
-                            </div>';
+                                           name="' . htmlspecialchars($field_id) . '" 
+                                           value="' . htmlspecialchars($option) . '" 
+                                           id="' . htmlspecialchars($field_id . '_' . $option) . '"
+                                           class="form-check-input" 
+                                           ' . $is_required . '>
+                                    <label class="form-check-label" 
+                                           for="' . htmlspecialchars($field_id . '_' . $option) . '">
+                                        ' . htmlspecialchars($option) . '
+                                    </label>
+                                </div>';
+                            }
                         }
                         break;
                         
                     case 'checkbox':
                         $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
                         foreach ($options as $option) {
-                            echo '<div class="form-group">
-                                <label>
+                            $option = trim($option);
+                            if (!empty($option)) {
+                                echo '<div class="form-check">
                                     <input type="checkbox" 
-                                           name="' . htmlspecialchars($question['id']) . '[]" 
-                                           value="' . htmlspecialchars(trim($option)) . '">
-                                    ' . htmlspecialchars(trim($option)) . '
-                                </label>
-                            </div>';
+                                           name="' . htmlspecialchars($field_id) . '[]' . '" 
+                                           value="' . htmlspecialchars($option) . '" 
+                                           id="' . htmlspecialchars($field_id . '_' . $option) . '" 
+                                           class="form-check-input">
+                                    <label class="form-check-label" 
+                                           for="' . htmlspecialchars($field_id . '_' . $option) . '">
+                                        ' . htmlspecialchars($option) . '
+                                    </label>
+                                </div>';
+                            }
                         }
                         break;
                         
                     case 'select':
-                        echo '<div class="form-group">
-                            <select name="' . htmlspecialchars($question['id']) . '" 
-                                    required="' . ($question['is_required'] ? 'required' : '') . '">
-                                <option value="">Select an option</option>';
+                        echo '<select name="' . htmlspecialchars($field_id) . '" 
+                               class="form-control" 
+                               ' . $is_required . '>';
+                        echo '<option value="">Select an option</option>';
                         
                         $options = !empty($question['options']) ? explode("\n", $question['options']) : [];
                         foreach ($options as $option) {
-                            echo '<option value="' . htmlspecialchars(trim($option)) . '">
-                                ' . htmlspecialchars(trim($option)) . '
-                            </option>';
+                            $option = trim($option);
+                            if (!empty($option)) {
+                                echo '<option value="' . htmlspecialchars($option) . '">' . 
+                                     htmlspecialchars($option) . '</option>';
+                            }
                         }
-                        
-                        echo '</select>
-                        </div>';
+                        echo '</select>';
                         break;
                 }
             }
             
             foreach ($survey as $question): ?>
                 <div class="question-group">
-                    <h3><?= htmlspecialchars($question['question']) ?></h3>
-                    
+                    <h3><?= htmlspecialchars($question['field_label']) ?></h3>
                     <?php if ($question['is_required']): ?>
                         <p class="required">* Required</p>
                     <?php endif; ?>
-                    
-                    <?php renderField($question); ?>
+                    <div class="form-group">
+                        <?php renderField($question); ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
             
