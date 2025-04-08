@@ -6,18 +6,31 @@ require_once __DIR__ . '/../vendor/autoload.php'; // Include Composer autoloader
 require_once __DIR__ . '/db.php'; // Ensure the correct path to the db.php file
 require_once __DIR__ . '/functions.php'; // Ensure the correct path to the functions.php file
 
+// Base configuration
+define('BASE_URL', 'http://localhost/School-CRM/');
+define('UPLOAD_DIR', __DIR__ . '/../uploads');
+
+// Database configuration
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'school_crm');
+define('DB_USER', 'root');
+define('DB_PASS', 'password123');
+
 // Database connection
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=school_crm', 'root', 'password123'); // Replace with actual credentials
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = new PDO(
+        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+        DB_USER,
+        DB_PASS,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false
+        ]
+    );
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
 }
-
-// Base configuration
-define(constant_name: 'BASE_URL', value: 'https://crm.flipperschools.com/');
-define(constant_name: 'UPLOAD_DIR', value: __DIR__ . '/../uploads');
-
 
 function safe_json_decode($json) {
     return $json ? json_decode($json, true) : [];
