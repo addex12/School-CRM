@@ -49,7 +49,7 @@ if (!function_exists('getCurrentUser')) {
 
 if (!function_exists('requireAdmin')) {
     function requireAdmin() {
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+        if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] !== 1) {
             $_SESSION['error'] = "Access denied. Admins only.";
             header("Location: ../error.php");
             exit();
@@ -61,17 +61,14 @@ if (!function_exists('setUserSession')) {
     function setUserSession(int $user_id): bool {
         global $pdo;
         try {
-            $stmt = $pdo->prepare("SELECT users.*, roles.role_name 
-                                 FROM users 
-                                 JOIN roles ON users.role_id = roles.id 
-                                 WHERE users.id = ?");
+            $stmt = $pdo->prepare("SELECT id, username, password, role_id FROM users WHERE id = ?");
             $stmt->execute([$user_id]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($user) {
                 $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
-                $_SESSION['role'] = $user['role_name'];
                 return true;
             }
             return false;
@@ -81,4 +78,3 @@ if (!function_exists('setUserSession')) {
         }
     }
 }
-?>
