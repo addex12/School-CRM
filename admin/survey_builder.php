@@ -29,16 +29,21 @@ if ($survey_id) {
             
             // Get questions for this survey
             $questionStmt = $pdo->prepare("
-                SELECT sq.*, 
-                       COALESCE(sq.field_options, '') as field_options,
-                       sq.is_required as required,
-                       sq.sort_order
-                FROM survey_questions sq
-                WHERE sq.survey_id = ?
-                ORDER BY sq.sort_order
+                SELECT q.*, 
+                       COALESCE(q.field_options, '') as field_options,
+                       q.is_required as required,
+                       q.sort_order
+                FROM survey_questions q
+                WHERE q.survey_id = ?
+                ORDER BY q.sort_order
             ");
             $questionStmt->execute([$survey_id]);
             $survey['questions'] = $questionStmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Debug output
+            if (empty($survey['questions'])) {
+                error_log("No questions found for survey ID: " . $survey_id);
+            }
         }
     } catch (PDOException $e) {
         error_log("Error fetching survey data: " . $e->getMessage());
@@ -46,6 +51,13 @@ if ($survey_id) {
         header("Location: surveys.php");
         exit();
     }
+}
+
+// Debug output for development
+if ($survey && isset($_GET['debug'])) {
+    echo "<pre>";
+    print_r($survey);
+    echo "</pre>";
 }
 
 // Fetch roles dynamically from the database
