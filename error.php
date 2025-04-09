@@ -1,7 +1,28 @@
 <?php
 session_start();
-$error_message = $_SESSION['error'] ?? "An unexpected error occurred.";
-unset($_SESSION['error']);
+
+// Prevent caching
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
+// Debugging: Check session variables
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    // Log session data for debugging (remove in production)
+    error_log("Access denied. Session data: " . print_r($_SESSION, true));
+    header("Location: login.php");
+    exit;
+}
+
+// Check if an error message is set in the session
+if (isset($_SESSION['error'])) {
+    $error_message = $_SESSION['error'];
+    unset($_SESSION['error']);
+} else {
+    // If no error message is set, redirect to the home page
+    header("Location: index.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +36,7 @@ unset($_SESSION['error']);
     <div class="error-container">
         <h1>Error</h1>
         <p><?= htmlspecialchars($error_message) ?></p>
-        <a href="admin/dashboard.php" class="btn">Go Back to Dashboard</a>
+        <a href="index.php" class="btn">Go Back to Home</a>
     </div>
 </body>
 </html>

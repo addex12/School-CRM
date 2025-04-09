@@ -11,8 +11,6 @@ module.exports = {
     },
 };
 const { createLogger, format, transports } = require('winston');
-const path = require('path');
-const fs = require('fs');
 const logDir = path.join(__dirname, 'logs');
 // Create log directory if it doesn't exist
 if (!fs.existsSync(logDir)) {
