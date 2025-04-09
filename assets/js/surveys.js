@@ -222,12 +222,6 @@ function shareSurvey(surveyId) {
     console.log('Sharing survey:', surveyId);
     // Add AJAX request to generate and display sharing link
 }
-// Function to handle survey deletion
-function deleteSurvey(surveyId) {
-    // Perform deletion action
-    console.log('Deleting survey:', surveyId);
-    // Add AJAX request to delete the survey
-}
 // Function to handle survey duplication
 function duplicateSurvey(surveyId) {
     // Perform duplication action
@@ -258,12 +252,6 @@ function viewSurveyAnalytics(surveyId) {
     console.log('Viewing analytics for survey:', surveyId);
     // Add AJAX request to fetch and display survey analytics
 }
-// Function to handle survey deletion
-function deleteSurvey(surveyId) {
-    // Perform deletion action
-    console.log('Deleting survey:', surveyId);
-    // Add AJAX request to delete the survey
-}
 // Function to handle survey duplication
 function duplicateSurvey(surveyId) {
     // Perform duplication action
@@ -293,12 +281,6 @@ function shareSurvey(surveyId) {
     // Perform sharing action
     console.log('Sharing survey:', surveyId);
     // Add AJAX request to share the survey
-}
-// Function to handle survey deletion
-function deleteSurvey(surveyId) {
-    // Perform deletion action
-    console.log('Deleting survey:', surveyId);
-    // Add AJAX request to delete the survey
 }
 // Function to handle survey duplication
 function duplicateSurvey(surveyId) {
