@@ -252,12 +252,6 @@ function deactivateSurvey(surveyId) {
     console.log('Deactivating survey:', surveyId);
     // Add AJAX request to deactivate the survey
 }
-// Function to handle survey preview
-function previewSurvey(surveyId) {
-    // Perform preview action
-    console.log('Previewing survey:', surveyId);
-    // Add AJAX request to fetch and display survey preview
-}
 // Function to handle survey analytics
 function viewSurveyAnalytics(surveyId) {
     // Perform analytics action
