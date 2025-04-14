@@ -123,7 +123,7 @@ try {
                 <div class="dashboard-section">
                     <h2>Recent Activity Log</h2>
                     <div class="table-container">
-                        <table class="table">
+                        <table>
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -160,7 +160,7 @@ try {
                 <div class="dashboard-section">
                     <h2>Recent Feedback</h2>
                     <div class="table-container">
-                        <table class="table">
+                        <table>
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -197,7 +197,7 @@ try {
                 <div class="dashboard-section">
                     <h2>Recent Support Tickets</h2>
                     <div class="table-container">
-                        <table class="table">
+                        <table>
                             <thead>
                                 <tr>
                                     <th>ID</th>
