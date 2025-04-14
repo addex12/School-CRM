@@ -12,12 +12,13 @@ if (!$response_id) {
     exit();
 }
 
-// Get response info
+// Get response info with more details
 $stmt = $pdo->prepare("
-    SELECT r.*, u.username, u.email, ro.role_name, s.title AS survey_title
-    FROM responses r
-    JOIN users u ON r.user_id = u.id
-    JOIN roles ro ON u.role_id = ro.id
+    SELECT r.*, u.username, u.email, ro.role_name, s.title AS survey_title,
+           s.is_anonymous, s.description AS survey_description
+    FROM survey_responses r
+    LEFT JOIN users u ON r.user_id = u.id
+    LEFT JOIN roles ro ON u.role_id = ro.id
     JOIN surveys s ON r.survey_id = s.id
     WHERE r.id = ?
 ");
@@ -30,9 +31,9 @@ if (!$response) {
     exit();
 }
 
-// Get response data
+// Get response data with field types and options
 $stmt = $pdo->prepare("
-    SELECT d.*, f.field_label, f.field_type
+    SELECT d.*, f.field_label, f.field_type, f.field_options
     FROM response_data d
     JOIN survey_fields f ON d.field_id = f.id
     WHERE d.response_id = ?
@@ -40,115 +41,247 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$response_id]);
 $response_data = $stmt->fetchAll();
+
+// Get survey fields to show unanswered questions
+$stmt = $pdo->prepare("
+    SELECT id, field_label, field_type, field_options
+    FROM survey_fields
+    WHERE survey_id = ?
+    ORDER BY display_order
+");
+$stmt->execute([$response['survey_id']]);
+$all_fields = $stmt->fetchAll();
+
+// Mark which fields were answered
+$answered_field_ids = array_column($response_data, 'field_id');
+foreach ($all_fields as &$field) {
+    $field['answered'] = in_array($field['id'], $answered_field_ids);
+}
+unset($field);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Response Details - Admin Panel</title>
+    <title>Response Details - <?= htmlspecialchars($response['survey_title']) ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <style>
-        .response-info {
-            background-color: #f5f5f5;
+        .response-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .response-header {
+            background: #f8f9fa;
             padding: 20px;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
-        .response-details {
+        .response-title {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .response-meta {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
+            margin-top: 15px;
         }
-        .response-item {
-            background-color: white;
-            padding: 15px;
+        .meta-item {
+            background: white;
+            padding: 10px;
             border-radius: 5px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .response-item h3 {
-            margin-top: 0;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+        .meta-label {
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        .meta-value {
+            margin-top: 5px;
+            font-size: 1.1em;
+        }
+        .response-items {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .response-item {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+        }
+        .response-item.unanswered {
+            border-left-color: #e74c3c;
+            opacity: 0.7;
+        }
+        .response-question {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .response-answer {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .rating-stars {
+            color: #f39c12;
+            font-size: 1.5em;
+            letter-spacing: 2px;
         }
         .file-preview {
             max-width: 100%;
-            max-height: 200px;
+            max-height: 300px;
             display: block;
             margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .actions {
+            margin-top: 30px;
+            text-align: center;
+        }
+        .btn-print {
+            background: #34495e;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Response Details</h1>
-            <nav>
-                <a href="dashboard.php">Dashboard</a>
-                <a href="surveys.php">Surveys</a>
-                <a href="survey_builder.php">Survey Builder</a>
-                <a href="categories.php">Categories</a>
-                <a href="users.php">Users</a>
-                <a href="results.php">Results</a>
-                <a href="../logout.php">Logout</a>
-            </nav>
-        </header>
-        
-        <div class="content">
-            <div class="response-info">
-                <h2><?php echo htmlspecialchars($response['survey_title']); ?></h2>
-                <p><strong>Respondent:</strong> <?php echo htmlspecialchars($response['username']); ?> (<?php echo ucfirst($response['role_name']); ?>)</p>
-                <p><strong>Email:</strong> <?php echo htmlspecialchars($response['email']); ?></p>
-                <p><strong>Submitted:</strong> <?php echo date('M j, Y g:i A', strtotime($response['submitted_at'])); ?></p>
-            </div>
+    <?php include 'includes/admin_header.php'; ?>
+    
+    <div class="response-container">
+        <div class="response-header">
+            <h2 class="response-title"><?= htmlspecialchars($response['survey_title']) ?></h2>
+            <p class="survey-description"><?= htmlspecialchars($response['survey_description']) ?></p>
             
-            <div class="response-details">
-                <?php foreach ($response_data as $data): ?>
-                    <div class="response-item">
-                        <h3><?php echo htmlspecialchars($data['field_label']); ?></h3>
-                        
-                        <?php if ($data['field_type'] === 'file'): ?>
-                            <?php if ($data['field_value']): ?>
-                                <?php 
-                                $filepath = "../uploads/survey_{$response['survey_id']}/{$data['field_value']}";
-                                if (file_exists($filepath)): 
-                                    $fileinfo = pathinfo($filepath);
-                                    if (in_array(strtolower($fileinfo['extension']), ['jpg', 'jpeg', 'png', 'gif'])): ?>
-                                        <img src="<?php echo $filepath; ?>" class="file-preview" alt="Uploaded file">
-                                    <?php else: ?>
-                                        <a href="<?php echo $filepath; ?>" target="_blank">Download File</a>
-                                    <?php endif; ?>
-                                <?php else: ?>
-                                    <p>File not found</p>
-                                <?php endif; ?>
-                            <?php else: ?>
-                                <p>No file uploaded</p>
-                            <?php endif; ?>
-                        
-                        <?php elseif (in_array($data['field_type'], ['radio', 'checkbox', 'select'])): ?>
-                            <p><?php echo htmlspecialchars($data['field_value']); ?></p>
-                        
-                        <?php elseif ($data['field_type'] === 'rating'): ?>
-                            <div class="rating-display">
-                                <?php 
-                                $rating = intval($data['field_value']);
-                                for ($i = 1; $i <= 5; $i++): ?>
-                                    <span class="rating-star <?php echo $i <= $rating ? 'active' : ''; ?>">★</span>
-                                <?php endfor; ?>
-                                <span class="rating-value">(<?php echo $rating; ?>/5)</span>
-                            </div>
-                        
-                        <?php else: ?>
-                            <p><?php echo nl2br(htmlspecialchars($data['field_value'])); ?></p>
-                        <?php endif; ?>
+            <div class="response-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Respondent</div>
+                    <div class="meta-value">
+                        <?= $response['is_anonymous'] ? 'Anonymous' : htmlspecialchars($response['username'] ?? 'N/A') ?>
                     </div>
-                <?php endforeach; ?>
-            </div>
-            
-            <div class="form-actions">
-                <a href="results.php?survey_id=<?php echo $response['survey_id']; ?>" class="btn">Back to Results</a>
+                </div>
+                
+                <div class="meta-item">
+                    <div class="meta-label">Role</div>
+                    <div class="meta-value"><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></div>
+                </div>
+                
+                <?php if (!$response['is_anonymous'] && $response['email']): ?>
+                <div class="meta-item">
+                    <div class="meta-label">Email</div>
+                    <div class="meta-value"><?= htmlspecialchars($response['email']) ?></div>
+                </div>
+                <?php endif; ?>
+                
+                <div class="meta-item">
+                    <div class="meta-label">Submitted At</div>
+                    <div class="meta-value">
+                        <?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <div class="response-items">
+            <?php foreach ($all_fields as $field): ?>
+                <div class="response-item <?= !$field['answered'] ? 'unanswered' : '' ?>">
+                    <div class="response-question">
+                        <?= htmlspecialchars($field['field_label']) ?>
+                        <?php if (!$field['answered']): ?>
+                            <span class="badge bg-danger">Not answered</span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <?php if ($field['answered']): ?>
+                        <?php 
+                        $answer = current(array_filter($response_data, function($item) use ($field) {
+                            return $item['field_id'] == $field['id'];
+                        }));
+                        ?>
+                        
+                        <div class="response-answer">
+                            <?php switch ($field['field_type']):
+                                case 'rating': ?>
+                                    <div class="rating-stars">
+                                        <?php 
+                                        $rating = intval($answer['field_value']);
+                                        echo str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
+                                        ?>
+                                        <span class="rating-value">(<?= $rating ?>/5)</span>
+                                    </div>
+                                    <?php break;
+                                
+                                case 'radio':
+                                case 'select': ?>
+                                    <p><?= htmlspecialchars($answer['field_value']) ?></p>
+                                    <?php break;
+                                
+                                case 'checkbox': ?>
+                                    <ul>
+                                        <?php 
+                                        $values = json_decode($answer['field_value'], true) ?: [$answer['field_value']];
+                                        foreach ($values as $value): ?>
+                                            <li><?= htmlspecialchars($value) ?></li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                    <?php break;
+                                
+                                case 'file': ?>
+                                    <?php if ($answer['field_value']): ?>
+                                        <?php 
+                                        $filepath = "../uploads/survey_{$response['survey_id']}/{$answer['field_value']}";
+                                        if (file_exists($filepath)): 
+                                            $fileinfo = pathinfo($filepath);
+                                            if (in_array(strtolower($fileinfo['extension']), ['jpg', 'jpeg', 'png', 'gif'])): ?>
+                                                <img src="<?= $filepath ?>" class="file-preview" alt="Uploaded file">
+                                            <?php else: ?>
+                                                <a href="<?= $filepath ?>" target="_blank" class="btn btn-primary">
+                                                    <i class="bi bi-download"></i> Download File
+                                                </a>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <p class="text-danger">File not found</p>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <p>No file uploaded</p>
+                                    <?php endif; ?>
+                                    <?php break;
+                                
+                                default: ?>
+                                    <p><?= nl2br(htmlspecialchars($answer['field_value'])) ?></p>
+                            <?php endswitch; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="response-answer">
+                            <p class="text-muted">Question was not answered</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        
+        <div class="actions">
+            <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-primary">
+                <i class="bi bi-arrow-left"></i> Back to Results
+            </a>
+            <button onclick="window.print()" class="btn btn-print">
+                <i class="bi bi-printer"></i> Print Response
+            </button>
+        </div>
     </div>
+
+    <?php include 'includes/admin_footer.php'; ?>
 </body>
 </html>
