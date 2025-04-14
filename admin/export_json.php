@@ -88,7 +88,14 @@ foreach ($responses as $response) {
     $response_data['answers'] = $answers;
     $export_data['responses'][] = $response_data;
 }
+// When displaying results, decode the JSON
+$answers = json_decode($response['answers'], true);
 
+foreach ($fields as $field) {
+    $field_name = $field['field_name'] ?: 'field_'.$field['id'];
+    echo '<td>' . (isset($answers[$field_name]) ? htmlspecialchars(is_array($answers[$field_name]) ? 
+         implode(', ', $answers[$field_name]) : $answers[$field_name]) : 'N/A' . '</td>');
+}
 // Output JSON
 header('Content-Type: application/json');
 header('Content-Disposition: attachment; filename="survey_' . $survey_id . '_responses.json"');
