@@ -119,7 +119,7 @@ foreach ($survey_data as $row) {
         'name' => $row['field_name'] ?: 'field_'.$row['field_id'],
         'type' => $row['field_type'],
         'label' => $row['field_label'],
-        'options' => $row['field_options'] ? json_decode($row['field_options']) : [],
+        'options' => $row['field_options'] ? json_decode($row['field_options'], true) : [],
         'required' => $row['is_required']
     ];
 }
