@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             INSERT INTO survey_responses 
             (survey_id, user_id, submitted_at, answers) 
-            VALUES (?, ?, NOW(), NULL)
+            VALUES (?, ?, NOW(), '{}')
         ");
         $stmt->execute([$survey_id, $_SESSION['user_id']]);
         $response_id = $pdo->lastInsertId();
