@@ -11,7 +11,6 @@ $survey = null;
 // Fetch survey details if editing an existing survey
 if ($survey_id) {
     try {
-        // Fetch survey with target roles
         $stmt = $pdo->prepare("
             SELECT s.*, GROUP_CONCAT(DISTINCT r.id) as target_roles
             FROM surveys s
@@ -24,11 +23,9 @@ if ($survey_id) {
         $survey = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($survey) {
-            // Convert target_roles string to array of integers
             $survey['target_roles'] = $survey['target_roles'] ? 
                 array_map('intval', explode(',', $survey['target_roles'])) : [];
             
-            // Fetch survey questions/fields
             $questionStmt = $pdo->prepare("
                 SELECT id, field_type, field_label, field_options, is_required, display_order
                 FROM survey_fields
@@ -46,12 +43,10 @@ if ($survey_id) {
     }
 }
 
-// Fetch required data from database
 $roles = fetchAll($pdo, "SELECT id, role_name FROM roles ORDER BY role_name");
 $categories = fetchAll($pdo, "SELECT id, name FROM survey_categories ORDER BY name");
 $statuses = fetchAll($pdo, "SELECT id, status, label FROM survey_statuses ORDER BY id");
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $survey_data = [
         'title' => trim($_POST['title'] ?? ''),
@@ -75,14 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        // Create or update survey
         if ($survey_id) {
             updateSurvey($pdo, $survey_data, $survey_id);
         } else {
             $survey_id = createSurvey($pdo, $survey_data);
         }
 
-        // Update related data
         updateTargetRoles($pdo, $survey_id, $target_roles);
         updateSurveyFields($pdo, $survey_id, $questions);
         
@@ -98,7 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Helper functions
 function fetchAll($pdo, $query) {
     try {
         $stmt = $pdo->query($query);
@@ -112,10 +104,20 @@ function fetchAll($pdo, $query) {
 function prepareQuestions($questions, $field_types, $options, $required) {
     $preparedQuestions = [];
     foreach ($questions as $index => $question) {
+        $fieldOptions = null;
+        if (!empty($options[$index])) {
+            $optionsArray = array_filter(
+                array_map('trim', 
+                    explode("\n", $options[$index])
+                )
+            );
+            $fieldOptions = json_encode($optionsArray);
+        }
+
         $preparedQuestions[] = [
             'field_type' => $field_types[$index] ?? 'text',
             'field_label' => trim($question),
-            'field_options' => !empty($options[$index]) ? trim($options[$index]) : null,
+            'field_options' => $fieldOptions,
             'is_required' => isset($required[$index]) ? 1 : 0,
             'display_order' => $index
         ];
@@ -150,11 +152,9 @@ function updateSurvey($pdo, $survey_data, $survey_id) {
 }
 
 function updateTargetRoles($pdo, $survey_id, $target_roles) {
-    // Delete existing roles
     $stmt = $pdo->prepare("DELETE FROM survey_roles WHERE survey_id = ?");
     $stmt->execute([$survey_id]);
 
-    // Insert new roles if any
     if (!empty($target_roles)) {
         $stmt = $pdo->prepare("INSERT INTO survey_roles (survey_id, role_id) VALUES (?, ?)");
         foreach ($target_roles as $role_id) {
@@ -164,11 +164,9 @@ function updateTargetRoles($pdo, $survey_id, $target_roles) {
 }
 
 function updateSurveyFields($pdo, $survey_id, $questions) {
-    // Delete existing fields
     $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
     $stmt->execute([$survey_id]);
 
-    // Insert new fields if any
     if (!empty($questions)) {
         $stmt = $pdo->prepare("
             INSERT INTO survey_fields 
@@ -250,7 +248,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                 <form method="POST" class="survey-form">
                     <input type="hidden" name="id" value="<?= $survey_id ?? '' ?>">
                     
-                    <!-- Basic Survey Info -->
                     <div class="form-group">
                         <label for="title">Survey Title *</label>
                         <input type="text" id="title" name="title" 
@@ -262,7 +259,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                         <textarea id="description" name="description" rows="3"><?= htmlspecialchars($survey['description'] ?? '') ?></textarea>
                     </div>
                     
-                    <!-- Target Roles -->
                     <div class="form-group">
                         <label>Target Roles *</label>
                         <div class="roles-grid">
@@ -278,7 +274,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                         </div>
                     </div>
                     
-                    <!-- Survey Settings -->
                     <div class="form-group">
                         <label for="category_id">Category *</label>
                         <select id="category_id" name="category_id" required>
@@ -332,7 +327,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                         </label>
                     </div>
                     
-                    <!-- Questions Section -->
                     <h3>Survey Questions</h3>
                     <div id="questions-container">
                         <?php if (isset($survey['questions'])): ?>
@@ -374,7 +368,11 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                                         
                                         <div class="form-group">
                                             <label>Options (for radio, checkbox, select)</label>
-                                            <textarea name="options[]" rows="3"><?= htmlspecialchars($question['field_options'] ?? '') ?></textarea>
+                                            <textarea name="options[]" rows="3"><?= 
+                                                isset($question['field_options']) ? 
+                                                htmlspecialchars(implode("\n", json_decode($question['field_options']))) : 
+                                                '' 
+                                            ?></textarea>
                                             <p class="help-text">Enter each option on a new line</p>
                                         </div>
                                     </div>
