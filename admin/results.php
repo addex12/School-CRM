@@ -12,7 +12,7 @@ requireAdmin();
 $survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
 if (!$survey_id) {
     $_SESSION['error'] = "Invalid survey ID.";
-    header("Location: surveys.php");
+    header("Location: results.php");
     exit();
 }
 
