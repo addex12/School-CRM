@@ -151,12 +151,15 @@ $completedSurveys = $completedCount->fetchColumn();
         }
         .btn-primary {
             display: inline-block;
-            padding: 10px 15px;
+            padding: 15px 30px; /* Increased padding for better size */
             background: #3498db;
             color: white;
             text-decoration: none;
             border-radius: 5px;
             transition: background 0.3s;
+            margin: 10px auto; /* Center the button */
+            width: calc(100% - 20px); /* Make the button full width with some margin */
+            font-size: 22px; /* Increased font size for better visibility */
         }
         .btn-primary:hover {
             background: #2980b9;
@@ -241,3 +244,7 @@ $completedSurveys = $completedCount->fetchColumn();
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </body>
 </html>
+<?php
+// Flush output buffer
+ob_end_flush();
+?>
