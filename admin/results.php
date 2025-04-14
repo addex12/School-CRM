@@ -80,6 +80,30 @@ $response_stmt = $pdo->prepare("
 $response_stmt->execute(array_merge($params, [$per_page, $offset]));
 $responses = $response_stmt->fetchAll();
 
+// --- BEGIN: Fetch all response_data for these responses ---
+$response_ids = array_column($responses, 'id');
+$response_data_map = [];
+if (!empty($response_ids)) {
+    $in = str_repeat('?,', count($response_ids) - 1) . '?';
+    $data_stmt = $pdo->prepare("SELECT * FROM response_data WHERE response_id IN ($in)");
+    $data_stmt->execute($response_ids);
+    foreach ($data_stmt->fetchAll() as $row) {
+        $response_id = $row['response_id'];
+        $field_id = $row['field_id'];
+        $value = $row['field_value'];
+        // If checkbox, decode JSON
+        foreach ($fields as $f) {
+            if ($f['id'] == $field_id && $f['field_type'] === 'checkbox') {
+                $decoded = json_decode($value, true);
+                $value = is_array($decoded) ? implode(', ', $decoded) : $value;
+                break;
+            }
+        }
+        $response_data_map[$response_id][$field_id] = $value;
+    }
+}
+// --- END: Fetch all response_data for these responses ---
+
 // Prepare analytics data for charts
 $analytics = [];
 foreach ($fields as $field) {
@@ -368,28 +392,17 @@ $chart_json = json_encode($chart_data);
                                         <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
                                         
                                         <?php 
-                                        // Parse answers JSON from survey_responses.answers
-                                        $answers = json_decode($response['answers'], true);
-                                        $response_data = [];
-                                        foreach ($fields as $field) {
-                                            $field_id_str = (string)$field['id'];
-                                            if (isset($answers[$field_id_str])) {
-                                                $value = $answers[$field_id_str];
-                                                if ($field['field_type'] === 'checkbox' && is_array($value)) {
-                                                    $response_data[$field['field_label']] = implode(', ', $value);
-                                                } else {
-                                                    $response_data[$field['field_label']] = is_array($value) ? implode(', ', $value) : $value;
-                                                }
-                                            }
-                                        }
-                                        
-                                        foreach ($fields as $field): ?>
+                                        // --- BEGIN: Use response_data_map for answers ---
+                                        foreach ($fields as $field): 
+                                            $val = $response_data_map[$response['id']][$field['id']] ?? null;
+                                        ?>
                                             <td>
-                                                <?= isset($response_data[$field['field_label']]) ? 
-                                                    htmlspecialchars($response_data[$field['field_label']]) : 
+                                                <?= $val !== null && $val !== '' ? 
+                                                    htmlspecialchars($val) : 
                                                     '<span class="text-muted">N/A</span>' ?>
                                             </td>
                                         <?php endforeach; ?>
+                                        <!-- --- END: Use response_data_map for answers --- -->
                                         
                                         <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                         <td>
