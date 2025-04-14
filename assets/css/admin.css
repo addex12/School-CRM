@@ -14,7 +14,7 @@ body, html {
 
 .admin-main {
     flex-grow: 1;
-    padding: 40px 24px;
+    padding: 0 24px;
     background: #f4f6f9;
 }
 
