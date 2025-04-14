@@ -68,30 +68,69 @@ if (!ob_get_level()) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - School CRM</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body class="login-page">
-    <div class="login-container">
-        <h1>Login to School CRM</h1>
-        <?php if (isset($error)): ?>
-            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
-        <form method="POST" action="">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" name="username" id="username" required autocomplete="username">
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h1>School CRM</h1>
+                </div>
+                <h2>Welcome Back!</h2>
+                <p>Please login to access your account</p>
             </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" name="password" id="password" required autocomplete="current-password">
+            
+            <?php if (isset($error)): ?>
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+            
+            <form method="POST" action="" class="login-form">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Username:
+                    </label>
+                    <input type="text" name="username" id="username" required autocomplete="username" placeholder="Enter your username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password:
+                    </label>
+                    <input type="password" name="password" id="password" required autocomplete="current-password" placeholder="Enter your password">
+                </div>
+                
+                <div class="form-options">
+                    <div class="remember-me">
+                        <input type="checkbox" id="remember" name="remember">
+                        <label for="remember">Remember me</label>
+                    </div>
+                    <a href="forgot_password.php" class="forgot-password">Forgot Password?</a>
+                </div>
+                
+                <button type="submit" class="btn-login">
+                    <span>Login</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Don't have an account? <a href="register.php" class="register-link">Register here</a></p>
             </div>
-            <div class="form-group" style="text-align: center;"> <!-- Center the button -->
-                <button type="submit" class="btn-primary">Login</button>
+        </div>
+        
+        <div class="login-illustration">
+            <img src="assets/images/login-illustration.svg" alt="Education illustration">
+            <div class="illustration-text">
+                <h3>School CRM</h3>
+                <p>Manage students, teachers, and classes with our comprehensive CRM solution</p>
             </div>
-            <div class="form-group">
-                <a href="forgot_password.php">Forgot Password?</a>
-            </div>
-        </form>
-        <p>Don't have an account? <a href="register.php">Register here</a></p>
+        </div>
     </div>
 </body>
 </html>
