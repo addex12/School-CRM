@@ -5,20 +5,10 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-// Debug: Show errors from session if any (only after all redirects)
-if (!empty($_SESSION['error'])) {
-    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
-    unset($_SESSION['error']);
-}
-
-// Debug: Check DB connection
-if (!$pdo) {
-    die('<div style="color:red; font-weight:bold;">Database connection failed.</div>');
-}
+// Ensure no output before any header() call below this point!
 
 $survey_id = $_GET['survey_id'] ?? null;
 
-// Only set error and redirect, do not echo before header()
 if (!$survey_id) {
     $_SESSION['error'] = "Survey ID is required.";
     header("Location: surveys.php");
@@ -30,7 +20,6 @@ $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
 $stmt->execute([$survey_id]);
 $survey = $stmt->fetch();
 
-// Only set error and redirect, do not echo before header()
 if (!$survey) {
     $_SESSION['error'] = "Survey not found.";
     header("Location: surveys.php");
@@ -104,6 +93,12 @@ $chart_data = [
     'total_responses' => $total_responses
 ];
 $chart_json = json_encode($chart_data);
+
+// Show errors from session only after all redirects
+if (!empty($_SESSION['error'])) {
+    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
+    unset($_SESSION['error']);
+}
 ?>
 
 <!DOCTYPE html>
