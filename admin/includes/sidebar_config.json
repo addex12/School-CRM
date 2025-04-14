@@ -54,6 +54,11 @@
                     "icon": "chart-bar"
                 },
                 {
+                    "title": "Responses",
+                    "link": "response_view.php",
+                    "icon": "chart-bar"
+                },
+                {
                     "title": "Survey Categories",
                     "link": "categories.php",
                     "icon": "folder"
