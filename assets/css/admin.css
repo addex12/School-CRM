@@ -12,10 +12,6 @@ body, html {
     background: #f4f6f9;
 }
 
-.admin-main {
-    flex-grow: 1;
-    background: #f4f6f9;
-}
 
 .admin-header {
     background: #fff;
