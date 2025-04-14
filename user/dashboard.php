@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -103,6 +104,16 @@ try {
         }
         .main-menu {
             display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+        .menu-item {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
         }
         .menu-item:hover {
             background: #2980b9;
