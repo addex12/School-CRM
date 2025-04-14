@@ -23,6 +23,8 @@ body, html {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: static !important; /* Override fixed positioning */
+    height: auto !important;
 }
 
 .admin-header h1 {
