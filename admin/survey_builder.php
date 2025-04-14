@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     $target_roles = isset($_POST['target_roles']) ? array_map('intval', $_POST['target_roles']) : [];
-    $questions = prepareQuestions($_POST['questions'], $_POST['field_types'], $_POST['options'], $_POST['required']);
+    $questions = prepareQuestions($_POST['questions'], $_POST['field_types'], $_POST['options'], $_POST['required'] ?? []);
 
     try {
         $pdo->beginTransaction();
