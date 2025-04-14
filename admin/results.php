@@ -5,9 +5,22 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
+// Debug: Show errors from session if any
+if (!empty($_SESSION['error'])) {
+    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
+    unset($_SESSION['error']);
+}
+
+// Debug: Check DB connection
+if (!$pdo) {
+    die('<div style="color:red; font-weight:bold;">Database connection failed.</div>');
+}
+
 $survey_id = $_GET['survey_id'] ?? null;
 
+// Debug: Output survey_id
 if (!$survey_id) {
+    echo '<div style="color:red; font-weight:bold;">Debug: survey_id is missing from GET parameters.</div>';
     $_SESSION['error'] = "Survey ID is required.";
     header("Location: surveys.php");
     exit();
@@ -18,7 +31,9 @@ $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
 $stmt->execute([$survey_id]);
 $survey = $stmt->fetch();
 
+// Debug: Output survey fetch result
 if (!$survey) {
+    echo '<div style="color:red; font-weight:bold;">Debug: No survey found for survey_id = ' . htmlspecialchars($survey_id) . '.</div>';
     $_SESSION['error'] = "Survey not found.";
     header("Location: surveys.php");
     exit();
