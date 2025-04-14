@@ -11,34 +11,44 @@ require_once '../includes/config.php';
 $pageTitle = "User Dashboard";
 
 // Fetch assigned surveys
-$stmt = $pdo->prepare("
-    SELECT s.*, 
-           GROUP_CONCAT(DISTINCT r.role_name) as assigned_roles,
-           sr.role_id,
-           COALESCE(
-               (SELECT 1 
-                FROM survey_responses sr 
-                WHERE sr.survey_id = s.id 
-                AND sr.user_id = ?), 
-               0
-           ) as completed
-    FROM surveys s
-    JOIN survey_roles sr ON s.id = sr.survey_id
-    JOIN roles r ON sr.role_id = r.id
-    WHERE sr.role_id = ? 
-      AND s.is_active = 1
-      AND s.starts_at <= NOW() 
-      AND s.ends_at >= NOW()
-    GROUP BY s.id
-    ORDER BY s.starts_at DESC
-");
-$stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]);
-$surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->prepare("
+        SELECT s.*, 
+               GROUP_CONCAT(DISTINCT r.role_name) as assigned_roles,
+               sr.role_id,
+               COALESCE(
+                   (SELECT 1 
+                    FROM survey_responses sr 
+                    WHERE sr.survey_id = s.id 
+                    AND sr.user_id = ?), 
+                   0
+               ) as completed
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        JOIN roles r ON sr.role_id = r.id
+        WHERE sr.role_id = ? 
+          AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+        GROUP BY s.id
+        ORDER BY s.starts_at DESC
+    ");
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]);
+    $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Error fetching surveys: " . $e->getMessage());
+    $surveys = []; // Set to empty array on error
+}
 
 // Get completed surveys count
-$completedCount = $pdo->prepare("SELECT COUNT(DISTINCT survey_id) FROM survey_responses WHERE user_id = ?");
-$completedCount->execute([$_SESSION['user_id']]);
-$completedSurveys = $completedCount->fetchColumn();
+try {
+    $completedCount = $pdo->prepare("SELECT COUNT(DISTINCT survey_id) FROM survey_responses WHERE user_id = ?");
+    $completedCount->execute([$_SESSION['user_id']]);
+    $completedSurveys = $completedCount->fetchColumn();
+} catch (Exception $e) {
+    error_log("Error fetching completed surveys count: " . $e->getMessage());
+    $completedSurveys = 0; // Set to 0 on error
+}
 ?>
 
 <!DOCTYPE html>
