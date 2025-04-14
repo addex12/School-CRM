@@ -14,11 +14,13 @@ require_once '../includes/functions.php';
 require_once '../includes/db.php';
 $pageTitle = "Admin Dashboard";
 
-// Ensure database connection is established
 if (!isset($pdo) || !$pdo) {
+    error_log("Database connection not established.");
     $_SESSION['error'] = "Database connection not established.";
     header("Location: ../error.php");
     exit();
+} else {
+    error_log("Database connection established successfully.");
 }
 
 // Fetch widget data
