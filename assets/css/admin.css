@@ -39,20 +39,20 @@ body, html {
 
 .widget-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 32px;
-    width: 100%;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
 }
 
 .dashboard-widget {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, #fff 80%, #f4f6f9 100%);
+    border-radius: 16px;
+    padding: 20px 20px 24px 20px;
+    text-align: center;
+    box-shadow: 0 6px 32px rgba(44, 62, 80, 0.10);
     transition: transform 0.2s, box-shadow 0.2s;
-    display: flex;
-    flex-direction: column;
+    position: relative;
+    overflow: hidden;
 }
 .dashboard-widget:hover {
     transform: translateY(-6px) scale(1.03);
