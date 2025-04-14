@@ -8,6 +8,8 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 requireAdmin();
 
+// Validate survey_id parameter
+$survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
 
 // Fetch survey details
 $survey = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
