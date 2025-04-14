@@ -101,3 +101,16 @@ header('Content-Type: application/json');
 header('Content-Disposition: attachment; filename="survey_' . $survey_id . '_responses.json"');
 echo json_encode($export_data, JSON_PRETTY_PRINT);
 exit();
+// After storing the JSON response, you could also store individual responses
+foreach ($answers as $field_name => $value) {
+    $field_id = ''; // get field ID from field_name
+    if (is_array($value)) {
+        foreach ($value as $val) {
+            $stmt = $pdo->prepare("INSERT INTO response_data (response_id, field_id, field_value) VALUES (?, ?, ?)");
+            $stmt->execute([$response_id, $field_id, $val]);
+        }
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO response_data (response_id, field_id, field_value) VALUES (?, ?, ?)");
+        $stmt->execute([$response_id, $field_id, $value]);
+    }
+}
