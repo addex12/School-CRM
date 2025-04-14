@@ -61,8 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Insert survey response - always include user_id
         $stmt = $pdo->prepare("
             INSERT INTO survey_responses 
-            (survey_id, user_id, submitted_at) 
-            VALUES (?, ?, NOW())
+            (survey_id, user_id, submitted_at, answers) 
+            VALUES (?, ?, NOW(), NULL)
         ");
         $stmt->execute([$survey_id, $_SESSION['user_id']]);
         $response_id = $pdo->lastInsertId();
