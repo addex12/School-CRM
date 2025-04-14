@@ -78,11 +78,11 @@ if (!ob_get_level()) {
         <form method="POST" action="">
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" name="username" id="username" required>
+                <input type="text" name="username" id="username" required autocomplete="username">
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input type="password" name="password" id="password" required>
+                <input type="password" name="password" id="password" required autocomplete="current-password">
             </div>
             <div class="form-group">
                 <button type="submit" class="btn-primary">Login</button>
