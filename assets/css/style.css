@@ -100,35 +100,27 @@ a:hover {
     transform: scale(1.05); /* Slightly enlarge the button on hover */
 }
 
-/* ================ FORMS ================ */
-.form-group {
+/* ================ DASHBOARD STYLES ================ */
+.dashboard-widget {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+.dashboard-section {
+    margin-bottom: 30px;
 }
 
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
+.dashboard-section h2 {
+    font-size: 1.5em;
+    color: #333;
+    cursor: pointer;
 }
 
-/* ================ LOGIN CONTAINER ================ */
-.login-container {
-    max-width: 400px; /* Set a max width for the login form */
-    margin: 100px auto; /* Center the form vertically and horizontally */
-    padding: 20px; /* Add padding around the container */
-    background-color: var(--white); /* Set a background color */
-    border-radius: 8px; /* Add rounded corners */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+.dashboard-section.collapsed {
+    display: none;
 }
 
 /* ================ MESSAGES ================ */
