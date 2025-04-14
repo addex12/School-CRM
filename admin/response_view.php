@@ -5,7 +5,7 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-// Debug: Show errors from session if any
+// Debug: Show errors from session if any (only after all redirects)
 if (!empty($_SESSION['error'])) {
     echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
     unset($_SESSION['error']);
@@ -18,9 +18,8 @@ if (!$pdo) {
 
 $response_id = $_GET['id'] ?? null;
 
-// Debug: Output response_id
+// Only set error and redirect, do not echo before header()
 if (!$response_id) {
-    echo '<div style="color:red; font-weight:bold;">Debug: response_id is missing from GET parameters.</div>';
     $_SESSION['error'] = "Response ID is required.";
     header("Location: results.php");
     exit();
@@ -36,9 +35,8 @@ $stmt = $pdo->prepare("SELECT sr.*, s.title AS survey_title, s.is_anonymous, u.u
 $stmt->execute([$response_id]);
 $response = $stmt->fetch();
 
-// Debug: Output response fetch result
+// Only set error and redirect, do not echo before header()
 if (!$response) {
-    echo '<div style="color:red; font-weight:bold;">Debug: No response found for response_id = ' . htmlspecialchars($response_id) . '.</div>';
     $_SESSION['error'] = "Response not found.";
     header("Location: results.php");
     exit();
