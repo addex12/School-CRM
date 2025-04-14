@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireLogin();
@@ -58,16 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        // Insert survey response - always include user_id
-        $stmt = $pdo->prepare("
-            INSERT INTO survey_responses 
-            (survey_id, user_id, submitted_at, answers) 
-            VALUES (?, ?, NOW(), '{}')
-        ");
-        $stmt->execute([$survey_id, $_SESSION['user_id']]);
-        $response_id = $pdo->lastInsertId();
-        
-        // Process each question response
+        // Collect all answers for JSON storage
+        $answers = [];
         foreach ($survey_data as $question) {
             $field_id = $question['field_id'];
             $value = $_POST['field_'.$field_id] ?? null;
@@ -77,7 +67,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Required question '{$question['field_label']}' was not answered");
             }
             
-            // Handle different field types
+            // Store answer for JSON
+            $answers[$field_id] = is_array($value) ? $value : (string)$value;
+        }
+
+        // Insert survey response with JSON answers
+        $stmt = $pdo->prepare("
+            INSERT INTO survey_responses 
+            (survey_id, user_id, submitted_at, answers) 
+            VALUES (?, ?, NOW(), ?)
+        ");
+        $stmt->execute([
+            $survey_id, 
+            $_SESSION['user_id'],
+            json_encode($answers, JSON_UNESCAPED_UNICODE)
+        ]);
+        $response_id = $pdo->lastInsertId();
+        
+        // Process individual responses for response_data table
+        foreach ($survey_data as $question) {
+            $field_id = $question['field_id'];
+            $value = $_POST['field_'.$field_id] ?? null;
+            
             if (!empty($value)) {
                 $values = is_array($value) ? $value : [$value];
                 
