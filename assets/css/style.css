@@ -143,6 +143,16 @@ a:hover {
     font-size: 16px;
 }
 
+/* ================ LOGIN CONTAINER ================ */
+.login-container {
+    max-width: 400px; /* Set a max width for the login form */
+    margin: 100px auto; /* Center the form vertically and horizontally */
+    padding: 20px; /* Add padding around the container */
+    background-color: var(--white); /* Set a background color */
+    border-radius: 8px; /* Add rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
 /* ================ MESSAGES ================ */
 .message,
 .error-message,
@@ -159,8 +169,11 @@ a:hover {
 }
 
 .error-message {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #f8d7da; /* Error background color */
+    color: #721c24; /* Error text color */
+    padding: 10px; /* Padding for the error message */
+    border-radius: 4px; /* Rounded corners for the error message */
+    margin-bottom: 20px; /* Space below the error message */
 }
 
 /* ================ HEADER & NAVIGATION ================ */
@@ -296,6 +309,7 @@ nav a.active {
     background-color: #f2f2f2;
     text-align: left;
 }
+
 /* Chart Cards */
 .chart-card {
     background: white;

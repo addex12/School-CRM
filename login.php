@@ -69,10 +69,10 @@ if (!ob_get_level()) {
     <title>Login - School CRM</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="login-page">
     <div class="login-container">
         <h1>Login to School CRM</h1>
-        <?php if ($error): ?>
+        <?php if (isset($error)): ?>
             <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
         <form method="POST" action="">
