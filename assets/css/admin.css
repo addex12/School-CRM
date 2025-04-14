@@ -19,16 +19,14 @@ body, html {
 }
 
 .admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: #fff;
     padding: 0 20px;
-    height: var(--header-height);
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    margin-bottom: 50px; /* Increased margin to prevent overlap */
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .admin-header h1 {
