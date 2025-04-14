@@ -5,10 +5,8 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-// Ensure no output before any header() call below this point!
-
+// No output before redirects!
 $survey_id = $_GET['survey_id'] ?? null;
-
 if (!$survey_id) {
     $_SESSION['error'] = "Survey ID is required.";
     header("Location: surveys.php");
@@ -19,7 +17,6 @@ if (!$survey_id) {
 $stmt = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
 $stmt->execute([$survey_id]);
 $survey = $stmt->fetch();
-
 if (!$survey) {
     $_SESSION['error'] = "Survey not found.";
     header("Location: surveys.php");
@@ -43,46 +40,66 @@ if (!empty($_GET['end_date'])) {
     $params[] = $_GET['end_date'] . ' 23:59:59';
 }
 
-// Get responses with pagination
+// Pagination
 $per_page = 20;
-$page = $_GET['page'] ?? 1;
+$page = max(1, intval($_GET['page'] ?? 1));
 $offset = ($page - 1) * $per_page;
 
-$stmt = $pdo->prepare("
-    SELECT COUNT(*) 
-    FROM survey_responses sr 
-    WHERE $whereClause
-");
+// Get total responses
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses sr WHERE $whereClause");
 $stmt->execute($params);
 $total_responses = $stmt->fetchColumn();
-$total_pages = ceil($total_responses / $per_page);
+$total_pages = max(1, ceil($total_responses / $per_page));
 
+// Get paginated responses
 $stmt = $pdo->prepare("
     SELECT sr.*, u.username, u.email, r.role_name
-    FROM survey_responses sr 
+    FROM survey_responses sr
     LEFT JOIN users u ON sr.user_id = u.id
     LEFT JOIN roles r ON u.role_id = r.id
     WHERE $whereClause
     ORDER BY sr.submitted_at DESC
     LIMIT ? OFFSET ?
 ");
-$params[] = $per_page;
-$params[] = $offset;
-$stmt->execute($params);
+$params2 = array_merge($params, [$per_page, $offset]);
+$stmt->execute($params2);
 $responses = $stmt->fetchAll();
 
 // Prepare analytics data for charts
 $analytics = [];
 foreach ($fields as $field) {
-    $stmt = $pdo->prepare("
-        SELECT field_value, COUNT(*) as count 
-        FROM response_data 
-        WHERE field_id = ? 
-        GROUP BY field_value
-        ORDER BY count DESC
-    ");
-    $stmt->execute([$field['id']]);
-    $analytics[$field['id']] = $stmt->fetchAll();
+    // For checkboxes, field_value is JSON array, so we need to extract each value
+    if ($field['field_type'] === 'checkbox') {
+        $stmt = $pdo->prepare("
+            SELECT field_value FROM response_data WHERE field_id = ?
+        ");
+        $stmt->execute([$field['id']]);
+        $all_values = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $val) {
+            $decoded = json_decode($val, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $v) $all_values[] = $v;
+            } elseif ($val !== null) {
+                $all_values[] = $val;
+            }
+        }
+        $counts = array_count_values($all_values);
+        arsort($counts);
+        $analytics[$field['id']] = [];
+        foreach ($counts as $k => $v) {
+            $analytics[$field['id']][] = ['field_value' => $k, 'count' => $v];
+        }
+    } else {
+        $stmt = $pdo->prepare("
+            SELECT field_value, COUNT(*) as count
+            FROM response_data
+            WHERE field_id = ?
+            GROUP BY field_value
+            ORDER BY count DESC
+        ");
+        $stmt->execute([$field['id']]);
+        $analytics[$field['id']] = $stmt->fetchAll();
+    }
 }
 
 // Prepare JSON data for JavaScript
@@ -169,7 +186,7 @@ if (!empty($_SESSION['error'])) {
             </header>
 
             <div class="survey-stats">
-                <div class="stat-card">
+                <div class="stat-card"></div>
                     <div class="stat-value"><?= $total_responses ?></div>
                     <div class="stat-label">Total Responses</div>
                 </div>
@@ -255,13 +272,21 @@ if (!empty($_SESSION['error'])) {
                                         <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
                                         <?php 
                                         $stmt = $pdo->prepare("
-                                            SELECT f.field_label, d.field_value
+                                            SELECT f.field_label, f.field_type, d.field_value
                                             FROM response_data d
                                             JOIN survey_fields f ON d.field_id = f.id
                                             WHERE d.response_id = ?
                                         ");
                                         $stmt->execute([$response['id']]);
-                                        $response_data = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+                                        $response_data = [];
+                                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                            if ($row['field_type'] === 'checkbox') {
+                                                $decoded = json_decode($row['field_value'], true);
+                                                $response_data[$row['field_label']] = is_array($decoded) ? implode(', ', $decoded) : $row['field_value'];
+                                            } else {
+                                                $response_data[$row['field_label']] = $row['field_value'];
+                                            }
+                                        }
                                         
                                         foreach ($fields as $field): ?>
                                             <td>

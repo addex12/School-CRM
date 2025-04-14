@@ -5,24 +5,16 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-// Only show errors after all redirects
-// Debug: Check DB connection
-if (!$pdo) {
-    die('<div style="color:red; font-weight:bold;">Database connection failed.</div>');
-}
-
+// No output before redirects!
 $response_id = $_GET['id'] ?? null;
-
-// Only set error and redirect, do not echo before header()
 if (!$response_id) {
     $_SESSION['error'] = "Response ID is required.";
-    // Ensure no output has been sent before this point!
     header("Location: results.php");
     exit();
 }
 
 // Fetch response details
-$stmt = $pdo->prepare("SELECT sr.*, s.title AS survey_title, s.is_anonymous, u.username, u.email, r.role_name
+$stmt = $pdo->prepare("SELECT sr.*, s.title AS survey_title, s.description AS survey_description, s.is_anonymous, u.username, u.email, r.role_name
     FROM survey_responses sr
     JOIN surveys s ON sr.survey_id = s.id
     LEFT JOIN users u ON sr.user_id = u.id
@@ -37,7 +29,7 @@ if (!$response) {
     exit();
 }
 
-// Debug: Show errors from session if any (only after all redirects)
+// Show errors from session only after all redirects
 if (!empty($_SESSION['error'])) {
     echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
     unset($_SESSION['error']);
@@ -66,6 +58,10 @@ $response_data = $stmt->fetchAll();
 // Create a map of field_id to response data for easy lookup
 $answered_data = [];
 foreach ($response_data as $data) {
+    if ($data['field_type'] === 'checkbox') {
+        $decoded = json_decode($data['field_value'], true);
+        $data['field_value'] = is_array($decoded) ? $decoded : [$data['field_value']];
+    }
     $answered_data[$data['field_id']] = $data;
 }
 ?>
@@ -255,9 +251,7 @@ foreach ($response_data as $data) {
                                 
                                 case 'checkbox': ?>
                                     <ul>
-                                        <?php 
-                                        $values = json_decode($answer['field_value'], true) ?: [$answer['field_value']];
-                                        foreach ($values as $value): ?>
+                                        <?php foreach ($answer['field_value'] as $value): ?>
                                             <li><?= htmlspecialchars($value) ?></li>
                                         <?php endforeach; ?>
                                     </ul>

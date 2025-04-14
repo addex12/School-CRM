@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 15, 2025 at 07:49 AM
+-- Generation Time: Apr 15, 2025 at 08:48 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -272,6 +272,18 @@ CREATE TABLE `response_data` (
   `field_value` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `response_data`
+--
+
+INSERT INTO `response_data` (`id`, `response_id`, `field_id`, `field_value`) VALUES
+(8, 3, 14, '16'),
+(9, 3, 15, '10'),
+(10, 3, 16, '8'),
+(11, 3, 17, '9'),
+(12, 4, 18, '5'),
+(13, 4, 19, 'Fine');
+
 -- --------------------------------------------------------
 
 --
@@ -421,7 +433,9 @@ INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `pl
 (14, 1, 'radio', '7+9', NULL, '', '[\"5\",\"6\",\"16\",\"15\"]', 1, NULL, 0),
 (15, 1, 'checkbox', '5+5', NULL, '', '[\"9\",\"8\",\"6\",\"10\"]', 1, NULL, 1),
 (16, 1, 'checkbox', '4+4', NULL, '', '[\"9\",\"8\",\"7\",\"6\",\"5\"]', 1, NULL, 2),
-(17, 1, 'number', '9+0', NULL, '', '[\"1\",\"2\",\"3\",\"4\"]', 1, NULL, 3);
+(17, 1, 'number', '9+0', NULL, '', '[\"1\",\"2\",\"3\",\"4\"]', 1, NULL, 3),
+(18, 8, 'select', '2+3', NULL, '', '[\"1\",\"2\",\"5\"]', 1, NULL, 0),
+(19, 8, 'select', 'How Are you?', NULL, '', '[\"Fine\",\"Good\"]', 1, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -453,6 +467,14 @@ CREATE TABLE `survey_responses` (
   `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`)),
   `status` enum('in_progress','completed') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_responses`
+--
+
+INSERT INTO `survey_responses` (`id`, `survey_id`, `user_id`, `submitted_at`, `answers`, `status`) VALUES
+(3, 1, 65, '2025-04-14 22:11:19', '{\"14\":\"16\",\"15\":[\"10\"],\"16\":[\"8\"],\"17\":\"9\"}', NULL),
+(4, 8, 65, '2025-04-14 22:26:23', '{\"18\":\"5\",\"19\":\"Fine\"}', NULL);
 
 -- --------------------------------------------------------
 
@@ -488,8 +510,9 @@ CREATE TABLE `survey_roles` (
 --
 
 INSERT INTO `survey_roles` (`id`, `survey_id`, `role_id`) VALUES
-(12, 8, 4),
-(23, 1, 5);
+(23, 1, 5),
+(24, 8, 4),
+(25, 8, 5);
 
 -- --------------------------------------------------------
 
@@ -657,7 +680,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `active`, `created_at`, `last_login`, `last_activity`, `reset_token`, `reset_token_expires`, `avatar`, `notification_prefs`, `social_provider`, `social_id`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, 1, '2025-03-25 14:50:31', '2025-04-14 21:24:27', '2025-04-15 07:24:27', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, 1, '2025-03-25 14:50:31', '2025-04-14 22:44:13', '2025-04-15 08:44:13', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
 (5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamyohannes@gmail.com', 1, 1, '2025-03-25 22:47:11', '2025-03-28 21:13:37', '2025-03-29 22:43:32', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
 (65, 'Adugna1', '$2y$10$mVnaYcK/FyHuL7meR9J5susyTa.6T4tgUt6Ci7xcLpMsREPWX6R3G', 'gizawadugna@gmail.com', 5, 1, '2025-03-29 12:03:37', '2025-04-14 20:53:48', '2025-04-15 06:53:48', NULL, NULL, 'avatar_65_d1bb19e4e9524942.jpeg', '{\"email\": true, \"push\": true}', NULL, NULL);
 
@@ -787,6 +810,7 @@ ALTER TABLE `positions`
 ALTER TABLE `response_data`
   ADD PRIMARY KEY (`id`),
   ADD KEY `response_id` (`response_id`,`field_id`),
+  ADD KEY `response_id_2` (`response_id`),
   ADD KEY `field_id` (`field_id`);
 
 --
@@ -853,7 +877,8 @@ ALTER TABLE `survey_logic`
 ALTER TABLE `survey_responses`
   ADD PRIMARY KEY (`id`),
   ADD KEY `survey_id` (`survey_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `survey_id_2` (`survey_id`);
 
 --
 -- Indexes for table `survey_roles`
@@ -973,7 +998,7 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `response_data`
 --
 ALTER TABLE `response_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1015,7 +1040,7 @@ ALTER TABLE `survey_conditions`
 -- AUTO_INCREMENT for table `survey_fields`
 --
 ALTER TABLE `survey_fields`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `survey_logic`
@@ -1027,13 +1052,13 @@ ALTER TABLE `survey_logic`
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `survey_roles`
 --
 ALTER TABLE `survey_roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `survey_statuses`
