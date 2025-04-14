@@ -56,16 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        // Insert survey response - removed 'anonymous' column
+        // Insert survey response - always include user_id
         $stmt = $pdo->prepare("
             INSERT INTO survey_responses 
             (survey_id, user_id, submitted_at) 
             VALUES (?, ?, NOW())
         ");
-        $stmt->execute([
-            $survey_id, 
-            $survey_data[0]['is_anonymous'] ? null : $_SESSION['user_id']
-        ]);
+        $stmt->execute([$survey_id, $_SESSION['user_id']]);
         $response_id = $pdo->lastInsertId();
         
         // Process each question response
@@ -199,6 +196,13 @@ foreach ($survey_data as $row) {
             list-style: none;
             padding-left: 0;
         }
+        .anonymous-notice {
+            background: #e7f5fe;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
     </style>
 </head>
 <body>
@@ -213,6 +217,13 @@ foreach ($survey_data as $row) {
         <?php endif; ?>
         
         <form method="POST">
+            <?php if ($survey['is_anonymous']): ?>
+                <div class="anonymous-notice">
+                    <i class="fas fa-user-secret"></i> 
+                    This survey is anonymous. Your responses will not be linked to your identity.
+                </div>
+            <?php endif; ?>
+            
             <?php foreach ($survey['questions'] as $question): ?>
                 <div class="question-group">
                     <label class="question-label">
@@ -230,13 +241,13 @@ foreach ($survey_data as $row) {
                                    <?= $question['required'] ? 'required' : '' ?>>
                             <?php break; ?>
                             
-                        <?php case 'textarea': ?>
+                        case 'textarea': ?>
                             <textarea name="field_<?= $question['id'] ?>" 
                                       class="form-control"
                                       <?= $question['required'] ? 'required' : '' ?>></textarea>
                             <?php break; ?>
                             
-                        <?php case 'radio': ?>
+                        case 'radio': ?>
                             <ul class="options-list">
                                 <?php foreach ($question['options'] as $option): ?>
                                     <li class="form-check">
@@ -255,7 +266,7 @@ foreach ($survey_data as $row) {
                             </ul>
                             <?php break; ?>
                             
-                        <?php case 'checkbox': ?>
+                        case 'checkbox': ?>
                             <ul class="options-list">
                                 <?php foreach ($question['options'] as $option): ?>
                                     <li class="form-check">
@@ -273,7 +284,7 @@ foreach ($survey_data as $row) {
                             </ul>
                             <?php break; ?>
                             
-                        <?php case 'select': ?>
+                        case 'select': ?>
                             <select name="field_<?= $question['id'] ?>" 
                                     class="form-control"
                                     <?= $question['required'] ? 'required' : '' ?>>
@@ -286,21 +297,21 @@ foreach ($survey_data as $row) {
                             </select>
                             <?php break; ?>
                             
-                        <?php case 'number': ?>
+                        case 'number': ?>
                             <input type="number" 
                                    name="field_<?= $question['id'] ?>" 
                                    class="form-control"
                                    <?= $question['required'] ? 'required' : '' ?>>
                             <?php break; ?>
                             
-                        <?php case 'date': ?>
+                        case 'date': ?>
                             <input type="date" 
                                    name="field_<?= $question['id'] ?>" 
                                    class="form-control"
                                    <?= $question['required'] ? 'required' : '' ?>>
                             <?php break; ?>
                             
-                        <?php case 'rating': ?>
+                        case 'rating': ?>
                             <select name="field_<?= $question['id'] ?>" 
                                     class="form-control"
                                     <?= $question['required'] ? 'required' : '' ?>>
