@@ -5,12 +5,7 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-// Debug: Show errors from session if any (only after all redirects)
-if (!empty($_SESSION['error'])) {
-    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
-    unset($_SESSION['error']);
-}
-
+// Only show errors after all redirects
 // Debug: Check DB connection
 if (!$pdo) {
     die('<div style="color:red; font-weight:bold;">Database connection failed.</div>');
@@ -40,6 +35,12 @@ if (!$response) {
     $_SESSION['error'] = "Response not found.";
     header("Location: results.php");
     exit();
+}
+
+// Debug: Show errors from session if any (only after all redirects)
+if (!empty($_SESSION['error'])) {
+    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
+    unset($_SESSION['error']);
 }
 
 // Get all fields for this survey to show unanswered questions
