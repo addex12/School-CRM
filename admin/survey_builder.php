@@ -98,10 +98,10 @@ function prepareQuestions($questions, $field_types, $options, $required) {
     $preparedQuestions = [];
     foreach ($questions as $index => $question) {
         $preparedQuestions[] = [
-            'field_type' => $field_types[$index],
+            'field_type' => $field_types[$index] ?? null,
             'field_label' => $question,
             'field_options' => $options[$index] ?? null,
-            'is_required' => isset($required[$index]),
+            'is_required' => isset($required) && isset($required[$index]),
             'sort_order' => $index + 1
         ];
     }
