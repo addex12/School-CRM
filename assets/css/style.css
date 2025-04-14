@@ -81,7 +81,7 @@ a:hover {
 
 .btn {
     display: inline-block;
-    padding: 12px 25px; /* Increased padding for better size */
+    padding: 15px 30px; /* Increased padding for better size */
     border-radius: 4px;
     color: var(--white);
     cursor: pointer;
@@ -90,7 +90,8 @@ a:hover {
     transition: background-color 0.3s, transform 0.2s; /* Added transform for hover effect */
     margin: 0 auto; /* Center the button */
     width: 100%; /* Make the button full width */
-    font-size: 18px; /* Increased font size for better visibility */
+    font-size: 20px; /* Increased font size for better visibility */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Added shadow for depth */
 }
 
 .btn-primary {
