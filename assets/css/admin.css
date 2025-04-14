@@ -13,9 +13,9 @@ body, html {
 }
 
 .admin-main {
-    flex: 1;
-    margin-left: var(--sidebar-width);
-    transition: all var(--transition-speed);
+    flex-grow: 1;
+    padding: 15px 24px;
+    background: #f4f6f9;
 }
 
 .admin-header {
