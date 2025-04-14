@@ -333,9 +333,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label>Options (for radio, checkbox, dropdown)</label>
 <?= 
     $question['field_options'] ? 
-    htmlspecialchars(implode("\n", json_decode($question['field_options'], associative: true))) : 
+    htmlspecialchars(implode("\n", json_decode($question['field_options'], true))) : 
     '' 
-?>
                                 <p class="help-text">Enter each option on a new line</p>
                             </div>
                         </div>
