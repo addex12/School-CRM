@@ -84,7 +84,7 @@ if (!ob_get_level()) {
                 <label for="password">Password:</label>
                 <input type="password" name="password" id="password" required autocomplete="current-password">
             </div>
-            <div class="form-group">
+            <div class="form-group" style="text-align: center;"> <!-- Center the button -->
                 <button type="submit" class="btn-primary">Login</button>
             </div>
             <div class="form-group">
