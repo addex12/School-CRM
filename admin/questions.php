@@ -63,7 +63,7 @@ $questions = $stmt->fetchAll();
             <nav>
                 <a href="dashboard.php">Dashboard</a>
                 <a href="surveys.php">Surveys</a>
-                <a href="results.php">Results</a>
+                <a href="results.php?survey_id=<?= $survey_id ?>">Results</a>
                 <a href="../logout.php">Logout</a>
             </nav>
         </header>
