@@ -368,22 +368,18 @@ $chart_json = json_encode($chart_data);
                                         <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
                                         
                                         <?php 
-                                        // Get all response data for this response
-                                        $stmt = $pdo->prepare("
-                                            SELECT f.field_label, d.field_value, f.field_type
-                                            FROM response_data d
-                                            JOIN survey_fields f ON d.field_id = f.id
-                                            WHERE d.response_id = ?
-                                        ");
-                                        $stmt->execute([$response['id']]);
+                                        // Parse answers JSON from survey_responses.answers
+                                        $answers = json_decode($response['answers'], true);
                                         $response_data = [];
-                                        
-                                        while ($row = $stmt->fetch()) {
-                                            if ($row['field_type'] === 'checkbox') {
-                                                $decoded = json_decode($row['field_value'], true);
-                                                $response_data[$row['field_label']] = is_array($decoded) ? implode(', ', $decoded) : $row['field_value'];
-                                            } else {
-                                                $response_data[$row['field_label']] = $row['field_value'];
+                                        foreach ($fields as $field) {
+                                            $field_id_str = (string)$field['id'];
+                                            if (isset($answers[$field_id_str])) {
+                                                $value = $answers[$field_id_str];
+                                                if ($field['field_type'] === 'checkbox' && is_array($value)) {
+                                                    $response_data[$field['field_label']] = implode(', ', $value);
+                                                } else {
+                                                    $response_data[$field['field_label']] = is_array($value) ? implode(', ', $value) : $value;
+                                                }
                                             }
                                         }
                                         
