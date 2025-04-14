@@ -20,7 +20,7 @@ body, html {
 
 .admin-header {
     background: #fff;
-    padding: 0 20px;
+    padding: 0 15px;
     margin-bottom: 50px; /* Increased margin to prevent overlap */
     border-radius: 12px;
     box-shadow: 0 4px 24px rgba(44, 62, 80, 0.07);
