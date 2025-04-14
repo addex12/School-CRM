@@ -25,10 +25,10 @@ if ($survey_id) {
         if ($survey) {
             $survey['target_roles'] = array_map('intval', explode(',', $survey['target_roles']));
             $questionStmt = $pdo->prepare("
-                SELECT q.*, COALESCE(q.field_options, '') as field_options
-                FROM survey_questions q
-                WHERE q.survey_id = ?
-                ORDER BY q.sort_order
+                SELECT sf.*
+                FROM survey_fields sf
+                WHERE sf.survey_id = ?
+                ORDER BY sf.display_order
             ");
             $questionStmt->execute([$survey_id]);
             $survey['questions'] = $questionStmt->fetchAll(PDO::FETCH_ASSOC);
@@ -60,7 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ];
 
     $target_roles = isset($_POST['target_roles']) ? array_map('intval', $_POST['target_roles']) : [];
-    $questions = prepareQuestions($_POST['questions'], $_POST['field_types'], $_POST['options'], $_POST['required'] ?? []);
+    $questions = prepareQuestions(
+        $_POST['questions'] ?? [],
+        $_POST['field_types'] ?? [],
+        $_POST['options'] ?? [],
+        $_POST['required'] ?? []
+    );
 
     try {
         $pdo->beginTransaction();
@@ -71,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         updateTargetRoles($pdo, $survey_id, $target_roles);
-        updateSurveyQuestions($pdo, $survey_id, $questions);
+        updateSurveyFields($pdo, $survey_id, $questions);
         $pdo->commit();
 
         $_SESSION['success'] = $survey_id ? "Survey updated successfully!" : "Survey created successfully!";
@@ -101,8 +106,8 @@ function prepareQuestions($questions, $field_types, $options, $required) {
             'field_type' => $field_types[$index] ?? null,
             'field_label' => $question,
             'field_options' => $options[$index] ?? null,
-            'is_required' => isset($required) && isset($required[$index]),
-            'sort_order' => $index + 1
+            'is_required' => isset($required) && isset($required[$index]) ? 1 : 0,
+            'display_order' => $index
         ];
     }
     return $preparedQuestions;
@@ -140,14 +145,14 @@ function updateTargetRoles($pdo, $survey_id, $target_roles) {
     }
 }
 
-function updateSurveyQuestions($pdo, $survey_id, $questions) {
-    $stmt = $pdo->prepare("DELETE FROM survey_questions WHERE survey_id = ?");
+function updateSurveyFields($pdo, $survey_id, $questions) {
+    $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
     $stmt->execute([$survey_id]);
 
     if (!empty($questions)) {
         $stmt = $pdo->prepare("
-            INSERT INTO survey_questions 
-            (survey_id, field_type, field_label, field_options, is_required, sort_order) 
+            INSERT INTO survey_fields 
+            (survey_id, field_type, field_label, field_options, is_required, display_order) 
             VALUES (?, ?, ?, ?, ?, ?)
         ");
         foreach ($questions as $question) {
@@ -157,7 +162,7 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
                 $question['field_label'],
                 $question['field_options'],
                 $question['is_required'],
-                $question['sort_order']
+                $question['display_order']
             ]);
         }
     }
@@ -167,11 +172,11 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
@@ -190,10 +195,16 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
             <div class="form-container">
                 <h2><?= $survey ? "Edit Survey" : "Create New Survey" ?></h2>
                 <form method="POST" class="survey-form">
-                    <input type="hidden" name="id" value="<?= $survey_id ?? '' ?>">
+                    <input type="hidden" name="id" value="<?= $survey_id ?? '' ?>" />
                     <div class="form-group">
                         <label for="title">Survey Title *</label>
-                        <input type="text" id="title" name="title" value="<?= htmlspecialchars($survey['title'] ?? '') ?>" required>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value="<?= htmlspecialchars($survey['title'] ?? '') ?>"
+                            required
+                        />
                     </div>
                     <div class="form-group">
                         <label for="description">Description</label>
@@ -203,12 +214,17 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
                         <label>Target Roles *</label>
                         <div class="roles-grid">
                             <?php foreach ($roles as $role): ?>
-                                <div class="role-checkbox">
-                                    <label>
-                                        <input type="checkbox" name="target_roles[]" value="<?= $role['id'] ?>" <?= in_array($role['id'], $survey['target_roles'] ?? []) ? 'checked' : '' ?>>
-                                        <?= htmlspecialchars($role['role_name']) ?>
-                                    </label>
-                                </div>
+                            <div class="role-checkbox">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        name="target_roles[]"
+                                        value="<?= $role['id'] ?>"
+                                        <?= in_array($role['id'], $survey['target_roles'] ?? []) ? 'checked' : '' ?>
+                                    />
+                                    <?= htmlspecialchars($role['role_name']) ?>
+                                </label>
+                            </div>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -217,7 +233,12 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
                         <select id="category_id" name="category_id" required>
                             <option value="">Select Category</option>
                             <?php foreach ($categories as $category): ?>
-                                <option value="<?= $category['id'] ?>" <?= $category['id'] == ($survey['category_id'] ?? 0) ? 'selected' : '' ?>><?= htmlspecialchars($category['name']) ?></option>
+                            <option
+                                value="<?= $category['id'] ?>"
+                                <?= $category['id'] == ($survey['category_id'] ?? 0) ? 'selected' : '' ?>
+                            >
+                                <?= htmlspecialchars($category['name']) ?>
+                            </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
@@ -225,50 +246,94 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
                         <label for="status">Status *</label>
                         <select id="status" name="status" required>
                             <?php foreach ($statuses as $status): ?>
-                                <option value="<?= $status['id'] ?>" <?= $status['id'] == ($survey['status'] ?? 0) ? 'selected' : '' ?>><?= htmlspecialchars($status['label']) ?></option>
+                            <option
+                                value="<?= $status['id'] ?>"
+                                <?= $status['id'] == ($survey['status'] ?? 0) ? 'selected' : '' ?>
+                            >
+                                <?= htmlspecialchars($status['label']) ?>
+                            </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="starts_at">Start Date *</label>
-                        <input type="datetime-local" id="starts_at" name="starts_at" value="<?= date('Y-m-d\TH:i', strtotime($survey['starts_at'] ?? '+1 day')) ?>" required>
+                        <input
+                            type="datetime-local"
+                            id="starts_at"
+                            name="starts_at"
+                            value="<?= date('Y-m-d\TH:i', strtotime($survey['starts_at'] ?? '+1 day')) ?>"
+                            required
+                        />
                     </div>
                     <div class="form-group">
                         <label for="ends_at">End Date *</label>
-                        <input type="datetime-local" id="ends_at" name="ends_at" value="<?= date('Y-m-d\TH:i', strtotime($survey['ends_at'] ?? '+1 month')) ?>" required>
+                        <input
+                            type="datetime-local"
+                            id="ends_at"
+                            name="ends_at"
+                            value="<?= date('Y-m-d\TH:i', strtotime($survey['ends_at'] ?? '+1 month')) ?>"
+                            required
+                        />
                     </div>
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="is_anonymous" <?= isset($survey['is_anonymous']) ? 'checked' : '' ?>> Make survey anonymous
+                            <input
+                                type="checkbox"
+                                name="is_anonymous"
+                                <?= isset($survey['is_anonymous']) && $survey['is_anonymous'] ? 'checked' : '' ?>
+                            />
+                            Make survey anonymous
                         </label>
                     </div>
                     <div class="form-group">
                         <label>
-                            <input type="checkbox" name="is_active" <?= isset($survey['is_active']) ? 'checked' : '' ?>> Activate survey
+                            <input
+                                type="checkbox"
+                                name="is_active"
+                                <?= isset($survey['is_active']) && $survey['is_active'] ? 'checked' : '' ?>
+                            />
+                            Activate survey
                         </label>
                     </div>
                     <div id="questions-container">
                         <?php if (isset($survey['questions'])): ?>
-                            <?php foreach ($survey['questions'] as $question): ?>
-                                <div class="question-box">
-                                    <div class="question-header">
-                                        <span>Question <?= htmlspecialchars($question['sort_order']) ?></span>
-                                        <button type="button" class="remove-question">Remove</button>
-                                    </div>
-                                    <div class="question-content">
-                                        <input type="text" name="questions[]" value="<?= htmlspecialchars($question['field_label']) ?>" required>
-                                        <select name="field_types[]" required>
-                                            <option value="text" <?= $question['field_type'] == 'text' ? 'selected' : '' ?>>Text</option>
-                                            <option value="textarea" <?= $question['field_type'] == 'textarea' ? 'selected' : '' ?>>Textarea</option>
-                                            <option value="radio" <?= $question['field_type'] == 'radio' ? 'selected' : '' ?>>Radio</option>
-                                            <option value="checkbox" <?= $question['field_type'] == 'checkbox' ? 'selected' : '' ?>>Checkbox</option>
-                                            <option value="select" <?= $question['field_type'] == 'select' ? 'selected' : '' ?>>Select</option>
-                                        </select>
-                                        <input type="checkbox" name="required[]" <?= $question['is_required'] ? 'checked' : '' ?>> Required
-                                        <textarea name="options[]" placeholder="Enter options separated by new line (for radio, checkbox, select)"><?= htmlspecialchars($question['field_options'] ?? '') ?></textarea>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
+                        <?php foreach ($survey['questions'] as $question): ?>
+                        <div class="question-box">
+                            <div class="question-header">
+                                <span>Question <?= htmlspecialchars($question['display_order'] + 1) ?></span>
+                                <button type="button" class="remove-question">Remove</button>
+                            </div>
+                            <div class="question-content">
+                                <input
+                                    type="text"
+                                    name="questions[]"
+                                    value="<?= htmlspecialchars($question['field_label']) ?>"
+                                    required
+                                />
+                                <select name="field_types[]" required>
+                                    <option value="text" <?= $question['field_type'] == 'text' ? 'selected' : '' ?>>Text</option>
+                                    <option value="textarea" <?= $question['field_type'] == 'textarea' ? 'selected' : '' ?>>Textarea</option>
+                                    <option value="radio" <?= $question['field_type'] == 'radio' ? 'selected' : '' ?>>Radio</option>
+                                    <option value="checkbox" <?= $question['field_type'] == 'checkbox' ? 'selected' : '' ?>>Checkbox</option>
+                                    <option value="select" <?= $question['field_type'] == 'select' ? 'selected' : '' ?>>Select</option>
+                                    <option value="number" <?= $question['field_type'] == 'number' ? 'selected' : '' ?>>Number</option>
+                                    <option value="date" <?= $question['field_type'] == 'date' ? 'selected' : '' ?>>Date</option>
+                                    <option value="rating" <?= $question['field_type'] == 'rating' ? 'selected' : '' ?>>Rating</option>
+                                    <option value="file" <?= $question['field_type'] == 'file' ? 'selected' : '' ?>>File</option>
+                                </select>
+                                <input
+                                    type="checkbox"
+                                    name="required[]"
+                                    <?= $question['is_required'] ? 'checked' : '' ?>
+                                />
+                                <label>Required</label>
+                                <textarea
+                                    name="options[]"
+                                    placeholder="Enter options separated by new line (for radio, checkbox, select)"
+                                ><?= htmlspecialchars($question['field_options'] ?? '') ?></textarea>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
                     <button type="button" class="add-question">Add Question</button>
@@ -279,10 +344,10 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
     </div>
     <script src="../assets/js/survey_builder.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             let questionIndex = <?= isset($survey['questions']) ? count($survey['questions']) : 0 ?>;
 
-            $('.add-question').click(function() {
+            $('.add-question').click(function () {
                 const questionBox = `
                     <div class="question-box">
                         <div class="question-header">
@@ -290,15 +355,19 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
                             <button type="button" class="remove-question">Remove</button>
                         </div>
                         <div class="question-content">
-                            <input type="text" name="questions[]" required placeholder="Enter question text">
+                            <input type="text" name="questions[]" required placeholder="Enter question text" />
                             <select name="field_types[]" required>
                                 <option value="text">Text</option>
                                 <option value="textarea">Textarea</option>
                                 <option value="radio">Radio</option>
                                 <option value="checkbox">Checkbox</option>
                                 <option value="select">Select</option>
+                                <option value="number">Number</option>
+                                <option value="date">Date</option>
+                                <option value="rating">Rating</option>
+                                <option value="file">File</option>
                             </select>
-                            <input type="checkbox" name="required[]">
+                            <input type="checkbox" name="required[]" />
                             <label>Required</label>
                             <textarea name="options[]" placeholder="Enter options separated by new line (for radio, checkbox, select)"></textarea>
                         </div>
@@ -308,7 +377,7 @@ function updateSurveyQuestions($pdo, $survey_id, $questions) {
                 questionIndex++;
             });
 
-            $(document).on('click', '.remove-question', function() {
+            $(document).on('click', '.remove-question', function () {
                 $(this).closest('.question-box').remove();
             });
         });
