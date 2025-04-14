@@ -1,31 +1,44 @@
 <?php
-require_once '../includes/db.php';
-require_once '../includes/config.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 require_once '../includes/auth.php';
 requireAdmin();
+require_once '../includes/config.php';
 
-$response_id = $_GET['id'] ?? 0;
+// Debug: Show errors from session if any
+if (!empty($_SESSION['error'])) {
+    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
+    unset($_SESSION['error']);
+}
 
+// Debug: Check DB connection
+if (!$pdo) {
+    die('<div style="color:red; font-weight:bold;">Database connection failed.</div>');
+}
+
+$response_id = $_GET['id'] ?? null;
+
+// Debug: Output response_id
 if (!$response_id) {
+    echo '<div style="color:red; font-weight:bold;">Debug: response_id is missing from GET parameters.</div>';
     $_SESSION['error'] = "Response ID is required.";
     header("Location: results.php");
     exit();
 }
 
-// Get response info with survey details
-$stmt = $pdo->prepare("
-    SELECT r.*, u.username, u.email, ro.role_name, s.title AS survey_title,
-           s.is_anonymous, s.description AS survey_description
-    FROM survey_responses r
-    LEFT JOIN users u ON r.user_id = u.id
-    LEFT JOIN roles ro ON u.role_id = ro.id
-    JOIN surveys s ON r.survey_id = s.id
-    WHERE r.id = ?
-");
+// Fetch response details
+$stmt = $pdo->prepare("SELECT sr.*, s.title AS survey_title, s.is_anonymous, u.username, u.email, r.role_name
+    FROM survey_responses sr
+    JOIN surveys s ON sr.survey_id = s.id
+    LEFT JOIN users u ON sr.user_id = u.id
+    LEFT JOIN roles r ON u.role_id = r.id
+    WHERE sr.id = ?");
 $stmt->execute([$response_id]);
 $response = $stmt->fetch();
 
+// Debug: Output response fetch result
 if (!$response) {
+    echo '<div style="color:red; font-weight:bold;">Debug: No response found for response_id = ' . htmlspecialchars($response_id) . '.</div>';
     $_SESSION['error'] = "Response not found.";
     header("Location: results.php");
     exit();
