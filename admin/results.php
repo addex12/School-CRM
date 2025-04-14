@@ -1,11 +1,4 @@
 <?php
-/**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -34,18 +27,7 @@ $stmt = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY 
 $stmt->execute([$survey_id]);
 $fields = $stmt->fetchAll();
 
-// Add a date range filter form
-?>
-<form method="GET" class="filter-form">
-    <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
-    <label for="start_date">Start Date:</label>
-    <input type="date" name="start_date" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>">
-    <label for="end_date">End Date:</label>
-    <input type="date" name="end_date" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>">
-    <button type="submit" class="btn btn-primary">Filter</button>
-</form>
-<?php
-// Modify the query to filter responses by date range
+// Date range filter
 $whereClause = "sr.survey_id = ?";
 $params = [$survey_id];
 if (!empty($_GET['start_date'])) {
@@ -54,96 +36,244 @@ if (!empty($_GET['start_date'])) {
 }
 if (!empty($_GET['end_date'])) {
     $whereClause .= " AND sr.submitted_at <= ?";
-    $params[] = $_GET['end_date'];
+    $params[] = $_GET['end_date'] . ' 23:59:59';
 }
+
+// Get responses with pagination
+$per_page = 20;
+$page = $_GET['page'] ?? 1;
+$offset = ($page - 1) * $per_page;
+
 $stmt = $pdo->prepare("
-    SELECT sr.*, u.username, sr.answers 
+    SELECT COUNT(*) 
     FROM survey_responses sr 
-    LEFT JOIN users u ON sr.user_id = u.id 
+    WHERE $whereClause
+");
+$stmt->execute($params);
+$total_responses = $stmt->fetchColumn();
+$total_pages = ceil($total_responses / $per_page);
+
+$stmt = $pdo->prepare("
+    SELECT sr.*, u.username, u.email, r.role_name
+    FROM survey_responses sr 
+    LEFT JOIN users u ON sr.user_id = u.id
+    LEFT JOIN roles r ON u.role_id = r.id
     WHERE $whereClause
     ORDER BY sr.submitted_at DESC
+    LIMIT ? OFFSET ?
 ");
+$params[] = $per_page;
+$params[] = $offset;
 $stmt->execute($params);
 $responses = $stmt->fetchAll();
 
-$pageTitle = "Results: " . htmlspecialchars($survey['title']);
+// Prepare data for charts
+$analytics = [];
+foreach ($fields as $field) {
+    $stmt = $pdo->prepare("
+        SELECT field_value, COUNT(*) as count 
+        FROM response_data 
+        WHERE field_id = ? 
+        GROUP BY field_value
+        ORDER BY count DESC
+    ");
+    $stmt->execute([$field['id']]);
+    $analytics[$field['id']] = $stmt->fetchAll();
+}
+
+// Prepare JSON data for JavaScript
+$chart_data = [
+    'survey' => $survey,
+    'fields' => $fields,
+    'analytics' => $analytics,
+    'total_responses' => $total_responses
+];
+$chart_json = json_encode($chart_data);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= $pageTitle ?> - Admin Panel</title>
+    <title>Results: <?= htmlspecialchars($survey['title']) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-content">
-            <h1><?= $pageTitle ?></h1>
-            <p>Results for the survey: <strong><?= htmlspecialchars($survey['title']) ?></strong></p>
-            <p><?= htmlspecialchars($survey['description']) ?></p>
-            <p>Created on: <?= date('M j, Y', strtotime($survey['created_at'])) ?></p>
-            <p>Available from <?= date('M j, Y g:i A', strtotime($survey['starts_at'])) ?> to <?= date('M j, Y g:i A', strtotime($survey['ends_at'])) ?></p>
-            <p>Respondents: <?= count($responses) ?></p>
-            <p>Anonymous: <?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></p>
-            <p>Allow Multiple Responses: <?= isset($survey['allow_multiple']) && $survey['allow_multiple'] ? 'Yes' : 'No' ?></p>
-        </div>
+        
         <div class="admin-main">
-        <header class="admin-header">
-    <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
-    <div class="export-dropdown">
-        <button class="btn btn-primary" onclick="toggleExportMenu()">Export Results ▼</button>
-        <div class="export-menu" id="exportMenu">
-            <a href="export.php?survey_id=<?= $survey_id ?>" class="export-option">Export as CSV</a>
-            <a href="#" id="export-pdf" class="export-option">Export as PDF</a>
-        </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
-        <script src="../js/export.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="../js/chart.js"></script>
-        <script src="../js/survey-results.js"></script>
-    </div>
-    <a href="surveys.php" class="btn btn-secondary">Back to Surveys</a>
-</header>
-            <div class="content">
-                <?php if (count($responses) > 0): ?>
-                    <div id="chart-container"></div> <!-- Container for charts -->
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Respondent</th>
-                                <?php foreach ($fields as $field): ?>
-                                    <th><?= htmlspecialchars($field['field_label']) ?></th>
-                                <?php endforeach; ?>
-                                <th>Submitted At</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($responses as $response): ?>
-                                <?php if ($survey['is_anonymous'] && !$response['username']) {
-                                    $response['username'] = 'Anonymous';
-                                } ?>
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
+                <div class="header-actions">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
+                            <i class="bi bi-download"></i> Export
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>">CSV</a></li>
+                            <li><a class="dropdown-item" href="#" id="export-pdf">PDF</a></li>
+                            <li><a class="dropdown-item" href="export_json.php?survey_id=<?= $survey_id ?>">JSON</a></li>
+                        </ul>
+                    </div>
+                    <a href="surveys.php" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Surveys
+                    </a>
+                </div>
+            </header>
+
+            <div class="survey-stats">
+                <div class="stat-card">
+                    <div class="stat-value"><?= $total_responses ?></div>
+                    <div class="stat-label">Total Responses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value"><?= date('M j, Y', strtotime($survey['starts_at'])) ?></div>
+                    <div class="stat-label">Start Date</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value"><?= date('M j, Y', strtotime($survey['ends_at'])) ?></div>
+                    <div class="stat-label">End Date</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value"><?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></div>
+                    <div class="stat-label">Anonymous</div>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <form method="GET" class="filter-form">
+                    <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
+                    <div class="form-group">
+                        <label for="start_date">From:</label>
+                        <input type="date" name="start_date" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="end_date">To:</label>
+                        <input type="date" name="end_date" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>">
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-funnel"></i> Filter
+                    </button>
+                    <a href="results.php?survey_id=<?= $survey_id ?>" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-counterclockwise"></i> Reset
+                    </a>
+                </form>
+            </div>
+
+            <div class="chart-section" id="chart-section">
+                <div class="chart-container" id="summary-chart"></div>
+                <?php foreach ($fields as $field): ?>
+                    <div class="chart-container" id="chart-<?= $field['id'] ?>"></div>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="response-table-section">
+                <h3>Individual Responses</h3>
+                <?php if ($total_responses > 0): ?>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
                                 <tr>
-                                    <td><?= $survey['is_anonymous'] ? 'Anonymous' : htmlspecialchars($response['username'] ?? 'Anonymous') ?></td>
-                                    <?php 
-                                    $answers = safe_json_decode($response['answers']); // Use helper function
-                                    foreach ($fields as $field): ?>
-                                        <td><?= isset($answers[$field['field_name']]) ? htmlspecialchars($answers[$field['field_name']]) : 'N/A' ?></td>
+                                    <th>#</th>
+                                    <th>Respondent</th>
+                                    <th>Role</th>
+                                    <?php foreach ($fields as $field): ?>
+                                        <th><?= htmlspecialchars($field['field_label']) ?></th>
                                     <?php endforeach; ?>
-                                    <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                                    <th>Submitted At</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($responses as $index => $response): ?>
+                                    <tr>
+                                        <td><?= $index + 1 + $offset ?></td>
+                                        <td>
+                                            <?php if ($survey['is_anonymous']): ?>
+                                                Anonymous
+                                            <?php else: ?>
+                                                <?= htmlspecialchars($response['username'] ?? 'N/A') ?>
+                                                <?php if ($response['email']): ?>
+                                                    <br><small><?= htmlspecialchars($response['email']) ?></small>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
+                                        <?php 
+                                        $stmt = $pdo->prepare("
+                                            SELECT d.field_value, f.field_label 
+                                            FROM response_data d
+                                            JOIN survey_fields f ON d.field_id = f.id
+                                            WHERE d.response_id = ?
+                                        ");
+                                        $stmt->execute([$response['id']]);
+                                        $response_data = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+                                        
+                                        foreach ($fields as $field): ?>
+                                            <td>
+                                                <?= isset($response_data[$field['field_label']]) ? 
+                                                    htmlspecialchars($response_data[$field['field_label']]) : 'N/A' ?>
+                                            </td>
+                                        <?php endforeach; ?>
+                                        <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                                        <td>
+                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <nav class="pagination-container">
+                        <ul class="pagination">
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= !empty($_GET['start_date']) ? '&start_date=' . urlencode($_GET['start_date']) : '' ?><?= !empty($_GET['end_date']) ? '&end_date=' . urlencode($_GET['end_date']) : '' ?>">
+                                        Previous
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= !empty($_GET['start_date']) ? '&start_date=' . urlencode($_GET['start_date']) : '' ?><?= !empty($_GET['end_date']) ? '&end_date=' . urlencode($_GET['end_date']) : '' ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li>
+                            <?php endfor; ?>
+                            
+                            <?php if ($page < $total_pages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= !empty($_GET['start_date']) ? '&start_date=' . urlencode($_GET['start_date']) : '' ?><?= !empty($_GET['end_date']) ? '&end_date=' . urlencode($_GET['end_date']) : '' ?>">
+                                        Next
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
                 <?php else: ?>
-                    <p>No responses found for this survey. Please check back later.</p>
+                    <div class="alert alert-info">
+                        No responses found for this survey. Please check back later.
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
-<?php include 'includes/footer.php'; ?>
+
+    <script>
+        // Pass PHP data to JavaScript
+        const chartData = <?= $chart_json ?>;
+    </script>
+    <script src="../assets/js/results-charts.js"></script>
+    <script src="../assets/js/results-export.js"></script>
 </body>
 </html>
