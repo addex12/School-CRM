@@ -86,10 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        // Update questions
+        // Delete existing questions first to avoid duplicate key issues
         $stmt = $pdo->prepare("DELETE FROM survey_fields WHERE survey_id = ?");
         $stmt->execute([$survey_id]);
 
+        // Insert new questions if they exist
         if (!empty($_POST['questions'])) {
             $stmt = $pdo->prepare("
                 INSERT INTO survey_fields 
@@ -97,7 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 VALUES (?, ?, ?, ?, ?, ?)
             ");
             
-            foreach ($_POST['questions'] as $index => $question) {
+            foreach ($_POST['questions'] as $index => $question_text) {
+                // Skip empty questions
+                if (empty(trim($question_text))) continue;
+                
                 $options = isset($_POST['options'][$index]) ? 
                     json_encode(array_filter(array_map('trim', explode("\n", $_POST['options'][$index])))) : 
                     null;
@@ -105,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([
                     $survey_id,
                     $_POST['field_types'][$index],
-                    $question,
+                    $question_text,
                     $options,
                     isset($_POST['required'][$index]) ? 1 : 0,
                     $index
@@ -121,6 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $pdo->rollBack();
         $_SESSION['error'] = "Error updating survey: " . $e->getMessage();
+        error_log("Survey update error: " . $e->getMessage());
     }
 }
 ?>
@@ -192,6 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 4px;
+            background: #f9f9f9;
         }
         .question-header {
             display: flex;
@@ -254,7 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="role-checkbox">
                             <label>
                                 <input type="checkbox" name="target_roles[]" value="<?= $role['id']; ?>" 
-                                    <?= in_array($role['id'], explode(',', $survey['target_roles'])) ? 'checked' : ''; ?>>
+                                    <?= in_array($role['id'], explode(',', $survey['target_roles'] ?? '')) ? 'checked' : ''; ?>>
                                 <?= htmlspecialchars($role['role_name']); ?>
                             </label>
                         </div>
