@@ -239,13 +239,13 @@ foreach ($survey_data as $row) {
                                    name="field_<?= $question['id'] ?>" 
                                    class="form-control"
                                    <?= $question['required'] ? 'required' : '' ?>>
-                            <?php break; ?>
+                            <?php break; 
                             
                         case 'textarea': ?>
                             <textarea name="field_<?= $question['id'] ?>" 
                                       class="form-control"
                                       <?= $question['required'] ? 'required' : '' ?>></textarea>
-                            <?php break; ?>
+                            <?php break; 
                             
                         case 'radio': ?>
                             <ul class="options-list">
@@ -264,7 +264,7 @@ foreach ($survey_data as $row) {
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
-                            <?php break; ?>
+                            <?php break; 
                             
                         case 'checkbox': ?>
                             <ul class="options-list">
@@ -282,7 +282,7 @@ foreach ($survey_data as $row) {
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
-                            <?php break; ?>
+                            <?php break; 
                             
                         case 'select': ?>
                             <select name="field_<?= $question['id'] ?>" 
@@ -295,21 +295,21 @@ foreach ($survey_data as $row) {
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <?php break; ?>
+                            <?php break; 
                             
                         case 'number': ?>
                             <input type="number" 
                                    name="field_<?= $question['id'] ?>" 
                                    class="form-control"
                                    <?= $question['required'] ? 'required' : '' ?>>
-                            <?php break; ?>
+                            <?php break; 
                             
                         case 'date': ?>
                             <input type="date" 
                                    name="field_<?= $question['id'] ?>" 
                                    class="form-control"
                                    <?= $question['required'] ? 'required' : '' ?>>
-                            <?php break; ?>
+                            <?php break; 
                             
                         case 'rating': ?>
                             <select name="field_<?= $question['id'] ?>" 
@@ -322,9 +322,9 @@ foreach ($survey_data as $row) {
                                 <option value="4">4 - Very Good</option>
                                 <option value="5">5 - Excellent</option>
                             </select>
-                            <?php break; ?>
+                            <?php break; 
                             
-                    <?php endswitch; ?>
+                    endswitch; ?>
                 </div>
             <?php endforeach; ?>
             
