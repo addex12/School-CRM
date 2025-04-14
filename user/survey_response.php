@@ -56,17 +56,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        // Insert survey response
+        // Insert survey response - removed 'anonymous' column
         $stmt = $pdo->prepare("
             INSERT INTO survey_responses 
-            (survey_id, user_id, submitted_at, anonymous) 
-            VALUES (?, ?, NOW(), ?)
+            (survey_id, user_id, submitted_at) 
+            VALUES (?, ?, NOW())
         ");
-        $anonymous = $survey_data[0]['is_anonymous'] ? 1 : 0;
         $stmt->execute([
             $survey_id, 
-            $anonymous ? null : $_SESSION['user_id'],
-            $anonymous
+            $survey_data[0]['is_anonymous'] ? null : $_SESSION['user_id']
         ]);
         $response_id = $pdo->lastInsertId();
         
@@ -215,15 +213,6 @@ foreach ($survey_data as $row) {
         <?php endif; ?>
         
         <form method="POST">
-            <?php if ($survey['is_anonymous']): ?>
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" name="anonymous" value="1">
-                        Submit anonymously (your identity will not be recorded)
-                    </label>
-                </div>
-            <?php endif; ?>
-            
             <?php foreach ($survey['questions'] as $question): ?>
                 <div class="question-group">
                     <label class="question-label">
