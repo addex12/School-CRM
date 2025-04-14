@@ -12,7 +12,7 @@ if (!$response_id) {
     exit();
 }
 
-// Get response info with more details
+// Get response info with survey details
 $stmt = $pdo->prepare("
     SELECT r.*, u.username, u.email, ro.role_name, s.title AS survey_title,
            s.is_anonymous, s.description AS survey_description
@@ -31,18 +31,7 @@ if (!$response) {
     exit();
 }
 
-// Get response data with field types and options
-$stmt = $pdo->prepare("
-    SELECT d.*, f.field_label, f.field_type, f.field_options
-    FROM response_data d
-    JOIN survey_fields f ON d.field_id = f.id
-    WHERE d.response_id = ?
-    ORDER BY f.display_order
-");
-$stmt->execute([$response_id]);
-$response_data = $stmt->fetchAll();
-
-// Get survey fields to show unanswered questions
+// Get all fields for this survey to show unanswered questions
 $stmt = $pdo->prepare("
     SELECT id, field_label, field_type, field_options
     FROM survey_fields
@@ -50,14 +39,23 @@ $stmt = $pdo->prepare("
     ORDER BY display_order
 ");
 $stmt->execute([$response['survey_id']]);
-$all_fields = $stmt->fetchAll();
+$fields = $stmt->fetchAll();
 
-// Mark which fields were answered
-$answered_field_ids = array_column($response_data, 'field_id');
-foreach ($all_fields as &$field) {
-    $field['answered'] = in_array($field['id'], $answered_field_ids);
+// Get response data for answered questions
+$stmt = $pdo->prepare("
+    SELECT d.*, f.field_label, f.field_type, f.field_options
+    FROM response_data d
+    JOIN survey_fields f ON d.field_id = f.id
+    WHERE d.response_id = ?
+");
+$stmt->execute([$response_id]);
+$response_data = $stmt->fetchAll();
+
+// Create a map of field_id to response data for easy lookup
+$answered_data = [];
+foreach ($response_data as $data) {
+    $answered_data[$data['field_id']] = $data;
 }
-unset($field);
 ?>
 
 <!DOCTYPE html>
@@ -66,6 +64,7 @@ unset($field);
     <meta charset="UTF-8">
     <title>Response Details - <?= htmlspecialchars($response['survey_title']) ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <style>
         .response-container {
@@ -155,6 +154,24 @@ unset($field);
             background: #34495e;
             color: white;
         }
+        .badge {
+            display: inline-block;
+            padding: 0.25em 0.4em;
+            font-size: 75%;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+        }
+        .bg-danger {
+            background-color: #dc3545 !important;
+            color: white;
+        }
+        .text-muted {
+            color: #6c757d !important;
+        }
     </style>
 </head>
 <body>
@@ -195,21 +212,17 @@ unset($field);
         </div>
         
         <div class="response-items">
-            <?php foreach ($all_fields as $field): ?>
-                <div class="response-item <?= !$field['answered'] ? 'unanswered' : '' ?>">
+            <?php foreach ($fields as $field): ?>
+                <div class="response-item <?= !isset($answered_data[$field['id']]) ? 'unanswered' : '' ?>">
                     <div class="response-question">
                         <?= htmlspecialchars($field['field_label']) ?>
-                        <?php if (!$field['answered']): ?>
+                        <?php if (!isset($answered_data[$field['id']])): ?>
                             <span class="badge bg-danger">Not answered</span>
                         <?php endif; ?>
                     </div>
                     
-                    <?php if ($field['answered']): ?>
-                        <?php 
-                        $answer = current(array_filter($response_data, function($item) use ($field) {
-                            return $item['field_id'] == $field['id'];
-                        }));
-                        ?>
+                    <?php if (isset($answered_data[$field['id']])): ?>
+                        <?php $answer = $answered_data[$field['id']]; ?>
                         
                         <div class="response-answer">
                             <?php switch ($field['field_type']):
