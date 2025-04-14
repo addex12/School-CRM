@@ -29,12 +29,6 @@ if (!$response) {
     exit();
 }
 
-// Show errors from session only after all redirects
-if (!empty($_SESSION['error'])) {
-    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
-    unset($_SESSION['error']);
-}
-
 // Get all fields for this survey to show unanswered questions
 $stmt = $pdo->prepare("
     SELECT id, field_label, field_type, field_options
@@ -183,6 +177,12 @@ foreach ($response_data as $data) {
     </style>
 </head>
 <body>
+    <?php
+    if (!empty($_SESSION['error'])) {
+        echo '<div style="color:red; font-weight:bold; text-align:center; margin:20px 0;">' . htmlspecialchars($_SESSION['error']) . '</div>';
+        unset($_SESSION['error']);
+    }
+    ?>
     <?php include 'includes/admin_header.php'; ?>
     
     <div class="response-container">
