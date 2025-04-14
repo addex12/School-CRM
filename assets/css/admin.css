@@ -46,14 +46,13 @@ body, html {
 }
 
 .dashboard-widget {
-    background: linear-gradient(135deg, #fff 80%, #f4f6f9 100%);
-    border-radius: 16px;
-    padding: 32px 20px 24px 20px;
-    text-align: center;
-    box-shadow: 0 6px 32px rgba(44, 62, 80, 0.10);
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 .dashboard-widget:hover {
     transform: translateY(-6px) scale(1.03);
