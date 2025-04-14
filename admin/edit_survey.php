@@ -331,11 +331,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             
                             <div class="form-group options-group">
                                 <label>Options (for radio, checkbox, dropdown)</label>
-                                <textarea name="options[]" rows="3"><?= 
-                                    $question['field_options'] ? 
-                                    htmlspecialchars(implode("\n", json_decode($question['field_options']))) : 
-                                    '' 
-                                ?></textarea>
+<?= 
+    $question['field_options'] ? 
+    htmlspecialchars(implode("\n", json_decode($question['field_options'], true))) : 
+    '' 
+?>
                                 <p class="help-text">Enter each option on a new line</p>
                             </div>
                         </div>
