@@ -16,6 +16,7 @@ $response_id = $_GET['id'] ?? null;
 // Only set error and redirect, do not echo before header()
 if (!$response_id) {
     $_SESSION['error'] = "Response ID is required.";
+    // Ensure no output has been sent before this point!
     header("Location: results.php");
     exit();
 }
@@ -30,7 +31,6 @@ $stmt = $pdo->prepare("SELECT sr.*, s.title AS survey_title, s.is_anonymous, u.u
 $stmt->execute([$response_id]);
 $response = $stmt->fetch();
 
-// Only set error and redirect, do not echo before header()
 if (!$response) {
     $_SESSION['error'] = "Response not found.";
     header("Location: results.php");
