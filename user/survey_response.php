@@ -8,8 +8,8 @@ $survey_id = $_GET['id'] ?? 0;
 // Validate survey access and get survey details
 try {
     $stmt = $pdo->prepare("
-        SELECT s.id, s.title, s.description, s.is_anonymous, s.allow_multiple,
-               sf.id AS field_id, sf.field_type, sf.field_label, sf.field_name,
+        SELECT s.id, s.title, s.description, s.is_anonymous,
+               sf.id AS field_id, sf.field_type, sf.field_label, 
                sf.field_options, sf.is_required, sf.display_order
         FROM surveys s
         JOIN survey_fields sf ON s.id = sf.survey_id
@@ -30,8 +30,8 @@ try {
         exit();
     }
     
-    // Check if user has already responded (only for non-anonymous surveys that don't allow multiple responses)
-    if (!$survey_data[0]['is_anonymous'] && !$survey_data[0]['allow_multiple']) {
+    // Check if user has already responded (only for non-anonymous surveys)
+    if (!$survey_data[0]['is_anonymous']) {
         $stmt = $pdo->prepare("
             SELECT COUNT(*) 
             FROM survey_responses 
@@ -56,11 +56,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
         
-        // Prepare all answers in JSON format
-        $answers = [];
+        // Insert survey response - always include user_id
+        $stmt = $pdo->prepare("
+            INSERT INTO survey_responses 
+            (survey_id, user_id, submitted_at) 
+            VALUES (?, ?, NOW())
+        ");
+        $stmt->execute([$survey_id, $_SESSION['user_id']]);
+        $response_id = $pdo->lastInsertId();
+        
+        // Process each question response
         foreach ($survey_data as $question) {
-            $field_name = $question['field_name'] ?: 'field_'.$question['field_id'];
-            $value = $_POST['field_'.$question['field_id']] ?? null;
+            $field_id = $question['field_id'];
+            $value = $_POST['field_'.$field_id] ?? null;
             
             // Validate required fields
             if ($question['is_required'] && empty($value)) {
@@ -69,27 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Handle different field types
             if (!empty($value)) {
-                if (is_array($value)) {
-                    $answers[$field_name] = array_map('trim', $value);
-                } else {
-                    $answers[$field_name] = trim($value);
+                $values = is_array($value) ? $value : [$value];
+                
+                foreach ($values as $val) {
+                    if (!empty($val)) {
+                        $stmt = $pdo->prepare("
+                            INSERT INTO response_data 
+                            (response_id, field_id, field_value) 
+                            VALUES (?, ?, ?)
+                        ");
+                        $stmt->execute([$response_id, $field_id, $val]);
+                    }
                 }
-            } else {
-                $answers[$field_name] = null;
             }
         }
-        
-        // Insert survey response with all answers as JSON
-        $stmt = $pdo->prepare("
-            INSERT INTO survey_responses 
-            (survey_id, user_id, submitted_at, answers) 
-            VALUES (?, ?, NOW(), ?)
-        ");
-        $stmt->execute([
-            $survey_id, 
-            $_SESSION['user_id'],
-            json_encode($answers, JSON_UNESCAPED_UNICODE)
-        ]);
         
         $pdo->commit();
         $_SESSION['success'] = "Thank you for completing the survey!";
@@ -109,17 +110,15 @@ $survey = [
     'title' => $survey_data[0]['title'],
     'description' => $survey_data[0]['description'],
     'is_anonymous' => $survey_data[0]['is_anonymous'],
-    'allow_multiple' => $survey_data[0]['allow_multiple'],
     'questions' => []
 ];
 
 foreach ($survey_data as $row) {
     $survey['questions'][] = [
         'id' => $row['field_id'],
-        'name' => $row['field_name'] ?: 'field_'.$row['field_id'],
         'type' => $row['field_type'],
         'label' => $row['field_label'],
-        'options' => $row['field_options'] ? json_decode($row['field_options'], true) : [],
+        'options' => $row['field_options'] ? json_decode($row['field_options']) : [],
         'required' => $row['is_required']
     ];
 }
