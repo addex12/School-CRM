@@ -81,7 +81,7 @@ a:hover {
 
 .btn {
     display: inline-block;
-    padding: 15px 30px; /* Increased padding for better size */
+    padding: 15px 40px; /* Increased padding for better size */
     border-radius: 4px;
     color: var(--white);
     cursor: pointer;
@@ -91,40 +91,13 @@ a:hover {
     margin: 0 auto; /* Center the button */
     width: 100%; /* Make the button full width */
     font-size: 20px; /* Increased font size for better visibility */
+    background-color: var(--success); /* Set a vibrant background color */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Added shadow for depth */
 }
 
-.btn-primary {
-    background-color: var(--success);
-}
-
-.btn-primary:hover {
-    background-color: #27ae60;
+.btn:hover {
+    background-color: #27ae60; /* Darker shade on hover */
     transform: scale(1.05); /* Slightly enlarge the button on hover */
-}
-
-.btn-edit {
-    background-color: var(--secondary);
-}
-
-.btn-edit:hover {
-    background-color: #2980b9;
-}
-
-.btn-delete {
-    background-color: var(--danger);
-}
-
-.btn-delete:hover {
-    background-color: #c0392b;
-}
-
-.btn-reset {
-    background-color: var(--warning);
-}
-
-.btn-reset:hover {
-    background-color: #d35400;
 }
 
 /* ================ FORMS ================ */
