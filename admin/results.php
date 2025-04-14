@@ -207,7 +207,7 @@ $chart_json = json_encode($chart_data);
                                         <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
                                         <?php 
                                         $stmt = $pdo->prepare("
-                                            SELECT d.field_value, f.field_label 
+                                            SELECT f.field_label, d.field_value
                                             FROM response_data d
                                             JOIN survey_fields f ON d.field_id = f.id
                                             WHERE d.response_id = ?
