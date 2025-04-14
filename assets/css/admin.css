@@ -93,17 +93,14 @@ body, html {
 }
 
 .dashboard-section {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.07);
-    width: 100%;
-    margin-bottom: 32px;
-    min-width: 320px;
-    max-width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .dashboard-section h2 {
-    margin-top: 10;
     margin-bottom: 18px;
     color: #2d3a4b;
     font-size: 1.4em;
