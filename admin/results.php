@@ -111,13 +111,8 @@ $chart_data = [
 ];
 $chart_json = json_encode($chart_data);
 
-// Show errors from session only after all redirects
-if (!empty($_SESSION['error'])) {
-    echo '<div style="color:red; font-weight:bold;">Error: ' . htmlspecialchars($_SESSION['error']) . '</div>';
-    unset($_SESSION['error']);
-}
+// Show errors from session only after all redirects and before HTML output
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -162,6 +157,12 @@ if (!empty($_SESSION['error'])) {
     </style>
 </head>
 <body>
+    <?php
+    if (!empty($_SESSION['error'])) {
+        echo '<div style="color:red; font-weight:bold; text-align:center; margin:20px 0;">' . htmlspecialchars($_SESSION['error']) . '</div>';
+        unset($_SESSION['error']);
+    }
+    ?>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         
