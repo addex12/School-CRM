@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -231,3 +232,7 @@ try {
     </div>
 </body>
 </html>
+<?php
+// Flush output buffer
+ob_end_flush();
+?>
