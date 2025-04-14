@@ -8,13 +8,6 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 requireAdmin();
 
-// Validate survey_id parameter
-$survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
-if (!$survey_id) {
-    $_SESSION['error'] = "Invalid survey ID.";
-    header("Location: dashboard.php");
-    exit();
-}
 
 // Fetch survey details
 $survey = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
@@ -23,6 +16,18 @@ $survey = $survey->fetch();
 
 if (!$survey) {
     $_SESSION['error'] = "Survey not found.";
+    header("Location: surveys.php");
+    exit();
+}
+
+// Check if there are any responses for this survey
+$responseCountStmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses WHERE survey_id = ?");
+$responseCountStmt->execute([$survey_id]);
+$responseCount = $responseCountStmt->fetchColumn();
+
+if ($responseCount == 0) {
+    // No responses yet, redirect or show message
+    $_SESSION['error'] = "No responses found for this survey yet.";
     header("Location: surveys.php");
     exit();
 }
