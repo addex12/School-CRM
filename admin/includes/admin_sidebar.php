@@ -85,7 +85,7 @@ $current = basename($_SERVER['PHP_SELF']);
             break;
         }
     }
-    echo $active ? ' class="submenu open"' : ' class="submenu"';
+    echo $active ? ' style="display:block"' : '';
 ?>>
                         <?php foreach ($item['items'] as $subitem): ?>
                             <li class="submenu-item <?= basename($_SERVER['PHP_SELF']) == $subitem['link'] ? 'active' : '' ?>">
@@ -110,8 +110,8 @@ $current = basename($_SERVER['PHP_SELF']);
 </aside>
 
 <script>
-// Pure JS submenu toggle
 (function() {
+    // Submenu toggle
     var headers = document.querySelectorAll('.category-header');
     headers.forEach(function(header) {
         header.addEventListener('click', function(e) {
@@ -120,20 +120,45 @@ $current = basename($_SERVER['PHP_SELF']);
             var icon = header.querySelector('.collapse-icon');
             // Close all submenus except this one
             document.querySelectorAll('.submenu').forEach(function(sm) {
-                if (sm !== submenu) sm.classList.remove('open');
+                if (sm !== submenu) {
+                    sm.classList.remove('open');
+                    sm.style.display = 'none';
+                }
             });
             document.querySelectorAll('.collapse-icon').forEach(function(ic) {
                 if (ic !== icon) ic.classList.remove('fa-chevron-up');
                 if (ic !== icon) ic.classList.add('fa-chevron-down');
             });
             if (submenu) {
-                submenu.classList.toggle('open');
-                if (icon) icon.classList.toggle('fa-chevron-up');
-                if (icon) icon.classList.toggle('fa-chevron-down');
+                var isOpen = submenu.classList.contains('open');
+                if (isOpen) {
+                    submenu.classList.remove('open');
+                    submenu.style.display = 'none';
+                    if(icon) { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); }
+                } else {
+                    submenu.classList.add('open');
+                    submenu.style.display = 'block';
+                    if(icon) { icon.classList.add('fa-chevron-up'); icon.classList.remove('fa-chevron-down'); }
+                }
             }
         });
     });
-
+    // On page load, ensure only submenu with .submenu-item.active is open
+    document.querySelectorAll('.submenu').forEach(function(sm) {
+        var active = sm.querySelector('.submenu-item.active');
+        if (active) {
+            sm.classList.add('open');
+            sm.style.display = 'block';
+            var chevron = sm.parentElement.querySelector('.collapse-icon');
+            if (chevron) {
+                chevron.classList.add('fa-chevron-up');
+                chevron.classList.remove('fa-chevron-down');
+            }
+        } else {
+            sm.classList.remove('open');
+            sm.style.display = 'none';
+        }
+    });
     // Sidebar hamburger toggle for mobile
     var sidebar = document.getElementById('adminSidebar');
     var sidebarToggle = document.getElementById('sidebarToggle');
