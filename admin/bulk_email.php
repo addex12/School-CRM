@@ -30,10 +30,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($_FILES['email_file']['tmp_name'])) {
             $file = fopen($_FILES['email_file']['tmp_name'], 'r');
             while (($line = fgetcsv($file)) !== false) {
-                $email = $line[0];
-                $role = $line[1] ?? 'parent'; // Default role if not provided
-                $stmt = $pdo->prepare("INSERT IGNORE INTO users (email, role) VALUES (?, ?)");
-                $stmt->execute([$email, $role]);
+                $email = trim($line[0]);
+                $roleName = isset($line[1]) && !empty($line[1]) ? trim($line[1]) : 'parent';
+                // Fetch role_id from roles table
+                $roleStmt = $pdo->prepare("SELECT id FROM roles WHERE role_name = ?");
+                $roleStmt->execute([$roleName]);
+                $role = $roleStmt->fetch(PDO::FETCH_ASSOC);
+                if ($role) {
+                    $role_id = $role['id'];
+                    $stmt = $pdo->prepare("INSERT IGNORE INTO users (email, role_id) VALUES (?, ?)");
+                    $stmt->execute([$email, $role_id]);
+                }
+                // Optionally, handle emails with invalid roles (skip or log)
             }
             fclose($file);
             $_SESSION['success'] = "Emails imported successfully!";
