@@ -76,7 +76,17 @@ $current = basename($_SERVER['PHP_SELF']);
                         <span class="category-text"><?= $item['title'] ?></span>
                         <i class="fas fa-chevron-down collapse-icon"></i>
                     </div>
-                    <ul class="submenu collapse" id="<?= $item['id'] ?>">
+                    <ul class="submenu" id="<?= $item['id'] ?>"<?php
+    // If any subitem is active, open this submenu
+    $active = false;
+    foreach ($item['items'] as $subitem) {
+        if (basename($_SERVER['PHP_SELF']) == $subitem['link']) {
+            $active = true;
+            break;
+        }
+    }
+    echo $active ? ' class="submenu open"' : ' class="submenu"';
+?>>
                         <?php foreach ($item['items'] as $subitem): ?>
                             <li class="submenu-item <?= basename($_SERVER['PHP_SELF']) == $subitem['link'] ? 'active' : '' ?>">
                                 <a href="<?= $subitem['link'] ?>">
