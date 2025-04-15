@@ -3,7 +3,6 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 requireAdmin();
 $pageTitle = "Chat Management";
-include '../includes/header.php';
 ?>
 <div class="admin-dashboard">
     <?php include 'includes/admin_sidebar.php'; ?>

@@ -2,9 +2,34 @@
     "menu": [
         {
             "title": "Dashboard",
+            "icon": "fas fa-tachometer-alt",
             "link": "dashboard.php",
-            "icon": "home",
             "id": "dashboard"
+        },
+        {
+            "title": "Users",
+            "icon": "fas fa-users",
+            "link": "users.php"
+        },
+        {
+            "title": "Feedback",
+            "icon": "fas fa-comments",
+            "link": "feedback_mgmt.php"
+        },
+        {
+            "title": "Chat",
+            "icon": "fas fa-comments",
+            "link": "chat_mgmt.php"
+        },
+        {
+            "title": "Bulk Email",
+            "icon": "fas fa-envelope",
+            "link": "bulk_email.php"
+        },
+        {
+            "title": "Logout",
+            "icon": "fas fa-sign-out-alt",
+            "link": "../logout.php"
         },
         {
             "title": "User Management",

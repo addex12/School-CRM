@@ -1,97 +1,47 @@
 <?php
-// Load sidebar configuration from JSON
-$sidebarConfig = json_decode(file_get_contents(__DIR__ . '/sidebar_config.json'), true);
+$configPath = __DIR__ . '/sidebar_config.json';
+$sidebarItems = [];
+if (file_exists($configPath)) {
+    $json = file_get_contents($configPath);
+    $data = json_decode($json, true);
+    $sidebarItems = isset($data['menu']) ? $data['menu'] : $data;
+}
+$current = basename($_SERVER['PHP_SELF']);
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <style>
-        .admin-sidebar {
-            width: 250px;
-            height: 100vh;
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px;
-            position: fixed;
-        }
-        
-        .sidebar-header {
-            margin-bottom: 30px;
-        }
-        
-        .logo-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .logo-icon {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-        
-        .logo-text {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .sidebar-toggle {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .menu-category {
-            margin-bottom: 10px;
-        }
-        
-        .category-header {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px;
-            background-color: #1a252f;
-            border-radius: 4px;
-            margin-bottom: 5px;
-        }
-        
-        .category-header:hover {
-            background-color: #0d1216;
-        }
-        
-        .category-icon {
-            margin-right: 10px;
-        }
-        
-        .collapse-icon {
-            margin-left: auto;
-        }
-        
-        .submenu {
-            background-color: #1a252f;
-            border-radius: 4px;
-            padding-left: 20px;
-        }
-        
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.admin-sidebar {
+    background: #222d32;
+    color: #fff;
+    width: 220px;
+    min-height: 100vh;
+    float: left;
+    padding-top: 20px;
+}
+.admin-sidebar ul { list-style: none; padding: 0; }
+.admin-sidebar li { margin-bottom: 18px; }
+.admin-sidebar a {
+    color: #b8c7ce;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 8px 18px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.admin-sidebar li.active a, .admin-sidebar a:hover {
+    background: #1a2226;
+    color: #fff;
+}
+.admin-sidebar i { margin-right: 12px; }
+</style>
+<aside class="admin-sidebar">
+    <ul>
+        <?php foreach ($sidebarItems as $item): ?>
+            <li class="<?= (isset($item['link']) && $current === $item['link']) ? 'active' : '' ?>">
+                <a href="<?= htmlspecialchars($item['link'] ?? '#') ?>">
+                    <?php if (!empty($item['icon'])): ?><i class="<?= htmlspecialchars($item['icon']) ?>"></i><?php endif; ?>
+                    <span><?= htmlspecialchars($item['title']) ?></span>
         .submenu-item {
             margin: 5px 0;
         }
