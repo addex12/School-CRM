@@ -42,55 +42,6 @@ $current = basename($_SERVER['PHP_SELF']);
                 <a href="<?= htmlspecialchars($item['link'] ?? '#') ?>">
                     <?php if (!empty($item['icon'])): ?><i class="<?= htmlspecialchars($item['icon']) ?>"></i><?php endif; ?>
                     <span><?= htmlspecialchars($item['title']) ?></span>
-        .submenu-item {
-            margin: 5px 0;
-        }
-        
-        .submenu-item a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-        }
-        
-        .submenu-item a:hover {
-            background-color: #0d1216;
-            border-radius: 4px;
-        }
-        
-        .submenu-item.active a {
-            background-color: #0d1216;
-        }
-        
-        .menu-item {
-            margin-bottom: 10px;
-        }
-        
-        .menu-item a {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .menu-item a:hover {
-            background-color: #0d1216;
-        }
-        
-        .menu-item.active a {
-            background-color: #0d1216;
-        }
-        
-        .sidebar-footer {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #374150;
-        }
-        
-        .logout-btn {
             color: white;
             text-decoration: none;
             display: flex;
@@ -172,6 +123,9 @@ $current = basename($_SERVER['PHP_SELF']);
                 $(this).find('.collapse-icon').toggleClass('fa-chevron-down fa-chevron-up');
             });
         });
+    
     </script>
 </body>
 </html>
+
+<?php endforeach; ?>
