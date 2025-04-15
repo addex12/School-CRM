@@ -243,6 +243,10 @@ function connectWebSocket() {
             ws.send(JSON.stringify({type: 'ping'}));
         }, 30000);
     };
+    ws.onerror = function(error) {
+        console.error('WebSocket Error:', error);
+        showSystemMessage('Connection error - trying to reconnect...');
+    };
     ws.onmessage = function(event) {
         const data = JSON.parse(event.data);
         if (data.type === 'chat') {
@@ -260,6 +264,79 @@ function connectWebSocket() {
     };
 }
 
+function refreshUserList() {
+    fetch('online_users.php')
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const contentType = res.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new TypeError('Invalid JSON response');
+            }
+            return res.json();
+        })
+        .then(data => {
+            if (!Array.isArray(data)) {
+                throw new Error('Invalid user data format');
+            }
+            updateUserList(data);
+        })
+        .catch(error => {
+            console.error('User list fetch failed:', error);
+            showSystemMessage('Failed to load user list');
+        });
+}
+
+function loadChatHistory(userId) {
+    fetch(`chat_history.php?user_id=${userId}`)
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.json().then(data => ({
+                ok: res.ok,
+                status: res.status,
+                data
+            }));
+        })
+        .then(({ data }) => {
+            if (!data || !Array.isArray(data.messages)) {
+                throw new Error('Invalid chat history format');
+            }
+            renderChatHistory(data.messages);
+        })
+        .catch(error => {
+            console.error('Chat history load failed:', error);
+            showSystemMessage('Failed to load chat history');
+        });
+}
+
+function updateUserList(data) {
+    users = data;
+    renderUserList();
+}
+
+function renderChatHistory(messages) {
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = '';
+    messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'message' + (msg.from_user_id == userId ? ' me' : '');
+        div.innerHTML =
+            '<div class="meta">' + (msg.from_user_id == userId ? 'Me' : msg.username) +
+            ' <small>' + (msg.created_at ? new Date(msg.created_at).toLocaleString() : '') + '</small></div>' +
+            '<div class="content">' + escapeHtml(msg.message) + '</div>';
+        box.appendChild(div);
+    });
+    box.scrollTop = box.scrollHeight;
+}
+
+function showSystemMessage(message) {
+    const chatMessages = document.getElementById('chatMessages');
+    const systemMessage = document.createElement('div');
+    systemMessage.className = 'message system';
+    systemMessage.innerHTML = '<div class="content">' + message + '</div>';
+    chatMessages.appendChild(systemMessage);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
 document.getElementById('chatForm').onsubmit = function(e) {
     e.preventDefault();
     const msg = document.getElementById('chatInput').value.trim();
@@ -271,10 +348,10 @@ document.getElementById('chatForm').onsubmit = function(e) {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetchUsers();
-    fetchChatHistory();
+    refreshUserList();
+    loadChatHistory(selectedUserId);
     connectWebSocket();
-    setInterval(fetchUsers, 10000); // Refresh user list every 10s
+    setInterval(refreshUserList, 10000); // Refresh user list every 10s
 });
 </script>
 </body>
