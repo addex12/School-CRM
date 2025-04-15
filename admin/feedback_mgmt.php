@@ -5,6 +5,9 @@ require_once '../includes/config.php';
 
 $pageTitle = "Feedback Management";
 
+// Fetch all users for dropdown
+$users = $pdo->query("SELECT id, username FROM users ORDER BY username")->fetchAll();
+
 // Fetch all feedback
 $stmt = $pdo->query("SELECT f.*, u.username FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC");
 $feedbackList = $stmt->fetchAll();
@@ -107,9 +110,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h2>Add Feedback</h2>
                     <form method="POST">
                         <div class="form-group">
-                            <label for="user_id">User ID</label>
-                            <input type="number" name="user_id" id="user_id" required>
-                        </div>
+    <label for="user_id">User</label>
+    <select name="user_id" id="user_id" class="form-control" required>
+        <option value="">Select user...</option>
+        <?php foreach ($users as $user): ?>
+            <option value="<?= $user['id'] ?>">ID <?= $user['id'] ?> - <?= htmlspecialchars($user['username']) ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
                         <div class="form-group">
                             <label for="subject">Subject</label>
                             <input type="text" name="subject" id="subject" required>
