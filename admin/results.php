@@ -1,54 +1,171 @@
 <?php
+
 // Enable error reporting for debugging
+
 error_reporting(E_ALL);
+
 ini_set('display_errors', 1);
 
+
+
 // Include required files
+
 require_once '../includes/auth.php';
+
 require_once '../includes/config.php';
+
 requireAdmin();
 
-// --- Admin: Show all survey responses (no survey_id required) ---
-$pageTitle = 'All Survey Responses';
+
+
+// Validate survey_id parameter
+$survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
+
+// Fetch survey details
+$survey = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
+$survey->execute([$survey_id]);
+$survey = $survey->fetch();
+
+if (!$survey) {
+    $_SESSION['error'] = "Survey not found.";
+    header("Location: surveys.php");
+    exit();
+}
+
+// Check if there are any responses for this survey
+$responseCountStmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses WHERE survey_id = ?");
+$responseCountStmt->execute([$survey_id]);
+$responseCount = $responseCountStmt->fetchColumn();
+
+if ($responseCount == 0) {
+    // No responses yet, redirect or show message
+    $_SESSION['error'] = "No responses found for this survey yet.";
+    header("Location: surveys.php");
+    exit();
+}
+
+// Fetch survey fields
+$fields = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
+$fields->execute([$survey_id]);
+$fields = $fields->fetchAll();
+
+// Prepare date filter
+$whereClause = "sr.survey_id = ?";
+$params = [$survey_id];
+$date_filter = '';
+
+if (!empty($_GET['start_date'])) {
+    $whereClause .= " AND sr.submitted_at >= ?";
+    $params[] = $_GET['start_date'];
+    $date_filter .= "&start_date=" . urlencode($_GET['start_date']);
+}
+
+if (!empty($_GET['end_date'])) {
+    $whereClause .= " AND sr.submitted_at <= ?";
+    $params[] = $_GET['end_date'] . ' 23:59:59';
+
+    $date_filter .= "&end_date=" . urlencode($_GET['end_date']);
+}
+
 
 // Pagination setup
-$per_page = 30;
+
+$per_page = 20;
+
 $page = max(1, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1]]));
+
 $offset = ($page - 1) * $per_page;
 
+
+
 // Get total responses count
-$total_stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses");
+
+$total_stmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses sr WHERE $whereClause");
+$total_stmt->execute($params);
+
 $total_responses = $total_stmt->fetchColumn();
+
 $total_pages = max(1, ceil($total_responses / $per_page));
 
-// Get paginated responses (with survey and user info)
+
+
+// Get paginated responses
+
 $response_stmt = $pdo->prepare("
-    SELECT sr.*, s.title AS survey_title, u.username, u.email, r.role_name
+
+    SELECT sr.*, u.username, u.email, r.role_name
+
     FROM survey_responses sr
-    LEFT JOIN surveys s ON sr.survey_id = s.id
+
     LEFT JOIN users u ON sr.user_id = u.id
+
     LEFT JOIN roles r ON u.role_id = r.id
+    WHERE $whereClause
+
     ORDER BY sr.submitted_at DESC
+
     LIMIT ? OFFSET ?
+
 ");
-$response_stmt->execute([$per_page, $offset]);
+
+$response_stmt->execute(array_merge($params, [$per_page, $offset]));
+
 $responses = $response_stmt->fetchAll();
 
 
 
+// --- BEGIN: Fetch all response_data for these responses ---
+
+$response_ids = array_column($responses, 'id');
+$response_data_map = [];
+if (!empty($response_ids)) {
+    $in = str_repeat('?,', count($response_ids) - 1) . '?';
+    $data_stmt = $pdo->prepare("SELECT * FROM response_data WHERE response_id IN ($in)");
+    $data_stmt->execute($response_ids);
+    foreach ($data_stmt->fetchAll() as $row) {
+        $response_id = $row['response_id'];
+        $field_id = $row['field_id'];
+        $value = $row['field_value'];
+        // If checkbox, decode JSON
+        foreach ($fields as $f) {
+            if ($f['id'] == $field_id && $f['field_type'] === 'checkbox') {
+                $decoded = json_decode($value, true);
+                $value = is_array($decoded) ? implode(', ', $decoded) : $value;
+                break;
+            }
+        }
+        $response_data_map[$response_id][$field_id] = $value;
+    }
+}
+// --- END: Fetch all response_data for these responses ---
+
+
 // Prepare analytics data for charts
+
 $analytics = [];
+
 foreach ($fields as $field) {
+
     if ($field['field_type'] === 'checkbox') {
+
         // Special handling for checkbox fields (stored as JSON arrays)
+
         $stmt = $pdo->prepare("SELECT field_value FROM response_data WHERE field_id = ?");
+
         $stmt->execute([$field['id']]);
+
         $all_values = [];
+
         
+
         foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $val) {
+
             $decoded = json_decode($val, true);
+
             if (is_array($decoded)) {
+
                 $all_values = array_merge($all_values, $decoded);
+
             } elseif ($val !== null) {
 
                 $all_values[] = $val;
@@ -198,7 +315,7 @@ $chart_json = json_encode($chart_data);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 
         }
-
+e
         .chart-title {
 
             margin-top: 0;

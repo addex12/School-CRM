@@ -54,8 +54,8 @@
                     "icon": "chart-bar"
                 },
                 {
-                    "title": "Responses",
-                    "link": "response_view.php",
+                    "title": "All Responses",
+                    "link": "all_responses.php",
                     "icon": "chart-bar"
                 },
                 {
