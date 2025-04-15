@@ -2,7 +2,6 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
-require_once '../includes/setting.php';
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

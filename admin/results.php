@@ -12,7 +12,7 @@ requireAdmin();
 $survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
 if (!$survey_id) {
     // If survey_id is not set or invalid, redirect to default survey (id=1)
-    header("Location: results.php?survey_id=1");
+    header("Location: results.php?survey_id=2");
     exit();
 }
 
