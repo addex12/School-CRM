@@ -16,19 +16,21 @@ $admin_id = 1; // Default admin user_id
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Live Chat - School CRM</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css" />
     <style>
-        body { background: #f2f6fa; }
+        body {
+            background: #f2f6fa;
+        }
         .chat-main-wrap {
             display: flex;
             max-width: 1100px;
             margin: 30px auto;
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
             overflow: hidden;
             min-height: 600px;
         }
@@ -59,19 +61,27 @@ $admin_id = 1; // Default admin user_id
             align-items: center;
             transition: background 0.2s;
         }
-        .user-list li.active, .user-list li:hover {
+        .user-list li.active,
+        .user-list li:hover {
             background: #eaf6fb;
         }
         .user-status {
-            width: 10px; height: 10px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             margin-right: 12px;
             background: #ccc;
             display: inline-block;
         }
-        .user-status.online { background: #2ecc71; }
-        .user-status.offline { background: #e74c3c; }
-        .user-list .username { font-weight: 500; }
+        .user-status.online {
+            background: #2ecc71;
+        }
+        .user-status.offline {
+            background: #e74c3c;
+        }
+        .user-list .username {
+            font-weight: 500;
+        }
         .chat-area {
             flex: 1;
             display: flex;
@@ -141,221 +151,248 @@ $admin_id = 1; // Default admin user_id
             cursor: pointer;
             transition: background 0.2s;
         }
-        .btn-primary:hover { background: #2980b9; }
-        .status-dot { margin-right: 7px; }
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        .status-dot {
+            margin-right: 7px;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-<?php include '../includes/header.php'; ?>
-<div class="chat-main-wrap">
-    <div class="sidebar">
-        <h3>Users</h3>
-        <ul class="user-list" id="userList"></ul>
-    </div>
-    <div class="chat-area">
-        <div class="chat-header" id="chatHeader">Chat</div>
-        <div class="chat-messages" id="chatMessages"></div>
-        <div class="chat-input-wrap">
-            <form id="chatForm" autocomplete="off">
-                <textarea id="chatInput" rows="2" placeholder="Type your message..." required></textarea>
-                <button type="submit" class="btn-primary">Send</button>
-            </form>
+    <div class="container">
+        <?php include '../includes/header.php'; ?>
+        <div class="chat-main-wrap">
+            <div class="sidebar">
+                <h3>Users</h3>
+                <ul class="user-list" id="userList"></ul>
+            </div>
+            <div class="chat-area">
+                <div class="chat-header" id="chatHeader">Chat</div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-wrap">
+                    <form id="chatForm" autocomplete="off">
+                        <textarea id="chatInput" rows="2" placeholder="Type your message..." required></textarea>
+                        <button type="submit" class="btn-primary">Send</button>
+                    </form>
+                </div>
+            </div>
         </div>
+        <?php include_once __DIR__ . '/includes/footer.php'; ?>
     </div>
-</div>
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
-</div>
-<script>
-const userId = <?= json_encode($user_id) ?>;
-const username = <?= json_encode($username) ?>;
-const adminId = <?= json_encode($admin_id) ?>;
-let selectedUserId = adminId;
-let ws;
-let users = [];
-let reconnectAttempts = 0;
+    <script>
+        const userId = <?= json_encode($user_id) ?>;
+        const username = <?= json_encode($username) ?>;
+        const adminId = <?= json_encode($admin_id) ?>;
+        let selectedUserId = adminId;
+        let ws;
+        let users = [];
+        let reconnectAttempts = 0;
 
-function fetchUsers() {
-    fetch('online_users_fixed.php')
-        .then(res => res.json())
-        .then(data => {
+        function fetchUsers() {
+            fetch('online_users_fixed.php')
+                .then((res) => res.json())
+                .then((data) => {
+                    users = data;
+                    renderUserList();
+                });
+        }
+
+        function fetchChatHistory() {
+            fetch('chat_history.php?user_id=' + selectedUserId)
+                .then((res) => res.json())
+                .then((data) => {
+                    renderMessages(data);
+                });
+        }
+
+        function renderUserList() {
+            const ul = document.getElementById('userList');
+            ul.innerHTML = '';
+            users.forEach((u) => {
+                if (u.id == userId) return; // skip self
+                const li = document.createElement('li');
+                li.className = u.id == selectedUserId ? 'active' : '';
+                li.onclick = () => {
+                    selectedUserId = u.id;
+                    renderUserList();
+                    document.getElementById('chatHeader').textContent =
+                        'Chat with ' + u.username;
+                    fetchChatHistory();
+                };
+                const status = document.createElement('span');
+                status.className = 'user-status ' + (u.online ? 'online' : 'offline');
+                li.appendChild(status);
+                const uname = document.createElement('span');
+                uname.className = 'username';
+                uname.textContent = u.username;
+                li.appendChild(uname);
+                ul.appendChild(li);
+            });
+        }
+
+        function renderMessages(messages) {
+            const box = document.getElementById('chatMessages');
+            box.innerHTML = '';
+            messages.forEach((msg) => {
+                const div = document.createElement('div');
+                div.className = 'message' + (msg.from_user_id == userId ? ' me' : '');
+                div.innerHTML =
+                    '<div class="meta">' +
+                    (msg.from_user_id == userId ? 'Me' : msg.username) +
+                    ' <small>' +
+                    (msg.created_at ? new Date(msg.created_at).toLocaleString() : '') +
+                    '</small></div>' +
+                    '<div class="content">' +
+                    escapeHtml(msg.message) +
+                    '</div>';
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;',
+            };
+            return text.replace(/[&<>"']/g, function (m) {
+                return map[m];
+            });
+        }
+
+        function connectWebSocket() {
+            ws = new WebSocket('ws://' + window.location.hostname + ':8080');
+
+            ws.onopen = function () {
+                reconnectAttempts = 0;
+                console.log('WebSocket connected');
+                ws.send(
+                    JSON.stringify({
+                        type: 'auth',
+                        userId: <?= $user_id ?>,
+                    })
+                );
+            };
+
+            ws.onerror = function (error) {
+                console.error('WebSocket Error:', error);
+                scheduleReconnect();
+            };
+
+            ws.onclose = function () {
+                console.log('WebSocket closed');
+                scheduleReconnect();
+            };
+        }
+
+        function scheduleReconnect() {
+            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+            setTimeout(() => {
+                reconnectAttempts++;
+                connectWebSocket();
+            }, delay);
+        }
+
+        function refreshUserList() {
+            fetch('online_users_fixed.php')
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const contentType = res.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new TypeError('Invalid JSON response');
+                    }
+                    return res.json();
+                })
+                .then((data) => {
+                    if (!Array.isArray(data)) {
+                        throw new Error('Invalid user data format');
+                    }
+                    updateUserList(data);
+                })
+                .catch((error) => {
+                    console.error('User list fetch failed:', error);
+                    showSystemMessage('Failed to load user list');
+                });
+        }
+
+        function loadChatHistory(userId) {
+            fetch(`chat_history.php?user_id=${userId}`)
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json().then((data) => ({
+                        ok: res.ok,
+                        status: res.status,
+                        data,
+                    }));
+                })
+                .then(({ data }) => {
+                    if (!data || !Array.isArray(data.messages)) {
+                        throw new Error('Invalid chat history format');
+                    }
+                    renderChatHistory(data.messages);
+                })
+                .catch((error) => {
+                    console.error('Chat history load failed:', error);
+                    showSystemMessage('Failed to load chat history');
+                });
+        }
+
+        function updateUserList(data) {
             users = data;
             renderUserList();
-        });
-}
+        }
 
-function fetchChatHistory() {
-    fetch('chat_history.php?user_id=' + selectedUserId)
-        .then(res => res.json())
-        .then(data => {
-            renderMessages(data);
-        });
-}
+        function renderChatHistory(messages) {
+            const box = document.getElementById('chatMessages');
+            box.innerHTML = '';
+            messages.forEach((msg) => {
+                const div = document.createElement('div');
+                div.className = 'message' + (msg.from_user_id == userId ? ' me' : '');
+                div.innerHTML =
+                    '<div class="meta">' +
+                    (msg.from_user_id == userId ? 'Me' : msg.username) +
+                    ' <small>' +
+                    (msg.created_at ? new Date(msg.created_at).toLocaleString() : '') +
+                    '</small></div>' +
+                    '<div class="content">' +
+                    escapeHtml(msg.message) +
+                    '</div>';
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        }
 
-function renderUserList() {
-    const ul = document.getElementById('userList');
-    ul.innerHTML = '';
-    users.forEach(u => {
-        if (u.id == userId) return; // skip self
-        const li = document.createElement('li');
-        li.className = (u.id == selectedUserId ? 'active' : '');
-        li.onclick = () => {
-            selectedUserId = u.id;
-            renderUserList();
-            document.getElementById('chatHeader').textContent = 'Chat with ' + u.username;
-            fetchChatHistory();
+        function showSystemMessage(message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const systemMessage = document.createElement('div');
+            systemMessage.className = 'message system';
+            systemMessage.innerHTML = '<div class="content">' + message + '</div>';
+            chatMessages.appendChild(systemMessage);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('chatForm').onsubmit = function (e) {
+            e.preventDefault();
+            const msg = document.getElementById('chatInput').value.trim();
+            if (!msg) return;
+            if (ws && ws.readyState === 1) {
+                ws.send(
+                    JSON.stringify({ type: 'chat', to: selectedUserId, message: msg })
+                );
+                document.getElementById('chatInput').value = '';
+            }
         };
-        const status = document.createElement('span');
-        status.className = 'user-status ' + (u.online ? 'online' : 'offline');
-        li.appendChild(status);
-        const uname = document.createElement('span');
-        uname.className = 'username';
-        uname.textContent = u.username;
-        li.appendChild(uname);
-        ul.appendChild(li);
-    });
-}
 
-function renderMessages(messages) {
-    const box = document.getElementById('chatMessages');
-    box.innerHTML = '';
-    messages.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = 'message' + (msg.from_user_id == userId ? ' me' : '');
-        div.innerHTML =
-            '<div class="meta">' + (msg.from_user_id == userId ? 'Me' : msg.username) +
-            ' <small>' + (msg.created_at ? new Date(msg.created_at).toLocaleString() : '') + '</small></div>' +
-            '<div class="content">' + escapeHtml(msg.message) + '</div>';
-        box.appendChild(div);
-    });
-    box.scrollTop = box.scrollHeight;
-}
-
-function escapeHtml(text) {
-    var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
-}
-
-function connectWebSocket() {
-    ws = new WebSocket('ws://' + window.location.hostname + ':8080');
-
-    ws.onopen = function() {
-        reconnectAttempts = 0;
-        console.log('WebSocket connected');
-        ws.send(JSON.stringify({
-            type: 'auth',
-            userId: <?= $user_id ?>
-        }));
-    };
-
-    ws.onerror = function(error) {
-        console.error('WebSocket Error:', error);
-        scheduleReconnect();
-    };
-
-    ws.onclose = function() {
-        console.log('WebSocket closed');
-        scheduleReconnect();
-    };
-}
-
-function scheduleReconnect() {
-    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
-    setTimeout(() => {
-        reconnectAttempts++;
-        connectWebSocket();
-    }, delay);
-}
-
-function refreshUserList() {
-    fetch('online_users_fixed.php')
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const contentType = res.headers.get('content-type');
-            if (!contentType || !contentType.includes('application/json')) {
-                throw new TypeError('Invalid JSON response');
-            }
-            return res.json();
-        })
-        .then(data => {
-            if (!Array.isArray(data)) {
-                throw new Error('Invalid user data format');
-            }
-            updateUserList(data);
-        })
-        .catch(error => {
-            console.error('User list fetch failed:', error);
-            showSystemMessage('Failed to load user list');
+        document.addEventListener('DOMContentLoaded', function () {
+            refreshUserList();
+            loadChatHistory(selectedUserId);
+            connectWebSocket();
+            setInterval(refreshUserList, 10000); // Refresh user list every 10s
         });
-}
-
-function loadChatHistory(userId) {
-    fetch(`chat_history.php?user_id=${userId}`)
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res.json().then(data => ({
-                ok: res.ok,
-                status: res.status,
-                data
-            }));
-        })
-        .then(({ data }) => {
-            if (!data || !Array.isArray(data.messages)) {
-                throw new Error('Invalid chat history format');
-            }
-            renderChatHistory(data.messages);
-        })
-        .catch(error => {
-            console.error('Chat history load failed:', error);
-            showSystemMessage('Failed to load chat history');
-        });
-}
-
-function updateUserList(data) {
-    users = data;
-    renderUserList();
-}
-
-function renderChatHistory(messages) {
-    const box = document.getElementById('chatMessages');
-    box.innerHTML = '';
-    messages.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = 'message' + (msg.from_user_id == userId ? ' me' : '');
-        div.innerHTML =
-            '<div class="meta">' + (msg.from_user_id == userId ? 'Me' : msg.username) +
-            ' <small>' + (msg.created_at ? new Date(msg.created_at).toLocaleString() : '') + '</small></div>' +
-            '<div class="content">' + escapeHtml(msg.message) + '</div>';
-        box.appendChild(div);
-    });
-    box.scrollTop = box.scrollHeight;
-}
-
-function showSystemMessage(message) {
-    const chatMessages = document.getElementById('chatMessages');
-    const systemMessage = document.createElement('div');
-    systemMessage.className = 'message system';
-    systemMessage.innerHTML = '<div class="content">' + message + '</div>';
-    chatMessages.appendChild(systemMessage);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-document.getElementById('chatForm').onsubmit = function(e) {
-    e.preventDefault();
-    const msg = document.getElementById('chatInput').value.trim();
-    if (!msg) return;
-    if (ws && ws.readyState === 1) {
-        ws.send(JSON.stringify({type: 'chat', to: selectedUserId, message: msg}));
-        document.getElementById('chatInput').value = '';
-    }
-};
-
-document.addEventListener('DOMContentLoaded', function() {
-    refreshUserList();
-    loadChatHistory(selectedUserId);
-    connectWebSocket();
-    setInterval(refreshUserList, 10000); // Refresh user list every 10s
-});
-</script>
+    </script>
 </body>
 </html>
