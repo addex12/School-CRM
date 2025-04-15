@@ -8,6 +8,9 @@ $pageTitle = "Feedback Management";
 // Fetch all users for dropdown
 $users = $pdo->query("SELECT id, username FROM users ORDER BY username")->fetchAll();
 
+// Fetch all active feedback subjects for dropdown
+$subjects = $pdo->query("SELECT subject FROM feedback_subjects WHERE status = 'active' ORDER BY subject")->fetchAll(PDO::FETCH_COLUMN);
+
 // Fetch all feedback
 $stmt = $pdo->query("SELECT f.*, u.username FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC");
 $feedbackList = $stmt->fetchAll();
@@ -119,9 +122,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </select>
 </div>
                         <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" name="subject" id="subject" required>
-                        </div>
+    <label for="subject">Subject</label>
+    <select name="subject" id="subject" class="form-control" required>
+        <option value="">Select subject...</option>
+        <?php foreach ($subjects as $subject): ?>
+            <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
                         <div class="form-group">
                             <label for="message">Message</label>
                             <textarea name="message" id="message" rows="4" required></textarea>
