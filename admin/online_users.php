@@ -12,7 +12,7 @@ try {
 
     // Fix: Always return all users except current, and always include online status as boolean
     $stmt = $pdo->prepare("SELECT id, username, 
-        (last_activity > (NOW() - INTERVAL 5 MINUTE)) as is_online 
+        (last_active > (NOW() - INTERVAL 5 MINUTE)) as is_online 
         FROM users WHERE id != ?");
     $stmt->execute([$current_user_id]);
 
