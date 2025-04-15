@@ -1,4 +1,9 @@
 <?php
+// DEBUG: Show all errors (remove after fixing)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 requireLogin();
@@ -9,41 +14,61 @@ $user_id = $_SESSION['user_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
     try {
-        // 1. Find if a thread exists
-        $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)");
-        $stmt->execute([$user_id, $admin_id, $admin_id, $user_id]);
-        $thread = $stmt->fetch();
-        if (!$thread) {
-            // 2. Create thread if not exists
-            $stmt = $pdo->prepare("INSERT INTO chat_threads (user1_id, user2_id) VALUES (?, ?)");
-            $stmt->execute([$user_id, $admin_id]);
-            $thread_id = $pdo->lastInsertId();
+        // Check if chat_threads table exists
+        $result = $pdo->query("SHOW TABLES LIKE 'chat_threads'");
+        if ($result && $result->rowCount() > 0) {
+            // 1. Find if a thread exists
+            $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)");
+            $stmt->execute([$user_id, $admin_id, $admin_id, $user_id]);
+            $thread = $stmt->fetch();
+            if (!$thread) {
+                // 2. Create thread if not exists
+                $stmt = $pdo->prepare("INSERT INTO chat_threads (user1_id, user2_id) VALUES (?, ?)");
+                $stmt->execute([$user_id, $admin_id]);
+                $thread_id = $pdo->lastInsertId();
+            } else {
+                $thread_id = $thread['id'];
+            }
+            // 3. Insert the message with thread_id, from_user_id, to_user_id, message
+            $stmt = $pdo->prepare("INSERT INTO chat_messages (thread_id, from_user_id, to_user_id, message) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$thread_id, $user_id, $admin_id, $message]);
         } else {
-            $thread_id = $thread['id'];
+            // Fallback to old logic if chat_threads doesn't exist
+            $stmt = $pdo->prepare("INSERT INTO chat_messages (user_id, message) VALUES (?, ?)");
+            $stmt->execute([$user_id, $message]);
         }
-        // 3. Insert the message with thread_id, from_user_id, to_user_id, message
-        $stmt = $pdo->prepare("INSERT INTO chat_messages (thread_id, from_user_id, to_user_id, message) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$thread_id, $user_id, $admin_id, $message]);
         $success = "Message sent successfully!";
     } catch (PDOException $e) {
         $error = "Error sending message: " . $e->getMessage();
     }
 }
 
-// Get chat history for this user-admin thread
+// Get chat history for this user-admin thread (if chat_threads exists)
 $admin_id = 1; // Change if your admin user_id is different
 $user_id = $_SESSION['user_id'];
-// Find thread
-$stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)");
-$stmt->execute([$user_id, $admin_id, $admin_id, $user_id]);
-$thread = $stmt->fetch();
-if ($thread) {
-    $thread_id = $thread['id'];
-    $stmt = $pdo->prepare("SELECT c.*, u.username FROM chat_messages c JOIN users u ON c.from_user_id = u.id WHERE c.thread_id = ? ORDER BY c.created_at ASC");
-    $stmt->execute([$thread_id]);
-    $messages = $stmt->fetchAll();
-} else {
+try {
+    $result = $pdo->query("SHOW TABLES LIKE 'chat_threads'");
+    if ($result && $result->rowCount() > 0) {
+        // Find thread
+        $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)");
+        $stmt->execute([$user_id, $admin_id, $admin_id, $user_id]);
+        $thread = $stmt->fetch();
+        if ($thread) {
+            $thread_id = $thread['id'];
+            $stmt = $pdo->prepare("SELECT c.*, u.username FROM chat_messages c JOIN users u ON c.from_user_id = u.id WHERE c.thread_id = ? ORDER BY c.created_at ASC");
+            $stmt->execute([$thread_id]);
+            $messages = $stmt->fetchAll();
+        } else {
+            $messages = [];
+        }
+    } else {
+        // Fallback to old logic if chat_threads doesn't exist
+        $stmt = $pdo->query("SELECT c.*, u.username FROM chat_messages c JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 50");
+        $messages = $stmt->fetchAll();
+    }
+} catch (PDOException $e) {
     $messages = [];
+    $error = "Error loading chat history: " . $e->getMessage();
 }
 ?>
 
