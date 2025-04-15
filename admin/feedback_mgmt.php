@@ -9,6 +9,14 @@ $pageTitle = "Feedback Management";
 $stmt = $pdo->query("SELECT f.*, u.username FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC");
 $feedbackList = $stmt->fetchAll();
 
+// Prepare ratings data for chart
+$ratingsData = [1=>0,2=>0,3=>0,4=>0,5=>0];
+foreach ($feedbackList as $feedback) {
+    $r = (int)$feedback['rating'];
+    if (isset($ratingsData[$r])) $ratingsData[$r]++;
+}
+$ratingsJson = json_encode(array_values($ratingsData));
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -21,6 +29,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (empty($subject) || empty($message)) {
                 throw new Exception("Subject and message are required.");
+            }
+
+            // Check if user exists
+            $userCheck = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+            $userCheck->execute([$user_id]);
+            if (!$userCheck->fetch()) {
+                throw new Exception("User ID does not exist.");
             }
 
             $stmt = $pdo->prepare("INSERT INTO feedback (user_id, subject, message, rating, created_at) VALUES (?, ?, ?, ?, NOW())");
@@ -42,6 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$subject, $message, $rating, $feedback_id]);
 
             $_SESSION['success'] = "Feedback updated successfully!";
+        } elseif (isset($_POST['admin_reply'])) {
+            // Admin reply to feedback
+            $feedback_id = intval($_POST['feedback_id']);
+            $reply = trim($_POST['reply']);
+            $stmt = $pdo->prepare("UPDATE feedback SET admin_reply = ? WHERE id = ?");
+            $stmt->execute([$reply, $feedback_id]);
+            $_SESSION['success'] = "Reply added successfully!";
         } elseif (isset($_POST['delete_feedback'])) {
             // Delete feedback
             $feedback_id = intval($_POST['feedback_id']);
@@ -103,8 +125,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Feedback List Section -->
                 <section class="table-section">
-                    <h2>Feedback List</h2>
-                    <input type="text" id="feedback-search" placeholder="Search feedback..." class="form-control">
+    <h2>Feedback List</h2>
+    <div style="max-width:500px;margin-bottom:24px;">
+        <canvas id="feedbackChart" height="180"></canvas>
+    </div>
+    <input type="text" id="feedback-search" placeholder="Search feedback..." class="form-control">
                     <?php if (count($feedbackList) > 0): ?>
                         <table class="table">
                             <thead>
@@ -114,20 +139,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <th>Subject</th>
                                     <th>Message</th>
                                     <th>Rating</th>
+<th>Admin Reply</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($feedbackList as $feedback): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($feedback['id']) ?></td>
-                                        <td><?= htmlspecialchars($feedback['username'] ?? 'Anonymous') ?></td>
-                                        <td><?= htmlspecialchars($feedback['subject']) ?></td>
-                                        <td><?= htmlspecialchars($feedback['message']) ?></td>
-                                        <td class="feedback-rating"><?= htmlspecialchars($feedback['rating']) ?></td>
-                                        <td><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
-                                        <td>
+    <tr>
+        <td><?= htmlspecialchars($feedback['id']) ?></td>
+        <td><?= htmlspecialchars($feedback['username'] ?? 'Anonymous') ?></td>
+        <td><?= htmlspecialchars($feedback['subject']) ?></td>
+        <td><?= htmlspecialchars($feedback['message']) ?></td>
+        <td class="feedback-rating">
+            <?php
+            $full = intval($feedback['rating']);
+            $empty = 5 - $full;
+            for ($i=0; $i<$full; $i++) echo '<span style="color:gold;font-size:1.2em">&#9733;</span>';
+            for ($i=0; $i<$empty; $i++) echo '<span style="color:#ccc;font-size:1.2em">&#9733;</span>';
+            ?>
+        </td>
+        <td>
+            <?php if (!empty($feedback['admin_reply'])): ?>
+                <div class="admin-reply"><strong>Admin:</strong> <?= htmlspecialchars($feedback['admin_reply']) ?></div>
+            <?php endif; ?>
+            <form method="POST" style="margin-top:5px;">
+                <input type="hidden" name="feedback_id" value="<?= $feedback['id'] ?>">
+                <input type="text" name="reply" placeholder="Add reply..." class="form-control" required>
+                <button type="submit" name="admin_reply" class="btn btn-sm btn-info" style="margin-top:2px;">Reply</button>
+            </form>
+        </td>
+        <td><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
+        <td>
                                             <!-- Edit Button -->
                                             <button class="btn btn-secondary" onclick="editFeedback(<?= $feedback['id'] ?>, '<?= htmlspecialchars($feedback['subject']) ?>', '<?= htmlspecialchars($feedback['message']) ?>', <?= $feedback['rating'] ?>)">Edit</button>
                                             
@@ -173,7 +216,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        // Chart.js feedback ratings bar chart
+        const ratingsData = <?= $ratingsJson ?>;
+        const ctx = document.getElementById('feedbackChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+                datasets: [{
+                    label: 'Number of Feedbacks',
+                    data: ratingsData,
+                    backgroundColor: [
+                        '#ff4d4d', '#ff9933', '#ffe066', '#a3e635', '#34d399'
+                    ],
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: 'Feedback Ratings Distribution' }
+                },
+                scales: {
+                    y: { beginAtZero: true, precision: 0 }
+                }
+            }
+        });
+
         function editFeedback(id, subject, message, rating) {
             document.getElementById('editFeedbackId').value = id;
             document.getElementById('editSubject').value = subject;
