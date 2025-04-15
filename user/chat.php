@@ -273,7 +273,7 @@ $admin_id = 1; // Default admin user_id
                 ws.send(
                     JSON.stringify({
                         type: 'auth',
-                        userId: <?= $user_id ?>,
+                        user_id: <?= $user_id ?>,
                     })
                 );
             };
