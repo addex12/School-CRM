@@ -1,250 +1,274 @@
 <?php
-// admin/all_responses.php
-// Show all survey responses for admin, with no filtering by survey_id
+ob_start();
 require_once '../includes/auth.php';
-require_once '../includes/config.php';
 requireAdmin();
+require_once '../includes/config.php';
+require_once '../includes/db.php';
 
-$pageTitle = 'All Survey Responses';
+$pageTitle = "All Survey Responses";
+
+// Fetch all surveys for filter dropdown
+$surveyStmt = $pdo->prepare("SELECT id, title FROM surveys ORDER BY created_at DESC");
+$surveyStmt->execute();
+$allSurveys = $surveyStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get optional survey filter from GET
+$filter_survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
+
+// Prepare date filter and parameters
+$whereClause = "1=1";
+$params = [];
+$date_filter = '';
+$survey_filter = '';
+
+if ($filter_survey_id) {
+    $whereClause .= " AND sr.survey_id = ?";
+    $params[] = $filter_survey_id;
+    $survey_filter = "&survey_id=" . urlencode($filter_survey_id);
+}
+
+if (!empty($_GET['start_date'])) {
+    $start_date = $_GET['start_date'];
+    if (DateTime::createFromFormat('Y-m-d', $start_date) !== false) {
+        $whereClause .= " AND sr.submitted_at >= ?";
+        $params[] = $start_date;
+        $date_filter .= "&start_date=" . urlencode($start_date);
+    }
+}
+
+if (!empty($_GET['end_date'])) {
+    $end_date = $_GET['end_date'];
+    if (DateTime::createFromFormat('Y-m-d', $end_date) !== false) {
+        $whereClause .= " AND sr.submitted_at <= ?";
+        $params[] = $end_date . ' 23:59:59';
+        $date_filter .= "&end_date=" . urlencode($end_date);
+    }
+}
 
 // Pagination setup
-$per_page = 30;
+$per_page = 20;
 $page = max(1, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1]]));
 $offset = ($page - 1) * $per_page;
 
 // Get total responses count
-$total_stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses");
+$total_stmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses sr WHERE $whereClause");
+$total_stmt->execute($params);
 $total_responses = $total_stmt->fetchColumn();
 $total_pages = max(1, ceil($total_responses / $per_page));
 
-// Get paginated responses (with survey and user info)
+// Get paginated responses with survey info
 $response_stmt = $pdo->prepare("
-    SELECT sr.*, s.title AS survey_title, u.username, u.email, r.role_name
+    SELECT sr.*, s.title AS survey_title
     FROM survey_responses sr
-    LEFT JOIN surveys s ON sr.survey_id = s.id
-    LEFT JOIN users u ON sr.user_id = u.id
-    LEFT JOIN roles r ON u.role_id = r.id
+    JOIN surveys s ON sr.survey_id = s.id
+    WHERE $whereClause
     ORDER BY sr.submitted_at DESC
     LIMIT ? OFFSET ?
 ");
-$response_stmt->execute([$per_page, $offset]);
-$responses = $response_stmt->fetchAll();
-
-// --- Analytics Data for Charts ---
-// 1. Responses per survey (bar)
-$survey_counts_stmt = $pdo->query("SELECT s.title AS survey_title, COUNT(*) AS count FROM survey_responses sr LEFT JOIN surveys s ON sr.survey_id = s.id GROUP BY sr.survey_id ORDER BY count DESC");
-$survey_counts = $survey_counts_stmt->fetchAll();
-
-// 2. Responses per day (line)
-$date_counts_stmt = $pdo->query("SELECT DATE(sr.submitted_at) as date, COUNT(*) as count FROM survey_responses sr GROUP BY DATE(sr.submitted_at) ORDER BY date ASC");
-$date_counts = $date_counts_stmt->fetchAll();
-
-// 3. Responses by role (pie)
-$role_counts_stmt = $pdo->query("SELECT r.role_name, COUNT(*) as count FROM survey_responses sr LEFT JOIN users u ON sr.user_id = u.id LEFT JOIN roles r ON u.role_id = r.id GROUP BY r.role_name");
-$role_counts = $role_counts_stmt->fetchAll();
-
-$chart_data = [
-    'surveys' => $survey_counts,
-    'dates' => $date_counts,
-    'roles' => $role_counts
-];
-$chart_json = json_encode($chart_data);
+$params_for_execute = $params;
+$params_for_execute[] = $per_page;
+$params_for_execute[] = $offset;
+$response_stmt->execute($params_for_execute);
+$responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/admin.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" />
     <style>
-        .response-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .response-table th, .response-table td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
-        .response-table th { background: #f8f9fa; }
-        .pagination { margin: 30px 0 0 0; }
+        .response-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .response-table th, .response-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .response-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .response-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        .filter-form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            color: white;
+            background-color: #4361ee;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .pagination {
+            display: flex;
+            padding-left: 0;
+            list-style: none;
+            border-radius: 0.25rem;
+        }
+        .page-item.active .page-link {
+            background-color: #4361ee;
+            border-color: #4361ee;
+            color: white;
+        }
+        .page-link {
+            position: relative;
+            display: block;
+            padding: 0.5rem 0.75rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: #4361ee;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            text-decoration: none;
+        }
+        .page-link:hover {
+            background-color: #e9ecef;
+            color: #4361ee;
+        }
     </style>
 </head>
 <body>
-    <?php include 'includes/admin_sidebar.php'; ?>
-    <div class="admin-main">
-        <header class="admin-header">
-            <h1>All Survey Responses</h1>
-        </header>
-        <!-- Chart Analytics Section -->
-        <div class="row" style="margin-bottom:30px;">
-            <div class="col-md-6">
-                <div class="chart-container" style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:20px;">
-                    <h3 style="font-size:1.1rem;">Responses per Survey</h3>
-                    <canvas id="surveyBarChart" height="130"></canvas>
-                </div>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+            </header>
+
+            <div class="filter-section">
+                <form method="GET" class="filter-form">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="survey_id">Filter by Survey</label>
+                            <select name="survey_id" id="survey_id" class="form-control">
+                                <option value="">All Surveys</option>
+                                <?php foreach ($allSurveys as $surveyOption): ?>
+                                    <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($filter_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($surveyOption['title']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="start_date">From Date</label>
+                            <input type="date" name="start_date" id="start_date" class="form-control" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>" />
+                        </div>
+                        <div class="col-md-3">
+                            <label for="end_date">To Date</label>
+                            <input type="date" name="end_date" id="end_date" class="form-control" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>" />
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn">Filter</button>
+                            <a href="all_responses.php" class="btn btn-secondary ml-2">Reset</a>
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="col-md-6">
-                <div class="chart-container" style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:20px;">
-                    <h3 style="font-size:1.1rem;">Responses Over Time</h3>
-                    <canvas id="dateLineChart" height="130"></canvas>
+
+            <?php if ($total_responses > 0): ?>
+                <div class="table-responsive">
+                    <table class="response-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Survey</th>
+                                <th>Respondent</th>
+                                <th>Submitted At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($responses as $index => $response): ?>
+                                <tr>
+                                    <td><?= $index + 1 + $offset ?></td>
+                                    <td><?= htmlspecialchars($response['survey_title']) ?></td>
+                                    <td>Anonymous</td>
+                                    <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                                    <td>
+                                        <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="chart-container" style="background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:20px;">
-                    <h3 style="font-size:1.1rem;">Responses by Role</h3>
-                    <canvas id="rolePieChart" height="130"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="response-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Survey</th>
-                        <th>Respondent</th>
-                        <th>Role</th>
-                        <th>Submitted At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($responses as $index => $response): ?>
-                    <tr>
-                        <td><?= $index + 1 + $offset ?></td>
-                        <td><?= htmlspecialchars($response['survey_title'] ?? 'Unknown') ?></td>
-                        <td><?= $response['username'] ? htmlspecialchars($response['username']) : '<span class="text-muted">Anonymous</span>' ?></td>
-                        <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
-                        <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
-                        <td>
-                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-eye"></i> View
-                            </a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-        <!-- Pagination -->
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                <?php if ($page > 1): ?>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<?= $page - 1 ?>">&laquo; Previous</a>
-                    </li>
-                <?php endif; ?>
-                <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                    <li class="page-item<?= $i == $page ? ' active' : '' ?>">
-                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-                    </li>
-                <?php endfor; ?>
-                <?php if ($page < $total_pages): ?>
-                    <li class="page-item">
-                        <a class="page-link" href="?page=<?= $page + 1 ?>">Next &raquo;</a>
-                    </li>
-                <?php endif; ?>
-            </ul>
-        </nav>
-    </div>
-    <?php require_once 'includes/footer.php'; ?>
-    <script>
-    const chartData = <?= $chart_json ?>;
-    document.addEventListener('DOMContentLoaded', function() {
-        // Bar Chart: Responses per Survey
-        if (chartData.surveys && chartData.surveys.length > 0) {
-            const ctx1 = document.getElementById('surveyBarChart').getContext('2d');
-            new Chart(ctx1, {
-                type: 'bar',
-                data: {
-                    labels: chartData.surveys.map(s => s.survey_title),
-                    datasets: [{
-                        label: 'Responses',
-                        data: chartData.surveys.map(s => s.count),
-                        backgroundColor: '#4361ee',
-                        borderRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: false },
-                        datalabels: { anchor: 'end', align: 'top', color: '#4361ee', font: { weight: 'bold' } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
-                        x: { grid: { display: false } }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
-        // Line Chart: Responses Over Time
-        if (chartData.dates && chartData.dates.length > 0) {
-            const ctx2 = document.getElementById('dateLineChart').getContext('2d');
-            new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: chartData.dates.map(d => d.date),
-                    datasets: [{
-                        label: 'Responses',
-                        data: chartData.dates.map(d => d.count),
-                        backgroundColor: 'rgba(67,97,238,0.15)',
-                        borderColor: '#4361ee',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true,
-                        pointBackgroundColor: '#4361ee',
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: false },
-                        datalabels: { anchor: 'end', align: 'top', color: '#4361ee', font: { weight: 'bold' } }
-                    },
-                    scales: {
-                        y: { beginAtZero: true, title: { display: true, text: 'Responses' }, grid: { color: 'rgba(0,0,0,0.05)' } },
-                        x: { title: { display: false }, grid: { display: false } }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
-        // Pie Chart: Responses by Role
-        if (chartData.roles && chartData.roles.length > 0) {
-            const ctx3 = document.getElementById('rolePieChart').getContext('2d');
-            new Chart(ctx3, {
-                type: 'pie',
-                data: {
-                    labels: chartData.roles.map(r => r.role_name || 'Unknown'),
-                    datasets: [{
-                        data: chartData.roles.map(r => r.count),
-                        backgroundColor: ['#4361ee', '#4895ef', '#4cc9f0', '#b5179e', '#f72585', '#7209b7', '#3f37c9'],
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' },
-                        title: { display: false },
-                        datalabels: {
-                            formatter: (value, ctx) => {
-                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                return (value/total*100).toFixed(1) + '%';
-                            },
-                            color: '#fff',
-                            font: { weight: 'bold' }
+
+                <!-- Pagination -->
+                <nav class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <?php if ($page > 1): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?= $page - 1 ?><?= $date_filter ?><?= $survey_filter ?>">
+                                    <i class="fas fa-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                        <?php endif; ?>
+
+                        <?php
+                        $start_page = max(1, $page - 2);
+                        $end_page = min($total_pages, $page + 2);
+
+                        if ($start_page > 1) {
+                            echo '<li class="page-item"><a class="page-link" href="?page=1' . $date_filter . $survey_filter . '">1</a></li>';
+                            if ($start_page > 2) {
+                                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                            }
                         }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
-    });
-    </script>
+
+                        for ($i = $start_page; $i <= $end_page; $i++): ?>
+                            <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                <a class="page-link" href="?page=<?= $i ?><?= $date_filter ?><?= $survey_filter ?>">
+                                    <?= $i ?>
+                                </a>
+                            </li>
+                        <?php endfor;
+
+                        if ($end_page < $total_pages) {
+                            if ($end_page < $total_pages - 1) {
+                                echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                            }
+                            echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . $date_filter . $survey_filter . '">' . $total_pages . '</a></li>';
+                        }
+                        ?>
+
+                        <?php if ($page < $total_pages): ?>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=<?= $page + 1 ?><?= $date_filter ?><?= $survey_filter ?>">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </nav>
+            <?php else: ?>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> No survey responses found.
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
 </body>
 </html>
+<?php
+ob_end_flush();
+?>
