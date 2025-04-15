@@ -8,177 +8,274 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 requireLogin();
 
-// Handle chat message submission
-$admin_id = 1; // Change if your admin user_id is different
 $user_id = $_SESSION['user_id'];
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
-    try {
-        // Check if chat_threads table exists
-        $result = $pdo->query("SHOW TABLES LIKE 'chat_threads'");
-        if ($result && $result->rowCount() > 0) {
-            // 1. Find if a thread exists for this user
-            $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE user_id = ?");
-            $stmt->execute([$user_id]);
-            $thread = $stmt->fetch();
-            if (!$thread) {
-                // 2. Create thread if not exists
-                $stmt = $pdo->prepare("INSERT INTO chat_threads (user_id, subject, status) VALUES (?, 'General', 'open')");
-                $stmt->execute([$user_id]);
-                $thread_id = $pdo->lastInsertId();
-            } else {
-                $thread_id = $thread['id'];
-            }
-            // 3. Insert the message with thread_id, from_user_id, to_user_id, message
-            $stmt = $pdo->prepare("INSERT INTO chat_messages (thread_id, from_user_id, to_user_id, message) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$thread_id, $user_id, $admin_id, $message]);
-        } else {
-            // Fallback to old logic if chat_threads doesn't exist
-            $stmt = $pdo->prepare("INSERT INTO chat_messages (user_id, message) VALUES (?, ?)");
-            $stmt->execute([$user_id, $message]);
-        }
-        $success = "Message sent successfully!";
-    } catch (PDOException $e) {
-        $error = "Error sending message: " . $e->getMessage();
-    }
-}
+$username = $_SESSION['username'];
+$admin_id = 1; // Default admin user_id
 
-// Get chat history for this user-admin thread (if chat_threads exists)
-$admin_id = 1; // Change if your admin user_id is different
-$user_id = $_SESSION['user_id'];
-try {
-    $result = $pdo->query("SHOW TABLES LIKE 'chat_threads'");
-    if ($result && $result->rowCount() > 0) {
-        // Find thread for this user
-        $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE user_id = ?");
-        $stmt->execute([$user_id]);
-        $thread = $stmt->fetch();
-        if ($thread) {
-            $thread_id = $thread['id'];
-            $stmt = $pdo->prepare("SELECT c.*, u.username FROM chat_messages c JOIN users u ON c.from_user_id = u.id WHERE c.thread_id = ? ORDER BY c.created_at ASC");
-            $stmt->execute([$thread_id]);
-            $messages = $stmt->fetchAll();
-        } else {
-            $messages = [];
-        }
-    } else {
-        // Fallback to old logic if chat_threads doesn't exist
-        $stmt = $pdo->query("SELECT c.*, u.username FROM chat_messages c JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 50");
-        $messages = $stmt->fetchAll();
-    }
-} catch (PDOException $e) {
-    $messages = [];
-    $error = "Error loading chat history: " . $e->getMessage();
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Chat - Survey System</title>
+    <title>Live Chat - School CRM</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        .chat-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        body { background: #f2f6fa; }
+        .chat-main-wrap {
+            display: flex;
+            max-width: 1100px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+            overflow: hidden;
+            min-height: 600px;
+        }
+        .sidebar {
+            width: 270px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 0;
+            overflow-y: auto;
+        }
+        .sidebar h3 {
+            padding: 18px 20px 10px 20px;
+            margin: 0;
+            font-size: 1.2em;
+            color: #3498db;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .user-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .user-list li {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .user-list li.active, .user-list li:hover {
+            background: #eaf6fb;
+        }
+        .user-status {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-right: 12px;
+            background: #ccc;
+            display: inline-block;
+        }
+        .user-status.online { background: #2ecc71; }
+        .user-status.offline { background: #e74c3c; }
+        .user-list .username { font-weight: 500; }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         .chat-header {
-            text-align: center;
-            margin-bottom: 20px;
+            padding: 18px 30px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #3498db;
         }
         .chat-messages {
-            height: 400px;
+            flex: 1;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 20px;
-            background: #f5f5f5;
-            border-radius: 8px;
+            padding: 25px 30px;
+            background: #f9fbfd;
         }
         .message {
-            margin-bottom: 15px;
-            padding: 10px;
+            margin-bottom: 18px;
+            padding: 10px 16px;
             background: #e9ecef;
             border-radius: 8px;
             position: relative;
+            max-width: 60%;
+            clear: both;
         }
-        .message strong {
-            display: block;
-            font-size: 0.9em;
-            color: #333;
+        .message.me {
+            background: #d1e7fd;
+            margin-left: auto;
+            text-align: right;
         }
-        .message small {
-            position: absolute;
-            bottom: 5px;
-            right: 10px;
-            font-size: 0.8em;
-            color: #666;
+        .message .meta {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 2px;
         }
-        textarea {
-            width: 100%;
-            padding: 10px;
+        .message .content {
+            font-size: 1.02em;
+            color: #222;
+        }
+        .chat-input-wrap {
+            padding: 18px 30px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .chat-input-wrap form {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input-wrap textarea {
+            flex: 1;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
             resize: none;
-            font-size: 1em;
+            font-size: 1.05em;
         }
         .btn-primary {
-            display: inline-block;
-            padding: 10px 20px;
+            padding: 0 22px;
             background: #3498db;
-            color: white;
+            color: #fff;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
+            font-size: 1em;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background 0.2s;
         }
-        .btn-primary:hover {
-            background: #2980b9;
-        }
+        .btn-primary:hover { background: #2980b9; }
+        .status-dot { margin-right: 7px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <?php include 'includes/header.php'; ?>
-
-        <div class="chat-container">
-            <div class="chat-header">
-                <h2>Live Chat Support</h2>
-            </div>
-            
-            <?php if (isset($success)): ?>
-                <div class="success-message"><?= $success ?></div>
-            <?php endif; ?>
-            
-            <?php if (isset($error)): ?>
-                <div class="error-message"><?= $error ?></div>
-            <?php endif; ?>
-
-            <div class="chat-messages">
-                <?php foreach ($messages as $message): ?>
-                    <div class="message">
-                        <strong><?= htmlspecialchars($message['username']) ?>:</strong>
-                        <?= htmlspecialchars($message['message']) ?>
-                        <small><?= date('M j, g:i a', strtotime($message['created_at'])) ?></small>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-
-            <form method="POST">
-                <div class="form-group">
-                    <textarea name="message" rows="3" placeholder="Type your message..." required></textarea>
-                </div>
-                <button type="submit" class="btn-primary">Send Message</button>
+<div class="container">
+<?php include '../includes/header.php'; ?>
+<div class="chat-main-wrap">
+    <div class="sidebar">
+        <h3>Users</h3>
+        <ul class="user-list" id="userList"></ul>
+    </div>
+    <div class="chat-area">
+        <div class="chat-header" id="chatHeader">Chat</div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input-wrap">
+            <form id="chatForm" autocomplete="off">
+                <textarea id="chatInput" rows="2" placeholder="Type your message..." required></textarea>
+                <button type="submit" class="btn-primary">Send</button>
             </form>
         </div>
-
-        <?php include 'includes/footer.php'; ?>
     </div>
+</div>
+<?php include '../includes/footer.php'; ?>
+</div>
+<script>
+const userId = <?= json_encode($user_id) ?>;
+const username = <?= json_encode($username) ?>;
+const adminId = <?= json_encode($admin_id) ?>;
+let selectedUserId = adminId;
+let ws;
+let users = [];
+
+function fetchUsers() {
+    fetch('online_users.php')
+        .then(res => res.json())
+        .then(data => {
+            users = data;
+            renderUserList();
+        });
+}
+
+function fetchChatHistory() {
+    fetch('chat_history.php?user_id=' + selectedUserId)
+        .then(res => res.json())
+        .then(data => {
+            renderMessages(data);
+        });
+}
+
+function renderUserList() {
+    const ul = document.getElementById('userList');
+    ul.innerHTML = '';
+    users.forEach(u => {
+        if (u.id == userId) return; // skip self
+        const li = document.createElement('li');
+        li.className = (u.id == selectedUserId ? 'active' : '');
+        li.onclick = () => {
+            selectedUserId = u.id;
+            renderUserList();
+            document.getElementById('chatHeader').textContent = 'Chat with ' + u.username;
+            fetchChatHistory();
+        };
+        const status = document.createElement('span');
+        status.className = 'user-status ' + (u.online ? 'online' : 'offline');
+        li.appendChild(status);
+        const uname = document.createElement('span');
+        uname.className = 'username';
+        uname.textContent = u.username;
+        li.appendChild(uname);
+        ul.appendChild(li);
+    });
+}
+
+function renderMessages(messages) {
+    const box = document.getElementById('chatMessages');
+    box.innerHTML = '';
+    messages.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'message' + (msg.from_user_id == userId ? ' me' : '');
+        div.innerHTML =
+            '<div class="meta">' + (msg.from_user_id == userId ? 'Me' : msg.username) +
+            ' <small>' + (msg.created_at ? new Date(msg.created_at).toLocaleString() : '') + '</small></div>' +
+            '<div class="content">' + escapeHtml(msg.message) + '</div>';
+        box.appendChild(div);
+    });
+    box.scrollTop = box.scrollHeight;
+}
+
+function escapeHtml(text) {
+    var map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+function connectWebSocket() {
+    ws = new WebSocket('ws://localhost:8080');
+    ws.onopen = function() {
+        ws.send(JSON.stringify({type: 'auth', user_id: userId, role: 'user'}));
+        setInterval(() => {
+            ws.send(JSON.stringify({type: 'ping'}));
+        }, 30000);
+    };
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.type === 'chat') {
+            // Only show if relevant to this thread
+            if (
+                (data.from == userId && data.to == selectedUserId) ||
+                (data.from == selectedUserId && data.to == userId)
+            ) {
+                fetchChatHistory();
+            }
+        }
+    };
+    ws.onclose = function() {
+        setTimeout(connectWebSocket, 2000); // Reconnect
+    };
+}
+
+document.getElementById('chatForm').onsubmit = function(e) {
+    e.preventDefault();
+    const msg = document.getElementById('chatInput').value.trim();
+    if (!msg) return;
+    if (ws && ws.readyState === 1) {
+        ws.send(JSON.stringify({type: 'chat', to: selectedUserId, message: msg}));
+        document.getElementById('chatInput').value = '';
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetchUsers();
+    fetchChatHistory();
+    connectWebSocket();
+    setInterval(fetchUsers, 10000); // Refresh user list every 10s
+});
+</script>
 </body>
 </html>
