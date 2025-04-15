@@ -4,38 +4,116 @@ require_once '../includes/config.php';
 requireAdmin();
 $pageTitle = "Chat Management";
 ?>
-<div class="admin-dashboard">
-    <div class="admin-main">
-        <div class="admin-header">
-        <?php include 'includes/admin_sidebar.php'; ?>
-            <h1><i class="fas fa-comments"></i> Chat Management</h1>
-        </div>
-        <div class="admin-content" style="display:flex;gap:24px;">
-            <div class="chat-sidebar" style="width:260px;min-width:180px;background:#f8f9fa;border-radius:8px;padding:16px 8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-                <h3 style="margin-top:0;">Online Users</h3>
-                <ul id="onlineUsers" class="chat-user-list" style="list-style:none;padding:0;margin:0;min-height:200px;"></ul>
-                <div id="noUsersMsg" style="color:#888;text-align:center;display:none;">No users online</div>
+<?php include 'includes/admin_sidebar.php'; ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<div class="container-fluid admin-chat-page" style="margin-left:240px;min-height:100vh;padding:0;">
+    <div class="row flex-nowrap" style="min-height:100vh;">
+        <div class="col-12 col-lg-3 px-0 border-end bg-light chat-sidebar" style="min-width:220px;max-width:340px;">
+            <div class="py-4 px-3">
+                <h5 class="mb-4"><i class="fas fa-users text-primary me-2"></i>Online Users</h5>
+                <ul id="onlineUsers" class="list-unstyled chat-user-list mb-0"></ul>
+                <div id="noUsersMsg" class="text-muted text-center mt-3" style="display:none;">No users online</div>
             </div>
-            <div class="chat-main" style="flex:1;display:flex;flex-direction:column;max-width:700px;">
-                <div id="chatMessages" style="flex:1 1 auto;min-height:350px;max-height:450px;overflow-y:auto;background:#f5f5f5;border-radius:8px;padding:16px;margin-bottom:12px;"></div>
-                <div style="display:flex;gap:8px;">
-                    <input id="chatInput" type="text" class="form-control" placeholder="Type your message..." style="flex:1;">
-                    <button id="sendBtn" class="btn btn-primary">Send</button>
+        </div>
+        <div class="col px-0 d-flex flex-column" style="background:#f7f8fa;min-height:100vh;">
+            <div class="admin-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
+                <h2 class="h4 mb-0"><i class="fas fa-comments text-primary me-2"></i> Chat Management</h2>
+            </div>
+            <div class="flex-grow-1 d-flex flex-column p-3 p-md-4" style="max-width:700px;margin:auto;width:100%;">
+                <div id="chatMessages" class="flex-grow-1 overflow-auto mb-3 rounded-3 p-3 bg-white shadow-sm" style="min-height:350px;max-height:480px;"></div>
+                <div class="d-flex gap-2">
+                    <input id="chatInput" type="text" class="form-control" placeholder="Type your message...">
+                    <button id="sendBtn" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<?php include '../includes/footer.php'; ?>
 <style>
-.chat-user-list li {padding:8px 10px;cursor:pointer;border-radius:5px;}
-.chat-user-list li.active,.chat-user-list li:hover{background:#e9ecef;}
-.chat-bubble{margin-bottom:10px;padding:8px 14px;border-radius:16px;max-width:68%;display:inline-block;clear:both;}
-.admin-bubble{background:#d1e7dd;color:#155724;float:right;}
-.user-bubble{background:#e2e3e5;color:#444;float:left;}
-.sender{font-weight:bold;margin-right:6px;}
-.time{font-size:0.8em;color:#888;margin-left:8px;}
+.admin-chat-page .chat-sidebar {
+    border-right: 1px solid #e3e3e3;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+.chat-user-list li {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.15s;
+    font-size: 1.02rem;
+}
+.chat-user-list li.active, .chat-user-list li:hover {
+    background: #e3e9f2;
+    color: #0d6efd;
+    font-weight: 500;
+}
+.chat-user-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #dbeafe; color: #2563eb;
+    display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 1.1em;
+    border: 2px solid #b6d4fe; margin-right: 8px;
+}
+.online-dot {
+    width: 9px; height: 9px; background: #38d39f; border-radius: 50%; margin-right: 8px; display: inline-block;
+}
+#chatMessages {
+    background: #fff;
+    min-height: 340px;
+    max-height: 480px;
+    overflow-y: auto;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+}
+.chat-bubble {
+    margin-bottom: 12px;
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 75%;
+    display: inline-block;
+    clear: both;
+    font-size: 1.04em;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.admin-bubble {
+    background: #d1e7dd;
+    color: #155724;
+    float: right;
+    text-align: right;
+}
+.user-bubble {
+    background: #e2e3e5;
+    color: #444;
+    float: left;
+}
+.sender {
+    font-weight: 700;
+    margin-right: 8px;
+}
+.time {
+    font-size: 0.88em;
+    color: #888;
+    margin-left: 8px;
+}
+@media (max-width: 991px) {
+    .admin-chat-page { margin-left:0 !important; }
+    .chat-sidebar { min-width: 100px !important; max-width: 100vw !important; }
+}
+@media (max-width: 700px) {
+    .admin-chat-page .row.flex-nowrap { flex-direction: column !important; }
+    .chat-sidebar { border-right: none; border-bottom: 1px solid #e3e3e3; }
+}
 </style>
+
+        </div>
+    </div>
+</div>
+<?php include '../includes/footer.php'; ?>
+
 <script>
 // --- Admin Chat Management ---
 const adminId = <?= (int)$_SESSION['user_id'] ?>;
@@ -79,13 +157,26 @@ function loadOnlineUsers() {
                 noUsersMsg.style.display = 'none';
             }
             users.forEach(u => {
-                const li = document.createElement('li');
-                li.textContent = u.username + (u.fullname ? ' ('+u.fullname+')' : '');
-                li.className = 'user-list-item';
-                li.onclick = () => selectUser(u.id);
-                if (selectedUserId == u.id) li.classList.add('active');
-                list.appendChild(li);
-            });
+    const li = document.createElement('li');
+    li.className = 'user-list-item d-flex align-items-center';
+    // Avatar/initials
+    let initials = (u.fullname ? u.fullname : u.username).split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+    const avatar = document.createElement('span');
+    avatar.className = 'chat-user-avatar';
+    avatar.textContent = initials;
+    // Online dot
+    const onlineDot = document.createElement('span');
+    onlineDot.className = 'online-dot';
+    // Username
+    const name = document.createElement('span');
+    name.textContent = u.fullname ? u.fullname : u.username;
+    li.appendChild(onlineDot);
+    li.appendChild(avatar);
+    li.appendChild(name);
+    li.onclick = () => selectUser(u.id);
+    if (selectedUserId == u.id) li.classList.add('active');
+    list.appendChild(li);
+});
         });
 }
 setInterval(loadOnlineUsers, 10000);
