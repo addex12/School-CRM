@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/auth.php';
-requireAdmin();
+require_once '../includes/config.php';requireAdmin();
 
 // Fetch chat messages with user info
 $stmt = $pdo->prepare("
