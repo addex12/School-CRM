@@ -135,9 +135,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <textarea name="message" id="message" rows="4" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="rating">Rating</label>
-                            <input type="number" name="rating" id="rating" min="1" max="5" required>
-                        </div>
+    <label for="rating">Rating</label>
+    <div class="star-rating" style="font-size:2em; color:gold;">
+        <?php for ($i = 5; $i >= 1; $i--): ?>
+            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;">
+            <label for="star<?= $i ?>" style="cursor:pointer;">&#9733;</label>
+        <?php endfor; ?>
+    </div>
+</div>
+<style>
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: orange !important;
+}
+.star-rating input:checked ~ label {
+    color: orange !important;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stars = document.querySelectorAll('.star-rating input');
+    stars.forEach(star => {
+        star.addEventListener('change', function() {
+            // Remove checked class from all labels
+            document.querySelectorAll('.star-rating label').forEach(label => label.classList.remove('checked'));
+            // Add checked class to selected and previous labels
+            for (let i = 5; i >= this.value; i--) {
+                document.querySelector('label[for="star'+i+'"]').classList.add('checked');
+            }
+        });
+    });
+});
+</script>
                         <button type="submit" name="add_feedback" class="btn btn-primary">Add Feedback</button>
                     </form>
                 </section>
