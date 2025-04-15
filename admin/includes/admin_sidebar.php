@@ -1,5 +1,5 @@
 <?php
-$configPath = __DIR__ . '/sidebar_config.json';
+$configPath =  'sidebar_config.json';
 $sidebarItems = [];
 if (file_exists($configPath)) {
     $json = file_get_contents($configPath);
