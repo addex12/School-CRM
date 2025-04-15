@@ -4,7 +4,18 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/includes/mailer.php';
 requireLogin();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Handle user reply to admin feedback
+if (isset($_POST['user_reply_submit'], $_POST['feedback_id'])) {
+    $feedback_id = intval($_POST['feedback_id']);
+    $user_reply = trim($_POST['user_reply']);
+    if ($user_reply !== '') {
+        $stmt = $pdo->prepare("UPDATE feedback SET user_reply = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$user_reply, $feedback_id, $_SESSION['user_id']]);
+        $success = "Your reply has been sent to the admin.";
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['user_reply_submit'])) {
     $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING);
     $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
     $rating = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT, [
@@ -21,11 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user_email = $_SESSION['email'];
         sendEmail($user_email, "Feedback Received", "Thank you for your feedback!\n\nWe appreciate your input.");
         
-        // Fetch user's feedback including admin replies
-        $stmt = $pdo->prepare("SELECT subject, message, rating, admin_reply, created_at FROM feedback WHERE user_id = ? ORDER BY created_at DESC");
-        $stmt->execute([$_SESSION['user_id']]);
-        $userFeedback = $stmt->fetchAll();
-
         // Notify admins
         $admin_subject = "New Feedback Submission";
         $admin_body = "Rating: $rating/5\nSubject: $subject\nMessage: $message";
@@ -102,6 +108,20 @@ $feedback->execute([$_SESSION['user_id']]);
                             <div class="alert alert-info mt-2">
                                 <strong>Admin Reply:</strong> <?= nl2br(htmlspecialchars($item['admin_reply'])) ?>
                             </div>
+                            <?php if (empty($item['user_reply'])): ?>
+                                <form method="post" class="mt-2">
+                                    <input type="hidden" name="feedback_id" value="<?= $item['id'] ?>">
+                                    <div class="form-group">
+                                        <label for="user_reply_<?= $item['id'] ?>">Your Reply:</label>
+                                        <textarea name="user_reply" id="user_reply_<?= $item['id'] ?>" class="form-control" rows="2" required></textarea>
+                                    </div>
+                                    <button type="submit" name="user_reply_submit" class="btn btn-sm btn-success">Send Reply</button>
+                                </form>
+                            <?php else: ?>
+                                <div class="alert alert-secondary mt-2">
+                                    <strong>Your Reply:</strong> <?= nl2br(htmlspecialchars($item['user_reply'])) ?>
+                                </div>
+                            <?php endif; ?>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
