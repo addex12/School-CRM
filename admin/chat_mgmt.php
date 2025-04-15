@@ -30,7 +30,7 @@ $pageTitle = "Chat Management";
         </div>
     </div>
 </div>
-<?php include '/includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
 <style>
 .admin-chat-page .chat-sidebar {
     border-right: 1px solid #e3e3e3;
