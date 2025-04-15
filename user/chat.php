@@ -176,7 +176,7 @@ let users = [];
 let reconnectAttempts = 0;
 
 function fetchUsers() {
-    fetch('online_users.php')
+    fetch('online_users_fixed.php')
         .then(res => res.json())
         .then(data => {
             users = data;
@@ -268,7 +268,7 @@ function scheduleReconnect() {
 }
 
 function refreshUserList() {
-    fetch('online_users.php')
+    fetch('online_users_fixed.php')
         .then(res => {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const contentType = res.headers.get('content-type');
