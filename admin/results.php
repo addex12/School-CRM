@@ -199,71 +199,57 @@ $chart_json = json_encode($chart_data);
         <div class="admin-main">
             <header class="admin-header">
                 <h1>All Survey Responses</h1>
-                <div class="header-actions">
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-download"></i> Export
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv"></i> CSV</a></li>
-                            <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF</a></li>
-                            <li><a class="dropdown-item" href="export_json.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-code"></i> JSON</a></li>
-                        </ul>
-                    </div>
-                    <a href="surveys.php" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Surveys
-                    </a>
-                </div>
             </header>
-
-            <!-- Survey Stats Cards -->
-            <div class="survey-stats mb-4">
-                <div class="stat-card">
-                    <div class="stat-value"><?= number_format($total_responses) ?></div>
-                    <div class="stat-label">Total Responses</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= date('M j, Y', strtotime($survey['starts_at'])) ?></div>
-                    <div class="stat-label">Start Date</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= date('M j, Y', strtotime($survey['ends_at'])) ?></div>
-                    <div class="stat-label">End Date</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></div>
-                    <div class="stat-label">Anonymous</div>
-                </div>
+            <div class="table-responsive">
+                <table class="response-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Survey</th>
+                            <th>Respondent</th>
+                            <th>Role</th>
+                            <th>Submitted At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($responses as $index => $response): ?>
+                        <tr>
+                            <td><?= $index + 1 + $offset ?></td>
+                            <td><?= htmlspecialchars($response['survey_title'] ?? 'Unknown') ?></td>
+                            <td><?= $response['username'] ? htmlspecialchars($response['username']) : '<span class="text-muted">Anonymous</span>' ?></td>
+                            <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
+                            <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                            <td>
+                                <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-
-            <!-- Filter Section -->
-            <div class="filter-section">
-                <form method="GET" class="filter-form">
-                    <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
-                    <div class="row">
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label for="start_date">From Date</label>
-                                <input type="date" class="form-control" name="start_date" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label for="end_date">To Date</label>
-                                <input type="date" class="form-control" name="end_date" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary mr-2">
-                                <i class="fas fa-filter"></i> Filter
-                            </button>
-                            <a href="results.php?survey_id=<?= $survey_id ?>" class="btn btn-outline-secondary">
-                                <i class="fas fa-sync-alt"></i> Reset
-                            </a>
-                        </div>
-                    </div>
-                </form>
-            </div>
+            <!-- Pagination -->
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <?php if ($page > 1): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>">&laquo; Previous</a>
+                        </li>
+                    <?php endif; ?>
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <li class="page-item<?= $i == $page ? ' active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+                    <?php if ($page < $total_pages): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>">Next &raquo;</a>
+                        </li>
+                    <?php endif; ?>
+                </ul>
+            </nav>
 
             <!-- Charts Section -->
             <div class="chart-section mb-5">
