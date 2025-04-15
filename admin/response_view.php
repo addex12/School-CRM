@@ -5,7 +5,7 @@ require_once '../includes/auth.php';
 requireAdmin();
 
 $response_id = $_GET['id'] ?? 0;
-
+$pageTitle = 'Response Details';
 if (!$response_id) {
     $_SESSION['error'] = "Response ID is required.";
     header("Location: results.php");
@@ -244,7 +244,14 @@ foreach ($response_data as $data) {
                                 case 'checkbox': ?>
                                     <ul>
                                         <?php 
-                                        $values = json_decode($answer['field_value'], true) ?: [$answer['field_value']];
+                                        $values = json_decode($answer['field_value'], true);
+                                        if (!is_array($values)) {
+                                            if ($answer['field_value'] === '' || $answer['field_value'] === null) {
+                                                $values = [];
+                                            } else {
+                                                $values = [$answer['field_value']];
+                                            }
+                                        }
                                         foreach ($values as $value): ?>
                                             <li><?= htmlspecialchars($value) ?></li>
                                         <?php endforeach; ?>
