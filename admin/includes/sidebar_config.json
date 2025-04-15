@@ -50,7 +50,7 @@
                 },
                 {
                     "title": "Results",
-                    "link": "results.php",
+                    "link": "all_responses.php",
                     "icon": "chart-bar"
                 },
                 {
