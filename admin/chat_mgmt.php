@@ -5,8 +5,8 @@ requireAdmin();
 $pageTitle = "Chat Management";
 ?>
 <div class="admin-dashboard">
-    <?php include 'includes/admin_sidebar.php'; ?>
     <div class="admin-main">
+    <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-header">
             <h1><i class="fas fa-comments"></i> Chat Management</h1>
         </div>
