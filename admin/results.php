@@ -8,33 +8,114 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 requireAdmin();
 
-// --- Admin: Show all survey responses (no survey_id required) ---
-$pageTitle = 'All Survey Responses';
+// --- Validate and handle survey_id parameter ---
+$survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
+if (!$survey_id) {
+    // If survey_id is not set or invalid, redirect to default survey (id=1)
+    header("Location: results.php?survey_id=1");
+    exit();
+}
+
+// Fetch survey details
+$survey = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
+$survey->execute([$survey_id]);
+$survey = $survey->fetch();
+
+if (!$survey) {
+    // If survey not found, redirect to default survey (id=1)
+    $_SESSION['error'] = "Survey not found.";
+    header("Location: results.php?survey_id=?");
+    exit();
+}
+
+// Check if there are any responses for this survey
+$responseCountStmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses WHERE survey_id = ?");
+$responseCountStmt->execute([$survey_id]);
+$responseCount = $responseCountStmt->fetchColumn();
+
+if ($responseCount == 0) {
+    // No responses yet, show message but do not redirect away from results page
+    $no_responses = true;
+} else {
+    $no_responses = false;
+}
+
+
+// Fetch survey fields
+$fields = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
+$fields->execute([$survey_id]);
+$fields = $fields->fetchAll();
+
+// Prepare date filter
+$whereClause = "sr.survey_id = ?";
+$params = [$survey_id];
+$date_filter = '';
+
+if (!empty($_GET['start_date'])) {
+    $whereClause .= " AND sr.submitted_at >= ?";
+    $params[] = $_GET['start_date'];
+    $date_filter .= "&start_date=" . urlencode($_GET['start_date']);
+}
+
+if (!empty($_GET['end_date'])) {
+    $whereClause .= " AND sr.submitted_at <= ?";
+    $params[] = $_GET['end_date'] . ' 23:59:59';
+    $date_filter .= "&end_date=" . urlencode($_GET['end_date']);
+}
 
 // Pagination setup
-$per_page = 30;
+$per_page = 20;
 $page = max(1, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1]]));
 $offset = ($page - 1) * $per_page;
 
 // Get total responses count
-$total_stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses");
+$total_stmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses sr WHERE $whereClause");
+$total_stmt->execute($params);
 $total_responses = $total_stmt->fetchColumn();
 $total_pages = max(1, ceil($total_responses / $per_page));
 
-// Get paginated responses (with survey and user info)
+// Get paginated responses
 $response_stmt = $pdo->prepare("
-    SELECT sr.*, s.title AS survey_title,s.is_anonymous, u.username, u.email, r.role_name
+    SELECT sr.*, u.username, u.email, r.role_name
     FROM survey_responses sr
-    LEFT JOIN surveys s ON sr.survey_id = s.id
     LEFT JOIN users u ON sr.user_id = u.id
     LEFT JOIN roles r ON u.role_id = r.id
+    WHERE $whereClause
     ORDER BY sr.submitted_at DESC
     LIMIT ? OFFSET ?
 ");
-$response_stmt->execute([$per_page, $offset]);
+// DEBUG: Output SQL params for troubleshooting
+// error_log('Params: ' . print_r(array_merge($params, [$per_page, $offset]), true));
+
+$response_stmt->execute(array_merge($params, [$per_page, $offset]));
 $responses = $response_stmt->fetchAll();
 
+// DEBUG: Output number of responses fetched
+// error_log('Fetched responses: ' . count($responses));
 
+// --- BEGIN: Fetch all response_data for these responses ---
+$response_ids = array_column($responses, 'id');
+$response_data_map = [];
+if (!empty($response_ids)) {
+    $in = str_repeat('?,', count($response_ids) - 1) . '?';
+    $data_stmt = $pdo->prepare("SELECT * FROM response_data WHERE response_id IN ($in)");
+    $data_stmt->execute($response_ids);
+    foreach ($data_stmt->fetchAll() as $row) {
+        $response_id = $row['response_id'];
+        $field_id = $row['field_id'];
+        $value = $row['field_value'];
+        // If checkbox, decode JSON
+        foreach ($fields as $f) {
+            if ($f['id'] == $field_id && $f['field_type'] === 'checkbox') {
+                $decoded = json_decode($value, true);
+                $value = is_array($decoded) ? implode(', ', $decoded) : $value;
+                break;
+            }
+        }
+        $response_data_map[$response_id][$field_id] = $value;
+    }
+}
+// --- END: Fetch all response_data for these responses ---
 
 // Prepare analytics data for charts
 $analytics = [];
@@ -198,903 +279,518 @@ $chart_json = json_encode($chart_data);
         
         <div class="admin-main">
             <header class="admin-header">
-                <h1>All Survey Responses</h1>
-            </header>
-            <div class="table-responsive">
-                <table class="response-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Survey</th>
-                            <th>Respondent</th>
-                            <th>Role-csv"></i> CSV</a></li>
-
+                <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
+                <div class="header-actions">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv"></i> CSV</a></li>
                             <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF</a></li>
-
                             <li><a class="dropdown-item" href="export_json.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-code"></i> JSON</a></li>
-
                         </ul>
-
                     </div>
-
                     <a href="surveys.php" class="btn btn-secondary">
-
                         <i class="fas fa-arrow-left"></i> Back to Surveys
                     </a>
-
                 </div>
             </header>
-
 
             <!-- Survey Stats Cards -->
             <div class="survey-stats mb-4">
                 <div class="stat-card">
-
                     <div class="stat-value"><?= number_format($total_responses) ?></div>
-
                     <div class="stat-label">Total Responses</div>
-
                 </div>
                 <div class="stat-card">
                     <div class="stat-value"><?= date('M j, Y', strtotime($survey['starts_at'])) ?></div>
-
                     <div class="stat-label">Start Date</div>
                 </div>
-
                 <div class="stat-card">
                     <div class="stat-value"><?= date('M j, Y', strtotime($survey['ends_at'])) ?></div>
                     <div class="stat-label">End Date</div>
-
                 </div>
                 <div class="stat-card">
-
                     <div class="stat-value"><?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></div>
-
                     <div class="stat-label">Anonymous</div>
-
                 </div>
             </div>
 
-            <div class="response-table-section">
-
-                <h3 class="mb-3">Individual Responses</h3>
-
-                
-
-                <?php if ($total_responses > 0): ?>
-
-                    <div class="table-responsive">
-
-                        <table class="response-table">
-
-                            <thead>
-
-                                <tr>
-
-                                    <th>#</th>
-
-                                    <th>Respondent</th>
-
-                                    <th>Role</th>
-
-                                    <?php foreach ($fields as $field): ?>
-
-                                        <th><?= htmlspecialchars($field['field_label']) ?></th>
-
-                                    <?php endforeach; ?>
-
-                                    <th>Submitted At</th>
-
-                                    <th>Actions</th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody>
-
-                                <?php foreach ($responses as $index => $response): ?>
-
-                                    <tr>
-
-                                        <td><?= $index + 1 + $offset ?></td>
-
-                                        <td>
-
-                                            <?php if ($survey['is_anonymous']): ?>
-
-                                                <span class="text-muted">Anonymous</span>
-
-                                            <?php else: ?>
-
-                                                <?= htmlspecialchars($response['username'] ?? 'N/A') ?>
-
-                                                <?php if ($response['email']): ?>
-
-                                                    <br><small class="text-muted"><?= htmlspecialchars($response['email']) ?></small>
-
-                                                <?php endif; ?>
-
-                                            <?php endif; ?>
-
-                                        </td>
-
-                                        <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
-
-                                        
-
-                                        <?php 
-
-                                        // --- BEGIN: Use response_data_map for answers ---
-
-                                        foreach ($fields as $field): 
-
-                                            $val = $response_data_map[$response['id']][$field['id']] ?? null;
-
-                                        ?>
-
-                                            <td>
-
-                                                <?= $val !== null && $val !== '' ? 
-
-                                                    htmlspecialchars($val) : 
-
-                                                    '<span class="text-muted">N/A</span>' ?>
-
-                                            </td>
-
-                                        <?php endforeach; ?>
-
-                                        <!-- --- END: Use response_data_map for answers --- -->
-
-                                        
-
-                                        <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
-
-                                        <td>
-
-                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
-
-                                                <i class="fas fa-eye"></i> View
-
-                                            </a>
-
-                                        </td>
-
-                                    </tr>
-
-                                <?php endforeach; ?>
-
-                            </tbody>
-
-                        </table>
-
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <form method="GET" class="filter-form">
+                    <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="start_date">From Date</label>
+                                <input type="date" class="form-control" name="start_date" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="end_date">To Date</label>
+                                <input type="date" class="form-control" name="end_date" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary mr-2">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <a href="results.php?survey_id=<?= $survey_id ?>" class="btn btn-outline-secondary">
+                                <i class="fas fa-sync-alt"></i> Reset
+                            </a>
+                        </div>
                     </div>
-
-
-
-                    <!-- Pagination -->
-
-                    <nav class="mt-4">
-
-                        <ul class="pagination justify-content-center">
-
-                            <?php if ($page > 1): ?>
-
-                                <li class="page-item">
-
-                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= $date_filter ?>">
-
-                                        <i class="fas fa-chevron-left"></i> Previous
-
-                                    </a>
-
-                                </li>
-
-                            <?php endif; ?>
-
-                            
-
-                            <?php 
-
-                            // Show page numbers
-
-                            $start_page = max(1, $page - 2);
-
-                            $end_page = min($total_pages, $page + 2);
-
-                            
-
-                            if ($start_page > 1) {
-
-                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page=1'.$date_filter.'">1</a></li>';
-
-                                if ($start_page > 2) {
-
-                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-
-                                }
-
-                            }
-
-                            
-
-                            for ($i = $start_page; $i <= $end_page; $i++): ?>
-
-                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-
-                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= $date_filter ?>">
-
-                                        <?= $i ?>
-
-                                    </a>
-
-                                </li>
-
-                            <?php endfor; 
-
-                            
-
-                            if ($end_page < $total_pages) {
-
-                                if ($end_page < $total_pages - 1) {
-
-                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
-
-                                }
-
-                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page='.$total_pages.$date_filter.'">'.$total_pages.'</a></li>';
-
-                            }
-
-                            ?>
-
-                            
-
-                            <?php if ($page < $total_pages): ?>
-
-                                <li class="page-item">
-
-                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= $date_filter ?>">
-
-                                        Next <i class="fas fa-chevron-right"></i>
-
-                                    </a>
-
-                                </li>
-
-                            <?php endif; ?>
-
-                        </ul>
-
-                    </nav>
-
-                <?php else: ?>
-
-                    <div class="alert alert-info">
-
-                        <i class="fas fa-info-circle"></i> No responses found for this survey. Please check back later.
-
-                    </div>
-
-                <?php endif; ?>
-
+                </form>
             </div>
 
-        </div>
+            <!-- Charts Section -->
+            <div class="chart-section mb-5">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="chart-container">
+                            <h3 class="chart-title">Response Summary</h3>
+                            <canvas id="summaryChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <?php foreach ($fields as $field): ?>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="chart-container">
+                                <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
+                                <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
 
+            <!-- Responses Table -->
+            <div class="response-table-section">
+                <h3 class="mb-3">Individual Responses</h3>
+                
+                <?php if ($total_responses > 0): ?>
+                    <div class="table-responsive">
+                        <table class="response-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Respondent</th>
+                                    <th>Role</th>
+                                    <?php foreach ($fields as $field): ?>
+                                        <th><?= htmlspecialchars($field['field_label']) ?></th>
+                                    <?php endforeach; ?>
+                                    <th>Submitted At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($responses as $index => $response): ?>
+                                    <tr>
+                                        <td><?= $index + 1 + $offset ?></td>
+                                        <td>
+                                            <?php if ($survey['is_anonymous']): ?>
+                                                <span class="text-muted">Anonymous</span>
+                                            <?php else: ?>
+                                                <?= htmlspecialchars($response['username'] ?? 'N/A') ?>
+                                                <?php if ($response['email']): ?>
+                                                    <br><small class="text-muted"><?= htmlspecialchars($response['email']) ?></small>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
+                                        
+                                        <?php 
+                                        // --- BEGIN: Use response_data_map for answers ---
+                                        foreach ($fields as $field): 
+                                            $val = $response_data_map[$response['id']][$field['id']] ?? null;
+                                        ?>
+                                            <td>
+                                                <?= $val !== null && $val !== '' ? 
+                                                    htmlspecialchars($val) : 
+                                                    '<span class="text-muted">N/A</span>' ?>
+                                            </td>
+                                        <?php endforeach; ?>
+                                        <!-- --- END: Use response_data_map for answers --- -->
+                                        
+                                        <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                                        <td>
+                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <?php if ($page > 1): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= $date_filter ?>">
+                                        <i class="fas fa-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            
+                            <?php 
+                            // Show page numbers
+                            $start_page = max(1, $page - 2);
+                            $end_page = min($total_pages, $page + 2);
+                            
+                            if ($start_page > 1) {
+                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page=1'.$date_filter.'">1</a></li>';
+                                if ($start_page > 2) {
+                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+                            }
+                            
+                            for ($i = $start_page; $i <= $end_page; $i++): ?>
+                                <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= $date_filter ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li>
+                            <?php endfor; 
+                            
+                            if ($end_page < $total_pages) {
+                                if ($end_page < $total_pages - 1) {
+                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                }
+                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page='.$total_pages.$date_filter.'">'.$total_pages.'</a></li>';
+                            }
+                            ?>
+                            
+                            <?php if ($page < $total_pages): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= $date_filter ?>">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                <?php else: ?>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> No responses found for this survey. Please check back later.
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 
-
-
     <script>
-
         // Pass PHP data to JavaScript
-
         const chartData = <?= $chart_json ?>;
-
         
-
         // Initialize charts when DOM is loaded
-
         document.addEventListener('DOMContentLoaded', function() {
-
             // Summary chart - Response trend over time
-
             if (chartData.total_responses > 0) {
-
                 const ctx = document.getElementById('summaryChart').getContext('2d');
-
                 new Chart(ctx, {
-
                     type: 'line',
-
                     data: {
-
                         labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-
                         datasets: [{
-
                             label: 'Responses',
-
                             data: [
-
                                 Math.floor(chartData.total_responses * 0.2),
-
                                 Math.floor(chartData.total_responses * 0.4),
-
                                 Math.floor(chartData.total_responses * 0.7),
-
                                 chartData.total_responses
-
                             ],
-
                             backgroundColor: 'rgba(67, 97, 238, 0.1)',
-
                             borderColor: 'rgba(67, 97, 238, 1)',
-
                             borderWidth: 2,
-
                             tension: 0.3,
-
                             fill: true,
-
                             pointBackgroundColor: 'rgba(67, 97, 238, 1)',
-
                             pointRadius: 4,
-
                             pointHoverRadius: 6
-
                         }]
-
                     },
-
                     options: {
-
                         responsive: true,
-
                         plugins: {
-
                             title: {
-
                                 display: true,
-
                                 text: 'Response Trend Over Time',
-
                                 font: { size: 16 }
-
                             },
-
                             legend: { display: false },
-
                             tooltip: {
-
                                 callbacks: {
-
                                     label: ctx => `Responses: ${ctx.raw}`
-
                                 }
-
                             }
-
                         },
-
                         scales: {
-
                             y: {
-
                                 beginAtZero: true,
-
                                 title: { 
-
                                     display: true, 
-
                                     text: 'Number of Responses',
-
                                     font: { weight: 'bold' }
-
                                 },
-
                                 grid: {
-
                                     color: 'rgba(0, 0, 0, 0.05)'
-
                                 }
-
                             },
-
                             x: {
-
                                 title: { 
-
                                     display: true, 
-
                                     text: 'Time Period',
-
                                     font: { weight: 'bold' }
-
                                 },
-
                                 grid: {
-
                                     display: false
-
                                 }
-
                             }
-
                         }
-
                     }
-
                 });
-
             }
-
             
-
             // Field-specific charts
-
             chartData.fields.forEach(field => {
-
                 const fieldAnalytics = chartData.analytics[field.id] || [];
-
                 const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
-
                 
-
                 if (fieldAnalytics.length > 0) {
-
                     switch(field.field_type) {
-
                         case 'radio':
-
                         case 'select':
-
                         case 'rating':
-
                             // Pie/Doughnut chart for single-select questions
-
                             new Chart(ctx, {
-
                                 type: 'doughnut',
-
                                 data: {
-
                                     labels: fieldAnalytics.map(item => item.field_value),
-
                                     datasets: [{
-
                                         data: fieldAnalytics.map(item => item.count),
-
                                         backgroundColor: [
-
                                             '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', 
-
                                             '#560bad', '#7209b7', '#b5179e', '#f72585',
-
                                             '#3a0ca3', '#480ca8'
-
                                         ],
-
                                         borderWidth: 1
-
                                     }]
-
                                 },
-
                                 options: {
-
                                     responsive: true,
-
                                     cutout: '60%',
-
                                     plugins: {
-
                                         title: {
-
                                             display: true,
-
                                             text: field.field_label,
-
                                             font: { size: 14 }
-
                                         },
-
                                         legend: {
-
                                             position: 'right',
-
                                             labels: {
-
                                                 padding: 20,
-
                                                 usePointStyle: true,
-
                                                 pointStyle: 'circle'
-
                                             }
-
                                         },
-
                                         datalabels: {
-
                                             formatter: (value, ctx) => {
-
                                                 const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-
                                                 return `${Math.round(value / total * 100)}%`;
-
                                             },
-
                                             color: '#fff',
-
                                             font: { weight: 'bold' }
-
                                         }
-
                                     }
-
                                 },
-
                                 plugins: [ChartDataLabels]
-
                             });
-
                             break;
-
                             
-
                         case 'checkbox':
-
                             // Horizontal bar chart for multi-select questions
-
                             new Chart(ctx, {
-
                                 type: 'bar',
-
                                 data: {
-
                                     labels: fieldAnalytics.map(item => item.field_value),
-
                                     datasets: [{
-
                                         label: 'Selections',
-
                                         data: fieldAnalytics.map(item => item.count),
-
                                         backgroundColor: '#4361ee',
-
                                         borderWidth: 0,
-
                                         borderRadius: 4
-
                                     }]
-
                                 },
-
                                 options: {
-
                                     indexAxis: 'y',
-
                                     responsive: true,
-
                                     plugins: {
-
                                         title: {
-
                                             display: true,
-
                                             text: field.field_label,
-
                                             font: { size: 14 }
-
                                         },
-
                                         legend: { display: false },
-
                                         datalabels: {
-
                                             anchor: 'end',
-
                                             align: 'end',
-
                                             formatter: value => value,
-
                                             color: '#4361ee',
-
                                             font: { weight: 'bold' }
-
                                         }
-
                                     },
-
                                     scales: {
-
                                         x: {
-
                                             beginAtZero: true,
-
                                             ticks: { precision: 0 },
-
                                             grid: {
-
                                                 color: 'rgba(0, 0, 0, 0.05)'
-
                                             }
-
                                         },
-
                                         y: {
-
                                             grid: {
-
                                                 display: false
-
                                             }
-
                                         }
-
                                     }
-
                                 },
-
                                 plugins: [ChartDataLabels]
-
                             });
-
                             break;
-
                             
-
                         case 'number':
-
                             // Histogram for numeric responses
-
                             const numericValues = fieldAnalytics
-
                                 .filter(item => !isNaN(parseFloat(item.field_value)))
-
                                 .map(item => parseFloat(item.field_value));
-
                             
-
                             if (numericValues.length > 0) {
-
                                 const min = Math.min(...numericValues);
-
                                 const max = Math.max(...numericValues);
-
                                 const binCount = Math.min(10, Math.ceil(Math.sqrt(numericValues.length)));
-
                                 const binSize = (max - min) / binCount;
-
                                 
-
                                 const bins = Array(binCount).fill(0);
-
                                 const labels = [];
-
                                 
-
                                 for (let i = 0; i < binCount; i++) {
-
                                     const binStart = min + i * binSize;
-
                                     const binEnd = binStart + binSize;
-
                                     labels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
-
                                     
-
                                     bins[i] = numericValues.filter(val => 
-
                                         val >= binStart && (i === binCount - 1 ? val <= binEnd : val < binEnd)
-
                                     ).length;
-
                                 }
-
                                 
-
                                 new Chart(ctx, {
-
                                     type: 'bar',
-
                                     data: {
-
                                         labels: labels,
-
                                         datasets: [{
-
                                             label: 'Frequency',
-
                                             data: bins,
-
                                             backgroundColor: '#4361ee',
-
                                             borderWidth: 0,
-
                                             borderRadius: 4
-
                                         }]
-
                                     },
-
                                     options: {
-
                                         responsive: true,
-
                                         plugins: {
-
                                             title: {
-
                                                 display: true,
-
                                                 text: `${field.field_label} Distribution`,
-
                                                 font: { size: 14 }
-
                                             },
-
                                             legend: { display: false }
-
                                         },
-
                                         scales: {
-
                                             y: {
-
                                                 beginAtZero: true,
-
                                                 title: { 
-
                                                     display: true, 
-
                                                     text: 'Count',
-
                                                     font: { weight: 'bold' }
-
                                                 },
-
                                                 grid: {
-
                                                     color: 'rgba(0, 0, 0, 0.05)'
-
                                                 }
-
                                             },
-
                                             x: {
-
                                                 title: { 
-
                                                     display: true, 
-
                                                     text: 'Value Range',
-
                                                     font: { weight: 'bold' }
-
                                                 },
-
                                                 grid: {
-
                                                     display: false
-
                                                 }
-
                                             }
-
                                         }
-
                                     }
-
                                 });
-
                             }
-
                             break;
-
                             
-
                         default:
-
                             // Default bar chart for other types
-
                             new Chart(ctx, {
-
                                 type: 'bar',
-
                                 data: {
-
                                     labels: fieldAnalytics.map(item => `Option ${item.field_value}`),
-
                                     datasets: [{
-
                                         label: 'Responses',
-
                                         data: fieldAnalytics.map(item => item.count),
-
                                         backgroundColor: '#4895ef',
-
                                         borderWidth: 0,
-
                                         borderRadius: 4
-
                                     }]
-
                                 },
-
                                 options: {
-
                                     responsive: true,
-
                                     plugins: {
-
                                         title: {
-
                                             display: true,
-
                                             text: field.field_label,
-
                                             font: { size: 14 }
-
                                         },
-
                                         legend: { display: false }
-
                                     },
-
                                     scales: {
-
                                         y: {
-
                                             beginAtZero: true,
-
                                             grid: {
-
                                                 color: 'rgba(0, 0, 0, 0.05)'
-
                                             }
-
                                         },
-
                                         x: {
-
                                             grid: {
-
                                                 display: false
-
                                             }
-
                                         }
-
                                     }
-
                                 }
-
                             });
-
                     }
-
                 } else {
-
                     // No data available for this field
-
                     ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
-
                 }
-
             });
-
         });
-
     </script>
-
     
-
     <script src="../assets/js/results-export.js"></script>
-
 </body>
-
+</html>
+</body>
 </html>
