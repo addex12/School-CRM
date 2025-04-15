@@ -165,3 +165,4 @@ $current = basename($_SERVER['PHP_SELF']);
     </script>
 </body>
 </html>
+<?php endforeach; ?>
