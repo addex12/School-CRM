@@ -164,7 +164,7 @@ $admin_id = 1; // Default admin user_id
         </div>
     </div>
 </div>
-<?php include '/includes/footer.php'; ?>
+<?php include_once __DIR__ . '/includes/footer.php'; ?>
 </div>
 <script>
 const userId = <?= json_encode($user_id) ?>;
