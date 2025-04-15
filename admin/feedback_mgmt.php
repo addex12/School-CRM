@@ -96,6 +96,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="../assets/js/feedback.js" defer></script>
 </head>
 <body>
+    <!-- Floating global status message -->
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div id="statusMsg" class="alert alert-success text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:260px;max-width:420px;padding:10px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:6px;">
+            <?= htmlspecialchars($_SESSION['success']) ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php elseif (!empty($_SESSION['error'])): ?>
+        <div id="statusMsg" class="alert alert-danger text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:260px;max-width:420px;padding:10px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:6px;">
+            <?= htmlspecialchars($_SESSION['error']) ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+    <script>
+    // Auto-hide status message after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        var msg = document.getElementById('statusMsg');
+        if (msg) setTimeout(function() { msg.style.display = 'none'; }, 3000);
+    });
+    </script>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
