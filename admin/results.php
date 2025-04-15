@@ -1,483 +1,213 @@
 <?php
-
 // Enable error reporting for debugging
-
 error_reporting(E_ALL);
-
 ini_set('display_errors', 1);
 
-
-
 // Include required files
-
 require_once '../includes/auth.php';
-
 require_once '../includes/config.php';
-
 requireAdmin();
 
-
-
-// Validate survey_id parameter
-$survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
-
-// Fetch survey details
-$survey = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
-$survey->execute([$survey_id]);
-$survey = $survey->fetch();
-
-if (!$survey) {
-    $_SESSION['error'] = "Survey not found.";
-    header("Location: surveys.php");
-    exit();
-}
-
-// Check if there are any responses for this survey
-$responseCountStmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses WHERE survey_id = ?");
-$responseCountStmt->execute([$survey_id]);
-$responseCount = $responseCountStmt->fetchColumn();
-
-if ($responseCount == 0) {
-    // No responses yet, redirect or show message
-    $_SESSION['error'] = "No responses found for this survey yet.";
-    header("Location: surveys.php");
-    exit();
-}
-
-// Fetch survey fields
-$fields = $pdo->prepare("SELECT * FROM survey_fields WHERE survey_id = ? ORDER BY display_order");
-$fields->execute([$survey_id]);
-$fields = $fields->fetchAll();
-
-// Prepare date filter
-$whereClause = "sr.survey_id = ?";
-$params = [$survey_id];
-$date_filter = '';
-
-if (!empty($_GET['start_date'])) {
-    $whereClause .= " AND sr.submitted_at >= ?";
-    $params[] = $_GET['start_date'];
-    $date_filter .= "&start_date=" . urlencode($_GET['start_date']);
-}
-
-if (!empty($_GET['end_date'])) {
-    $whereClause .= " AND sr.submitted_at <= ?";
-    $params[] = $_GET['end_date'] . ' 23:59:59';
-
-    $date_filter .= "&end_date=" . urlencode($_GET['end_date']);
-}
-
+// --- Admin: Show all survey responses (no survey_id required) ---
+$pageTitle = 'All Survey Responses';
 
 // Pagination setup
-
-$per_page = 20;
-
+$per_page = 30;
 $page = max(1, filter_input(INPUT_GET, 'page', FILTER_VALIDATE_INT, ['options' => ['default' => 1]]));
-
 $offset = ($page - 1) * $per_page;
 
-
-
 // Get total responses count
-
-$total_stmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses sr WHERE $whereClause");
-$total_stmt->execute($params);
-
+$total_stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses");
 $total_responses = $total_stmt->fetchColumn();
-
 $total_pages = max(1, ceil($total_responses / $per_page));
 
-
-
-// Get paginated responses
-
+// Get paginated responses (with survey and user info)
 $response_stmt = $pdo->prepare("
-
-    SELECT sr.*, u.username, u.email, r.role_name
-
+    SELECT sr.*, s.title AS survey_title,s.is_anonymous, u.username, u.email, r.role_name
     FROM survey_responses sr
-
+    LEFT JOIN surveys s ON sr.survey_id = s.id
     LEFT JOIN users u ON sr.user_id = u.id
-
     LEFT JOIN roles r ON u.role_id = r.id
-    WHERE $whereClause
-
     ORDER BY sr.submitted_at DESC
-
     LIMIT ? OFFSET ?
-
 ");
-
-$response_stmt->execute(array_merge($params, [$per_page, $offset]));
-
+$response_stmt->execute([$per_page, $offset]);
 $responses = $response_stmt->fetchAll();
 
 
 
-// --- BEGIN: Fetch all response_data for these responses ---
-
-$response_ids = array_column($responses, 'id');
-$response_data_map = [];
-if (!empty($response_ids)) {
-    $in = str_repeat('?,', count($response_ids) - 1) . '?';
-    $data_stmt = $pdo->prepare("SELECT * FROM response_data WHERE response_id IN ($in)");
-    $data_stmt->execute($response_ids);
-    foreach ($data_stmt->fetchAll() as $row) {
-        $response_id = $row['response_id'];
-        $field_id = $row['field_id'];
-        $value = $row['field_value'];
-        // If checkbox, decode JSON
-        foreach ($fields as $f) {
-            if ($f['id'] == $field_id && $f['field_type'] === 'checkbox') {
-                $decoded = json_decode($value, true);
-                $value = is_array($decoded) ? implode(', ', $decoded) : $value;
-                break;
-            }
-        }
-        $response_data_map[$response_id][$field_id] = $value;
-    }
-}
-// --- END: Fetch all response_data for these responses ---
-
-
 // Prepare analytics data for charts
-
 $analytics = [];
-
 foreach ($fields as $field) {
-
     if ($field['field_type'] === 'checkbox') {
-
         // Special handling for checkbox fields (stored as JSON arrays)
-
         $stmt = $pdo->prepare("SELECT field_value FROM response_data WHERE field_id = ?");
-
         $stmt->execute([$field['id']]);
-
         $all_values = [];
-
         
-
         foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $val) {
-
             $decoded = json_decode($val, true);
-
             if (is_array($decoded)) {
-
                 $all_values = array_merge($all_values, $decoded);
-
             } elseif ($val !== null) {
-
                 $all_values[] = $val;
-
             }
-
         }
-
         
-
         $counts = array_count_values($all_values);
-
         arsort($counts);
-
         $analytics[$field['id']] = array_map(function($value, $count) {
-
             return ['field_value' => $value, 'count' => $count];
-
         }, array_keys($counts), $counts);
-
     } else {
-
         // Standard handling for other field types
-
         $stmt = $pdo->prepare("
-
             SELECT field_value, COUNT(*) as count
-
             FROM response_data
-
             WHERE field_id = ?
-
             GROUP BY field_value
-
             ORDER BY count DESC
-
         ");
-
         $stmt->execute([$field['id']]);
-
         $analytics[$field['id']] = $stmt->fetchAll();
-
     }
-
 }
-
-
 
 // Prepare JSON data for JavaScript charts
-
 $chart_data = [
-
     'survey' => $survey,
-
     'fields' => $fields,
-
     'analytics' => $analytics,
-
     'total_responses' => $total_responses
-
 ];
-
 $chart_json = json_encode($chart_data);
-
 ?>
-
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title><?= htmlspecialchars($survey['title']) ?> Results - Admin Panel</title>
-
     <link rel="stylesheet" href="../assets/css/style.css">
-
     <link rel="stylesheet" href="../assets/css/admin.css">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-
     <style>
-
         /* Modern, clean styling */
-
         .stat-card {
-
             background: white;
-
             border-radius: 10px;
-
             padding: 20px;
-
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-
             transition: transform 0.2s, box-shadow 0.2s;
-
         }
-
         .stat-card:hover {
-
             transform: translateY(-3px);
-
             box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-
         }
-
         .stat-value {
-
             font-size: 2rem;
-
             font-weight: 700;
-
             color: #4361ee;
-
             margin-bottom: 5px;
-
         }
-
         .stat-label {
-
             color: #6c757d;
-
             font-size: 0.9rem;
-
         }
-
         .chart-container {
-
             background: white;
-
             border-radius: 10px;
-
             padding: 20px;
-
             margin-bottom: 25px;
-
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-
         }
-e
         .chart-title {
-
             margin-top: 0;
-
             color: #2c3e50;
-
             font-size: 1.2rem;
-
             padding-bottom: 10px;
-
             border-bottom: 1px solid #eee;
-
         }
-
         .response-table {
-
             width: 100%;
-
             border-collapse: collapse;
-
         }
-
         .response-table th {
-
             background: #f8f9fa;
-
             padding: 12px 15px;
-
             text-align: left;
-
             font-weight: 600;
-
         }
-
         .response-table td {
-
             padding: 10px 15px;
-
             border-bottom: 1px solid #eee;
-
         }
-
         .response-table tr:hover {
-
             background-color: #f8f9fa;
-
         }
-
         .badge {
-
             display: inline-block;
-
             padding: 0.35em 0.65em;
-
             font-size: 0.75em;
-
             font-weight: 700;
-
             line-height: 1;
-
             text-align: center;
-
             white-space: nowrap;
-
             vertical-align: baseline;
-
             border-radius: 0.25rem;
-
         }
-
         .badge-primary {
-
             background-color: #4361ee;
-
             color: white;
-
         }
-
         .pagination {
-
             display: flex;
-
             padding-left: 0;
-
             list-style: none;
-
             border-radius: 0.25rem;
-
         }
-
         .page-item.active .page-link {
-
             background-color: #4361ee;
-
             border-color: #4361ee;
-
         }
-
         .page-link {
-
             position: relative;
-
             display: block;
-
             padding: 0.5rem 0.75rem;
-
             margin-left: -1px;
-
             line-height: 1.25;
-
             color: #4361ee;
-
             background-color: #fff;
-
             border: 1px solid #dee2e6;
-
         }
-
         .filter-form {
-
             background: white;
-
             padding: 20px;
-
             border-radius: 10px;
-
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-
             margin-bottom: 25px;
-
         }
-
     </style>
-
 </head>
-
 <body>
-
     <div class="admin-dashboard">
-
         <?php include 'includes/admin_sidebar.php'; ?>
-
         
-
         <div class="admin-main">
-
             <header class="admin-header">
-
-                <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
-
-                <div class="header-actions">
-
-                    <div class="dropdown">
-
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
-
-                            <i class="fas fa-download"></i> Export
-
-                        </button>
-                        <ul class="dropdown-menu">
-
-                            <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv"></i> CSV</a></li>
+                <h1>All Survey Responses</h1>
+            </header>
+            <div class="table-responsive">
+                <table class="response-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Survey</th>
+                            <th>Respondent</th>
+                            <th>Role-csv"></i> CSV</a></li>
 
                             <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF</a></li>
 
@@ -524,99 +254,6 @@ e
 
                 </div>
             </div>
-
-            <!-- Filter Section -->
-
-            <div class="filter-section">
-                <form method="GET" class="filter-form">
-
-                    <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
-                    <div class="row">
-                        <div class="col-md-5">
-                            <div class="form-group">
-
-                                <label for="start_date">From Date</label>
-                                <input type="date" class="form-control" name="start_date" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>">
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-5">
-
-                            <div class="form-group">
-
-                                <label for="end_date">To Date</label>
-                                <input type="date" class="form-control" name="end_date" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>">
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary mr-2">
-                                <i class="fas fa-filter"></i> Filter
-                            </button>
-                            <a href="results.php?survey_id=<?= $survey_id ?>" class="btn btn-outline-secondary">
-                                <i class="fas fa-sync-alt"></i> Reset
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </form>
-
-            </div>
-
-
-
-            <!-- Charts Section -->
-
-            <div class="chart-section mb-5">
-
-                <div class="row">
-
-                    <div class="col-12">
-
-                        <div class="chart-container">
-
-                            <h3 class="chart-title">Response Summary</h3>
-
-                            <canvas id="summaryChart" height="100"></canvas>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                
-
-                <?php foreach ($fields as $field): ?>
-
-                    <div class="row">
-
-                        <div class="col-12">
-
-                            <div class="chart-container">
-
-                                <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
-
-                                <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                <?php endforeach; ?>
-
-            </div>
-
-
-
-            <!-- Responses Table -->
 
             <div class="response-table-section">
 
