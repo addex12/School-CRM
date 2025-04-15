@@ -6,8 +6,8 @@ $pageTitle = "Chat Management";
 ?>
 <div class="admin-dashboard">
     <div class="admin-main">
-    <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-header">
+        <?php include 'includes/admin_sidebar.php'; ?>
             <h1><i class="fas fa-comments"></i> Chat Management</h1>
         </div>
         <div class="admin-content" style="display:flex;gap:24px;">
@@ -26,6 +26,7 @@ $pageTitle = "Chat Management";
         </div>
     </div>
 </div>
+<?php include '../includes/footer.php'; ?>
 <style>
 .chat-user-list li {padding:8px 10px;cursor:pointer;border-radius:5px;}
 .chat-user-list li.active,.chat-user-list li:hover{background:#e9ecef;}
@@ -124,4 +125,3 @@ function setupSendBox() {
     };
 }
 </script>
-<?php include '../includes/footer.php'; ?>
