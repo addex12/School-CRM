@@ -120,6 +120,7 @@ $pageTitle = "Chat Management";
 const adminId = <?= (int)$_SESSION['user_id'] ?>;
 const ws = new WebSocket("ws://localhost:8080");
 let selectedUserId = null;
+let selectedUserName = null;
 
 ws.onopen = function() {
     ws.send(JSON.stringify({ type: 'auth', user_id: adminId, role: 'admin' }));
@@ -130,7 +131,7 @@ ws.onmessage = function(event) {
     let data = JSON.parse(event.data);
     if (data.type === 'chat') {
         if (selectedUserId && (data.from == selectedUserId || data.to == selectedUserId)) {
-            appendChatMessage(data, data.from == adminId ? 'admin' : 'user');
+            appendChatMessage(data, data.from == adminId ? 'admin' : 'user', data.username);
         }
     }
 };
@@ -158,46 +159,49 @@ function loadOnlineUsers() {
                 noUsersMsg.style.display = 'none';
             }
             users.forEach(u => {
-    const li = document.createElement('li');
-    li.className = 'user-list-item d-flex align-items-center';
-    // Avatar/initials
-    let initials = (u.fullname ? u.fullname : u.username).split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
-    const avatar = document.createElement('span');
-    avatar.className = 'chat-user-avatar';
-    avatar.textContent = initials;
-    // Online dot
-    const onlineDot = document.createElement('span');
-    onlineDot.className = 'online-dot';
-    // Username
-    const name = document.createElement('span');
-    name.textContent = u.fullname ? u.fullname : u.username;
-    li.appendChild(onlineDot);
-    li.appendChild(avatar);
-    li.appendChild(name);
-    li.onclick = () => selectUser(u.id);
-    if (selectedUserId == u.id) li.classList.add('active');
-    list.appendChild(li);
-});
+                const li = document.createElement('li');
+                li.className = 'user-list-item d-flex align-items-center';
+                // Avatar/initials
+                let initials = u.username.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+                const avatar = document.createElement('span');
+                avatar.className = 'chat-user-avatar';
+                avatar.textContent = initials;
+                // Online dot
+                if (u.online) {
+                    const onlineDot = document.createElement('span');
+                    onlineDot.className = 'online-dot';
+                    li.appendChild(onlineDot);
+                }
+                // Username
+                const name = document.createElement('span');
+                name.textContent = u.username;
+                li.appendChild(avatar);
+                li.appendChild(name);
+                li.onclick = () => selectUser(u.id, u.username);
+                if (selectedUserId == u.id) li.classList.add('active');
+                list.appendChild(li);
+            });
         });
 }
 setInterval(loadOnlineUsers, 10000);
 window.onload = function() { loadOnlineUsers(); setupSendBox(); };
 
-function selectUser(userId) {
+function selectUser(userId, username) {
     selectedUserId = userId;
+    selectedUserName = username;
     document.getElementById('chatMessages').innerHTML = '';
     fetch('chat_history.php?user_id=' + userId)
         .then(r => r.json())
         .then(msgs => {
-            msgs.forEach(m => appendChatMessage(m, m.from == adminId ? 'admin' : 'user'));
+            msgs.forEach(m => appendChatMessage(m, m.from_user_id == adminId ? 'admin' : 'user', m.username));
         });
 }
 
-function appendChatMessage(msg, sender) {
+function appendChatMessage(msg, sender, senderName) {
     const container = document.getElementById('chatMessages');
     const div = document.createElement('div');
     div.className = 'chat-bubble ' + (sender === 'admin' ? 'admin-bubble' : 'user-bubble');
-    div.innerHTML = `<span class='sender'>${sender === 'admin' ? 'You' : 'User'}</span>: ` +
+    div.innerHTML = `<span class='sender'>${sender === 'admin' ? 'You' : (senderName || selectedUserName)}</span>: ` +
         `<span class='msg'>${msg.message}</span> <span class='time'>${msg.created_at ? msg.created_at : ''}</span>`;
     container.appendChild(div);
     container.scrollTop = container.scrollHeight;
