@@ -217,7 +217,16 @@ $chart_json = json_encode($chart_data);
                         <tr>
                             <td><?= $index + 1 + $offset ?></td>
                             <td><?= htmlspecialchars($response['survey_title'] ?? 'Unknown') ?></td>
-                            <td><?= $response['username'] ? htmlspecialchars($response['username']) : '<span class="text-muted">Anonymous</span>' ?></td>
+                            <td>
+                                <?php if (!empty($response['is_anonymous'])): ?>
+                                    <span class="text-muted">Anonymous</span>
+                                <?php else: ?>
+                                    <?= htmlspecialchars($response['username'] ?? 'N/A') ?>
+                                    <?php if (!empty($response['email'])): ?>
+                                        <br><small class="text-muted"><?= htmlspecialchars($response['email']) ?></small>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </td>
                             <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
                             <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                             <td>
