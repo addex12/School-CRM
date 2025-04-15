@@ -28,7 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['import_emails'])) {
         if (!empty($_FILES['email_file']['tmp_name'])) {
+            $subject = $_POST['subject_import'];
+            $message = $_POST['message_import'];
             $file = fopen($_FILES['email_file']['tmp_name'], 'r');
+            $sentCount = 0;
+            $importedCount = 0;
             while (($line = fgetcsv($file)) !== false) {
                 $email = trim($line[0]);
                 $roleName = isset($line[1]) && !empty($line[1]) ? trim($line[1]) : 'parent';
@@ -39,20 +43,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($role) {
                     $role_id = $role['id'];
                     $stmt = $pdo->prepare("INSERT IGNORE INTO users (email, role_id) VALUES (?, ?)");
-                    $stmt->execute([$email, $role_id]);
+                    if ($stmt->execute([$email, $role_id])) {
+                        $importedCount++;
+                    }
+                    // Send email after import
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                        mail($email, $subject, $message, "From: admin@school.edu");
+                        $sentCount++;
+                    }
                 }
                 // Optionally, handle emails with invalid roles (skip or log)
             }
             fclose($file);
-            $_SESSION['success'] = "Emails imported successfully!";
+            $_SESSION['success'] = "Imported $importedCount emails and sent $sentCount emails!";
         } else {
             $_SESSION['error'] = "Please upload a valid CSV file.";
         }
     }
 }
 
-// Fetch categories
-$categories = ['admin', 'teacher', 'parent', 'student'];
+// Fetch categories from the database
+$categories = [];
+$roleStmt = $pdo->query("SELECT role_name FROM roles ORDER BY role_name");
+if ($roleStmt) {
+    $categories = $roleStmt->fetchAll(PDO::FETCH_COLUMN);
+}
 ?>
 
 <!DOCTYPE html>
@@ -98,7 +113,7 @@ $categories = ['admin', 'teacher', 'parent', 'student'];
                 </div>
 
                 <div class="form-section">
-    <h2>Import Emails</h2>
+    <h2>Import Emails & Send</h2>
     <p>
         Download the <a href="bulk_email_template.php" class="btn btn-secondary">CSV Template</a> and fill in your bulk email addresses.<br>
         <strong>CSV Format:</strong> <code>email,role</code> (role can be admin, teacher, parent, or student; role is optional and defaults to parent)
@@ -108,7 +123,15 @@ $categories = ['admin', 'teacher', 'parent', 'student'];
             <label for="email_file">Upload CSV File:</label>
             <input type="file" id="email_file" name="email_file" accept=".csv" required>
         </div>
-        <button type="submit" name="import_emails" class="btn btn-primary">Import Emails</button>
+        <div class="form-group">
+            <label for="subject_import">Subject:</label>
+            <input type="text" id="subject_import" name="subject_import" required>
+        </div>
+        <div class="form-group">
+            <label for="message_import">Message:</label>
+            <textarea id="message_import" name="message_import" rows="5" required></textarea>
+        </div>
+        <button type="submit" name="import_emails" class="btn btn-primary">Import & Send Emails</button>
     </form>
 </div>
             </div>
