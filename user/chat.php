@@ -17,14 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if chat_threads table exists
         $result = $pdo->query("SHOW TABLES LIKE 'chat_threads'");
         if ($result && $result->rowCount() > 0) {
-            // 1. Find if a thread exists
-            $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)");
-            $stmt->execute([$user_id, $admin_id, $admin_id, $user_id]);
+            // 1. Find if a thread exists for this user
+            $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE user_id = ?");
+            $stmt->execute([$user_id]);
             $thread = $stmt->fetch();
             if (!$thread) {
                 // 2. Create thread if not exists
-                $stmt = $pdo->prepare("INSERT INTO chat_threads (user1_id, user2_id) VALUES (?, ?)");
-                $stmt->execute([$user_id, $admin_id]);
+                $stmt = $pdo->prepare("INSERT INTO chat_threads (user_id, subject, status) VALUES (?, 'General', 'open')");
+                $stmt->execute([$user_id]);
                 $thread_id = $pdo->lastInsertId();
             } else {
                 $thread_id = $thread['id'];
@@ -49,9 +49,9 @@ $user_id = $_SESSION['user_id'];
 try {
     $result = $pdo->query("SHOW TABLES LIKE 'chat_threads'");
     if ($result && $result->rowCount() > 0) {
-        // Find thread
-        $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE (user1_id = ? AND user2_id = ?) OR (user1_id = ? AND user2_id = ?)");
-        $stmt->execute([$user_id, $admin_id, $admin_id, $user_id]);
+        // Find thread for this user
+        $stmt = $pdo->prepare("SELECT id FROM chat_threads WHERE user_id = ?");
+        $stmt->execute([$user_id]);
         $thread = $stmt->fetch();
         if ($thread) {
             $thread_id = $thread['id'];
