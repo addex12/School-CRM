@@ -100,27 +100,49 @@ $current = basename($_SERVER['PHP_SELF']);
 </aside>
 
 <script>
-    $(document).ready(function() {
-        // Initialize collapse functionality
-        $('.category-header').on('click', function() {
-            var targetId = $(this).data('target');
-            $(targetId).collapse('toggle');
-            
-            // Toggle icon
-            $(this).find('.collapse-icon').toggleClass('fa-chevron-down fa-chevron-up');
-        });
-        
-        // Toggle sidebar on small screens
-        $('#sidebarToggle').on('click', function() {
-            $('.admin-sidebar').toggleClass('expanded');
-</body>
-</html>
-
-                
-                // Toggle icon
-                $(this).find('.collapse-icon').toggleClass('fa-chevron-down fa-chevron-up');
+// Pure JS submenu toggle
+(function() {
+    var headers = document.querySelectorAll('.category-header');
+    headers.forEach(function(header) {
+        header.addEventListener('click', function(e) {
+            var targetId = header.getAttribute('data-target');
+            var submenu = document.getElementById(targetId.replace('#',''));
+            var icon = header.querySelector('.collapse-icon');
+            // Close all submenus except this one
+            document.querySelectorAll('.submenu').forEach(function(sm) {
+                if (sm !== submenu) sm.classList.remove('open');
             });
+            document.querySelectorAll('.collapse-icon').forEach(function(ic) {
+                if (ic !== icon) ic.classList.remove('fa-chevron-up');
+                if (ic !== icon) ic.classList.add('fa-chevron-down');
+            });
+            if (submenu) {
+                submenu.classList.toggle('open');
+                if (icon) icon.classList.toggle('fa-chevron-up');
+                if (icon) icon.classList.toggle('fa-chevron-down');
+            }
         });
+    });
+
+    // Sidebar hamburger toggle for mobile
+    var sidebar = document.getElementById('adminSidebar');
+    var sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebar && sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+        });
+    }
+    // Close sidebar on outside click (mobile)
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 700 && sidebar && sidebar.classList.contains('open')) {
+            if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+})();
+</script>
+
     </script>
 </body>
 </html>
