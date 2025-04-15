@@ -90,15 +90,19 @@ $categories = ['admin', 'teacher', 'parent', 'student'];
                 </div>
 
                 <div class="form-section">
-                    <h2>Import Emails</h2>
-                    <form method="POST" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="email_file">Upload CSV File:</label>
-                            <input type="file" id="email_file" name="email_file" accept=".csv" required>
-                        </div>
-                        <button type="submit" name="import_emails" class="btn btn-primary">Import Emails</button>
-                    </form>
-                </div>
+    <h2>Import Emails</h2>
+    <p>
+        Download the <a href="bulk_email_template.php" class="btn btn-secondary">CSV Template</a> and fill in your bulk email addresses.<br>
+        <strong>CSV Format:</strong> <code>email,role</code> (role can be admin, teacher, parent, or student; role is optional and defaults to parent)
+    </p>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="email_file">Upload CSV File:</label>
+            <input type="file" id="email_file" name="email_file" accept=".csv" required>
+        </div>
+        <button type="submit" name="import_emails" class="btn btn-primary">Import Emails</button>
+    </form>
+</div>
             </div>
         </div>
     </div>
