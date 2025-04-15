@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <td><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
         <td>
                                             <!-- Edit Button -->
-                                            <button class="btn btn-secondary" onclick="editFeedback(<?= $feedback['id'] ?>, '<?= htmlspecialchars($feedback['subject']) ?>', '<?= htmlspecialchars($feedback['message']) ?>', <?= $feedback['rating'] ?>)">Edit</button>
+                                            <?php /**<button class="btn btn-secondary" onclick="editFeedback(<?= $feedback['id'] ?>, '<?= htmlspecialchars($feedback['subject']) ?>', '<?= htmlspecialchars($feedback['message']) ?>', <?= $feedback['rating'] ?>)">Edit</button> **/?>
                                             
                                             <!-- Delete Button -->
                                             <form method="POST" style="display:inline;">
