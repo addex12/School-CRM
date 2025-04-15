@@ -161,18 +161,15 @@ function loadOnlineUsers() {
             users.forEach(u => {
                 const li = document.createElement('li');
                 li.className = 'user-list-item d-flex align-items-center';
-                // Avatar/initials
                 let initials = u.username.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
                 const avatar = document.createElement('span');
                 avatar.className = 'chat-user-avatar';
                 avatar.textContent = initials;
-                // Online dot
                 if (u.online) {
                     const onlineDot = document.createElement('span');
                     onlineDot.className = 'online-dot';
                     li.appendChild(onlineDot);
                 }
-                // Username
                 const name = document.createElement('span');
                 name.textContent = u.username;
                 li.appendChild(avatar);
@@ -182,19 +179,29 @@ function loadOnlineUsers() {
                 list.appendChild(li);
             });
         });
+    // Disable chat input and send button if no user selected
+    setChatInputEnabled(!!selectedUserId);
 }
-setInterval(loadOnlineUsers, 10000);
-window.onload = function() { loadOnlineUsers(); setupSendBox(); };
+
+function setChatInputEnabled(enabled) {
+    document.getElementById('chatInput').disabled = !enabled;
+    document.getElementById('sendBtn').disabled = !enabled;
+}
 
 function selectUser(userId, username) {
     selectedUserId = userId;
     selectedUserName = username;
     document.getElementById('chatMessages').innerHTML = '';
+    setChatInputEnabled(true);
     fetch('chat_history.php?user_id=' + userId)
         .then(r => r.json())
         .then(msgs => {
             msgs.forEach(m => appendChatMessage(m, m.from_user_id == adminId ? 'admin' : 'user', m.username));
         });
+    // Focus chat input after selecting user
+    setTimeout(() => {
+        document.getElementById('chatInput').focus();
+    }, 100);
 }
 
 function appendChatMessage(msg, sender, senderName) {
@@ -209,15 +216,22 @@ function appendChatMessage(msg, sender, senderName) {
 
 function setupSendBox() {
     const input = document.getElementById('chatInput');
+    input.disabled = true;
+    document.getElementById('sendBtn').disabled = true;
     input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!selectedUserId) return;
             sendMessage(input.value);
             input.value = '';
         }
     });
     document.getElementById('sendBtn').onclick = function() {
+        if (!selectedUserId) return;
         sendMessage(input.value);
         input.value = '';
     };
 }
+setInterval(loadOnlineUsers, 10000);
+window.onload = function() { loadOnlineUsers(); setupSendBox(); };
 </script>
