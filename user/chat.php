@@ -190,7 +190,7 @@ $admin_id = 1; // Default admin user_id
         let reconnectAttempts = 0;
 
         function fetchUsers() {
-            fetch('online_users_fixed.php')
+            fetch('online_users.php') // Use unified endpoint
                 .then((res) => res.json())
                 .then((data) => {
                     users = data;
