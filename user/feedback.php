@@ -4,6 +4,9 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/includes/mailer.php';
 requireLogin();
 
+// Fetch all active feedback subjects for dropdown
+$subjects = $pdo->query("SELECT subject FROM feedback_subjects WHERE status = 'active' ORDER BY subject")->fetchAll(PDO::FETCH_COLUMN);
+
 // Handle user reply to admin feedback
 if (isset($_POST['user_reply_submit'], $_POST['feedback_id'])) {
     $feedback_id = intval($_POST['feedback_id']);
@@ -71,9 +74,14 @@ $feedback->execute([$_SESSION['user_id']]);
             <!-- Feedback Form -->
             <form method="POST">
                 <div class="form-group">
-                    <label>Subject:</label>
-                    <input type="text" name="subject" required>
-                </div>
+    <label for="subject">Subject:</label>
+    <select name="subject" id="subject" class="form-control" required>
+        <option value="">Select subject...</option>
+        <?php foreach ($subjects as $subject): ?>
+            <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
                 
                 <div class="form-group">
                     <label>Message:</label>
@@ -125,8 +133,7 @@ $feedback->execute([$_SESSION['user_id']]);
                             <?= str_repeat('★', $item['rating']) . str_repeat('☆', 5 - $item['rating']) ?>
                         </div>
                         <h4><?= htmlspecialchars($item['subject']) ?></h4>
-                        <p><?= htmlspecialchars($item['message']) ?></p>
-                        <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
+                        <?= nl2br(htmlspecialchars_decode($item['message'])) ?>                        <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
                         <?php if (!empty($item['admin_reply'])): ?>
                             <div class="alert alert-info mt-2">
                                 <strong>Admin Reply:</strong> <?= nl2br(htmlspecialchars($item['admin_reply'])) ?>
