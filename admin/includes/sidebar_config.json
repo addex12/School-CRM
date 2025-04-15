@@ -50,13 +50,13 @@
                 },
                 {
                     "title": "Results",
-                    "link": "all_responses.php",
+                    "link": "all_responses.php",   
                     "icon": "chart-bar"
                 },
                 {
-                    "title": "All Responses",
-                    "link": "all_responses.php",
-                    "icon": "chart-bar"
+                    "title": "Survey Statistics",
+                    "link": "survey_statistics.php",
+                    "icon": "chart-line"
                 },
                 {
                     "title": "Survey Categories",
