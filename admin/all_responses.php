@@ -104,6 +104,6 @@ $responses = $response_stmt->fetchAll();
             </ul>
         </nav>
     </div>
-    <?php require_once 'includes/admin_footer.php'; ?>
+    <?php require_once 'includes/footer.php'; ?>
 </body>
 </html>
