@@ -124,7 +124,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="content">
                 <!-- Add Feedback Section -->
                 <section class="form-section">
-                    <h2>Add Feedback</h2>
+    <!-- Status Message for Feedback Section Only -->
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div id="statusMsg" class="alert alert-success text-center" style="margin-bottom:10px;padding:8px 20px;max-width:400px;margin-left:auto;margin-right:auto;">
+            <?= htmlspecialchars($_SESSION['success']) ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php elseif (!empty($_SESSION['error'])): ?>
+        <div id="statusMsg" class="alert alert-danger text-center" style="margin-bottom:10px;padding:8px 20px;max-width:400px;margin-left:auto;margin-right:auto;">
+            <?= htmlspecialchars($_SESSION['error']) ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+    <script>
+    // Auto-hide status message after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        var msg = document.getElementById('statusMsg');
+        if (msg) setTimeout(function() { msg.style.display = 'none'; }, 3000);
+    });
+    </script>
+    <h2>Add Feedback</h2>
                     <form method="POST">
                         <div class="form-group">
     <label for="user_id">User</label>
