@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $message = $_POST['message'];
         $category = $_POST['category'];
 
-        // Fetch users by category
-        $stmt = $pdo->prepare("SELECT email FROM users WHERE role = ?");
+        // Fetch users by category (role name)
+        $stmt = $pdo->prepare("SELECT u.email FROM users u JOIN roles r ON u.role_id = r.id WHERE r.role_name = ?");
         $stmt->execute([$category]);
         $emails = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
