@@ -1,6 +1,5 @@
 <?php
-// Load sidebar configuration from JSON
-$sidebarConfig = json_decode(file_get_contents(__DIR__ . '/sidebar_config.json'), true);
+$sidebarConfig = json_decode(file_get_contents(include  'sidebar_config.json'), true);
 ?>
 
 <!DOCTYPE html>
