@@ -21,6 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user_email = $_SESSION['email'];
         sendEmail($user_email, "Feedback Received", "Thank you for your feedback!\n\nWe appreciate your input.");
         
+        // Fetch user's feedback including admin replies
+        $stmt = $pdo->prepare("SELECT subject, message, rating, admin_reply, created_at FROM feedback WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$_SESSION['user_id']]);
+        $userFeedback = $stmt->fetchAll();
+
         // Notify admins
         $admin_subject = "New Feedback Submission";
         $admin_body = "Rating: $rating/5\nSubject: $subject\nMessage: $message";
@@ -93,6 +98,11 @@ $feedback->execute([$_SESSION['user_id']]);
                         <h4><?= htmlspecialchars($item['subject']) ?></h4>
                         <p><?= htmlspecialchars($item['message']) ?></p>
                         <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
+                        <?php if (!empty($item['admin_reply'])): ?>
+                            <div class="alert alert-info mt-2">
+                                <strong>Admin Reply:</strong> <?= nl2br(htmlspecialchars($item['admin_reply'])) ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
