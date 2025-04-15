@@ -175,7 +175,7 @@ foreach ($response_data as $data) {
     </style>
 </head>
 <body>
-    <?php include 'includes/admin_header.php'; ?>
+    <?php include 'includes/admin_sidebar.php'; ?>
     
     <div class="response-container">
         <div class="response-header">
@@ -295,6 +295,6 @@ foreach ($response_data as $data) {
         </div>
     </div>
 
-    <?php include 'includes/admin_footer.php'; ?>
+    <?php require_once 'includes/admin_footer.php'; ?>
 </body>
 </html>
