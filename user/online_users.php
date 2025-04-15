@@ -10,8 +10,9 @@ try {
 
     $current_user_id = $_SESSION['user_id'];
 
-    $stmt = $pdo->prepare("SELECT id, username, fullname, 
-        (last_active > (NOW() - INTERVAL 5 MINUTE)) as online 
+    // Use correct column: last_activity (not last_active) for online status
+    $stmt = $pdo->prepare("SELECT id, username, 
+        (last_activity > (NOW() - INTERVAL 5 MINUTE)) as online 
         FROM users WHERE id != ?");
     $stmt->execute([$current_user_id]);
 
