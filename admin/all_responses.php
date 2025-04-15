@@ -206,6 +206,9 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-eye"></i> View
                                         </a>
+                                        <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-primary">
+                                          <i class="bi bi-arrow-left"></i> BDetail Results
+                                        </a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
