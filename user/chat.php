@@ -173,6 +173,7 @@ const adminId = <?= json_encode($admin_id) ?>;
 let selectedUserId = adminId;
 let ws;
 let users = [];
+let reconnectAttempts = 0;
 
 function fetchUsers() {
     fetch('online_users.php')
@@ -236,32 +237,34 @@ function escapeHtml(text) {
 }
 
 function connectWebSocket() {
-    ws = new WebSocket('ws://localhost:8080');
+    ws = new WebSocket('ws://' + window.location.hostname + ':8080');
+
     ws.onopen = function() {
-        ws.send(JSON.stringify({type: 'auth', user_id: userId, role: 'user'}));
-        setInterval(() => {
-            ws.send(JSON.stringify({type: 'ping'}));
-        }, 30000);
+        reconnectAttempts = 0;
+        console.log('WebSocket connected');
+        ws.send(JSON.stringify({
+            type: 'auth',
+            userId: <?= $user_id ?>
+        }));
     };
+
     ws.onerror = function(error) {
         console.error('WebSocket Error:', error);
-        showSystemMessage('Connection error - trying to reconnect...');
+        scheduleReconnect();
     };
-    ws.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        if (data.type === 'chat') {
-            // Only show if relevant to this thread
-            if (
-                (data.from == userId && data.to == selectedUserId) ||
-                (data.from == selectedUserId && data.to == userId)
-            ) {
-                fetchChatHistory();
-            }
-        }
-    };
+
     ws.onclose = function() {
-        setTimeout(connectWebSocket, 2000); // Reconnect
+        console.log('WebSocket closed');
+        scheduleReconnect();
     };
+}
+
+function scheduleReconnect() {
+    const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+    setTimeout(() => {
+        reconnectAttempts++;
+        connectWebSocket();
+    }, delay);
 }
 
 function refreshUserList() {
