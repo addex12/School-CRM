@@ -144,30 +144,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 <style>
-.star-rating label:hover,
-.star-rating label:hover ~ label,
-.star-rating input:checked ~ label {
-    color: orange !important;
+.star-rating {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    display: inline-block;
 }
-.star-rating input:checked ~ label {
-    color: orange !important;
+.star-rating input[type="radio"] {
+    display: none;
+}
+.star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.star-rating input[type="radio"]:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: orange;
+}
+.star-rating input[type="radio"]:checked ~ label {
+    color: orange;
 }
 </style>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const stars = document.querySelectorAll('.star-rating input');
-    stars.forEach(star => {
-        star.addEventListener('change', function() {
-            // Remove checked class from all labels
-            document.querySelectorAll('.star-rating label').forEach(label => label.classList.remove('checked'));
-            // Add checked class to selected and previous labels
-            for (let i = 5; i >= this.value; i--) {
-                document.querySelector('label[for="star'+i+'"]').classList.add('checked');
-            }
-        });
-    });
-});
-</script>
                         <button type="submit" name="add_feedback" class="btn btn-primary">Add Feedback</button>
                     </form>
                 </section>
