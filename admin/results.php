@@ -23,7 +23,7 @@ $total_pages = max(1, ceil($total_responses / $per_page));
 
 // Get paginated responses (with survey and user info)
 $response_stmt = $pdo->prepare("
-    SELECT sr.*, s.title AS survey_title, u.username, u.email, r.role_name
+    SELECT sr.*, s.title AS survey_title, s.is_anonymous, u.username, u.email, r.role_name
     FROM survey_responses sr
     LEFT JOIN surveys s ON sr.survey_id = s.id
     LEFT JOIN users u ON sr.user_id = u.id
