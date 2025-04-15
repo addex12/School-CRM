@@ -2,68 +2,40 @@
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 requireAdmin();
-
-// Fetch chat messages with user info
-$stmt = $pdo->prepare("
-    SELECT c.*, u.username, u.email 
-    FROM chat_messages c
-    JOIN users u ON c.user_id = u.id
-    ORDER BY c.created_at DESC
-");
-$stmt->execute();
-$messages = $stmt->fetchAll();
-
 $pageTitle = "Chat Management";
 include '../includes/header.php';
 ?>
-
-<div class="admin-content">
-    <h2><i class="fas fa-comments"></i> Chat Management</h2>
-    
-    <div class="content-section">
-        <div class="search-filter">
-            <input type="text" placeholder="Search messages..." class="search-input">
-            <select class="status-filter">
-                <option value="all">All Statuses</option>
-                <option value="open">Open</option>
-                <option value="pending">Pending</option>
-                <option value="resolved">Resolved</option>
-            </select>
+<div class="admin-dashboard">
+    <?php include 'includes/admin_sidebar.php'; ?>
+    <div class="admin-main">
+        <div class="admin-header">
+            <h1><i class="fas fa-comments"></i> Chat Management</h1>
         </div>
-        
-        <div class="chat-list">
-            <?php foreach($messages as $message): ?>
-            <div class="chat-item" data-status="<?= $message['status'] ?>">
-                <div class="chat-header">
-                    <span class="user-info">
-                        <?= htmlspecialchars($message['username']) ?> 
-                        <small><?= htmlspecialchars($message['email']) ?></small>
-                    </span>
-                    <span class="chat-meta">
-                        <?= date('M j, Y g:i a', strtotime($message['created_at'])) ?>
-                        <span class="status-badge <?= $message['status'] ?>">
-                            <?= ucfirst($message['status']) ?>
-                        </span>
-                    </span>
-                </div>
-                <div class="chat-body">
-                    <?= htmlspecialchars($message['message']) ?>
-                    <div class="chat-actions">
-                        <select class="status-change" data-message-id="<?= $message['id'] ?>">
-                            <option value="open" <?= $message['status'] === 'open' ? 'selected' : '' ?>>Open</option>
-                            <option value="pending" <?= $message['status'] === 'pending' ? 'selected' : '' ?>>Pending</option>
-                            <option value="resolved" <?= $message['status'] === 'resolved' ? 'selected' : '' ?>>Resolved</option>
-                        </select>
-                        <button class="btn reply-btn" data-email="<?= htmlspecialchars($message['email']) ?>">
-                            <i class="fas fa-reply"></i> Reply
-                        </button>
-                    </div>
+        <div class="admin-content" style="display:flex;gap:24px;">
+            <div class="chat-sidebar" style="width:260px;min-width:180px;background:#f8f9fa;border-radius:8px;padding:16px 8px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <h3 style="margin-top:0;">Online Users</h3>
+                <ul id="onlineUsers" class="chat-user-list" style="list-style:none;padding:0;margin:0;min-height:200px;"></ul>
+                <div id="noUsersMsg" style="color:#888;text-align:center;display:none;">No users online</div>
+            </div>
+            <div class="chat-main" style="flex:1;display:flex;flex-direction:column;max-width:700px;">
+                <div id="chatMessages" style="flex:1 1 auto;min-height:350px;max-height:450px;overflow-y:auto;background:#f5f5f5;border-radius:8px;padding:16px;margin-bottom:12px;"></div>
+                <div style="display:flex;gap:8px;">
+                    <input id="chatInput" type="text" class="form-control" placeholder="Type your message..." style="flex:1;">
+                    <button id="sendBtn" class="btn btn-primary">Send</button>
                 </div>
             </div>
-            <?php endforeach; ?>
         </div>
     </div>
 </div>
+<style>
+.chat-user-list li {padding:8px 10px;cursor:pointer;border-radius:5px;}
+.chat-user-list li.active,.chat-user-list li:hover{background:#e9ecef;}
+.chat-bubble{margin-bottom:10px;padding:8px 14px;border-radius:16px;max-width:68%;display:inline-block;clear:both;}
+.admin-bubble{background:#d1e7dd;color:#155724;float:right;}
+.user-bubble{background:#e2e3e5;color:#444;float:left;}
+.sender{font-weight:bold;margin-right:6px;}
+.time{font-size:0.8em;color:#888;margin-left:8px;}
+</style>
 <script>
 // --- Admin Chat Management ---
 const adminId = <?= (int)$_SESSION['user_id'] ?>;
@@ -71,9 +43,7 @@ const ws = new WebSocket("ws://localhost:8080");
 let selectedUserId = null;
 
 ws.onopen = function() {
-    // Authenticate as admin
     ws.send(JSON.stringify({ type: 'auth', user_id: adminId, role: 'admin' }));
-    // Start ping interval
     setInterval(() => ws.send(JSON.stringify({type: 'ping'})), 20000);
 };
 
@@ -95,13 +65,19 @@ function sendMessage(msg) {
     }));
 }
 
-// UI: Load online users
 function loadOnlineUsers() {
     fetch('online_users.php')
         .then(r => r.json())
         .then(users => {
             const list = document.getElementById('onlineUsers');
+            const noUsersMsg = document.getElementById('noUsersMsg');
             list.innerHTML = '';
+            if (!users.length) {
+                noUsersMsg.style.display = 'block';
+                return;
+            } else {
+                noUsersMsg.style.display = 'none';
+            }
             users.forEach(u => {
                 const li = document.createElement('li');
                 li.textContent = u.username + (u.fullname ? ' ('+u.fullname+')' : '');
@@ -112,8 +88,8 @@ function loadOnlineUsers() {
             });
         });
 }
-setInterval(loadOnlineUsers, 10000); // refresh every 10s
-window.onload = loadOnlineUsers;
+setInterval(loadOnlineUsers, 10000);
+window.onload = function() { loadOnlineUsers(); setupSendBox(); };
 
 function selectUser(userId) {
     selectedUserId = userId;
@@ -135,7 +111,6 @@ function appendChatMessage(msg, sender) {
     container.scrollTop = container.scrollHeight;
 }
 
-// Send on button click or Enter
 function setupSendBox() {
     const input = document.getElementById('chatInput');
     input.addEventListener('keydown', function(e) {
@@ -149,6 +124,5 @@ function setupSendBox() {
         input.value = '';
     };
 }
-window.onload = function() { loadOnlineUsers(); setupSendBox(); };
 </script>
 <?php include '../includes/footer.php'; ?>
