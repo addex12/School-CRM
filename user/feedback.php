@@ -81,14 +81,37 @@ $feedback->execute([$_SESSION['user_id']]);
                 </div>
                 
                 <div class="form-group">
-                    <label>Rating:</label>
-                    <div class="star-rating">
-                        <?php for ($i = 5; $i >= 1; $i--): ?>
-                            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required>
-                            <label for="star<?= $i ?>" class="fas fa-star"></label>
-                        <?php endfor; ?>
-                    </div>
-                </div>
+    <label for="rating">Rating:</label>
+    <div class="star-rating" style="font-size:2em; color:gold;">
+        <?php for ($i = 5; $i >= 1; $i--): ?>
+            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;">
+            <label for="star<?= $i ?>" style="cursor:pointer;">&#9733;</label>
+        <?php endfor; ?>
+    </div>
+</div>
+<style>
+.star-rating {
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    display: inline-block;
+}
+.star-rating input[type="radio"] {
+    display: none;
+}
+.star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.star-rating input[type="radio"]:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: orange;
+}
+.star-rating input[type="radio"]:checked ~ label {
+    color: orange;
+}
+</style>
                 
                 <button type="submit" class="btn btn-primary">Submit Feedback</button>
             </form>
