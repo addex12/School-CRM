@@ -38,11 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Check if user exists
-            $check = $pdo->query("SHOW TABLES");
-            var_dump($check->fetchAll());
-            $check2 = $pdo->query("SHOW COLUMNS FROM feedback");
-            var_dump($check2->fetchAll());
-            exit; 
+            $userCheck = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+            $userCheck->execute([$user_id]);
             if (!$userCheck->fetch()) {
                 throw new Exception("User ID does not exist.");
             }
