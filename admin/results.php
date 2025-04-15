@@ -84,8 +84,14 @@ $response_stmt = $pdo->prepare("
     ORDER BY sr.submitted_at DESC
     LIMIT ? OFFSET ?
 ");
+// DEBUG: Output SQL params for troubleshooting
+// error_log('Params: ' . print_r(array_merge($params, [$per_page, $offset]), true));
+
 $response_stmt->execute(array_merge($params, [$per_page, $offset]));
 $responses = $response_stmt->fetchAll();
+
+// DEBUG: Output number of responses fetched
+// error_log('Fetched responses: ' . count($responses));
 
 // --- BEGIN: Fetch all response_data for these responses ---
 $response_ids = array_column($responses, 'id');
