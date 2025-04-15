@@ -64,5 +64,25 @@ include '../includes/header.php';
         </div>
     </div>
 </div>
+<script>
+let ws = new WebSocket("ws://localhost:8080"); // Use your server IP/domain if remote
 
+ws.onopen = function() {
+    console.log("Connected to chat server.");
+};
+
+ws.onmessage = function(event) {
+    // Handle/display incoming message
+    let data = JSON.parse(event.data);
+    // Update chat UI here
+};
+
+function sendMessage(msg, toUserId) {
+    ws.send(JSON.stringify({
+        type: "chat",
+        message: msg,
+        to: toUserId
+    }));
+}
+</script>
 <?php include '../includes/footer.php'; ?>
