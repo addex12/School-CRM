@@ -28,25 +28,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            // Update last login
-            $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
-            
-            // Set session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['logged_in'] = true;
-            
-            // Redirect based on role
-            if ($user['role_id'] == 1) { 
-                header("Location: " . BASE_URL . "/admin/dashboard.php");
-            } else if ($user['role_id'] >= 2) { 
-                header("Location: " . BASE_URL . "/user/dashboard.php");
-            } else {
-                header("Location: " . BASE_URL . "/error.php");
-            }
-            exit();
-        } else {
+    // Update last login
+    $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
+
+    // Log the login action to audit_logs
+    try {
+        $stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action, details, ip_address, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([
+            $user['id'],
+            'login',
+            'User logged in',
+            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+        ]);
+    } catch (Exception $e) {
+        error_log('Audit log insert failed (login): ' . $e->getMessage());
+    }
+
+    // Set session
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['username'] = $user['username'];
+    $_SESSION['role_id'] = $user['role_id'];
+    $_SESSION['logged_in'] = true;
+
+    // Redirect based on role
+    if ($user['role_id'] == 1) { 
+        header("Location: " . BASE_URL . "/admin/dashboard.php");
+    } else if ($user['role_id'] >= 2) { 
+        header("Location: " . BASE_URL . "/user/dashboard.php");
+    } else {
+        header("Location: " . BASE_URL . "/error.php");
+    }
+    exit();
+} else {
             $error = "Invalid username or password.";
         }
     } catch (PDOException $e) {
