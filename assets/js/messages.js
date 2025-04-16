@@ -49,7 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('../api/send_message.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `receiver_id=${encodeURIComponent(receiverInput.value)}&message=${encodeURIComponent(messageInput.value)}`
+            body: `receiver_id=${encodeURIComponent(receiverInput.value)}&message=${encodeURIComponent(messageInput.value)}`,
+            credentials: 'include' 
         })
         .then(res => {
             if (!res.ok) {
