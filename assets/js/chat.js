@@ -3,7 +3,6 @@ class ChatInterface {
         this.chatContainer = document.createElement('div');
         this.setupUI();
         this.initializeEventListeners();
-        this.pollMessages();
     }
 
     setupUI() {
@@ -24,25 +23,32 @@ class ChatInterface {
     }
 
     initializeEventListeners() {
-        // Implement WebSocket/SSE connection here
+        this.setupSSEConnection();
         // Notification polling
         this.pollNotifications();
         document.querySelector('.send-btn').addEventListener('click', () => this.sendMessage());
     }
 
-    async pollMessages() {
-        try {
-            const response = await fetch(`/api/get_messages?user_id=${selectedUserId}`);
-            const data = await response.json();
-            if(data.success) this.updateMessages(data.messages);
-        } catch(e) {
-            console.error('Message polling error:', e);
-        }
-        setTimeout(() => this.pollMessages(), 3000);
+    setupSSEConnection() {
+        this.eventSource = new EventSource('/api/chat_stream');
+        this.eventSource.onmessage = (e) => {
+            const messages = JSON.parse(e.data);
+            this.updateMessages(messages.reverse());
+        };
     }
 
     updateMessages(messages) {
-        // Render messages in UI
+        const container = document.querySelector('.chat-messages');
+        container.innerHTML = messages.map(msg => `
+            <div class="message ${msg.sender_id === currentUserId ? 'sent' : 'received'}">
+                <div class="meta">
+                    <span class="user">${msg.username}</span>
+                    <span class="time">${new Date(msg.created_at).toLocaleTimeString()}</span>
+                </div>
+                <div class="content">${msg.message}</div>
+            </div>
+        `).join('');
+        container.scrollTop = container.scrollHeight;
     }
 
     async sendMessage() {
