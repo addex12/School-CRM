@@ -34,9 +34,13 @@ class ChatServer implements MessageComponentInterface {
                     'role' => $role
                 ];
                 $this->userConns[$user_id] = $from;
-                // Update last_active
-                $stmt = $this->pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
-                $stmt->execute([$user_id]);
+                // Update last_active with error logging
+                try {
+                    $stmt = $this->pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
+                    $stmt->execute([$user_id]);
+                } catch (PDOException $e) {
+                    error_log("Failed to update last_active for user_id $user_id: " . $e->getMessage());
+                }
                 return;
             } else {
                 $from->close();
@@ -70,8 +74,12 @@ class ChatServer implements MessageComponentInterface {
         // Heartbeat/keepalive
         if ($data['type'] === 'ping') {
             $user_id = $this->connUsers[$from->resourceId]['user_id'];
-            $stmt = $this->pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
-            $stmt->execute([$user_id]);
+            try {
+                $stmt = $this->pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
+                $stmt->execute([$user_id]);
+            } catch (PDOException $e) {
+                error_log("Failed to update last_active during ping for user_id $user_id: " . $e->getMessage());
+            }
         }
     }
 
