@@ -70,15 +70,22 @@ $totalPages = ceil($totalLogs / $perPage);
                             </thead>
                             <tbody>
                                 <?php foreach ($auditLogs as $log): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($log['id']) ?></td>
-                                        <td><?= htmlspecialchars($log['username'] ?? 'System') ?></td>
-                                        <td><?= htmlspecialchars($log['action']) ?></td>
-                                        <td><?= htmlspecialchars($log['details'] ?? 'N/A') ?></td>
-                                        <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                        <td><?= date('M j, Y g:i A', strtotime($log['created_at'])) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
+    <tr>
+        <td><?= htmlspecialchars($log['id']) ?></td>
+        <td><?= htmlspecialchars($log['username'] ?? 'System') ?></td>
+        <td>
+            <?php
+            $action = $log['action'];
+            echo isset($actionDescriptions[$action])
+                ? htmlspecialchars($actionDescriptions[$action])
+                : htmlspecialchars($action);
+            ?>
+        </td>
+        <td><?= htmlspecialchars($log['details'] ?? 'N/A') ?></td>
+        <td><?= htmlspecialchars($log['ip_address']) ?></td>
+        <td><?= date('M j, Y g:i A', strtotime($log['created_at'])) ?></td>
+    </tr>
+<?php endforeach; ?>
                             </tbody>
                         </table>
                         
