@@ -41,6 +41,15 @@ function loginUser($username, $password) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
+
+        // Update last_active column
+        try {
+            $updateStmt = $pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
+            $updateStmt->execute([$user['id']]);
+        } catch (PDOException $e) {
+            error_log("Error updating last_active: " . $e->getMessage());
+        }
+
         return true;
     }
     return false;
