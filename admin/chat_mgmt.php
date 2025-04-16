@@ -137,7 +137,14 @@ ws.onmessage = function(event) {
 };
 
 function sendMessage(msg) {
-    if (!selectedUserId || !msg.trim()) return;
+    if (!selectedUserId || !msg.trim()) {
+        alert('Please select a user and type a message.');
+        return;
+    }
+    if (ws.readyState !== WebSocket.OPEN) {
+        alert('WebSocket connection is not open. Please try again later.');
+        return;
+    }
     ws.send(JSON.stringify({
         type: "chat",
         message: msg,
@@ -161,7 +168,7 @@ function loadOnlineUsers() {
             users.forEach(u => {
                 const li = document.createElement('li');
                 li.className = 'user-list-item d-flex align-items-center';
-                let initials = u.username.split(' ').map(x=>x[0]).join('').substring(0,2).toUpperCase();
+                let initials = u.username.split(' ').map(x => x[0]).join('').substring(0, 2).toUpperCase();
                 const avatar = document.createElement('span');
                 avatar.className = 'chat-user-avatar';
                 avatar.textContent = initials;
@@ -175,10 +182,11 @@ function loadOnlineUsers() {
                 li.appendChild(avatar);
                 li.appendChild(name);
                 li.onclick = () => selectUser(u.id, u.username);
-                if (selectedUserId == u.id) li.classList.add('active');
+                if (selectedUserId === u.id) li.classList.add('active');
                 list.appendChild(li);
             });
-        });
+        })
+        .catch(error => console.error('Error loading online users:', error));
     // Disable chat input and send button if no user selected
     setChatInputEnabled(!!selectedUserId);
 }
@@ -196,8 +204,9 @@ function selectUser(userId, username) {
     fetch('chat_history.php?user_id=' + userId)
         .then(r => r.json())
         .then(msgs => {
-            msgs.forEach(m => appendChatMessage(m, m.from_user_id == adminId ? 'admin' : 'user', m.username));
-        });
+            msgs.forEach(m => appendChatMessage(m, m.from_user_id === adminId ? 'admin' : 'user', m.username));
+        })
+        .catch(error => console.error('Error fetching chat history:', error));
     // Focus chat input after selecting user
     setTimeout(() => {
         document.getElementById('chatInput').focus();
