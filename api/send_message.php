@@ -1,4 +1,5 @@
 <?php
+error_log('Session in send_message.php: ' . print_r($_SESSION, true));
 header('Content-Type: application/json');
 require_once __DIR__ . '/../config.php';
 
