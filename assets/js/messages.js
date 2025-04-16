@@ -8,6 +8,23 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedUserId = null;
 
     // Select a user/admin to chat with
+    // Fetch and render contacts
+    function loadContacts() {
+        fetch('../api/get_contacts.php')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) return;
+                userList.innerHTML = '';
+                data.contacts.forEach(contact => {
+                    const li = document.createElement('li');
+                    li.setAttribute('data-user-id', contact.id);
+                    li.innerHTML = `${contact.username} ${contact.unread > 0 ? `<span class='unread-badge'>${contact.unread}</span>` : ''}`;
+                    userList.appendChild(li);
+                });
+            });
+    }
+    loadContacts();
+
     userList && userList.addEventListener('click', function (e) {
         const li = e.target.closest('li[data-user-id]');
         if (!li) return;
@@ -16,6 +33,9 @@ document.addEventListener('DOMContentLoaded', function () {
         chatHeader.textContent = li.textContent.trim();
         messageForm.style.display = '';
         loadMessages();
+        // Mark as read after loading messages
+        fetch(`../api/mark_read.php?user_id=${selectedUserId}`)
+            .then(() => loadContacts());
     });
 
     // Send a message
