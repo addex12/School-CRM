@@ -58,6 +58,25 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Highlight selected contact and add hover effect
+    userList && userList.addEventListener('click', function (e) {
+        const li = e.target.closest('li[data-user-id]');
+        if (!li) return;
+        // Remove selected from all
+        userList.querySelectorAll('li').forEach(el => el.classList.remove('selected-contact'));
+        li.classList.add('selected-contact');
+    });
+
+    // Add hover effect via JS if not present in CSS
+    userList && userList.addEventListener('mouseover', function (e) {
+        const li = e.target.closest('li[data-user-id]');
+        if (li) li.classList.add('hover-contact');
+    });
+    userList && userList.addEventListener('mouseout', function (e) {
+        const li = e.target.closest('li[data-user-id]');
+        if (li) li.classList.remove('hover-contact');
+    });
+
     // Load messages
     function loadMessages() {
         if (!selectedUserId) return;

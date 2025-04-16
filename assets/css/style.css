@@ -92,7 +92,43 @@ a:hover {
     width: calc(100% - 20px); /* Make the button full width with some margin */
     font-size: 22px; /* Increased font size for better visibility */
     background-color: var(--success); /* Set a vibrant background color */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Added shadow for depth */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add your custom styles below */
+}
+
+.contact-list ul li.selected-contact {
+    background: #007bff;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.contact-list ul li.hover-contact:not(.selected-contact) {
+    background: #e9ecef;
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.message-form button[type="submit"]:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
+
+.message-form button[type="submit"]:not(:disabled) {
+    background: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+.unread-badge {
+    background: #dc3545;
+    color: #fff;
+    border-radius: 10px;
+    padding: 2px 7px;
+    font-size: 0.8em;
+    margin-left: 7px;
+    vertical-align: middle;
 }
 
 .btn:hover {
