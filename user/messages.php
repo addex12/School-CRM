@@ -17,7 +17,7 @@ $admins = $pdo->query("SELECT id, username FROM users WHERE role_id = 1 ORDER BY
 </head>
 <body>
     <div class="user-dashboard">
-        <?php include 'includes/user_sidebar.php'; ?>
+        <?php include 'includes/header.php'; ?>
         <div class="user-main">
             <header class="user-header"><h1><?= htmlspecialchars($pageTitle) ?></h1></header>
             <div class="content">
