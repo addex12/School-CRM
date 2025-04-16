@@ -1,10 +1,10 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
+requireAdmin();
 require_once __DIR__ . '/../includes/db.php';
-requireLogin();
 
-$userId = $_SESSION['user_id'];
-$username = $_SESSION['username'];
+$adminId = $_SESSION['user_id'];
+$adminName = $_SESSION['username'];
 
 ?>
 <!DOCTYPE html>
@@ -12,9 +12,9 @@ $username = $_SESSION['username'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat - School CRM</title>
+    <title>Admin Chat - School CRM</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <script src="../assets/js/chat.js" defer></script>
+    <script src="../assets/js/admin_chat.js" defer></script>
 </head>
 <body>
     <div class="chat-container">
