@@ -3,7 +3,6 @@ require_once __DIR__.'/../includes/auth.php';
 requireAdmin();
 
 $title = 'Admin Chat';
-include __DIR__.'/includes/header.php';
 ?>
 
 <div class="container-fluid">
