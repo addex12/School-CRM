@@ -7,7 +7,7 @@ $adminId = $_SESSION['user_id'];
 $adminName = $_SESSION['username'];
 
 ?>
-<?php include '../includes/header.php'; ?>
+<?php include 'includes/admin_sidebar.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,4 +33,4 @@ $adminName = $_SESSION['username'];
     </div>
 </body>
 </html>
-<?php include '../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>

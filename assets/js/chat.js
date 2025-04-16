@@ -38,6 +38,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Update chat.js to handle sending messages and fetching chat history
+    function sendMessage(receiverId, message) {
+        fetch('../api/send_message.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ receiverId, message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const p = document.createElement('p');
+                p.textContent = `You: ${message}`;
+                chatMessages.appendChild(p);
+                chatInput.value = '';
+            } else {
+                console.error('Error sending message:', data.error);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Fetch chat history
+    function fetchChatHistory(receiverId) {
+        fetch(`../api/chat_history.php?receiverId=${receiverId}`)
+            .then(response => response.json())
+            .then(messages => {
+                chatMessages.innerHTML = '';
+                messages.forEach(msg => {
+                    const p = document.createElement('p');
+                    p.textContent = `${msg.sender}: ${msg.message}`;
+                    chatMessages.appendChild(p);
+                });
+            })
+            .catch(error => console.error('Error fetching chat history:', error));
+    }
+
     // Initial fetches
     fetchOnlineUsers();
     fetchChatMessages();
