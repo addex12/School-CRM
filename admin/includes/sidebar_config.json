@@ -91,6 +91,11 @@
                     "title": "Feedback Management",
                     "link": "feedback_mgmt.php",
                     "icon": "comment-dots"
+                },
+                {
+                    "title": "Messages",
+                    "link": "messages.php",
+                    "icon": "comments"
                 }  
             ]
         },

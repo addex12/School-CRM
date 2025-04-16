@@ -106,13 +106,6 @@ $current = basename($_SERVER['PHP_SELF']);
                 </li>
             <?php endif; ?>
         <?php endforeach; ?>
-        <li class="nav-item">
-            <a class="nav-link" href="#" onclick="openChatInterface()">
-                <i class="fas fa-comments"></i>
-                <span>Messages</span>
-                <span class="badge badge-danger"></span>
-            </a>
-        </li>
     </ul>
 </aside>
 
