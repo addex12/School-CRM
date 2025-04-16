@@ -43,16 +43,22 @@ function loginUser($username, $password) {
         $_SESSION['role'] = $user['role'];
 
         // Update last_active column
-        try {
-            $updateStmt = $pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
-            $updateStmt->execute([$user['id']]);
-        } catch (PDOException $e) {
-            error_log("Error updating last_active: " . $e->getMessage());
-        }
+        updateLastActive($user['id']);
 
         return true;
     }
     return false;
+}
+
+// Add a helper function to update last_active
+function updateLastActive($userId) {
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
+        $stmt->execute([$userId]);
+    } catch (PDOException $e) {
+        error_log("Error updating last_active for user_id $userId: " . $e->getMessage());
+    }
 }
 
 // Get all active surveys

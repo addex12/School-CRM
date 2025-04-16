@@ -5,6 +5,9 @@ requireLogin();
 
 $userId = $_SESSION['user_id'];
 
+// Replace direct last_active updates with the helper function
+updateLastActive($userId);
+
 // Fetch messages for the inbox
 $stmt = $pdo->prepare("
     SELECT m.id, m.subject, m.content, m.sender_id, m.receiver_id, m.sent_at, m.is_read, u.username AS sender_name 
@@ -155,8 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (filter === 'unread' && message.dataset.status === 'unread') {
                 message.style.display = '';
             } else if (filter === 'read' && message.dataset.status === 'read') {
-                message.style.display = '';
-            } else {
                 message.style.display = 'none';
             }
         });

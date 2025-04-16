@@ -36,8 +36,7 @@ class ChatServer implements MessageComponentInterface {
                 $this->userConns[$user_id] = $from;
                 // Update last_active with error logging
                 try {
-                    $stmt = $this->pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
-                    $stmt->execute([$user_id]);
+                    updateLastActive($user_id);
                 } catch (PDOException $e) {
                     error_log("Failed to update last_active for user_id $user_id: " . $e->getMessage());
                 }
@@ -75,8 +74,7 @@ class ChatServer implements MessageComponentInterface {
         if ($data['type'] === 'ping') {
             $user_id = $this->connUsers[$from->resourceId]['user_id'];
             try {
-                $stmt = $this->pdo->prepare("UPDATE users SET last_active = NOW() WHERE id = ?");
-                $stmt->execute([$user_id]);
+                updateLastActive($user_id);
             } catch (PDOException $e) {
                 error_log("Failed to update last_active during ping for user_id $user_id: " . $e->getMessage());
             }
