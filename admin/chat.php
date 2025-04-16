@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__.'../includes/auth.php';
-require_admin();
+require_once __DIR__.'/../includes/auth.php';
+requireAdmin();
 
 $title = 'Admin Chat';
 include __DIR__.'/includes/header.php';
