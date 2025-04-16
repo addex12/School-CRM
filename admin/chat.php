@@ -7,7 +7,6 @@ $adminId = $_SESSION['user_id'];
 $adminName = $_SESSION['username'];
 
 ?>
-<?php include 'includes/admin_sidebar.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,9 +14,9 @@ $adminName = $_SESSION['username'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Chat - School CRM</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <script src="../assets/js/admin_chat.js" defer></script>
 </head>
 <body>
+    <?php include 'includes/admin_sidebar.php'; ?>
     <div class="chat-container">
         <div class="user-list">
             <h3>Online Users</h3>
@@ -31,6 +30,12 @@ $adminName = $_SESSION['username'];
             </form>
         </div>
     </div>
+    <script src="../assets/js/admin_chat.js" defer></script>
+    <script>
+        // Call the functions to fetch online users and chat messages
+        fetchOnlineUsers();
+        fetchChatMessages();
+    </script>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
-<?php include 'includes/footer.php'; ?>

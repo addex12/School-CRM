@@ -21,8 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch chat messages (placeholder for WebSocket integration)
     function fetchChatMessages() {
-        // Placeholder: Replace with WebSocket or AJAX logic
-        chatMessages.innerHTML = '<p>Chat messages will appear here...</p>';
+        fetch('../api/chat_history.php')
+            .then(response => response.json())
+            .then(messages => {
+                chatMessages.innerHTML = '';
+                messages.forEach(message => {
+                    const p = document.createElement('p');
+                    p.textContent = `${message.sender}: ${message.message}`;
+                    chatMessages.appendChild(p);
+                });
+            })
+            .catch(error => console.error('Error fetching chat messages:', error));
     }
 
     // Handle chat form submission
@@ -30,54 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
         const message = chatInput.value.trim();
         if (message) {
-            // Placeholder: Send message via WebSocket or AJAX
-            const p = document.createElement('p');
-            p.textContent = `Admin: ${message}`;
-            chatMessages.appendChild(p);
-            chatInput.value = '';
+            // Send message via AJAX
+            fetch('../api/send_message.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const p = document.createElement('p');
+                    p.textContent = `Admin: ${message}`;
+                    chatMessages.appendChild(p);
+                    chatInput.value = '';
+                } else {
+                    console.error('Error sending message:', data.error);
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
     });
-
-    // Update admin_chat.js to handle sending messages and fetching chat history
-    function sendMessage(receiverId, message) {
-        fetch('../api/send_message.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ receiverId, message })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const p = document.createElement('p');
-                p.textContent = `Admin: ${message}`;
-                chatMessages.appendChild(p);
-                chatInput.value = '';
-            } else {
-                console.error('Error sending message:', data.error);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    // Fetch chat history
-    function fetchChatHistory(receiverId) {
-        fetch(`../api/chat_history.php?receiverId=${receiverId}`)
-            .then(response => response.json())
-            .then(messages => {
-                chatMessages.innerHTML = '';
-                messages.forEach(msg => {
-                    const p = document.createElement('p');
-                    p.textContent = `${msg.sender}: ${msg.message}`;
-                    chatMessages.appendChild(p);
-                });
-            })
-            .catch(error => console.error('Error fetching chat history:', error));
-    }
-
-    // Initial fetches
-    fetchOnlineUsers();
-    fetchChatMessages();
-
-    // Refresh online users every 10 seconds
-    setInterval(fetchOnlineUsers, 10000);
 });
