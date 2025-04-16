@@ -8,16 +8,21 @@ $userId = $_SESSION['user_id'];
 // Replace direct last_active updates with the helper function
 updateLastActive($userId);
 
-// Fetch messages for the inbox
-$stmt = $pdo->prepare("
-    SELECT m.id, m.subject, m.content, m.sender_id, m.receiver_id, m.sent_at, m.is_read, u.username AS sender_name 
-    FROM messages m
-    JOIN users u ON m.sender_id = u.id
-    WHERE m.receiver_id = ?
-    ORDER BY m.sent_at DESC
-");
-$stmt->execute([$userId]);
-$messages = $stmt->fetchAll();
+// Add error handling for the message-fetching query
+try {
+    $stmt = $pdo->prepare("
+        SELECT m.id, m.subject, m.content, m.sender_id, m.receiver_id, m.sent_at, m.is_read, u.username AS sender_name 
+        FROM messages m
+        JOIN users u ON m.sender_id = u.id
+        WHERE m.receiver_id = ?
+        ORDER BY m.sent_at DESC
+    ");
+    $stmt->execute([$userId]);
+    $messages = $stmt->fetchAll();
+} catch (PDOException $e) {
+    error_log("Error fetching messages: " . $e->getMessage());
+    $messages = [];
+}
 
 // Fetch online users (active in last 5 minutes)
 $onlineThreshold = date('Y-m-d H:i:s', strtotime('-5 minutes'));
