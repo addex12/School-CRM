@@ -91,12 +91,7 @@
                     "title": "Feedback Management",
                     "link": "feedback_mgmt.php",
                     "icon": "comment-dots"
-                },
-                {
-                    "title": "Chat Management",
-                    "link": "chat.php",
-                    "icon": "comments"
-                }
+                }  
             ]
         },
         {

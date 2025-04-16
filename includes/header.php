@@ -20,9 +20,7 @@ requireLogin();
                 <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
-                <a href="chat.php" class="<?= basename($_SERVER['PHP_SELF']) === 'chat.php' ? 'active' : '' ?>">
-                    <i class="fas fa-comments"></i> Chat
-                </a>
+
                 <a href="feedback.php" class="<?= basename($_SERVER['PHP_SELF']) === 'feedback.php' ? 'active' : '' ?>">
                     <i class="fas fa-comment-dots"></i> Feedback
                 </a>
