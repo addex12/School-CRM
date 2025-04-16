@@ -9,7 +9,12 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Validate input
-$data = json_decode(file_get_contents('php://input'), true);
+// Support both JSON and form-urlencoded
+if ($_SERVER['CONTENT_TYPE'] === 'application/x-www-form-urlencoded') {
+    $data = $_POST;
+} else {
+    $data = json_decode(file_get_contents('php://input'), true);
+}
 if (!isset($data['receiver_id']) || !isset($data['message']) || empty(trim($data['message']))) {
     echo json_encode(['success' => false, 'error' => 'Invalid request']);
     exit;

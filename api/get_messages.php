@@ -16,16 +16,24 @@ $offset = ($page - 1) * $limit;
 
 try {
     // Get messages between current user and selected user
-    $stmt = $pdo->prepare("SELECT m.*, u.username, u.avatar 
+    $stmt = $pdo->prepare("SELECT m.*, u.username
         FROM messages m
         JOIN users u ON m.sender_id = u.id
         WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
-        ORDER BY created_at DESC
+        ORDER BY sent_at ASC
         LIMIT ? OFFSET ?");
     
     $stmt->execute([$current_user_id, $other_user_id, $other_user_id, $current_user_id, $limit, $offset]);
-    $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    $raw_messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $messages = [];
+    foreach ($raw_messages as $msg) {
+        $messages[] = [
+            'is_own' => $msg['sender_id'] == $current_user_id,
+            'sender' => $msg['username'],
+            'message' => $msg['message'],
+            'sent_at' => $msg['sent_at'],
+        ];
+    }
     echo json_encode(['success' => true, 'messages' => $messages]);
 } catch (PDOException $e) {
     error_log('Message retrieval error: '.$e->getMessage());
