@@ -42,21 +42,46 @@ document.addEventListener('DOMContentLoaded', function () {
     messageForm && messageForm.addEventListener('submit', function (e) {
         e.preventDefault();
         if (!messageInput.value.trim()) return;
+        if (!receiverInput.value) {
+            alert('Please select a contact before sending a message.');
+            return;
+        }
         fetch('../api/send_message.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: `receiver_id=${encodeURIComponent(receiverInput.value)}&message=${encodeURIComponent(messageInput.value)}`
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                alert('Network error: ' + res.status);
+                return res.text().then(text => { throw new Error(text); });
+            }
+            return res.json();
+        })
         .then(data => {
+            console.log('Send response:', data);
             if(data.success) {
                 messageInput.value = '';
                 loadMessages();
             } else {
                 alert(data.error || 'Failed to send message');
             }
+        })
+        .catch(err => {
+            console.error('Send error:', err);
+            alert('Send error: ' + err.message);
         });
     });
+
+    // Disable send button if no contact selected
+    function updateSendButtonState() {
+        const btn = messageForm.querySelector('button[type="submit"]');
+        btn.disabled = !receiverInput.value;
+    }
+    userList && userList.addEventListener('click', function () {
+        setTimeout(updateSendButtonState, 10);
+    });
+    updateSendButtonState();
 
     // Highlight selected contact and add hover effect
     userList && userList.addEventListener('click', function (e) {
