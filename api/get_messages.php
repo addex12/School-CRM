@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
@@ -12,7 +16,7 @@ error_log("SESSION: " . print_r($_SESSION, true));
 // Validate input
 if (!isset($_GET['user_id'])) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing user_id parameter']);
+    echo json_encode(['success' => false, 'error' => 'Missing user_id']);
     exit;
 }
 
@@ -47,13 +51,17 @@ try {
         $query = "SELECT m.*, u.username as sender 
                  FROM messages m
                  JOIN users u ON m.sender_id = u.id
-                 WHERE (m.sender_id = :current_user_id AND m.receiver_id = :other_user_id)
-                 OR (m.sender_id = :other_user_id AND m.receiver_id = :current_user_id)
+                 WHERE (m.sender_id = :current_user1 AND m.receiver_id = :user_id1)
+                 OR (m.sender_id = :user_id2 AND m.receiver_id = :current_user2)
                  ORDER BY m.sent_at ASC";
         
         $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':current_user_id', $current_user_id, PDO::PARAM_INT);
-        $stmt->bindParam(':other_user_id', $other_user_id, PDO::PARAM_INT);
+        $stmt->execute([
+            'current_user1' => $current_user_id,
+            'user_id1' => $other_user_id,
+            'user_id2' => $other_user_id,
+            'current_user2' => $current_user_id
+        ]);
     }
 
     if (!$stmt->execute()) {
