@@ -20,17 +20,11 @@ requireLogin();
                 <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
-                <a href="messages.php" class="<?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>">
-                    <i class="fas fa-comments"></i> Chat
-                </a>
                 <a href="feedback.php" class="<?= basename($_SERVER['PHP_SELF']) === 'feedback.php' ? 'active' : '' ?>">
                     <i class="fas fa-comment-dots"></i> Feedback
                 </a>
                 <a href="contact.php" class="<?= basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Contact
-                </a>
-                <a href="inbox.php" class="<?= basename($_SERVER['PHP_SELF']) === 'inbox.php' ? 'active' : '' ?>">
-                    <i class="fas fa-inbox"></i> Inbox
                 </a>
                 
                 <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>">
