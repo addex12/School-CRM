@@ -1,7 +1,7 @@
 <?php
 ob_start();
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/db.php';
+require_once  '../includes/auth.php';
+require_once  '../includes/db.php';
 // Create Database instance and get PDO connection
 $database = new Database();
 $pdo = $database->getConnection();
