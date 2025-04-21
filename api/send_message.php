@@ -8,7 +8,7 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 
 header('Content-Type: application/json');
-
+file_put_contents('debug.log', print_r($_POST, true), FILE_APPEND);
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Invalid request method']);
