@@ -117,7 +117,7 @@ function getUserRoleName($roleId) {
     </div>
 </div>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
-<script
+<script>
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search');
     const filterDropdown = document.getElementById('filter');
