@@ -1,5 +1,6 @@
 <?php
-require_once '../includes/auth.php';
+// Always use an absolute path for includes to avoid path issues
+require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
 ?>
 <!DOCTYPE html>
