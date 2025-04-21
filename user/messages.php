@@ -44,6 +44,16 @@ $conversations->execute([
     ':admin_role_id' => $admin_role_id ?: 0
 ]);
 $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
+
+// Get support contacts (simplified version)
+$support_contact = $pdo->query("
+    SELECT u.id, u.username, u.avatar, r.role_name 
+    FROM users u
+    JOIN roles r ON u.role_id = r.id
+    WHERE r.role_name IN ('admin', 'teacher', 'support')
+    ORDER BY FIELD(r.role_name, 'admin', 'teacher', 'support')
+    LIMIT 1
+")->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -113,7 +123,7 @@ $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
         
         <div class="messaging-container">
             <aside class="contact-list">
-                <?php if ($support_contact): ?>
+                <?php if (!empty($support_contact)): ?>
                 <div class="contact-item support-contact" data-user-id="<?= $support_contact['id'] ?>">
                     <img src="../assets/avatars/<?= htmlspecialchars($support_contact['avatar'] ?? 'default.jpg') ?>" 
                          class="contact-avatar" 
