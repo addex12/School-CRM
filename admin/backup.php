@@ -152,7 +152,6 @@ $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [
     <script>
     // Restore progress bar logic
     document.addEventListener('DOMContentLoaded', function() {
-        // Attach to all restore forms
         document.querySelectorAll('form[action="restore.php"]').forEach(function(form) {
             form.addEventListener('submit', function(e) {
                 // Show progress bar
