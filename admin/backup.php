@@ -2,6 +2,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
+require_once '../includes/db.php';
 
 $pageTitle = "System Backup & Restore";
 
@@ -22,10 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {
         $dbDumpFile = $backupDir . "/db_backup_$timestamp.sql";
         $command = sprintf(
             'mysqldump --user=%s --password=%s --host=%s %s > %s',
-            escapeshellarg($config['DB_USER']),
-            escapeshellarg($config['DB_PASSWORD']),
-            escapeshellarg($config['DB_HOST']),
-            escapeshellarg($config['DB_NAME']),
+            escapeshellarg(DB_USER),
+            escapeshellarg(DB_PASS),
+            escapeshellarg(DB_HOST),
+            escapeshellarg(DB_NAME),
             escapeshellarg($dbDumpFile)
         );
         exec($command, $output, $returnVar);
