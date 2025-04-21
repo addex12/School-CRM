@@ -6,7 +6,6 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-ob_start();
 
 // Error reporting - consider logging to file in production
 error_reporting(E_ALL);
