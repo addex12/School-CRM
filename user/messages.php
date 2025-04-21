@@ -27,20 +27,22 @@ $conversations = $pdo->prepare("
         MAX(m.sent_at) as last_message_time
     FROM users u
     JOIN roles r ON u.role_id = r.id
-    JOIN messages m ON (
-        (m.sender_id = u.id AND m.receiver_id = :current_user) OR
+    LEFT JOIN messages m ON (
+        (m.sender_id = u.id AND m.receiver_id = :current_user)
+        OR
         (m.receiver_id = u.id AND m.sender_id = :current_user2)
     )
     WHERE u.id != :current_user3
     AND u.role_id != :admin_role_id
     GROUP BY u.id, u.username, u.avatar, u.role_id, r.role_name
+    HAVING last_message_time IS NOT NULL
     ORDER BY last_message_time DESC
 ");
 
 $conversations->execute([
     ':current_user' => $current_user_id,
     ':current_user2' => $current_user_id,
-    ':current_user3' => $current_user_id, // Added this third parameter
+    ':current_user3' => $current_user_id,
     ':admin_role_id' => $admin_role_id ?: 0
 ]);
 $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
