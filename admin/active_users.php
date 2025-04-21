@@ -10,8 +10,8 @@ ini_set('display_errors', 1);
 define('ROOT_PATH', dirname(__DIR__));
 
 // Include required files
-require ROOT_PATH . '/includes/db.php';
-require ROOT_PATH . '/includes/auth.php';
+require '../includes/db.php';
+require '../includes/auth.php';
 
 // Verify admin access
 requireAdmin();
