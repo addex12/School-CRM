@@ -29,7 +29,7 @@ $conversations = $pdo->prepare("
     JOIN roles r ON u.role_id = r.id
     JOIN messages m ON (
         (m.sender_id = u.id AND m.receiver_id = :current_user) OR
-        (m.receiver_id = u.id AND m.sender_id = :current_user)
+        (m.receiver_id = u.id AND m.sender_id = :current_user2)
     )
     WHERE u.id != :current_user
     AND u.role_id != :admin_role_id
@@ -39,6 +39,7 @@ $conversations = $pdo->prepare("
 
 $conversations->execute([
     ':current_user' => $current_user_id,
+    ':current_user2' => $current_user_id,
     ':admin_role_id' => $admin_role_id ?: 0
 ]);
 $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
