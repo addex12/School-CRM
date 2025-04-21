@@ -54,11 +54,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    $role_id = 4; // Default to 'new' role (assuming 4 is the ID for 'new')
+
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, user_role) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)");
 
-        if ($stmt->execute([$username, $email, $hashed_password, $role])) {
+        if ($stmt->execute([$username, $email, $hashed_password, $role_id])) {
             $_SESSION['success'] = "Registration successful! Please login.";
             header("Location: login.php");
             exit();
