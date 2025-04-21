@@ -385,3 +385,48 @@ nav a.active {
 .export-menu a:hover {
     background: #f8f9fa;
 }
+.message {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 80%;
+}
+
+.message.sent {
+    background-color: #dcf8c6;
+    margin-left: auto;
+    border-bottom-right-radius: 0;
+}
+
+.message.received {
+    background-color: #ffffff;
+    margin-right: auto;
+    border-bottom-left-radius: 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+.message-content {
+    word-wrap: break-word;
+}
+
+.message-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: #666;
+}
+
+.message-sender {
+    font-weight: bold;
+}
+
+.message-time {
+    color: #999;
+}
+
+.no-messages {
+    text-align: center;
+    color: #999;
+    margin-top: 50px;
+}
