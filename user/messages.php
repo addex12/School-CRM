@@ -31,7 +31,7 @@ $conversations = $pdo->prepare("
         (m.sender_id = u.id AND m.receiver_id = :current_user) OR
         (m.receiver_id = u.id AND m.sender_id = :current_user2)
     )
-    WHERE u.id != :current_user
+    WHERE u.id != :current_user3
     AND u.role_id != :admin_role_id
     GROUP BY u.id, u.username, u.avatar, u.role_id, r.role_name
     ORDER BY last_message_time DESC
@@ -40,19 +40,10 @@ $conversations = $pdo->prepare("
 $conversations->execute([
     ':current_user' => $current_user_id,
     ':current_user2' => $current_user_id,
+    ':current_user3' => $current_user_id, // Added this third parameter
     ':admin_role_id' => $admin_role_id ?: 0
 ]);
 $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
-
-// Get support contacts (simplified version)
-$support_contact = $pdo->query("
-    SELECT u.id, u.username, u.avatar, r.role_name 
-    FROM users u
-    JOIN roles r ON u.role_id = r.id
-    WHERE r.role_name IN ('admin', 'teacher', 'support')
-    ORDER BY FIELD(r.role_name, 'admin', 'teacher', 'support')
-    LIMIT 1
-")->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
