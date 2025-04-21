@@ -59,11 +59,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // Send a message
     messageForm && messageForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        if (!messageInput.value.trim()) return;
+        if (!messageInput.value.trim()) {
+            alert('Message cannot be empty.');
+            return;
+        }
         if (!receiverInput.value) {
             alert('Please select a contact before sending a message.');
             return;
         }
+        // Debug: log what is being sent
+        console.log('Sending:', {
+            receiver_id: receiverInput.value,
+            message: messageInput.value
+        });
         fetch('../api/send_message.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -82,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 messageInput.value = '';
                 loadMessages();
             } else {
-                alert(data.error || 'Failed to send message');
+                alert((data.error || 'Failed to send message') + (data.debug ? '\nDebug: ' + JSON.stringify(data.debug) : ''));
             }
         })
         .catch(err => {
