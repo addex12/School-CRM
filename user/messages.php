@@ -261,7 +261,7 @@ $support_contact = $pdo->query("
    
     <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const MESSAGES_API = '../api/user/get_messages.php';
+    const MESSAGES_API = 'api/user/get_messages.php';
     const SEND_API = '../api/user/send_message.php';
     const MARK_READ_API = '../api/user/mark_read.php';
     
