@@ -17,7 +17,6 @@ require_once 'includes/auth.php';
 require_once 'includes/db.php';
 
 // Initialize database connection
-$db = new Database();
 $pdo = $db->getConnection();
 
 class AuthHelper {
