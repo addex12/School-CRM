@@ -27,14 +27,21 @@ if ($user_id === 'broadcast') {
 }
 
 try {
-    // Mark all messages from $user_id to current user as read
-    $stmt = $pdo->prepare("UPDATE messages SET is_read = 1 WHERE sender_id = :sender AND receiver_id = :receiver");
+    // Mark all messages from this user as read
+    $stmt = $pdo->prepare("
+        UPDATE messages 
+        SET is_read = 1 
+        WHERE sender_id = :sender_id 
+        AND receiver_id = :receiver_id
+        AND is_read = 0
+    ");
     $stmt->execute([
-        'sender' => $user_id,
-        'receiver' => $current_user_id
+        'sender_id' => $user_id,
+        'receiver_id' => $current_user_id
     ]);
-    echo json_encode(['success' => true]);
-} catch (Exception $e) {
+    
+    echo json_encode(['success' => true, 'updated' => $stmt->rowCount()]);
+} catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
 }
