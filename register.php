@@ -84,6 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             justify-content: center;
             background: #f4f8fb;
+            padding: 0 10px;
         }
         .register-card {
             background: #fff;
@@ -160,6 +161,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .register-logo i {
             font-size: 2.5rem;
             color: #3498db;
+        }
+        @media (max-width: 600px) {
+            .register-card {
+                padding: 24px 8px 18px 8px;
+                max-width: 100%;
+            }
+            .register-title {
+                font-size: 1.4rem;
+            }
         }
     </style>
 </head>
