@@ -17,8 +17,8 @@ require_once 'includes/auth.php';
 require_once 'includes/db.php';
 
 // Initialize database connection
-$pdo = $db->getConnection();
-
+$db = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 class AuthHelper {
     public static function isLoggedIn(): bool {
         return isset($_SESSION['user_id']);
