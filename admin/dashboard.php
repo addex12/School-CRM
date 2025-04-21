@@ -1,5 +1,4 @@
 <?php
-ob_start(); // Start output buffering
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -7,85 +6,119 @@ ob_start(); // Start output buffering
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-require_once '../includes/auth.php';
-requireAdmin();
 require_once '../includes/config.php';
-require_once '../includes/functions.php';
-require_once '../includes/db.php';
-$pageTitle = "Admin Dashboard";
+require_once '../includes/auth.php';
+requireLogin();
 
-if (!isset($pdo) || !$pdo) {
-    error_log("Database connection not established.");
-    $_SESSION['error'] = "Database connection not established.";
-    header("Location: ../error.php");
-    exit();
-} else {
-    error_log("Database connection established successfully.");
-}
+$pageTitle = "Dashboard";
 
-// Fetch widget data
-$widgets = [
-    [
-        "title" => "Total Users",
-        "icon" => "fa-users",
-        "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM users"
-    ],
-    [
-        "title" => "Active Surveys",
-        "icon" => "fa-poll",
-        "color" => "green",
-        "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
-    ],
-    [
-        "title" => "Feedback Received",
-        "icon" => "fa-comments",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM feedback"
-    ],
-    [
-        "title" => "Open Tickets",
-        "icon" => "fa-ticket-alt",
-        "color" => "red",
-        "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
-    ]
-];
+try {
+    // Dashboard Statistics
+    $stats = [];
+    
+    // Survey Statistics
+    $stats['availableSurveys'] = $pdo->prepare("
+        SELECT COUNT(DISTINCT s.id)
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+    ")->execute([$_SESSION['role_id']])->fetchColumn();
 
-foreach ($widgets as &$widget) {
-    try {
-        $stmt = $pdo->query($widget['query']);
-        $widget['count'] = $stmt->fetchColumn() ?? 0;
-    } catch (Exception $e) {
-        $widget['count'] = "Error";
-        error_log("Widget Error: " . $e->getMessage());
+    $stats['completedSurveys'] = $pdo->prepare("
+        SELECT COUNT(DISTINCT survey_id) 
+        FROM survey_responses 
+        WHERE user_id = ?
+    ")->execute([$_SESSION['user_id']])->fetchColumn();
+
+    $stats['pendingSurveys'] = $pdo->prepare("
+        SELECT COUNT(DISTINCT s.id)
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        LEFT JOIN survey_responses r ON s.id = r.survey_id AND r.user_id = ?
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+          AND r.id IS NULL
+    ")->execute([$_SESSION['user_id'], $_SESSION['role_id']])->fetchColumn();
+
+    // Recent surveys (limit to 5)
+    $recentSurveys = $pdo->prepare("
+        SELECT s.id, s.title, s.description, s.ends_at,
+               (SELECT COUNT(*) FROM survey_responses r 
+                WHERE r.survey_id = s.id AND r.user_id = ?) as completed
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+        ORDER BY s.ends_at ASC
+        LIMIT 5
+    ")->execute([$_SESSION['user_id'], $_SESSION['role_id']])->fetchAll(PDO::FETCH_ASSOC);
+
+    // Upcoming deadlines (surveys ending soon)
+    $upcomingDeadlines = $pdo->prepare("
+        SELECT s.id, s.title, s.ends_at
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.ends_at BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY)
+        ORDER BY s.ends_at ASC
+        LIMIT 5
+    ")->execute([$_SESSION['role_id']])->fetchAll(PDO::FETCH_ASSOC);
+
+    // Recent feedback (if applicable)
+    $recentFeedback = [];
+    if(in_array($_SESSION['role_id'], [3,4,5])) { // Teachers, Parents, Students
+        $recentFeedback = $pdo->prepare("
+            SELECT f.id, f.subject, f.message, f.created_at, fs.subject as category
+            FROM feedback f
+            LEFT JOIN feedback_subjects fs ON f.subject = fs.id
+            WHERE f.user_id = ?
+            ORDER BY f.created_at DESC
+            LIMIT 3
+        ")->execute([$_SESSION['user_id']])->fetchAll(PDO::FETCH_ASSOC);
     }
-}
 
-// Fetch recent activity log
-$activityLog = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10");
-    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Activity Log Error: " . $e->getMessage());
-}
+    // Unread messages
+    $unreadMessages = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM messages 
+        WHERE receiver_id = ? AND is_read = 0
+    ")->execute([$_SESSION['user_id']])->fetchColumn();
 
-// Fetch recent feedback
-$feedback = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 5");
-    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Feedback Error: " . $e->getMessage());
-}
+    // Recent notifications
+    $recentNotifications = $pdo->prepare("
+        SELECT id, message, created_at 
+        FROM notifications 
+        WHERE user_id = ? AND read_at IS NULL
+        ORDER BY created_at DESC
+        LIMIT 5
+    ")->execute([$_SESSION['user_id']])->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch recent support tickets
-$tickets = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM support_tickets ORDER BY created_at DESC LIMIT 5");
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Tickets Error: " . $e->getMessage());
+} catch (PDOException $e) {
+    // Enhanced error logging
+    error_log("[".date('Y-m-d H:i:s')."] Dashboard Error - User ID: {$_SESSION['user_id']} - ".$e->getMessage()."\n", 3, "../logs/dashboard_errors.log");
+    
+    // Initialize empty data to prevent errors
+    $stats = [
+        'availableSurveys' => 0,
+        'completedSurveys' => 0,
+        'pendingSurveys' => 0
+    ];
+    $recentSurveys = [];
+    $upcomingDeadlines = [];
+    $recentFeedback = [];
+    $unreadMessages = 0;
+    $recentNotifications = [];
+    
+    // User-friendly message
+    $_SESSION['error'] = "We encountered an issue loading your dashboard. Our team has been notified.";
 }
 ?>
 
@@ -94,238 +127,414 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <title><?= htmlspecialchars($pageTitle) ?> - School Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../assets/js/dashboard.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2.5rem;
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .dashboard-widget {
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            text-align: center;
-            transition: transform 0.15s, box-shadow 0.15s;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
             position: relative;
         }
-        .dashboard-widget i {
-            font-size: 2.2rem;
-            margin-bottom: 0.7rem;
-            color: #f1c40f;
+        
+        .card-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .widget-blue { border-top: 4px solid #3498db; }
-        .widget-green { border-top: 4px solid #27ae60; }
-        .widget-orange { border-top: 4px solid #f39c12; }
-        .widget-red { border-top: 4px solid #e74c3c; }
-        .dashboard-widget h3 {
-            font-size: 2.1rem;
-            margin: 0.5rem 0 0.2rem 0;
-            color: #2c3e50;
-        }
-        .dashboard-widget p {
-            color: #7f8c8d;
-            font-size: 1.1rem;
+        
+        .card-title {
             margin: 0;
+            color: #333;
+            font-size: 1.2em;
         }
-        .dashboard-section {
-            margin-bottom: 2.5rem;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
+        
+        .stat-card {
+            text-align: center;
         }
-        .dashboard-section h2 {
-            font-size: 1.3rem;
-            color: #34495e;
-            margin-bottom: 1.2rem;
-            border-bottom: 1px solid #f0f2f5;
-            padding-bottom: 0.5rem;
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #3498db;
         }
-        .table-container {
-            overflow-x: auto;
+        
+        .stat-card.completed .stat-value {
+            color: #28a745;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
+        
+        .stat-card.pending .stat-value {
+            color: #ffc107;
         }
-        th, td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
+        
+        .stat-card.warning .stat-value {
+            color: #dc3545;
         }
-        th {
-            background: #f8f9fa;
+        
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-action {
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quick-action:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .quick-action i {
+            font-size: 1.2em;
+        }
+        
+        .survey-item, .deadline-item, .feedback-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .survey-item:last-child, .deadline-item:last-child, .feedback-item:last-child {
+            border-bottom: none;
+        }
+        
+        .survey-title, .deadline-title, .feedback-title {
             font-weight: 600;
-            color: #34495e;
+            margin-bottom: 5px;
         }
-        tr:hover {
-            background: #f4f8fb;
+        
+        .survey-meta, .deadline-date, .feedback-meta {
+            font-size: 0.9em;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
         }
-        @media (max-width: 900px) {
-            .widget-grid {
-                grid-template-columns: 1fr;
-            }
-            .dashboard-section {
-                padding: 1rem 0.5rem;
-            }
+        
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 500;
         }
-        @media (max-width: 600px) {
-            .admin-main {
-                padding: 10px 2px 80px;
-            }
-            .dashboard-widget, .dashboard-section {
-                padding: 1rem 0.5rem;
-            }
-            th, td {
-                padding: 8px 6px;
-            }
+        
+        .status-completed {
+            background: #d4edda;
+            color: #28a745;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-warning {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .time-left {
+            font-weight: bold;
+        }
+        
+        .urgent {
+            color: #dc3545;
+        }
+        
+        .soon {
+            color: #ffc107;
+        }
+        
+        .main-content-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px 0 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .notification-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .notification-item.unread {
+            background-color: #f8f9fa;
+        }
+        
+        .notification-message {
+            margin-bottom: 5px;
+        }
+        
+        .notification-time {
+            font-size: 0.8em;
+            color: #666;
         }
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="content">
-                <!-- Widgets Section -->
-                <div class="widget-grid">
-                    <?php foreach ($widgets as $widget): ?>
-                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
-                            <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                            <p><?= htmlspecialchars($widget['title']) ?></p>
+    <?php include 'includes/header.php'; ?>
+    
+    <div class="main-content-container">
+        <div class="dashboard-container">
+            <h1 style="color:#007bff;">
+                <i class="fas fa-tachometer-alt"></i> <?= htmlspecialchars($pageTitle) ?>
+            </h1>
+            
+            <?php if(isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
+            
+            <!-- Quick Stats Section -->
+            <div class="grid-container">
+                <div class="card stat-card">
+                    <h3>Available Surveys</h3>
+                    <div class="stat-value"><?= $stats['availableSurveys'] ?></div>
+                    <p>Surveys you can participate in</p>
+                </div>
+                
+                <div class="card stat-card completed">
+                    <h3>Completed Surveys</h3>
+                    <div class="stat-value"><?= $stats['completedSurveys'] ?></div>
+                    <p>Surveys you've submitted</p>
+                </div>
+                
+                <div class="card stat-card pending">
+                    <h3>Pending Surveys</h3>
+                    <div class="stat-value"><?= $stats['pendingSurveys'] ?></div>
+                    <p>Surveys awaiting your response</p>
+                </div>
+                
+                <div class="card stat-card warning">
+                    <h3>Unread Messages</h3>
+                    <div class="stat-value"><?= $unreadMessages ?></div>
+                    <p>Messages requiring attention</p>
+                </div>
+            </div>
+            
+            <!-- Quick Actions Section -->
+            <div class="quick-actions">
+                <a href="survey.php" class="quick-action">
+                    <i class="fas fa-poll"></i> View All Surveys
+                </a>
+                <a href="feedback.php" class="quick-action">
+                    <i class="fas fa-comment-alt"></i> Submit Feedback
+                </a>
+                <a href="messages.php" class="quick-action">
+                    <i class="fas fa-comments"></i> Messages
+                    <?php if($unreadMessages > 0): ?>
+                        <span class="badge bg-danger"><?= $unreadMessages ?></span>
+                    <?php endif; ?>
+                </a>
+                <a href="profile.php" class="quick-action">
+                    <i class="fas fa-user"></i> My Profile
+                </a>
+            </div>
+            
+            <!-- Main Content Grid -->
+            <div class="grid-container">
+                <!-- Recent Surveys Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-clipboard-list"></i> Recent Surveys</h2>
+                        <a href="survey.php" class="btn btn-sm">View All</a>
+                    </div>
+                    
+                    <?php if(empty($recentSurveys)): ?>
+                        <div class="empty-state">
+                            <i class="fas fa-clipboard-check fa-2x" style="color:#ddd;"></i>
+                            <p>No recent surveys available</p>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach($recentSurveys as $survey): 
+                            $now = new DateTime();
+                            $end = new DateTime($survey['ends_at']);
+                            $diff = $now->diff($end);
+                            $daysLeft = $diff->format('%a');
+                            $isUrgent = $daysLeft <= 3;
+                        ?>
+                            <div class="survey-item">
+                                <div class="survey-title"><?= htmlspecialchars($survey['title']) ?></div>
+                                <div class="survey-meta">
+                                    <span>Deadline: <?= date('M j, Y', strtotime($survey['ends_at'])) ?></span>
+                                    <span class="time-left <?= $isUrgent ? 'urgent' : 'soon' ?>">
+                                        <?= $daysLeft ?> days left
+                                    </span>
+                                </div>
+                                <?php if($survey['completed']): ?>
+                                    <span class="status-badge status-completed">
+                                        <i class="fas fa-check-circle"></i> Completed
+                                    </span>
+                                <?php else: ?>
+                                    <span class="status-badge status-pending">
+                                        <i class="fas fa-exclamation-circle"></i> Pending
+                                    </span>
+                                    <a href="survey_response.php?id=<?= $survey['id'] ?>" class="btn btn-sm">
+                                        Take Survey
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Upcoming Deadlines Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-calendar-times"></i> Upcoming Deadlines</h2>
+                    </div>
+                    
+                    <?php if(empty($upcomingDeadlines)): ?>
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-check fa-2x" style="color:#ddd;"></i>
+                            <p>No upcoming deadlines</p>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach($upcomingDeadlines as $deadline): 
+                            $now = new DateTime();
+                            $end = new DateTime($deadline['ends_at']);
+                            $diff = $now->diff($end);
+                            $daysLeft = $diff->format('%a');
+                            $isUrgent = $daysLeft <= 2;
+                        ?>
+                            <div class="deadline-item">
+                                <div class="deadline-title"><?= htmlspecialchars($deadline['title']) ?></div>
+                                <div class="deadline-date">
+                                    <span>Due: <?= date('M j, Y', strtotime($deadline['ends_at'])) ?></span>
+                                    <span class="<?= $isUrgent ? 'urgent' : 'soon' ?>">
+                                        <?= $daysLeft ?> days left
+                                    </span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <!-- Second Row -->
+            <div class="grid-container">
+                <!-- Recent Feedback Section -->
+                <?php if(!empty($recentFeedback)): ?>
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-comment-dots"></i> Recent Feedback</h2>
+                        <a href="feedback.php" class="btn btn-sm">View All</a>
+                    </div>
+                    
+                    <?php foreach($recentFeedback as $feedback): ?>
+                        <div class="feedback-item">
+                            <div class="feedback-title"><?= htmlspecialchars($feedback['subject']) ?></div>
+                            <div class="feedback-meta">
+                                <span><?= htmlspecialchars($feedback['category']) ?></span>
+                                <span><?= date('M j', strtotime($feedback['created_at'])) ?></span>
+                            </div>
+                            <p class="feedback-excerpt"><?= substr(htmlspecialchars($feedback['message']), 0, 100) ?>...</p>
                         </div>
                     <?php endforeach; ?>
                 </div>
-
-                <!-- Activity Log Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Activity Log</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Activity Type</th>
-                                    <th>Description</th>
-                                    <th>IP Address</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($activityLog)): ?>
-                                    <?php foreach ($activityLog as $log): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($log['id']) ?></td>
-                                            <td><?= htmlspecialchars($log['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($log['activity_type']) ?></td>
-                                            <td><?= htmlspecialchars($log['description']) ?></td>
-                                            <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                            <td><?= htmlspecialchars($log['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No recent activity found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                <?php endif; ?>
+                
+                <!-- Notifications Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-bell"></i> Notifications</h2>
+                        <a href="notifications.php" class="btn btn-sm">View All</a>
                     </div>
-                </div>
-
-                <!-- Feedback Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Feedback</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Message</th>
-                                    <th>Rating</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($feedback)): ?>
-                                    <?php foreach ($feedback as $item): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($item['id']) ?></td>
-                                            <td><?= htmlspecialchars($item['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($item['subject']) ?></td>
-                                            <td><?= htmlspecialchars($item['message']) ?></td>
-                                            <td><?= htmlspecialchars($item['rating']) ?></td>
-                                            <td><?= htmlspecialchars($item['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No feedback found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Support Tickets Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Support Tickets</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Status</th>
-                                    <th>Priority</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($tickets)): ?>
-                                    <?php foreach ($tickets as $ticket): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($ticket['id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['status']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['priority']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No tickets found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                    
+                    <?php if(empty($recentNotifications)): ?>
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash fa-2x" style="color:#ddd;"></i>
+                            <p>No new notifications</p>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach($recentNotifications as $notification): ?>
+                            <div class="notification-item unread">
+                                <div class="notification-message"><?= htmlspecialchars($notification['message']) ?></div>
+                                <div class="notification-time">
+                                    <?= date('M j, g:i a', strtotime($notification['created_at'])) ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
     </div>
+    
     <?php include 'includes/footer.php'; ?>
+    
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        // Simple script to mark notifications as read when clicked
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const notificationId = this.dataset.id;
+                if(notificationId) {
+                    fetch(`../api/mark_notification_read.php?id=${notificationId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if(data.success) {
+                                this.classList.remove('unread');
+                            }
+                        });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-<?php
-// Flush output buffer
-ob_end_flush();
-?>
