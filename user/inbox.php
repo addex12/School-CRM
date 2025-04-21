@@ -201,7 +201,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.view-message').forEach(button => {
         button.addEventListener('click', () => {
             const messageId = button.dataset.id;
-            window.location.href = `/view-message.php?id=${messageId}`;
+            // Change from /view-message.php to user/view_message.php
+            window.location.href = 'view_message.php?id=' + messageId;
         });
     });
 
