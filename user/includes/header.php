@@ -15,7 +15,7 @@ requireLogin();
 <body>
     <header class="main-header">
         <div class="header-content">
-            <h1 class="logo">Survey System</h1>
+            <h1 class="logo">School CRM System</h1>
             <nav class="main-nav">
                 <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Dashboard
@@ -24,7 +24,7 @@ requireLogin();
                     <i class="fas fa-comment-dots"></i> Feedback
                 </a>
                 <a href="contact.php" class="<?= basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>">
-                    <i class="fas contact"></i> Contact
+                    <i class="fas fa-phone"></i> Contact
                 </a>
                 <a href="messages.php" class="<?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Messages
