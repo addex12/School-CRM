@@ -95,12 +95,12 @@ function getUserRoleName($roleId) {
                     <?php foreach ($messages as $message): ?>
                         <div class="message-item" data-status="<?= $message['is_read'] ? 'read' : 'unread' ?>">
                             <div class="message-header">
-                                <span class="sender"><?= htmlspecialchars($message['sender_name']) ?></span>
+                                <span class="sender"><?= htmlspecialchars($message['sender_name'] ?? '') ?></span>
                                 <span class="date"><?= date('M j, Y g:i a', strtotime($message['sent_at'])) ?></span>
                             </div>
                             <div class="message-body">
-                                <h3 class="subject"><?= htmlspecialchars($message['subject']) ?></h3>
-                                <p class="content"><?= htmlspecialchars(substr($message['content'], 0, 100)) ?>...</p>
+                                <h3 class="subject"><?= htmlspecialchars($message['subject'] ?? '') ?></h3>
+                                <p class="content"><?= htmlspecialchars(substr($message['content'] ?? '', 0, 100)) ?>...</p>
                             </div>
                             <div class="message-actions">
                                 <button class="btn btn-primary view-message" data-id="<?= $message['id'] ?>">View</button>
