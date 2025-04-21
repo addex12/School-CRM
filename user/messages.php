@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
@@ -21,45 +28,47 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?> - Users Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .container {
             max-width: 1000px;
             margin: 30px auto 0 auto;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.07);
             padding: 30px 30px 20px 30px;
         }
         .messaging-container {
             display: flex;
             height: 65vh;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            background: #fafbfc;
+            border-radius: 8px;
+            background: #f8fafc;
             margin-top: 20px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+            box-shadow: 0 1px 8px rgba(0,0,0,0.04);
         }
         .contact-list {
             width: 250px;
             border-right: 1px solid #ddd;
             overflow-y: auto;
             background: #f8fafd;
-            border-radius: 5px 0 0 5px;
+            border-radius: 8px 0 0 8px;
         }
         .chat-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             background: #fff;
-            border-radius: 0 5px 5px 0;
+            border-radius: 0 8px 8px 0;
         }
         .chat-header {
             padding: 18px 20px 10px 20px;
             border-bottom: 1px solid #eee;
             background: #f7fafd;
-            border-radius: 0 5px 0 0;
+            border-radius: 0 8px 0 0;
         }
         .chat-messages {
             flex: 1;
@@ -71,7 +80,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             padding: 15px 20px;
             border-top: 1px solid #eee;
             background: #f7fafd;
-            border-radius: 0 0 5px 0;
+            border-radius: 0 0 8px 0;
         }
         .user-list {
             list-style: none;
@@ -84,6 +93,9 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             border-bottom: 1px solid #f0f0f0;
             font-size: 16px;
             transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
         .user-list li:hover {
             background-color: #f0f7fa;
@@ -104,18 +116,21 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         .chat-message {
             margin-bottom: 15px;
             padding: 10px 14px;
-            border-radius: 5px;
+            border-radius: 8px;
             max-width: 70%;
             word-break: break-word;
             font-size: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         .chat-message.own {
             background-color: #e3f2fd;
             margin-left: auto;
+            border: 1px solid #b6e0fe;
         }
         .chat-message.other {
             background-color: #f1f1f1;
             margin-right: auto;
+            border: 1px solid #e0e0e0;
         }
         .msg-time {
             font-size: 12px;
@@ -135,10 +150,18 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid #ddd;
-                border-radius: 5px 5px 0 0;
+                border-radius: 8px 8px 0 0;
             }
             .chat-section {
-                border-radius: 0 0 5px 5px;
+                border-radius: 0 0 8px 8px;
+            }
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 2vw;
+            }
+            .chat-header, .chat-messages, .message-form {
+                padding: 10px;
             }
         }
     </style>
@@ -147,15 +170,19 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     <?php include 'includes/header.php'; ?>
     <div class="container">
         <header style="margin-bottom: 18px;">
-            <h1 style="font-size: 2rem; font-weight: 700; margin: 0;"><?= htmlspecialchars($pageTitle) ?></h1>
+            <h1 style="font-size: 2rem; font-weight: 700; margin: 0; color:#007bff;">
+                <i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?>
+            </h1>
         </header>
         <div class="messaging-container">
             <aside class="contact-list">
-                <h2 style="font-size: 1.2rem; font-weight: 600; margin: 18px 0 10px 18px;">Users</h2>
+                <h2 style="font-size: 1.2rem; font-weight: 600; margin: 18px 0 10px 18px; color:#007bff;">
+                    <i class="fas fa-users"></i> Users
+                </h2>
                 <ul id="user-list" class="user-list">
                     <?php foreach ($users as $user): ?>
                         <li data-user-id="<?= $user['id'] ?>" class="contact-item">
-                            <?= htmlspecialchars($user['username']) ?>
+                            <span><?= htmlspecialchars($user['username']) ?></span>
                             <?php if (isset($unreadCounts[$user['id']])): ?>
                                 <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                             <?php endif; ?>
@@ -165,13 +192,17 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             </aside>
             <section class="chat-section">
                 <div id="chat-header" class="chat-header">
-                    <h3 style="margin:0; font-size:1.1rem; color:#333;">Select a user to start chatting</h3>
+                    <h3 style="margin:0; font-size:1.1rem; color:#333;">
+                        <i class="fas fa-comment-dots"></i> Select a user to start chatting
+                    </h3>
                 </div>
                 <div id="chat-messages" class="chat-messages"></div>
                 <form id="message-form" class="message-form" style="display:none;">
                     <input type="hidden" name="receiver_id" id="receiver_id">
                     <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required style="width:100%;resize:vertical;"></textarea>
-                    <button type="submit" class="btn btn-primary" style="margin-top:8px;">Send</button>
+                    <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
                 </form>
             </section>
         </div>

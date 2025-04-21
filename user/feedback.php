@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 require_once __DIR__ . '/../includes/auth.php';
@@ -62,17 +69,20 @@ $feedback->execute([$_SESSION['user_id']]);
     <meta charset="UTF-8">
     <title>Feedback System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         .rating-stars { color: #ffd700; font-size: 1.5em; }
         .feedback-history { margin-top: 30px; }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" style="max-width:900px;">
         <?php include 'includes/header.php'; ?>
 
         <div class="content">
-            <h2>Submit Feedback</h2>
+            <h2 style="color:#007bff;">
+                <i class="fas fa-comment-alt"></i> Submit Feedback
+            </h2>
             
             <!-- Feedback Form -->
             <form method="POST">

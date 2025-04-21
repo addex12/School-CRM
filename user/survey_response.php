@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireLogin();
@@ -222,7 +229,9 @@ foreach ($survey_data as $row) {
     <?php include 'includes/header.php'; ?>
     
     <div class="survey-container">
-        <h1 class="survey-title"><?= htmlspecialchars($survey['title']) ?></h1>
+        <h1 class="survey-title" style="color:#007bff;">
+            <i class="fas fa-clipboard-list"></i> <?= htmlspecialchars($survey['title']) ?>
+        </h1>
         <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
         
         <?php if (isset($_SESSION['error'])): ?>

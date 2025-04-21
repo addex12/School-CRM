@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 
@@ -7,10 +14,12 @@ $user_id = $_SESSION['user_id'] ?? null;
 $user_email = $_SESSION['email'] ?? '';
 ?>
 
-<div class="container">
+<div class="container" style="max-width:900px;">
 <?php include_once __DIR__ . '/includes/header.php';
 ?>
-    <h2>Contact Support</h2>
+    <h2 style="color:#007bff;">
+        <i class="fas fa-headset"></i> Contact Support
+    </h2>
     
     <?php if (isset($_GET['success'])): ?>
         <div class="alert alert-success">

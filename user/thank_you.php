@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once 'includes/header.php';
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -50,7 +57,9 @@ requireLogin();
     </header>
     <main>
         <div class="thank-you-container">
-            <h1>Thank You!</h1>
+            <h1 style="color:#007bff;">
+                <i class="fas fa-check-circle"></i> Thank You!
+            </h1>
             <p>We appreciate your time and effort in completing the survey.</p>
             <a href="dashboard.php" class="btn-primary">Back to Dashboard</a>
         </div>

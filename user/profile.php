@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 ob_start();
 
 // Error reporting - consider logging to file in production
@@ -166,8 +173,10 @@ function sendPasswordChangeNotification($email) {
 <div class="container">
     <?php include_once __DIR__ . '/includes/header.php'; ?>
     <main>
-        <div class="container mt-5">
-            <h1 class="text-center mb-4">Manage Your Profile</h1>
+        <div class="container mt-5" style="max-width:900px;">
+            <h1 class="text-center mb-4" style="color:#007bff;">
+                <i class="fas fa-user-circle"></i> Manage Your Profile
+            </h1>
 
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">

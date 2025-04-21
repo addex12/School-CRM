@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireLogin();
@@ -107,7 +114,9 @@ try {
     <?php include 'includes/header.php'; ?>
     
     <div class="survey-container">
-        <h1><?= htmlspecialchars($pageTitle) ?></h1>
+        <h1 style="color:#007bff;">
+            <i class="fas fa-poll"></i> <?= htmlspecialchars($pageTitle) ?>
+        </h1>
         
         <?php if (empty($surveys)): ?>
             <p>No surveys available for your role at this time.</p>
