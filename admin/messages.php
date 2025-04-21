@@ -155,8 +155,14 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                     messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
                                     messageDiv.innerHTML = `
                                         <strong>${msg.sender}</strong>
-                                        <p>${msg.message}</p>
+                                        <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
                                         <span class="msg-time">${msg.sent_at}</span>
+                                        ${
+                                            msg.is_own
+                                            ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
+                                               <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
+                                            : ''
+                                        }
                                     `;
                                     chatMessages.appendChild(messageDiv);
                                 });
@@ -257,6 +263,50 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                     loadMessages(selectedUserId);
                 }
             }, 5000);
+
+            // Handle Edit and Delete actions
+            chatMessages.addEventListener('click', function(e) {
+                // Edit message
+                if (e.target.classList.contains('edit-btn')) {
+                    const msgId = e.target.getAttribute('data-msg-id');
+                    const oldText = decodeURIComponent(e.target.getAttribute('data-msg-text'));
+                    const newText = prompt('Edit your message:', oldText);
+                    if (newText !== null && newText.trim() !== '' && newText !== oldText) {
+                        fetch('../api/edit_message.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: msgId, message: newText })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                loadMessages(selectedUserId);
+                            } else {
+                                alert('Failed to edit message: ' + (data.error || 'Unknown error'));
+                            }
+                        });
+                    }
+                }
+                // Delete message
+                if (e.target.classList.contains('delete-btn')) {
+                    const msgId = e.target.getAttribute('data-msg-id');
+                    if (confirm('Are you sure you want to delete this message?')) {
+                        fetch('../api/delete_message.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: msgId })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                loadMessages(selectedUserId);
+                            } else {
+                                alert('Failed to delete message: ' + (data.error || 'Unknown error'));
+                            }
+                        });
+                    }
+                }
+            });
         });
     </script>
 </body>
