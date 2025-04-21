@@ -22,6 +22,9 @@ $stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE 
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $unreadCounts[$row['receiver_id']] = $row['unread'];
 }
+
+// Get selected user from query string (for direct chat from inbox)
+$selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -224,7 +227,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             const receiverInput = document.getElementById('receiver_id');
             const messageInput = document.getElementById('message-input');
             
-            let selectedUserId = null;
+            let selectedUserId = <?= $selectedUserId ? json_encode($selectedUserId) : 'null' ?>;
             let currentUser = <?= $_SESSION['user_id'] ?? 0 ?>;
             
             // Load messages for selected user
@@ -340,6 +343,18 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 loadMessages(selectedUserId);
             });
             
+            // If redirected with user_id, auto-select that user
+            if (selectedUserId) {
+                const li = document.querySelector(`li[data-user-id="${selectedUserId}"]`);
+                if (li) {
+                    li.classList.add('selected');
+                    receiverInput.value = selectedUserId;
+                    chatHeader.innerHTML = `<h3>Chat with ${li.textContent.trim()}</h3>`;
+                    messageForm.style.display = 'block';
+                    loadMessages(selectedUserId);
+                }
+            }
+
             // Poll for new messages every 5 seconds
             setInterval(() => {
                 if (selectedUserId) {
