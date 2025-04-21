@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/includes/mailer.php';
+require_once __DIR__ . '../includes/config.php';
 requireLogin();
 
 // Fetch all active feedback subjects for dropdown
