@@ -5,10 +5,6 @@ session_start();
 // Error reporting (remove in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-// Define root path
-define('ROOT_PATH', dirname(__DIR__));
-
 // Include required files
 require '../includes/db.php';
 require '../includes/auth.php';
