@@ -3,7 +3,7 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 
-// Verify user is logged in and get role configuration
+// Verify user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../login.php');
     exit;
@@ -12,8 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 $current_user_id = (int)$_SESSION['user_id'];
 $current_user_role_id = (int)($_SESSION['role_id'] ?? 0);
 
-// Get role configuration from database
-$roles = $pdo->query("SELECT id, role_name FROM roles")->fetchAll(PDO::FETCH_KEY_PAIR);
+// Get admin role ID
 $admin_role_id = $pdo->query("SELECT id FROM roles WHERE role_name = 'admin' LIMIT 1")->fetchColumn();
 
 // Get all conversations (excluding admins)
@@ -33,39 +32,26 @@ $conversations = $pdo->prepare("
         (m.receiver_id = u.id AND m.sender_id = :current_user)
     )
     WHERE u.id != :current_user
-    AND u.role_id != :admin_role_id  // Dynamically exclude admins
+    AND u.role_id != :admin_role_id
     GROUP BY u.id, u.username, u.avatar, u.role_id, r.role_name
     ORDER BY last_message_time DESC
 ");
 
 $conversations->execute([
     ':current_user' => $current_user_id,
-    ':admin_role_id' => $admin_role_id ?: 0  // Fallback if no admin role found
+    ':admin_role_id' => $admin_role_id ?: 0
 ]);
 $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
 
-// Get support contacts based on role configuration
-$support_roles = $pdo->prepare("
-    SELECT id FROM roles 
-    WHERE is_support_role = 1  // Assuming you have this column
-    OR role_name IN ('admin', 'teacher', 'support')  // Fallback
-    ORDER BY FIELD(role_name, 'admin', 'teacher', 'support')
-");
-$support_roles->execute();
-$support_role_ids = $support_roles->fetchAll(PDO::FETCH_COLUMN);
-
-$support_contact = null;
-if (!empty($support_role_ids)) {
-    $support_query = $pdo->prepare("
-        SELECT u.id, u.username, u.avatar, r.role_name 
-        FROM users u
-        JOIN roles r ON u.role_id = r.id
-        WHERE u.role_id IN (" . implode(',', array_fill(0, count($support_role_ids), '?')) . ")
-        LIMIT 1
-    ");
-    $support_query->execute($support_role_ids);
-    $support_contact = $support_query->fetch(PDO::FETCH_ASSOC);
-}
+// Get support contacts (simplified version)
+$support_contact = $pdo->query("
+    SELECT u.id, u.username, u.avatar, r.role_name 
+    FROM users u
+    JOIN roles r ON u.role_id = r.id
+    WHERE r.role_name IN ('admin', 'teacher', 'support')
+    ORDER BY FIELD(r.role_name, 'admin', 'teacher', 'support')
+    LIMIT 1
+")->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
