@@ -14,11 +14,6 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
-try {
-    // Verify database connection
-    if (!isset($pdo) || !($pdo instanceof PDO)) {
-        throw new Exception("Database connection failed");
-    }
 
     // Get active users (last 15 minutes)
     $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
