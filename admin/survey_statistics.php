@@ -123,6 +123,64 @@ $chart_json = json_encode($chart_data);
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             margin-bottom: 25px;
         }
+        .statistics-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+        .statistics-header {
+            margin-bottom: 1.5rem;
+        }
+        .statistics-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+        .chart-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 1.5rem auto;
+            max-width: 420px;
+            min-height: 220px;
+            background: #f6f8fa;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+            padding: 1.5rem 1rem;
+        }
+        #responsesChart {
+            max-width: 350px !important;
+            max-height: 180px !important;
+            margin: 0 auto;
+        }
+        @media (max-width: 600px) {
+            .statistics-container {
+                padding: 1rem 0.5rem;
+                max-width: 98vw;
+            }
+            .chart-wrapper {
+                padding: 0.5rem 0.2rem;
+            }
+            #responsesChart {
+                max-width: 98vw !important;
+                max-height: 140px !important;
+            }
+        }
     </style>
 </head>
 <body>
