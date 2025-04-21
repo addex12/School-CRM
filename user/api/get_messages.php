@@ -18,16 +18,10 @@ if (!isset($_GET['user_id'])) {
 }
 
 $current_user_id = (int)$_SESSION['user_id'];
-$other_user_id = $_GET['user_id'];
+$other_user_id = (int)$_GET['user_id'];
 
 try {
-    // For regular users, don't allow viewing admin broadcasts
-    if ($other_user_id === 'broadcast') {
-        echo json_encode(['success' => false, 'error' => 'Access denied']);
-        exit;
-    }
-
-    // Get conversation between two users
+    // Get conversation between two users (including admin messages)
     $stmt = $pdo->prepare("
         SELECT 
             m.id,
@@ -45,7 +39,7 @@ try {
     
     $stmt->execute([
         ':current_user' => $current_user_id,
-        ':other_user' => (int)$other_user_id
+        ':other_user' => $other_user_id
     ]);
 
     $messages = [];
@@ -63,8 +57,11 @@ try {
         'success' => true,
         'messages' => $messages,
         'debug' => [
-            'current_user' => $current_user_id,
-            'other_user' => $other_user_id,
+            'query' => $stmt->queryString,
+            'params' => [
+                'current_user' => $current_user_id,
+                'other_user' => $other_user_id
+            ],
             'count' => count($messages)
         ]
     ]);
