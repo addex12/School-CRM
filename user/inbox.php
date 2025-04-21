@@ -426,6 +426,13 @@ document.addEventListener('DOMContentLoaded', () => {
     color: #fff;
 }
 
+.btn-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    /* Remove default browser styling for disabled buttons (like stop icon) */
+    background-image: none !important;
+}
+
 .no-messages {
     text-align: center;
     color: #666;
