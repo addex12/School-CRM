@@ -1,197 +1,151 @@
 <?php
-/**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/functions.php';
+require_once __DIR__ . '/includes/header.php';
 
- session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+$pageTitle = 'Register';
 
-require_once 'includes/config.php';
-require_once 'includes/auth.php';
-require_once 'includes/db.php';
-
-// Initialize database connection
-$db = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-class AuthHelper {
-    public static function isLoggedIn(): bool {
-        return isset($_SESSION['user_id']);
-    }
-}
-
-$errors = [];
-$username = $email = $role = '';
-
-// Move POST handling outside of the AuthHelper check
+// Registration logic (simplified, add your own validation and error handling)
+$success = $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
-    $email = $_POST['email'] ?? '';
+    $username = trim($_POST['username'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    $role = $_POST['role'] ?? 'parent';
 
-    // Validation
-    if (empty($username)) $errors['username'] = "Username is required";
-    if (empty($email)) $errors['email'] = "Email is required";
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = "Invalid email format";
-    if (empty($password)) $errors['password'] = "Password is required";
-    if (strlen($password) < 6) $errors['password'] = "Password must be at least 6 characters";
-    if ($password !== $confirm_password) $errors['confirm_password'] = "Passwords do not match";
-
-    // Check if username or email exists
-    if (empty($errors)) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+    if (empty($username) || empty($email) || empty($password) || empty($confirm_password)) {
+        $error = 'All fields are required.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Invalid email address.';
+    } elseif ($password !== $confirm_password) {
+        $error = 'Passwords do not match.';
+    } else {
+        // Check if username or email exists
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM users WHERE username = ? OR email = ?');
         $stmt->execute([$username, $email]);
-        $count = $stmt->fetchColumn();
-        
-        if ($count > 0) {
-            $errors['general'] = "Username or email already exists";
+        if ($stmt->fetchColumn() > 0) {
+            $error = 'Username or email already exists.';
+        } else {
+            // Register user
+            if (registerUser($username, $email, $password)) {
+                $success = 'Registration successful! You can now <a href="login.php">login</a>.';
+            } else {
+                $error = 'Registration failed. Please try again.';
+            }
         }
     }
-
-if (empty($errors)) {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");//-
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, user_role) VALUES (?, ?, ?, ?)");//+
-
-        if ($stmt->execute([$username, $email, $hashed_password, $role])) {
-            $_SESSION['success'] = "Registration successful! Please login.";
-            header("Location: login.php");
-            exit();
-        } else {
-            $errors['general'] = "Registration failed. Please try again.";
-        }
-    }//-
-    }//+
-
-
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register - Survey System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - School CRM</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         .register-container {
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 420px;
+            margin: 40px auto 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 32px 28px 28px 28px;
         }
         .register-title {
             text-align: center;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        .register-logo {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 48px;
+            font-size: 2rem;
             color: #3498db;
+            margin-bottom: 18px;
+            font-weight: 600;
         }
-        .role-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+        .form-group {
+            margin-bottom: 18px;
         }
-        .role-option {
-            flex: 1;
-            text-align: center;
-        }
-        .role-option input {
-            display: none;
-        }
-        .role-option label {
+        label {
             display: block;
-            padding: 15px;
-            background: #f5f5f5;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
         }
-        .role-option input:checked + label {
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #f9f9f9;
+            font-size: 1em;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
             background: #3498db;
-            color: white;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
         }
-        .role-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
+        .btn-primary:hover {
+            background: #217dbb;
+        }
+        .form-footer {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.98em;
+        }
+        .error-message, .success-message {
+            padding: 10px 14px;
+            border-radius: 5px;
+            margin-bottom: 18px;
+            font-size: 1em;
+        }
+        .error-message {
+            background: #ffeaea;
+            color: #d32f2f;
+            border: 1px solid #f5c6cb;
+        }
+        .success-message {
+            background: #e7fbe7;
+            color: #388e3c;
+            border: 1px solid #b2dfdb;
         }
     </style>
 </head>
 <body>
     <div class="register-container">
-        <div class="register-logo">
-            <i class="fas fa-user-plus"></i>
-        </div>
-        <h1 class="register-title">Create an Account</h1>
-        
-        <?php if (isset($errors['general'])): ?>
-            <div class="error-message"><?php echo $errors['general']; ?></div>
+        <div class="register-title">Create Account</div>
+        <?php if ($error): ?>
+            <div class="error-message"><?= htmlspecialchars($error) ?></div>
+        <?php elseif ($success): ?>
+            <div class="success-message"><?= $success ?></div>
         <?php endif; ?>
-        
-        <form method="POST">
+        <form method="POST" autocomplete="off">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username ?? ''); ?>" required>
-                <?php if (isset($errors['username'])): ?>
-                    <div class="field-error"><?php echo $errors['username']; ?></div>
-                <?php endif; ?>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required value="<?= htmlspecialchars($_POST['username'] ?? '') ?>">
             </div>
-            
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email ?? ''); ?>" required>
-                <?php if (isset($errors['email'])): ?>
-                    <div class="field-error"><?php echo $errors['email']; ?></div>
-                <?php endif; ?>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
             </div>
-            
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
-                <?php if (isset($errors['password'])): ?>
-                    <div class="field-error"><?php echo $errors['password']; ?></div>
-                <?php endif; ?>
             </div>
-            
             <div class="form-group">
-                <label for="confirm_password">Confirm Password:</label>
+                <label for="confirm_password">Confirm Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" required>
-                <?php if (isset($errors['confirm_password'])): ?>
-                    <div class="field-error"><?php echo $errors['confirm_password']; ?></div>
-                <?php endif; ?>
             </div>
-            
-            <div class="role-selector">
-                <div class="role-option">
-                    <input type="radio" id="user" name="role" value="user" required>
-                    <label for="user">
-                        <i class="fas fa-user role-icon"></i>
-                        new
-                    </label>
-                </div>
-                </div>
-                           
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <button type="submit" class="btn-primary">Register</button>
         </form>
-        
-        <div class="login-footer">
-            <p>Already have an account? <a href="login.php">Login here</a></p>
+        <div class="form-footer">
+            Already have an account? <a href="login.php">Login here</a>
         </div>
     </div>
-    
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <?php include 'includes/footer.php'; ?>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
