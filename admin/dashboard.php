@@ -17,7 +17,7 @@ try {
     $stats = [];
     
     // Survey Statistics
-    $stats['availableSurveys'] = $pdo->prepare("
+    $stmt = $pdo->prepare("
         SELECT COUNT(DISTINCT s.id)
         FROM surveys s
         JOIN survey_roles sr ON s.id = sr.survey_id
@@ -25,21 +25,27 @@ try {
           AND s.is_active = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
-    ")->execute([$_SESSION['role_id']])->fetchColumn();
-
-    $stats['completedSurveys'] = $pdo->prepare("
+    ");
+    $stmt->execute([$_SESSION['role_id']]);
+    $stmt = $pdo->prepare("
         SELECT COUNT(DISTINCT survey_id) 
         FROM survey_responses 
         WHERE user_id = ?
-    ")->execute([$_SESSION['user_id']])->fetchColumn();
-
-    $stats['pendingSurveys'] = $pdo->prepare("
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $stmt = $pdo->prepare("
         SELECT COUNT(DISTINCT s.id)
         FROM surveys s
         JOIN survey_roles sr ON s.id = sr.survey_id
         LEFT JOIN survey_responses r ON s.id = r.survey_id AND r.user_id = ?
         WHERE sr.role_id = ?
           AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+          AND r.id IS NULL
+    ");
+    $stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]);
+    $stats['pendingSurveys'] = $stmt->fetchColumn();
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
           AND r.id IS NULL

@@ -6,88 +6,50 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
+require_once '../includes/config.php';
 
 $pageTitle = "Manage User Roles";
 
-// Handle form submissions
+// Handle add/edit/delete role actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if (isset($_POST['add_role'])) {
-            $roleName = trim($_POST['role_name']);
-            $description = trim($_POST['description']);
-            
-            // Validate input
-            if (empty($roleName)) {
-                throw new Exception("Role name cannot be empty");
-            }
-            
-            // Check for existing role
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM roles WHERE role_name = ?");
-            $stmt->execute([$roleName]);
-            if ($stmt->fetchColumn() > 0) {
-                throw new Exception("Role name already exists");
-            }
-            
-            // Insert new role
-            $stmt = $pdo->prepare("INSERT INTO roles (role_name, description) VALUES (?, ?)");
-            $stmt->execute([$roleName, $description]);
+            $role_name = trim($_POST['role_name']);
+            if (empty($role_name)) throw new Exception("Role name is required.");
+            $stmt = $pdo->prepare("INSERT INTO roles (role_name) VALUES (?)");
+            $stmt->execute([$role_name]);
             $_SESSION['success'] = "Role added successfully!";
+            header("Location: user_roles.php");
+            exit();
         }
-        
-        if (isset($_POST['update_role'])) {
-            $roleId = $_POST['role_id'];
-            $roleName = trim($_POST['role_name']);
-            $description = trim($_POST['description']);
-            
-            // Validate input
-            if (empty($roleName)) {
-                throw new Exception("Role name cannot be empty");
-            }
-            
-            // Check for existing role excluding current
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM roles WHERE role_name = ? AND id != ?");
-            $stmt->execute([$roleName, $roleId]);
-            if ($stmt->fetchColumn() > 0) {
-                throw new Exception("Role name already exists");
-            }
-            
-            // Update role
-            $stmt = $pdo->prepare("UPDATE roles SET role_name = ?, description = ? WHERE id = ?");
-            $stmt->execute([$roleName, $description, $roleId]);
+        if (isset($_POST['edit_role'])) {
+            $role_id = intval($_POST['role_id']);
+            $role_name = trim($_POST['role_name']);
+            if (empty($role_name)) throw new Exception("Role name is required.");
+            $stmt = $pdo->prepare("UPDATE roles SET role_name = ? WHERE id = ?");
+            $stmt->execute([$role_name, $role_id]);
             $_SESSION['success'] = "Role updated successfully!";
+            header("Location: user_roles.php");
+            exit();
         }
-        
         if (isset($_POST['delete_role'])) {
-            $roleId = $_POST['role_id'];
-            
-            // Check if role is in use
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role_id = ?");
-            $stmt->execute([$roleId]);
-            if ($stmt->fetchColumn() > 0) {
-                throw new Exception("Cannot delete role assigned to users");
-            }
-            
-            // Delete role
+            $role_id = intval($_POST['role_id']);
             $stmt = $pdo->prepare("DELETE FROM roles WHERE id = ?");
-            $stmt->execute([$roleId]);
+            $stmt->execute([$role_id]);
             $_SESSION['success'] = "Role deleted successfully!";
+            header("Location: user_roles.php");
+            exit();
         }
-        
     } catch (Exception $e) {
         $_SESSION['error'] = $e->getMessage();
     }
-    
-    header("Location: user_roles.php");
-    exit();
 }
 
-// Get all roles
-$roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
+// Fetch all roles
+$roles = $pdo->query("SELECT * FROM roles ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -96,43 +58,58 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
-        /* Modal overlay */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
+        .roles-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            margin: 2rem 0;
+        }
+        .roles-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .roles-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        .roles-table {
             width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
+            border-collapse: collapse;
         }
-
-        /* Modal content */
-        .modal-content {
-            background-color: #fff;
-            margin: 10% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .roles-table th, .roles-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            text-align: left;
         }
-
-        /* Close button */
-        .modal .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+        .roles-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #34495e;
         }
-
-        .modal .close:hover,
-        .modal .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
+        .roles-table tr:hover {
+            background: #f4f8fb;
+        }
+        .role-actions button {
+            margin-right: 8px;
+        }
+        @media (max-width: 900px) {
+            .roles-container {
+                padding: 1rem 0.5rem;
+            }
+            .roles-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+        @media (max-width: 600px) {
+            .roles-table th, .roles-table td {
+                padding: 8px 6px;
+            }
         }
     </style>
 </head>
@@ -141,127 +118,57 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1>Manage User Roles</h1>
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <?php if (isset($_SESSION['success'])): ?>
-                    <div class="success-message"><?= $_SESSION['success'] ?></div>
-                    <?php unset($_SESSION['success']); ?>
-                <?php endif; ?>
-                
-                <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message"><?= $_SESSION['error'] ?></div>
-                    <?php unset($_SESSION['error']); ?>
-                <?php endif; ?>
-
-                <!-- Add Role Form -->
-                <div class="card mb-4">
-                    <h2>Add New Role</h2>
-                    <form method="POST">
-                        <div class="form-group">
-                            <label>Role Name:</label>
-                            <input type="text" name="role_name" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Description:</label>
-                            <textarea name="description" rows="2"></textarea>
-                        </div>
-                        <div class="form-actions">
+                <div class="roles-container">
+                    <div class="roles-header">
+                        <h2>User Roles</h2>
+                        <form method="POST" style="display:flex;gap:10px;">
+                            <input type="text" name="role_name" placeholder="New role name" required>
                             <button type="submit" name="add_role" class="btn btn-primary">Add Role</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Roles Table -->
-                <div class="card">
-                    <h2>Existing Roles</h2>
-                    <?php if (count($roles) > 0): ?>
-                        <table class="table">
+                        </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="roles-table">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Role Name</th>
-                                    <th>Description</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($roles as $role): ?>
+                                <?php if (!empty($roles)): ?>
+                                    <?php foreach ($roles as $role): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($role['id']) ?></td>
+                                            <td><?= htmlspecialchars($role['role_name']) ?></td>
+                                            <td class="role-actions">
+                                                <form method="POST" style="display:inline;">
+                                                    <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
+                                                    <input type="text" name="role_name" value="<?= htmlspecialchars($role['role_name']) ?>" required style="width:120px;">
+                                                    <button type="submit" name="edit_role" class="btn btn-secondary btn-sm">Edit</button>
+                                                </form>
+                                                <form method="POST" style="display:inline;">
+                                                    <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
+                                                    <button type="submit" name="delete_role" class="btn btn-danger btn-sm" onclick="return confirm('Delete this role?')">Delete</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($role['role_name']) ?></td>
-                                        <td><?= htmlspecialchars($role['description']) ?></td>
-                                        <td>
-                                            <button class="btn btn-edit" onclick="openEditModal(
-                                                <?= $role['id'] ?>,
-                                                '<?= htmlspecialchars($role['role_name']) ?>',
-                                                '<?= htmlspecialchars($role['description']) ?>'
-                                            )">Edit</button>
-                                            
-                                            <form method="POST" style="display:inline;">
-                                                <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
-                                                <button type="submit" name="delete_role" class="btn btn-delete" 
-                                                    onclick="return confirm('Are you sure you want to delete this role?')">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        </td>
+                                        <td colspan="3">No roles found.</td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
-                    <?php else: ?>
-                        <p>No roles found.</p>
-                    <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-
-    <!-- Edit Role Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeEditModal()">&times;</span>
-            <h2>Edit Role</h2>
-            <form method="POST">
-                <input type="hidden" name="role_id" id="editRoleId">
-                <input type="hidden" name="update_role">
-                
-                <div class="form-group">
-                    <label>Role Name:</label>
-                    <input type="text" name="role_name" id="editRoleName" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Description:</label>
-                    <textarea name="description" id="editDescription" rows="2"></textarea>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function openEditModal(id, name, description) {
-            document.getElementById('editRoleId').value = id;
-            document.getElementById('editRoleName').value = name;
-            document.getElementById('editDescription').value = description;
-            document.getElementById('editModal').style.display = 'block';
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('editModal');
-            if (event.target === modal) {
-                closeEditModal();
-            }
-        }
-    </script>
 </body>
 </html>
