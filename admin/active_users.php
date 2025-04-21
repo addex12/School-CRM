@@ -3,7 +3,7 @@
 session_start();
 
 // Include the database connection file
-include 'includes/db.php';
+include '../includes/db.php';
 
 try {
     // Create a new PDO instance
