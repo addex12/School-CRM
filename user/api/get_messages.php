@@ -21,11 +21,11 @@ $current_user_id = (int)$_SESSION['user_id'];
 $other_user_id = (int)$_GET['user_id'];
 
 try {
-    // Get conversation between two users (including admin messages)
+    // Use the correct column name: 'message' instead of 'content' if your DB uses 'message'
     $stmt = $pdo->prepare("
         SELECT 
             m.id,
-            m.content as message,
+            m.message as message,
             m.sent_at,
             m.sender_id,
             u.username as sender
@@ -55,22 +55,13 @@ try {
 
     echo json_encode([
         'success' => true,
-        'messages' => $messages,
-        'debug' => [
-            'query' => $stmt->queryString,
-            'params' => [
-                'current_user' => $current_user_id,
-                'other_user' => $other_user_id
-            ],
-            'count' => count($messages)
-        ]
+        'messages' => $messages
     ]);
 
 } catch (PDOException $e) {
     error_log("Message Error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'error' => 'Database error',
-        'debug' => $e->getMessage()
+        'error' => 'Database error'
     ]);
 }
