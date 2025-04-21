@@ -149,5 +149,38 @@ $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [
     </div>
     <?php include 'includes/footer.php'; ?>
     <script src="../assets/js/backup.js"></script>
+    <script>
+    // Restore progress bar logic
+    document.addEventListener('DOMContentLoaded', function() {
+        // Attach to all restore forms
+        document.querySelectorAll('form[action="restore.php"]').forEach(function(form) {
+            form.addEventListener('submit', function(e) {
+                // Show progress bar
+                let progressBar = document.createElement('div');
+                progressBar.id = 'restoreProgress';
+                progressBar.style.marginTop = '10px';
+                progressBar.innerHTML = `
+                    <div style="width:100%;background:#eee;border-radius:4px;overflow:hidden;">
+                        <div id="restoreBar" style="width:0%;height:20px;background:#28a745;"></div>
+                    </div>
+                    <div id="restoreStatus" style="margin-top:5px;font-size:14px;color:#333;">Starting restore...</div>
+                `;
+                form.parentNode.insertBefore(progressBar, form.nextSibling);
+                // Start polling
+                let interval = setInterval(function() {
+                    fetch('restore_status.php')
+                        .then(r => r.json())
+                        .then(data => {
+                            document.getElementById('restoreBar').style.width = data.percent + '%';
+                            document.getElementById('restoreStatus').textContent = data.message;
+                            if (data.percent >= 100) {
+                                clearInterval(interval);
+                            }
+                        });
+                }, 1000);
+            });
+        });
+    });
+    </script>
 </body>
 </html>

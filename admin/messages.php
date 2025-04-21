@@ -1,10 +1,36 @@
 <?php
-require_once '../includes/auth.php';
-requireAdmin();
-require_once '../includes/config.php';
-$pageTitle = "Admin Messaging";
-// Get all non-admin users
-$users = $pdo->query("SELECT id, username FROM users WHERE role_id != 1 ORDER BY username")->fetchAll();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    require_once '../includes/auth.php';
+    requireAdmin();
+    require_once '../includes/db.php';
+    
+    header('Content-Type: application/json');
+    
+    try {
+        if ($_POST['action'] === 'send_message') {
+            $receiver_id = $_POST['receiver_id'] === 'broadcast' ? null : (int)$_POST['receiver_id'];
+            $message = trim($_POST['message']);
+            
+            if (empty($message)) {
+                throw new Exception("Message cannot be empty");
+            }
+            
+            $stmt = $pdo->prepare("INSERT INTO messages 
+                                 (sender_id, receiver_id, subject, content, sent_at) 
+                                 VALUES (?, ?, 'Admin Message', ?, NOW())");
+            $stmt->execute([$_SESSION['user_id'], $receiver_id, $message]);
+            
+            echo json_encode(['success' => true]);
+            exit;
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+        exit;
+    }
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -50,7 +50,7 @@ function getReportData($pdo, $type, $startDate, $endDate, $userId, $status) {
     $stmt->execute($params);
     return $stmt->fetchAll();
 }
-
+}
 // Get report data
 $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $status);
 
@@ -90,6 +90,7 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                     </label>
                     <label>Start Date: <input type="date" name="start_date" value="<?= htmlspecialchars($startDate) ?>"></label>
                     <label>End Date: <input type="date" name="end_date" value="<?= htmlspecialchars($endDate) ?>"></label>
+                   
                     <label>User:
                         <select name="user_id">
                             <option value="">All</option>
@@ -162,3 +163,4 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
+<?php endif; ?>
