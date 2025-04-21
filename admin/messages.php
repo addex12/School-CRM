@@ -264,6 +264,10 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 }
             }, 5000);
 
+            // The following endpoints are used for message CRUD via AJAX:
+            //   - ../api/edit_message.php
+            //   - ../api/delete_message.php
+
             // Handle Edit and Delete actions
             chatMessages.addEventListener('click', function(e) {
                 // Edit message
