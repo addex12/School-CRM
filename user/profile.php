@@ -393,3 +393,6 @@ function sendPasswordChangeNotification($email) {
 <script src="js/profile.js"></script>
 </body>
 </html>
+<?php
+exit;
+?>
