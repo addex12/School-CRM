@@ -11,62 +11,87 @@ $current = basename($_SERVER['PHP_SELF']);
 ?>
 <style>
 .admin-sidebar {
-    background: #222d32;
+    background: linear-gradient(180deg, #222d32 0%, #34495e 100%);
     color: #fff;
-    width: 220px;
+    width: 250px;
     min-height: 100vh;
-    float: left;
-    padding-top: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: width 0.2s;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    padding-top: 30px;
+    box-shadow: 2px 0 8px rgba(44,62,80,0.07);
+    transition: width 0.2s, left 0.2s;
+    display: flex;
+    flex-direction: column;
 }
-.admin-sidebar ul { list-style: none; padding: 0; }
-.admin-sidebar li { margin-bottom: 18px; }
+.admin-sidebar ul { list-style: none; padding: 0; margin: 0; }
+.admin-sidebar li { margin-bottom: 12px; }
 .admin-sidebar a {
     color: #b8c7ce;
     text-decoration: none;
     display: flex;
     align-items: center;
-    padding: 8px 18px;
-    border-radius: 4px;
-    transition: background 0.2s;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: background 0.18s, color 0.18s;
+    gap: 10px;
 }
 .admin-sidebar li.active a, .admin-sidebar a:hover {
     background: #1a2226;
-    color: #fff;
+    color: #f1c40f;
 }
-.admin-sidebar i { margin-right: 12px; }
+.admin-sidebar i { margin-right: 10px; font-size: 1.2em; }
 .sidebar-toggle {
     display: none;
 }
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .admin-sidebar {
         width: 60px;
         padding-top: 10px;
     }
     .admin-sidebar a {
-        padding: 8px 12px;
+        padding: 10px 10px;
+        font-size: 0;
+    }
+    .admin-sidebar a .menu-text, .admin-sidebar a .category-text {
+        display: none;
     }
     .admin-sidebar i {
-        margin-right: 6px;
+        margin-right: 0;
+        font-size: 1.3em;
     }
     .sidebar-toggle {
         display: block;
-        position: absolute;
-        top: 10px;
-        right: 10px;
+        position: fixed;
+        top: 12px;
+        left: 12px;
         background: #1a2226;
         color: #fff;
-        padding: 8px;
-        border-radius: 4px;
+        padding: 10px;
+        border-radius: 6px;
         cursor: pointer;
+        z-index: 300;
+        border: none;
+    }
+}
+@media (max-width: 600px) {
+    .admin-sidebar {
+        left: -250px;
+        width: 220px;
+        transition: left 0.2s;
+    }
+    .admin-sidebar.open {
+        left: 0;
     }
 }
 </style>
-<aside class="admin-sidebar">
-    <button class="sidebar-toggle" id="sidebarToggle">
-        <i class="fas fa-bars"></i>
-    </button>
+<button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-bars"></i>
+</button>
+<aside class="admin-sidebar" id="adminSidebar">
     <ul>
         <?php foreach ($sidebarItems as $item): ?>
             <?php if (isset($item['items'])): // Category with subitems ?>
@@ -77,21 +102,21 @@ $current = basename($_SERVER['PHP_SELF']);
                         <i class="fas fa-chevron-down collapse-icon"></i>
                     </div>
                     <ul class="submenu" id="<?= $item['id'] ?>"<?php
-    // If any subitem is active, open this submenu
-    $active = false;
-    foreach ($item['items'] as $subitem) {
-        if (basename($_SERVER['PHP_SELF']) == $subitem['link']) {
-            $active = true;
-            break;
-        }
-    }
-    echo $active ? ' style="display:block"' : '';
-?>>
+                        // If any subitem is active, open this submenu
+                        $active = false;
+                        foreach ($item['items'] as $subitem) {
+                            if (basename($_SERVER['PHP_SELF']) == $subitem['link']) {
+                                $active = true;
+                                break;
+                            }
+                        }
+                        echo $active ? ' style="display:block"' : '';
+                    ?>>
                         <?php foreach ($item['items'] as $subitem): ?>
                             <li class="submenu-item <?= basename($_SERVER['PHP_SELF']) == $subitem['link'] ? 'active' : '' ?>">
                                 <a href="<?= $subitem['link'] ?>">
                                     <i class="fas fa-<?= $subitem['icon'] ?>"></i>
-                                    <span><?= $subitem['title'] ?></span>
+                                    <span class="menu-text"><?= $subitem['title'] ?></span>
                                 </a>
                             </li>
                         <?php endforeach; ?>
@@ -159,17 +184,18 @@ $current = basename($_SERVER['PHP_SELF']);
             sm.style.display = 'none';
         }
     });
-    // Sidebar hamburger toggle for mobile
+    // Sidebar hamburger toggle for mobile/tablet
     var sidebar = document.getElementById('adminSidebar');
     var sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebar && sidebarToggle) {
-        sidebarToggle.addEventListener('click', function() {
+        sidebarToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
             sidebar.classList.toggle('open');
         });
     }
     // Close sidebar on outside click (mobile)
     document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 700 && sidebar && sidebar.classList.contains('open')) {
+        if (window.innerWidth <= 600 && sidebar && sidebar.classList.contains('open')) {
             if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
                 sidebar.classList.remove('open');
             }
@@ -177,7 +203,3 @@ $current = basename($_SERVER['PHP_SELF']);
     });
 })();
 </script>
-
-    </script>
-</body>
-</html>
