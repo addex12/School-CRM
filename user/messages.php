@@ -92,7 +92,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include 'includes/header.php'; ?>
         <div class="admin-main">
             <header class="admin-header"><h1><?= htmlspecialchars($pageTitle) ?></h1></header>
             <div class="content">
@@ -313,5 +313,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             });
         });
     </script>
+        <?php include_once __DIR__ . '/includes/footer.php'; ?>
+
 </body>
 </html>
