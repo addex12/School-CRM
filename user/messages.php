@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedUserId = null;
     let isLoading = false;
 
-    // Load messages for selected user
+    // Enhanced loadMessages function with better error handling
     async function loadMessages(userId) {
         if (!userId || isLoading) return;
         
@@ -285,10 +285,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const response = await fetch(`${MESSAGES_API}?user_id=${userId}`);
+            
+            // First check if the response is OK
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
+            // Then check if the API returned success
             if (!data.success) {
-                throw new Error(data.error || 'Failed to load messages');
+                throw new Error(data.error || 'API returned failure');
             }
             
             chatMessages.innerHTML = '';
@@ -317,16 +324,38 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error loading messages:', error);
-            chatMessages.innerHTML = `<div class="no-messages">Error: ${error.message}</div>`;
+            chatMessages.innerHTML = `
+                <div class="no-messages">
+                    Error loading messages<br>
+                    <small>${error.message}</small>
+                </div>
+            `;
+            
+            // Show more debug info in console
+            console.debug('Debug info:', {
+                selectedUserId,
+                currentUserId,
+                apiEndpoint: MESSAGES_API,
+                error: error.message
+            });
         } finally {
             isLoading = false;
         }
     }
 
-    // Mark messages as read
+    // Enhanced markAsRead function
     async function markAsRead(senderId) {
         try {
-            await fetch(`${MARK_READ_API}?user_id=${senderId}`);
+            const response = await fetch(`${MARK_READ_API}?user_id=${senderId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            
+            if (!data.success) {
+                console.warn('Mark as read failed:', data.error);
+            }
+            
             // Update unread count in UI
             const badge = document.querySelector(`.contact-item[data-user-id="${senderId}"] .unread-badge`);
             if (badge) badge.remove();
@@ -335,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Handle contact selection
+    // Contact selection handler
     contactItems.forEach(item => {
         item.addEventListener('click', function() {
             selectedUserId = this.getAttribute('data-user-id');
@@ -355,12 +384,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle form submission
+    // Enhanced form submission handler
     messageForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const message = messageInput.value.trim();
-        if (!message || !selectedUserId) return;
+        if (!message || !selectedUserId) {
+            alert('Please enter a message');
+            return;
+        }
         
         try {
             const response = await fetch(SEND_API, {
@@ -371,14 +403,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: `receiver_id=${encodeURIComponent(selectedUserId)}&message=${encodeURIComponent(message)}`
             });
             
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const data = await response.json();
             
             if (!data.success) {
                 throw new Error(data.error || 'Failed to send message');
             }
             
+            // Clear input and reload messages
             messageInput.value = '';
             await loadMessages(selectedUserId);
+            
         } catch (error) {
             console.error('Error sending message:', error);
             alert(`Failed to send message: ${error.message}`);
@@ -390,12 +428,17 @@ document.addEventListener('DOMContentLoaded', function() {
         contactItems[0].click();
     }
 
-    // Poll for new messages every 3 seconds
-    setInterval(() => {
-        if (selectedUserId) {
+    // Poll for new messages with error handling
+    const pollInterval = setInterval(() => {
+        if (selectedUserId && !isLoading) {
             loadMessages(selectedUserId);
         }
     }, 3000);
+
+    // Clean up interval when page unloads
+    window.addEventListener('beforeunload', () => {
+        clearInterval(pollInterval);
+    });
 });
 </script>
     
