@@ -105,11 +105,19 @@ function handleAvatarUpload($user, $userId) {
         $fileSize = $_FILES['avatar']['size'];
         $maxSize = 2 * 1024 * 1024; // 2MB
 
-        $fileInfo = getimagesize($_FILES['avatar']['tmp_name']);
-        if (!$fileInfo || !in_array($fileInfo['mime'], $allowedTypes)) {
-            $_SESSION['error'] = "Only JPG, PNG, and GIF files are allowed.";
+        // Only check getimagesize if file was uploaded
+        if (is_uploaded_file($_FILES['avatar']['tmp_name'])) {
+            $fileInfo = getimagesize($_FILES['avatar']['tmp_name']);
+            if (!$fileInfo || !in_array($fileInfo['mime'], $allowedTypes)) {
+                $_SESSION['error'] = "Only JPG, PNG, and GIF files are allowed.";
+                return false;
+            }
+        } else {
+            $_SESSION['error'] = "No file uploaded or upload error.";
             return false;
-        } elseif ($fileSize > $maxSize) {
+        }
+
+        if ($fileSize > $maxSize) {
             $_SESSION['error'] = "File size must be less than 2MB.";
             return false;
         } else {
@@ -282,7 +290,7 @@ function sendPasswordChangeNotification($email) {
     padding: 40px 20px 0 20px;
 }
 </style>
-<?php include_once __DIR__ . '/includes/header.php'; ?>
+<?php include_once __DIR__ . '/../includes/header.php'; ?>
 <div class="main-content-container">
     <div class="profile-main-container">
         <div class="profile-header">
@@ -386,7 +394,7 @@ function sendPasswordChangeNotification($email) {
         </div>
     </div>
 </div>
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
+<?php include_once __DIR__ . '/../includes/footer.php'; ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
