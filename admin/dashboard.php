@@ -12,73 +12,113 @@ requireLogin();
 
 $pageTitle = "Dashboard";
 
-// Initialize all variables with default values
-$stats = [
-    'availableSurveys' => 0,
-    'completedSurveys' => 0,
-    'pendingSurveys' => 0
-];
-
-$recentSurveys = [];
-$upcomingDeadlines = [];
-$recentFeedback = [];
-$unreadMessages = 0;  // Initialize with default value
-$recentNotifications = [];
-
 try {
-    // Survey Statistics - Available Surveys
-    $stmt = $pdo->prepare("SELECT COUNT(DISTINCT s.id) FROM surveys s JOIN survey_roles sr ON s.id = sr.survey_id WHERE sr.role_id = ? AND s.is_active = 1 AND s.starts_at <= NOW() AND s.ends_at >= NOW()");
-    if ($stmt->execute([$_SESSION['role_id']])) {
-        $stats['availableSurveys'] = $stmt->fetchColumn();
-    }
+    // Dashboard Statistics
+    $stats = [];
+    
+    // Survey Statistics
+    $stats['availableSurveys'] = $pdo->prepare("
+        SELECT COUNT(DISTINCT s.id)
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+    ")->execute([$_SESSION['role_id']])->fetchColumn();
 
-    // Completed Surveys
-    $stmt = $pdo->prepare("SELECT COUNT(DISTINCT survey_id) FROM survey_responses WHERE user_id = ?");
-    if ($stmt->execute([$_SESSION['user_id']])) {
-        $stats['completedSurveys'] = $stmt->fetchColumn();
-    }
+    $stats['completedSurveys'] = $pdo->prepare("
+        SELECT COUNT(DISTINCT survey_id) 
+        FROM survey_responses 
+        WHERE user_id = ?
+    ")->execute([$_SESSION['user_id']])->fetchColumn();
 
-    // Pending Surveys
-    $stmt = $pdo->prepare("SELECT COUNT(DISTINCT s.id) FROM surveys s JOIN survey_roles sr ON s.id = sr.survey_id LEFT JOIN survey_responses r ON s.id = r.survey_id AND r.user_id = ? WHERE sr.role_id = ? AND s.is_active = 1 AND s.starts_at <= NOW() AND s.ends_at >= NOW() AND r.id IS NULL");
-    if ($stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']])) {
-        $stats['pendingSurveys'] = $stmt->fetchColumn();
-    }
+    $stats['pendingSurveys'] = $pdo->prepare("
+        SELECT COUNT(DISTINCT s.id)
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        LEFT JOIN survey_responses r ON s.id = r.survey_id AND r.user_id = ?
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+          AND r.id IS NULL
+    ")->execute([$_SESSION['user_id'], $_SESSION['role_id']])->fetchColumn();
 
-    // Recent surveys
-    $stmt = $pdo->prepare("SELECT s.id, s.title, s.description, s.ends_at, (SELECT COUNT(*) FROM survey_responses r WHERE r.survey_id = s.id AND r.user_id = ?) as completed FROM surveys s JOIN survey_roles sr ON s.id = sr.survey_id WHERE sr.role_id = ? AND s.is_active = 1 AND s.starts_at <= NOW() AND s.ends_at >= NOW() ORDER BY s.ends_at ASC LIMIT 5");
-    if ($stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']])) {
-        $recentSurveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    // Recent surveys (limit to 5)
+    $recentSurveys = $pdo->prepare("
+        SELECT s.id, s.title, s.description, s.ends_at,
+               (SELECT COUNT(*) FROM survey_responses r 
+                WHERE r.survey_id = s.id AND r.user_id = ?) as completed
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.starts_at <= NOW() 
+          AND s.ends_at >= NOW()
+        ORDER BY s.ends_at ASC
+        LIMIT 5
+    ")->execute([$_SESSION['user_id'], $_SESSION['role_id']])->fetchAll(PDO::FETCH_ASSOC);
 
-    // Upcoming deadlines
-    $stmt = $pdo->prepare("SELECT s.id, s.title, s.ends_at FROM surveys s JOIN survey_roles sr ON s.id = sr.survey_id WHERE sr.role_id = ? AND s.is_active = 1 AND s.ends_at BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY) ORDER BY s.ends_at ASC LIMIT 5");
-    if ($stmt->execute([$_SESSION['role_id']])) {
-        $upcomingDeadlines = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Unread messages count
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE receiver_id = ? AND is_read = 0");
-    if ($stmt->execute([$_SESSION['user_id']])) {
-        $unreadMessages = $stmt->fetchColumn();
-    }
-
-    // Recent notifications
-    $stmt = $pdo->prepare("SELECT id, message, created_at FROM notifications WHERE user_id = ? AND read_at IS NULL ORDER BY created_at DESC LIMIT 5");
-    if ($stmt->execute([$_SESSION['user_id']])) {
-        $recentNotifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    // Upcoming deadlines (surveys ending soon)
+    $upcomingDeadlines = $pdo->prepare("
+        SELECT s.id, s.title, s.ends_at
+        FROM surveys s
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE sr.role_id = ?
+          AND s.is_active = 1
+          AND s.ends_at BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 7 DAY)
+        ORDER BY s.ends_at ASC
+        LIMIT 5
+    ")->execute([$_SESSION['role_id']])->fetchAll(PDO::FETCH_ASSOC);
 
     // Recent feedback (if applicable)
-    if (in_array($_SESSION['role_id'], [3,4,5])) {
-        $stmt = $pdo->prepare("SELECT f.id, f.subject, f.message, f.created_at, fs.subject as category FROM feedback f LEFT JOIN feedback_subjects fs ON f.subject = fs.id WHERE f.user_id = ? ORDER BY f.created_at DESC LIMIT 3");
-        if ($stmt->execute([$_SESSION['user_id']])) {
-            $recentFeedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
+    $recentFeedback = [];
+    if(in_array($_SESSION['role_id'], [3,4,5])) { // Teachers, Parents, Students
+        $recentFeedback = $pdo->prepare("
+            SELECT f.id, f.subject, f.message, f.created_at, fs.subject as category
+            FROM feedback f
+            LEFT JOIN feedback_subjects fs ON f.subject = fs.id
+            WHERE f.user_id = ?
+            ORDER BY f.created_at DESC
+            LIMIT 3
+        ")->execute([$_SESSION['user_id']])->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Unread messages
+    $unreadMessages = $pdo->prepare("
+        SELECT COUNT(*) 
+        FROM messages 
+        WHERE receiver_id = ? AND is_read = 0
+    ")->execute([$_SESSION['user_id']])->fetchColumn();
+
+    // Recent notifications
+    $recentNotifications = $pdo->prepare("
+        SELECT id, message, created_at 
+        FROM notifications 
+        WHERE user_id = ? AND read_at IS NULL
+        ORDER BY created_at DESC
+        LIMIT 5
+    ")->execute([$_SESSION['user_id']])->fetchAll(PDO::FETCH_ASSOC);
+
 } catch (PDOException $e) {
-    error_log("Dashboard Error: " . $e->getMessage());
-    $_SESSION['error'] = "We encountered an issue loading your dashboard data.";
+    // Enhanced error logging
+    error_log("[".date('Y-m-d H:i:s')."] Dashboard Error - User ID: {$_SESSION['user_id']} - ".$e->getMessage()."\n", 3, "../logs/dashboard_errors.log");
+    
+    // Initialize empty data to prevent errors
+    $stats = [
+        'availableSurveys' => 0,
+        'completedSurveys' => 0,
+        'pendingSurveys' => 0
+    ];
+    $recentSurveys = [];
+    $upcomingDeadlines = [];
+    $recentFeedback = [];
+    $unreadMessages = 0;
+    $recentNotifications = [];
+    
+    // User-friendly message
+    $_SESSION['error'] = "We encountered an issue loading your dashboard. Our team has been notified.";
 }
 ?>
 
@@ -288,7 +328,7 @@ try {
     </style>
 </head>
 <body>
-    <?php include 'includes/admin_sidebar.php'; ?>
+    <?php include 'includes/header.php'; ?>
     
     <div class="main-content-container">
         <div class="dashboard-container">
