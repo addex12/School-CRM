@@ -1,18 +1,25 @@
 <?php
 ob_start();
-require_once  '../includes/auth.php';
-require_once  '../includes/db.php';
-// Create Database instance and get PDO connection
-$database = new Database();
-$pdo = $database->getConnection();
+session_start();
+
+// Error reporting (remove in production)
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+// Include required files
+require '../includes/db.php';
+require '../includes/auth.php';
+
+// Verify admin access
 requireAdmin();
 
 $pageTitle = "Active Users";
 
 try {
-    // Verify database connection
+    // Attempt to get PDO connection
+    require_once __DIR__ . '/../includes/db.php';
     if (!isset($pdo) || !($pdo instanceof PDO)) {
-        throw new Exception("Database connection failed");
+        $database = new Database();
+        $pdo = $database->getConnection();
     }
 
     // Get active users (last 15 minutes)
@@ -119,7 +126,7 @@ try {
 <body>
     <div class="admin-dashboard">
        
-    <?php include './includes/admin_sidebar.php'; ?>
+    <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
 
         <div class="admin-main">
             <div class="active-users-container">
@@ -173,7 +180,7 @@ try {
             </div>
         </div>
         
-        <?php include './includes/footer.php'; ?>
+        <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
 </body>
 </html>
