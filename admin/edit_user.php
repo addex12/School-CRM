@@ -24,17 +24,32 @@ if (!$user) {
 $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
-    $username = $_POST['username'];
-    $email = $_POST['email'];
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
     $role_id = $_POST['role_id'];
+    $validation_error = '';
+
+    // Validate email format
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $validation_error = 'Please enter a valid email address.';
+    }
+    // Validate username (optional: add more rules if needed)
+    elseif (empty($username)) {
+        $validation_error = 'Username cannot be empty.';
+    }
 
     // Check if username or email already exists (excluding current user)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
-    $stmt->execute([$username, $email, $id]);
-    $count = $stmt->fetchColumn();
+    if (!$validation_error) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
+        $stmt->execute([$username, $email, $id]);
+        $count = $stmt->fetchColumn();
+        if ($count > 0) {
+            $validation_error = 'Username or email already exists!';
+        }
+    }
 
-    if ($count > 0) {
-        $_SESSION['error'] = "Username or email already exists!";
+    if ($validation_error) {
+        $_SESSION['error'] = $validation_error;
     } else {
         $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
         $stmt->execute([$username, $email, $role_id, $id]);
