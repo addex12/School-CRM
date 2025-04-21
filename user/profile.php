@@ -18,7 +18,29 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 requireLogin();
+function getCurrentUser() {
+    global $pdo;
+    if (!isset($_SESSION['user_id'])) {
+        return false;
+    }
+    
+    $stmt = $pdo->prepare("
+        SELECT u.*, r.role_name 
+        FROM users u 
+        LEFT JOIN roles r ON u.role_id = r.id 
+        WHERE u.id = ?
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
+function requireLogin() {
+    if (!isset($_SESSION['user_id'])) {
+        $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
+        header("Location: ../login.php");
+        exit();
+    }
+}
 // CSRF Protection
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
