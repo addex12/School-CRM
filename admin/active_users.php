@@ -8,6 +8,7 @@ ini_set('display_errors', 1);
 // Include required files
 require '../includes/db.php';
 require '../includes/auth.php';
+require '../includes/config.php';
 
 // Verify admin access
 requireAdmin();
@@ -15,13 +16,6 @@ requireAdmin();
 $pageTitle = "Active Users";
 
 try {
-    // Attempt to get PDO connection
-    require_once  '../includes/db.php';
-    if (!isset($pdo) || !($pdo instanceof PDO)) {
-        $database = new Database();
-        $pdo = $database->getConnection();
-    }
-
     // Get active users (last 15 minutes)
     $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
     
