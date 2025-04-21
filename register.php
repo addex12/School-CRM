@@ -14,11 +14,9 @@ error_reporting(E_ALL);
 
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
-require_once 'includes/db.php';
-
-// Initialize database connection
-$db = new Database();
-$pdo = $db->getConnection();
+require_once __DIR__ . '/includes/db.php';
+$database = new Database();
+$pdo = $database->getConnection();
 
 class AuthHelper {
     public static function isLoggedIn(): bool {
