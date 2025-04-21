@@ -7,12 +7,11 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Define root path
-define('ROOT_PATH', dirname(__DIR__));
 
 try {
     // Include required files
-    require ROOT_PATH . '/includes/db.php'; // Database connection first
-    require ROOT_PATH . '/includes/auth.php';
+    require '../includes/db.php'; // Database connection first
+    require  '../includes/auth.php';
     
     // Check if admin
     if (!function_exists('requireAdmin')) {
