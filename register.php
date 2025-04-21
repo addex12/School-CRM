@@ -15,6 +15,8 @@ error_reporting(E_ALL);
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/header.php';
+$pageTitle = 'Register';
 // Use global $pdo from db.php, do not instantiate Database class
 
 class AuthHelper {
@@ -53,10 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-if (empty($errors)) {
+    if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");//-
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, user_role) VALUES (?, ?, ?, ?)");//+
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, user_role) VALUES (?, ?, ?, ?)");
 
         if ($stmt->execute([$username, $email, $hashed_password, $role])) {
             $_SESSION['success'] = "Registration successful! Please login.";
@@ -65,131 +66,152 @@ if (empty($errors)) {
         } else {
             $errors['general'] = "Registration failed. Please try again.";
         }
-    }//-
-    }//+
-
-
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Register - Survey System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - School CRM</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .register-container {
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .register-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f8fb;
+        }
+        .register-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 40px 32px 32px 32px;
+            max-width: 420px;
+            width: 100%;
         }
         .register-title {
             text-align: center;
-            margin-bottom: 20px;
-            color: #2c3e50;
+            font-size: 2rem;
+            color: #3498db;
+            margin-bottom: 18px;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #f9f9f9;
+            font-size: 1em;
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover {
+            background: #217dbb;
+        }
+        .form-footer {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.98em;
+        }
+        .error-message, .success-message {
+            padding: 10px 14px;
+            border-radius: 5px;
+            margin-bottom: 18px;
+            font-size: 1em;
+        }
+        .error-message {
+            background: #ffeaea;
+            color: #d32f2f;
+            border: 1px solid #f5c6cb;
+        }
+        .success-message {
+            background: #e7fbe7;
+            color: #388e3c;
+            border: 1px solid #b2dfdb;
         }
         .register-logo {
             text-align: center;
-            margin-bottom: 20px;
-            font-size: 48px;
+            margin-bottom: 18px;
+        }
+        .register-logo i {
+            font-size: 2.5rem;
             color: #3498db;
-        }
-        .role-selector {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .role-option {
-            flex: 1;
-            text-align: center;
-        }
-        .role-option input {
-            display: none;
-        }
-        .role-option label {
-            display: block;
-            padding: 15px;
-            background: #f5f5f5;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .role-option input:checked + label {
-            background: #3498db;
-            color: white;
-        }
-        .role-icon {
-            font-size: 24px;
-            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="register-container">
+<div class="register-wrapper">
+    <div class="register-card">
         <div class="register-logo">
             <i class="fas fa-user-plus"></i>
         </div>
-        <h1 class="register-title">Create an Account</h1>
-        
-        <?php if (isset($errors['general'])): ?>
-            <div class="error-message"><?php echo $errors['general']; ?></div>
+        <div class="register-title">Create Account</div>
+        <?php if (!empty($errors['general'])): ?>
+            <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
+        <?php elseif (!empty($success)): ?>
+            <div class="success-message"><?= $success ?></div>
         <?php endif; ?>
-        
-        <form method="POST">
+        <form method="POST" autocomplete="off">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($username ?? ''); ?>" required>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required value="<?= htmlspecialchars($username ?? '') ?>">
                 <?php if (isset($errors['username'])): ?>
                     <div class="field-error"><?php echo $errors['username']; ?></div>
                 <?php endif; ?>
             </div>
-            
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($email ?? ''); ?>" required>
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required value="<?= htmlspecialchars($email ?? '') ?>">
                 <?php if (isset($errors['email'])): ?>
                     <div class="field-error"><?php echo $errors['email']; ?></div>
                 <?php endif; ?>
             </div>
-            
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
                 <?php if (isset($errors['password'])): ?>
                     <div class="field-error"><?php echo $errors['password']; ?></div>
                 <?php endif; ?>
             </div>
-            
             <div class="form-group">
-                <label for="confirm_password">Confirm Password:</label>
+                <label for="confirm_password">Confirm Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" required>
                 <?php if (isset($errors['confirm_password'])): ?>
                     <div class="field-error"><?php echo $errors['confirm_password']; ?></div>
                 <?php endif; ?>
             </div>
-            
-            <div class="role-selector">
-                <div class="role-option">
-                    <input type="radio" id="user" name="role" value="user" required>
-                    <label for="user">
-                        <i class="fas fa-user role-icon"></i>
-                        new
-                    </label>
-                </div>
-                </div>
-                           
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <button type="submit" class="btn-primary">Register</button>
         </form>
-        
-        <div class="login-footer">
-            <p>Already have an account? <a href="login.php">Login here</a></p>
+        <div class="form-footer">
+            Already have an account? <a href="login.php">Login here</a>
         </div>
     </div>
-    
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <?php include 'includes/footer.php'; ?>
+</div>
+<?php require_once __DIR__ . '/includes/footer.php'; ?>
 </body>
 </html>
