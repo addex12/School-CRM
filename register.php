@@ -15,8 +15,7 @@ error_reporting(E_ALL);
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
-$database = new Database();
-$pdo = $database->getConnection();
+// Use global $pdo from db.php, do not instantiate Database class
 
 class AuthHelper {
     public static function isLoggedIn(): bool {
