@@ -41,9 +41,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {
             new RecursiveDirectoryIterator($rootDir, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::SELF_FIRST
         );
+        $excludeDirs = [
+            realpath($backupDir),
+            realpath(__DIR__ . '/../vendor'),
+            realpath(__DIR__ . '/../uploads'),
+            realpath(__DIR__ . '/../logs'),
+        ];
         foreach ($files as $file) {
             $filePath = $file->getRealPath();
-            if ($file->isFile()) { // Only add files, not directories
+            // Skip excluded directories
+            foreach ($excludeDirs as $excluded) {
+                if ($excluded && strpos($filePath, $excluded) === 0) {
+                    continue 2;
+                }
+            }
+            if ($file->isFile()) {
                 $relativePath = substr($filePath, strlen($rootDir) + 1);
                 $zip->addFile($filePath, $relativePath);
             }
