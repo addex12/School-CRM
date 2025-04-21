@@ -51,90 +51,73 @@ function getUserRoleName($roleId) {
     return $roles[$roleId] ?? 'Unknown';
 }
 ?>
-<div class="container">
-<?php include_once __DIR__ . '/includes/header.php';
-?>
-            <?php require_once 'includes/header.php'; // Add header.php inclusion?>
-<div class="inbox-container">
-    <div class="inbox-layout">
-        <div class="inbox-sidebar">
-            <h3>Online Users</h3>
+<?php include_once __DIR__ . '/includes/header.php'; ?>
+<div class="main-content-container" style="max-width:1200px;margin:0 auto;padding:40px 20px 0 20px;">
+    <div class="inbox-container">
+        <div class="inbox-layout">
+            <div class="inbox-sidebar">
+                <h3>Online Users</h3>
 
-            <div class="online-users-list">
-                <?php if (count($onlineUsers) > 0): ?>
-                    <?php foreach ($onlineUsers as $user): ?>
-                        <div class="online-user">
-                            <span class="user-status"></span>
-                            <span class="username"><?= htmlspecialchars($user['username']) ?></span>
-                            <?php if ($user['role_id']): ?>
-                                <span class="user-role">(<?= getUserRoleName($user['role_id']) ?>)</span>
-                            <?php endif; ?>
-                            <button class="btn btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="no-users">No users currently online</p>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <div class="inbox-main">
-            <h1>Your Inbox</h1>
-
-            <div class="inbox-controls">
-                <input type="text" id="search" placeholder="Search messages..." class="search-bar">
-                <select id="filter" class="filter-dropdown">
-                    <option value="all">All Messages</option>
-                    <option value="unread">Unread</option>
-                    <option value="read">Read</option>
-                </select>
+                <div class="online-users-list">
+                    <?php if (count($onlineUsers) > 0): ?>
+                        <?php foreach ($onlineUsers as $user): ?>
+                            <div class="online-user">
+                                <span class="user-status"></span>
+                                <span class="username"><?= htmlspecialchars($user['username']) ?></span>
+                                <?php if ($user['role_id']): ?>
+                                    <span class="user-role">(<?= getUserRoleName($user['role_id']) ?>)</span>
+                                <?php endif; ?>
+                                <button class="btn btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="no-users">No users currently online</p>
+                    <?php endif; ?>
+                </div>
             </div>
 
-            <div class="message-list">
-                <?php if (count($messages) > 0): ?>
-                    <?php foreach ($messages as $message): ?>
-                        <div class="message-item" data-status="<?= $message['is_read'] ? 'read' : 'unread' ?>">
-                            <div class="message-header">
-                                <span class="sender"><?= htmlspecialchars($message['sender_name'] ?? '') ?></span>
-                                <span class="date"><?= date('M j, Y g:i a', strtotime($message['sent_at'])) ?></span>
+            <div class="inbox-main">
+                <h1>Your Inbox</h1>
+
+                <div class="inbox-controls">
+                    <input type="text" id="search" placeholder="Search messages..." class="search-bar">
+                    <select id="filter" class="filter-dropdown">
+                        <option value="all">All Messages</option>
+                        <option value="unread">Unread</option>
+                        <option value="read">Read</option>
+                    </select>
+                </div>
+
+                <div class="message-list">
+                    <?php if (count($messages) > 0): ?>
+                        <?php foreach ($messages as $message): ?>
+                            <div class="message-item" data-status="<?= $message['is_read'] ? 'read' : 'unread' ?>">
+                                <div class="message-header">
+                                    <span class="sender"><?= htmlspecialchars($message['sender_name'] ?? '') ?></span>
+                                    <span class="date"><?= date('M j, Y g:i a', strtotime($message['sent_at'])) ?></span>
+                                </div>
+                                <div class="message-body">
+                                    <h3 class="subject"><?= htmlspecialchars($message['subject'] ?? '') ?></h3>
+                                    <p class="content"><?= htmlspecialchars(substr($message['content'] ?? '', 0, 100)) ?>...</p>
+                                </div>
+                                <div class="message-actions">
+                                    <button class="btn btn-primary view-message" data-id="<?= $message['id'] ?>">View</button>
+                                    <button class="btn btn-secondary mark-read" data-id="<?= $message['id'] ?>" <?= $message['is_read'] ? 'disabled' : '' ?>>
+                                        <?= $message['is_read'] ? 'Read' : 'Mark as Read' ?>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="message-body">
-                                <h3 class="subject"><?= htmlspecialchars($message['subject'] ?? '') ?></h3>
-                                <p class="content"><?= htmlspecialchars(substr($message['content'] ?? '', 0, 100)) ?>...</p>
-                            </div>
-                            <div class="message-actions">
-                                <button class="btn btn-primary view-message" data-id="<?= $message['id'] ?>">View</button>
-                                <button class="btn btn-secondary mark-read" data-id="<?= $message['id'] ?>" <?= $message['is_read'] ? 'disabled' : '' ?>>
-                                    <?= $message['is_read'] ? 'Read' : 'Mark as Read' ?>
-                                </button>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p class="no-messages">No messages found.</p>
-                <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="no-messages">No messages found.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Chat Modal -->
-<div id="chatModal" class="chat-modal">
-    <div class="chat-modal-content">
-        <span class="close-chat">&times;</span>
-        <h3>Chat with <span id="chatUserName"></span></h3>
-        <div class="chat-messages" id="chatMessages"></div>
-        <form id="chatForm">
-            <input type="hidden" id="chatUserId">
-            <textarea id="chatInput" placeholder="Type your message..." required></textarea>
-            <button type="submit" class="btn btn-primary">Send</button>
-        </form>
-    </div>
-</div>
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
-</div>
-
-<script>
+<?php include_once __DIR__ . '/includes/footer.php'; ?>
+<script></script>
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search');
     const filterDropdown = document.getElementById('filter');

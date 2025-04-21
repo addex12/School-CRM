@@ -40,8 +40,8 @@ if (!$message['is_read']) {
 }
 ?>
 <?php include_once __DIR__ . '/includes/header.php'; ?>
-<div class="main-content-container" style="max-width:700px;margin:40px auto;">
-    <div class="card" style="padding:32px 24px;">
+<div class="main-content-container" style="max-width:1000px;margin:0 auto;padding:40px 20px 0 20px;">
+    <div class="card" style="padding:32px 24px;max-width:700px;margin:40px auto;">
         <h2 style="color:#007bff;"><i class="fas fa-envelope-open"></i> Message Details</h2>
         <div style="margin-bottom:18px;">
             <strong>From:</strong> <?= htmlspecialchars($message['sender_name'] ?? '') ?><br>
