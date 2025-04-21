@@ -2,7 +2,6 @@
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
 require_once '../includes/mailer.php';
-require_once '../includes/config.php';
 requireLogin();
 
 // Fetch all active feedback subjects for dropdown
