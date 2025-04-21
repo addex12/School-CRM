@@ -12,7 +12,6 @@ requireLogin();
 
 $pageTitle = "Dashboard";
 
-<?php
 // Initialize all variables with default values
 $stats = [
     'availableSurveys' => 0,
