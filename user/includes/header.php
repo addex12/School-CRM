@@ -26,7 +26,9 @@ requireLogin();
                 <a href="contact.php" class="<?= basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Contact
                 </a>
-                
+                <a href="messages.php" class="<?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>">
+                    <i class="fas fa-envelope"></i> Contact
+                </a>                
                 <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>">
                     <i class="fas fa-user"></i> Account
                 </a>
