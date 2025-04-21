@@ -27,12 +27,12 @@ try {
             SELECT m.*, u.username as sender 
             FROM messages m
             JOIN users u ON m.sender_id = u.id
-            WHERE m.receiver_id = :current_user AND m.sender_id = :admin_id
+            WHERE m.receiver_id = :current_user 
+            AND m.is_admin = 1
             ORDER BY m.sent_at ASC
         ");
         $stmt->execute([
-            'current_user' => $current_user_id,
-            'admin_id' => 1 // Assuming admin has ID 1
+            ':current_user' => $current_user_id
         ]);
     } else {
         // Get conversation between two users
@@ -40,13 +40,13 @@ try {
             SELECT m.*, u.username as sender 
             FROM messages m
             JOIN users u ON m.sender_id = u.id
-            WHERE (m.sender_id = :user1 AND m.receiver_id = :user2)
-               OR (m.sender_id = :user2 AND m.receiver_id = :user1)
+            WHERE (m.sender_id = :current_user AND m.receiver_id = :other_user)
+               OR (m.sender_id = :other_user AND m.receiver_id = :current_user)
             ORDER BY m.sent_at ASC
         ");
         $stmt->execute([
-            'user1' => $current_user_id,
-            'user2' => $user_id
+            ':current_user' => $current_user_id,
+            ':other_user' => $user_id
         ]);
     }
     
