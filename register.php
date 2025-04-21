@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $role_id = 6; // Default to 'new' role (assuming 4 is the ID for 'new')
+    $role_id = 6; 
 
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
