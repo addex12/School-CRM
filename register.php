@@ -7,7 +7,7 @@
  * GitHub: https://github.com/addex12
  */
 
-// Enable error reporting for debugging
+ session_start();
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
