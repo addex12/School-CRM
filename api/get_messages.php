@@ -36,13 +36,15 @@ try {
                     u.username AS sender 
              FROM messages m 
              JOIN users u ON m.sender_id = u.id 
-             WHERE (m.sender_id = :current_user AND m.receiver_id = :user_id)
-                OR (m.sender_id = :user_id AND m.receiver_id = :current_user)
+             WHERE (m.sender_id = :current_user1 AND m.receiver_id = :user_id1)
+                OR (m.sender_id = :user_id2 AND m.receiver_id = :current_user2)
              ORDER BY m.sent_at ASC"
         );
         $stmt->execute([
-            'current_user' => $current_user_id,
-            'user_id' => $user_id
+            'current_user1' => $current_user_id,
+            'user_id1' => $user_id,
+            'user_id2' => $user_id,
+            'current_user2' => $current_user_id
         ]);
     }
     $messages = [];
