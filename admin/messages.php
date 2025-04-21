@@ -268,12 +268,14 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             //   - ../api/edit_message.php
             //   - ../api/delete_message.php
 
-            // Handle Edit and Delete actions
+            // Handle Edit and Delete actions with robust event delegation
             chatMessages.addEventListener('click', function(e) {
                 // Edit message
-                if (e.target.classList.contains('edit-btn')) {
-                    const msgId = e.target.getAttribute('data-msg-id');
-                    const oldText = decodeURIComponent(e.target.getAttribute('data-msg-text'));
+                const editBtn = e.target.closest('.edit-btn');
+                if (editBtn) {
+                    e.preventDefault();
+                    const msgId = editBtn.getAttribute('data-msg-id');
+                    const oldText = decodeURIComponent(editBtn.getAttribute('data-msg-text'));
                     const newText = prompt('Edit your message:', oldText);
                     if (newText !== null && newText.trim() !== '' && newText !== oldText) {
                         fetch('../api/edit_message.php', {
@@ -290,10 +292,13 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             }
                         });
                     }
+                    return;
                 }
                 // Delete message
-                if (e.target.classList.contains('delete-btn')) {
-                    const msgId = e.target.getAttribute('data-msg-id');
+                const deleteBtn = e.target.closest('.delete-btn');
+                if (deleteBtn) {
+                    e.preventDefault();
+                    const msgId = deleteBtn.getAttribute('data-msg-id');
                     if (confirm('Are you sure you want to delete this message?')) {
                         fetch('../api/delete_message.php', {
                             method: 'POST',
@@ -309,6 +314,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             }
                         });
                     }
+                    return;
                 }
             });
         });
