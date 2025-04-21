@@ -27,10 +27,6 @@ function getReportData($pdo, $type, $startDate, $endDate, $userId, $status) {
         $where[] = 'created_at <= ?';
         $params[] = $endDate . ' 23:59:59';
     }
-    if ($userId && in_array($type, ['audit','feedback','tickets','attendance'])) {
-        $where[] = 'user_id = ?';
-        $params[] = $userId;
-    }
     if ($status && $type === 'tickets') {
         $where[] = 'status = ?';
         $params[] = $status;
