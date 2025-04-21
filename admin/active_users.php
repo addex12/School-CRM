@@ -16,7 +16,7 @@ $pageTitle = "Active Users";
 
 try {
     // Attempt to get PDO connection
-    require_once __DIR__ . '/../includes/db.php';
+    require_once  '../includes/db.php';
     if (!isset($pdo) || !($pdo instanceof PDO)) {
         $database = new Database();
         $pdo = $database->getConnection();
