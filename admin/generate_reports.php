@@ -106,7 +106,6 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                             <option value="closed" <?= $status==='closed'?'selected':'' ?>>Closed</option>
                         </select>
                     </label>
-                    <?php endif; ?>
                     <!--<button type="submit" class="btn btn-primary">Generate</button>-->
                 </form>
                 <div class="report-actions">
