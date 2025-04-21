@@ -25,20 +25,30 @@ if (!$receiver_id || !$message) {
 }
 
 try {
-    // Regular users can't send broadcasts
-    if ($receiver_id === 'broadcast') {
-        echo json_encode(['success' => false, 'error' => 'Access denied']);
-        exit;
-    }
-
-    // Use correct column name: 'message' instead of 'content' if your DB uses 'message'
     $stmt = $pdo->prepare("
-        INSERT INTO messages (sender_id, receiver_id, message, sent_at, is_read) 
-        VALUES (?, ?, ?, NOW(), 0)
+        INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
+        VALUES (:sender_id, :receiver_id, :content, NOW(), 0)
     ");
-    $stmt->execute([$current_user_id, $receiver_id, $message]);
+    
+    $stmt->execute([
+        ':sender_id' => $current_user_id,
+        ':receiver_id' => $receiver_id,
+        ':content' => $message
+    ]);
 
-    echo json_encode(['success' => true]);
+    echo json_encode([
+        'success' => true,
+        'message_id' => $pdo->lastInsertId(),
+        'debug' => [
+            'sender' => $current_user_id,
+            'receiver' => $receiver_id
+        ]
+    ]);
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
+    error_log("Send Message Error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'error' => 'Database error',
+        'debug' => $e->getMessage()
+    ]);
 }
