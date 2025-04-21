@@ -2,6 +2,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
+require_once '../includes/db.php';
 $pageTitle = "Admin Messaging";
 // Get all non-admin users
 $users = $pdo->query("SELECT id, username FROM users WHERE role_id != 1 ORDER BY username")->fetchAll();
