@@ -309,7 +309,7 @@ $recentNotifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
-    <?php include 'includes/header.php'; ?>
+    <?php include 'includes/admin_sidebar.php'; ?>
     
     <div class="main-content-container">
         <div class="dashboard-container">
