@@ -45,12 +45,7 @@ function getReportData($pdo, $type, $startDate, $endDate, $userId, $status) {
         case 'tickets':
             $sql = "SELECT t.*, u.username FROM support_tickets t LEFT JOIN users u ON t.user_id = u.id $whereSql ORDER BY t.created_at DESC LIMIT 100";
             break;
-        case 'attendance':
-            $sql = "SELECT a.*, u.username FROM attendance a LEFT JOIN users u ON a.employee_id = u.id $whereSql ORDER BY a.date DESC LIMIT 100";
-            break;
-        default:
-            return [];
-    }
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     return $stmt->fetchAll();
@@ -91,12 +86,10 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                             <option value="surveys" <?= $reportType==='surveys'?'selected':'' ?>>Surveys</option>
                             <option value="feedback" <?= $reportType==='feedback'?'selected':'' ?>>Feedback</option>
                             <option value="tickets" <?= $reportType==='tickets'?'selected':'' ?>>Support Tickets</option>
-                            <option value="attendance" <?= $reportType==='attendance'?'selected':'' ?>>Attendance</option>
                         </select>
                     </label>
                     <label>Start Date: <input type="date" name="start_date" value="<?= htmlspecialchars($startDate) ?>"></label>
                     <label>End Date: <input type="date" name="end_date" value="<?= htmlspecialchars($endDate) ?>"></label>
-                    <?php if (in_array($reportType, ['audit','feedback','tickets','attendance'])): ?>
                     <label>User:
                         <select name="user_id">
                             <option value="">All</option>
