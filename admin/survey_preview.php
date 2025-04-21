@@ -28,7 +28,13 @@ $stmt->execute([$survey_id]);
 $fields = $stmt->fetchAll();
 
 // Get target roles
-$target_roles = json_decode($survey['target_roles'], true);
+$target_roles = [];
+if (isset($survey['target_roles']) && !is_null($survey['target_roles']) && $survey['target_roles'] !== '') {
+    $decoded = json_decode($survey['target_roles'], true);
+    if (is_array($decoded)) {
+        $target_roles = $decoded;
+    }
+}
 
 $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
 ?>
