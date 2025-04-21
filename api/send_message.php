@@ -17,16 +17,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $current_user_id = $_SESSION['user_id'] ?? null;
 $receiver_id = $_POST['receiver_id'] ?? null;
-$message = trim($_POST['message'] ?? '');
+$message = isset($_POST['message']) ? trim($_POST['message']) : '';
 
 if (!$current_user_id) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;
 }
-if (!$receiver_id || $message === '') {
+if ($receiver_id === null || $receiver_id === '' || $message === '') {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing receiver_id or message']);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Missing receiver_id or message',
+        'debug' => [
+            'receiver_id' => $receiver_id,
+            'message' => $message
+        ]
+    ]);
     exit;
 }
 
@@ -50,5 +57,12 @@ try {
 } catch (Exception $e) {
     if ($pdo->inTransaction()) $pdo->rollBack();
     http_response_code(500);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'error' => $e->getMessage(),
+        'debug' => [
+            'receiver_id' => $receiver_id,
+            'message' => $message
+        ]
+    ]);
 }
