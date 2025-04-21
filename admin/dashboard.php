@@ -99,6 +99,96 @@ try {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
+    <style>
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .dashboard-widget {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+        }
+        .dashboard-widget i {
+            font-size: 2.2rem;
+            margin-bottom: 0.7rem;
+            color: #f1c40f;
+        }
+        .widget-blue { border-top: 4px solid #3498db; }
+        .widget-green { border-top: 4px solid #27ae60; }
+        .widget-orange { border-top: 4px solid #f39c12; }
+        .widget-red { border-top: 4px solid #e74c3c; }
+        .dashboard-widget h3 {
+            font-size: 2.1rem;
+            margin: 0.5rem 0 0.2rem 0;
+            color: #2c3e50;
+        }
+        .dashboard-widget p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        .dashboard-section {
+            margin-bottom: 2.5rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+        }
+        .dashboard-section h2 {
+            font-size: 1.3rem;
+            color: #34495e;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid #f0f2f5;
+            padding-bottom: 0.5rem;
+        }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            text-align: left;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #34495e;
+        }
+        tr:hover {
+            background: #f4f8fb;
+        }
+        @media (max-width: 900px) {
+            .widget-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-section {
+                padding: 1rem 0.5rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .admin-main {
+                padding: 10px 2px 80px;
+            }
+            .dashboard-widget, .dashboard-section {
+                padding: 1rem 0.5rem;
+            }
+            th, td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
