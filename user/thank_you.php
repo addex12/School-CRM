@@ -29,7 +29,7 @@ requireLogin();
         }
         .thank-you-container h1 {
             font-size: 2em;
-            color: #333;
+            color: #007bff;
             margin-bottom: 20px;
         }
         .thank-you-container p {
@@ -49,23 +49,24 @@ requireLogin();
         .btn-primary:hover {
             background: #2980b9;
         }
+        .main-content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 0 20px;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <?php include 'includes/header.php'; ?>
-    </header>
-    <main>
+    <?php include 'includes/header.php'; ?>
+    <div class="main-content-container">
         <div class="thank-you-container">
-            <h1 style="color:#007bff;">
+            <h1>
                 <i class="fas fa-check-circle"></i> Thank You!
             </h1>
             <p>We appreciate your time and effort in completing the survey.</p>
             <a href="dashboard.php" class="btn-primary">Back to Dashboard</a>
         </div>
-    </main>
-    <footer>
-        <?php include 'includes/footer.php'; ?>
-    </footer>
+    </div>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

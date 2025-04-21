@@ -202,84 +202,89 @@ try {
             font-weight: bold;
             color: #dc3545;
         }
+        .main-content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 0 20px;
+        }
     </style>
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
-    
-    <div class="dashboard-container">
-        <h1 style="color:#007bff;">
-            <i class="fas fa-tachometer-alt"></i> <?= htmlspecialchars($pageTitle) ?>
-        </h1>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Available Surveys</h3>
-                <div class="stat-value"><?= $availableSurveys ?></div>
-                <p>Surveys you can take</p>
+    <div class="main-content-container">
+        <div class="dashboard-container">
+            <h1 style="color:#007bff;">
+                <i class="fas fa-tachometer-alt"></i> <?= htmlspecialchars($pageTitle) ?>
+            </h1>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Available Surveys</h3>
+                    <div class="stat-value"><?= $availableSurveys ?></div>
+                    <p>Surveys you can take</p>
+                </div>
+                <div class="stat-card completed">
+                    <h3>Completed Surveys</h3>
+                    <div class="stat-value"><?= $completedSurveys ?></div>
+                    <p>Surveys you've finished</p>
+                </div>
+                <div class="stat-card pending">
+                    <h3>Pending Surveys</h3>
+                    <div class="stat-value"><?= $pendingSurveys ?></div>
+                    <p>Surveys awaiting your response</p>
+                </div>
             </div>
-            <div class="stat-card completed">
-                <h3>Completed Surveys</h3>
-                <div class="stat-value"><?= $completedSurveys ?></div>
-                <p>Surveys you've finished</p>
+            
+            <div class="quick-actions">
+                <a href="survey.php" class="quick-action">
+                    <i class="fas fa-poll"></i> View All Surveys
+                </a>
+                <a href="feedback.php" class="quick-action">
+                    <i class="fas fa-comment-alt"></i> Submit Feedback
+                </a>
+                <a href="chat.php" class="quick-action">
+                    <i class="fas fa-comments"></i> Start Chat
+                </a>
             </div>
-            <div class="stat-card pending">
-                <h3>Pending Surveys</h3>
-                <div class="stat-value"><?= $pendingSurveys ?></div>
-                <p>Surveys awaiting your response</p>
-            </div>
-        </div>
-        
-        <div class="quick-actions">
-            <a href="survey.php" class="quick-action">
-                <i class="fas fa-poll"></i> View All Surveys
-            </a>
-            <a href="feedback.php" class="quick-action">
-                <i class="fas fa-comment-alt"></i> Submit Feedback
-            </a>
-            <a href="chat.php" class="quick-action">
-                <i class="fas fa-comments"></i> Start Chat
-            </a>
-        </div>
-        
-        <h2 class="section-title">Recent Surveys</h2>
-        <?php if (empty($recentSurveys)): ?>
-            <p>No recent surveys available.</p>
-        <?php else: ?>
-            <div class="survey-cards">
-                <?php foreach ($recentSurveys as $survey): 
-                    $now = new DateTime();
-                    $end = new DateTime($survey['ends_at']);
-                    $diff = $now->diff($end);
-                    $daysLeft = $diff->format('%a');
-                ?>
-                    <div class="survey-card <?= $survey['completed'] ? 'completed' : '' ?>">
-                        <h3><?= htmlspecialchars($survey['title']) ?></h3>
-                        <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
-                        
-                        <div class="survey-meta">
-                            <p><strong>Deadline:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
-                            <p><strong>Time Left:</strong> <span class="time-left"><?= $daysLeft ?> days</span></p>
+            
+            <h2 class="section-title">Recent Surveys</h2>
+            <?php if (empty($recentSurveys)): ?>
+                <p>No recent surveys available.</p>
+            <?php else: ?>
+                <div class="survey-cards">
+                    <?php foreach ($recentSurveys as $survey): 
+                        $now = new DateTime();
+                        $end = new DateTime($survey['ends_at']);
+                        $diff = $now->diff($end);
+                        $daysLeft = $diff->format('%a');
+                    ?>
+                        <div class="survey-card <?= $survey['completed'] ? 'completed' : '' ?>">
+                            <h3><?= htmlspecialchars($survey['title']) ?></h3>
+                            <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
+                            
+                            <div class="survey-meta">
+                                <p><strong>Deadline:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
+                                <p><strong>Time Left:</strong> <span class="time-left"><?= $daysLeft ?> days</span></p>
+                            </div>
+                            
+                            <?php if ($survey['completed']): ?>
+                                <div class="survey-status status-completed">
+                                    <i class="fas fa-check-circle"></i> Completed
+                                </div>
+                            <?php else: ?>
+                                <div class="survey-status status-pending">
+                                    <i class="fas fa-exclamation-circle"></i> Pending
+                                </div>
+                                <a href="survey_response.php?id=<?= $survey['id'] ?>" class="btn">
+                                    Take Survey
+                                </a>
+                            <?php endif; ?>
                         </div>
-                        
-                        <?php if ($survey['completed']): ?>
-                            <div class="survey-status status-completed">
-                                <i class="fas fa-check-circle"></i> Completed
-                            </div>
-                        <?php else: ?>
-                            <div class="survey-status status-pending">
-                                <i class="fas fa-exclamation-circle"></i> Pending
-                            </div>
-                            <a href="survey_response.php?id=<?= $survey['id'] ?>" class="btn">
-                                Take Survey
-                            </a>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
-
     <?php include 'includes/footer.php'; ?>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </body>

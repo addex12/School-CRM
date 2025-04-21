@@ -80,10 +80,15 @@ $user_email = $_SESSION['email'] ?? '';
         padding: 12px 2vw;
     }
 }
+.main-content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px 0 20px;
+}
 </style>
 
-<div class="container">
-    <?php include_once __DIR__ . '/includes/header.php'; ?>
+<?php include_once __DIR__ . '/includes/header.php'; ?>
+<div class="main-content-container">
     <div class="contact-main-container">
         <div class="contact-header">
             <h2>
@@ -137,6 +142,7 @@ $user_email = $_SESSION['email'] ?? '';
             <button type="submit" class="btn btn-primary">Submit Ticket</button>
         </form>
     </div>
-    <?php include_once __DIR__ . '/includes/footer.php'; ?>
+</div>
+<?php include_once __DIR__ . '/includes/footer.php'; ?>
 </div>
 

@@ -223,141 +223,146 @@ foreach ($survey_data as $row) {
             margin-bottom: 20px;
             border-left: 4px solid #3498db;
         }
+        .main-content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 0 20px;
+        }
     </style>
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
-    
-    <div class="survey-container">
-        <h1 class="survey-title" style="color:#007bff;">
-            <i class="fas fa-clipboard-list"></i> <?= htmlspecialchars($survey['title']) ?>
-        </h1>
-        <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
-        
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
-        <?php endif; ?>
-        
-        <form method="POST">
-            <?php if ($survey['is_anonymous']): ?>
-                <div class="anonymous-notice">
-                    <i class="fas fa-user-secret"></i> 
-                    This survey is anonymous. Your responses will not be linked to your identity.
-                </div>
+    <div class="main-content-container">
+        <div class="survey-container">
+            <h1 class="survey-title" style="color:#007bff;">
+                <i class="fas fa-clipboard-list"></i> <?= htmlspecialchars($survey['title']) ?>
+            </h1>
+            <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
+            
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="alert alert-danger"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
             <?php endif; ?>
             
-            <?php foreach ($survey['questions'] as $question): ?>
-                <div class="question-group">
-                    <label class="question-label">
-                        <?= htmlspecialchars($question['label']) ?>
-                        <?php if ($question['required']): ?>
-                            <span class="required">*</span>
-                        <?php endif; ?>
-                    </label>
-                    
-                    <?php switch ($question['type']):
-                        case 'text': ?>
-                            <input type="text" 
-                                   name="field_<?= $question['id'] ?>" 
-                                   class="form-control"
-                                   <?= $question['required'] ? 'required' : '' ?>>
-                            <?php break; 
-                            
-                        case 'textarea': ?>
-                            <textarea name="field_<?= $question['id'] ?>" 
-                                      class="form-control"
-                                      <?= $question['required'] ? 'required' : '' ?>></textarea>
-                            <?php break; 
-                            
-                        case 'radio': ?>
-                            <ul class="options-list">
-                                <?php foreach ($question['options'] as $option): ?>
-                                    <li class="form-check">
-                                        <input type="radio" 
-                                               name="field_<?= $question['id'] ?>" 
-                                               value="<?= htmlspecialchars($option) ?>" 
-                                               id="field_<?= $question['id'] ?>_<?= md5($option) ?>"
-                                               class="form-check-input"
-                                               <?= $question['required'] ? 'required' : '' ?>>
-                                        <label class="form-check-label" 
-                                               for="field_<?= $question['id'] ?>_<?= md5($option) ?>">
+            <form method="POST">
+                <?php if ($survey['is_anonymous']): ?>
+                    <div class="anonymous-notice">
+                        <i class="fas fa-user-secret"></i> 
+                        This survey is anonymous. Your responses will not be linked to your identity.
+                    </div>
+                <?php endif; ?>
+                
+                <?php foreach ($survey['questions'] as $question): ?>
+                    <div class="question-group">
+                        <label class="question-label">
+                            <?= htmlspecialchars($question['label']) ?>
+                            <?php if ($question['required']): ?>
+                                <span class="required">*</span>
+                            <?php endif; ?>
+                        </label>
+                        
+                        <?php switch ($question['type']):
+                            case 'text': ?>
+                                <input type="text" 
+                                       name="field_<?= $question['id'] ?>" 
+                                       class="form-control"
+                                       <?= $question['required'] ? 'required' : '' ?>>
+                                <?php break; 
+                                
+                            case 'textarea': ?>
+                                <textarea name="field_<?= $question['id'] ?>" 
+                                          class="form-control"
+                                          <?= $question['required'] ? 'required' : '' ?>></textarea>
+                                <?php break; 
+                                
+                            case 'radio': ?>
+                                <ul class="options-list">
+                                    <?php foreach ($question['options'] as $option): ?>
+                                        <li class="form-check">
+                                            <input type="radio" 
+                                                   name="field_<?= $question['id'] ?>" 
+                                                   value="<?= htmlspecialchars($option) ?>" 
+                                                   id="field_<?= $question['id'] ?>_<?= md5($option) ?>"
+                                                   class="form-check-input"
+                                                   <?= $question['required'] ? 'required' : '' ?>>
+                                            <label class="form-check-label" 
+                                                   for="field_<?= $question['id'] ?>_<?= md5($option) ?>">
+                                                <?= htmlspecialchars($option) ?>
+                                            </label>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <?php break; 
+                                
+                            case 'checkbox': ?>
+                                <ul class="options-list">
+                                    <?php foreach ($question['options'] as $option): ?>
+                                        <li class="form-check">
+                                            <input type="checkbox" 
+                                                   name="field_<?= $question['id'] ?>[]" 
+                                                   value="<?= htmlspecialchars($option) ?>" 
+                                                   id="field_<?= $question['id'] ?>_<?= md5($option) ?>"
+                                                   class="form-check-input">
+                                            <label class="form-check-label" 
+                                                   for="field_<?= $question['id'] ?>_<?= md5($option) ?>">
+                                                <?= htmlspecialchars($option) ?>
+                                            </label>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <?php break; 
+                                
+                            case 'select': ?>
+                                <select name="field_<?= $question['id'] ?>" 
+                                        class="form-control"
+                                        <?= $question['required'] ? 'required' : '' ?>>
+                                    <option value="">-- Select an option --</option>
+                                    <?php foreach ($question['options'] as $option): ?>
+                                        <option value="<?= htmlspecialchars($option) ?>">
                                             <?= htmlspecialchars($option) ?>
-                                        </label>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                            <?php break; 
-                            
-                        case 'checkbox': ?>
-                            <ul class="options-list">
-                                <?php foreach ($question['options'] as $option): ?>
-                                    <li class="form-check">
-                                        <input type="checkbox" 
-                                               name="field_<?= $question['id'] ?>[]" 
-                                               value="<?= htmlspecialchars($option) ?>" 
-                                               id="field_<?= $question['id'] ?>_<?= md5($option) ?>"
-                                               class="form-check-input">
-                                        <label class="form-check-label" 
-                                               for="field_<?= $question['id'] ?>_<?= md5($option) ?>">
-                                            <?= htmlspecialchars($option) ?>
-                                        </label>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                            <?php break; 
-                            
-                        case 'select': ?>
-                            <select name="field_<?= $question['id'] ?>" 
-                                    class="form-control"
-                                    <?= $question['required'] ? 'required' : '' ?>>
-                                <option value="">-- Select an option --</option>
-                                <?php foreach ($question['options'] as $option): ?>
-                                    <option value="<?= htmlspecialchars($option) ?>">
-                                        <?= htmlspecialchars($option) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <?php break; 
-                            
-                        case 'number': ?>
-                            <input type="number" 
-                                   name="field_<?= $question['id'] ?>" 
-                                   class="form-control"
-                                   <?= $question['required'] ? 'required' : '' ?>>
-                            <?php break; 
-                            
-                        case 'date': ?>
-                            <input type="date" 
-                                   name="field_<?= $question['id'] ?>" 
-                                   class="form-control"
-                                   <?= $question['required'] ? 'required' : '' ?>>
-                            <?php break; 
-                            
-                        case 'rating': ?>
-                            <select name="field_<?= $question['id'] ?>" 
-                                    class="form-control"
-                                    <?= $question['required'] ? 'required' : '' ?>>
-                                <option value="">-- Select rating --</option>
-                                <option value="1">1 - Poor</option>
-                                <option value="2">2 - Fair</option>
-                                <option value="3">3 - Good</option>
-                                <option value="4">4 - Very Good</option>
-                                <option value="5">5 - Excellent</option>
-                            </select>
-                            <?php break; 
-                            
-                    endswitch; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <?php break; 
+                                
+                            case 'number': ?>
+                                <input type="number" 
+                                       name="field_<?= $question['id'] ?>" 
+                                       class="form-control"
+                                       <?= $question['required'] ? 'required' : '' ?>>
+                                <?php break; 
+                                
+                            case 'date': ?>
+                                <input type="date" 
+                                       name="field_<?= $question['id'] ?>" 
+                                       class="form-control"
+                                       <?= $question['required'] ? 'required' : '' ?>>
+                                <?php break; 
+                                
+                            case 'rating': ?>
+                                <select name="field_<?= $question['id'] ?>" 
+                                        class="form-control"
+                                        <?= $question['required'] ? 'required' : '' ?>>
+                                    <option value="">-- Select rating --</option>
+                                    <option value="1">1 - Poor</option>
+                                    <option value="2">2 - Fair</option>
+                                    <option value="3">3 - Good</option>
+                                    <option value="4">4 - Very Good</option>
+                                    <option value="5">5 - Excellent</option>
+                                </select>
+                                <?php break; 
+                                
+                        endswitch; ?>
+                    </div>
+                <?php endforeach; ?>
+                
+                <div class="form-group text-center">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i> Submit Survey
+                    </button>
                 </div>
-            <?php endforeach; ?>
-            
-            <div class="form-group text-center">
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-paper-plane"></i> Submit Survey
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-
     <?php include 'includes/footer.php'; ?>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </body>

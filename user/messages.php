@@ -164,47 +164,54 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 padding: 10px;
             }
         }
+        .main-content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 0 20px;
+        }
     </style>
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
-    <div class="container">
-        <header style="margin-bottom: 18px;">
-            <h1 style="font-size: 2rem; font-weight: 700; margin: 0; color:#007bff;">
-                <i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?>
-            </h1>
-        </header>
-        <div class="messaging-container">
-            <aside class="contact-list">
-                <h2 style="font-size: 1.2rem; font-weight: 600; margin: 18px 0 10px 18px; color:#007bff;">
-                    <i class="fas fa-users"></i> Users
-                </h2>
-                <ul id="user-list" class="user-list">
-                    <?php foreach ($users as $user): ?>
-                        <li data-user-id="<?= $user['id'] ?>" class="contact-item">
-                            <span><?= htmlspecialchars($user['username']) ?></span>
-                            <?php if (isset($unreadCounts[$user['id']])): ?>
-                                <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </aside>
-            <section class="chat-section">
-                <div id="chat-header" class="chat-header">
-                    <h3 style="margin:0; font-size:1.1rem; color:#333;">
-                        <i class="fas fa-comment-dots"></i> Select a user to start chatting
-                    </h3>
-                </div>
-                <div id="chat-messages" class="chat-messages"></div>
-                <form id="message-form" class="message-form" style="display:none;">
-                    <input type="hidden" name="receiver_id" id="receiver_id">
-                    <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required style="width:100%;resize:vertical;"></textarea>
-                    <button type="submit" class="btn btn-primary" style="margin-top:8px;">
-                        <i class="fas fa-paper-plane"></i> Send
-                    </button>
-                </form>
-            </section>
+    <div class="main-content-container">
+        <div class="container">
+            <header style="margin-bottom: 18px;">
+                <h1 style="font-size: 2rem; font-weight: 700; margin: 0; color:#007bff;">
+                    <i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?>
+                </h1>
+            </header>
+            <div class="messaging-container">
+                <aside class="contact-list">
+                    <h2 style="font-size: 1.2rem; font-weight: 600; margin: 18px 0 10px 18px; color:#007bff;">
+                        <i class="fas fa-users"></i> Users
+                    </h2>
+                    <ul id="user-list" class="user-list">
+                        <?php foreach ($users as $user): ?>
+                            <li data-user-id="<?= $user['id'] ?>" class="contact-item">
+                                <span><?= htmlspecialchars($user['username']) ?></span>
+                                <?php if (isset($unreadCounts[$user['id']])): ?>
+                                    <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </aside>
+                <section class="chat-section">
+                    <div id="chat-header" class="chat-header">
+                        <h3 style="margin:0; font-size:1.1rem; color:#333;">
+                            <i class="fas fa-comment-dots"></i> Select a user to start chatting
+                        </h3>
+                    </div>
+                    <div id="chat-messages" class="chat-messages"></div>
+                    <form id="message-form" class="message-form" style="display:none;">
+                        <input type="hidden" name="receiver_id" id="receiver_id">
+                        <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required style="width:100%;resize:vertical;"></textarea>
+                        <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </form>
+                </section>
+            </div>
         </div>
     </div>
     <?php include_once __DIR__ . '/includes/footer.php'; ?>

@@ -73,105 +73,110 @@ $feedback->execute([$_SESSION['user_id']]);
     <style>
         .rating-stars { color: #ffd700; font-size: 1.5em; }
         .feedback-history { margin-top: 30px; }
+        .main-content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px 0 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container" style="max-width:900px;">
-        <?php include 'includes/header.php'; ?>
-
-        <div class="content">
-            <h2 style="color:#007bff;">
-                <i class="fas fa-comment-alt"></i> Submit Feedback
-            </h2>
-            
-            <!-- Feedback Form -->
-            <form method="POST">
-                <div class="form-group">
-    <label for="subject">Subject:</label>
-    <select name="subject" id="subject" class="form-control" required>
-        <option value="">Select subject...</option>
-        <?php foreach ($subjects as $subject): ?>
-            <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
+    <?php include 'includes/header.php'; ?>
+    <div class="main-content-container">
+        <div class="container" style="max-width:900px;">
+            <div class="content">
+                <h2 style="color:#007bff;">
+                    <i class="fas fa-comment-alt"></i> Submit Feedback
+                </h2>
                 
-                <div class="form-group">
-                    <label>Message:</label>
-                    <textarea name="message" rows="5" required></textarea>
-                </div>
-                
-                <div class="form-group">
-    <label for="rating">Rating:</label>
-    <div class="star-rating" style="font-size:2em; color:gold;">
-        <?php for ($i = 5; $i >= 1; $i--): ?>
-            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;">
-            <label for="star<?= $i ?>" style="cursor:pointer;">&#9733;</label>
-        <?php endfor; ?>
-    </div>
-</div>
-<style>
-.star-rating {
-    direction: rtl;
-    unicode-bidi: bidi-override;
-    display: inline-block;
-}
-.star-rating input[type="radio"] {
-    display: none;
-}
-.star-rating label {
-    color: #ccc;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.star-rating input[type="radio"]:checked ~ label,
-.star-rating label:hover,
-.star-rating label:hover ~ label {
-    color: orange;
-}
-.star-rating input[type="radio"]:checked ~ label {
-    color: orange;
-}
-</style>
-                
-                <button type="submit" class="btn btn-primary">Submit Feedback</button>
-            </form>
-
-            <!-- Feedback History -->
-            <div class="feedback-history">
-                <h3>Your Previous Feedback</h3>
-                <?php foreach ($feedback as $item): ?>
-                    <div class="feedback-item">
-                        <div class="rating-stars">
-                            <?= str_repeat('★', $item['rating']) . str_repeat('☆', 5 - $item['rating']) ?>
-                        </div>
-                        <h4><?= htmlspecialchars($item['subject']) ?></h4>
-                        <?= nl2br(htmlspecialchars_decode($item['message'])) ?>                        <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
-                        <?php if (!empty($item['admin_reply'])): ?>
-                            <div class="alert alert-info mt-2">
-                                <strong>Admin Reply:</strong> <?= nl2br(htmlspecialchars($item['admin_reply'])) ?>
-                            </div>
-                            <?php if (empty($item['user_reply'])): ?>
-                                <form method="post" class="mt-2">
-                                    <input type="hidden" name="feedback_id" value="<?= $item['id'] ?>">
-                                    <div class="form-group">
-                                        <label for="user_reply_<?= $item['id'] ?>">Your Reply:</label>
-                                        <textarea name="user_reply" id="user_reply_<?= $item['id'] ?>" class="form-control" rows="2" required></textarea>
-                                    </div>
-                                    <button type="submit" name="user_reply_submit" class="btn btn-sm btn-success">Send Reply</button>
-                                </form>
-                            <?php else: ?>
-                                <div class="alert alert-secondary mt-2">
-                                    <strong>Your Reply:</strong> <?= nl2br(htmlspecialchars($item['user_reply'])) ?>
-                                </div>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                <!-- Feedback Form -->
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <select name="subject" id="subject" class="form-control" required>
+                            <option value="">Select subject...</option>
+                            <?php foreach ($subjects as $subject): ?>
+                                <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-                <?php endforeach; ?>
+                    
+                    <div class="form-group">
+                        <label>Message:</label>
+                        <textarea name="message" rows="5" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="rating">Rating:</label>
+                        <div class="star-rating" style="font-size:2em; color:gold;">
+                            <?php for ($i = 5; $i >= 1; $i--): ?>
+                                <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;">
+                                <label for="star<?= $i ?>" style="cursor:pointer;">&#9733;</label>
+                            <?php endfor; ?>
+                        </div>
+                    </div>
+                    <style>
+                        .star-rating {
+                            direction: rtl;
+                            unicode-bidi: bidi-override;
+                            display: inline-block;
+                        }
+                        .star-rating input[type="radio"] {
+                            display: none;
+                        }
+                        .star-rating label {
+                            color: #ccc;
+                            cursor: pointer;
+                            transition: color 0.2s;
+                        }
+                        .star-rating input[type="radio"]:checked ~ label,
+                        .star-rating label:hover,
+                        .star-rating label:hover ~ label {
+                            color: orange;
+                        }
+                        .star-rating input[type="radio"]:checked ~ label {
+                            color: orange;
+                        }
+                    </style>
+                    
+                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                </form>
+
+                <!-- Feedback History -->
+                <div class="feedback-history">
+                    <h3>Your Previous Feedback</h3>
+                    <?php foreach ($feedback as $item): ?>
+                        <div class="feedback-item">
+                            <div class="rating-stars">
+                                <?= str_repeat('★', $item['rating']) . str_repeat('☆', 5 - $item['rating']) ?>
+                            </div>
+                            <h4><?= htmlspecialchars($item['subject']) ?></h4>
+                            <?= nl2br(htmlspecialchars_decode($item['message'])) ?>                        <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
+                            <?php if (!empty($item['admin_reply'])): ?>
+                                <div class="alert alert-info mt-2">
+                                    <strong>Admin Reply:</strong> <?= nl2br(htmlspecialchars($item['admin_reply'])) ?>
+                                </div>
+                                <?php if (empty($item['user_reply'])): ?>
+                                    <form method="post" class="mt-2">
+                                        <input type="hidden" name="feedback_id" value="<?= $item['id'] ?>">
+                                        <div class="form-group">
+                                            <label for="user_reply_<?= $item['id'] ?>">Your Reply:</label>
+                                            <textarea name="user_reply" id="user_reply_<?= $item['id'] ?>" class="form-control" rows="2" required></textarea>
+                                        </div>
+                                        <button type="submit" name="user_reply_submit" class="btn btn-sm btn-success">Send Reply</button>
+                                    </form>
+                                <?php else: ?>
+                                    <div class="alert alert-secondary mt-2">
+                                        <strong>Your Reply:</strong> <?= nl2br(htmlspecialchars($item['user_reply'])) ?>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         </div>
-
-        <?php include 'includes/footer.php'; ?>
     </div>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
