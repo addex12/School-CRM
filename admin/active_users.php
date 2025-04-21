@@ -1,22 +1,9 @@
 <?php
 ob_start();
-
-// Error reporting for development (remove in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-try {
-    // Required files
-    require_once __DIR__ . '/../includes/auth.php';
-    require_once __DIR__ . '/../includes/db.php';
-    global $pdo;
-    
-    // Verify admin access
-    if (!function_exists('requireAdmin')) {
-        throw new Exception("Authentication functions not available");
-    }
-    requireAdmin();
-    
+require_once '../includes/auth.php';
+require_once '../includes/db.php';
+global $pdo; // <-- Add this line
+requireAdmin();
     $pageTitle = "Active Users";
 
     // Define active threshold (15 minutes)
