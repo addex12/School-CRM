@@ -176,13 +176,111 @@ $support_contact = $pdo->query("
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // [Previous JavaScript code remains exactly the same]
-        // Only change the API endpoints to point to user-specific versions:
+        // Use correct API endpoints
         const MESSAGES_API = '../api/user/get_messages.php';
         const SEND_API = '../api/user/send_message.php';
         const MARK_READ_API = '../api/user/mark_read.php';
-        
-        // [Rest of your existing JavaScript code]
+
+        // DOM elements
+        const contactItems = document.querySelectorAll('.contact-item');
+        const chatHeader = document.getElementById('chat-header');
+        const chatMessages = document.getElementById('chat-messages');
+        const messageForm = document.getElementById('message-form');
+        const receiverInput = document.getElementById('receiver_id');
+        const messageInput = document.getElementById('message-input');
+
+        let selectedUserId = null;
+
+        // Load messages for selected user
+        function loadMessages(userId) {
+            if (!userId) return;
+
+            fetch(`${MESSAGES_API}?user_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    chatMessages.innerHTML = '';
+                    if (data.success && data.messages.length > 0) {
+                        data.messages.forEach(msg => {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = `message ${msg.is_own ? 'sent' : 'received'}`;
+                            messageDiv.innerHTML = `
+                                <div>${msg.message}</div>
+                                <div class="message-time">${msg.sent_at}</div>
+                            `;
+                            chatMessages.appendChild(messageDiv);
+                        });
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                        markAsRead(userId);
+                    } else if (data.success) {
+                        chatMessages.innerHTML = '<p class="no-messages">No messages yet. Start the conversation!</p>';
+                    } else {
+                        chatMessages.innerHTML = `<p class="no-messages">Error loading messages: ${data.error}</p>`;
+                    }
+                })
+                .catch(() => {
+                    chatMessages.innerHTML = '<p class="no-messages">Error loading messages</p>';
+                });
+        }
+
+        // Mark messages as read
+        function markAsRead(senderId) {
+            fetch(`${MARK_READ_API}?user_id=${senderId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const badge = document.querySelector(`.contact-item[data-user-id="${senderId}"] .unread-badge`);
+                        if (badge) badge.remove();
+                    }
+                });
+        }
+
+        // Send message
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message || !selectedUserId) return;
+            const formData = new FormData();
+            formData.append('receiver_id', selectedUserId);
+            formData.append('message', message);
+
+            fetch(SEND_API, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageInput.value = '';
+                    loadMessages(selectedUserId);
+                } else {
+                    alert('Failed to send message: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(() => {
+                alert('Failed to send message');
+            });
+        });
+
+        // Select user from contact list
+        contactItems.forEach(item => {
+            item.addEventListener('click', function() {
+                selectedUserId = this.getAttribute('data-user-id');
+                receiverInput.value = selectedUserId;
+                contactItems.forEach(i => i.classList.remove('selected'));
+                this.classList.add('selected');
+                const contactName = this.querySelector('.contact-name').textContent;
+                chatHeader.innerHTML = `<h3>Chat with ${contactName}</h3>`;
+                messageForm.style.display = 'block';
+                loadMessages(selectedUserId);
+            });
+        });
+
+        // Poll for new messages every 5 seconds
+        setInterval(() => {
+            if (selectedUserId) {
+                loadMessages(selectedUserId);
+            }
+        }, 5000);
     });
     </script>
     
