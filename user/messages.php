@@ -32,7 +32,6 @@ $conversations = $pdo->prepare("
 $conversations->bindParam(':current_user', $current_user_id, PDO::PARAM_INT);
 $conversations->execute();
 // Get admin user for support messages
-$admin_user = $pdo->query("SELECT id, username FROM users WHERE role_id = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
