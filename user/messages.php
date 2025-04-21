@@ -18,23 +18,19 @@ $conversations = $pdo->prepare("
         u.id,
         u.username,
         u.avatar,
-        COUNT(CASE WHEN m.is_read = 0 AND m.sender_id = u.id THEN 1 END) as unread_count,
+        SUM(CASE WHEN m.is_read = 0 AND m.sender_id = u.id THEN 1 ELSE 0 END) as unread_count,
         MAX(m.sent_at) as last_message_time
     FROM users u
-    JOIN messages m ON (
+    LEFT JOIN messages m ON (
         (m.sender_id = u.id AND m.receiver_id = :current_user) OR
-        (m.receiver_id = u.id AND m.sender_id = :current_user2)
+        (m.receiver_id = u.id AND m.sender_id = :current_user)
     )
     WHERE u.id != :current_user
     GROUP BY u.id, u.username, u.avatar
     ORDER BY last_message_time DESC
 ");
-$conversations->execute([
-    ':current_user' => $current_user_id,
-    ':current_user2' => $current_user_id
-]);
-$contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
-
+$conversations->bindParam(':current_user', $current_user_id, PDO::PARAM_INT);
+$conversations->execute();
 // Get admin user for support messages
 $admin_user = $pdo->query("SELECT id, username FROM users WHERE role_id = 1 LIMIT 1")->fetch(PDO::FETCH_ASSOC);
 ?>
