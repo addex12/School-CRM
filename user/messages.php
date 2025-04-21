@@ -23,7 +23,7 @@ $conversations = $pdo->prepare("
         u.avatar,
         u.role_id,
         r.role_name,
-        SUM(CASE WHEN m.is_read = 0 AND m.sender_id = u.id THEN 1 ELSE 0 END) as unread_count,
+        COALESCE(SUM(CASE WHEN m.is_read = 0 AND m.sender_id = u.id THEN 1 ELSE 0 END), 0) as unread_count,
         MAX(m.sent_at) as last_message_time
     FROM users u
     JOIN roles r ON u.role_id = r.id
@@ -35,7 +35,6 @@ $conversations = $pdo->prepare("
     WHERE u.id != :current_user3
     AND u.role_id != :admin_role_id
     GROUP BY u.id, u.username, u.avatar, u.role_id, r.role_name
-    HAVING last_message_time IS NOT NULL
     ORDER BY last_message_time DESC
 ");
 
@@ -70,18 +69,22 @@ $support_contact = $pdo->query("
             height: 70vh;
             border: 1px solid #ddd;
             border-radius: 5px;
+            background: #fafbfc;
         }
         .contact-list {
             width: 250px;
             border-right: 1px solid #ddd;
             overflow-y: auto;
+            background: #fff;
+            padding: 0;
         }
         .contact-item {
-            padding: 10px;
+            padding: 10px 12px;
             cursor: pointer;
             border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
+            transition: background 0.2s;
         }
         .contact-item:hover {
             background-color: #f5f5f5;
@@ -95,6 +98,24 @@ $support_contact = $pdo->query("
             border-radius: 50%;
             margin-right: 10px;
             object-fit: cover;
+            background: #f0f0f0;
+        }
+        .contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .contact-name {
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .contact-last-message {
+            font-size: 0.85em;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .role-badge {
             font-size: 0.7em;
@@ -114,6 +135,66 @@ $support_contact = $pdo->query("
         .support-contact {
             background-color: #f8f9fa;
             border-left: 3px solid #e74c3c;
+        }
+        .chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f9f9f9;
+        }
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            background: #fff;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+        .message-form {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background: #fff;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+        }
+        .message.sent {
+            background-color: #dcf8c6;
+            margin-left: auto;
+            border-bottom-right-radius: 0;
+            align-items: flex-end;
+        }
+        .message.received {
+            background-color: #fff;
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+            align-items: flex-start;
+        }
+        .message-content {
+            word-break: break-word;
+        }
+        .message-meta {
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+        .no-messages {
+            color: #999;
+            text-align: center;
+            margin-top: 50px;
         }
     </style>
 </head>
@@ -154,7 +235,7 @@ $support_contact = $pdo->query("
                             <?php endif; ?>
                         </div>
                         <div class="contact-last-message">
-                            Last activity: <?= date('M j, g:i a', strtotime($contact['last_message_time'])) ?>
+                            <?= $contact['last_message_time'] ? 'Last activity: ' . date('M j, g:i a', strtotime($contact['last_message_time'])) : '' ?>
                         </div>
                     </div>
                 </div>
