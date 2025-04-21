@@ -1,118 +1,44 @@
 <?php
-ob_start();
-require_once '../includes/auth.php';
-require_once '../includes/db.php';
-global $pdo; // <-- Add this line
-requireAdmin();
-    $pageTitle = "Active Users";
+// Start the session
+session_start();
 
-    // Define active threshold (15 minutes)
-    $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
+// Include the database connection file
+include 'includes/db.php';
 
-    // Get active users
-    $query = "SELECT u.id, u.username, u.email, u.last_activity, 
-                     IFNULL(r.role_name, 'No Role') as role_name 
-              FROM users u
-              LEFT JOIN roles r ON u.role_id = r.id
-              WHERE u.last_activity >= :threshold
-              ORDER BY u.last_activity DESC";
-    
-    $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':threshold', $activeThreshold, PDO::PARAM_STR);
-    $stmt->execute();
-    
-    $activeUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Create a new PDO instance
+$db = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Format last activity time
-    foreach ($activeUsers as &$user) {
-        $user['last_active'] = date('M j, Y g:i A', strtotime($user['last_activity']));
-    }
-    unset($user);
+// Define the active threshold (15 minutes)
+$activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
 
-} catch (PDOException $e) {
-    error_log("Database error: " . $e->getMessage());
-    die("A database error occurred. Please try again later.");
-} catch (Exception $e) {
-    error_log("General error: " . $e->getMessage());
-    die("An error occurred. Please try again later.");
+// Get active users
+$query = "SELECT u.id, u.username, u.email, u.last_activity, 
+                 IFNULL(r.role_name, 'No Role') as role_name 
+          FROM users u
+          LEFT JOIN roles r ON u.role_id = r.id
+          WHERE u.last_activity >= :threshold
+          ORDER BY u.last_activity DESC";
+
+$stmt = $db->prepare($query);
+$stmt->bindParam(':threshold', $activeThreshold, PDO::PARAM_STR);
+$stmt->execute();
+
+$activeUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Display the active users
+echo "<h1>Active Users</h1>";
+echo "<table border='1'>";
+echo "<tr><th>ID</th><th>Username</th><th>Email</th><th>Last Activity</th><th>Role</th></tr>";
+
+foreach ($activeUsers as $user) {
+    echo "<tr>";
+    echo "<td>" . $user['id'] . "</td>";
+    echo "<td>" . $user['username'] . "</td>";
+    echo "<td>" . $user['email'] . "</td>";
+    echo "<td>" . $user['last_activity'] . "</td>";
+    echo "<td>" . $user['role_name'] . "</td>";
+    echo "</tr>";
 }
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle ?? 'Admin Panel') ?></title>
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <link rel="stylesheet" href="/assets/css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle ?? 'Active Users') ?></h1>
-                <div class="active-users-count">
-                    <i class="fas fa-users"></i>
-                    <span><?= count($activeUsers ?? []) ?> active now</span>
-                </div>
-            </header>
-            
-            <div class="content">
-                <div class="dashboard-section">
-                    <div class="table-actions">
-                        <button id="refreshUsers" class="btn btn-primary">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                        <span class="last-updated">Last updated: <?= date('g:i A') ?></span>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Last Active</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($activeUsers)): ?>
-                                    <?php foreach ($activeUsers as $user): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($user['id'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($user['username'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($user['email'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($user['role_name'] ?? '') ?></td>
-                                            <td><?= htmlspecialchars($user['last_active'] ?? 'Never') ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="5" class="text-center">
-                                            No active users found.
-                                        </td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <?php include __DIR__ . '/includes/footer.php'; ?>
-    
-    <script>
-    // Simple refresh functionality
-    document.getElementById('refreshUsers').addEventListener('click', function() {
-        window.location.reload();
-    });
-    </script>
-</body>
-</html>
-<?php ob_end_flush(); ?>
+
+echo "</table>";
