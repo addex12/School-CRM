@@ -31,14 +31,14 @@ try {
         exit;
     }
 
-    // Send to single user
+    // Use correct column name: 'message' instead of 'content' if your DB uses 'message'
     $stmt = $pdo->prepare("
-        INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
+        INSERT INTO messages (sender_id, receiver_id, message, sent_at, is_read) 
         VALUES (?, ?, ?, NOW(), 0)
     ");
     $stmt->execute([$current_user_id, $receiver_id, $message]);
 
     echo json_encode(['success' => true]);
 } catch (PDOException $e) {
-    echo json_encode(['success' => false, 'error' => 'Database error']);
+    echo json_encode(['success' => false, 'error' => 'Database error: ' . $e->getMessage()]);
 }
