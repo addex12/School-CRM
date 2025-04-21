@@ -11,7 +11,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Fetch and render contacts
     function loadContacts() {
         fetch('../api/get_contacts.php')
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => { throw new Error(`Contacts fetch failed: ${res.status} ${text}`); });
+                }
+                return res.json();
+            })
             .then(data => {
                 if (!data.success) return;
                 userList.innerHTML = '';
@@ -21,6 +26,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     li.innerHTML = `${contact.username} ${contact.unread > 0 ? `<span class='unread-badge'>${contact.unread}</span>` : ''}`;
                     userList.appendChild(li);
                 });
+            })
+            .catch(err => {
+                alert('Error loading contacts: ' + err.message);
+                console.error(err);
             });
     }
     loadContacts();
@@ -35,7 +44,16 @@ document.addEventListener('DOMContentLoaded', function () {
         loadMessages();
         // Mark as read after loading messages
         fetch(`../api/mark_read.php?user_id=${selectedUserId}`)
-            .then(() => loadContacts());
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => { throw new Error(`Mark read failed: ${res.status} ${text}`); });
+                }
+                loadContacts();
+            })
+            .catch(err => {
+                alert('Error marking as read: ' + err.message);
+                console.error(err);
+            });
     });
 
     // Send a message
@@ -54,8 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .then(res => {
             if (!res.ok) {
-                alert('Network error: ' + res.status);
-                return res.text().then(text => { throw new Error(text); });
+                return res.text().then(text => { throw new Error(`Send failed: ${res.status} ${text}`); });
             }
             return res.json();
         })
@@ -69,8 +86,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         })
         .catch(err => {
-            console.error('Send error:', err);
             alert('Send error: ' + err.message);
+            console.error('Send error:', err);
         });
     });
 
@@ -107,7 +124,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function loadMessages() {
         if (!selectedUserId) return;
         fetch(`../api/get_messages.php?user_id=${selectedUserId}`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    return res.text().then(text => { throw new Error(`Messages fetch failed: ${res.status} ${text}`); });
+                }
+                return res.json();
+            })
             .then(data => {
                 chatMessages.innerHTML = '';
                 if(data.messages && data.messages.length > 0) {
@@ -121,6 +143,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     chatMessages.innerHTML = '<div class="no-messages">No messages yet.</div>';
                 }
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+            })
+            .catch(err => {
+                chatMessages.innerHTML = `<div class="error-message">Error loading messages: ${err.message}</div>`;
+                console.error(err);
             });
     }
 
