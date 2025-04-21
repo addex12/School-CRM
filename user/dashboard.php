@@ -242,7 +242,7 @@ try {
                 <a href="feedback.php" class="quick-action">
                     <i class="fas fa-comment-alt"></i> Submit Feedback
                 </a>
-                <a href="chat.php" class="quick-action">
+                <a href="messages.php" class="quick-action">
                     <i class="fas fa-comments"></i> Start Chat
                 </a>
             </div>
