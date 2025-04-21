@@ -569,7 +569,7 @@ INSERT INTO `system_settings` (`id`, `setting_key`, `setting_value`, `setting_gr
 (10, 'smtp_host', 'smtp.gmail.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
 (11, 'smtp_port', '587', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
 (12, 'smtp_username', 'adugna.gizaw@flipperschools.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
-(13, 'smtp_password', 'SutumaJigi25582067s-', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
+(13, 'smtp_password', 'flipperschools123', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
 (14, 'smtp_secure', 'tls', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42');
 
 -- --------------------------------------------------------

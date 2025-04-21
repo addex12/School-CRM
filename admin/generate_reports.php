@@ -98,7 +98,6 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                             <?php endforeach; ?>
                         </select>
                     </label>
-                    <?php endif; ?>
                     <?php if ($reportType==='tickets'): ?>
                     <label>Status:
                         <select name="status">
