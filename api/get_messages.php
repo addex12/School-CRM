@@ -1,41 +1,62 @@
 <?php
-header('Content-Type: application/json');
-require_once __DIR__.'/../config.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// Validate authentication
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+require_once '../includes/auth.php';
+require_once '../includes/config.php';
+require_once '../includes/db.php';
+
+header('Content-Type: application/json');
+
+if (!isset($_GET['user_id'])) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Missing user_id']);
     exit;
 }
 
-$current_user_id = $_SESSION['user_id'];
-$other_user_id = filter_var($_GET['user_id'], FILTER_VALIDATE_INT);
-$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$limit = 50;
-$offset = ($page - 1) * $limit;
+$user_id = $_GET['user_id'];
+$current_user_id = $_SESSION['user_id'] ?? null;
+
+if (!$current_user_id) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
+    exit;
+}
 
 try {
-    // Get messages between current user and selected user
-    $stmt = $pdo->prepare("SELECT m.*, u.username
-        FROM messages m
-        JOIN users u ON m.sender_id = u.id
-        WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)
-        ORDER BY sent_at ASC
-        LIMIT ? OFFSET ?");
-    
-    $stmt->execute([$current_user_id, $other_user_id, $other_user_id, $current_user_id, $limit, $offset]);
-    $raw_messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($user_id === 'broadcast') {
+        // Optionally, handle broadcast messages if you support them
+        $stmt = $pdo->prepare("SELECT * FROM messages WHERE receiver_id = 'broadcast' ORDER BY sent_at ASC");
+        $stmt->execute();
+    } else {
+        // Fetch messages between current user and selected user
+        $stmt = $pdo->prepare(
+            "SELECT m.*, 
+                    u.username AS sender 
+             FROM messages m 
+             JOIN users u ON m.sender_id = u.id 
+             WHERE (m.sender_id = :current_user AND m.receiver_id = :user_id)
+                OR (m.sender_id = :user_id AND m.receiver_id = :current_user)
+             ORDER BY m.sent_at ASC"
+        );
+        $stmt->execute([
+            'current_user' => $current_user_id,
+            'user_id' => $user_id
+        ]);
+    }
     $messages = [];
-    foreach ($raw_messages as $msg) {
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $messages[] = [
-            'is_own' => $msg['sender_id'] == $current_user_id,
-            'sender' => $msg['username'],
-            'message' => $msg['message'],
-            'sent_at' => $msg['sent_at'],
+            'id' => $row['id'],
+            'sender' => $row['sender'],
+            'message' => $row['message'],
+            'sent_at' => $row['sent_at'],
+            'is_own' => $row['sender_id'] == $current_user_id
         ];
     }
     echo json_encode(['success' => true, 'messages' => $messages]);
-} catch (PDOException $e) {
-    error_log('Message retrieval error: '.$e->getMessage());
-    echo json_encode(['success' => false, 'error' => 'Failed to retrieve messages']);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }

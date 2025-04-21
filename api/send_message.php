@@ -1,52 +1,55 @@
 <?php
 session_start();
-error_log('Session in send_message.php: ' . print_r($_SESSION, true));
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+require_once '../includes/auth.php';
+require_once '../includes/config.php';
+require_once '../includes/db.php';
+
 header('Content-Type: application/json');
-require_once __DIR__ . '/../config.php';
 
-// Validate authentication
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'error' => 'Invalid request method']);
     exit;
 }
 
-// Validate input
-// Support both JSON and form-urlencoded
-$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-if (stripos($contentType, 'application/x-www-form-urlencoded') !== false) {
-    $data = $_POST;
-} else {
-    $data = json_decode(file_get_contents('php://input'), true);
-    if (!is_array($data)) $data = [];
-}
-if (!isset($data['receiver_id']) || !isset($data['message']) || empty(trim($data['message']))) {
-    echo json_encode(['success' => false, 'error' => 'Invalid request']);
+$current_user_id = $_SESSION['user_id'] ?? null;
+$receiver_id = $_POST['receiver_id'] ?? null;
+$message = trim($_POST['message'] ?? '');
+
+if (!$current_user_id) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit;
 }
-
-// Sanitize inputs
-$sender_id = $_SESSION['user_id'];
-$message = htmlspecialchars(trim($data['message']));
-$receiver_id_raw = $data['receiver_id'];
+if (!$receiver_id || $message === '') {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'error' => 'Missing receiver_id or message']);
+    exit;
+}
 
 try {
-    if ($receiver_id_raw === 'broadcast' && isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1) {
-        // Admin broadcast: send to all users (excluding admins and self)
-        $users = $pdo->query("SELECT id FROM users WHERE role_id != 1 AND id != $sender_id")->fetchAll(PDO::FETCH_COLUMN);
-        if (!$users) throw new Exception('No users found to broadcast');
-        $stmt = $pdo->prepare('INSERT INTO messages (sender_id, receiver_id, message, sent_at) VALUES (?, ?, ?, NOW())');
-        foreach ($users as $uid) {
-            $stmt->execute([$sender_id, $uid, $message]);
+    if ($receiver_id === 'broadcast') {
+        // Send to all non-admin users
+        $stmt = $pdo->query("SELECT id FROM users WHERE role_id != 1");
+        $user_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $pdo->beginTransaction();
+        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, message, sent_at, is_read) VALUES (?, ?, ?, NOW(), 0)");
+        foreach ($user_ids as $uid) {
+            $stmt->execute([$current_user_id, $uid, $message]);
         }
-        echo json_encode(['success' => true, 'broadcast' => true, 'count' => count($users)]);
+        $pdo->commit();
+        echo json_encode(['success' => true]);
     } else {
-        $receiver_id = filter_var($receiver_id_raw, FILTER_VALIDATE_INT);
-        if (!$receiver_id) throw new Exception('Invalid receiver');
-        $stmt = $pdo->prepare('INSERT INTO messages (sender_id, receiver_id, message, sent_at) VALUES (?, ?, ?, NOW())');
-        $stmt->execute([$sender_id, $receiver_id, $message]);
-        echo json_encode(['success' => true, 'message_id' => $pdo->lastInsertId()]);
+        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, message, sent_at, is_read) VALUES (?, ?, ?, NOW(), 0)");
+        $stmt->execute([$current_user_id, $receiver_id, $message]);
+        echo json_encode(['success' => true]);
     }
 } catch (Exception $e) {
-    error_log('Message send error: '.$e->getMessage());
+    if ($pdo->inTransaction()) $pdo->rollBack();
+    http_response_code(500);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
