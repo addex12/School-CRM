@@ -102,9 +102,15 @@ $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [
 
                 <section class="form-section">
                     <h2>Create Full System Backup</h2>
-                    <form method="POST">
-                        <button type="submit" name="backup_system" class="btn btn-primary">Backup Now</button>
+                    <form id="backupForm" method="POST">
+                        <button type="submit" id="backupBtn" name="backup_system" class="btn btn-primary">Backup Now</button>
                     </form>
+                    <div id="backupProgress" style="display:none; margin-top:10px;">
+                        <div style="width:100%;background:#eee;border-radius:4px;overflow:hidden;">
+                            <div id="progressBar" style="width:0%;height:20px;background:#007bff;"></div>
+                        </div>
+                        <div id="progressStatus" style="margin-top:5px;font-size:14px;color:#333;">Starting backup...</div>
+                    </div>
                 </section>
 
                 <section class="table-section">
@@ -142,5 +148,6 @@ $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <script src="../assets/js/backup.js"></script>
 </body>
 </html>
