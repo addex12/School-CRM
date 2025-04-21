@@ -7,7 +7,7 @@ requireLogin();
 $pageTitle = "Messaging";
 
 // Get all non-admin users
-$users = $pdo->query("SELECT id, username FROM users WHERE role_id != 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo->query("SELECT id, username FROM users WHERE role_id != 0 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
 // Get unread counts for each user
 $unreadCounts = [];
