@@ -119,7 +119,7 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                         </select>
                     </label>
                     <?php endif; ?>
-                    <button type="submit" class="btn btn-primary">Generate</button>
+                    <!--<button type="submit" class="btn btn-primary">Generate</button>-->
                 </form>
                 <div class="report-actions">
                     <button onclick="exportTableToCSV('report.csv')" class="btn btn-secondary">Export CSV</button>
