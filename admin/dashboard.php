@@ -87,54 +87,54 @@ try {
 } catch (Exception $e) {
     error_log("Tickets Error: " . $e->getMessage());
 }
-
-// Fetch recent users
-$recentUsers = [];
-try {
-    $stmt = $pdo->query("SELECT u.id, u.username, u.email, r.role_name, u.created_at FROM users u LEFT JOIN roles r ON u.role_id = r.id ORDER BY u.created_at DESC LIMIT 5");
-    $recentUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    $recentUsers = [];
-}
-
-// Fetch system stats
-$systemStats = [];
-try {
-    $systemStats['total_categories'] = $pdo->query("SELECT COUNT(*) FROM survey_categories")->fetchColumn();
-    $systemStats['total_feedback'] = $pdo->query("SELECT COUNT(*) FROM feedback")->fetchColumn();
-    $systemStats['total_tickets'] = $pdo->query("SELECT COUNT(*) FROM support_tickets")->fetchColumn();
-    $systemStats['total_surveys'] = $pdo->query("SELECT COUNT(*) FROM surveys")->fetchColumn();
-} catch (Exception $e) {
-    $systemStats = [];
-}
-
-// Prepare data for activity chart (last 7 days)
-$activityChartLabels = [];
-$activityChartData = [];
-try {
-    $stmt = $pdo->query("
-        SELECT DATE(created_at) as day, COUNT(*) as count
-        FROM activity_log
-        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
-        GROUP BY day
-        ORDER BY day ASC
-    ");
-    $days = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-    for ($i = 6; $i >= 0; $i--) {
-        $date = date('Y-m-d', strtotime("-$i days"));
-        $activityChartLabels[] = date('D', strtotime($date));
-        $activityChartData[] = isset($days[$date]) ? (int)$days[$date] : 0;
-    }
-} catch (Exception $e) {
-    $activityChartLabels = [];
-    $activityChartData = [];
-}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/dashboard.js" defer></script>
+    <style>
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .dashboard-widget {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+        }
+        .dashboard-widget i {
+            font-size: 2.2rem;
+            margin-bottom: 0.7rem;
+            color: #f1c40f;
+        }
+        .widget-blue { border-top: 4px solid #3498db; }
+        .widget-green { border-top: 4px solid #27ae60; }
+        .widget-orange { border-top: 4px solid #f39c12; }
+        .widget-red { border-top: 4px solid #e74c3c; }
+        .dashboard-widget h3 {
+            font-size: 2.1rem;
+            margin: 0.5rem 0 0.2rem 0;
+            color: #2c3e50;
+        }
+        .dashboard-widget p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        .dashboard-section {
             margin-bottom: 2.5rem;
             background: #fff;
             border-radius: 12px;
