@@ -5,6 +5,10 @@ require_once '../includes/db.php';
 
 header('Content-Type: application/json');
 
+// Debugging: Log initial request
+error_log("GET: " . print_r($_GET, true));
+error_log("SESSION: " . print_r($_SESSION, true));
+
 // Validate input
 if (!isset($_GET['user_id'])) {
     http_response_code(400);
@@ -22,35 +26,39 @@ if (!$current_user_id) {
 }
 
 try {
+    // Verify database connection
+    if (!$pdo) {
+        throw new Exception('Database connection failed');
+    }
+
     if ($other_user_id === 'broadcast') {
-        // Handle broadcast messages (admin to all users)
-        $stmt = $pdo->prepare("
-            SELECT m.*, u.username as sender 
-            FROM messages m
-            JOIN users u ON m.sender_id = u.id
-            WHERE m.receiver_id = :current_user_id 
-            AND m.is_admin = 1
-            ORDER BY m.sent_at ASC
-        ");
+        // Handle broadcast messages
+        $query = "SELECT m.*, u.username as sender 
+                 FROM messages m
+                 JOIN users u ON m.sender_id = u.id
+                 WHERE m.receiver_id = :current_user_id 
+                 AND m.is_admin = 1
+                 ORDER BY m.sent_at ASC";
         
-        $stmt->execute([
-            ':current_user_id' => $current_user_id
-        ]);
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':current_user_id', $current_user_id, PDO::PARAM_INT);
     } else {
         // Handle one-to-one conversations
-        $stmt = $pdo->prepare("
-            SELECT m.*, u.username as sender 
-            FROM messages m
-            JOIN users u ON m.sender_id = u.id
-            WHERE (m.sender_id = :current_user_id AND m.receiver_id = :other_user_id)
-               OR (m.sender_id = :other_user_id AND m.receiver_id = :current_user_id)
-            ORDER BY m.sent_at ASC
-        ");
+        $query = "SELECT m.*, u.username as sender 
+                 FROM messages m
+                 JOIN users u ON m.sender_id = u.id
+                 WHERE (m.sender_id = :current_user_id AND m.receiver_id = :other_user_id)
+                 OR (m.sender_id = :other_user_id AND m.receiver_id = :current_user_id)
+                 ORDER BY m.sent_at ASC";
         
-        $stmt->execute([
-            ':current_user_id' => $current_user_id,
-            ':other_user_id' => $other_user_id
-        ]);
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':current_user_id', $current_user_id, PDO::PARAM_INT);
+        $stmt->bindParam(':other_user_id', $other_user_id, PDO::PARAM_INT);
+    }
+
+    if (!$stmt->execute()) {
+        $error = $stmt->errorInfo();
+        throw new Exception("Query failed: " . $error[2]);
     }
 
     $messages = [];
@@ -64,21 +72,29 @@ try {
         ];
     }
 
+    // Debug output
+    error_log("Retrieved messages: " . count($messages));
+    
     echo json_encode([
         'success' => true,
         'messages' => $messages,
-        'debug' => [
+        'debug_info' => [
             'current_user' => $current_user_id,
-            'other_user' => $other_user_id
+            'other_user' => $other_user_id,
+            'message_count' => count($messages)
         ]
     ]);
 
-} catch (PDOException $e) {
-    error_log('Message query error: ' . $e->getMessage());
+} catch (Exception $e) {
+    error_log("Error in get_messages: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'error' => 'Database error',
-        'debug' => $e->getMessage()
+        'error' => 'Database error occurred',
+        'debug_info' => [
+            'error_message' => $e->getMessage(),
+            'current_user' => $current_user_id,
+            'other_user' => $other_user_id
+        ]
     ]);
 }
