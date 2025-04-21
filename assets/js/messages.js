@@ -58,7 +58,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Send a message
     messageForm && messageForm.addEventListener('submit', function (e) {
+        console.log('Submit handler triggered'); // Debug
         e.preventDefault();
+        console.log('receiverInput.value:', receiverInput.value); // Debug
+        console.log('messageInput.value:', messageInput.value); // Debug
         if (!messageInput.value.trim()) {
             alert('Message cannot be empty.');
             return;
