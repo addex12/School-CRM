@@ -28,7 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Register user
             if (registerUser($username, $email, $password)) {
-                $success = 'Registration successful! You can now <a href="login.php">login</a>.';
+                $_SESSION['success'] = 'Registration successful! You can now login.';
+                header('Location: login.php');
+                exit();
             } else {
                 $error = 'Registration failed. Please try again.';
             }
