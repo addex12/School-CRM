@@ -23,13 +23,16 @@ $conversations = $pdo->prepare("
     FROM users u
     JOIN messages m ON (
         (m.sender_id = u.id AND m.receiver_id = :current_user) OR
-        (m.receiver_id = u.id AND m.sender_id = :current_user)
+        (m.receiver_id = u.id AND m.sender_id = :current_user2)
     )
     WHERE u.id != :current_user
     GROUP BY u.id, u.username, u.avatar
     ORDER BY last_message_time DESC
 ");
-$conversations->execute([':current_user' => $current_user_id]);
+$conversations->execute([
+    ':current_user' => $current_user_id,
+    ':current_user2' => $current_user_id
+]);
 $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
 
 // Get admin user for support messages
