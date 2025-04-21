@@ -189,6 +189,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Redirect chat button to messages.php with selected user id
+    document.querySelectorAll('.btn-chat').forEach(button => {
+        button.addEventListener('click', () => {
+            const userId = button.dataset.userId;
+            window.location.href = 'messages.php?user_id=' + encodeURIComponent(userId);
+        });
+    });
+
     const chatModal = document.getElementById('chatModal');
     const chatUserName = document.getElementById('chatUserName');
     const chatUserId = document.getElementById('chatUserId');
