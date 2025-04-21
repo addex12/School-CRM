@@ -1,16 +1,10 @@
 <?php
 ob_start();
-session_start();
-
-// Error reporting (remove in production)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-// Include required files
-require '../includes/db.php';
-require '../includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/db.php';
+// Create Database instance and get PDO connection
 $database = new Database();
 $pdo = $database->getConnection();
-// Verify admin access
 requireAdmin();
 
 $pageTitle = "Active Users";
