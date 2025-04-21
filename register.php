@@ -15,7 +15,6 @@ error_reporting(E_ALL);
 require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
-require_once __DIR__ . '/includes/header.php';
 $pageTitle = 'Register';
 // Use global $pdo from db.php, do not instantiate Database class
 
