@@ -1,9 +1,16 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-$pageTitle = "Manage Support Tickets";
+$pageTitle = "Support Tickets";
 
 // Load tickets configuration
 $ticketsConfig = json_decode(file_get_contents(__DIR__ . '/tickets.json'), true);
@@ -12,53 +19,21 @@ $ticketsConfig = json_decode(file_get_contents(__DIR__ . '/tickets.json'), true)
 $stmt = $pdo->query("SELECT * FROM ticket_priorities ORDER BY id ASC");
 $ticketPriorities = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch all tickets
-$stmt = $pdo->query("
-    SELECT t.*, u.username 
-    FROM support_tickets t 
-    LEFT JOIN users u ON t.user_id = u.id 
-    ORDER BY t.created_at DESC
-");
-$tickets = $stmt->fetchAll();
-
-// Handle ticket actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        $ticket_id = intval($_POST['ticket_id']);
-        $action = $_POST['action'];
-
-        if ($action === 'delete') {
-            $stmt = $pdo->prepare("DELETE FROM support_tickets WHERE id = ?");
-            $stmt->execute([$ticket_id]);
-            $_SESSION['success'] = "Ticket deleted successfully!";
-        } elseif ($action === 'close') {
-            $stmt = $pdo->prepare("UPDATE support_tickets SET status = 'resolved' WHERE id = ?");
-            $stmt->execute([$ticket_id]);
-            $_SESSION['success'] = "Ticket closed successfully!";
-        } elseif ($action === 'reopen') {
-            $stmt = $pdo->prepare("UPDATE support_tickets SET status = 'open' WHERE id = ?");
-            $stmt->execute([$ticket_id]);
-            $_SESSION['success'] = "Ticket reopened successfully!";
-        } elseif ($action === 'reply') {
-            $message = trim($_POST['message']);
-            if (empty($message)) {
-                throw new Exception("Reply message cannot be empty.");
-            }
-            $stmt = $pdo->prepare("
-                INSERT INTO ticket_responses (ticket_id, user_id, message, is_admin, created_at) 
-                VALUES (?, ?, ?, 1, NOW())
-            ");
-            $stmt->execute([$ticket_id, $_SESSION['user_id'], $message]);
-            $_SESSION['success'] = "Reply sent successfully!";
-        }
-        header("Location: tickets.php");
-        exit();
-    } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
-    }
+// Handle ticket status update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+    $ticket_id = intval($_POST['ticket_id']);
+    $status = $_POST['status'];
+    $stmt = $pdo->prepare("UPDATE support_tickets SET status = ? WHERE id = ?");
+    $stmt->execute([$status, $ticket_id]);
+    $_SESSION['success'] = "Ticket status updated!";
+    header("Location: tickets.php");
+    exit();
 }
-?>
 
+// Fetch all tickets
+$stmt = $pdo->query("SELECT t.*, u.username FROM support_tickets t LEFT JOIN users u ON t.user_id = u.id ORDER BY t.created_at DESC");
+$tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -66,7 +41,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <script src="../assets/js/tickets.js" defer></script>
+    <style>
+        .tickets-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            margin: 2rem 0;
+        }
+        .tickets-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .tickets-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        .tickets-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tickets-table th, .tickets-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            text-align: left;
+        }
+        .tickets-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #34495e;
+        }
+        .tickets-table tr:hover {
+            background: #f4f8fb;
+        }
+        .ticket-actions form {
+            display: inline;
+        }
+        .status-open {
+            color: #27ae60;
+            font-weight: 500;
+        }
+        .status-closed {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        @media (max-width: 900px) {
+            .tickets-container {
+                padding: 1rem 0.5rem;
+            }
+            .tickets-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+        @media (max-width: 600px) {
+            .tickets-table th, .tickets-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -78,18 +115,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="content">
                 <?php include 'includes/alerts.php'; ?>
 
-                <section class="table-section">
-                    <h2>Support Tickets</h2>
-                    <div class="search-container">
-                        <input type="text" id="ticket-search" placeholder="Search tickets..." class="form-control">
+                <div class="tickets-container">
+                    <div class="tickets-header">
+                        <h2>Support Tickets</h2>
                     </div>
-                    <?php if (count($tickets) > 0): ?>
-                        <table class="tickets-table table">
+                    <div class="table-responsive">
+                        <table class="tickets-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>User</th>
                                     <th>Subject</th>
+                                    <th>Message</th>
                                     <th>Status</th>
                                     <th>Priority</th>
                                     <th>Created At</th>
@@ -97,115 +134,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($tickets as $ticket): ?>
+                                <?php if (!empty($tickets)): ?>
+                                    <?php foreach ($tickets as $ticket): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($ticket['id']) ?></td>
+                                            <td><?= htmlspecialchars($ticket['username'] ?? 'N/A') ?></td>
+                                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
+                                            <td><?= htmlspecialchars($ticket['message']) ?></td>
+                                            <td>
+                                                <span class="status-<?= $ticket['status'] === 'open' ? 'open' : 'closed' ?>">
+                                                    <?= ucfirst($ticket['status']) ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <?php 
+                                                $priority = array_filter($ticketPriorities, fn($p) => $p['value'] === ($ticket['priority'] ?? ''));
+                                                $priority = reset($priority);
+                                                ?>
+                                                <span style="color: <?= htmlspecialchars($priority['color'] ?? 'black') ?>">
+                                                    <?= htmlspecialchars($priority['label'] ?? ucfirst($ticket['priority'] ?? 'N/A')) ?>
+                                                </span>
+                                            </td>
+                                            <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
+                                            <td class="ticket-actions">
+                                                <form method="POST">
+                                                    <input type="hidden" name="ticket_id" value="<?= $ticket['id'] ?>">
+                                                    <select name="status" onchange="this.form.submit()">
+                                                        <option value="open" <?= $ticket['status'] === 'open' ? 'selected' : '' ?>>Open</option>
+                                                        <option value="closed" <?= $ticket['status'] === 'closed' ? 'selected' : '' ?>>Closed</option>
+                                                    </select>
+                                                    <input type="hidden" name="update_status" value="1">
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($ticket['id'] ?? '') ?></td>
-                                        <td><?= htmlspecialchars($ticket['username'] ?? 'N/A') ?></td>
-                                        <td><?= htmlspecialchars($ticket['subject'] ?? 'N/A') ?></td>
-                                        <td>
-                                            <span style="color: <?= htmlspecialchars($ticketsConfig['statuses'][array_search($ticket['status'], array_column($ticketsConfig['statuses'], 'value'))]['color'] ?? 'black') ?>">
-                                                <?= ucfirst(htmlspecialchars($ticket['status'] ?? 'N/A')) ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <?php 
-                                            $priority = array_filter($ticketPriorities, fn($p) => $p['value'] === ($ticket['priority'] ?? ''));
-                                            $priority = reset($priority);
-                                            ?>
-                                            <span style="color: <?= htmlspecialchars($priority['color'] ?? 'black') ?>">
-                                                <?= htmlspecialchars($priority['label'] ?? ucfirst($ticket['priority'] ?? 'N/A')) ?>
-                                            </span>
-                                        </td>
-                                        <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'] ?? 'now')) ?></td>
-                                        <td>
-                                            <button class="btn btn-secondary view-ticket" data-ticket-id="<?= $ticket['id'] ?>">View</button>
-                                            <?php foreach ($ticketsConfig['actions'] as $action): ?>
-                                                <button class="btn btn-<?= $action['value'] ?>" data-ticket-id="<?= $ticket['id'] ?>" data-action="<?= $action['value'] ?>">
-                                                    <i class="fas <?= $action['icon'] ?>"></i> <?= $action['label'] ?>
-                                                </button>
-                                            <?php endforeach; ?>
-                                        </td>
+                                        <td colspan="8">No tickets found.</td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
-                    <?php else: ?>
-                        <p>No tickets found.</p>
-                    <?php endif; ?>
-                </section>
+                    </div>
+                </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-
-    <!-- Ticket Modal -->
-    <div id="ticketModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Ticket Details</h2>
-            <div id="ticketDetails"></div>
-            <form method="POST">
-                <input type="hidden" name="ticket_id" id="ticketId">
-                <input type="hidden" name="action" value="reply">
-                <div class="form-group">
-                    <label for="message">Reply</label>
-                    <textarea name="message" id="message" rows="4" class="form-control"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Send Reply</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function viewTicket(ticketId) {
-            fetch(`ticket_details.php?ticket_id=${ticketId}`)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('ticketDetails').innerHTML = data;
-                    document.getElementById('ticketId').value = ticketId;
-                    document.getElementById('ticketModal').style.display = 'block';
-                });
-        }
-
-        function closeModal() {
-            document.getElementById('ticketModal').style.display = 'none';
-        }
-    </script>
-
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-            border-radius: 8px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
 </body>
 </html>
