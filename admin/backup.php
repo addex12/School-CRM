@@ -43,8 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {
         );
         foreach ($files as $file) {
             $filePath = $file->getRealPath();
-            $relativePath = substr($filePath, strlen($rootDir) + 1);
-            $zip->addFile($filePath, $relativePath);
+            if ($file->isFile()) { // Only add files, not directories
+                $relativePath = substr($filePath, strlen($rootDir) + 1);
+                $zip->addFile($filePath, $relativePath);
+            }
         }
 
         $zip->close();
