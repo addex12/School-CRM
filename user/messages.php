@@ -24,55 +24,90 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
+        .container {
+            max-width: 1000px;
+            margin: 30px auto 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            padding: 30px 30px 20px 30px;
+        }
         .messaging-container {
             display: flex;
-            height: 70vh;
+            height: 65vh;
             border: 1px solid #ddd;
             border-radius: 5px;
+            background: #fafbfc;
+            margin-top: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
         }
         .contact-list {
             width: 250px;
             border-right: 1px solid #ddd;
             overflow-y: auto;
+            background: #f8fafd;
+            border-radius: 5px 0 0 5px;
         }
         .chat-section {
             flex: 1;
             display: flex;
             flex-direction: column;
+            background: #fff;
+            border-radius: 0 5px 5px 0;
+        }
+        .chat-header {
+            padding: 18px 20px 10px 20px;
+            border-bottom: 1px solid #eee;
+            background: #f7fafd;
+            border-radius: 0 5px 0 0;
         }
         .chat-messages {
             flex: 1;
-            padding: 15px;
+            padding: 18px 20px 18px 20px;
             overflow-y: auto;
+            background: #fff;
         }
         .message-form {
-            padding: 15px;
-            border-top: 1px solid #ddd;
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            background: #f7fafd;
+            border-radius: 0 0 5px 0;
+        }
+        .user-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
         }
         .user-list li {
-            padding: 10px;
+            padding: 12px 18px;
             cursor: pointer;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 16px;
+            transition: background 0.15s;
         }
         .user-list li:hover {
-            background-color: #f5f5f5;
+            background-color: #f0f7fa;
         }
         .user-list li.selected {
             background-color: #e9f7fe;
+            font-weight: 600;
         }
         .unread-badge {
             background-color: #e74c3c;
             color: white;
             border-radius: 50%;
-            padding: 2px 6px;
+            padding: 2px 7px;
             font-size: 12px;
-            margin-left: 5px;
+            margin-left: 7px;
+            vertical-align: middle;
         }
         .chat-message {
             margin-bottom: 15px;
-            padding: 10px;
+            padding: 10px 14px;
             border-radius: 5px;
             max-width: 70%;
+            word-break: break-word;
+            font-size: 15px;
         }
         .chat-message.own {
             background-color: #e3f2fd;
@@ -88,44 +123,60 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             display: block;
             margin-top: 5px;
         }
+        @media (max-width: 900px) {
+            .container {
+                padding: 10px;
+            }
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .contact-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                border-radius: 5px 5px 0 0;
+            }
+            .chat-section {
+                border-radius: 0 0 5px 5px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
-        <?php include 'includes/header.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header"><h1><?= htmlspecialchars($pageTitle) ?></h1></header>
-            <div class="content">
-                <div class="messaging-container">
-                    <aside class="contact-list">
-                        <h2>Users</h2>
-                        <ul id="user-list" class="user-list">
-                            <?php foreach ($users as $user): ?>
-                                <li data-user-id="<?= $user['id'] ?>" class="contact-item">
-                                    <?= htmlspecialchars($user['username']) ?>
-                                    <?php if (isset($unreadCounts[$user['id']])): ?>
-                                        <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
-                                    <?php endif; ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </aside>
-                    <section class="chat-section">
-                        <div id="chat-header" class="chat-header">
-                            <h3>Select a user to start chatting</h3>
-                        </div>
-                        <div id="chat-messages" class="chat-messages"></div>
-                        <form id="message-form" class="message-form" style="display:none;">
-                            <input type="hidden" name="receiver_id" id="receiver_id">
-                            <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required></textarea>
-                            <button type="submit" class="btn btn-primary">Send</button>
-                        </form>
-                    </section>
+    <?php include 'includes/header.php'; ?>
+    <div class="container">
+        <header style="margin-bottom: 18px;">
+            <h1 style="font-size: 2rem; font-weight: 700; margin: 0;"><?= htmlspecialchars($pageTitle) ?></h1>
+        </header>
+        <div class="messaging-container">
+            <aside class="contact-list">
+                <h2 style="font-size: 1.2rem; font-weight: 600; margin: 18px 0 10px 18px;">Users</h2>
+                <ul id="user-list" class="user-list">
+                    <?php foreach ($users as $user): ?>
+                        <li data-user-id="<?= $user['id'] ?>" class="contact-item">
+                            <?= htmlspecialchars($user['username']) ?>
+                            <?php if (isset($unreadCounts[$user['id']])): ?>
+                                <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </aside>
+            <section class="chat-section">
+                <div id="chat-header" class="chat-header">
+                    <h3 style="margin:0; font-size:1.1rem; color:#333;">Select a user to start chatting</h3>
                 </div>
-            </div>
+                <div id="chat-messages" class="chat-messages"></div>
+                <form id="message-form" class="message-form" style="display:none;">
+                    <input type="hidden" name="receiver_id" id="receiver_id">
+                    <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required style="width:100%;resize:vertical;"></textarea>
+                    <button type="submit" class="btn btn-primary" style="margin-top:8px;">Send</button>
+                </form>
+            </section>
         </div>
     </div>
-    
+    <?php include_once __DIR__ . '/includes/footer.php'; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const userList = document.getElementById('user-list');
@@ -313,7 +364,5 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             });
         });
     </script>
-        <?php include_once __DIR__ . '/includes/footer.php'; ?>
-
 </body>
 </html>
