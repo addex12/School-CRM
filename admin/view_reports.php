@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -41,6 +48,58 @@ try {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .reports-container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            margin: 2rem 0;
+        }
+        .reports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .reports-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        .reports-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .reports-table th, .reports-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            text-align: left;
+        }
+        .reports-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #34495e;
+        }
+        .reports-table tr:hover {
+            background: #f4f8fb;
+        }
+        @media (max-width: 900px) {
+            .reports-container {
+                padding: 1rem 0.5rem;
+            }
+            .reports-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+        @media (max-width: 600px) {
+            .reports-table th, .reports-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -120,6 +179,43 @@ try {
                     </tbody></table>
                 </section>
                 <?php endif; ?>
+                <div class="reports-container">
+                    <div class="reports-header">
+                        <h2>Audit Log (Last 50)</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="reports-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User ID</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                    <th>IP Address</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($recentAudit)): ?>
+                                    <?php foreach ($recentAudit as $report): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($report['id']) ?></td>
+                                            <td><?= htmlspecialchars($report['user_id']) ?></td>
+                                            <td><?= htmlspecialchars($report['action']) ?></td>
+                                            <td><?= htmlspecialchars($report['details']) ?></td>
+                                            <td><?= htmlspecialchars($report['ip_address']) ?></td>
+                                            <td><?= htmlspecialchars($report['created_at']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="6">No reports found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
