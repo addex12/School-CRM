@@ -106,7 +106,7 @@ $contacts = $conversations->fetchAll(PDO::FETCH_ASSOC);
     </style>
 </head>
 <body>
-    <?php include '../includes/user_header.php'; ?>
+    <?php include '/includes/header.php'; ?>
     
     <div class="container">
         <h1>Messages</h1>
