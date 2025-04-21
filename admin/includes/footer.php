@@ -94,7 +94,6 @@
                 <li><a href="dashboard.php" class="footer-link">Dashboard</a></li>
                 <li><a href="surveys.php" class="footer-link">Surveys</a></li>
                 <li><a href="users.php" class="footer-link">Users</a></li>
-                <li><a href="results.php" class="footer-link">Results</a></li>
                 <li><a href="../../logout.php" class="footer-link">Logout</a></li>
             </ul>
         </div>
