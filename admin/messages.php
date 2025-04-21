@@ -26,10 +26,7 @@ $users = $pdo->query("SELECT id, username FROM users WHERE role_id != 1 ORDER BY
                     <aside class="contact-list">
                         <h2>Users</h2>
                         <ul id="user-list">
-                            <li data-user-id="broadcast" style="font-weight:bold;color:#007bff;">Broadcast to All Users</li>
-                            <?php foreach ($users as $user): ?>
-                                <li data-user-id="<?= $user['id'] ?>"> <?= htmlspecialchars($user['username']) ?> </li>
-                            <?php endforeach; ?>
+                            <!-- Contacts will be loaded by JS -->
                         </ul>
                     </aside>
                     <section class="chat-section">
