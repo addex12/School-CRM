@@ -62,6 +62,13 @@ foreach ($grading_scale_rows as $row) {
     }
 }
 
+// Fetch sections for all classes (for AJAX)
+$sectionsByClass = [];
+$sections = $pdo->query("SELECT id, class_id, section_name FROM sections")->fetchAll(PDO::FETCH_ASSOC);
+foreach ($sections as $sec) {
+    $sectionsByClass[$sec['class_id']][] = $sec;
+}
+
 // --- AUTO-INSERT COMMON CURRICULUMS, SUBJECTS, AND GRADING SCALES IF TABLES ARE EMPTY ---
 
 // Insert common curriculums if not present
@@ -213,6 +220,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     var subjectsByLevel = <?= json_encode($subjectsByLevel) ?>;
     var studentClassLevel = <?= json_encode($studentClassLevel) ?>;
     var gradingScalesByLevel = <?= json_encode($gradingScalesByLevel) ?>;
+    var sectionsByClass = <?= json_encode($sectionsByClass) ?>;
+    var students = <?= json_encode($students) ?>;
+
     function updateSubjects() {
         var studentId = document.getElementById('student_id').value;
         var subjectSelect = document.getElementById('subject_id');
@@ -225,7 +235,24 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 subjectSelect.appendChild(opt);
             });
         }
+        updateSections();
     }
+
+    function updateSections() {
+        var studentId = document.getElementById('student_id').value;
+        var sectionSelect = document.getElementById('section_id');
+        sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
+        var student = students.find(function(s) { return s.id == studentId; });
+        if (student && student.class_id && sectionsByClass[student.class_id]) {
+            sectionsByClass[student.class_id].forEach(function(sec) {
+                var opt = document.createElement('option');
+                opt.value = sec.id;
+                opt.text = sec.section_name;
+                sectionSelect.appendChild(opt);
+            });
+        }
+    }
+
     function autoFillGradeLetter() {
         var studentId = document.getElementById('student_id').value;
         var score = parseFloat(document.getElementById('score').value);
@@ -266,7 +293,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <form method="post" style="margin-bottom:2rem;">
                         <div style="margin-bottom:1rem;">
                             <label for="student_id">Student</label>
-                            <select name="student_id" id="student_id" required onchange="updateSubjects()">
+                            <select name="student_id" id="student_id" required onchange="updateSubjects();autoFillGradeLetter();">
                                 <option value="">-- Select Student --</option>
                                 <?php foreach ($students as $s): ?>
                                     <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['username']) ?></option>
@@ -283,9 +310,6 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <label for="section_id">Section (optional)</label>
                             <select name="section_id" id="section_id">
                                 <option value="">-- Any Section --</option>
-                                <?php foreach ($sections as $sec): ?>
-                                    <option value="<?= $sec['id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
-                                <?php endforeach; ?>
                             </select>
                         </div>
                         <div style="margin-bottom:1rem;">
