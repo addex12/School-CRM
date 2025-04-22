@@ -13,8 +13,13 @@ require_once '../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $id = intval($_POST['id']);
-    $stmt = $pdo->prepare("DELETE FROM sections WHERE id = ?");
+    // Double-check section exists before deleting (optional)
+    $stmt = $pdo->prepare("SELECT id FROM sections WHERE id = ?");
     $stmt->execute([$id]);
+    if ($stmt->fetch()) {
+        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = ?");
+        $stmt->execute([$id]);
+    }
 }
 header("Location: sections.php");
 exit();
