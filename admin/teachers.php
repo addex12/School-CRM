@@ -33,20 +33,20 @@ $stmt = $pdo->prepare("
         u.avatar,
         r.role_name,
         GROUP_CONCAT(DISTINCT s.subject_name ORDER BY s.subject_name SEPARATOR ', ') AS subjects,
-        GROUP_CONCAT(DISTINCT CONCAT(cls.class_name, IF(sec.section_name IS NULL, '', CONCAT(' (', sec.section_name, ')'))) SEPARATOR ', ') AS classes
+        GROUP_CONCAT(DISTINCT c.class_name ORDER BY c.class_name SEPARATOR ', ') AS classes
     FROM teachers t
     JOIN users u ON t.user_id = u.id
     JOIN roles r ON u.role_id = r.id
     LEFT JOIN teacher_subjects ts ON t.id = ts.teacher_id
     LEFT JOIN class_subjects cs ON ts.class_subject_id = cs.id
     LEFT JOIN subjects s ON cs.subject_id = s.id
-    LEFT JOIN classes cls ON cs.class_id = cls.id
-    LEFT JOIN sections sec ON ts.section_id = sec.id
+    LEFT JOIN classes c ON cs.class_id = c.id
     GROUP BY t.id
     ORDER BY u.first_name, u.last_name
 ");
 $stmt->execute();
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Handle bulk actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
     $action = $_POST['bulk_action'];
@@ -57,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
         
         try {
             if ($action === 'delete') {
-                // Delete teacher records (users remain active)
                 $stmt = $pdo->prepare("DELETE FROM teachers WHERE id IN ($placeholders)");
                 $stmt->execute($teacher_ids);
                 $message = count($teacher_ids) . " teacher(s) deleted successfully.";
@@ -82,12 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
 }
 
 // Handle success/error messages
-if (isset($_GET['success'])) {
-    $success = htmlspecialchars($_GET['success']);
-}
-if (isset($_GET['error'])) {
-    $error = htmlspecialchars($_GET['error']);
-}
+$success = $_GET['success'] ?? '';
+$error = $_GET['error'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
