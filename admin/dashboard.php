@@ -78,6 +78,20 @@ $widgets = [
         "icon" => "fa-th-large",
         "color" => "teal",
         "query" => "SELECT COUNT(*) FROM sections"
+    ],
+    // Add widget for total curriculums
+    [
+        "title" => "Total Curriculums",
+        "icon" => "fa-list",
+        "color" => "blue",
+        "query" => "SELECT COUNT(*) FROM curriculums"
+    ],
+    // Add widget for curriculum-grade/class mappings
+    [
+        "title" => "Curriculum-Grade/Class Mappings",
+        "icon" => "fa-layer-group",
+        "color" => "purple",
+        "query" => "SELECT COUNT(*) FROM curriculum_grades"
     ]
 ];
 
