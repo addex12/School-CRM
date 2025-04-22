@@ -27,9 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_scale'])) {
     }
 }
 
-// Fetch all grading scales
+// Fetch all grading scales (remove gs.created_at from SELECT)
 $stmt = $pdo->query("
-    SELECT gs.id, cu.name AS curriculum, gs.scale_name, gs.min_score, gs.max_score, gs.grade_letter, gs.remark, gs.created_at
+    SELECT gs.id, gs.scale_name, gs.min_score, gs.max_score, gs.grade_letter, gs.remark, cu.name AS curriculum
     FROM grading_scales gs
     LEFT JOIN curriculums cu ON gs.curriculum_id = cu.id
     ORDER BY cu.name, gs.scale_name, gs.min_score DESC
@@ -101,7 +101,6 @@ $scales = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Max Score</th>
                                     <th>Grade Letter</th>
                                     <th>Remark</th>
-                                    <th>Created At</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -115,12 +114,11 @@ $scales = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($scale['max_score']) ?></td>
                                             <td><?= htmlspecialchars($scale['grade_letter']) ?></td>
                                             <td><?= htmlspecialchars($scale['remark']) ?></td>
-                                            <td><?= date('M j, Y g:i A', strtotime($scale['created_at'])) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="8">No grading scales found.</td>
+                                        <td colspan="7">No grading scales found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
