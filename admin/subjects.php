@@ -182,7 +182,8 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
+            <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
