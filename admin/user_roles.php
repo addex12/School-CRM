@@ -54,7 +54,8 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY id")->fetchAll(PDO::FETCH_ASS
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Roles - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
@@ -118,7 +119,7 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY id")->fetchAll(PDO::FETCH_ASS
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1>User Roles</h1>
             </header>
             <div class="content">
                 <div class="roles-container">

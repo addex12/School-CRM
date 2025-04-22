@@ -93,145 +93,63 @@ $chart_json = json_encode($chart_data);
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css" />
-    <link rel="stylesheet" href="../assets/css/admin.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <style>
-        .chart-container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .chart-title {
-            margin-top: 0;
-            color: #2c3e50;
-            font-size: 1.2rem;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .filter-form {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        .statistics-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem auto;
-            max-width: 600px;
-        }
-        .statistics-header {
-            margin-bottom: 1.5rem;
-        }
-        .statistics-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .stat-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            font-size: 1.2rem;
-            color: #2c3e50;
-        }
-        .chart-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto 1.5rem auto;
-            max-width: 420px;
-            min-height: 220px;
-            background: #f6f8fa;
-            border-radius: 12px;
-            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
-            padding: 1.5rem 1rem;
-        }
-        #responsesChart {
-            max-width: 350px !important;
-            max-height: 180px !important;
-            margin: 0 auto;
-        }
-        @media (max-width: 600px) {
-            .statistics-container {
-                padding: 1rem 0.5rem;
-                max-width: 98vw;
-            }
-            .chart-wrapper {
-                padding: 0.5rem 0.2rem;
-            }
-            #responsesChart {
-                max-width: 98vw !important;
-                max-height: 140px !important;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Statistics - Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1>Survey Statistics</h1>
             </header>
-
-            <div class="filter-section">
-                <form method="GET" class="filter-form">
-                    <label for="survey_id">Select Survey</label>
-                    <select name="survey_id" id="survey_id" class="form-control" onchange="this.form.submit()">
-                        <option value="">-- Select a Survey --</option>
-                        <?php foreach ($allSurveys as $surveyOption): ?>
-                            <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($selected_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($surveyOption['title']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </form>
-            </div>
-
-            <?php if ($selected_survey_id && $survey): ?>
-                <div class="survey-summary mb-4">
-                    <p><strong>Title:</strong> <?= htmlspecialchars($survey['title']) ?></p>
-                    <p><strong>Start Date:</strong> <?= date('M j, Y', strtotime($survey['starts_at'])) ?></p>
-                    <p><strong>End Date:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
-                    <p><strong>Anonymous:</strong> <?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></p>
-                    <p><strong>Total Responses:</strong> <?= number_format($total_responses) ?></p>
+            <div class="content">
+                <div class="filter-section">
+                    <form method="GET" class="filter-form">
+                        <label for="survey_id">Select Survey</label>
+                        <select name="survey_id" id="survey_id" class="form-control" onchange="this.form.submit()">
+                            <option value="">-- Select a Survey --</option>
+                            <?php foreach ($allSurveys as $surveyOption): ?>
+                                <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($selected_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($surveyOption['title']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
                 </div>
 
-                <?php if ($total_responses > 0): ?>
-                    <?php foreach ($fields as $field): ?>
-                        <div class="chart-container">
-                            <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
-                            <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
+                <?php if ($selected_survey_id && $survey): ?>
+                    <div class="survey-summary mb-4">
+                        <p><strong>Title:</strong> <?= htmlspecialchars($survey['title']) ?></p>
+                        <p><strong>Start Date:</strong> <?= date('M j, Y', strtotime($survey['starts_at'])) ?></p>
+                        <p><strong>End Date:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
+                        <p><strong>Anonymous:</strong> <?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></p>
+                        <p><strong>Total Responses:</strong> <?= number_format($total_responses) ?></p>
+                    </div>
+
+                    <?php if ($total_responses > 0): ?>
+                        <?php foreach ($fields as $field): ?>
+                            <div class="chart-container">
+                                <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
+                                <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No responses found for this survey.
                         </div>
-                    <?php endforeach; ?>
+                    <?php endif; ?>
                 <?php else: ?>
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No responses found for this survey.
+                        <i class="fas fa-info-circle"></i> Please select a survey to view statistics.
                     </div>
                 <?php endif; ?>
-            <?php else: ?>
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> Please select a survey to view statistics.
-                </div>
-            <?php endif; ?>
+            </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script>

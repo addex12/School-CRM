@@ -38,7 +38,8 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support Tickets - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
@@ -110,7 +111,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1>Support Tickets</h1>
             </header>
             <div class="content">
                 <?php include 'includes/alerts.php'; ?>

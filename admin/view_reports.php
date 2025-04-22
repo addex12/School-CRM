@@ -44,7 +44,8 @@ try {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reports - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -106,7 +107,7 @@ try {
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1>View Reports</h1>
             </header>
             <div class="content">
                 <section class="dashboard-section">
@@ -218,7 +219,7 @@ try {
                 </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

@@ -176,6 +176,15 @@ tr:hover {
         align-items: flex-start !important;
         gap: 8px !important;
     }
+    .table-responsive, .response-table, .users-table, .audit-log-table, .report-table, .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+    th, td {
+        white-space: nowrap;
+        font-size: 0.95em;
+    }
 }
 
 @media (max-width: 600px) {
