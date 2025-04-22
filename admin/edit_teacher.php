@@ -1,9 +1,10 @@
 <?php
 /**
- * Flipper School CRM - Edit Teacher Page
- * Developed by: [Your Name/Team]
- * Email: [your@email.com]
- * (c) 2024 Flipper School. All rights reserved.
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
  */
 require_once '../includes/config.php';
 require_once '../includes/db.php';
