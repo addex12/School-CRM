@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 23, 2025 at 07:24 AM
+-- Generation Time: Apr 23, 2025 at 08:00 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -97,7 +97,8 @@ CREATE TABLE `audit_logs` (
 
 INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `details`, `ip_address`, `created_at`) VALUES
 (1, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 20:48:37'),
-(2, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 21:21:46');
+(2, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 21:21:46'),
+(3, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 21:26:14');
 
 -- --------------------------------------------------------
 
@@ -224,6 +225,7 @@ CREATE TABLE `grades` (
   `id` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
   `subject_id` int(11) NOT NULL,
+  `class_subject_id` int(11) DEFAULT NULL,
   `grading_scale_id` int(11) DEFAULT NULL,
   `score` decimal(5,2) NOT NULL,
   `grade_letter` varchar(10) DEFAULT NULL,
@@ -367,7 +369,9 @@ INSERT INTO `sections` (`id`, `class_id`, `section_name`, `created_at`) VALUES
 (5, 2, 'B', '2025-04-23 05:15:28'),
 (6, 2, 'C', '2025-04-23 05:15:28'),
 (40, 13, 'A', '2025-04-23 05:15:28'),
-(41, 13, 'B', '2025-04-23 05:15:28');
+(41, 13, 'B', '2025-04-23 05:15:28'),
+(42, 10, 'A', '2025-04-23 07:44:28'),
+(43, 10, 'B', '2025-04-23 07:44:55');
 
 -- --------------------------------------------------------
 
@@ -578,7 +582,7 @@ INSERT INTO `teachers` (`id`, `user_id`, `qualification`, `subject_specializatio
 CREATE TABLE `teacher_subjects` (
   `id` int(11) NOT NULL,
   `teacher_id` int(11) NOT NULL,
-  `class_subject_id` int(11) DEFAULT NULL,
+  `class_subject_id` int(11) NOT NULL,
   `section_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -607,7 +611,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `active`, `created_at`, `last_login`, `avatar`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, 1, '2025-03-25 03:50:31', '2025-04-22 21:21:46', 'admin_avatar.jpg'),
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, 1, '2025-03-25 03:50:31', '2025-04-22 21:26:14', 'admin_avatar.jpg'),
 (5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'mcdc@gmail.com', 'Efream', 'Yohannes', 4, 1, '2025-03-25 11:47:11', '2025-04-21 07:40:11', 'student_avatar5.jpg'),
 (65, 'Adugna1', '$2y$10$mVnaYcK/FyHuL7meR9J5susyTa.6T4tgUt6Ci7xcLpMsREPWX6R3G', 'gizawadugna@gmail.com', 'Adugna', 'Gizaw', 4, 1, '2025-03-29 01:03:37', '2025-04-21 12:52:56', 'avatar_65_053303628160f3c6.png'),
 (66, 'gizawadugna1', '$2y$10$lc./P6NQpbQoCJ8j6PkI.ecLmF5mJ3n5ykcwXZ2DzZ8IGk/E5w/2W', 'gizawadugna1@gmail.com', 'Gizaw', 'Parent', 3, 1, '2025-04-21 07:18:47', '2025-04-21 09:07:43', 'parent_avatar66.jpg'),
@@ -683,7 +687,8 @@ ALTER TABLE `grades`
   ADD PRIMARY KEY (`id`),
   ADD KEY `student_id` (`student_id`),
   ADD KEY `subject_id` (`subject_id`),
-  ADD KEY `grading_scale_id` (`grading_scale_id`);
+  ADD KEY `grading_scale_id` (`grading_scale_id`),
+  ADD KEY `fk_grades_class_subjects` (`class_subject_id`);
 
 --
 -- Indexes for table `grading_scales`
@@ -788,8 +793,8 @@ ALTER TABLE `teachers`
 ALTER TABLE `teacher_subjects`
   ADD PRIMARY KEY (`id`),
   ADD KEY `teacher_id` (`teacher_id`),
-  ADD KEY `fk_teacher_subjects_class_subjects` (`class_subject_id`),
-  ADD KEY `fk_teacher_subjects_sections` (`section_id`);
+  ADD KEY `class_subject_id` (`class_subject_id`),
+  ADD KEY `section_id` (`section_id`);
 
 --
 -- Indexes for table `users`
@@ -826,7 +831,7 @@ ALTER TABLE `attendance`
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `classes`
@@ -886,7 +891,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `sections`
 --
 ALTER TABLE `sections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -940,7 +945,7 @@ ALTER TABLE `teachers`
 -- AUTO_INCREMENT for table `teacher_subjects`
 --
 ALTER TABLE `teacher_subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -988,14 +993,16 @@ ALTER TABLE `class_levels`
 --
 ALTER TABLE `class_subjects`
   ADD CONSTRAINT `class_subjects_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `class_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `class_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_class_subjects_class` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_class_subjects_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `grades`
 --
 ALTER TABLE `grades`
+  ADD CONSTRAINT `fk_grades_class_subjects` FOREIGN KEY (`class_subject_id`) REFERENCES `class_subjects` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `grades_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `grades_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `grades_ibfk_3` FOREIGN KEY (`grading_scale_id`) REFERENCES `grading_scales` (`id`) ON DELETE SET NULL;
 
 --
@@ -1073,10 +1080,9 @@ ALTER TABLE `teachers`
 -- Constraints for table `teacher_subjects`
 --
 ALTER TABLE `teacher_subjects`
-  ADD CONSTRAINT `fk_teacher_subjects_class_subjects` FOREIGN KEY (`class_subject_id`) REFERENCES `class_subjects` (`id`),
-  ADD CONSTRAINT `fk_teacher_subjects_sections` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`),
-  ADD CONSTRAINT `teacher_subjects_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `teacher_subjects_ibfk_2` FOREIGN KEY (`class_subject_id`) REFERENCES `class_subjects` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_teacher_subjects_class_subjects` FOREIGN KEY (`class_subject_id`) REFERENCES `class_subjects` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_teacher_subjects_sections` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_teacher_subjects_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `users`
