@@ -10,6 +10,73 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php'; // Include config to initialize $pdo
 $pageTitle = 'Settings';
+
+// Handle Academic Year CRUD
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Add Academic Year
+    if (isset($_POST['add_academic_year'])) {
+        $name = trim($_POST['year_name']);
+        $start = $_POST['year_start'];
+        $end = $_POST['year_end'];
+        if ($name && $start && $end) {
+            $stmt = $pdo->prepare("INSERT INTO academic_years (name, start_date, end_date) VALUES (?, ?, ?)");
+            $stmt->execute([$name, $start, $end]);
+            $success = "Academic Year added!";
+        }
+    }
+    // Edit Academic Year
+    if (isset($_POST['edit_academic_year'])) {
+        $id = intval($_POST['year_id']);
+        $name = trim($_POST['year_name']);
+        $start = $_POST['year_start'];
+        $end = $_POST['year_end'];
+        if ($id && $name && $start && $end) {
+            $stmt = $pdo->prepare("UPDATE academic_years SET name=?, start_date=?, end_date=? WHERE id=?");
+            $stmt->execute([$name, $start, $end, $id]);
+            $success = "Academic Year updated!";
+        }
+    }
+    // Delete Academic Year
+    if (isset($_POST['delete_academic_year'])) {
+        $id = intval($_POST['year_id']);
+        $stmt = $pdo->prepare("DELETE FROM academic_years WHERE id=?");
+        $stmt->execute([$id]);
+        $success = "Academic Year deleted!";
+    }
+    // Add Academic Term
+    if (isset($_POST['add_academic_term'])) {
+        $name = trim($_POST['term_name']);
+        $start = $_POST['term_start'];
+        $end = $_POST['term_end'];
+        $year_id = intval($_POST['term_year_id']);
+        if ($name && $start && $end && $year_id) {
+            $stmt = $pdo->prepare("INSERT INTO academic_terms (academic_year_id, name, start_date, end_date) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$year_id, $name, $start, $end]);
+            $success = "Academic Term added!";
+        }
+    }
+    // Edit Academic Term
+    if (isset($_POST['edit_academic_term'])) {
+        $id = intval($_POST['term_id']);
+        $name = trim($_POST['term_name']);
+        $start = $_POST['term_start'];
+        $end = $_POST['term_end'];
+        $year_id = intval($_POST['term_year_id']);
+        if ($id && $name && $start && $end && $year_id) {
+            $stmt = $pdo->prepare("UPDATE academic_terms SET academic_year_id=?, name=?, start_date=?, end_date=? WHERE id=?");
+            $stmt->execute([$year_id, $name, $start, $end, $id]);
+            $success = "Academic Term updated!";
+        }
+    }
+    // Delete Academic Term
+    if (isset($_POST['delete_academic_term'])) {
+        $id = intval($_POST['term_id']);
+        $stmt = $pdo->prepare("DELETE FROM academic_terms WHERE id=?");
+        $stmt->execute([$id]);
+        $success = "Academic Term deleted!";
+    }
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($_POST['settings'] as $key => $value) {
@@ -99,6 +166,10 @@ $users = $pdo->query("SELECT id, username, email, active FROM users")->fetchAll(
 
 // Fetch system logs
 $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch Academic Years and Terms
+$years = $pdo->query("SELECT * FROM academic_years ORDER BY start_date DESC")->fetchAll(PDO::FETCH_ASSOC);
+$terms = $pdo->query("SELECT t.*, y.name AS year_name FROM academic_terms t LEFT JOIN academic_years y ON t.academic_year_id = y.id ORDER BY t.start_date DESC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -253,6 +324,8 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
                         <div class="settings-tab" data-tab="features">Features</div>
                         <div class="settings-tab" data-tab="users">User Management</div>
                         <div class="settings-tab" data-tab="logs">System Logs</div>
+                        <div class="settings-tab" data-tab="academic_years">Academic Years</div>
+                        <div class="settings-tab" data-tab="academic_terms">Academic Terms</div>
                     </div>
 
                     <div class="settings-container">
@@ -356,6 +429,104 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
                                         <li><?php echo htmlspecialchars($log['action']); ?> - <?php echo $log['created_at']; ?></li>
                                     <?php endforeach; ?>
                                 </ul>
+                            </div>
+                        </div>
+
+                        <!-- Academic Years -->
+                        <div class="settings-tab-content" id="academic_years-tab">
+                            <div class="settings-group">
+                                <h3>Academic Years</h3>
+                                <form method="post" style="margin-bottom:1em;">
+                                    <input type="text" name="year_name" placeholder="Year Name (e.g. 2024/25)" required>
+                                    <input type="date" name="year_start" required>
+                                    <input type="date" name="year_end" required>
+                                    <button type="submit" name="add_academic_year" class="btn">Add Year</button>
+                                </form>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Start</th>
+                                            <th>End</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($years as $year): ?>
+                                            <tr>
+                                                <form method="post">
+                                                    <td>
+                                                        <input type="text" name="year_name" value="<?= htmlspecialchars($year['name']) ?>" required>
+                                                        <input type="hidden" name="year_id" value="<?= $year['id'] ?>">
+                                                    </td>
+                                                    <td><input type="date" name="year_start" value="<?= $year['start_date'] ?>" required></td>
+                                                    <td><input type="date" name="year_end" value="<?= $year['end_date'] ?>" required></td>
+                                                    <td>
+                                                        <button type="submit" name="edit_academic_year" class="btn btn-secondary">Save</button>
+                                                        <button type="submit" name="delete_academic_year" class="btn btn-danger" onclick="return confirm('Delete this year?')">Delete</button>
+                                                    </td>
+                                                </form>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Academic Terms -->
+                        <div class="settings-tab-content" id="academic_terms-tab">
+                            <div class="settings-group">
+                                <h3>Academic Terms</h3>
+                                <form method="post" style="margin-bottom:1em;">
+                                    <select name="term_year_id" required>
+                                        <option value="">Select Year</option>
+                                        <?php foreach ($years as $year): ?>
+                                            <option value="<?= $year['id'] ?>"><?= htmlspecialchars($year['name']) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <input type="text" name="term_name" placeholder="Term Name (e.g. Term 1)" required>
+                                    <input type="date" name="term_start" required>
+                                    <input type="date" name="term_end" required>
+                                    <button type="submit" name="add_academic_term" class="btn">Add Term</button>
+                                </form>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Term</th>
+                                            <th>Year</th>
+                                            <th>Start</th>
+                                            <th>End</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($terms as $term): ?>
+                                            <tr>
+                                                <form method="post">
+                                                    <td>
+                                                        <input type="text" name="term_name" value="<?= htmlspecialchars($term['name']) ?>" required>
+                                                        <input type="hidden" name="term_id" value="<?= $term['id'] ?>">
+                                                    </td>
+                                                    <td>
+                                                        <select name="term_year_id" required>
+                                                            <?php foreach ($years as $year): ?>
+                                                                <option value="<?= $year['id'] ?>" <?= $year['id'] == $term['academic_year_id'] ? 'selected' : '' ?>>
+                                                                    <?= htmlspecialchars($year['name']) ?>
+                                                                </option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="date" name="term_start" value="<?= $term['start_date'] ?>" required></td>
+                                                    <td><input type="date" name="term_end" value="<?= $term['end_date'] ?>" required></td>
+                                                    <td>
+                                                        <button type="submit" name="edit_academic_term" class="btn btn-secondary">Save</button>
+                                                        <button type="submit" name="delete_academic_term" class="btn btn-danger" onclick="return confirm('Delete this term?')">Delete</button>
+                                                    </td>
+                                                </form>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
