@@ -133,7 +133,8 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
+            <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
