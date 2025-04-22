@@ -11,6 +11,8 @@ try {
 
 // Fetch class levels
 $class_levels = $db->query("SELECT id, level_name FROM class_levels")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch all grades/classes from class_names
+$class_names = $db->query("SELECT id, grade FROM class_names")->fetchAll(PDO::FETCH_ASSOC);
 
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -57,5 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br><br>
         <button type="submit">Add Section</button>
     </form>
+
+    <h3>All Classes/Grades</h3>
+    <ul>
+        <?php foreach ($class_names as $class): ?>
+            <li><?= htmlspecialchars($class['grade']) ?></li>
+        <?php endforeach; ?>
+    </ul>
 </body>
 </html>
