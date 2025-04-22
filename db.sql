@@ -1097,3 +1097,32 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+-- Example: Set class_level_id for Cambridge Primary subjects
+UPDATE subjects SET class_level_id = 1 WHERE id IN (1,2,3,4,5,6,7,8);
+
+-- Set class_level_id for Cambridge Lower Secondary subjects
+UPDATE subjects SET class_level_id = 2 WHERE id IN (9,10,11,12,13,14,15);
+
+-- Set class_level_id for Cambridge IGCSE subjects
+UPDATE subjects SET class_level_id = 3 WHERE id IN (16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35);
+
+-- Set class_level_id for Cambridge AS/A Level subjects
+UPDATE subjects SET class_level_id = 4 WHERE id IN (36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51);
+
+-- If you have more fine-grained levels (e.g., "Year 1", "Year 2", ...), adjust the queries accordingly.
+-- Example for a specific subject:
+-- UPDATE subjects SET class_level_id = (SELECT id FROM class_levels WHERE level_name = 'Year 7' AND curriculum_id = 1 LIMIT 1) WHERE id = 9;
+
+-- Repeat for other curriculums and levels as needed.
+-- Link Primary subjects
+UPDATE subjects SET class_level_id = X WHERE id IN (1,2,3,4,5,6,7,8);
+
+-- Link Lower Secondary subjects
+UPDATE subjects SET class_level_id = Y WHERE id IN (9,10,11,12,13,14,15);
+
+-- Link IGCSE subjects
+UPDATE subjects SET class_level_id = Z WHERE id IN (16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35);
+
+-- Link AS/A Level subjects
+UPDATE subjects SET class_level_id = W WHERE id IN (36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51);
