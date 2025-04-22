@@ -6,20 +6,37 @@ require_once '../includes/config.php';
 $pageTitle = "Grade Reports";
 
 // Fetch students, subjects, sections for dropdowns
-$students = $pdo->query("SELECT s.id, u.username FROM students s LEFT JOIN users u ON s.user_id = u.id ORDER BY u.username")->fetchAll(PDO::FETCH_ASSOC);
-$sections = $pdo->query("SELECT id, section_name FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
+$students = $pdo->query("
+    SELECT s.id, u.username, s.class_id, c.class_level_id
+    FROM students s
+    LEFT JOIN users u ON s.user_id = u.id
+    LEFT JOIN classes c ON s.class_id = c.id
+    ORDER BY u.username
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Prepare a mapping: student_id => class_level_id
+$studentClassLevel = [];
+foreach ($students as $stu) {
+    $studentClassLevel[$stu['id']] = $stu['class_level_id'];
+}
 
 // Fetch curriculums for subject and grading scale filtering
 $curriculums = $pdo->query("SELECT id, name FROM curriculums ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch subjects with curriculum and class level info
 $subjects = $pdo->query("
-    SELECT s.id, s.subject_name, cu.name AS curriculum, lv.level_name
+    SELECT s.id, s.subject_name, s.class_level_id, cu.name AS curriculum, lv.level_name
     FROM subjects s
     LEFT JOIN curriculums cu ON s.curriculum_id = cu.id
     LEFT JOIN class_levels lv ON s.class_level_id = lv.id
     ORDER BY cu.name, lv.level_name, s.subject_name
 ")->fetchAll(PDO::FETCH_ASSOC);
+
+// Group subjects by class_level_id for quick lookup
+$subjectsByLevel = [];
+foreach ($subjects as $subj) {
+    $subjectsByLevel[$subj['class_level_id']][] = $subj;
+}
 
 // Fetch grading scales with curriculum info
 $grading_scales = $pdo->query("
@@ -175,6 +192,24 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Grade Reports - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <script>
+    // Dynamically update subject dropdown based on selected student
+    var subjectsByLevel = <?= json_encode($subjectsByLevel) ?>;
+    var studentClassLevel = <?= json_encode($studentClassLevel) ?>;
+    function updateSubjects() {
+        var studentId = document.getElementById('student_id').value;
+        var subjectSelect = document.getElementById('subject_id');
+        subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+        if (studentId && studentClassLevel[studentId] && subjectsByLevel[studentClassLevel[studentId]]) {
+            subjectsByLevel[studentClassLevel[studentId]].forEach(function(subj) {
+                var opt = document.createElement('option');
+                opt.value = subj.id;
+                opt.text = subj.subject_name;
+                subjectSelect.appendChild(opt);
+            });
+        }
+    }
+    </script>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -192,7 +227,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <form method="post" style="margin-bottom:2rem;">
                         <div style="margin-bottom:1rem;">
                             <label for="student_id">Student</label>
-                            <select name="student_id" id="student_id" required>
+                            <select name="student_id" id="student_id" required onchange="updateSubjects()">
                                 <option value="">-- Select Student --</option>
                                 <?php foreach ($students as $s): ?>
                                     <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['username']) ?></option>
@@ -202,14 +237,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div style="margin-bottom:1rem;">
                             <label for="subject_id">Subject</label>
                             <select name="subject_id" id="subject_id" required>
-                                <option value="">-- Select Subject --</option>
-                                <?php foreach ($subjects as $s): ?>
-                                    <option value="<?= $s['id'] ?>">
-                                        <?= htmlspecialchars($s['subject_name']) ?>
-                                        (<?= htmlspecialchars($s['curriculum'] ?? '-') ?>
-                                        <?= $s['level_name'] ? ' - ' . htmlspecialchars($s['level_name']) : '' ?>)
-                                    </option>
-                                <?php endforeach; ?>
+                                <option value="">-- Select Student First --</option>
                             </select>
                         </div>
                         <div style="margin-bottom:1rem;">
@@ -351,5 +379,11 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
             <?php include 'includes/footer.php'; ?>
 
+    <script>
+    // Initialize subject dropdown on page load if editing
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSubjects();
+    });
+    </script>
 </body>
 </html>
