@@ -57,12 +57,20 @@ foreach ($class_subjects_stmt->fetchAll(PDO::FETCH_ASSOC) as $cs) {
     $class_subjects[$cs['class_id']][] = $cs;
 }
 
+// Prepare data for JS
+$js_classes = json_encode($classes);
+$js_sections = json_encode($sections);
+$js_class_subjects = json_encode($class_subjects);
+
 // Fetch current assignments for this teacher
 $assigned = [];
 $assigned_stmt = $pdo->prepare("SELECT class_subject_id, section_id FROM teacher_subjects WHERE teacher_id = ?");
 $assigned_stmt->execute([$teacher_id]);
 foreach ($assigned_stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-    $assigned[$row['class_subject_id'] . '_' . $row['section_id']] = true;
+    $assigned[] = [
+        'class_subject_id' => $row['class_subject_id'],
+        'section_id' => $row['section_id']
+    ];
 }
 
 // Handle update
@@ -85,9 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
     // Remove all old assignments
     $pdo->prepare("DELETE FROM teacher_subjects WHERE teacher_id = ?")->execute([$teacher_id]);
     // Insert new assignments
-    foreach ($new_assignments as $key) {
-        // $key format: class_subject_id_section_id
-        list($class_subject_id, $section_id) = explode('_', $key);
+    foreach ($new_assignments as $assignment) {
+        list($class_subject_id, $section_id) = explode('_', $assignment);
         $stmt = $pdo->prepare("INSERT INTO teacher_subjects (teacher_id, class_subject_id, section_id) VALUES (?, ?, ?)");
         $stmt->execute([$teacher_id, $class_subject_id, $section_id]);
     }
@@ -109,7 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
     $assigned_stmt = $pdo->prepare("SELECT class_subject_id, section_id FROM teacher_subjects WHERE teacher_id = ?");
     $assigned_stmt->execute([$teacher_id]);
     foreach ($assigned_stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $assigned[$row['class_subject_id'] . '_' . $row['section_id']] = true;
+        $assigned[] = [
+            'class_subject_id' => $row['class_subject_id'],
+            'section_id' => $row['section_id']
+        ];
     }
 }
 
@@ -155,53 +165,49 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
             color: #e74c3c;
             margin-bottom: 1rem;
         }
-        .assignment-table-container {
-            max-height: 340px;
-            overflow-y: auto;
-            margin-top: 2rem;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            background: #fafbfc;
+        .assignment-form-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
         }
-        .assignment-table {
+        .assignment-form-row select {
+            width: 180px;
+            min-width: 120px;
+        }
+        .assignment-list {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .assignment-list-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 600px;
         }
-        .assignment-table th, .assignment-table td {
+        .assignment-list-table th, .assignment-list-table td {
             border: 1px solid #eee;
             padding: 6px 8px;
             font-size: 0.97em;
+            text-align: left;
         }
-        .assignment-table th {
+        .assignment-list-table th {
             background: #f8f9fa;
-            position: sticky;
-            top: 0;
-            z-index: 1;
         }
-        .assignment-table tr:nth-child(even) {
-            background: #f9f9fb;
-        }
-        .assignment-table label {
-            font-weight: normal;
+        .remove-btn {
+            color: #e74c3c;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
         }
         @media (max-width: 900px) {
-            .dashboard-section {
-                max-width: 98vw;
-                padding: 1rem 0.5rem;
-            }
-            .assignment-table {
-                min-width: 400px;
-            }
+            .dashboard-section { max-width: 98vw; padding: 1rem 0.5rem; }
+            .assignment-form-row select { width: 100px; }
         }
         @media (max-width: 600px) {
-            .dashboard-section {
-                padding: 0.5rem 0.2rem;
-            }
-            .assignment-table th, .assignment-table td {
-                padding: 5px 3px;
-                font-size: 0.93em;
-            }
+            .dashboard-section { padding: 0.5rem 0.2rem; }
+            .assignment-form-row { flex-direction: column; gap: 8px; }
+            .assignment-form-row select { width: 100%; }
         }
     </style>
 </head>
@@ -220,7 +226,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                     <?php if ($error): ?>
                         <div class="error"><?= esc($error) ?></div>
                     <?php endif; ?>
-                    <form method="post">
+                    <form method="post" id="teacherForm">
                         <label>Username:
                             <input type="text" value="<?= esc($teacher['username']) ?>" disabled>
                         </label>
@@ -252,40 +258,47 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                         </label>
 
                         <h3 style="margin-top:2.5rem;">Assign Classes, Sections & Subjects</h3>
-                        <div class="assignment-table-container">
-                            <table class="assignment-table">
+                        <div class="assignment-form-row">
+                            <div>
+                                <label for="class_select">Class</label>
+                                <select id="class_select">
+                                    <option value="">Select Class</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="section_select">Section</label>
+                                <select id="section_select" disabled>
+                                    <option value="">Select Section</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="subject_select">Subject</label>
+                                <select id="subject_select" disabled>
+                                    <option value="">Select Subject</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn" id="addAssignmentBtn" style="margin-top:0;">Add Assignment</button>
+                        </div>
+
+                        <div class="assignment-list">
+                            <table class="assignment-list-table" id="assignmentTable">
                                 <thead>
                                     <tr>
                                         <th>Class</th>
                                         <th>Section</th>
                                         <th>Subject</th>
-                                        <th>Assign</th>
+                                        <th>Remove</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php foreach ($classes as $class): ?>
-                                        <?php
-                                        $class_id = $class['id'];
-                                        if (empty($sections[$class_id]) || empty($class_subjects[$class_id])) continue;
-                                        foreach ($sections[$class_id] as $section):
-                                            foreach ($class_subjects[$class_id] as $subject):
-                                                $key = $subject['class_subject_id'] . '_' . $section['id'];
-                                                ?>
-                                                <tr>
-                                                    <td><?= esc($class['class_name']) ?></td>
-                                                    <td><?= esc($section['section_name']) ?></td>
-                                                    <td><?= esc($subject['subject_name']) ?></td>
-                                                    <td style="text-align:center;">
-                                                        <input type="checkbox" name="assignments[]" value="<?= $key ?>" <?= isset($assigned[$key]) ? 'checked' : '' ?>>
-                                                    </td>
-                                                </tr>
-                                            <?php endforeach;
-                                        endforeach;
-                                        ?>
-                                    <?php endforeach; ?>
+                                    <!-- JS will populate -->
                                 </tbody>
                             </table>
                         </div>
+
+                        <!-- Hidden inputs for assignments -->
+                        <div id="assignmentsInputs"></div>
+
                         <button type="submit" name="update_teacher" class="btn">Update</button>
                         <a href="teachers.php" class="btn" style="background:#aaa;">Cancel</a>
                     </form>
@@ -294,5 +307,143 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         </div>
         <?php include 'includes/footer.php'; ?>
     </div>
+    <script>
+        // Data from PHP
+        const classes = <?= $js_classes ?>;
+        const sections = <?= $js_sections ?>;
+        const classSubjects = <?= $js_class_subjects ?>;
+        const assignments = <?= json_encode($assigned) ?>;
+
+        // Helper: get class name by id
+        function getClassName(id) {
+            const c = classes.find(x => x.id == id);
+            return c ? c.class_name : '';
+        }
+        // Helper: get section name by id
+        function getSectionName(class_id, section_id) {
+            if (!sections[class_id]) return '';
+            const s = sections[class_id].find(x => x.id == section_id);
+            return s ? s.section_name : '';
+        }
+        // Helper: get subject name by class_subject_id
+        function getSubjectName(class_id, class_subject_id) {
+            if (!classSubjects[class_id]) return '';
+            const s = classSubjects[class_id].find(x => x.class_subject_id == class_subject_id);
+            return s ? s.subject_name : '';
+        }
+
+        // Populate class dropdown
+        function populateClassDropdown() {
+            const classSelect = document.getElementById('class_select');
+            classSelect.innerHTML = '<option value="">Select Class</option>';
+            classes.forEach(c => {
+                classSelect.innerHTML += `<option value="${c.id}">${c.class_name}</option>`;
+            });
+        }
+        // Populate section dropdown based on class
+        function populateSectionDropdown(class_id) {
+            const sectionSelect = document.getElementById('section_select');
+            sectionSelect.innerHTML = '<option value="">Select Section</option>';
+            sectionSelect.disabled = true;
+            if (sections[class_id]) {
+                sections[class_id].forEach(s => {
+                    sectionSelect.innerHTML += `<option value="${s.id}">${s.section_name}</option>`;
+                });
+                sectionSelect.disabled = false;
+            }
+        }
+        // Populate subject dropdown based on class
+        function populateSubjectDropdown(class_id) {
+            const subjectSelect = document.getElementById('subject_select');
+            subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+            subjectSelect.disabled = true;
+            if (classSubjects[class_id]) {
+                classSubjects[class_id].forEach(s => {
+                    subjectSelect.innerHTML += `<option value="${s.class_subject_id}">${s.subject_name}</option>`;
+                });
+                subjectSelect.disabled = false;
+            }
+        }
+
+        // Assignment list (array of {class_id, section_id, class_subject_id})
+        let assignmentList = [];
+
+        // Initialize with current assignments
+        function initAssignments() {
+            assignments.forEach(a => {
+                // Find class_id for class_subject_id
+                let class_id = null;
+                for (const cid in classSubjects) {
+                    if (classSubjects[cid].find(s => s.class_subject_id == a.class_subject_id)) {
+                        class_id = cid;
+                        break;
+                    }
+                }
+                if (class_id) {
+                    assignmentList.push({
+                        class_id: class_id,
+                        section_id: a.section_id,
+                        class_subject_id: a.class_subject_id
+                    });
+                }
+            });
+            renderAssignmentTable();
+        }
+
+        // Render assignment table and hidden inputs
+        function renderAssignmentTable() {
+            const tbody = document.getElementById('assignmentTable').querySelector('tbody');
+            const inputsDiv = document.getElementById('assignmentsInputs');
+            tbody.innerHTML = '';
+            inputsDiv.innerHTML = '';
+            assignmentList.forEach((a, idx) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${getClassName(a.class_id)}</td>
+                        <td>${getSectionName(a.class_id, a.section_id)}</td>
+                        <td>${getSubjectName(a.class_id, a.class_subject_id)}</td>
+                        <td><button type="button" class="remove-btn" onclick="removeAssignment(${idx})" title="Remove">&times;</button></td>
+                    </tr>
+                `;
+                inputsDiv.innerHTML += `<input type="hidden" name="assignments[]" value="${a.class_subject_id}_${a.section_id}">`;
+            });
+        }
+
+        // Remove assignment
+        function removeAssignment(idx) {
+            assignmentList.splice(idx, 1);
+            renderAssignmentTable();
+        }
+
+        // Add assignment
+        document.getElementById('addAssignmentBtn').addEventListener('click', function() {
+            const class_id = document.getElementById('class_select').value;
+            const section_id = document.getElementById('section_select').value;
+            const class_subject_id = document.getElementById('subject_select').value;
+            if (!class_id || !section_id || !class_subject_id) {
+                alert('Please select class, section, and subject.');
+                return;
+            }
+            // Prevent duplicates
+            if (assignmentList.find(a => a.class_id == class_id && a.section_id == section_id && a.class_subject_id == class_subject_id)) {
+                alert('This assignment already exists.');
+                return;
+            }
+            assignmentList.push({class_id, section_id, class_subject_id});
+            renderAssignmentTable();
+        });
+
+        // Dropdown change handlers
+        document.getElementById('class_select').addEventListener('change', function() {
+            const class_id = this.value;
+            populateSectionDropdown(class_id);
+            populateSubjectDropdown(class_id);
+        });
+
+        // On page load
+        populateClassDropdown();
+        initAssignments();
+
+    </script>
 </body>
 </html>
