@@ -116,7 +116,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($ticket['priority']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
                                             <td class="ticket-actions">
-                                                <a href="view_ticket.php?id=<?= $ticket['id'] ?>" title="View"><i class="fas fa-eye"></i></a>
+                                                <a href="tickets.php?id=<?= $ticket['id'] ?>" title="View"><i class="fas fa-eye"></i></a>
                                                 <a href="edit_ticket.php?id=<?= $ticket['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="delete_ticket.php?id=<?= $ticket['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this ticket?')"><i class="fas fa-trash-alt"></i></a>
                                             </td>
