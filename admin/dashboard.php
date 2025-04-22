@@ -1,5 +1,4 @@
 <?php
-ob_start(); // Start output buffering
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -7,6 +6,7 @@ ob_start(); // Start output buffering
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
+ob_start(); // Start output buffering
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
