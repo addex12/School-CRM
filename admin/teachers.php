@@ -5,7 +5,7 @@ require_once '../includes/config.php';
 
 $pageTitle = "Teachers";
 
-// Fetch teachers data with corrected join condition
+// Fetch teachers data with corrected table names
 $stmt = $pdo->prepare("
     SELECT 
         u.id AS user_id,
@@ -14,11 +14,11 @@ $stmt = $pdo->prepare("
         r.role_name,
         t.id AS teacher_id,
         t.created_at AS teacher_created_at,
-        cn.grade AS class_name
+        c.class_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
     LEFT JOIN teachers t ON t.user_id = u.id
-    LEFT JOIN class_names cn ON t.class_name_id = cn.id
+    LEFT JOIN classes c ON t.class_id = c.id
     WHERE LOWER(r.role_name) = 'teacher'
     ORDER BY COALESCE(t.created_at, u.created_at) DESC
 ");
@@ -110,7 +110,7 @@ $error = isset($_GET['error']) ? "Error importing file. Please try again." : '';
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <th>Grade</th>
+                                    <th>Class</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
