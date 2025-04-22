@@ -6,7 +6,7 @@ require_once '../includes/config.php';
 $pageTitle = "Edit Teacher";
 
 // Get teacher ID from URL
-$teacher_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$teacher_id = isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0;
 if (!$teacher_id) {
     header("Location: teachers.php?error=Invalid+teacher+ID");
     exit;
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $delete_stmt->execute([$teacher_id]);
         
         // Then add new assignments
-        if (is_array($new_assignments) {
+        if (is_array($new_assignments)) {
             $insert_stmt = $pdo->prepare("
                 INSERT INTO teacher_subjects (teacher_id, subject_id, class_id, section_id)
                 VALUES (?, ?, ?, ?)
