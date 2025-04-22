@@ -12,6 +12,11 @@ require_once '../includes/config.php';
 
 $pageTitle = "Edit Teacher";
 
+// Enable error reporting for debugging (remove or comment out in production)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Get teacher ID from URL
 $teacher_id = isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0;
 if (!$teacher_id) {
