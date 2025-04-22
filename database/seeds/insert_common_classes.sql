@@ -1,12 +1,12 @@
 -- Insert common class levels
-INSERT INTO class_levels (name) VALUES
+INSERT INTO class_levels (class_name) VALUES
 ('Kindergarten'),
 ('Primary'),
 ('Secondary'),
 ('High School');
 
 -- Insert common class names
-INSERT INTO class_names (name) VALUES
+INSERT INTO class_names (class_name) VALUES
 ('Grade 1'),
 ('Grade 2'),
 ('Grade 3'),
