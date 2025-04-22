@@ -46,10 +46,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $curriculum_id = $_POST['curriculum_id'];
     $level_id = $_POST['level_id'];
     $created_at = $_POST['created_at'];
+    $class_name = $_POST['class_name'];
+    $level_name = $_POST['level_name'];
 
-    // Update class's curriculum and level if changed
-    $pdo->prepare("UPDATE classes SET curriculum_id = ?, class_level_id = ? WHERE id = ?")
-        ->execute([$curriculum_id, $level_id, $class_id]);
+    // Update class name, curriculum, and level
+    $pdo->prepare("UPDATE classes SET class_name = ?, curriculum_id = ?, class_level_id = ? WHERE id = ?")
+        ->execute([$class_name, $curriculum_id, $level_id, $class_id]);
+
+    // Update class level name
+    $pdo->prepare("UPDATE class_levels SET level_name = ? WHERE id = ?")
+        ->execute([$level_name, $level_id]);
 
     // Update section
     $stmt = $pdo->prepare("UPDATE sections SET section_name = ?, class_id = ?, created_at = ? WHERE id = ?");
@@ -80,13 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" name="section_name" value="<?= htmlspecialchars($section['section_name']) ?>" required>
                     </label>
                     <label>Class:
-                        <select name="class_id" required>
+                        <select name="class_id" required onchange="updateClassFields(this)">
                             <?php foreach ($classes as $cl): ?>
                                 <option value="<?= $cl['id'] ?>" <?= $cl['id'] == $section['class_id'] ? 'selected' : '' ?>>
                                     <?= htmlspecialchars($cl['class_name']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <input type="text" name="class_name" value="<?= htmlspecialchars($section['class_name']) ?>" required placeholder="Rename Class Name">
                     </label>
                     <label>Curriculum:
                         <select name="curriculum_id" required>
@@ -105,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <input type="text" name="level_name" value="<?= htmlspecialchars($section['level_name']) ?>" required placeholder="Rename Class Level">
                     </label>
                     <label>Created At:
                         <input type="datetime-local" name="created_at" value="<?= date('Y-m-d\TH:i', strtotime($section['created_at'])) ?>" required>
@@ -115,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
