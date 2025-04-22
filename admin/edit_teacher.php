@@ -9,11 +9,7 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
-
-// Make sure $pdo is initialized
-if (!isset($pdo) || !$pdo) {
-    require_once '../includes/db.php';
-}
+require_once '../includes/db.php'; // Always include DB connection
 
 $pageTitle = "Edit Teacher";
 
