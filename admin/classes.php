@@ -5,8 +5,14 @@ require_once '../includes/config.php';
 
 $pageTitle = "Classes";
 
-// Fetch all classes
-$stmt = $pdo->query("SELECT id, class_name, created_at FROM classes ORDER BY class_name");
+// Fetch all classes with curriculum and class level
+$stmt = $pdo->query("
+    SELECT cl.id, cl.class_name, cu.name AS curriculum, lv.level_name, cl.created_at
+    FROM classes cl
+    LEFT JOIN curriculums cu ON cl.curriculum_id = cu.id
+    LEFT JOIN class_levels lv ON cl.class_level_id = lv.id
+    ORDER BY cu.name, lv.level_order, cl.class_name
+");
 $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -94,12 +100,15 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="classes-header">
                         <h2>Class List</h2>
                         <a href="add_class.php" class="btn"><i class="fas fa-plus"></i> Add Class</a>
+                        <a href="curriculums.php" class="btn" style="background:#16a085;"><i class="fas fa-list"></i> Manage Curriculums</a>
                     </div>
                     <div class="table-responsive">
                         <table class="classes-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
+                                    <th>Curriculum</th>
+                                    <th>Class Level</th>
                                     <th>Class Name</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
@@ -110,6 +119,8 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php foreach ($classes as $class): ?>
                                         <tr>
                                             <td><?= htmlspecialchars($class['id']) ?></td>
+                                            <td><?= htmlspecialchars($class['curriculum'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($class['level_name'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($class['class_name']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($class['created_at'])) ?></td>
                                             <td class="class-actions">
@@ -120,7 +131,7 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="4">No classes found.</td>
+                                        <td colspan="6">No classes found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

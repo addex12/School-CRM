@@ -5,31 +5,25 @@ require_once '../includes/config.php';
 
 $pageTitle = "Add Class";
 
-// Define curriculum options and their class structure
-$curriculums = [
-    'Cambridge' => ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12'],
-    'Ethiopian' => ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'],
-    'American'  => ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'],
-    'Standard'  => ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6']
-];
+// Fetch curriculums
+$curriculum_stmt = $pdo->query("SELECT id, name FROM curriculums ORDER BY name");
+$curriculums = $curriculum_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch class levels for all curriculums
+$class_levels_stmt = $pdo->query("SELECT id, curriculum_id, level_name FROM class_levels ORDER BY curriculum_id, level_order, level_name");
+$class_levels = $class_levels_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $error = '';
-$success = '';
-
-// --- Database schema update hint ---
-// You should update your classes table to support curriculum info:
-// ALTER TABLE classes ADD COLUMN curriculum VARCHAR(50) NOT NULL AFTER id;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $curriculum = $_POST['curriculum'] ?? '';
+    $curriculum_id = $_POST['curriculum_id'] ?? '';
+    $class_level_id = $_POST['class_level_id'] ?? '';
     $class_name = trim($_POST['class_name'] ?? '');
 
-    if (!$curriculum || !$class_name) {
+    if (!$curriculum_id || !$class_level_id || !$class_name) {
         $error = "All fields are required.";
     } else {
-        // Insert both curriculum and class_name
-        $stmt = $pdo->prepare("INSERT INTO classes (curriculum, class_name) VALUES (?, ?)");
-        if ($stmt->execute([$curriculum, $class_name])) {
+        $stmt = $pdo->prepare("INSERT INTO classes (curriculum_id, class_level_id, class_name) VALUES (?, ?, ?)");
+        if ($stmt->execute([$curriculum_id, $class_level_id, $class_name])) {
             header("Location: classes.php?msg=Class+added+successfully");
             exit;
         } else {
@@ -46,28 +40,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <script>
-        // JavaScript to update class_name options based on curriculum
-        function updateClassOptions() {
-            var curriculum = document.getElementById('curriculum').value;
-            var classNameSelect = document.getElementById('class_name');
-            var options = {
-                <?php foreach ($curriculums as $key => $levels): ?>
-                "<?= $key ?>": <?= json_encode($levels) ?>,
-                <?php endforeach; ?>
-            };
-            classNameSelect.innerHTML = '';
-            if (curriculum && options[curriculum]) {
-                options[curriculum].forEach(function(level) {
+        // Pass PHP arrays to JS
+        var classLevels = <?php echo json_encode($class_levels); ?>;
+        function updateClassLevels() {
+            var curriculumId = document.getElementById('curriculum_id').value;
+            var classLevelSelect = document.getElementById('class_level_id');
+            classLevelSelect.innerHTML = '';
+            var found = false;
+            classLevels.forEach(function(level) {
+                if (level.curriculum_id == curriculumId) {
                     var opt = document.createElement('option');
-                    opt.value = level;
-                    opt.text = level;
-                    classNameSelect.appendChild(opt);
-                });
-            } else {
+                    opt.value = level.id;
+                    opt.text = level.level_name;
+                    classLevelSelect.appendChild(opt);
+                    found = true;
+                }
+            });
+            if (!found) {
                 var opt = document.createElement('option');
                 opt.value = '';
-                opt.text = '-- Select Curriculum First --';
-                classNameSelect.appendChild(opt);
+                opt.text = '-- No Levels Available --';
+                classLevelSelect.appendChild(opt);
             }
         }
     </script>
@@ -86,19 +79,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
                     <form method="post" autocomplete="off">
                         <div style="margin-bottom:1rem;">
-                            <label for="curriculum">Curriculum</label>
-                            <select name="curriculum" id="curriculum" required onchange="updateClassOptions()">
+                            <label for="curriculum_id">Curriculum</label>
+                            <select name="curriculum_id" id="curriculum_id" required onchange="updateClassLevels()">
                                 <option value="">-- Select Curriculum --</option>
-                                <?php foreach ($curriculums as $key => $levels): ?>
-                                    <option value="<?= htmlspecialchars($key) ?>"><?= htmlspecialchars($key) ?></option>
+                                <?php foreach ($curriculums as $c): ?>
+                                    <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
                         <div style="margin-bottom:1rem;">
-                            <label for="class_name">Class Name</label>
-                            <select name="class_name" id="class_name" required>
+                            <label for="class_level_id">Class Level</label>
+                            <select name="class_level_id" id="class_level_id" required>
                                 <option value="">-- Select Curriculum First --</option>
                             </select>
+                        </div>
+                        <div style="margin-bottom:1rem;">
+                            <label for="class_name">Class Name</label>
+                            <input type="text" name="class_name" id="class_name" required>
                         </div>
                         <button type="submit" class="btn" style="background:#3498db;color:#fff;">Add Class</button>
                         <a href="classes.php" class="btn" style="background:#aaa;color:#fff;margin-left:10px;">Cancel</a>
@@ -109,10 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php include 'includes/footer.php'; ?>
     </div>
     <script>
-        // Initialize options if curriculum is pre-selected
-        document.addEventListener('DOMContentLoaded', function() {
-            updateClassOptions();
-        });
+        document.getElementById('curriculum_id').addEventListener('change', updateClassLevels);
     </script>
 </body>
 </html>
