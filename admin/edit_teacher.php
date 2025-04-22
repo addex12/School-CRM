@@ -86,14 +86,14 @@ $teacher_subjects = $teacher_subjects_stmt->fetchAll(PDO::FETCH_ASSOC);
 $error = '';
 $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $qualification = $_POST['qualification'] ?? '';
-    $subject_specialization = $_POST['subject_specialization'] ?? '';
-    $date_of_birth = $_POST['date_of_birth'] ?? null;
-    $gender = $_POST['gender'] ?? null;
-    $address = $_POST['address'] ?? '';
+    $qualification = $_POST['qualification'] ?? null;
+    $subject_specialization = $_POST['subject_specialization'] ?? null;
+    $date_of_birth = !empty($_POST['date_of_birth']) ? $_POST['date_of_birth'] : null;
+    $gender = !empty($_POST['gender']) ? $_POST['gender'] : null;
+    $address = $_POST['address'] ?? null;
     $status = $_POST['status'] ?? 'active';
 
-    // Ensure correct parameter order and types for the update statement
+    // Use correct parameter order and types for the update statement
     $update_stmt = $pdo->prepare("
         UPDATE teachers 
         SET qualification = ?, subject_specialization = ?, date_of_birth = ?, 
@@ -103,20 +103,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $update_stmt->execute([
         $qualification,
         $subject_specialization,
-        $date_of_birth ?: null,
-        $gender ?: null,
+        $date_of_birth,
+        $gender,
         $address,
         $status,
         $teacher_id
     ]);
 
-    if ($result) {
+    if ($result === false) {
+        $error = "Failed to update teacher information.";
+    } else {
         $success = "Teacher information updated successfully.";
         // Refresh teacher data after update
         $teacher_stmt->execute([$teacher_id]);
         $teacher = $teacher_stmt->fetch(PDO::FETCH_ASSOC);
-    } else {
-        $error = "Failed to update teacher information.";
     }
 
     // Handle subject assignments
