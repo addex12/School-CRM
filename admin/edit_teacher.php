@@ -434,6 +434,6 @@ $js_classes = json_encode($classes);
             }
         });
     </script>
-   <?php require_once '../includes/footer.php';?>
+   <?php require_once '/includes/footer.php';?>
 </body>
 </html>
