@@ -1,5 +1,6 @@
 <?php
 require_once '../includes/auth.php';
+require_once '../includes/db.php';
 requireAdmin();
 require_once '../includes/config.php';
 
