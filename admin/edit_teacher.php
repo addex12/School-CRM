@@ -234,8 +234,8 @@ $js_data = [
                             <div id="new-assignment-form">
                                 <div class="form-row">
                                     <div>
-                                        <label for="new_class_id">Class</label>
-                                        <select id="new_class_id" class="select2-class">
+                                        <label for="new_class_id">Class *</label>
+                                        <select id="new_class_id" class="select2-class" required>
                                             <option value="">-- Select Class --</option>
                                             <?php foreach ($classes as $class): ?>
                                                 <option value="<?= $class['id'] ?>"><?= htmlspecialchars($class['class_name']) ?></option>
@@ -243,12 +243,9 @@ $js_data = [
                                         </select>
                                     </div>
                                     <div>
-                                        <label for="new_subject_id">Subject</label>
-                                        <select id="new_subject_id" class="select2-subject">
+                                        <label for="new_subject_id">Subject *</label>
+                                        <select id="new_subject_id" class="select2-subject" required disabled>
                                             <option value="">-- Select Subject --</option>
-                                            <?php foreach ($subjects as $subject): ?>
-                                                <option value="<?= $subject['id'] ?>"><?= htmlspecialchars($subject['subject_name']) ?></option>
-                                            <?php endforeach; ?>
                                         </select>
                                     </div>
                                     <div>
@@ -260,11 +257,14 @@ $js_data = [
                                 </div>
                                 <button type="button" id="add-assignment" class="btn btn-primary">Add Assignment</button>
                             </div>
+                            
                             <div class="assignment-list" id="assignment-list">
                                 <!-- Assignment items will be added here by JavaScript -->
                             </div>
+                            
                             <input type="hidden" name="subject_assignments" id="subject_assignments" value="">
                         </div>
+                        
                         <div style="margin-top: 2rem;">
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                             <a href="teachers.php" class="btn btn-secondary">Cancel</a>
@@ -273,6 +273,7 @@ $js_data = [
                 </div>
             </div>
         </div>
+    </div>
         <?php include 'includes/footer.php'; ?>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -281,49 +282,77 @@ $js_data = [
         $(document).ready(function() {
             const data = <?= json_encode($js_data) ?>;
             let assignments = [...data.teacherSubjects];
-
+            
+            // Initialize Select2
             $('.select2-class').select2();
             $('.select2-subject').select2();
             $('.select2-section').select2();
-
+            
+            // Render initial assignments
             renderAssignments();
-
+            
+            // Update sections dropdown when class changes
             $('#new_class_id').on('change', function() {
                 const classId = $(this).val();
                 const $sectionSelect = $('#new_section_id');
+                const $subjectSelect = $('#new_subject_id');
+                
+                // Reset and enable subject dropdown
+                $subjectSelect.empty().append('<option value="">-- Select Subject --</option>');
+                
+                // Update sections
                 $sectionSelect.empty().append('<option value="">-- Select Section --</option>');
                 if (classId && data.sectionsByClass[classId]) {
                     data.sectionsByClass[classId].forEach(section => {
                         $sectionSelect.append(`<option value="${section.id}">${section.section_name}</option>`);
                     });
                 }
-                $sectionSelect.trigger('change');
+                
+                // Load subjects for this class via AJAX
+                if (classId) {
+                    $subjectSelect.prop('disabled', false);
+                    $.ajax({
+                        url: 'ajax/get_subjects.php',
+                        data: { class_id: classId },
+                        success: function(subjects) {
+                            $subjectSelect.empty().append('<option value="">-- Select Subject --</option>');
+                            subjects.forEach(subject => {
+                                $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
+                            });
+                        }
+                    });
+                } else {
+                    $subjectSelect.prop('disabled', true);
+                }
             });
-
+            
+            // Add new assignment
             $('#add-assignment').on('click', function() {
                 const subjectId = $('#new_subject_id').val();
                 const classId = $('#new_class_id').val();
                 const sectionId = $('#new_section_id').val();
-
+                
                 if (!subjectId || !classId) {
                     alert('Please select both class and subject');
                     return;
                 }
-
+                
+                // Find subject and class names
                 const subjectName = $('#new_subject_id option:selected').text();
                 const className = $('#new_class_id option:selected').text();
                 const sectionName = sectionId ? $('#new_section_id option:selected').text() : 'Any Section';
-
-                const exists = assignments.some(a =>
-                    a.subject_id == subjectId &&
-                    a.class_id == classId &&
-                    a.section_id == (sectionId || null)
+                
+                // Check if this assignment already exists
+                const exists = assignments.some(a => 
+                    a.subject_id == subjectId && 
+                    a.class_id == classId
                 );
+                
                 if (exists) {
-                    alert('This assignment already exists');
+                    alert('This teacher already has this subject assignment for the selected class');
                     return;
                 }
-
+                
                 assignments.push({
                     subject_id: subjectId,
                     subject_name: subjectName,
@@ -332,23 +361,39 @@ $js_data = [
                     section_id: sectionId || null,
                     section_name: sectionName
                 });
-
+                
                 renderAssignments();
-
+                
+                // Reset form
                 $('#new_subject_id').val('').trigger('change');
                 $('#new_class_id').val('').trigger('change');
                 $('#new_section_id').val('').trigger('change');
+                $('#new_subject_id').prop('disabled', true);
             });
-
+            
+            // Remove assignment
             $(document).on('click', '.remove-assignment', function() {
                 const index = $(this).data('index');
                 assignments.splice(index, 1);
                 renderAssignments();
             });
-
+            
+            // Form submission validation
+            $('#teacherForm').on('submit', function() {
+                const assignmentsForSubmit = assignments.map(a => ({
+                    subject_id: a.subject_id,
+                    class_id: a.class_id,
+                    section_id: a.section_id || null
+                }));
+                $('#subject_assignments').val(JSON.stringify(assignmentsForSubmit));
+                return true;
+            });
+            
+            // Render assignments list
             function renderAssignments() {
                 const $list = $('#assignment-list');
                 $list.empty();
+                
                 if (assignments.length === 0) {
                     $list.append('<p>No assignments yet</p>');
                 } else {
@@ -357,7 +402,7 @@ $js_data = [
                             <div class="assignment-item">
                                 <div>${assignment.subject_name}</div>
                                 <div>${assignment.class_name}</div>
-                                <div>${assignment.section_name}</div>
+                                <div>${assignment.section_name || 'Any Section'}</div>
                                 <div class="assignment-actions">
                                     <button type="button" class="btn btn-danger btn-sm remove-assignment" data-index="${index}">Remove</button>
                                 </div>
@@ -365,12 +410,6 @@ $js_data = [
                         `);
                     });
                 }
-                const assignmentsForSubmit = assignments.map(a => ({
-                    subject_id: a.subject_id,
-                    class_id: a.class_id,
-                    section_id: a.section_id || null
-                }));
-                $('#subject_assignments').val(JSON.stringify(assignmentsForSubmit));
             }
         });
     </script>
