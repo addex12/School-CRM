@@ -322,31 +322,50 @@ $js_data = [
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-        <script>
-
+    <script>
         $(document).ready(function() {
-            // Initialize data
-            const teacherSubjects = <?= $js_teacher_subjects ?>;
-            const sectionsByClass = <?= $js_sections_by_class ?>;
-            const allClasses = <?= $js_classes ?>;
+            const data = <?= json_encode($js_data) ?>;
+            let assignments = [...data.teacherSubjects];
             
-            let assignments = [...teacherSubjects];
-            renderAssignments();
+            // Initialize Select2
+            $('.select2-class').select2();
+            $('.select2-subject').select2();
+            $('.select2-section').select2();
             
-            // Update sections dropdown when class changes
+            // Update sections based on selected class
             $('#new_class_id').on('change', function() {
                 const classId = $(this).val();
-                const $sectionSelect = $('#new_section_id');
+                $('#new_section_id').val('').trigger('change');
                 
-                $sectionSelect.empty().append('<option value="">-- Select Section --</option>');
+                // Enable/disable subject dropdown
+                $('#new_subject_id').prop('disabled', !classId);
                 
-                if (classId && sectionsByClass[classId]) {
-                    sectionsByClass[classId].forEach(section => {
-                        $sectionSelect.append(`<option value="${section.id}">${section.section_name}</option>`);
+                if (classId) {
+                    // Load subjects for this class
+                    $.ajax({
+                        url: 'ajax/get_subjects.php',
+                        data: { class_id: classId },
+                        success: function(subjects) {
+                            const $subjectSelect = $('#new_subject_id');
+                            $subjectSelect.empty().append('<option value="">-- Select Subject --</option>');
+                            subjects.forEach(subject => {
+                                $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
+                            });
+                            $subjectSelect.trigger('change');
+                        }
                     });
+                } else {
+                    $('#new_subject_id').empty().append('<option value="">-- Select Subject --</option>');
                 }
-                
-                $sectionSelect.trigger('change');
+            });
+            
+            // Filter sections based on selected class
+            $('#new_class_id').on('change', function() {
+                const classId = $(this).val();
+                $('#new_section_id option').show();
+                if (classId) {
+                    $('#new_section_id option').not('[value=""],[data-class="' + classId + '"]').hide();
+                }
             });
             
             // AJAX call to get subjects for selected class
