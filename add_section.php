@@ -9,25 +9,23 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Fetch class levels
-$class_levels = $db->query("SELECT id, level_name FROM class_levels")->fetchAll(PDO::FETCH_ASSOC);
 // Fetch all grades/classes from class_names
 $class_names = $db->query("SELECT id, grade FROM class_names")->fetchAll(PDO::FETCH_ASSOC);
 
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $class_level_id = $_POST['class_level_id'];
+    $class_name_id = $_POST['class_name_id'];
     $section = strtoupper($_POST['section']);
 
-    // Check if section already exists for this class level
-    $check_stmt = $db->prepare("SELECT COUNT(*) FROM sections WHERE class_level_id = ? AND section = ?");
-    $check_stmt->execute([$class_level_id, $section]);
+    // Check if section already exists for this grade
+    $check_stmt = $db->prepare("SELECT COUNT(*) FROM sections WHERE class_name_id = ? AND section = ?");
+    $check_stmt->execute([$class_name_id, $section]);
     if ($check_stmt->fetchColumn() > 0) {
-        $message = "Section already exists for this class level.";
+        $message = "Section already exists for this grade.";
     } else {
         // Insert into sections table
-        $stmt = $db->prepare("INSERT INTO sections (class_level_id, section) VALUES (?, ?)");
-        if ($stmt->execute([$class_level_id, $section])) {
+        $stmt = $db->prepare("INSERT INTO sections (class_name_id, section) VALUES (?, ?)");
+        if ($stmt->execute([$class_name_id, $section])) {
             $message = "Section added successfully!";
         } else {
             $message = "Failed to add section.";
@@ -47,10 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p><?= htmlspecialchars($message) ?></p>
     <?php endif; ?>
     <form method="post">
-        <label for="class_level_id">Class Level:</label>
-        <select name="class_level_id" id="class_level_id" required>
-            <?php foreach ($class_levels as $level): ?>
-                <option value="<?= $level['id'] ?>"><?= htmlspecialchars($level['level_name']) ?></option>
+        <label for="class_name_id">Grade Name:</label>
+        <select name="class_name_id" id="class_name_id" required>
+            <?php foreach ($class_names as $class): ?>
+                <option value="<?= $class['id'] ?>"><?= htmlspecialchars($class['grade']) ?></option>
             <?php endforeach; ?>
         </select>
         <br><br>
