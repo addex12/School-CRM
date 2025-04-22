@@ -29,7 +29,16 @@ if (!$teacher) {
 
 // Fetch available classes
 $class_stmt = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name");
-$classes = $class_stmt->fetchAll(PDO::FETCH_ASSOC);
+$classes = [];
+while ($row = $class_stmt->fetch(PDO::FETCH_ASSOC)) {
+    // Avoid undefined index warning by checking if 'id' exists
+    $row_id = isset($row['id']) ? $row['id'] : null;
+    $row_name = isset($row['class_name']) ? $row['class_name'] : '';
+    $classes[] = [
+        'id' => $row_id,
+        'class_name' => $row_name
+    ];
+}
 
 // Fetch subjects taught by this teacher
 $subjects_stmt = $pdo->prepare("
@@ -240,7 +249,7 @@ $js_classes = json_encode($classes);
                                 <select name="class_id" id="class_id">
                                     <option value="">-- None --</option>
                                     <?php foreach ($classes as $class): ?>
-                                        <option value="<?= $class['id'] ?>" <?= $teacher['class_id'] == $class['id'] ? 'selected' : '' ?>>
+                                        <option value="<?= htmlspecialchars($class['id']) ?>" <?= (isset($teacher['class_id']) && $teacher['class_id'] == $class['id']) ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($class['class_name']) ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -425,5 +434,6 @@ $js_classes = json_encode($classes);
             }
         });
     </script>
+    require_once '../includes/footer.php';
 </body>
 </html>
