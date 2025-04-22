@@ -11,6 +11,7 @@ $students = $pdo->query("
     FROM students s
     LEFT JOIN users u ON s.user_id = u.id
     LEFT JOIN classes c ON s.class_id = c.id
+    WHERE s.class_id IS NOT NULL
     ORDER BY u.username
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -29,6 +30,7 @@ $subjects = $pdo->query("
     FROM subjects s
     LEFT JOIN curriculums cu ON s.curriculum_id = cu.id
     LEFT JOIN class_levels lv ON s.class_level_id = lv.id
+    WHERE s.class_level_id IS NOT NULL
     ORDER BY cu.name, lv.level_name, s.subject_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
