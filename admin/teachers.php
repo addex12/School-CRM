@@ -236,10 +236,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </header>
             <div class="content">
                 <div class="dashboard-section">
-                    <div class="teachers-header">
-                        <h2>Teacher List</h2>
-                        <a href="add_teacher.php" class="btn"><i class="fas fa-user-plus"></i> Add Teacher</a>
-                    </div>
+
                     <div class="import-bar">
                         <a href="download_teacher_template.php" class="btn"><i class="fas fa-download"></i> Download Template</a>
                         <form action="import_teachers.php" method="post" enctype="multipart/form-data" style="display:inline;">

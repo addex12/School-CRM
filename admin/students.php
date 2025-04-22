@@ -108,10 +108,6 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </header>
             <div class="content">
                 <div class="dashboard-section">
-                    <div class="students-header">
-                        <h2>Student List</h2>
-                        <a href="add_student.php" class="btn"><i class="fas fa-user-plus"></i> Add Student</a>
-                    </div>
                     <div class="table-responsive">
                         <table class="students-table">
                             <thead>
