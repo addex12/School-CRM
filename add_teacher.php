@@ -8,6 +8,9 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
+// Fetch all users
+$users = $db->query("SELECT id, username, email, role FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
@@ -62,5 +65,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br><br>
         <button type="submit">Add Teacher</button>
     </form>
+
+    <h3>Existing Users</h3>
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+        </tr>
+        <?php foreach ($users as $user): ?>
+        <tr>
+            <td><?= htmlspecialchars($user['id']) ?></td>
+            <td><?= htmlspecialchars($user['username']) ?></td>
+            <td><?= htmlspecialchars($user['email']) ?></td>
+            <td><?= htmlspecialchars($user['role']) ?></td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
 </body>
 </html>
