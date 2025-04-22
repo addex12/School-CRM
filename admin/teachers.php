@@ -1,12 +1,11 @@
 <?php
 require_once '../includes/auth.php';
-require_once '../includes/db.php';
 requireAdmin();
 require_once '../includes/config.php';
 
 $pageTitle = "Teachers";
 
-// Fetch teachers data
+// Fetch teachers data with corrected join condition
 $stmt = $pdo->prepare("
     SELECT 
         u.id AS user_id,
@@ -15,16 +14,21 @@ $stmt = $pdo->prepare("
         r.role_name,
         t.id AS teacher_id,
         t.created_at AS teacher_created_at,
-        c.class_name
+        cn.grade AS class_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
     LEFT JOIN teachers t ON t.user_id = u.id
-    LEFT JOIN classes c ON t.class_id = c.id
+    LEFT JOIN class_names cn ON t.class_name_id = cn.id
     WHERE LOWER(r.role_name) = 'teacher'
     ORDER BY COALESCE(t.created_at, u.created_at) DESC
 ");
 $stmt->execute();
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Handle import status messages
+$imported = isset($_GET['imported']) ? intval($_GET['imported']) : 0;
+$failed = isset($_GET['failed']) ? intval($_GET['failed']) : 0;
+$error = isset($_GET['error']) ? "Error importing file. Please try again." : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,6 +58,9 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .import-section { margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; }
         .file-input { display: none; }
         .file-label { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 4px; background: #2980b9; color: white; cursor: pointer; }
+        .alert { padding: 0.75rem 1.25rem; margin-bottom: 1rem; border-radius: 4px; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
@@ -69,6 +76,19 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <h2>Teacher Management</h2>
                         <a href="add_teacher.php" class="btn btn-primary">Add Teacher</a>
                     </div>
+
+                    <?php if ($imported > 0): ?>
+                        <div class="alert alert-success">
+                            Successfully imported <?= $imported ?> teachers.
+                            <?php if ($failed > 0): ?>
+                                Failed to import <?= $failed ?> records.
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><?= $error ?></div>
+                    <?php endif; ?>
 
                     <div class="import-section">
                         <a href="download_teacher_template.php" class="btn btn-success">
@@ -90,7 +110,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <th>Class</th>
+                                    <th>Grade</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
