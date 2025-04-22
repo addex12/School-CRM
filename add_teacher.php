@@ -8,15 +8,20 @@ try {
     die("Database connection failed: " . $e->getMessage());
 }
 
-// Fetch all users
+// Fetch all users for display
 $users = $db->query("SELECT id, username, email, role FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch teacher role id from role table
+$role_stmt = $db->prepare("SELECT id FROM role WHERE name = ?");
+$role_stmt->execute(['teacher']);
+$teacher_role_id = $role_stmt->fetchColumn();
 
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $username = trim($_POST['username']);
-    $password = $_POST['password']; // Should be hashed in production
+    $password = $_POST['password'];
 
     // Check if user exists
     $check_stmt = $db->prepare("SELECT COUNT(*) FROM users WHERE email = ? OR username = ?");
@@ -28,11 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $teacher_stmt = $db->prepare("INSERT INTO teachers (name, email, username) VALUES (?, ?, ?)");
         $teacher_stmt->execute([$name, $email, $username]);
 
-        // Insert into users table
+        // Insert into users table with teacher role
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $user_stmt = $db->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
-        if ($user_stmt->execute([$username, $email, $hashed_password, 'teacher'])) {
+        if ($user_stmt->execute([$username, $email, $hashed_password, $teacher_role_id])) {
             $message = "Teacher and user account created successfully!";
+            // Refresh users list
+            $users = $db->query("SELECT id, username, email, role FROM users ORDER BY id DESC")->fetchAll(PDO::FETCH_ASSOC);
         } else {
             $message = "Failed to create user account.";
         }
@@ -46,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Add Teacher</title>
 </head>
 <body>
-    <h2>Add Teacher</h2>
+    <h2>Register New Teacher</h2>
     <?php if ($message): ?>
         <p><?= htmlspecialchars($message) ?></p>
     <?php endif; ?>
@@ -63,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="password">Password:</label>
         <input type="password" name="password" id="password" required>
         <br><br>
-        <button type="submit">Add Teacher</button>
+        <button type="submit">Register Teacher</button>
     </form>
 
     <h3>Existing Users</h3>
@@ -72,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <th>ID</th>
             <th>Username</th>
             <th>Email</th>
-            <th>Role</th>
+            <th>Role ID</th>
         </tr>
         <?php foreach ($users as $user): ?>
         <tr>
