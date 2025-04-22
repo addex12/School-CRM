@@ -81,11 +81,13 @@ ALTER TABLE subjects ADD COLUMN IF NOT EXISTS subject_name VARCHAR(100) NOT NULL
 -- Remove 'name' column if it exists
 ALTER TABLE subjects DROP COLUMN IF EXISTS name;
 
--- Make extra columns nullable (if they exist and are not needed for subject inserts)
-ALTER TABLE subjects MODIFY COLUMN scale_name VARCHAR(100) NULL;
-ALTER TABLE subjects MODIFY COLUMN min_score INT NULL;
-ALTER TABLE subjects MODIFY COLUMN max_score INT NULL;
-ALTER TABLE subjects MODIFY COLUMN grade_letter VARCHAR(10) NULL;
+-- Only modify columns if they exist. 
+-- Remove or comment out these lines if the columns do not exist in your subjects table:
+
+-- ALTER TABLE subjects MODIFY COLUMN scale_name VARCHAR(100) NULL;
+-- ALTER TABLE subjects MODIFY COLUMN min_score INT NULL;
+-- ALTER TABLE subjects MODIFY COLUMN max_score INT NULL;
+-- ALTER TABLE subjects MODIFY COLUMN grade_letter VARCHAR(10) NULL;
 
 -- Example: Insert subjects for Ethiopian Curriculum (replace 6 with the actual id if different)
 -- You may need to SELECT the id for 'Ethiopian Curriculum' if not known
