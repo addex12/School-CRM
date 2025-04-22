@@ -139,6 +139,31 @@ $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php endif; ?>
                             </tbody>
                         </table>
+                        <table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Section Name</th>
+            <th>Class</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        foreach ($sections as $section) {
+            echo "<tr>";
+            echo "<td>{$section['id']}</td>";
+            echo "<td>{$section['section_name']}</td>";
+            echo "<td>" . (isset($section['class_name']) ? htmlspecialchars($section['class_name']) : '-') . "</td>";
+            echo "<td>
+                <a href='edit_section.php?id={$section['id']}'>Edit</a> |
+                <a href='delete_section.php?id={$section['id']}' onclick=\"return confirm('Are you sure you want to delete this section?');\">Delete</a>
+            </td>";
+            echo "</tr>";
+        }
+        ?>
+    </tbody>
+</table>
                     </div>
                 </div>
             </div>
