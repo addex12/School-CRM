@@ -164,16 +164,16 @@ if (isset($_GET['updated'])) {
         </tr>
         <?php foreach ($teachers as $teacher): ?>
         <tr>
-            <td><?= htmlspecialchars($teacher['id']) ?></td>
-            <td><?= htmlspecialchars($teacher['name']) ?></td>
-            <td><?= htmlspecialchars($teacher['email']) ?></td>
-            <td><?= htmlspecialchars($teacher['username']) ?></td>
+            <td><?= htmlspecialchars((string)$teacher['id']) ?></td>
+            <td><?= htmlspecialchars((string)($teacher['name'] ?? '')) ?></td>
+            <td><?= htmlspecialchars((string)($teacher['email'] ?? '')) ?></td>
+            <td><?= htmlspecialchars((string)($teacher['username'] ?? '')) ?></td>
             <td>
                 <?php
                 if (!empty($teacher['subject_id'])) {
                     $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
                     $subj->execute([$teacher['subject_id']]);
-                    echo htmlspecialchars($subj->fetchColumn());
+                    echo htmlspecialchars((string)($subj->fetchColumn() ?? ''));
                 }
                 ?>
             </td>
@@ -182,7 +182,7 @@ if (isset($_GET['updated'])) {
                 if (!empty($teacher['class_name_id'])) {
                     $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
                     $grd->execute([$teacher['class_name_id']]);
-                    echo htmlspecialchars($grd->fetchColumn());
+                    echo htmlspecialchars((string)($grd->fetchColumn() ?? ''));
                 }
                 ?>
             </td>
@@ -191,7 +191,7 @@ if (isset($_GET['updated'])) {
                 if (!empty($teacher['section_id'])) {
                     $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
                     $sec->execute([$teacher['section_id']]);
-                    echo htmlspecialchars($sec->fetchColumn());
+                    echo htmlspecialchars((string)($sec->fetchColumn() ?? ''));
                 }
                 ?>
             </td>
