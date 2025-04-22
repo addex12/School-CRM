@@ -47,18 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="post">
         <label for="class_name_id">Grade Name:</label>
         <select name="class_name_id" id="class_name_id" required>
+            <option value="">-- Select Grade --</option>
             <?php foreach ($class_names as $class): ?>
                 <option value="<?= $class['id'] ?>"><?= htmlspecialchars($class['grade']) ?></option>
             <?php endforeach; ?>
         </select>
         <br><br>
-        <label for="section">Section:</label>
+        <label for="section">Section Name:</label>
         <input type="text" name="section" id="section" maxlength="1" required placeholder="A">
         <br><br>
         <button type="submit">Add Section</button>
     </form>
 
-    <h3>All Classes/Grades</h3>
+    <h3>All Grades</h3>
     <ul>
         <?php foreach ($class_names as $class): ?>
             <li><?= htmlspecialchars($class['grade']) ?></li>
