@@ -14,6 +14,13 @@ $stmt = $pdo->prepare("
         r.role_name,
         t.id AS teacher_id,
         t.created_at AS teacher_created_at,
+        t.phone,
+        t.address,
+        t.date_of_birth,
+        t.gender,
+        t.qualification,
+        t.subject_specialization,
+        t.status,
         c.class_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
@@ -191,6 +198,40 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .dashboard-section { padding: 0.7rem 0.2rem; }
             .teacher-avatar { width: 30px; height: 30px; font-size: 0.95rem; }
         }
+        .import-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+            align-items: center;
+        }
+        .import-bar .btn {
+            background: #27ae60;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.18s;
+        }
+        .import-bar .btn:hover {
+            background: #219150;
+        }
+        .import-bar input[type="file"] {
+            display: none;
+        }
+        .import-bar label {
+            background: #2980b9;
+            color: #fff;
+            border-radius: 6px;
+            padding: 0.5rem 1.1rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.18s;
+        }
+        .import-bar label:hover {
+            background: #1c5d8c;
+        }
     </style>
 </head>
 <body>
@@ -206,6 +247,13 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <h2>Teacher List</h2>
                         <a href="add_teacher.php" class="btn"><i class="fas fa-user-plus"></i> Add Teacher</a>
                     </div>
+                    <div class="import-bar">
+                        <a href="download_teacher_template.php" class="btn"><i class="fas fa-download"></i> Download Template</a>
+                        <form action="import_teachers.php" method="post" enctype="multipart/form-data" style="display:inline;">
+                            <label for="import-file"><i class="fas fa-upload"></i> Import Teachers</label>
+                            <input type="file" id="import-file" name="import_file" accept=".csv" onchange="this.form.submit()">
+                        </form>
+                    </div>
                     <div class="table-responsive">
                         <table class="teachers-table">
                             <thead>
@@ -215,6 +263,13 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Class</th>
+                                    <th>Phone</th>
+                                    <th>Address</th>
+                                    <th>Date of Birth</th>
+                                    <th>Gender</th>
+                                    <th>Qualification</th>
+                                    <th>Subject Specialization</th>
+                                    <th>Status</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
@@ -242,6 +297,13 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($teacher['email']) ?></td>
                                             <td><span class="badge-role"><?= htmlspecialchars($teacher['role_name'] ?? 'N/A') ?></span></td>
                                             <td><?= htmlspecialchars($teacher['class_name'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['phone'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['address'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['date_of_birth'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['gender'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['qualification'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['subject_specialization'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['status'] ?? '-') ?></td>
                                             <td>
                                                 <?= $teacher['teacher_created_at'] 
                                                     ? date('M j, Y g:i A', strtotime($teacher['teacher_created_at'])) 
@@ -259,7 +321,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="7">No teachers found.</td>
+                                        <td colspan="14">No teachers found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -270,5 +332,13 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <?php include 'includes/footer.php'; ?>
     </div>
+    <script>
+        // Auto-submit import form when file is selected
+        document.querySelectorAll('input[type="file"][name="import_file"]').forEach(function(input) {
+            input.addEventListener('change', function() {
+                if (this.files.length) this.form.submit();
+            });
+        });
+    </script>
 </body>
 </html>
