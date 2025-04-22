@@ -1,10 +1,8 @@
 <?php
 require_once '../includes/config.php';
-// Fix: Ensure db.php sets $host, $dbname, $user, $pass
 require_once '../includes/db.php';
 
 try {
-    // Use variables from config/db.php
     $db = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
@@ -66,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
             $update_user->execute([$username, $email, $current['user_id']]);
         }
         $message = "Teacher details updated successfully!";
-        // Refresh selected teacher info
         header("Location: edit_teacher.php?edit_id=" . $teacher_id . "&updated=1");
         exit;
     }
@@ -75,17 +72,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
 if (isset($_GET['updated'])) {
     $message = "Teacher details updated successfully!";
 }
+
+// Helper function to safely escape output and avoid deprecated warnings
+function esc($value) {
+    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Edit Teacher</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; }
+        th, td { padding: 6px 12px; }
+        th { background: #f0f0f0; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
 </head>
 <body>
     <h2>Edit Teacher</h2>
     <?php if ($message): ?>
-        <p><?= htmlspecialchars($message) ?></p>
+        <p class="<?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>"><?= esc($message) ?></p>
     <?php endif; ?>
 
     <form method="get" action="edit_teacher.php">
@@ -93,8 +103,8 @@ if (isset($_GET['updated'])) {
         <select name="edit_id" id="edit_id" onchange="this.form.submit()">
             <option value="">-- Select --</option>
             <?php foreach ($teachers as $teacher): ?>
-                <option value="<?= htmlspecialchars((string)($teacher['id'] ?? '')) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars((string)($teacher['name'] ?? '')) ?> (<?= htmlspecialchars((string)($teacher['username'] ?? '')) ?>)
+                <option value="<?= esc($teacher['id']) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
+                    <?= esc($teacher['name']) ?> (<?= esc($teacher['username']) ?>)
                 </option>
             <?php endforeach; ?>
         </select>
@@ -102,24 +112,24 @@ if (isset($_GET['updated'])) {
     </form>
 
     <?php if ($selected_teacher): ?>
-        <h3>Editing: <?= htmlspecialchars((string)($selected_teacher['name'] ?? '')) ?></h3>
+        <h3>Editing: <?= esc($selected_teacher['name']) ?></h3>
         <form method="post">
-            <input type="hidden" name="teacher_id" value="<?= $selected_teacher['id'] ?>">
+            <input type="hidden" name="teacher_id" value="<?= esc($selected_teacher['id']) ?>">
             <label for="name">Full Name:</label>
-            <input type="text" name="name" id="name" value="<?= htmlspecialchars((string)($selected_teacher['name'] ?? '')) ?>" required>
+            <input type="text" name="name" id="name" value="<?= esc($selected_teacher['name']) ?>" required>
             <br><br>
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" value="<?= htmlspecialchars((string)($selected_teacher['email'] ?? '')) ?>" required>
+            <input type="email" name="email" id="email" value="<?= esc($selected_teacher['email']) ?>" required>
             <br><br>
             <label for="username">Username:</label>
-            <input type="text" name="username" id="username" value="<?= htmlspecialchars((string)($selected_teacher['username'] ?? '')) ?>" required>
+            <input type="text" name="username" id="username" value="<?= esc($selected_teacher['username']) ?>" required>
             <br><br>
             <label for="subject_id">Subject:</label>
             <select name="subject_id" id="subject_id" required>
                 <option value="">-- Select Subject --</option>
                 <?php foreach ($subjects as $subject): ?>
-                    <option value="<?= $subject['id'] ?>" <?= ($selected_teacher['subject_id'] ?? '') == $subject['id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($subject['subject_name']) ?>
+                    <option value="<?= esc($subject['id']) ?>" <?= ($selected_teacher['subject_id'] ?? '') == $subject['id'] ? 'selected' : '' ?>>
+                        <?= esc($subject['subject_name']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -128,8 +138,8 @@ if (isset($_GET['updated'])) {
             <select name="class_name_id" id="class_name_id" required>
                 <option value="">-- Select Grade --</option>
                 <?php foreach ($class_names as $grade): ?>
-                    <option value="<?= $grade['id'] ?>" <?= ($selected_teacher['class_name_id'] ?? '') == $grade['id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($grade['grade']) ?>
+                    <option value="<?= esc($grade['id']) ?>" <?= ($selected_teacher['class_name_id'] ?? '') == $grade['id'] ? 'selected' : '' ?>>
+                        <?= esc($grade['grade']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -138,8 +148,8 @@ if (isset($_GET['updated'])) {
             <select name="section_id" id="section_id" required>
                 <option value="">-- Select Section --</option>
                 <?php foreach ($sections as $section): ?>
-                    <option value="<?= $section['id'] ?>" <?= ($selected_teacher['section_id'] ?? '') == $section['id'] ? 'selected' : '' ?>>
-                        <?= htmlspecialchars($section['section']) ?>
+                    <option value="<?= esc($section['id']) ?>" <?= ($selected_teacher['section_id'] ?? '') == $section['id'] ? 'selected' : '' ?>>
+                        <?= esc($section['section']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -164,16 +174,16 @@ if (isset($_GET['updated'])) {
         </tr>
         <?php foreach ($teachers as $teacher): ?>
         <tr>
-            <td><?= htmlspecialchars((string)$teacher['id']) ?></td>
-            <td><?= htmlspecialchars((string)($teacher['name'] ?? '')) ?></td>
-            <td><?= htmlspecialchars((string)($teacher['email'] ?? '')) ?></td>
-            <td><?= htmlspecialchars((string)($teacher['username'] ?? '')) ?></td>
+            <td><?= esc($teacher['id']) ?></td>
+            <td><?= esc($teacher['name']) ?></td>
+            <td><?= esc($teacher['email']) ?></td>
+            <td><?= esc($teacher['username']) ?></td>
             <td>
                 <?php
                 if (!empty($teacher['subject_id'])) {
                     $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
                     $subj->execute([$teacher['subject_id']]);
-                    echo htmlspecialchars((string)($subj->fetchColumn() ?? ''));
+                    echo esc($subj->fetchColumn());
                 }
                 ?>
             </td>
@@ -182,7 +192,7 @@ if (isset($_GET['updated'])) {
                 if (!empty($teacher['class_name_id'])) {
                     $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
                     $grd->execute([$teacher['class_name_id']]);
-                    echo htmlspecialchars((string)($grd->fetchColumn() ?? ''));
+                    echo esc($grd->fetchColumn());
                 }
                 ?>
             </td>
@@ -191,7 +201,7 @@ if (isset($_GET['updated'])) {
                 if (!empty($teacher['section_id'])) {
                     $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
                     $sec->execute([$teacher['section_id']]);
-                    echo htmlspecialchars((string)($sec->fetchColumn() ?? ''));
+                    echo esc($sec->fetchColumn());
                 }
                 ?>
             </td>
