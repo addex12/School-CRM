@@ -106,13 +106,13 @@ if (isset($_GET['updated'])) {
         <form method="post">
             <input type="hidden" name="teacher_id" value="<?= $selected_teacher['id'] ?>">
             <label for="name">Full Name:</label>
-            <input type="text" name="name" id="name" value="<?= htmlspecialchars($selected_teacher['name']) ?>" required>
+            <input type="text" name="name" id="name" value="<?= htmlspecialchars((string)($selected_teacher['name'] ?? '')) ?>" required>
             <br><br>
             <label for="email">Email:</label>
-            <input type="email" name="email" id="email" value="<?= htmlspecialchars($selected_teacher['email']) ?>" required>
+            <input type="email" name="email" id="email" value="<?= htmlspecialchars((string)($selected_teacher['email'] ?? '')) ?>" required>
             <br><br>
             <label for="username">Username:</label>
-            <input type="text" name="username" id="username" value="<?= htmlspecialchars($selected_teacher['username']) ?>" required>
+            <input type="text" name="username" id="username" value="<?= htmlspecialchars((string)($selected_teacher['username'] ?? '')) ?>" required>
             <br><br>
             <label for="subject_id">Subject:</label>
             <select name="subject_id" id="subject_id" required>
