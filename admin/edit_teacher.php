@@ -327,24 +327,41 @@ $js_classes = json_encode($classes);
             
             let assignments = [...teacherSubjects];
             renderAssignments();
-            
-            // Update sections dropdown when class changes
+
+            // Filter subjects when class changes
             $('#new_class_id').on('change', function() {
                 const classId = $(this).val();
+                const $subjectSelect = $('#new_subject_id');
                 const $sectionSelect = $('#new_section_id');
-                
+
+                // Filter subjects for the selected class
+                $subjectSelect.empty().append('<option value="">-- Select Subject --</option>');
+                if (classId) {
+                    // Only show subjects that are assigned to this class (by class_id in allSubjects)
+                    allSubjects
+                        .filter(subject => subject.class_name && allClasses.find(c => c.id == classId && c.class_name === subject.class_name))
+                        .forEach(subject => {
+                            $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
+                        });
+                } else {
+                    // Show all subjects if no class selected
+                    allSubjects.forEach(subject => {
+                        $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
+                    });
+                }
+                $subjectSelect.trigger('change');
+
+                // Filter sections for the selected class
                 $sectionSelect.empty().append('<option value="">-- Select Section --</option>');
-                
                 if (classId) {
                     const sectionsForClass = allSections.filter(section => section.class_id == classId);
                     sectionsForClass.forEach(section => {
                         $sectionSelect.append(`<option value="${section.id}">${section.section_name}</option>`);
                     });
                 }
-                
                 $sectionSelect.trigger('change');
             });
-            
+
             // Add new assignment
             $('#add-assignment').on('click', function() {
                 const subjectId = $('#new_subject_id').val();
@@ -434,6 +451,6 @@ $js_classes = json_encode($classes);
             }
         });
     </script>
-   <?php require_once '/includes/footer.php';?>
+   <?php require_once 'includes/footer.php';?>
 </body>
 </html>
