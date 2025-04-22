@@ -1,7 +1,10 @@
 <?php
-require_once '../includes/db.php';
 require_once '../includes/config.php';
+// Fix: Ensure db.php sets $host, $dbname, $user, $pass
+require_once '../includes/db.php';
+
 try {
+    // Use variables from config/db.php
     $db = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
@@ -9,7 +12,12 @@ try {
 }
 
 // Fetch all teachers for selection
-$teachers = $db->query("SELECT t.id, t.name, t.email, t.username, u.id as user_id FROM teachers t LEFT JOIN users u ON t.username = u.username")->fetchAll(PDO::FETCH_ASSOC);
+$teachers = $db->query("SELECT t.id, t.name, t.email, t.username, t.subject_id, t.class_name_id, t.section_id, u.id as user_id FROM teachers t LEFT JOIN users u ON t.username = u.username")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch all subjects, grades, and sections for dropdowns
+$subjects = $db->query("SELECT id, subject_name FROM subjects")->fetchAll(PDO::FETCH_ASSOC);
+$class_names = $db->query("SELECT id, grade FROM class_names")->fetchAll(PDO::FETCH_ASSOC);
+$sections = $db->query("SELECT id, section FROM sections")->fetchAll(PDO::FETCH_ASSOC);
 
 $message = '';
 $selected_teacher = null;
@@ -29,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
     $email = trim($_POST['email']);
     $username = trim($_POST['username']);
     $password = $_POST['password'];
+    $subject_id = $_POST['subject_id'];
+    $class_name_id = $_POST['class_name_id'];
+    $section_id = $_POST['section_id'];
 
     // Fetch current teacher info
     $stmt = $db->prepare("SELECT t.*, u.id as user_id FROM teachers t LEFT JOIN users u ON t.username = u.username WHERE t.id = ?");
@@ -41,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
     if ($check_stmt->fetch(PDO::FETCH_ASSOC)) {
         $message = "A user with this email or username already exists.";
     } else {
-        // Update teachers table
-        $update_teacher = $db->prepare("UPDATE teachers SET name = ?, email = ?, username = ? WHERE id = ?");
-        $update_teacher->execute([$name, $email, $username, $teacher_id]);
+        // Update teachers table with subject, grade, section
+        $update_teacher = $db->prepare("UPDATE teachers SET name = ?, email = ?, username = ?, subject_id = ?, class_name_id = ?, section_id = ? WHERE id = ?");
+        $update_teacher->execute([$name, $email, $username, $subject_id, $class_name_id, $section_id, $teacher_id]);
 
         // Update users table
         if (!empty($password)) {
@@ -103,6 +114,36 @@ if (isset($_GET['updated'])) {
             <label for="username">Username:</label>
             <input type="text" name="username" id="username" value="<?= htmlspecialchars($selected_teacher['username']) ?>" required>
             <br><br>
+            <label for="subject_id">Subject:</label>
+            <select name="subject_id" id="subject_id" required>
+                <option value="">-- Select Subject --</option>
+                <?php foreach ($subjects as $subject): ?>
+                    <option value="<?= $subject['id'] ?>" <?= ($selected_teacher['subject_id'] ?? '') == $subject['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($subject['subject_name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <br><br>
+            <label for="class_name_id">Grade:</label>
+            <select name="class_name_id" id="class_name_id" required>
+                <option value="">-- Select Grade --</option>
+                <?php foreach ($class_names as $grade): ?>
+                    <option value="<?= $grade['id'] ?>" <?= ($selected_teacher['class_name_id'] ?? '') == $grade['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($grade['grade']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <br><br>
+            <label for="section_id">Section:</label>
+            <select name="section_id" id="section_id" required>
+                <option value="">-- Select Section --</option>
+                <?php foreach ($sections as $section): ?>
+                    <option value="<?= $section['id'] ?>" <?= ($selected_teacher['section_id'] ?? '') == $section['id'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($section['section']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+            <br><br>
             <label for="password">New Password (leave blank to keep current):</label>
             <input type="password" name="password" id="password">
             <br><br>
@@ -117,6 +158,9 @@ if (isset($_GET['updated'])) {
             <th>Name</th>
             <th>Email</th>
             <th>Username</th>
+            <th>Subject</th>
+            <th>Grade</th>
+            <th>Section</th>
         </tr>
         <?php foreach ($teachers as $teacher): ?>
         <tr>
@@ -124,6 +168,33 @@ if (isset($_GET['updated'])) {
             <td><?= htmlspecialchars($teacher['name']) ?></td>
             <td><?= htmlspecialchars($teacher['email']) ?></td>
             <td><?= htmlspecialchars($teacher['username']) ?></td>
+            <td>
+                <?php
+                if (!empty($teacher['subject_id'])) {
+                    $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
+                    $subj->execute([$teacher['subject_id']]);
+                    echo htmlspecialchars($subj->fetchColumn());
+                }
+                ?>
+            </td>
+            <td>
+                <?php
+                if (!empty($teacher['class_name_id'])) {
+                    $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
+                    $grd->execute([$teacher['class_name_id']]);
+                    echo htmlspecialchars($grd->fetchColumn());
+                }
+                ?>
+            </td>
+            <td>
+                <?php
+                if (!empty($teacher['section_id'])) {
+                    $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
+                    $sec->execute([$teacher['section_id']]);
+                    echo htmlspecialchars($sec->fetchColumn());
+                }
+                ?>
+            </td>
         </tr>
         <?php endforeach; ?>
     </table>
