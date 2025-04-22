@@ -5,14 +5,21 @@ require_once '../includes/config.php';
 
 $pageTitle = "Students";
 
-// Fetch students with user and role info (only users with role 'Student')
+// Fetch all users with Student role, join students table for enrollment info if exists
 $stmt = $pdo->prepare("
-    SELECT s.id AS student_id, u.username, u.email, r.role_name, s.enrollment_no, s.created_at
-    FROM students s
-    JOIN users u ON s.user_id = u.id
+    SELECT 
+        u.id AS user_id,
+        u.username,
+        u.email,
+        r.role_name,
+        s.id AS student_id,
+        s.enrollment_no,
+        s.created_at AS student_created_at
+    FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
+    LEFT JOIN students s ON s.user_id = u.id
     WHERE LOWER(r.role_name) = 'student'
-    ORDER BY s.created_at DESC
+    ORDER BY COALESCE(s.created_at, u.created_at) DESC
 ");
 $stmt->execute();
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -107,7 +114,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <table class="students-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>User ID</th>
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Role</th>
@@ -120,15 +127,23 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php if (!empty($students)): ?>
                                     <?php foreach ($students as $student): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($student['student_id']) ?></td>
+                                            <td><?= htmlspecialchars($student['user_id']) ?></td>
                                             <td><?= htmlspecialchars($student['username']) ?></td>
                                             <td><?= htmlspecialchars($student['email']) ?></td>
                                             <td><?= htmlspecialchars($student['role_name'] ?? 'N/A') ?></td>
-                                            <td><?= htmlspecialchars($student['enrollment_no']) ?></td>
-                                            <td><?= date('M j, Y g:i A', strtotime($student['created_at'])) ?></td>
+                                            <td><?= htmlspecialchars($student['enrollment_no'] ?? '-') ?></td>
+                                            <td>
+                                                <?= $student['student_created_at'] 
+                                                    ? date('M j, Y g:i A', strtotime($student['student_created_at'])) 
+                                                    : '-' ?>
+                                            </td>
                                             <td class="student-actions">
-                                                <a href="edit_student.php?id=<?= $student['student_id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <a href="delete_student.php?id=<?= $student['student_id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this student?')"><i class="fas fa-trash-alt"></i></a>
+                                                <?php if ($student['student_id']): ?>
+                                                    <a href="edit_student.php?id=<?= $student['student_id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
+                                                    <a href="delete_student.php?id=<?= $student['student_id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this student?')"><i class="fas fa-trash-alt"></i></a>
+                                                <?php else: ?>
+                                                    <a href="add_student.php?user_id=<?= $student['user_id'] ?>" title="Add Enrollment"><i class="fas fa-plus"></i></a>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
