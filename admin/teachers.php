@@ -5,7 +5,7 @@ require_once '../includes/config.php';
 
 $pageTitle = "Teachers";
 
-// Fetch all users with Teacher role, join teachers and classes table for info if exists
+// Only fetch and show important details: user_id, username, email, role_name, class_name, created_at
 $stmt = $pdo->prepare("
     SELECT 
         u.id AS user_id,
@@ -14,12 +14,6 @@ $stmt = $pdo->prepare("
         r.role_name,
         t.id AS teacher_id,
         t.created_at AS teacher_created_at,
-        t.address,
-        t.date_of_birth,
-        t.gender,
-        t.qualification,
-        t.subject_specialization,
-        t.status,
         c.class_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
@@ -262,12 +256,6 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Class</th>
-                                    <th>Address</th>
-                                    <th>Date of Birth</th>
-                                    <th>Gender</th>
-                                    <th>Qualification</th>
-                                    <th>Subject Specialization</th>
-                                    <th>Status</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
@@ -299,12 +287,6 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 echo !empty($teacher['class_name']) ? htmlspecialchars($teacher['class_name']) : '<span style="color:#888;">Unassigned</span>';
                                                 ?>
                                             </td>
-                                            <td><?= htmlspecialchars($teacher['address'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($teacher['date_of_birth'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($teacher['gender'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($teacher['qualification'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($teacher['subject_specialization'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($teacher['status'] ?? '-') ?></td>
                                             <td>
                                                 <?= $teacher['teacher_created_at'] 
                                                     ? date('M j, Y g:i A', strtotime($teacher['teacher_created_at'])) 
@@ -312,7 +294,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             </td>
                                             <td class="teacher-actions">
                                                 <?php if ($teacher['teacher_id']): ?>
-                                                    <a href="edit_teacher.php?id=<?= $teacher['teacher_id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
+                                                    <a href="edit_teacher.php?edit_id=<?= $teacher['teacher_id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
                                                     <a href="delete_teacher.php?id=<?= $teacher['teacher_id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this teacher?')"><i class="fas fa-trash-alt"></i></a>
                                                 <?php else: ?>
                                                     <a href="add_teacher.php?user_id=<?= $teacher['user_id'] ?>" title="Add Assignment"><i class="fas fa-plus"></i></a>
@@ -322,7 +304,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="13">No teachers found.</td>
+                                        <td colspan="7">No teachers found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
