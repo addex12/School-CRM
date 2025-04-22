@@ -66,6 +66,12 @@ INSERT INTO grading_scales (name, description)
 SELECT * FROM (SELECT 'Ethiopian 100-point', '0-100 scale, Pass mark 50, Distinction 85+') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM grading_scales WHERE name = 'Ethiopian 100-point');
 
+-- Ensure the subjects table exists and has a 'name' column before inserting
+CREATE TABLE IF NOT EXISTS subjects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
 -- Insert all subjects (global, including Ethiopian curriculum) if not exists
 -- MySQL does not support INSERT ... WHERE NOT EXISTS for multiple rows directly.
 -- Use individual INSERT IGNORE statements for each subject to avoid duplicates.
