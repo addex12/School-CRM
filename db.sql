@@ -231,7 +231,8 @@ CREATE TABLE `grades` (
   `grade_letter` varchar(10) DEFAULT NULL,
   `term` varchar(50) DEFAULT NULL,
   `academic_year` varchar(20) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
+  `created_at` datetime DEFAULT current_timestamp(),
+  `section_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -1003,7 +1004,8 @@ ALTER TABLE `class_subjects`
 ALTER TABLE `grades`
   ADD CONSTRAINT `fk_grades_class_subjects` FOREIGN KEY (`class_subject_id`) REFERENCES `class_subjects` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `grades_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `grades_ibfk_3` FOREIGN KEY (`grading_scale_id`) REFERENCES `grading_scales` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `grades_ibfk_3` FOREIGN KEY (`grading_scale_id`) REFERENCES `grading_scales` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `fk_grades_section` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `grading_scales`
