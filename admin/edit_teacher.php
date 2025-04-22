@@ -1,13 +1,10 @@
 <?php
-/**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
+require_once '../includes/auth.php';
+requireAdmin();
 require_once '../includes/config.php';
 require_once '../includes/db.php';
+
+$pageTitle = "Edit Teacher";
 
 try {
     $db = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
@@ -23,8 +20,6 @@ $teachers = $db->query("SELECT t.id, t.name, t.email, t.username, t.subject_id, 
 $subjects = $db->query("SELECT id, subject_name FROM subjects")->fetchAll(PDO::FETCH_ASSOC);
 $class_names = $db->query("SELECT id, grade FROM class_names")->fetchAll(PDO::FETCH_ASSOC);
 $sections = $db->query("SELECT id, section_name FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch all classes for class assignment dropdown
 $classes = $db->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
 
 $message = '';
@@ -61,13 +56,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
     $stmt->execute([$teacher_id]);
     $current = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Check for duplicate email/username in users table (excluding current user)
+    // Check for duplicate email/username
     $check_stmt = $db->prepare("SELECT id FROM users WHERE (email = ? OR username = ?) AND id != ?");
     $check_stmt->execute([$email, $username, $current['user_id']]);
     if ($check_stmt->fetch(PDO::FETCH_ASSOC)) {
         $message = "A user with this email or username already exists.";
     } else {
-        // Update teachers table with subject, grade, section
+        // Update teachers table
         $update_teacher = $db->prepare("UPDATE teachers SET name = ?, email = ?, username = ?, subject_id = ?, class_name_id = ?, section_id = ?, address = ?, date_of_birth = ?, gender = ?, qualification = ?, subject_specialization = ?, status = ?, class_id = ? WHERE id = ?");
         $update_teacher->execute([$name, $email, $username, $subject_id, $class_name_id, $section_id, $address, $date_of_birth, $gender, $qualification, $subject_specialization, $status, $class_id, $teacher_id]);
 
@@ -80,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
             $update_user = $db->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
             $update_user->execute([$username, $email, $current['user_id']]);
         }
+        
         $message = "Teacher details updated successfully!";
         header("Location: edit_teacher.php?edit_id=" . $teacher_id . "&updated=1");
         exit;
@@ -90,7 +86,6 @@ if (isset($_GET['updated'])) {
     $message = "Teacher details updated successfully!";
 }
 
-// Helper function to safely escape output and avoid deprecated warnings
 function esc($value) {
     return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
 }
@@ -99,195 +94,42 @@ function esc($value) {
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Edit Teacher | Flipper School CRM</title>
+    <title><?= esc($pageTitle) ?> | School CRM</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .admin-dashboard {
-            display: flex;
-            flex-direction: row;
-            min-height: 100vh;
-            background: #f4f6fa;
-        }
-        .admin-main {
-            flex: 1;
-            margin-left: 250px;
-            padding: 2rem 2.5rem;
-            max-width: 100%;
-            background: none;
-            border-radius: 0;
-            box-shadow: none;
-            transition: margin-left 0.2s;
-        }
-        @media (max-width: 900px) {
-            .admin-dashboard {
-                flex-direction: column;
-            }
-            .admin-main {
-                margin-left: 60px;
-                padding: 10px 5px 80px;
-            }
-        }
-        @media (max-width: 600px) {
-            .admin-dashboard {
-                flex-direction: column;
-            }
-            .admin-main {
-                margin-left: 0;
-                width: 100%;
-                padding: 5px 2px 80px;
-            }
-            .sidebar-overlay {
-                display: block;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                background: rgba(0,0,0,0.3);
-                z-index: 199;
-            }
-        }
-        .sidebar-overlay {
-            display: none;
-        }
-        .users-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .users-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .users-header .btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-        }
-        .users-header .btn:hover {
-            background: #217dbb;
-        }
-        .dashboard-section, .form-section {
-            background: linear-gradient(135deg, #f8fafc 80%, #e3e9f7 100%);
-            border-radius: 18px;
-            box-shadow: 0 4px 24px rgba(44,62,80,0.10);
-            padding: 2.5rem 2rem;
-            margin-bottom: 2.5rem;
-            transition: box-shadow 0.2s;
-        }
-        .dashboard-section:hover, .form-section:hover {
-            box-shadow: 0 8px 32px rgba(44,62,80,0.13);
-        }
-        .dashboard-section h3, .dashboard-section h2 {
-            font-size: 1.5rem;
-            color: #2d3a4b;
-            margin-bottom: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        .teacher-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: #3498db;
-            color: #fff;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-right: 10px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
-        }
-        .badge-role {
-            background: #eaf6ff;
-            color: #3498db;
-            border-radius: 12px;
-            padding: 2px 10px;
-            font-size: 0.95em;
-            font-weight: 600;
-            margin-left: 6px;
-        }
-        .success, .error {
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-size: 1.1em;
-            margin-bottom: 1.2rem;
-        }
-        .success { background: #eafaf1; color: #27ae60; }
-        .error { background: #fee2e2; color: #e74c3c; }
-        .table-container {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            background: #fff;
-        }
-        table th, table td {
-            vertical-align: middle;
-        }
-        .dashboard-section label {
-            font-weight: 600;
-            color: #34495e;
-        }
-        .dashboard-section input, .dashboard-section select {
-            margin-bottom: 1rem;
-        }
-        .dashboard-section button {
-            background: linear-gradient(90deg, #3498db 60%, #217dbb 100%);
-            color: #fff;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 28px;
-            margin-top: 10px;
-            transition: background 0.18s;
-        }
-        .dashboard-section button:hover {
-            background: #00509e;
-        }
-        .search-bar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 1.5rem;
-        }
-        .search-bar input {
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            padding: 8px 14px;
-            font-size: 1em;
-            width: 220px;
-        }
-        @media (max-width: 900px) {
-            .dashboard-section, .form-section { padding: 1.2rem 0.5rem; }
-        }
-        @media (max-width: 600px) {
-            .dashboard-section, .form-section { padding: 0.7rem 0.2rem; }
-            .teacher-avatar { width: 30px; height: 30px; font-size: 0.95rem; }
+        .admin-dashboard { display: flex; flex-direction: row; min-height: 100vh; background: #f4f6fa; }
+        .admin-main { flex: 1; margin-left: 250px; padding: 2rem 2.5rem; max-width: 100%; background: none; }
+        .dashboard-section { background: #fff; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .dashboard-section h3 { margin-top: 0; color: #333; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #444; }
+        input, select { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #3498db; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        .success { background: #d4edda; color: #155724; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
+        .error { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
+        .teacher-avatar { width: 40px; height: 40px; border-radius: 50%; background: #3498db; color: white; 
+                          display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        table th, table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #ddd; }
+        table th { background: #f8f9fa; }
+        @media (max-width: 768px) {
+            .admin-main { margin-left: 0; padding: 1rem; }
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('adminSidebar').classList.remove('open');this.style.display='none';"></div>
         <div class="admin-main">
             <header class="admin-header">
-                <h1>Edit Teacher</h1>
+                <h1><?= esc($pageTitle) ?></h1>
             </header>
             <div class="content">
                 <?php if ($message): ?>
-                    <p class="<?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>"><?= esc($message) ?></p>
+                    <div class="<?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>"><?= esc($message) ?></div>
                 <?php endif; ?>
 
                 <div class="dashboard-section">
@@ -297,23 +139,10 @@ function esc($value) {
                             <option value="">-- Select --</option>
                             <?php foreach ($teachers as $teacher): ?>
                                 <option value="<?= esc($teacher['id']) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
-                                    <?php
-                                        $display_name = trim(esc($teacher['name']));
-                                        $display_username = trim(esc($teacher['username']));
-                                        if ($display_name && $display_username) {
-                                            echo $display_name . " (" . $display_username . ")";
-                                        } elseif ($display_name) {
-                                            echo $display_name;
-                                        } elseif ($display_username) {
-                                            echo $display_username;
-                                        } else {
-                                            echo "Teacher #" . esc($teacher['id']);
-                                        }
-                                    ?>
+                                    <?= esc($teacher['name']) ?> (<?= esc($teacher['username']) ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <noscript><button type="submit">Edit</button></noscript>
                     </form>
                 </div>
 
@@ -322,12 +151,16 @@ function esc($value) {
                         <h3>Editing: <?= esc($selected_teacher['name']) ?></h3>
                         <form method="post">
                             <input type="hidden" name="teacher_id" value="<?= esc($selected_teacher['id']) ?>">
+                            
                             <label for="name">Full Name:</label>
                             <input type="text" name="name" id="name" value="<?= esc($selected_teacher['name']) ?>" required>
+                            
                             <label for="email">Email:</label>
                             <input type="email" name="email" id="email" value="<?= esc($selected_teacher['email']) ?>" required>
+                            
                             <label for="username">Username:</label>
                             <input type="text" name="username" id="username" value="<?= esc($selected_teacher['username']) ?>" required>
+                            
                             <label for="subject_id">Subject:</label>
                             <select name="subject_id" id="subject_id" required>
                                 <option value="">-- Select Subject --</option>
@@ -337,6 +170,7 @@ function esc($value) {
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            
                             <label for="class_name_id">Grade:</label>
                             <select name="class_name_id" id="class_name_id" required>
                                 <option value="">-- Select Grade --</option>
@@ -346,6 +180,7 @@ function esc($value) {
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            
                             <label for="section_id">Section:</label>
                             <select name="section_id" id="section_id" required>
                                 <option value="">-- Select Section --</option>
@@ -355,34 +190,10 @@ function esc($value) {
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <label for="address">Address:</label>
-                            <input type="text" name="address" id="address" value="<?= esc($selected_teacher['address'] ?? '') ?>">
-                            <label for="date_of_birth">Date of Birth:</label>
-                            <input type="date" name="date_of_birth" id="date_of_birth" value="<?= esc($selected_teacher['date_of_birth'] ?? '') ?>">
-                            <label for="gender">Gender:</label>
-                            <select name="gender" id="gender">
-                                <option value="">Select</option>
-                                <option value="Male" <?= ($selected_teacher['gender'] ?? '') === 'Male' ? 'selected' : '' ?>>Male</option>
-                                <option value="Female" <?= ($selected_teacher['gender'] ?? '') === 'Female' ? 'selected' : '' ?>>Female</option>
-                                <option value="Other" <?= ($selected_teacher['gender'] ?? '') === 'Other' ? 'selected' : '' ?>>Other</option>
-                            </select>
-                            <label for="qualification">Qualification:</label>
-                            <input type="text" name="qualification" id="qualification" value="<?= esc($selected_teacher['qualification'] ?? '') ?>">
-                            <label for="subject_specialization">Subject Specialization:</label>
-                            <input type="text" name="subject_specialization" id="subject_specialization" value="<?= esc($selected_teacher['subject_specialization'] ?? '') ?>">
-                            <label for="status">Status:</label>
-                            <input type="text" name="status" id="status" value="<?= esc($selected_teacher['status'] ?? '') ?>">
-                            <label for="class_id">Class:</label>
-                            <select name="class_id" id="class_id">
-                                <option value="">Unassigned</option>
-                                <?php foreach ($classes as $class): ?>
-                                    <option value="<?= esc($class['id']) ?>" <?= ($selected_teacher['class_id'] ?? null) == $class['id'] ? 'selected' : '' ?>>
-                                        <?= esc($class['class_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+                            
                             <label for="password">New Password (leave blank to keep current):</label>
                             <input type="password" name="password" id="password">
+                            
                             <button type="submit" name="update_teacher">Update Teacher</button>
                         </form>
                     </div>
@@ -390,35 +201,23 @@ function esc($value) {
 
                 <div class="dashboard-section">
                     <h3>All Teachers</h3>
-                    <div class="table-container">
+                    <div class="table-responsive">
                         <table>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Username</th>
-                                <th>Subject</th>
-                                <th>Grade</th>
-                                <th>Section</th>
-                            </tr>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Username</th>
+                                    <th>Subject</th>
+                                    <th>Grade</th>
+                                    <th>Section</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <?php foreach ($teachers as $teacher): ?>
                                 <tr>
-                                    <td>
-                                        <span class="teacher-avatar">
-                                            <?php
-                                            $initials = '';
-                                            if (!empty($teacher['name'])) {
-                                                $parts = explode(' ', $teacher['name']);
-                                                foreach ($parts as $p) { $initials .= strtoupper($p[0]); if (strlen($initials) == 2) break; }
-                                            } else {
-                                                $initials = strtoupper(substr($teacher['username'], 0, 2));
-                                            }
-                                            echo esc($initials);
-                                            ?>
-                                        </span>
-                                        <?= esc($teacher['id']) ?>
-                                    </td>
+                                    <td><?= esc($teacher['id']) ?></td>
                                     <td><?= esc($teacher['name']) ?></td>
                                     <td><?= esc($teacher['email']) ?></td>
                                     <td><?= esc($teacher['username']) ?></td>
@@ -458,32 +257,5 @@ function esc($value) {
             </div>
         </div>
     </div>
-    <script>
-    // Show overlay when sidebar is open on mobile
-    document.addEventListener('DOMContentLoaded', function() {
-        var sidebar = document.getElementById('adminSidebar');
-        var overlay = document.getElementById('sidebarOverlay');
-        var toggle = document.getElementById('sidebarToggle');
-        if (sidebar && overlay && toggle) {
-            toggle.addEventListener('click', function() {
-                if (window.innerWidth <= 600) {
-                    setTimeout(function() {
-                        if (sidebar.classList.contains('open')) {
-                            overlay.style.display = 'block';
-                        } else {
-                            overlay.style.display = 'none';
-                        }
-                    }, 10);
-                }
-            });
-        }
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 600) {
-                overlay.style.display = 'none';
-            }
-        });
-    });
-    </script>
-                <?php include 'includes/footer.php'; ?>
 </body>
 </html>
