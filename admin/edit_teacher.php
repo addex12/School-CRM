@@ -9,7 +9,7 @@ $pageTitle = "Add Teacher";
 $stmt = $pdo->prepare("
     SELECT u.id, u.username, u.email
     FROM users u
-    LEFT JOIN roles r ON u.role_id = r.id
+    INNER JOIN roles r ON u.role_id = r.id
     LEFT JOIN teachers t ON t.user_id = u.id
     WHERE LOWER(r.role_name) = 'teacher' AND t.id IS NULL
     ORDER BY u.username
@@ -82,7 +82,7 @@ $preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
                     <?php endif; ?>
                     <form method="post" autocomplete="off">
                         <div>
-                            <label for="user_id">Select Teacher User</label>
+                            <label for="user_id">Select Teacher</label>
                             <select name="user_id" id="user_id" required>
                                 <option value="">-- Select --</option>
                                 <?php foreach ($users as $user): ?>

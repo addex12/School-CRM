@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 15, 2025 at 08:48 AM
+-- Generation Time: Apr 23, 2025 at 05:28 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -24,16 +24,42 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `activity_log`
+-- Table structure for table `academic_terms`
 --
 
-CREATE TABLE `activity_log` (
+CREATE TABLE `academic_terms` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `activity_type` enum('survey','ticket','chat','feedback','login','logout') NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+  `academic_year` varchar(20) NOT NULL,
+  `term_name` varchar(50) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  `is_current` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `academic_terms`
+--
+
+INSERT INTO `academic_terms` (`id`, `academic_year`, `term_name`, `start_date`, `end_date`, `is_current`) VALUES
+(1, '2025-2026', 'Term 1', '2025-09-01', '2025-12-15', 1),
+(2, '2025-2026', 'Term 2', '2026-01-07', '2026-03-25', 0),
+(3, '2025-2026', 'Term 3', '2026-04-08', '2026-06-30', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcements`
+--
+
+CREATE TABLE `announcements` (
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
+  `created_by` int(11) NOT NULL,
+  `target_roles` varchar(255) DEFAULT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -44,12 +70,10 @@ CREATE TABLE `activity_log` (
 
 CREATE TABLE `attendance` (
   `id` int(11) NOT NULL,
-  `employee_id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
   `date` date NOT NULL,
-  `check_in` time DEFAULT NULL,
-  `check_out` time DEFAULT NULL,
-  `hours_worked` decimal(5,2) DEFAULT NULL,
-  `status` enum('present','absent','late','leave') NOT NULL
+  `status` enum('present','absent','late','excused') NOT NULL,
+  `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -70,120 +94,158 @@ CREATE TABLE `audit_logs` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chats`
+-- Table structure for table `classes`
 --
 
-CREATE TABLE `chats` (
+CREATE TABLE `classes` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `subject` varchar(255) NOT NULL,
-  `status` enum('open','closed') NOT NULL DEFAULT 'open',
-  `last_activity` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+  `class_name` varchar(100) NOT NULL,
+  `class_level_id` int(11) DEFAULT NULL,
+  `curriculum_id` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `classes`
+--
+
+INSERT INTO `classes` (`id`, `class_name`, `class_level_id`, `curriculum_id`, `created_at`) VALUES
+(1, 'Grade 1', 1, 1, '2025-04-23 05:15:10'),
+(2, 'Grade 2', 1, 1, '2025-04-23 05:15:10'),
+(3, 'Grade 3', 1, 1, '2025-04-23 05:15:10'),
+(4, 'Grade 4', 1, 1, '2025-04-23 05:15:10'),
+(5, 'Grade 5', 1, 1, '2025-04-23 05:15:10'),
+(6, 'Grade 6', 1, 1, '2025-04-23 05:15:10'),
+(7, 'Grade 7', 2, 1, '2025-04-23 05:15:10'),
+(8, 'Grade 8', 2, 1, '2025-04-23 05:15:10'),
+(9, 'Grade 9', 2, 1, '2025-04-23 05:15:10'),
+(10, 'Grade 10 (IGCSE Year 1)', 3, 1, '2025-04-23 05:15:10'),
+(11, 'Grade 11 (IGCSE Year 2)', 3, 1, '2025-04-23 05:15:10'),
+(12, 'Grade 12 (AS Level)', 4, 1, '2025-04-23 05:15:10'),
+(13, 'Grade 13 (A Level)', 4, 1, '2025-04-23 05:15:10');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chat_messages`
+-- Table structure for table `class_levels`
 --
 
-CREATE TABLE `chat_messages` (
+CREATE TABLE `class_levels` (
   `id` int(11) NOT NULL,
-  `thread_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `attachment` varchar(255) DEFAULT NULL,
-  `is_admin` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `curriculum_id` int(11) NOT NULL,
+  `level_name` varchar(100) NOT NULL,
+  `level_order` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `class_levels`
+--
+
+INSERT INTO `class_levels` (`id`, `curriculum_id`, `level_name`, `level_order`) VALUES
+(1, 1, 'Primary (Grades 1-6)', 1),
+(2, 1, 'Lower Secondary (Grades 7-9)', 2),
+(3, 1, 'Upper Secondary (IGCSE - Grades 10-11)', 3),
+(4, 1, 'Advanced (AS & A Level - Grades 12-13)', 4);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `chat_threads`
+-- Table structure for table `curriculums`
 --
 
-CREATE TABLE `chat_threads` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `subject` varchar(255) NOT NULL,
-  `status` enum('open','closed') NOT NULL DEFAULT 'open',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `contact_requests`
---
-
-CREATE TABLE `contact_requests` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `subject` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `contact_responses`
---
-
-CREATE TABLE `contact_responses` (
-  `id` int(11) NOT NULL,
-  `contact_id` int(11) NOT NULL,
-  `admin_id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `departments`
---
-
-CREATE TABLE `departments` (
+CREATE TABLE `curriculums` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `manager_user_id` int(11) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `country` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `curriculums`
+--
+
+INSERT INTO `curriculums` (`id`, `name`, `country`, `description`) VALUES
+(1, 'Cambridge Curriculum', 'International', 'This is Cambridge Curriculum'),
+(2, 'US K-12', 'USA', NULL),
+(3, 'British Curriculum', 'UK', NULL),
+(4, 'CBSE', 'India', NULL),
+(5, 'IB', 'International', NULL),
+(6, 'IGCSE', 'International', NULL),
+(7, 'Ethiopian Curriculum', 'Ethiopia', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `grades`
+--
+
+CREATE TABLE `grades` (
+  `id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `grading_scale_id` int(11) DEFAULT NULL,
+  `score` decimal(5,2) NOT NULL,
+  `grade_letter` varchar(10) DEFAULT NULL,
+  `term` varchar(50) DEFAULT NULL,
+  `academic_year` varchar(20) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `employees`
+-- Table structure for table `grading_scales`
 --
 
-CREATE TABLE `employees` (
+CREATE TABLE `grading_scales` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `position_id` int(11) NOT NULL,
-  `hire_date` date NOT NULL
+  `curriculum_id` int(11) DEFAULT NULL,
+  `scale_name` varchar(100) NOT NULL,
+  `min_score` decimal(5,2) NOT NULL,
+  `max_score` decimal(5,2) NOT NULL,
+  `grade_letter` varchar(10) NOT NULL,
+  `remark` varchar(100) DEFAULT NULL,
+  `description` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
-
 --
--- Table structure for table `feedback`
+-- Dumping data for table `grading_scales`
 --
 
-CREATE TABLE `feedback` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `subject` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `rating` tinyint(1) NOT NULL,
-  `status` enum('open','in_progress','resolved') DEFAULT 'open',
-  `admin_notes` text DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+INSERT INTO `grading_scales` (`id`, `curriculum_id`, `scale_name`, `min_score`, `max_score`, `grade_letter`, `remark`, `description`) VALUES
+(1, 1, 'Primary Checkpoint', 90.00, 100.00, 'A*', 'Outstanding', 'Primary Checkpoint Assessment Scale'),
+(2, 1, 'Primary Checkpoint', 80.00, 89.99, 'A', 'Excellent', 'Primary Checkpoint Assessment Scale'),
+(3, 1, 'Primary Checkpoint', 70.00, 79.99, 'B', 'Good', 'Primary Checkpoint Assessment Scale'),
+(4, 1, 'Primary Checkpoint', 60.00, 69.99, 'C', 'Satisfactory', 'Primary Checkpoint Assessment Scale'),
+(5, 1, 'Primary Checkpoint', 50.00, 59.99, 'D', 'Needs Improvement', 'Primary Checkpoint Assessment Scale'),
+(6, 1, 'Primary Checkpoint', 0.00, 49.99, 'E', 'Below Standard', 'Primary Checkpoint Assessment Scale'),
+(7, 1, 'Lower Secondary Checkpoint', 90.00, 100.00, 'A*', 'Outstanding', 'Lower Secondary Checkpoint Assessment Scale'),
+(8, 1, 'Lower Secondary Checkpoint', 80.00, 89.99, 'A', 'Excellent', 'Lower Secondary Checkpoint Assessment Scale'),
+(9, 1, 'Lower Secondary Checkpoint', 70.00, 79.99, 'B', 'Good', 'Lower Secondary Checkpoint Assessment Scale'),
+(10, 1, 'Lower Secondary Checkpoint', 60.00, 69.99, 'C', 'Satisfactory', 'Lower Secondary Checkpoint Assessment Scale'),
+(11, 1, 'Lower Secondary Checkpoint', 50.00, 59.99, 'D', 'Needs Improvement', 'Lower Secondary Checkpoint Assessment Scale'),
+(12, 1, 'Lower Secondary Checkpoint', 0.00, 49.99, 'E', 'Below Standard', 'Lower Secondary Checkpoint Assessment Scale'),
+(13, 1, 'IGCSE', 90.00, 100.00, 'A*', 'Exceptional', 'IGCSE Grading Scale'),
+(14, 1, 'IGCSE', 80.00, 89.99, 'A', 'Excellent', 'IGCSE Grading Scale'),
+(15, 1, 'IGCSE', 70.00, 79.99, 'B', 'Good', 'IGCSE Grading Scale'),
+(16, 1, 'IGCSE', 60.00, 69.99, 'C', 'Satisfactory', 'IGCSE Grading Scale'),
+(17, 1, 'IGCSE', 50.00, 59.99, 'D', 'Minimum Pass', 'IGCSE Grading Scale'),
+(18, 1, 'IGCSE', 40.00, 49.99, 'E', 'Below Pass', 'IGCSE Grading Scale'),
+(19, 1, 'IGCSE', 0.00, 39.99, 'F', 'Fail', 'IGCSE Grading Scale'),
+(20, 1, 'IGCSE', 0.00, 39.99, 'G', 'Fail', 'IGCSE Grading Scale'),
+(21, 1, 'AS Level', 90.00, 100.00, 'a', 'Outstanding', 'AS Level Grading Scale'),
+(22, 1, 'AS Level', 80.00, 89.99, 'b', 'Good', 'AS Level Grading Scale'),
+(23, 1, 'AS Level', 70.00, 79.99, 'c', 'Satisfactory', 'AS Level Grading Scale'),
+(24, 1, 'AS Level', 60.00, 69.99, 'd', 'Minimum Pass', 'AS Level Grading Scale'),
+(25, 1, 'AS Level', 50.00, 59.99, 'e', 'Below Pass', 'AS Level Grading Scale'),
+(26, 1, 'AS Level', 0.00, 49.99, 'f', 'Fail', 'AS Level Grading Scale'),
+(27, 1, 'A Level', 90.00, 100.00, 'A*', 'Exceptional', 'A Level Grading Scale'),
+(28, 1, 'A Level', 80.00, 89.99, 'A', 'Excellent', 'A Level Grading Scale'),
+(29, 1, 'A Level', 70.00, 79.99, 'B', 'Good', 'A Level Grading Scale'),
+(30, 1, 'A Level', 60.00, 69.99, 'C', 'Satisfactory', 'A Level Grading Scale'),
+(31, 1, 'A Level', 50.00, 59.99, 'D', 'Minimum Pass', 'A Level Grading Scale'),
+(32, 1, 'A Level', 40.00, 49.99, 'E', 'Below Pass', 'A Level Grading Scale'),
+(33, 1, 'A Level', 0.00, 39.99, 'F', 'Fail', 'A Level Grading Scale');
 
 -- --------------------------------------------------------
 
@@ -193,96 +255,28 @@ CREATE TABLE `feedback` (
 
 CREATE TABLE `messages` (
   `id` int(11) NOT NULL,
-  `sender_id` int(11) DEFAULT NULL,
-  `receiver_id` int(11) DEFAULT NULL,
+  `sender_id` int(11) NOT NULL,
+  `receiver_id` int(11) NOT NULL,
   `subject` varchar(255) DEFAULT NULL,
-  `content` text DEFAULT NULL,
+  `content` text NOT NULL,
   `sent_at` datetime DEFAULT current_timestamp(),
-  `is_read` tinyint(1) DEFAULT 0,
-  `is_email` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `is_read` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `notifications`
+-- Table structure for table `parents`
 --
 
-CREATE TABLE `notifications` (
+CREATE TABLE `parents` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `read_at` timestamp NULL DEFAULT NULL
+  `occupation` varchar(100) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `payrolls`
---
-
-CREATE TABLE `payrolls` (
-  `id` int(11) NOT NULL,
-  `payroll_month` date NOT NULL,
-  `total_amount` decimal(10,2) DEFAULT 0.00,
-  `status` enum('draft','processed','paid') NOT NULL DEFAULT 'draft',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `payroll_items`
---
-
-CREATE TABLE `payroll_items` (
-  `id` int(11) NOT NULL,
-  `payroll_id` int(11) NOT NULL,
-  `employee_id` int(11) NOT NULL,
-  `amount` decimal(10,2) NOT NULL,
-  `type` enum('salary','allowance','deduction','bonus') NOT NULL,
-  `description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `positions`
---
-
-CREATE TABLE `positions` (
-  `id` int(11) NOT NULL,
-  `title` varchar(100) NOT NULL,
-  `description` text DEFAULT NULL,
-  `department_id` int(11) NOT NULL,
-  `salary_grade` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `response_data`
---
-
-CREATE TABLE `response_data` (
-  `id` int(11) NOT NULL,
-  `response_id` int(11) NOT NULL,
-  `field_id` int(11) NOT NULL,
-  `field_value` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `response_data`
---
-
-INSERT INTO `response_data` (`id`, `response_id`, `field_id`, `field_value`) VALUES
-(8, 3, 14, '16'),
-(9, 3, 15, '10'),
-(10, 3, 16, '8'),
-(11, 3, 17, '9'),
-(12, 4, 18, '5'),
-(13, 4, 19, 'Fine');
 
 -- --------------------------------------------------------
 
@@ -303,42 +297,147 @@ CREATE TABLE `roles` (
 
 INSERT INTO `roles` (`id`, `role_name`, `description`, `created_at`) VALUES
 (1, 'admin', 'System Administrator', '2025-03-28 16:53:20'),
-(3, 'teacher', 'Teaching Staff', '2025-03-28 16:52:46'),
-(4, 'parent', 'Student Parent', '2025-03-28 16:53:05'),
-(5, 'student', 'School Student', '2025-03-28 16:53:39');
+(2, 'teacher', 'Teaching Staff', '2025-03-28 16:52:46'),
+(3, 'parent', 'Student Parent', '2025-03-28 16:53:05'),
+(4, 'student', 'School Student', '2025-03-28 16:53:39');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `salary_structures`
+-- Table structure for table `sections`
 --
 
-CREATE TABLE `salary_structures` (
+CREATE TABLE `sections` (
   `id` int(11) NOT NULL,
-  `employee_id` int(11) NOT NULL,
-  `base_salary` decimal(10,2) NOT NULL,
-  `allowances` decimal(10,2) DEFAULT 0.00,
-  `deductions` decimal(10,2) DEFAULT 0.00,
-  `effective_date` date NOT NULL
+  `class_id` int(11) NOT NULL,
+  `section_name` varchar(20) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `sections`
+--
+
+INSERT INTO `sections` (`id`, `class_id`, `section_name`, `created_at`) VALUES
+(1, 1, 'A', '2025-04-23 05:15:28'),
+(2, 1, 'B', '2025-04-23 05:15:28'),
+(3, 1, 'C', '2025-04-23 05:15:28'),
+(4, 2, 'A', '2025-04-23 05:15:28'),
+(5, 2, 'B', '2025-04-23 05:15:28'),
+(6, 2, 'C', '2025-04-23 05:15:28'),
+(40, 13, 'A', '2025-04-23 05:15:28'),
+(41, 13, 'B', '2025-04-23 05:15:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `students`
+--
+
+CREATE TABLE `students` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `class_id` int(11) DEFAULT NULL,
+  `section_id` int(11) DEFAULT NULL,
+  `enrollment_no` varchar(50) DEFAULT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `gender` varchar(20) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'active',
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`id`, `user_id`, `class_id`, `section_id`, `enrollment_no`, `date_of_birth`, `gender`, `address`, `status`, `created_at`) VALUES
+(3, 5, 10, 3, 'STU001', '2010-05-15', 'Male', '123 Student Street, Addis Ababa', 'active', '2025-04-23 05:23:51'),
+(4, 65, 10, 3, 'STU002', '2011-03-22', 'Male', '456 Learner Avenue, Addis Ababa', 'active', '2025-04-23 05:23:51');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `student_parents`
+--
+
+CREATE TABLE `student_parents` (
+  `id` int(11) NOT NULL,
+  `student_id` int(11) NOT NULL,
+  `parent_id` int(11) NOT NULL,
+  `relationship` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `support_tickets`
+-- Table structure for table `subjects`
 --
 
-CREATE TABLE `support_tickets` (
+CREATE TABLE `subjects` (
   `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `ticket_number` varchar(20) NOT NULL,
-  `subject` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `priority` enum('low','medium','high') DEFAULT 'medium',
-  `status` enum('open','in_progress','on_hold','resolved') DEFAULT 'open',
-  `attachment` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `curriculum_id` int(11) NOT NULL,
+  `subject_name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subjects`
+--
+
+INSERT INTO `subjects` (`id`, `curriculum_id`, `subject_name`, `description`, `created_at`) VALUES
+(1, 1, 'English', 'Primary English', '2025-04-23 05:16:40'),
+(2, 1, 'Mathematics', 'Primary Mathematics', '2025-04-23 05:16:40'),
+(3, 1, 'Science', 'Primary Science', '2025-04-23 05:16:40'),
+(4, 1, 'Global Perspectives', 'Primary Global Perspectives', '2025-04-23 05:16:40'),
+(5, 1, 'ICT', 'Primary Information and Communication Technology', '2025-04-23 05:16:40'),
+(6, 1, 'Art & Design', 'Primary Art and Design', '2025-04-23 05:16:40'),
+(7, 1, 'Music', 'Primary Music', '2025-04-23 05:16:40'),
+(8, 1, 'Physical Education', 'Primary PE', '2025-04-23 05:16:40'),
+(9, 1, 'English', 'Lower Secondary English', '2025-04-23 05:16:40'),
+(10, 1, 'Mathematics', 'Lower Secondary Mathematics', '2025-04-23 05:16:40'),
+(11, 1, 'Science', 'Lower Secondary Science (Biology, Chemistry, Physics)', '2025-04-23 05:16:40'),
+(12, 1, 'Global Perspectives', 'Lower Secondary Global Perspectives', '2025-04-23 05:16:40'),
+(13, 1, 'ICT', 'Lower Secondary ICT', '2025-04-23 05:16:40'),
+(14, 1, 'First Language (Amharic)', 'Lower Secondary First Language', '2025-04-23 05:16:40'),
+(15, 1, 'Foreign Language (French)', 'Lower Secondary Foreign Language', '2025-04-23 05:16:40'),
+(16, 1, 'English - First Language', 'IGCSE English First Language', '2025-04-23 05:16:40'),
+(17, 1, 'English - Second Language', 'IGCSE English Second Language', '2025-04-23 05:16:40'),
+(18, 1, 'Mathematics', 'IGCSE Mathematics', '2025-04-23 05:16:40'),
+(19, 1, 'Additional Mathematics', 'IGCSE Additional Mathematics', '2025-04-23 05:16:40'),
+(20, 1, 'Biology', 'IGCSE Biology', '2025-04-23 05:16:40'),
+(21, 1, 'Chemistry', 'IGCSE Chemistry', '2025-04-23 05:16:40'),
+(22, 1, 'Physics', 'IGCSE Physics', '2025-04-23 05:16:40'),
+(23, 1, 'Business Studies', 'IGCSE Business Studies', '2025-04-23 05:16:40'),
+(24, 1, 'Economics', 'IGCSE Economics', '2025-04-23 05:16:40'),
+(25, 1, 'Accounting', 'IGCSE Accounting', '2025-04-23 05:16:40'),
+(26, 1, 'ICT', 'IGCSE Information and Communication Technology', '2025-04-23 05:16:40'),
+(27, 1, 'Computer Science', 'IGCSE Computer Science', '2025-04-23 05:16:40'),
+(28, 1, 'Geography', 'IGCSE Geography', '2025-04-23 05:16:40'),
+(29, 1, 'History', 'IGCSE History', '2025-04-23 05:16:40'),
+(30, 1, 'Foreign Language (French)', 'IGCSE French', '2025-04-23 05:16:40'),
+(31, 1, 'Foreign Language (Spanish)', 'IGCSE Spanish', '2025-04-23 05:16:40'),
+(32, 1, 'Foreign Language (Arabic)', 'IGCSE Arabic', '2025-04-23 05:16:40'),
+(33, 1, 'Art & Design', 'IGCSE Art and Design', '2025-04-23 05:16:40'),
+(34, 1, 'Music', 'IGCSE Music', '2025-04-23 05:16:40'),
+(35, 1, 'Physical Education', 'IGCSE PE', '2025-04-23 05:16:40'),
+(36, 1, 'English - Language & Literature', 'AS/A Level English Language and Literature', '2025-04-23 05:16:40'),
+(37, 1, 'Mathematics', 'AS/A Level Mathematics', '2025-04-23 05:16:40'),
+(38, 1, 'Further Mathematics', 'AS/A Level Further Mathematics', '2025-04-23 05:16:40'),
+(39, 1, 'Biology', 'AS/A Level Biology', '2025-04-23 05:16:40'),
+(40, 1, 'Chemistry', 'AS/A Level Chemistry', '2025-04-23 05:16:40'),
+(41, 1, 'Physics', 'AS/A Level Physics', '2025-04-23 05:16:40'),
+(42, 1, 'Business', 'AS/A Level Business', '2025-04-23 05:16:40'),
+(43, 1, 'Economics', 'AS/A Level Economics', '2025-04-23 05:16:40'),
+(44, 1, 'Accounting', 'AS/A Level Accounting', '2025-04-23 05:16:40'),
+(45, 1, 'Computer Science', 'AS/A Level Computer Science', '2025-04-23 05:16:40'),
+(46, 1, 'Psychology', 'AS/A Level Psychology', '2025-04-23 05:16:40'),
+(47, 1, 'Global Perspectives', 'AS/A Level Global Perspectives', '2025-04-23 05:16:40'),
+(48, 1, 'Geography', 'AS/A Level Geography', '2025-04-23 05:16:40'),
+(49, 1, 'History', 'AS/A Level History', '2025-04-23 05:16:40'),
+(50, 1, 'Art & Design', 'AS/A Level Art and Design', '2025-04-23 05:16:40'),
+(51, 1, 'Music', 'AS/A Level Music', '2025-04-23 05:16:40');
 
 -- --------------------------------------------------------
 
@@ -350,61 +449,13 @@ CREATE TABLE `surveys` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
-  `category_id` int(11) DEFAULT NULL,
   `created_by` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `starts_at` datetime NOT NULL,
   `ends_at` datetime NOT NULL,
   `is_anonymous` tinyint(1) DEFAULT 0,
   `is_active` tinyint(1) DEFAULT 1,
-  `status` int(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `surveys`
---
-
-INSERT INTO `surveys` (`id`, `title`, `description`, `category_id`, `created_by`, `created_at`, `starts_at`, `ends_at`, `is_anonymous`, `is_active`, `status`) VALUES
-(1, 'For Students Only', 'It for students', 1, 4, '2025-04-08 22:27:53', '2025-04-14 23:50:00', '2025-04-30 00:00:00', 1, 1, 0),
-(8, 'Teachers Survey', 'For Teachers', 1, 4, '2025-04-14 19:16:28', '2025-04-14 22:20:00', '2025-05-14 19:15:00', 1, 1, 2);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `survey_categories`
---
-
-CREATE TABLE `survey_categories` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `survey_categories`
---
-
-INSERT INTO `survey_categories` (`id`, `name`, `description`, `created_at`) VALUES
-(1, 'Behaviour Survey', 'This is to know how behave our employees are.(example)', '2025-03-26 13:36:15'),
-(2, 'Survey on Teachers', 'Description', '2025-03-26 13:38:51'),
-(3, 'Students Performance Survey', 'Descritpion', '2025-03-26 13:40:18'),
-(4, 'contact survey', '', '2025-03-28 16:47:46');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `survey_conditions`
---
-
-CREATE TABLE `survey_conditions` (
-  `id` int(11) NOT NULL,
-  `survey_id` int(11) NOT NULL,
-  `field_id` int(11) NOT NULL,
-  `operator` enum('=','!=','>','<','>=','<=','contains') NOT NULL,
-  `compare_value` varchar(255) NOT NULL,
-  `logic_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -417,41 +468,11 @@ CREATE TABLE `survey_fields` (
   `survey_id` int(11) NOT NULL,
   `field_type` enum('text','textarea','radio','checkbox','select','number','date','rating','file') NOT NULL,
   `field_label` varchar(255) NOT NULL,
-  `placeholder` varchar(255) DEFAULT NULL,
   `field_name` varchar(100) NOT NULL,
   `field_options` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`field_options`)),
   `is_required` tinyint(1) DEFAULT 1,
-  `validation_rules` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`validation_rules`)),
   `display_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `survey_fields`
---
-
-INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `placeholder`, `field_name`, `field_options`, `is_required`, `validation_rules`, `display_order`) VALUES
-(14, 1, 'radio', '7+9', NULL, '', '[\"5\",\"6\",\"16\",\"15\"]', 1, NULL, 0),
-(15, 1, 'checkbox', '5+5', NULL, '', '[\"9\",\"8\",\"6\",\"10\"]', 1, NULL, 1),
-(16, 1, 'checkbox', '4+4', NULL, '', '[\"9\",\"8\",\"7\",\"6\",\"5\"]', 1, NULL, 2),
-(17, 1, 'number', '9+0', NULL, '', '[\"1\",\"2\",\"3\",\"4\"]', 1, NULL, 3),
-(18, 8, 'select', '2+3', NULL, '', '[\"1\",\"2\",\"5\"]', 1, NULL, 0),
-(19, 8, 'select', 'How Are you?', NULL, '', '[\"Fine\",\"Good\"]', 1, NULL, 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `survey_logic`
---
-
-CREATE TABLE `survey_logic` (
-  `id` int(11) NOT NULL,
-  `survey_id` int(11) NOT NULL,
-  `source_field_id` int(11) NOT NULL,
-  `trigger_value` varchar(255) NOT NULL,
-  `target_field_id` int(11) NOT NULL,
-  `action` enum('show','hide','enable','disable') NOT NULL,
-  `condition` varchar(20) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -464,78 +485,8 @@ CREATE TABLE `survey_responses` (
   `survey_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`)),
-  `status` enum('in_progress','completed') DEFAULT NULL
+  `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `survey_responses`
---
-
-INSERT INTO `survey_responses` (`id`, `survey_id`, `user_id`, `submitted_at`, `answers`, `status`) VALUES
-(3, 1, 65, '2025-04-14 22:11:19', '{\"14\":\"16\",\"15\":[\"10\"],\"16\":[\"8\"],\"17\":\"9\"}', NULL),
-(4, 8, 65, '2025-04-14 22:26:23', '{\"18\":\"5\",\"19\":\"Fine\"}', NULL);
-
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `survey_response_analytics`
--- (See below for the actual view)
---
-CREATE TABLE `survey_response_analytics` (
-`survey_id` int(11)
-,`survey_title` varchar(255)
-,`field_id` int(11)
-,`field_label` varchar(255)
-,`field_type` enum('text','textarea','radio','checkbox','select','number','date','rating','file')
-,`response_count` bigint(21)
-,`answered_count` bigint(21)
-,`sample_responses` mediumtext
-);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `survey_roles`
---
-
-CREATE TABLE `survey_roles` (
-  `id` int(11) NOT NULL,
-  `survey_id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `survey_roles`
---
-
-INSERT INTO `survey_roles` (`id`, `survey_id`, `role_id`) VALUES
-(23, 1, 5),
-(24, 8, 4),
-(25, 8, 5);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `survey_statuses`
---
-
-CREATE TABLE `survey_statuses` (
-  `id` int(11) NOT NULL,
-  `status` varchar(50) NOT NULL,
-  `label` varchar(100) NOT NULL,
-  `icon` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `survey_statuses`
---
-
-INSERT INTO `survey_statuses` (`id`, `status`, `label`, `icon`) VALUES
-(1, 'draft', 'Draft', 'fa-file'),
-(2, 'active', 'Active', 'fa-rocket'),
-(3, 'inactive', 'Inactive', 'fa-pause'),
-(4, 'archived', 'Archived', 'fa-archive');
 
 -- --------------------------------------------------------
 
@@ -550,106 +501,54 @@ CREATE TABLE `system_settings` (
   `setting_group` varchar(50) DEFAULT 'general',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `system_settings`
---
-
-INSERT INTO `system_settings` (`id`, `setting_key`, `setting_value`, `setting_group`, `created_at`, `updated_at`) VALUES
-(1, 'site_name', 'School Survey System', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
-(2, 'site_email', 'adugna.gizaw@flipperschools.com', 'general', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
-(3, 'timezone', 'Africa/Addis_Ababa', 'general', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
-(4, 'items_per_page', '10', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
-(5, 'admin_menu', '[{\"title\":\"Dashboard\",\"url\":\"dashboard.php\",\"icon\":\"fa-home\"}]', 'general', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
-(6, 'site_logo', '', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
-(7, 'favicon', '', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
-(8, 'theme_color', '#3498db', 'appearance', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
-(9, 'smtp_provider', 'gmail', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
-(10, 'smtp_host', 'smtp.gmail.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
-(11, 'smtp_port', '587', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42'),
-(12, 'smtp_username', 'adugna.gizaw@flipperschools.com', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
-(13, 'smtp_password', 'flipperschools123', 'email', '2025-03-26 04:43:42', '2025-03-27 18:06:53'),
-(14, 'smtp_secure', 'tls', 'email', '2025-03-26 04:43:42', '2025-03-26 04:43:42');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `templates`
+-- Table structure for table `teachers`
 --
 
-CREATE TABLE `templates` (
+CREATE TABLE `teachers` (
   `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `content` text NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `user_id` int(11) NOT NULL,
+  `qualification` varchar(255) DEFAULT NULL,
+  `subject_specialization` varchar(255) DEFAULT NULL,
+  `date_of_birth` date DEFAULT NULL,
+  `gender` varchar(20) DEFAULT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `status` varchar(50) DEFAULT 'active',
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `templates`
+-- Dumping data for table `teachers`
 --
 
-INSERT INTO `templates` (`id`, `name`, `content`, `created_at`) VALUES
-(1, 'Welcome Email', 'Dear [Name], Welcome to our platform!', '2025-03-31 22:03:48'),
-(2, 'Password Reset', 'Click the link below to reset your password: [Reset Link]', '2025-03-31 22:03:48');
+INSERT INTO `teachers` (`id`, `user_id`, `qualification`, `subject_specialization`, `date_of_birth`, `gender`, `address`, `status`, `created_at`) VALUES
+(1, 69, 'BSc Degree in Business', 'Business Studies', '1985-08-10', 'Male', '789 Educator Road, Addis Ababa', 'active', '2025-04-23 05:28:17');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ticket_priorities`
+-- Table structure for table `teacher_subjects`
 --
 
-CREATE TABLE `ticket_priorities` (
+CREATE TABLE `teacher_subjects` (
   `id` int(11) NOT NULL,
-  `value` varchar(50) NOT NULL,
-  `label` varchar(100) NOT NULL,
-  `color` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  `teacher_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `class_id` int(11) DEFAULT NULL,
+  `section_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `ticket_priorities`
+-- Dumping data for table `teacher_subjects`
 --
 
-INSERT INTO `ticket_priorities` (`id`, `value`, `label`, `color`) VALUES
-(1, 'low', 'Low', 'green'),
-(2, 'medium', 'Medium', 'orange'),
-(3, 'high', 'High', 'red');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ticket_replies`
---
-
-CREATE TABLE `ticket_replies` (
-  `id` int(11) NOT NULL,
-  `ticket_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `created_at` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `ticket_replies`
---
-
-INSERT INTO `ticket_replies` (`id`, `ticket_id`, `user_id`, `message`, `created_at`) VALUES
-(1, 5, 4, 'D', '0000-00-00 00:00:00');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `ticket_responses`
---
-
-CREATE TABLE `ticket_responses` (
-  `id` int(11) NOT NULL,
-  `ticket_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `is_admin` tinyint(1) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+INSERT INTO `teacher_subjects` (`id`, `teacher_id`, `subject_id`, `class_id`, `section_id`) VALUES
+(5, 1, 23, 9, NULL),
+(6, 1, 25, 10, NULL);
 
 -- --------------------------------------------------------
 
@@ -662,45 +561,51 @@ CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
   `role_id` int(11) DEFAULT NULL,
   `active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_login` timestamp NULL DEFAULT NULL,
-  `last_activity` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `reset_token` varchar(255) DEFAULT NULL,
-  `reset_token_expires` datetime DEFAULT NULL,
-  `avatar` varchar(255) DEFAULT 'default.jpg',
-  `notification_prefs` longtext DEFAULT NULL,
-  `social_provider` varchar(20) DEFAULT NULL,
-  `social_id` varchar(255) DEFAULT NULL
+  `avatar` varchar(255) DEFAULT 'default.jpg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `role_id`, `active`, `created_at`, `last_login`, `last_activity`, `reset_token`, `reset_token_expires`, `avatar`, `notification_prefs`, `social_provider`, `social_id`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 1, 1, '2025-03-25 14:50:31', '2025-04-14 22:44:13', '2025-04-15 08:44:13', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
-(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamyohannes@gmail.com', 1, 1, '2025-03-25 22:47:11', '2025-03-28 21:13:37', '2025-03-29 22:43:32', NULL, NULL, 'default.jpg', '{\"email\": true, \"push\": true}', NULL, NULL),
-(65, 'Adugna1', '$2y$10$mVnaYcK/FyHuL7meR9J5susyTa.6T4tgUt6Ci7xcLpMsREPWX6R3G', 'gizawadugna@gmail.com', 5, 1, '2025-03-29 12:03:37', '2025-04-14 20:53:48', '2025-04-15 06:53:48', NULL, NULL, 'avatar_65_d1bb19e4e9524942.jpeg', '{\"email\": true, \"push\": true}', NULL, NULL);
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `active`, `created_at`, `last_login`, `avatar`) VALUES
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, 1, '2025-03-25 03:50:31', '2025-04-22 06:12:10', 'admin_avatar.jpg'),
+(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'mcdc@gmail.com', 'Efream', 'Yohannes', 4, 1, '2025-03-25 11:47:11', '2025-04-21 07:40:11', 'student_avatar5.jpg'),
+(65, 'Adugna1', '$2y$10$mVnaYcK/FyHuL7meR9J5susyTa.6T4tgUt6Ci7xcLpMsREPWX6R3G', 'gizawadugna@gmail.com', 'Adugna', 'Gizaw', 4, 1, '2025-03-29 01:03:37', '2025-04-21 12:52:56', 'avatar_65_053303628160f3c6.png'),
+(66, 'gizawadugna1', '$2y$10$lc./P6NQpbQoCJ8j6PkI.ecLmF5mJ3n5ykcwXZ2DzZ8IGk/E5w/2W', 'gizawadugna1@gmail.com', 'Gizaw', 'Parent', 3, 1, '2025-04-21 07:18:47', '2025-04-21 09:07:43', 'parent_avatar66.jpg'),
+(67, 'abel', '$2y$10$bGlkJRnMYCgBgcmpmCKtR.Kej4OY9UEb8h66IAXmtxuBpDBWZZ7wu', 'efreamyohannes@gmail.com', 'Abel', 'Manager', 1, 1, '2025-04-21 08:03:05', '2025-04-21 09:16:38', 'admin_avatar67.jpg'),
+(68, 'developermustafa', '$2y$10$ztkwBLG9mvtcipjuNnhc5Otu3obOiAQKQYO.ScHvZpIFBrFu6RluK', 'mustafarahman792@gmail.com', 'Mustafa', 'Rahman', 1, 1, '2025-04-21 15:55:48', '2025-04-21 15:55:53', 'default.jpg'),
+(69, 'gizawadugna3', '$2y$10$Zhuo9Q3Efpz5Y1o8AckTpOeXCTEjK3138VIBRFiQ8bNy1joC.kx7u', 'gizawadugna3@gmail.com', 'Adugna', 'Gizaw', 2, 1, '2025-04-22 06:13:36', NULL, 'teacher_avatar69.jpg');
 
 --
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `activity_log`
+-- Indexes for table `academic_terms`
 --
-ALTER TABLE `activity_log`
+ALTER TABLE `academic_terms`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `announcements`
+--
+ALTER TABLE `announcements`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `created_by` (`created_by`);
 
 --
 -- Indexes for table `attendance`
 --
 ALTER TABLE `attendance`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `employee_id` (`employee_id`);
+  ADD KEY `student_id` (`student_id`);
 
 --
 -- Indexes for table `audit_logs`
@@ -710,108 +615,57 @@ ALTER TABLE `audit_logs`
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `chats`
+-- Indexes for table `classes`
 --
-ALTER TABLE `chats`
+ALTER TABLE `classes`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `class_level_id` (`class_level_id`),
+  ADD KEY `curriculum_id` (`curriculum_id`);
 
 --
--- Indexes for table `chat_messages`
+-- Indexes for table `class_levels`
 --
-ALTER TABLE `chat_messages`
+ALTER TABLE `class_levels`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `thread_id` (`thread_id`,`user_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `curriculum_id` (`curriculum_id`);
 
 --
--- Indexes for table `chat_threads`
+-- Indexes for table `curriculums`
 --
-ALTER TABLE `chat_threads`
+ALTER TABLE `curriculums`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `name` (`name`);
 
 --
--- Indexes for table `contact_requests`
+-- Indexes for table `grades`
 --
-ALTER TABLE `contact_requests`
+ALTER TABLE `grades`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `subject_id` (`subject_id`),
+  ADD KEY `grading_scale_id` (`grading_scale_id`);
 
 --
--- Indexes for table `contact_responses`
+-- Indexes for table `grading_scales`
 --
-ALTER TABLE `contact_responses`
+ALTER TABLE `grading_scales`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `contact_id` (`contact_id`);
-
---
--- Indexes for table `departments`
---
-ALTER TABLE `departments`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `manager_user_id` (`manager_user_id`);
-
---
--- Indexes for table `employees`
---
-ALTER TABLE `employees`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `user_id` (`user_id`),
-  ADD KEY `position_id` (`position_id`);
-
---
--- Indexes for table `feedback`
---
-ALTER TABLE `feedback`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `curriculum_id` (`curriculum_id`);
 
 --
 -- Indexes for table `messages`
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `sender_id` (`sender_id`,`receiver_id`),
+  ADD KEY `sender_id` (`sender_id`),
   ADD KEY `receiver_id` (`receiver_id`);
 
 --
--- Indexes for table `notifications`
+-- Indexes for table `parents`
 --
-ALTER TABLE `notifications`
+ALTER TABLE `parents`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `user_id_2` (`user_id`);
-
---
--- Indexes for table `payrolls`
---
-ALTER TABLE `payrolls`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `payroll_items`
---
-ALTER TABLE `payroll_items`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `payroll_id` (`payroll_id`),
-  ADD KEY `employee_id` (`employee_id`);
-
---
--- Indexes for table `positions`
---
-ALTER TABLE `positions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `department_id` (`department_id`);
-
---
--- Indexes for table `response_data`
---
-ALTER TABLE `response_data`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `response_id` (`response_id`,`field_id`),
-  ADD KEY `response_id_2` (`response_id`),
-  ADD KEY `field_id` (`field_id`);
+  ADD UNIQUE KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `roles`
@@ -821,39 +675,43 @@ ALTER TABLE `roles`
   ADD UNIQUE KEY `role_name` (`role_name`);
 
 --
--- Indexes for table `salary_structures`
+-- Indexes for table `sections`
 --
-ALTER TABLE `salary_structures`
+ALTER TABLE `sections`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `employee_id` (`employee_id`);
+  ADD KEY `class_id` (`class_id`);
 
 --
--- Indexes for table `support_tickets`
+-- Indexes for table `students`
 --
-ALTER TABLE `support_tickets`
+ALTER TABLE `students`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `user_id` (`user_id`),
+  ADD KEY `class_id` (`class_id`),
+  ADD KEY `section_id` (`section_id`);
+
+--
+-- Indexes for table `student_parents`
+--
+ALTER TABLE `student_parents`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `parent_id` (`parent_id`);
+
+--
+-- Indexes for table `subjects`
+--
+ALTER TABLE `subjects`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `curriculum_id` (`curriculum_id`),
+  ADD KEY `subject_name` (`subject_name`) USING BTREE;
 
 --
 -- Indexes for table `surveys`
 --
 ALTER TABLE `surveys`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `category_id` (`category_id`);
-
---
--- Indexes for table `survey_categories`
---
-ALTER TABLE `survey_categories`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `survey_conditions`
---
-ALTER TABLE `survey_conditions`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `survey_id` (`survey_id`),
-  ADD KEY `field_id` (`field_id`);
+  ADD KEY `created_by` (`created_by`);
 
 --
 -- Indexes for table `survey_fields`
@@ -863,75 +721,60 @@ ALTER TABLE `survey_fields`
   ADD KEY `survey_id` (`survey_id`);
 
 --
--- Indexes for table `survey_logic`
---
-ALTER TABLE `survey_logic`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `survey_id` (`survey_id`),
-  ADD KEY `source_field_id` (`source_field_id`),
-  ADD KEY `target_field_id` (`target_field_id`);
-
---
 -- Indexes for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
   ADD PRIMARY KEY (`id`),
   ADD KEY `survey_id` (`survey_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `survey_id_2` (`survey_id`);
-
---
--- Indexes for table `survey_roles`
---
-ALTER TABLE `survey_roles`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `survey_id` (`survey_id`),
-  ADD KEY `role_id` (`role_id`);
-
---
--- Indexes for table `survey_statuses`
---
-ALTER TABLE `survey_statuses`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `ticket_priorities`
---
-ALTER TABLE `ticket_priorities`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `ticket_replies`
---
-ALTER TABLE `ticket_replies`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `ticket_id` (`ticket_id`,`user_id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `ticket_responses`
+-- Indexes for table `system_settings`
 --
-ALTER TABLE `ticket_responses`
+ALTER TABLE `system_settings`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `ticket_id` (`ticket_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `setting_key` (`setting_key`);
+
+--
+-- Indexes for table `teachers`
+--
+ALTER TABLE `teachers`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `teacher_subjects`
+--
+ALTER TABLE `teacher_subjects`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `teacher_id` (`teacher_id`),
+  ADD KEY `subject_id` (`subject_id`),
+  ADD KEY `class_id` (`class_id`),
+  ADD KEY `section_id` (`section_id`);
 
 --
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `role_id` (`role_id`),
-  ADD KEY `social_id` (`social_id`);
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT for table `activity_log`
+-- AUTO_INCREMENT for table `academic_terms`
 --
-ALTER TABLE `activity_log`
+ALTER TABLE `academic_terms`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `announcements`
+--
+ALTER TABLE `announcements`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -947,40 +790,34 @@ ALTER TABLE `audit_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `chats`
+-- AUTO_INCREMENT for table `classes`
 --
-ALTER TABLE `chats`
+ALTER TABLE `classes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `class_levels`
+--
+ALTER TABLE `class_levels`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `curriculums`
+--
+ALTER TABLE `curriculums`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT for table `grades`
+--
+ALTER TABLE `grades`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `chat_messages`
+-- AUTO_INCREMENT for table `grading_scales`
 --
-ALTER TABLE `chat_messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `chat_threads`
---
-ALTER TABLE `chat_threads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `contact_requests`
---
-ALTER TABLE `contact_requests`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `contact_responses`
---
-ALTER TABLE `contact_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `feedback`
---
-ALTER TABLE `feedback`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `grading_scales`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -989,239 +826,211 @@ ALTER TABLE `messages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `notifications`
+-- AUTO_INCREMENT for table `parents`
 --
-ALTER TABLE `notifications`
+ALTER TABLE `parents`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `response_data`
---
-ALTER TABLE `response_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `salary_structures`
+-- AUTO_INCREMENT for table `sections`
 --
-ALTER TABLE `salary_structures`
+ALTER TABLE `sections`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+
+--
+-- AUTO_INCREMENT for table `students`
+--
+ALTER TABLE `students`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `student_parents`
+--
+ALTER TABLE `student_parents`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `support_tickets`
+-- AUTO_INCREMENT for table `subjects`
 --
-ALTER TABLE `support_tickets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `subjects`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `surveys`
 --
 ALTER TABLE `surveys`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- AUTO_INCREMENT for table `survey_categories`
---
-ALTER TABLE `survey_categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `survey_conditions`
---
-ALTER TABLE `survey_conditions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `survey_fields`
 --
 ALTER TABLE `survey_fields`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
-
---
--- AUTO_INCREMENT for table `survey_logic`
---
-ALTER TABLE `survey_logic`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `survey_roles`
+-- AUTO_INCREMENT for table `system_settings`
 --
-ALTER TABLE `survey_roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+ALTER TABLE `system_settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `survey_statuses`
+-- AUTO_INCREMENT for table `teachers`
 --
-ALTER TABLE `survey_statuses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `ticket_priorities`
---
-ALTER TABLE `ticket_priorities`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `ticket_replies`
---
-ALTER TABLE `ticket_replies`
+ALTER TABLE `teachers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `ticket_responses`
+-- AUTO_INCREMENT for table `teacher_subjects`
 --
-ALTER TABLE `ticket_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
--- --------------------------------------------------------
+ALTER TABLE `teacher_subjects`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- Structure for view `survey_response_analytics`
+-- AUTO_INCREMENT for table `users`
 --
-DROP TABLE IF EXISTS `survey_response_analytics`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`flipperschool`@`localhost` SQL SECURITY DEFINER VIEW `survey_response_analytics`  AS SELECT `s`.`id` AS `survey_id`, `s`.`title` AS `survey_title`, `f`.`id` AS `field_id`, `f`.`field_label` AS `field_label`, `f`.`field_type` AS `field_type`, count(distinct `r`.`id`) AS `response_count`, count(distinct case when `d`.`field_value` is not null then `r`.`id` end) AS `answered_count`, group_concat(distinct `d`.`field_value` separator ',') AS `sample_responses` FROM (((`surveys` `s` join `survey_fields` `f` on(`s`.`id` = `f`.`survey_id`)) left join `survey_responses` `r` on(`s`.`id` = `r`.`survey_id`)) left join `response_data` `d` on(`f`.`id` = `d`.`field_id` and `r`.`id` = `d`.`response_id`)) GROUP BY `s`.`id`, `f`.`id` ;
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `activity_log`
+-- Constraints for table `announcements`
 --
-ALTER TABLE `activity_log`
-  ADD CONSTRAINT `activity_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `announcements`
+  ADD CONSTRAINT `announcements_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `attendance`
 --
 ALTER TABLE `attendance`
-  ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`employee_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  ADD CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `chats`
+-- Constraints for table `classes`
 --
-ALTER TABLE `chats`
-  ADD CONSTRAINT `chats_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `classes`
+  ADD CONSTRAINT `classes_ibfk_1` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `classes_ibfk_2` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `chat_messages`
+-- Constraints for table `class_levels`
 --
-ALTER TABLE `chat_messages`
-  ADD CONSTRAINT `chat_messages_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `chat_messages_ibfk_2` FOREIGN KEY (`thread_id`) REFERENCES `chat_threads` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `class_levels`
+  ADD CONSTRAINT `class_levels_ibfk_1` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `chat_threads`
+-- Constraints for table `grades`
 --
-ALTER TABLE `chat_threads`
-  ADD CONSTRAINT `chat_threads_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `grades`
+  ADD CONSTRAINT `grades_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `grades_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `grades_ibfk_3` FOREIGN KEY (`grading_scale_id`) REFERENCES `grading_scales` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `contact_requests`
+-- Constraints for table `grading_scales`
 --
-ALTER TABLE `contact_requests`
-  ADD CONSTRAINT `contact_requests_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `contact_responses`
---
-ALTER TABLE `contact_responses`
-  ADD CONSTRAINT `contact_responses_ibfk_1` FOREIGN KEY (`contact_id`) REFERENCES `contact_requests` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `feedback`
---
-ALTER TABLE `feedback`
-  ADD CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `grading_scales`
+  ADD CONSTRAINT `grading_scales_ibfk_1` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `messages`
 --
 ALTER TABLE `messages`
-  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`sender_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`receiver_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `notifications`
+-- Constraints for table `parents`
 --
-ALTER TABLE `notifications`
-  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `parents`
+  ADD CONSTRAINT `parents_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `response_data`
+-- Constraints for table `sections`
 --
-ALTER TABLE `response_data`
-  ADD CONSTRAINT `response_data_ibfk_1` FOREIGN KEY (`field_id`) REFERENCES `survey_fields` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `response_data_ibfk_2` FOREIGN KEY (`response_id`) REFERENCES `survey_responses` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `sections`
+  ADD CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `support_tickets`
+-- Constraints for table `students`
 --
-ALTER TABLE `support_tickets`
-  ADD CONSTRAINT `support_tickets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `students`
+  ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `students_ibfk_2` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `students_ibfk_3` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `student_parents`
+--
+ALTER TABLE `student_parents`
+  ADD CONSTRAINT `student_parents_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `student_parents_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `parents` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `subjects`
+--
+ALTER TABLE `subjects`
+  ADD CONSTRAINT `subjects_ibfk_1` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `surveys`
 --
 ALTER TABLE `surveys`
-  ADD CONSTRAINT `surveys_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `survey_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `survey_conditions`
---
-ALTER TABLE `survey_conditions`
-  ADD CONSTRAINT `survey_conditions_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `survey_conditions_ibfk_2` FOREIGN KEY (`field_id`) REFERENCES `survey_fields` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `surveys_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `survey_fields`
 --
 ALTER TABLE `survey_fields`
-  ADD CONSTRAINT `survey_fields_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `survey_fields_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  ADD CONSTRAINT `survey_responses_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `survey_responses_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `survey_responses_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `survey_responses_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `survey_roles`
+-- Constraints for table `teachers`
 --
-ALTER TABLE `survey_roles`
-  ADD CONSTRAINT `survey_roles_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `survey_roles_ibfk_2` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE;
+ALTER TABLE `teachers`
+  ADD CONSTRAINT `teachers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `ticket_replies`
+-- Constraints for table `teacher_subjects`
 --
-ALTER TABLE `ticket_replies`
-  ADD CONSTRAINT `ticket_replies_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `teacher_subjects`
+  ADD CONSTRAINT `teacher_subjects_ibfk_1` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `teacher_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `teacher_subjects_ibfk_3` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `teacher_subjects_ibfk_4` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL;
 
 --
--- Constraints for table `ticket_responses`
+-- Constraints for table `users`
 --
-ALTER TABLE `ticket_responses`
-  ADD CONSTRAINT `ticket_responses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `users`
+  ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
