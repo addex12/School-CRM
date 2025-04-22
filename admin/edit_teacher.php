@@ -6,7 +6,7 @@ require_once '../includes/config.php';
 $pageTitle = "Edit Teacher";
 
 // Get teacher ID from URL
-$teacher_id = isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0;
+$teacher_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if (!$teacher_id) {
     header("Location: teachers.php?error=Invalid+teacher+ID");
     exit;
@@ -27,21 +27,29 @@ if (!$teacher) {
     exit;
 }
 
-// Fetch available classes
-$class_stmt = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name");
-$classes = [];
-while ($row = $class_stmt->fetch(PDO::FETCH_ASSOC)) {
-    // Avoid undefined index warning by checking if 'id' exists
-    $row_id = isset($row['id']) ? $row['id'] : null;
-    $row_name = isset($row['class_name']) ? $row['class_name'] : '';
-    $classes[] = [
-        'id' => $row_id,
-        'class_name' => $row_name
-    ];
+// Fetch available classes with their curriculum
+$classes_stmt = $pdo->query("
+    SELECT c.id, c.class_name, cu.name AS curriculum_name 
+    FROM classes c
+    JOIN curriculums cu ON c.curriculum_id = cu.id
+    ORDER BY c.class_name
+");
+$classes = $classes_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch subjects grouped by curriculum
+$subjects_by_curriculum = [];
+$subjects_stmt = $pdo->query("
+    SELECT s.id, s.subject_name, s.curriculum_id, cu.name AS curriculum_name
+    FROM subjects s
+    JOIN curriculums cu ON s.curriculum_id = cu.id
+    ORDER BY cu.name, s.subject_name
+");
+while ($subject = $subjects_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $subjects_by_curriculum[$subject['curriculum_name']][] = $subject;
 }
 
 // Fetch subjects taught by this teacher
-$subjects_stmt = $pdo->prepare("
+$teacher_subjects_stmt = $pdo->prepare("
     SELECT ts.id, ts.subject_id, ts.class_id, ts.section_id, 
            s.subject_name, c.class_name, sec.section_name
     FROM teacher_subjects ts
@@ -51,22 +59,20 @@ $subjects_stmt = $pdo->prepare("
     WHERE ts.teacher_id = ?
     ORDER BY c.class_name, sec.section_name, s.subject_name
 ");
-$subjects_stmt->execute([$teacher_id]);
-$teacher_subjects = $subjects_stmt->fetchAll(PDO::FETCH_ASSOC);
+$teacher_subjects_stmt->execute([$teacher_id]);
+$teacher_subjects = $teacher_subjects_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch all available subjects
-$all_subjects_stmt = $pdo->query("
-    SELECT s.id, s.subject_name, c.class_name, s.curriculum_id
-    FROM subjects s
-    JOIN curriculums cu ON s.curriculum_id = cu.id
-    LEFT JOIN classes c ON cu.id = c.curriculum_id
-    ORDER BY s.subject_name
+// Fetch all sections grouped by class
+$sections_by_class = [];
+$sections_stmt = $pdo->query("
+    SELECT s.id, s.section_name, s.class_id, c.class_name
+    FROM sections s
+    JOIN classes c ON s.class_id = c.id
+    ORDER BY c.class_name, s.section_name
 ");
-$all_subjects = $all_subjects_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch all sections
-$sections_stmt = $pdo->query("SELECT id, section_name, class_id FROM sections ORDER BY class_id, section_name");
-$sections = $sections_stmt->fetchAll(PDO::FETCH_ASSOC);
+while ($section = $sections_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $sections_by_class[$section['class_id']][] = $section;
+}
 
 // Handle form submission
 $error = '';
@@ -85,13 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $update_stmt = $pdo->prepare("
         UPDATE teachers 
         SET qualification = ?, subject_specialization = ?, date_of_birth = ?, 
-            gender = ?, address = ?, status = ?
+            gender = ?, address = ?, status = ?, class_id = ?
         WHERE id = ?
     ");
     
     if ($update_stmt->execute([
         $qualification, $subject_specialization, $date_of_birth,
-        $gender, $address, $status, $teacher_id
+        $gender, $address, $status, $class_id, $teacher_id
     ])) {
         $success = "Teacher information updated successfully.";
     } else {
@@ -128,8 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Prepare data for JS
 $js_teacher_subjects = json_encode($teacher_subjects);
-$js_all_subjects = json_encode($all_subjects);
-$js_sections = json_encode($sections);
+$js_subjects_by_curriculum = json_encode($subjects_by_curriculum);
+$js_sections_by_class = json_encode($sections_by_class);
 $js_classes = json_encode($classes);
 ?>
 <!DOCTYPE html>
@@ -161,6 +167,8 @@ $js_classes = json_encode($classes);
         .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
         .btn-danger { background: #dc3545; color: white; }
         .select2-container { width: 100% !important; margin-bottom: 1rem; }
+        .subject-group { margin-bottom: 1rem; }
+        .subject-group h4 { margin-bottom: 0.5rem; color: #555; }
     </style>
 </head>
 <body>
@@ -249,7 +257,7 @@ $js_classes = json_encode($classes);
                                 <select name="class_id" id="class_id">
                                     <option value="">-- None --</option>
                                     <?php foreach ($classes as $class): ?>
-                                        <option value="<?= htmlspecialchars($class['id']) ?>" <?= (isset($teacher['class_id']) && $teacher['class_id'] == $class['id']) ? 'selected' : '' ?>>
+                                        <option value="<?= $class['id'] ?>" <?= $teacher['class_id'] == $class['id'] ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($class['class_name']) ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -265,10 +273,14 @@ $js_classes = json_encode($classes);
                                         <label for="new_subject_id">Subject</label>
                                         <select id="new_subject_id" class="select2-subject">
                                             <option value="">-- Select Subject --</option>
-                                            <?php foreach ($all_subjects as $subject): ?>
-                                                <option value="<?= $subject['id'] ?>">
-                                                    <?= htmlspecialchars($subject['subject_name']) ?>
-                                                </option>
+                                            <?php foreach ($subjects_by_curriculum as $curriculum => $subjects): ?>
+                                                <optgroup label="<?= htmlspecialchars($curriculum) ?>">
+                                                    <?php foreach ($subjects as $subject): ?>
+                                                        <option value="<?= $subject['id'] ?>">
+                                                            <?= htmlspecialchars($subject['subject_name']) ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </optgroup>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -321,47 +333,29 @@ $js_classes = json_encode($classes);
             
             // Initialize data
             const teacherSubjects = <?= $js_teacher_subjects ?>;
-            const allSubjects = <?= $js_all_subjects ?>;
-            const allSections = <?= $js_sections ?>;
+            const subjectsByCurriculum = <?= $js_subjects_by_curriculum ?>;
+            const sectionsByClass = <?= $js_sections_by_class ?>;
             const allClasses = <?= $js_classes ?>;
             
             let assignments = [...teacherSubjects];
             renderAssignments();
-
-            // Filter subjects when class changes
+            
+            // Update sections dropdown when class changes
             $('#new_class_id').on('change', function() {
                 const classId = $(this).val();
-                const $subjectSelect = $('#new_subject_id');
                 const $sectionSelect = $('#new_section_id');
-
-                // Filter subjects for the selected class
-                $subjectSelect.empty().append('<option value="">-- Select Subject --</option>');
-                if (classId) {
-                    // Only show subjects that are assigned to this class (by class_id in allSubjects)
-                    allSubjects
-                        .filter(subject => subject.class_name && allClasses.find(c => c.id == classId && c.class_name === subject.class_name))
-                        .forEach(subject => {
-                            $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
-                        });
-                } else {
-                    // Show all subjects if no class selected
-                    allSubjects.forEach(subject => {
-                        $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
-                    });
-                }
-                $subjectSelect.trigger('change');
-
-                // Filter sections for the selected class
+                
                 $sectionSelect.empty().append('<option value="">-- Select Section --</option>');
-                if (classId) {
-                    const sectionsForClass = allSections.filter(section => section.class_id == classId);
-                    sectionsForClass.forEach(section => {
+                
+                if (classId && sectionsByClass[classId]) {
+                    sectionsByClass[classId].forEach(section => {
                         $sectionSelect.append(`<option value="${section.id}">${section.section_name}</option>`);
                     });
                 }
+                
                 $sectionSelect.trigger('change');
             });
-
+            
             // Add new assignment
             $('#add-assignment').on('click', function() {
                 const subjectId = $('#new_subject_id').val();
@@ -371,6 +365,26 @@ $js_classes = json_encode($classes);
                 if (!subjectId) {
                     alert('Please select a subject');
                     return;
+                }
+                
+                // Find subject details
+                let subjectName = '';
+                for (const curriculum in subjectsByCurriculum) {
+                    const subject = subjectsByCurriculum[curriculum].find(s => s.id == subjectId);
+                    if (subject) {
+                        subjectName = subject.subject_name;
+                        break;
+                    }
+                }
+                
+                // Find class name
+                const className = classId ? allClasses.find(c => c.id == classId)?.class_name : 'Any Class';
+                
+                // Find section name
+                let sectionName = 'Any Section';
+                if (classId && sectionId && sectionsByClass[classId]) {
+                    const section = sectionsByClass[classId].find(s => s.id == sectionId);
+                    if (section) sectionName = section.section_name;
                 }
                 
                 // Check if this assignment already exists
@@ -385,14 +399,9 @@ $js_classes = json_encode($classes);
                     return;
                 }
                 
-                // Find subject details
-                const subject = allSubjects.find(s => s.id == subjectId);
-                const className = classId ? allClasses.find(c => c.id == classId)?.class_name : 'Any Class';
-                const sectionName = sectionId ? allSections.find(s => s.id == sectionId)?.section_name : 'Any Section';
-                
                 assignments.push({
                     subject_id: subjectId,
-                    subject_name: subject?.subject_name || '',
+                    subject_name: subjectName,
                     class_id: classId || null,
                     class_name: className,
                     section_id: sectionId || null,
@@ -423,15 +432,11 @@ $js_classes = json_encode($classes);
                     $list.append('<p>No assignments yet</p>');
                 } else {
                     assignments.forEach((assignment, index) => {
-                        const subjectName = assignment.subject_name || allSubjects.find(s => s.id == assignment.subject_id)?.subject_name || 'Unknown Subject';
-                        const className = assignment.class_name || (assignment.class_id ? allClasses.find(c => c.id == assignment.class_id)?.class_name : 'Any Class');
-                        const sectionName = assignment.section_name || (assignment.section_id ? allSections.find(s => s.id == assignment.section_id)?.section_name : 'Any Section');
-                        
                         $list.append(`
                             <div class="assignment-item">
-                                <div>${subjectName}</div>
-                                <div>${className}</div>
-                                <div>${sectionName}</div>
+                                <div>${assignment.subject_name}</div>
+                                <div>${assignment.class_name}</div>
+                                <div>${assignment.section_name}</div>
                                 <div class="assignment-actions">
                                     <button type="button" class="btn btn-danger btn-sm remove-assignment" data-index="${index}">Remove</button>
                                 </div>
@@ -451,6 +456,5 @@ $js_classes = json_encode($classes);
             }
         });
     </script>
-   <?php require_once 'includes/footer.php';?>
 </body>
 </html>
