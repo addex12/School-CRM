@@ -396,7 +396,7 @@ if (isset($_GET['error'])) {
                                                 <td><?= htmlspecialchars($teacher['classes'] ?? 'Unassigned') ?></td>
                                                 <td>
                                                     <span class="<?= strtolower($teacher['status']) === 'active' ? 'status-active' : 'status-inactive' ?>">
-                                                        <?= htmlspecialchars(ucfirst($teacher['status'] ?? 'Inactive') ?>
+                                                        <?= htmlspecialchars(ucfirst($teacher['status'] ?? 'Inactive')) ?>
                                                     </span>
                                                 </td>
                                                 <td class="teacher-actions">
