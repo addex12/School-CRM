@@ -86,19 +86,25 @@ function esc($value) {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Edit Teacher | Flipper School CRM</title>
     <meta charset="utf-8">
+    <title>Edit Teacher | Flipper School CRM</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f9fa; margin: 0; }
-        header, footer { background: #003366; color: #fff; padding: 16px 0; text-align: center; }
-        main { max-width: 900px; margin: 30px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+        .admin-main {
+            max-width: 900px;
+            margin: 30px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #0001;
+            padding: 32px;
+        }
         h2, h3 { color: #003366; }
-        table { border-collapse: collapse; width: 100%; margin-top: 24px; }
-        th, td { padding: 8px 12px; border: 1px solid #e0e0e0; }
-        th { background: #e9ecef; }
+        .form-section { margin-bottom: 32px; }
         .success { color: #28a745; }
         .error { color: #dc3545; }
         label { display: block; margin-top: 12px; font-weight: 500; }
@@ -107,147 +113,167 @@ function esc($value) {
         }
         button { background: #003366; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; margin-top: 16px; }
         button:hover { background: #00509e; }
-        .form-section { margin-bottom: 32px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 24px; background: #fff; }
+        th, td { padding: 8px 12px; border: 1px solid #e0e0e0; }
+        th { background: #e9ecef; }
         .footer-dev { font-size: 13px; color: #b0c4de; }
+        @media (max-width: 900px) {
+            .admin-main { padding: 1rem 0.5rem; }
+        }
+        @media (max-width: 600px) {
+            .admin-main { padding: 10px 2px 80px; }
+            th, td { padding: 8px 6px; }
+        }
     </style>
 </head>
 <body>
-<header>
-    <h1>Flipper School CRM - Admin Panel</h1>
-    <div class="footer-dev">
-        Developed by: [Your Name/Team] &bull; Email: [your@email.com]
-    </div>
-</header>
-<main>
-    <h2>Edit Teacher</h2>
-    <?php if ($message): ?>
-        <p class="<?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>"><?= esc($message) ?></p>
-    <?php endif; ?>
+    <div class="admin-dashboard" style="display:flex;min-height:100vh;background:#f4f6fa;">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header style="background:#003366;color:#fff;padding:16px 0;text-align:center;">
+                <h1>Flipper School CRM - Admin Panel</h1>
+                <div class="footer-dev">
+                    Developed by: Adugna Gizaw &bull; Email: gizawadugna@gmail.com &bull;
+                    <a href="https://www.linkedin.com/in/eleganceict" style="color:#b0c4de" target="_blank">LinkedIn</a> &bull;
+                    <a href="https://twitter.com/eleganceict1" style="color:#b0c4de" target="_blank">Twitter</a> &bull;
+                    <a href="https://github.com/addex12" style="color:#b0c4de" target="_blank">GitHub</a>
+                </div>
+            </header>
+            <main>
+                <h2>Edit Teacher</h2>
+                <?php if ($message): ?>
+                    <p class="<?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>"><?= esc($message) ?></p>
+                <?php endif; ?>
 
-    <div class="form-section">
-        <form method="get" action="edit_teacher.php">
-            <label for="edit_id">Select Teacher:</label>
-            <select name="edit_id" id="edit_id" onchange="this.form.submit()">
-                <option value="">-- Select --</option>
-                <?php foreach ($teachers as $teacher): ?>
-                    <option value="<?= esc($teacher['id']) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
-                        <?php
-                            $display_name = trim(esc($teacher['name']));
-                            $display_username = trim(esc($teacher['username']));
-                            if ($display_name && $display_username) {
-                                echo $display_name . " (" . $display_username . ")";
-                            } elseif ($display_name) {
-                                echo $display_name;
-                            } elseif ($display_username) {
-                                echo $display_username;
-                            } else {
-                                echo "Teacher #" . esc($teacher['id']);
+                <div class="form-section">
+                    <form method="get" action="edit_teacher.php">
+                        <label for="edit_id">Select Teacher:</label>
+                        <select name="edit_id" id="edit_id" onchange="this.form.submit()">
+                            <option value="">-- Select --</option>
+                            <?php foreach ($teachers as $teacher): ?>
+                                <option value="<?= esc($teacher['id']) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
+                                    <?php
+                                        $display_name = trim(esc($teacher['name']));
+                                        $display_username = trim(esc($teacher['username']));
+                                        if ($display_name && $display_username) {
+                                            echo $display_name . " (" . $display_username . ")";
+                                        } elseif ($display_name) {
+                                            echo $display_name;
+                                        } elseif ($display_username) {
+                                            echo $display_username;
+                                        } else {
+                                            echo "Teacher #" . esc($teacher['id']);
+                                        }
+                                    ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <noscript><button type="submit">Edit</button></noscript>
+                    </form>
+                </div>
+
+                <?php if ($selected_teacher): ?>
+                    <div class="form-section">
+                        <h3>Editing: <?= esc($selected_teacher['name']) ?></h3>
+                        <form method="post">
+                            <input type="hidden" name="teacher_id" value="<?= esc($selected_teacher['id']) ?>">
+                            <label for="name">Full Name:</label>
+                            <input type="text" name="name" id="name" value="<?= esc($selected_teacher['name']) ?>" required>
+                            <label for="email">Email:</label>
+                            <input type="email" name="email" id="email" value="<?= esc($selected_teacher['email']) ?>" required>
+                            <label for="username">Username:</label>
+                            <input type="text" name="username" id="username" value="<?= esc($selected_teacher['username']) ?>" required>
+                            <label for="subject_id">Subject:</label>
+                            <select name="subject_id" id="subject_id" required>
+                                <option value="">-- Select Subject --</option>
+                                <?php foreach ($subjects as $subject): ?>
+                                    <option value="<?= esc($subject['id']) ?>" <?= ($selected_teacher['subject_id'] ?? '') == $subject['id'] ? 'selected' : '' ?>>
+                                        <?= esc($subject['subject_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="class_name_id">Grade:</label>
+                            <select name="class_name_id" id="class_name_id" required>
+                                <option value="">-- Select Grade --</option>
+                                <?php foreach ($class_names as $grade): ?>
+                                    <option value="<?= esc($grade['id']) ?>" <?= ($selected_teacher['class_name_id'] ?? '') == $grade['id'] ? 'selected' : '' ?>>
+                                        <?= esc($grade['grade']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="section_id">Section:</label>
+                            <select name="section_id" id="section_id" required>
+                                <option value="">-- Select Section --</option>
+                                <?php foreach ($sections as $section): ?>
+                                    <option value="<?= esc($section['id']) ?>" <?= ($selected_teacher['section_id'] ?? '') == $section['id'] ? 'selected' : '' ?>>
+                                        <?= esc($section['section']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <label for="password">New Password (leave blank to keep current):</label>
+                            <input type="password" name="password" id="password">
+                            <button type="submit" name="update_teacher">Update Teacher</button>
+                        </form>
+                    </div>
+                <?php endif; ?>
+
+                <h3>All Teachers</h3>
+                <table>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Subject</th>
+                        <th>Grade</th>
+                        <th>Section</th>
+                    </tr>
+                    <?php foreach ($teachers as $teacher): ?>
+                    <tr>
+                        <td><?= esc($teacher['id']) ?></td>
+                        <td><?= esc($teacher['name']) ?></td>
+                        <td><?= esc($teacher['email']) ?></td>
+                        <td><?= esc($teacher['username']) ?></td>
+                        <td>
+                            <?php
+                            if (!empty($teacher['subject_id'])) {
+                                $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
+                                $subj->execute([$teacher['subject_id']]);
+                                echo esc($subj->fetchColumn());
                             }
-                        ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
-            <noscript><button type="submit">Edit</button></noscript>
-        </form>
-    </div>
-
-    <?php if ($selected_teacher): ?>
-        <div class="form-section">
-            <h3>Editing: <?= esc($selected_teacher['name']) ?></h3>
-            <form method="post">
-                <input type="hidden" name="teacher_id" value="<?= esc($selected_teacher['id']) ?>">
-                <label for="name">Full Name:</label>
-                <input type="text" name="name" id="name" value="<?= esc($selected_teacher['name']) ?>" required>
-                <label for="email">Email:</label>
-                <input type="email" name="email" id="email" value="<?= esc($selected_teacher['email']) ?>" required>
-                <label for="username">Username:</label>
-                <input type="text" name="username" id="username" value="<?= esc($selected_teacher['username']) ?>" required>
-                <label for="subject_id">Subject:</label>
-                <select name="subject_id" id="subject_id" required>
-                    <option value="">-- Select Subject --</option>
-                    <?php foreach ($subjects as $subject): ?>
-                        <option value="<?= esc($subject['id']) ?>" <?= ($selected_teacher['subject_id'] ?? '') == $subject['id'] ? 'selected' : '' ?>>
-                            <?= esc($subject['subject_name']) ?>
-                        </option>
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                            if (!empty($teacher['class_name_id'])) {
+                                $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
+                                $grd->execute([$teacher['class_name_id']]);
+                                echo esc($grd->fetchColumn());
+                            }
+                            ?>
+                        </td>
+                        <td>
+                            <?php
+                            if (!empty($teacher['section_id'])) {
+                                $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
+                                $sec->execute([$teacher['section_id']]);
+                                echo esc($sec->fetchColumn());
+                            }
+                            ?>
+                        </td>
+                    </tr>
                     <?php endforeach; ?>
-                </select>
-                <label for="class_name_id">Grade:</label>
-                <select name="class_name_id" id="class_name_id" required>
-                    <option value="">-- Select Grade --</option>
-                    <?php foreach ($class_names as $grade): ?>
-                        <option value="<?= esc($grade['id']) ?>" <?= ($selected_teacher['class_name_id'] ?? '') == $grade['id'] ? 'selected' : '' ?>>
-                            <?= esc($grade['grade']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="section_id">Section:</label>
-                <select name="section_id" id="section_id" required>
-                    <option value="">-- Select Section --</option>
-                    <?php foreach ($sections as $section): ?>
-                        <option value="<?= esc($section['id']) ?>" <?= ($selected_teacher['section_id'] ?? '') == $section['id'] ? 'selected' : '' ?>>
-                            <?= esc($section['section']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <label for="password">New Password (leave blank to keep current):</label>
-                <input type="password" name="password" id="password">
-                <button type="submit" name="update_teacher">Update Teacher</button>
-            </form>
+                </table>
+            </main>
+            <footer style="background:#003366;color:#fff;padding:16px 0;text-align:center;">
+                <div class="footer-dev">
+                    &copy; <?= date('Y') ?> Flipper School CRM. Developed by Adugna Gizaw &bull; Email: gizawadugna@gmail.com &bull;
+                    <a href="https://www.linkedin.com/in/eleganceict" style="color:#b0c4de" target="_blank">LinkedIn</a> &bull;
+                    <a href="https://twitter.com/eleganceict1" style="color:#b0c4de" target="_blank">Twitter</a> &bull;
+                    <a href="https://github.com/addex12" style="color:#b0c4de" target="_blank">GitHub</a>
+                </div>
+            </footer>
         </div>
-    <?php endif; ?>
-
-    <h3>All Teachers</h3>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Username</th>
-            <th>Subject</th>
-            <th>Grade</th>
-            <th>Section</th>
-        </tr>
-        <?php foreach ($teachers as $teacher): ?>
-        <tr>
-            <td><?= esc($teacher['id']) ?></td>
-            <td><?= esc($teacher['name']) ?></td>
-            <td><?= esc($teacher['email']) ?></td>
-            <td><?= esc($teacher['username']) ?></td>
-            <td>
-                <?php
-                if (!empty($teacher['subject_id'])) {
-                    $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
-                    $subj->execute([$teacher['subject_id']]);
-                    echo esc($subj->fetchColumn());
-                }
-                ?>
-            </td>
-            <td>
-                <?php
-                if (!empty($teacher['class_name_id'])) {
-                    $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
-                    $grd->execute([$teacher['class_name_id']]);
-                    echo esc($grd->fetchColumn());
-                }
-                ?>
-            </td>
-            <td>
-                <?php
-                if (!empty($teacher['section_id'])) {
-                    $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
-                    $sec->execute([$teacher['section_id']]);
-                    echo esc($sec->fetchColumn());
-                }
-                ?>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-    </table>
-</main>
-<footer>
-    <div class="footer-dev">
-        &copy; <?= date('Y') ?> Flipper School CRM. Developed by [Your Name/Team] &bull; Email: [your@email.com]
     </div>
-</footer>
 </body>
 </html>
