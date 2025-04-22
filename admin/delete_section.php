@@ -11,9 +11,8 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
-    // Optionally, you can check if the section exists before deleting
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+    $id = intval($_POST['id']);
     $stmt = $pdo->prepare("DELETE FROM sections WHERE id = ?");
     $stmt->execute([$id]);
 }

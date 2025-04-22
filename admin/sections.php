@@ -135,7 +135,12 @@ $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= date('M j, Y g:i A', strtotime($section['created_at'])) ?></td>
                                             <td class="section-actions">
                                                 <a href="edit_section.php?id=<?= $section['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <a href="delete_section.php?id=<?= $section['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this section?');"><i class="fas fa-trash-alt"></i></a>
+                                                <form action="delete_section.php" method="post" style="display:inline;">
+                                                    <input type="hidden" name="id" value="<?= $section['id'] ?>">
+                                                    <button type="submit" title="Delete" onclick="return confirm('Are you sure you want to delete this section?');" style="background:none;border:none;color:#3498db;cursor:pointer;">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
