@@ -78,6 +78,15 @@ CREATE TABLE IF NOT EXISTS subjects (
 ALTER TABLE subjects ADD COLUMN IF NOT EXISTS curriculum_id INT NOT NULL;
 ALTER TABLE subjects ADD COLUMN IF NOT EXISTS subject_name VARCHAR(100) NOT NULL UNIQUE;
 
+-- Remove 'name' column if it exists
+ALTER TABLE subjects DROP COLUMN IF EXISTS name;
+
+-- Make extra columns nullable (if they exist and are not needed for subject inserts)
+ALTER TABLE subjects MODIFY COLUMN scale_name VARCHAR(100) NULL;
+ALTER TABLE subjects MODIFY COLUMN min_score INT NULL;
+ALTER TABLE subjects MODIFY COLUMN max_score INT NULL;
+ALTER TABLE subjects MODIFY COLUMN grade_letter VARCHAR(10) NULL;
+
 -- Example: Insert subjects for Ethiopian Curriculum (replace 6 with the actual id if different)
 -- You may need to SELECT the id for 'Ethiopian Curriculum' if not known
 SET @ethiopian_curriculum_id = (SELECT id FROM curriculums WHERE name = 'Ethiopian Curriculum' LIMIT 1);
@@ -120,6 +129,148 @@ INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
 (@ethiopian_curriculum_id, 'Home Economics'),
 (@ethiopian_curriculum_id, 'Technology'),
 (@ethiopian_curriculum_id, 'Ethics');
+
+-- Insert all subjects for each curriculum and link with curriculum_id
+
+-- US K-12 Subjects
+SET @us_id = (SELECT id FROM curriculums WHERE name = 'US K-12' LIMIT 1);
+INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
+(@us_id, 'Mathematics'),
+(@us_id, 'English'),
+(@us_id, 'Science'),
+(@us_id, 'Social Studies'),
+(@us_id, 'History'),
+(@us_id, 'Geography'),
+(@us_id, 'Civics'),
+(@us_id, 'Economics'),
+(@us_id, 'Physical Education'),
+(@us_id, 'Art'),
+(@us_id, 'Music'),
+(@us_id, 'Technology'),
+(@us_id, 'Reading'),
+(@us_id, 'Writing'),
+(@us_id, 'Handwriting'),
+(@us_id, 'Drama'),
+(@us_id, 'French'),
+(@us_id, 'Spanish');
+
+-- British Curriculum Subjects
+SET @british_id = (SELECT id FROM curriculums WHERE name = 'British Curriculum' LIMIT 1);
+INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
+(@british_id, 'Mathematics'),
+(@british_id, 'English'),
+(@british_id, 'Science'),
+(@british_id, 'Biology'),
+(@british_id, 'Chemistry'),
+(@british_id, 'Physics'),
+(@british_id, 'Geography'),
+(@british_id, 'History'),
+(@british_id, 'ICT'),
+(@british_id, 'Art'),
+(@british_id, 'Music'),
+(@british_id, 'Physical Education'),
+(@british_id, 'French'),
+(@british_id, 'Drama'),
+(@british_id, 'Design and Technology'),
+(@british_id, 'Religious Education');
+
+-- CBSE Subjects (India)
+SET @cbse_id = (SELECT id FROM curriculums WHERE name = 'CBSE' LIMIT 1);
+INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
+(@cbse_id, 'Mathematics'),
+(@cbse_id, 'English'),
+(@cbse_id, 'Hindi'),
+(@cbse_id, 'Science'),
+(@cbse_id, 'Social Science'),
+(@cbse_id, 'Physics'),
+(@cbse_id, 'Chemistry'),
+(@cbse_id, 'Biology'),
+(@cbse_id, 'Geography'),
+(@cbse_id, 'History'),
+(@cbse_id, 'Civics'),
+(@cbse_id, 'Economics'),
+(@cbse_id, 'Computer Science'),
+(@cbse_id, 'Physical Education'),
+(@cbse_id, 'Art'),
+(@cbse_id, 'Music'),
+(@cbse_id, 'Sanskrit'),
+(@cbse_id, 'Environmental Science'),
+(@cbse_id, 'Business Studies'),
+(@cbse_id, 'Accountancy');
+
+-- IB Subjects
+SET @ib_id = (SELECT id FROM curriculums WHERE name = 'IB' LIMIT 1);
+INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
+(@ib_id, 'Mathematics'),
+(@ib_id, 'English'),
+(@ib_id, 'Language Acquisition'),
+(@ib_id, 'Sciences'),
+(@ib_id, 'Individuals and Societies'),
+(@ib_id, 'Arts'),
+(@ib_id, 'Design'),
+(@ib_id, 'Physical and Health Education'),
+(@ib_id, 'Theory of Knowledge'),
+(@ib_id, 'Extended Essay'),
+(@ib_id, 'Creativity, Activity, Service');
+
+-- IGCSE Subjects
+SET @igcse_id = (SELECT id FROM curriculums WHERE name = 'IGCSE' LIMIT 1);
+INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
+(@igcse_id, 'Mathematics'),
+(@igcse_id, 'English'),
+(@igcse_id, 'Biology'),
+(@igcse_id, 'Chemistry'),
+(@igcse_id, 'Physics'),
+(@igcse_id, 'Geography'),
+(@igcse_id, 'History'),
+(@igcse_id, 'ICT'),
+(@igcse_id, 'Business Studies'),
+(@igcse_id, 'Economics'),
+(@igcse_id, 'French'),
+(@igcse_id, 'Art and Design'),
+(@igcse_id, 'Music'),
+(@igcse_id, 'Physical Education');
+
+-- Ethiopian Curriculum Subjects
+SET @ethiopia_id = (SELECT id FROM curriculums WHERE name = 'Ethiopian Curriculum' LIMIT 1);
+INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
+(@ethiopia_id, 'Mathematics'),
+(@ethiopia_id, 'English'),
+(@ethiopia_id, 'Physics'),
+(@ethiopia_id, 'Chemistry'),
+(@ethiopia_id, 'Biology'),
+(@ethiopia_id, 'Geography'),
+(@ethiopia_id, 'History'),
+(@ethiopia_id, 'Civics'),
+(@ethiopia_id, 'Economics'),
+(@ethiopia_id, 'ICT'),
+(@ethiopia_id, 'Amharic'),
+(@ethiopia_id, 'Afan Oromo'),
+(@ethiopia_id, 'Somali'),
+(@ethiopia_id, 'Tigrigna'),
+(@ethiopia_id, 'HPE'),
+(@ethiopia_id, 'Moral Education'),
+(@ethiopia_id, 'Technical Drawing'),
+(@ethiopia_id, 'Agriculture'),
+(@ethiopia_id, 'Business'),
+(@ethiopia_id, 'Accounting'),
+(@ethiopia_id, 'General Science'),
+(@ethiopia_id, 'Social Studies'),
+(@ethiopia_id, 'Music'),
+(@ethiopia_id, 'Art'),
+(@ethiopia_id, 'French'),
+(@ethiopia_id, 'Arabic'),
+(@ethiopia_id, 'Religious Education'),
+(@ethiopia_id, 'Environmental Science'),
+(@ethiopia_id, 'Science'),
+(@ethiopia_id, 'Reading'),
+(@ethiopia_id, 'Writing'),
+(@ethiopia_id, 'Handwriting'),
+(@ethiopia_id, 'Drama'),
+(@ethiopia_id, 'Physical Education'),
+(@ethiopia_id, 'Home Economics'),
+(@ethiopia_id, 'Technology'),
+(@ethiopia_id, 'Ethics');
 
 -- Repeat similar blocks for other curriculums if needed, changing @ethiopian_curriculum_id to the appropriate curriculum id.
 
