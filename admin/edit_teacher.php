@@ -88,23 +88,33 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $qualification = $_POST['qualification'] ?? '';
     $subject_specialization = $_POST['subject_specialization'] ?? '';
-    $date_of_birth = $_POST['date_of_birth'] ?? '';
-    $gender = $_POST['gender'] ?? '';
+    $date_of_birth = $_POST['date_of_birth'] ?? null;
+    $gender = $_POST['gender'] ?? null;
     $address = $_POST['address'] ?? '';
     $status = $_POST['status'] ?? 'active';
 
-    // Update teacher record
+    // Ensure correct parameter order and types for the update statement
     $update_stmt = $pdo->prepare("
         UPDATE teachers 
         SET qualification = ?, subject_specialization = ?, date_of_birth = ?, 
             gender = ?, address = ?, status = ?
         WHERE id = ?
     ");
-    if ($update_stmt->execute([
-        $qualification, $subject_specialization, $date_of_birth,
-        $gender, $address, $status, $teacher_id
-    ])) {
+    $result = $update_stmt->execute([
+        $qualification,
+        $subject_specialization,
+        $date_of_birth ?: null,
+        $gender ?: null,
+        $address,
+        $status,
+        $teacher_id
+    ]);
+
+    if ($result) {
         $success = "Teacher information updated successfully.";
+        // Refresh teacher data after update
+        $teacher_stmt->execute([$teacher_id]);
+        $teacher = $teacher_stmt->fetch(PDO::FETCH_ASSOC);
     } else {
         $error = "Failed to update teacher information.";
     }
