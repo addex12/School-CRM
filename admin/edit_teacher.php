@@ -2,122 +2,70 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
-require_once '../includes/db.php';
 
-$pageTitle = "Edit Teacher";
+$pageTitle = "Add Teacher";
 
-try {
-    $db = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
-}
+// Fetch users with Teacher role who are not yet in teachers table
+$stmt = $pdo->prepare("
+    SELECT u.id, u.username, u.email
+    FROM users u
+    LEFT JOIN roles r ON u.role_id = r.id
+    LEFT JOIN teachers t ON t.user_id = u.id
+    WHERE LOWER(r.role_name) = 'teacher' AND t.id IS NULL
+    ORDER BY u.username
+");
+$stmt->execute();
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch all teachers for selection
-$teachers = $db->query("SELECT t.id, t.name, t.email, t.username, t.subject_id, t.class_name_id, t.section_id, u.id as user_id FROM teachers t LEFT JOIN users u ON t.username = u.username")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch available classes
+$class_stmt = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name");
+$classes = $class_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch all subjects, grades, and sections for dropdowns
-$subjects = $db->query("SELECT id, subject_name FROM subjects")->fetchAll(PDO::FETCH_ASSOC);
-$class_names = $db->query("SELECT id, grade FROM class_names")->fetchAll(PDO::FETCH_ASSOC);
-$sections = $db->query("SELECT id, section_name FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
-$classes = $db->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
+// Handle form submission
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = $_POST['user_id'] ?? '';
+    $class_id = $_POST['class_id'] ?? null;
 
-$message = '';
-$selected_teacher = null;
-
-// Handle teacher selection
-if (isset($_GET['edit_id'])) {
-    $edit_id = intval($_GET['edit_id']);
-    $stmt = $db->prepare("SELECT t.*, u.id as user_id, u.email as user_email FROM teachers t LEFT JOIN users u ON t.username = u.username WHERE t.id = ?");
-    $stmt->execute([$edit_id]);
-    $selected_teacher = $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-// Handle update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
-    $teacher_id = intval($_POST['teacher_id']);
-    $name = trim($_POST['name']);
-    $email = trim($_POST['email']);
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-    $subject_id = $_POST['subject_id'];
-    $class_name_id = $_POST['class_name_id'];
-    $section_id = $_POST['section_id'];
-    $address = $_POST['address'] ?? null;
-    $date_of_birth = $_POST['date_of_birth'] ?? null;
-    $gender = $_POST['gender'] ?? null;
-    $qualification = $_POST['qualification'] ?? null;
-    $subject_specialization = $_POST['subject_specialization'] ?? null;
-    $status = $_POST['status'] ?? null;
-    $class_id = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
-
-    // Fetch current teacher info
-    $stmt = $db->prepare("SELECT t.*, u.id as user_id FROM teachers t LEFT JOIN users u ON t.username = u.username WHERE t.id = ?");
-    $stmt->execute([$teacher_id]);
-    $current = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Check for duplicate email/username
-    $check_stmt = $db->prepare("SELECT id FROM users WHERE (email = ? OR username = ?) AND id != ?");
-    $check_stmt->execute([$email, $username, $current['user_id']]);
-    if ($check_stmt->fetch(PDO::FETCH_ASSOC)) {
-        $message = "A user with this email or username already exists.";
+    if (!$user_id) {
+        $error = "User selection is required.";
     } else {
-        // Update teachers table
-        $update_teacher = $db->prepare("UPDATE teachers SET name = ?, email = ?, username = ?, subject_id = ?, class_name_id = ?, section_id = ?, address = ?, date_of_birth = ?, gender = ?, qualification = ?, subject_specialization = ?, status = ?, class_id = ? WHERE id = ?");
-        $update_teacher->execute([$name, $email, $username, $subject_id, $class_name_id, $section_id, $address, $date_of_birth, $gender, $qualification, $subject_specialization, $status, $class_id, $teacher_id]);
-
-        // Update users table
-        if (!empty($password)) {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $update_user = $db->prepare("UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?");
-            $update_user->execute([$username, $email, $hashed_password, $current['user_id']]);
+        // Check if already exists
+        $check = $pdo->prepare("SELECT id FROM teachers WHERE user_id = ?");
+        $check->execute([$user_id]);
+        if ($check->fetch()) {
+            $error = "Teacher already exists.";
         } else {
-            $update_user = $db->prepare("UPDATE users SET username = ?, email = ? WHERE id = ?");
-            $update_user->execute([$username, $email, $current['user_id']]);
+            $insert = $pdo->prepare("INSERT INTO teachers (user_id, class_id) VALUES (?, ?)");
+            if ($insert->execute([$user_id, $class_id ?: null])) {
+                header("Location: teachers.php?msg=Teacher+added+successfully");
+                exit;
+            } else {
+                $error = "Failed to add teacher.";
+            }
         }
-        
-        $message = "Teacher details updated successfully!";
-        header("Location: edit_teacher.php?edit_id=" . $teacher_id . "&updated=1");
-        exit;
     }
 }
 
-if (isset($_GET['updated'])) {
-    $message = "Teacher details updated successfully!";
-}
-
-function esc($value) {
-    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
-}
+$preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title><?= esc($pageTitle) ?> | School CRM</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .admin-dashboard { display: flex; flex-direction: row; min-height: 100vh; background: #f4f6fa; }
-        .admin-main { flex: 1; margin-left: 250px; padding: 2rem 2.5rem; max-width: 100%; background: none; }
-        .dashboard-section { background: #fff; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .dashboard-section h3 { margin-top: 0; color: #333; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #444; }
-        input, select { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px; }
-        button { background: #3498db; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background: #2980b9; }
-        .success { background: #d4edda; color: #155724; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
-        .error { background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
-        .teacher-avatar { width: 40px; height: 40px; border-radius: 50%; background: #3498db; color: white; 
-                          display: inline-flex; align-items: center; justify-content: center; margin-right: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        table th, table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #ddd; }
-        table th { background: #f8f9fa; }
-        @media (max-width: 768px) {
-            .admin-main { margin-left: 0; padding: 1rem; }
-        }
+        .admin-dashboard { display: flex; min-height: 100vh; background: #f4f6fa; }
+        .admin-main { flex: 1; padding: 2rem; }
+        .form-container { max-width: 600px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+        select, input { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .error { color: #dc3545; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
@@ -125,134 +73,37 @@ function esc($value) {
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= esc($pageTitle) ?></h1>
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <?php if ($message): ?>
-                    <div class="<?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>"><?= esc($message) ?></div>
-                <?php endif; ?>
-
-                <div class="dashboard-section">
-                    <form method="get" action="edit_teacher.php">
-                        <label for="edit_id">Select Teacher:</label>
-                        <select name="edit_id" id="edit_id" onchange="this.form.submit()">
-                            <option value="">-- Select --</option>
-                            <?php foreach ($teachers as $teacher): ?>
-                                <option value="<?= esc($teacher['id']) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
-                                    <?= esc($teacher['name']) ?> (<?= esc($teacher['username']) ?>)
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                <div class="form-container">
+                    <?php if ($error): ?>
+                        <div class="error"><?= htmlspecialchars($error) ?></div>
+                    <?php endif; ?>
+                    <form method="post" autocomplete="off">
+                        <div>
+                            <label for="user_id">Select Teacher User</label>
+                            <select name="user_id" id="user_id" required>
+                                <option value="">-- Select --</option>
+                                <?php foreach ($users as $user): ?>
+                                    <option value="<?= $user['id'] ?>" <?= ($preselect_user_id == $user['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['email']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="class_id">Assign to Class (optional)</label>
+                            <select name="class_id" id="class_id">
+                                <option value="">-- None --</option>
+                                <?php foreach ($classes as $class): ?>
+                                    <option value="<?= $class['id'] ?>"><?= htmlspecialchars($class['class_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Teacher</button>
+                        <a href="teachers.php" class="btn btn-secondary">Cancel</a>
                     </form>
-                </div>
-
-                <?php if ($selected_teacher): ?>
-                    <div class="dashboard-section">
-                        <h3>Editing: <?= esc($selected_teacher['name']) ?></h3>
-                        <form method="post">
-                            <input type="hidden" name="teacher_id" value="<?= esc($selected_teacher['id']) ?>">
-                            
-                            <label for="name">Full Name:</label>
-                            <input type="text" name="name" id="name" value="<?= esc($selected_teacher['name']) ?>" required>
-                            
-                            <label for="email">Email:</label>
-                            <input type="email" name="email" id="email" value="<?= esc($selected_teacher['email']) ?>" required>
-                            
-                            <label for="username">Username:</label>
-                            <input type="text" name="username" id="username" value="<?= esc($selected_teacher['username']) ?>" required>
-                            
-                            <label for="subject_id">Subject:</label>
-                            <select name="subject_id" id="subject_id" required>
-                                <option value="">-- Select Subject --</option>
-                                <?php foreach ($subjects as $subject): ?>
-                                    <option value="<?= esc($subject['id']) ?>" <?= ($selected_teacher['subject_id'] ?? '') == $subject['id'] ? 'selected' : '' ?>>
-                                        <?= esc($subject['subject_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            
-                            <label for="class_name_id">Grade:</label>
-                            <select name="class_name_id" id="class_name_id" required>
-                                <option value="">-- Select Grade --</option>
-                                <?php foreach ($class_names as $grade): ?>
-                                    <option value="<?= esc($grade['id']) ?>" <?= ($selected_teacher['class_name_id'] ?? '') == $grade['id'] ? 'selected' : '' ?>>
-                                        <?= esc($grade['grade']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            
-                            <label for="section_id">Section:</label>
-                            <select name="section_id" id="section_id" required>
-                                <option value="">-- Select Section --</option>
-                                <?php foreach ($sections as $section): ?>
-                                    <option value="<?= esc($section['id']) ?>" <?= ($selected_teacher['section_id'] ?? '') == $section['id'] ? 'selected' : '' ?>>
-                                        <?= esc($section['section_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            
-                            <label for="password">New Password (leave blank to keep current):</label>
-                            <input type="password" name="password" id="password">
-                            
-                            <button type="submit" name="update_teacher">Update Teacher</button>
-                        </form>
-                    </div>
-                <?php endif; ?>
-
-                <div class="dashboard-section">
-                    <h3>All Teachers</h3>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Username</th>
-                                    <th>Subject</th>
-                                    <th>Grade</th>
-                                    <th>Section</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($teachers as $teacher): ?>
-                                <tr>
-                                    <td><?= esc($teacher['id']) ?></td>
-                                    <td><?= esc($teacher['name']) ?></td>
-                                    <td><?= esc($teacher['email']) ?></td>
-                                    <td><?= esc($teacher['username']) ?></td>
-                                    <td>
-                                        <?php
-                                        if (!empty($teacher['subject_id'])) {
-                                            $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
-                                            $subj->execute([$teacher['subject_id']]);
-                                            echo esc($subj->fetchColumn());
-                                        }
-                                        ?>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        if (!empty($teacher['class_name_id'])) {
-                                            $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
-                                            $grd->execute([$teacher['class_name_id']]);
-                                            echo esc($grd->fetchColumn());
-                                        }
-                                        ?>
-                                    </td>
-                                    <td>
-                                        <?php
-                                        if (!empty($teacher['section_id'])) {
-                                            $sec = $db->prepare("SELECT section_name FROM sections WHERE id = ?");
-                                            $sec->execute([$teacher['section_id']]);
-                                            echo esc($sec->fetchColumn());
-                                        }
-                                        ?>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
         </div>

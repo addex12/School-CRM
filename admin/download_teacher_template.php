@@ -1,4 +1,7 @@
 <?php
+require_once '../includes/auth.php';
+requireAdmin();
+
 header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="teacher_import_template.csv"');
 
