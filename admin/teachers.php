@@ -3,28 +3,27 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-$pageTitle = "Students";
+$pageTitle = "Teachers";
 
-// Fetch all users with Student role, join students table for enrollment info if exists
+// Fetch all users with Teacher role, join teachers and classes table for info if exists
 $stmt = $pdo->prepare("
     SELECT 
         u.id AS user_id,
         u.username,
         u.email,
         r.role_name,
-        s.id AS student_id,
-        s.enrollment_no,
-        s.created_at AS student_created_at,
+        t.id AS teacher_id,
+        t.created_at AS teacher_created_at,
         c.class_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
-    LEFT JOIN students s ON s.user_id = u.id
-    LEFT JOIN classes c ON s.class_id = c.id
-    WHERE LOWER(r.role_name) = 'student'
-    ORDER BY COALESCE(s.created_at, u.created_at) DESC
+    LEFT JOIN teachers t ON t.user_id = u.id
+    LEFT JOIN classes c ON t.class_id = c.id
+    WHERE LOWER(r.role_name) = 'teacher'
+    ORDER BY COALESCE(t.created_at, u.created_at) DESC
 ");
 $stmt->execute();
-$students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,18 +34,18 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .students-header {
+        .teachers-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-        .students-header h2 {
+        .teachers-header h2 {
             margin: 0;
             font-size: 1.5rem;
             color: #34495e;
         }
-        .students-header .btn {
+        .teachers-header .btn {
             background: #3498db;
             color: #fff;
             border: none;
@@ -56,44 +55,44 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
             transition: background 0.18s;
             text-decoration: none;
         }
-        .students-header .btn:hover {
+        .teachers-header .btn:hover {
             background: #217dbb;
         }
-        .students-table {
+        .teachers-table {
             width: 100%;
             border-collapse: collapse;
         }
-        .students-table th, .students-table td {
+        .teachers-table th, .teachers-table td {
             padding: 12px 16px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
         }
-        .students-table th {
+        .teachers-table th {
             background: #f8f9fa;
             font-weight: 600;
             color: #34495e;
         }
-        .students-table tr:hover {
+        .teachers-table tr:hover {
             background: #f4f8fb;
         }
-        .student-actions a {
+        .teacher-actions a {
             margin-right: 8px;
             color: #3498db;
             text-decoration: none;
             font-size: 1.1em;
         }
-        .student-actions a:last-child {
+        .teacher-actions a:last-child {
             margin-right: 0;
         }
         @media (max-width: 900px) {
-            .students-header {
+            .teachers-header {
                 flex-direction: column;
                 gap: 1rem;
                 align-items: flex-start;
             }
         }
         @media (max-width: 600px) {
-            .students-table th, .students-table td {
+            .teachers-table th, .teachers-table td {
                 padding: 8px 6px;
             }
         }
@@ -108,12 +107,12 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </header>
             <div class="content">
                 <div class="dashboard-section">
-                    <div class="students-header">
-                        <h2>Student List</h2>
-                        <a href="add_student.php" class="btn"><i class="fas fa-user-plus"></i> Add Student</a>
+                    <div class="teachers-header">
+                        <h2>Teacher List</h2>
+                        <a href="add_teacher.php" class="btn"><i class="fas fa-user-plus"></i> Add Teacher</a>
                     </div>
                     <div class="table-responsive">
-                        <table class="students-table">
+                        <table class="teachers-table">
                             <thead>
                                 <tr>
                                     <th>User ID</th>
@@ -121,39 +120,37 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Class</th>
-                                    <th>Enrollment No</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($students)): ?>
-                                    <?php foreach ($students as $student): ?>
+                                <?php if (!empty($teachers)): ?>
+                                    <?php foreach ($teachers as $teacher): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($student['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($student['username']) ?></td>
-                                            <td><?= htmlspecialchars($student['email']) ?></td>
-                                            <td><?= htmlspecialchars($student['role_name'] ?? 'N/A') ?></td>
-                                            <td><?= htmlspecialchars($student['class_name'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($student['enrollment_no'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['user_id']) ?></td>
+                                            <td><?= htmlspecialchars($teacher['username']) ?></td>
+                                            <td><?= htmlspecialchars($teacher['email']) ?></td>
+                                            <td><?= htmlspecialchars($teacher['role_name'] ?? 'N/A') ?></td>
+                                            <td><?= htmlspecialchars($teacher['class_name'] ?? '-') ?></td>
                                             <td>
-                                                <?= $student['student_created_at'] 
-                                                    ? date('M j, Y g:i A', strtotime($student['student_created_at'])) 
+                                                <?= $teacher['teacher_created_at'] 
+                                                    ? date('M j, Y g:i A', strtotime($teacher['teacher_created_at'])) 
                                                     : '-' ?>
                                             </td>
-                                            <td class="student-actions">
-                                                <?php if ($student['student_id']): ?>
-                                                    <a href="edit_student.php?id=<?= $student['student_id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                                    <a href="delete_student.php?id=<?= $student['student_id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this student?')"><i class="fas fa-trash-alt"></i></a>
+                                            <td class="teacher-actions">
+                                                <?php if ($teacher['teacher_id']): ?>
+                                                    <a href="edit_teacher.php?id=<?= $teacher['teacher_id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
+                                                    <a href="delete_teacher.php?id=<?= $teacher['teacher_id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this teacher?')"><i class="fas fa-trash-alt"></i></a>
                                                 <?php else: ?>
-                                                    <a href="add_student.php?user_id=<?= $student['user_id'] ?>" title="Add Enrollment"><i class="fas fa-plus"></i></a>
+                                                    <a href="add_teacher.php?user_id=<?= $teacher['user_id'] ?>" title="Add Assignment"><i class="fas fa-plus"></i></a>
                                                 <?php endif; ?>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="8">No students found.</td>
+                                        <td colspan="7">No teachers found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -162,8 +159,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
 </body>
 </html>

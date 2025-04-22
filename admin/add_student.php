@@ -17,13 +17,18 @@ $stmt = $pdo->prepare("
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch available classes
+$class_stmt = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name");
+$classes = $class_stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Handle form submission
 $success = $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user_id = $_POST['user_id'] ?? '';
     $enrollment_no = trim($_POST['enrollment_no'] ?? '');
+    $class_id = $_POST['class_id'] ?? null;
 
-    if (!$user_id || !$enrollment_no) {
+    if (!$user_id || !$enrollment_no || !$class_id) {
         $error = "All fields are required.";
     } else {
         // Check if already exists
@@ -32,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($check->fetch()) {
             $error = "Student already enrolled.";
         } else {
-            $insert = $pdo->prepare("INSERT INTO students (user_id, enrollment_no) VALUES (?, ?)");
-            if ($insert->execute([$user_id, $enrollment_no])) {
+            $insert = $pdo->prepare("INSERT INTO students (user_id, enrollment_no, class_id) VALUES (?, ?, ?)");
+            if ($insert->execute([$user_id, $enrollment_no, $class_id])) {
                 header("Location: students.php?msg=Student+added+successfully");
                 exit;
             } else {
@@ -81,6 +86,17 @@ $preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
                         <div style="margin-bottom:1rem;">
                             <label for="enrollment_no">Enrollment No</label>
                             <input type="text" name="enrollment_no" id="enrollment_no" required>
+                        </div>
+                        <div style="margin-bottom:1rem;">
+                            <label for="class_id">Select Class</label>
+                            <select name="class_id" id="class_id" required>
+                                <option value="">-- Select --</option>
+                                <?php foreach ($classes as $class): ?>
+                                    <option value="<?= $class['id'] ?>">
+                                        <?= htmlspecialchars($class['class_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <button type="submit" class="btn" style="background:#3498db;color:#fff;">Add Student</button>
                         <a href="students.php" class="btn" style="background:#aaa;color:#fff;margin-left:10px;">Cancel</a>
