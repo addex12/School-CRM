@@ -5,7 +5,7 @@ require_once '../includes/config.php';
 
 $pageTitle = "Classes";
 
-// Fetch all classes with curriculum and class level
+// Fetch all classes with curriculum, class level, and sections
 $stmt = $pdo->query("
     SELECT cl.id, cl.class_name, cu.name AS curriculum, lv.level_name, cl.created_at
     FROM classes cl
@@ -14,6 +14,13 @@ $stmt = $pdo->query("
     ORDER BY cu.name, lv.level_order, cl.class_name
 ");
 $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch sections for all classes
+$sections_stmt = $pdo->query("SELECT id, class_id, section_name FROM sections ORDER BY class_id, section_name");
+$sections = [];
+foreach ($sections_stmt->fetchAll(PDO::FETCH_ASSOC) as $section) {
+    $sections[$section['class_id']][] = $section['section_name'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -110,6 +117,7 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Curriculum</th>
                                     <th>Class Level</th>
                                     <th>Class Name</th>
+                                    <th>Sections</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
@@ -122,16 +130,24 @@ $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($class['curriculum'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($class['level_name'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($class['class_name']) ?></td>
+                                            <td>
+                                                <?php if (!empty($sections[$class['id']])): ?>
+                                                    <?= htmlspecialchars(implode(', ', $sections[$class['id']])) ?>
+                                                <?php else: ?>
+                                                    <a href="add_section.php?class_id=<?= $class['id'] ?>" class="btn" style="padding:2px 8px;font-size:0.9em;">Add Section</a>
+                                                <?php endif; ?>
+                                            </td>
                                             <td><?= date('M j, Y g:i A', strtotime($class['created_at'])) ?></td>
                                             <td class="class-actions">
                                                 <a href="edit_class.php?id=<?= $class['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="delete_class.php?id=<?= $class['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this class?')"><i class="fas fa-trash-alt"></i></a>
+                                                <a href="add_section.php?class_id=<?= $class['id'] ?>" title="Add Section"><i class="fas fa-plus"></i></a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="6">No classes found.</td>
+                                        <td colspan="7">No classes found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>

@@ -13,17 +13,29 @@ $curriculums = $curriculum_stmt->fetchAll(PDO::FETCH_ASSOC);
 $class_levels_stmt = $pdo->query("SELECT id, curriculum_id, level_name FROM class_levels ORDER BY curriculum_id, level_order, level_name");
 $class_levels = $class_levels_stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch sections for all classes (if needed for display, not for selection here)
+$sections_stmt = $pdo->query("SELECT id, class_id, section_name FROM sections ORDER BY class_id, section_name");
+$sections = $sections_stmt ? $sections_stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $curriculum_id = $_POST['curriculum_id'] ?? '';
     $class_level_id = $_POST['class_level_id'] ?? '';
     $class_name = trim($_POST['class_name'] ?? '');
+    $section_name = trim($_POST['section_name'] ?? '');
 
     if (!$curriculum_id || !$class_level_id || !$class_name) {
         $error = "All fields are required.";
     } else {
+        // Insert class
         $stmt = $pdo->prepare("INSERT INTO classes (curriculum_id, class_level_id, class_name) VALUES (?, ?, ?)");
         if ($stmt->execute([$curriculum_id, $class_level_id, $class_name])) {
+            $class_id = $pdo->lastInsertId();
+            // If section is provided, insert section
+            if ($section_name) {
+                $section_stmt = $pdo->prepare("INSERT INTO sections (class_id, section_name) VALUES (?, ?)");
+                $section_stmt->execute([$class_id, $section_name]);
+            }
             header("Location: classes.php?msg=Class+added+successfully");
             exit;
         } else {
@@ -96,6 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div style="margin-bottom:1rem;">
                             <label for="class_name">Class Name</label>
                             <input type="text" name="class_name" id="class_name" required>
+                        </div>
+                        <div style="margin-bottom:1rem;">
+                            <label for="section_name">Section (optional, e.g. A, B, C)</label>
+                            <input type="text" name="section_name" id="section_name" maxlength="10">
                         </div>
                         <button type="submit" class="btn" style="background:#3498db;color:#fff;">Add Class</button>
                         <a href="classes.php" class="btn" style="background:#aaa;color:#fff;margin-left:10px;">Cancel</a>
