@@ -1116,13 +1116,3 @@ UPDATE subjects SET class_level_id = 4 WHERE id IN (36,37,38,39,40,41,42,43,44,4
 
 -- Repeat for other curriculums and levels as needed.
 -- Link Primary subjects
-UPDATE subjects SET class_level_id = X WHERE id IN (1,2,3,4,5,6,7,8);
-
--- Link Lower Secondary subjects
-UPDATE subjects SET class_level_id = Y WHERE id IN (9,10,11,12,13,14,15);
-
--- Link IGCSE subjects
-UPDATE subjects SET class_level_id = Z WHERE id IN (16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35);
-
--- Link AS/A Level subjects
-UPDATE subjects SET class_level_id = W WHERE id IN (36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51);
