@@ -34,7 +34,14 @@ $classes_stmt = $pdo->query("
     JOIN curriculums cu ON c.curriculum_id = cu.id
     ORDER BY c.class_name
 ");
-$classes = $classes_stmt->fetchAll(PDO::FETCH_ASSOC);
+$classes = [];
+while ($row = $classes_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $classes[] = [
+        'id' => isset($row['id']) ? $row['id'] : '',
+        'class_name' => isset($row['class_name']) ? $row['class_name'] : '',
+        'curriculum_name' => isset($row['curriculum_name']) ? $row['curriculum_name'] : ''
+    ];
+}
 
 // Fetch subjects grouped by curriculum
 $subjects_by_curriculum = [];
