@@ -146,6 +146,49 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
             max-width: 100%;
             height: auto;
         }
+
+        @media (max-width: 900px) {
+            .admin-main {
+                margin-left: 0 !important;
+                padding: 10px 5px 80px !important;
+            }
+            .preview-container, .survey-info {
+                padding: 12px !important;
+                margin: 10px 0 !important;
+            }
+            .meta-grid {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+        }
+        @media (max-width: 600px) {
+            .admin-main {
+                padding: 5px 2px 80px !important;
+            }
+            .preview-container, .survey-info {
+                padding: 8px !important;
+                margin: 6px 0 !important;
+            }
+            .preview-field {
+                padding: 10px !important;
+            }
+            .form-actions {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            .admin-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+            .page-title {
+                font-size: 1.2rem !important;
+            }
+        }
+        .table-responsive {
+            overflow-x: auto;
+            width: 100%;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
