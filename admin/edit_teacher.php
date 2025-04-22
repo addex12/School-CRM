@@ -5,7 +5,7 @@ require_once '../includes/db.php';
 
 try {
     // Use variables from config/db.php
-    $db = new PDO("mysql:host=$host;dbname=$dbname", $user, $pass);
+    $db = new PDO("mysql:host=$host;dbname=$db_name", $username, $password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Database connection failed: " . $e->getMessage());
