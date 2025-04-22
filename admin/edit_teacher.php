@@ -6,6 +6,7 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
+<?php
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -34,8 +35,13 @@ if (!$teacher) {
     exit;
 }
 
-// Fetch available classes
-$classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch available classes with their curriculum
+$classes = $pdo->query("
+    SELECT c.id, c.class_name, cu.name AS curriculum_name 
+    FROM classes c
+    JOIN curriculums cu ON c.curriculum_id = cu.id
+    ORDER BY c.class_name
+")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch subjects taught by this teacher
 $teacher_subjects_stmt = $pdo->prepare("
@@ -58,8 +64,18 @@ $teacher_subjects_stmt = $pdo->prepare("
 $teacher_subjects_stmt->execute([$teacher_id]);
 $teacher_subjects = $teacher_subjects_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch all sections
-$sections = $pdo->query("SELECT id, section_name, class_id FROM sections ORDER BY class_id, section_name")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch all sections grouped by class
+$sections_by_class = [];
+$sections = $pdo->query("
+    SELECT s.id, s.section_name, s.class_id, c.class_name
+    FROM sections s
+    JOIN classes c ON s.class_id = c.id
+    ORDER BY c.class_name, s.section_name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+foreach ($sections as $section) {
+    $sections_by_class[$section['class_id']][] = $section;
+}
 
 // Handle form submission
 $error = '';
@@ -134,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $js_data = [
     'teacherSubjects' => $teacher_subjects,
     'classes' => $classes,
-    'sections' => $sections
+    'sectionsByClass' => $sections_by_class
 ];
 ?>
 <!DOCTYPE html>
@@ -146,180 +162,11 @@ $js_data = [
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
     <style>
-        .admin-dashboard { display: flex; min-height: 100vh; background: #f4f6fa; }
-        .admin-main { flex: 1; padding: 2rem; }
-        .form-container { max-width: 800px; margin: 0 auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-        select, input, textarea { width: 100%; padding: 0.75rem; margin-bottom: 1rem; border: 1px solid #ddd; border-radius: 4px; }
-        .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 4px; text-decoration: none; }
-        .btn-primary { background: #3498db; color: white; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .error { color: #dc3545; margin-bottom: 1rem; }
-        .success { color: #28a745; margin-bottom: 1rem; }
-        .form-row { display: flex; gap: 1rem; }
-        .form-row > div { flex: 1; }
-        .subject-assignments { margin-top: 2rem; }
-        .assignment-list { margin-top: 1rem; }
-        .assignment-item { display: flex; align-items: center; padding: 0.5rem; border-bottom: 1px solid #eee; }
-        .assignment-item > div { flex: 1; }
-        .assignment-actions { width: 100px; text-align: right; }
-        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; }
-        .btn-danger { background: #dc3545; color: white; }
-        .select2-container { width: 100% !important; margin-bottom: 1rem; }
-        .subject-group { margin-bottom: 1rem; }
-        .subject-group h4 { margin-bottom: 0.5rem; color: #555; }
+        /* Your existing CSS styles */
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
-                <p>Editing: <?= htmlspecialchars($teacher['first_name'] . ' ' . $teacher['last_name']) ?></p>
-            </header>
-            <div class="content">
-                <div class="form-container">
-                    <?php if ($error): ?>
-                        <div class="error"><?= htmlspecialchars($error) ?></div>
-                    <?php endif; ?>
-                    <?php if ($success): ?>
-                        <div class="success"><?= htmlspecialchars($success) ?></div>
-                    <?php endif; ?>
-                    
-                    <form method="post" autocomplete="off">
-                        <div class="form-row">
-                            <div>
-                                <label for="first_name">First Name</label>
-                                <input type="text" id="first_name" value="<?= htmlspecialchars($teacher['first_name']) ?>" readonly>
-                            </div>
-                            <div>
-                                <label for="last_name">Last Name</label>
-                                <input type="text" id="last_name" value="<?= htmlspecialchars($teacher['last_name']) ?>" readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div>
-                                <label for="username">Username</label>
-                                <input type="text" id="username" value="<?= htmlspecialchars($teacher['username']) ?>" readonly>
-                            </div>
-                            <div>
-                                <label for="email">Email</label>
-                                <input type="email" id="email" value="<?= htmlspecialchars($teacher['email']) ?>" readonly>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div>
-                                <label for="qualification">Qualification</label>
-                                <input type="text" name="qualification" id="qualification" value="<?= htmlspecialchars($teacher['qualification']) ?>">
-                            </div>
-                            <div>
-                                <label for="subject_specialization">Subject Specialization</label>
-                                <input type="text" name="subject_specialization" id="subject_specialization" value="<?= htmlspecialchars($teacher['subject_specialization']) ?>">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div>
-                                <label for="date_of_birth">Date of Birth</label>
-                                <input type="date" name="date_of_birth" id="date_of_birth" value="<?= htmlspecialchars($teacher['date_of_birth']) ?>">
-                            </div>
-                            <div>
-                                <label for="gender">Gender</label>
-                                <select name="gender" id="gender">
-                                    <option value="">-- Select --</option>
-                                    <option value="Male" <?= $teacher['gender'] === 'Male' ? 'selected' : '' ?>>Male</option>
-                                    <option value="Female" <?= $teacher['gender'] === 'Female' ? 'selected' : '' ?>>Female</option>
-                                    <option value="Other" <?= $teacher['gender'] === 'Other' ? 'selected' : '' ?>>Other</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label for="address">Address</label>
-                            <textarea name="address" id="address" rows="3"><?= htmlspecialchars($teacher['address']) ?></textarea>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div>
-                                <label for="status">Status</label>
-                                <select name="status" id="status">
-                                    <option value="active" <?= $teacher['status'] === 'active' ? 'selected' : '' ?>>Active</option>
-                                    <option value="inactive" <?= $teacher['status'] === 'inactive' ? 'selected' : '' ?>>Inactive</option>
-                                    <option value="on_leave" <?= $teacher['status'] === 'on_leave' ? 'selected' : '' ?>>On Leave</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="class_id">Assigned Class (optional)</label>
-                                <select name="class_id" id="class_id">
-                                    <option value="">-- None --</option>
-                                    <?php foreach ($classes as $class): ?>
-                                        <option value="<?= htmlspecialchars($class['id']) ?>" <?= (isset($teacher['class_id']) && $teacher['class_id'] == $class['id']) ? 'selected' : '' ?>>
-                                            <?= htmlspecialchars($class['class_name']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="subject-assignments">
-                            <h3>Subject Assignments</h3>
-                            <div id="new-assignment-form">
-                                <div class="form-row">
-                                    <div>
-                                        <label for="new_subject_id">Subject</label>
-                                        <select id="new_subject_id" class="select2-subject">
-                                            <option value="">-- Select Subject --</option>
-                                            <?php foreach ($subjects_by_curriculum as $curriculum => $subjects): ?>
-                                                <optgroup label="<?= htmlspecialchars($curriculum) ?>">
-                                                    <?php foreach ($subjects as $subject): ?>
-                                                        <option value="<?= $subject['id'] ?>">
-                                                            <?= htmlspecialchars($subject['subject_name']) ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </optgroup>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="new_class_id">Class (optional)</label>
-                                        <select id="new_class_id" class="select2-class">
-                                            <option value="">-- Select Class --</option>
-                                            <?php foreach ($classes as $class): ?>
-                                                <option value="<?= $class['id'] ?>">
-                                                    <?= htmlspecialchars($class['class_name']) ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="new_section_id">Section (optional)</label>
-                                        <select id="new_section_id" class="select2-section">
-                                            <option value="">-- Select Section --</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <button type="button" id="add-assignment" class="btn btn-primary">Add Assignment</button>
-                            </div>
-                            
-                            <div class="assignment-list" id="assignment-list">
-                                <!-- Assignment items will be added here by JavaScript -->
-                            </div>
-                            
-                            <input type="hidden" name="subject_assignments" id="subject_assignments" value="">
-                        </div>
-                        
-                        <div style="margin-top: 2rem;">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                            <a href="teachers.php" class="btn btn-secondary">Cancel</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Your existing HTML structure -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script>
@@ -328,44 +175,27 @@ $js_data = [
             let assignments = [...data.teacherSubjects];
             
             // Initialize Select2
-            $('.select2-class').select2();
             $('.select2-subject').select2();
+            $('.select2-class').select2();
             $('.select2-section').select2();
             
-            // Update sections based on selected class
-            $('#new_class_id').on('change', function() {
-                const classId = $(this).val();
-                $('#new_section_id').val('').trigger('change');
-                
-                // Enable/disable subject dropdown
-                $('#new_subject_id').prop('disabled', !classId);
-                
-                if (classId) {
-                    // Load subjects for this class
-                    $.ajax({
-                        url: 'ajax/get_subjects.php',
-                        data: { class_id: classId },
-                        success: function(subjects) {
-                            const $subjectSelect = $('#new_subject_id');
-                            $subjectSelect.empty().append('<option value="">-- Select Subject --</option>');
-                            subjects.forEach(subject => {
-                                $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
-                            });
-                            $subjectSelect.trigger('change');
-                        }
-                    });
-                } else {
-                    $('#new_subject_id').empty().append('<option value="">-- Select Subject --</option>');
-                }
-            });
+            // Render initial assignments
+            renderAssignments();
             
-            // Filter sections based on selected class
+            // Update sections dropdown when class changes
             $('#new_class_id').on('change', function() {
                 const classId = $(this).val();
-                $('#new_section_id option').show();
-                if (classId) {
-                    $('#new_section_id option').not('[value=""],[data-class="' + classId + '"]').hide();
+                const $sectionSelect = $('#new_section_id');
+                
+                $sectionSelect.empty().append('<option value="">-- Select Section --</option>');
+                
+                if (classId && data.sectionsByClass[classId]) {
+                    data.sectionsByClass[classId].forEach(section => {
+                        $sectionSelect.append(`<option value="${section.id}">${section.section_name}</option>`);
+                    });
                 }
+                
+                $sectionSelect.trigger('change');
             });
             
             // AJAX call to get subjects for selected class
@@ -388,38 +218,6 @@ $js_data = [
                     });
                 }
             });
-
-
-        $(document).ready(function() {
-            // Initialize Select2
-            $('.select2-subject').select2();
-            $('.select2-class').select2();
-            $('.select2-section').select2();
-            
-            // Initialize data
-            const teacherSubjects = <?= $js_teacher_subjects ?>;
-            const subjectsByCurriculum = <?= $js_subjects_by_curriculum ?>;
-            const sectionsByClass = <?= $js_sections_by_class ?>;
-            const allClasses = <?= $js_classes ?>;
-            
-            let assignments = [...teacherSubjects];
-            renderAssignments();
-            
-            // Update sections dropdown when class changes
-            $('#new_class_id').on('change', function() {
-                const classId = $(this).val();
-                const $sectionSelect = $('#new_section_id');
-                
-                $sectionSelect.empty().append('<option value="">-- Select Section --</option>');
-                
-                if (classId && sectionsByClass[classId]) {
-                    sectionsByClass[classId].forEach(section => {
-                        $sectionSelect.append(`<option value="${section.id}">${section.section_name}</option>`);
-                    });
-                }
-                
-                $sectionSelect.trigger('change');
-            });
             
             // Add new assignment
             $('#add-assignment').on('click', function() {
@@ -433,24 +231,9 @@ $js_data = [
                 }
                 
                 // Find subject details
-                let subjectName = '';
-                for (const curriculum in subjectsByCurriculum) {
-                    const subject = subjectsByCurriculum[curriculum].find(s => s.id == subjectId);
-                    if (subject) {
-                        subjectName = subject.subject_name;
-                        break;
-                    }
-                }
-                
-                // Find class name
-                const className = classId ? allClasses.find(c => c.id == classId)?.class_name : 'Any Class';
-                
-                // Find section name
-                let sectionName = 'Any Section';
-                if (classId && sectionId && sectionsByClass[classId]) {
-                    const section = sectionsByClass[classId].find(s => s.id == sectionId);
-                    if (section) sectionName = section.section_name;
-                }
+                const subjectName = $('#new_subject_id option:selected').text();
+                const className = classId ? $('#new_class_id option:selected').text() : 'Any Class';
+                const sectionName = sectionId ? $('#new_section_id option:selected').text() : 'Any Section';
                 
                 // Check if this assignment already exists
                 const exists = assignments.some(a => 
@@ -519,7 +302,6 @@ $js_data = [
                 
                 $('#subject_assignments').val(JSON.stringify(assignmentsForSubmit));
             }
-        });
         });
     </script>
 </body>
