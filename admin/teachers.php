@@ -282,7 +282,12 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($teacher['username']) ?></td>
                                             <td><?= htmlspecialchars($teacher['email']) ?></td>
                                             <td><span class="badge-role"><?= htmlspecialchars($teacher['role_name'] ?? 'N/A') ?></span></td>
-                                            <td><?= htmlspecialchars($teacher['class_name'] ?? '-') ?></td>
+                                            <td>
+                                                <?php
+                                                // Show class name or "Unassigned" if null/empty
+                                                echo !empty($teacher['class_name']) ? htmlspecialchars($teacher['class_name']) : '<span style="color:#888;">Unassigned</span>';
+                                                ?>
+                                            </td>
                                             <td>
                                                 <?= $teacher['teacher_created_at'] 
                                                     ? date('M j, Y g:i A', strtotime($teacher['teacher_created_at'])) 
