@@ -12,6 +12,13 @@ try {
 // Fetch all grades/classes from class_names
 $class_names = $db->query("SELECT id, grade FROM class_names")->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch all sections grouped by class_name_id
+$sections_stmt = $db->query("SELECT class_name_id, section FROM sections ORDER BY class_name_id, section");
+$sections = [];
+foreach ($sections_stmt as $row) {
+    $sections[$row['class_name_id']][] = $row['section'];
+}
+
 $message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $class_name_id = $_POST['class_name_id'];
@@ -27,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $db->prepare("INSERT INTO sections (class_name_id, section) VALUES (?, ?)");
         if ($stmt->execute([$class_name_id, $section])) {
             $message = "Section added successfully!";
+            // Update the $sections array immediately for display
+            $sections[$class_name_id][] = $section;
         } else {
             $message = "Failed to add section.";
         }
@@ -59,10 +68,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit">Add Section</button>
     </form>
 
-    <h3>All Grades</h3>
+    <h3>Grades and Their Sections</h3>
     <ul>
         <?php foreach ($class_names as $class): ?>
-            <li><?= htmlspecialchars($class['grade']) ?></li>
+            <li>
+                <strong><?= htmlspecialchars($class['grade']) ?>:</strong>
+                <?php if (!empty($sections[$class['id']])): ?>
+                    <?= implode(', ', array_map('htmlspecialchars', $sections[$class['id']])) ?>
+                <?php else: ?>
+                    <em>No sections</em>
+                <?php endif; ?>
+            </li>
         <?php endforeach; ?>
     </ul>
 </body>
