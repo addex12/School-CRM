@@ -36,6 +36,7 @@ $classes_stmt = $pdo->query("
 ");
 $classes = [];
 while ($row = $classes_stmt->fetch(PDO::FETCH_ASSOC)) {
+    // Use 'id' as the key for the value attribute in the select dropdown
     $classes[] = [
         'id' => isset($row['id']) ? $row['id'] : '',
         'class_name' => isset($row['class_name']) ? $row['class_name'] : '',
@@ -264,7 +265,7 @@ $js_classes = json_encode($classes);
                                 <select name="class_id" id="class_id">
                                     <option value="">-- None --</option>
                                     <?php foreach ($classes as $class): ?>
-                                        <option value="<?= $class['id'] ?>" <?= $teacher['class_id'] == $class['id'] ? 'selected' : '' ?>>
+                                        <option value="<?= htmlspecialchars($class['id']) ?>" <?= (isset($teacher['class_id']) && $teacher['class_id'] == $class['id']) ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($class['class_name']) ?>
                                         </option>
                                     <?php endforeach; ?>
