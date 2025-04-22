@@ -154,27 +154,27 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
         <?php include 'includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">
-            <header class="admin-header">
-                <h1 class="page-title"><?= htmlspecialchars($survey['title']) ?> Preview</h1>
-                <div class="header-actions">
-                    <a href="surveys.php" class="btn btn-back">
+            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                <h1 class="page-title" style="margin: 0; flex: 1;"><?= htmlspecialchars($survey['title']) ?> Preview</h1>
+                <div class="header-actions" style="flex-shrink: 0;">
+                    <a href="surveys.php" class="btn btn-back" style="margin-right: 10px;">
                         <i class="fas fa-arrow-left"></i> Back to Surveys
                     </a>
                 </div>
             </header>
 
-            <div class="content">
-                <div class="survey-info">
+            <div class="content" style="margin-top: 20px;">
+                <div class="survey-info" aria-label="Survey Information">
                     <div class="survey-meta">
                         <h2>Survey Details</h2>
-                        <div class="meta-grid">
+                        <div class="meta-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
                             <div class="meta-item">
                                 <label>Description:</label>
-                                <p><?= htmlspecialchars($survey['description']) ?></p>
+                                <p><?= !empty($survey['description']) ? htmlspecialchars($survey['description']) : '<em>No description provided.</em>' ?></p>
                             </div>
                             <div class="meta-item">
                                 <label>Target Audience:</label>
-                                <p id="target-roles">Loading...</p>
+                                <p id="target-roles" aria-live="polite">Loading...</p>
                             </div>
                             <div class="meta-item">
                                 <label>Status:</label>
@@ -193,109 +193,127 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                             <div class="meta-item">
                                 <label>Schedule:</label>
                                 <p>
-                                    <?= date('M j, Y', strtotime($survey['starts_at'])) ?> - 
-                                    <?= date('M j, Y', strtotime($survey['ends_at'])) ?>
+                                    <?php if (!empty($survey['starts_at']) && !empty($survey['ends_at'])): ?>
+                                        <?= date('M j, Y', strtotime($survey['starts_at'])) ?> - 
+                                        <?= date('M j, Y', strtotime($survey['ends_at'])) ?>
+                                    <?php else: ?>
+                                        <em>Not scheduled</em>
+                                    <?php endif; ?>
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="preview-container">
-                    <?php foreach ($fields as $field): ?>
-                        <div class="preview-field">
-                            <div class="field-header">
-                                <h3><?= htmlspecialchars($field['field_label']) ?>
-                                    <?php if ($field['is_required']): ?>
-                                        <span class="required">*</span>
-                                    <?php endif; ?>
-                                </h3>
-                            </div>
-                            
-                            <?php if ($field['field_type'] === 'text'): ?>
-                                <input type="text" class="form-control" disabled placeholder="Text input">
-
-                            <?php elseif ($field['field_type'] === 'textarea'): ?>
-                                <textarea class="form-control" rows="4" disabled placeholder="Textarea input"></textarea>
-
-                            <?php elseif (in_array($field['field_type'], ['radio', 'checkbox', 'dropdown'])): ?>
-                                <div class="options">
-                                    <?php
-                                    $options = json_decode($field['field_options'], true);
-                                    foreach ($options as $option):
-                                    ?>
-                                        <div class="form-check">
-                                            <input class="form-check-input" 
-                                                   type="<?= $field['field_type'] === 'radio' ? 'radio' : 'checkbox' ?>" 
-                                                   disabled>
-                                            <label class="form-check-label">
-                                                <?= htmlspecialchars($option) ?>
-                                            </label>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-
-                            <?php elseif ($field['field_type'] === 'rating'): ?>
-                                <div class="rating-container">
-                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                        <span class="rating-star">★</span>
-                                    <?php endfor; ?>
-                                </div>
-
-                            <?php elseif ($field['field_type'] === 'file'): ?>
-                                <div class="file-preview">
-                                    <input type="file" class="form-control" disabled>
-                                    <small class="form-text text-muted">File upload preview</small>
-                                </div>
-
-                            <?php endif; ?>
-
-                            <?php if (in_array($field['field_type'], ['radio', 'checkbox', 'select'])): ?>
-                                <canvas id="chart-<?= $field['id'] ?>" class="response-chart"></canvas>
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        fetch(`../api/response_data.php?field_id=<?= $field['id'] ?>`)
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                const ctx = document.getElementById('chart-<?= $field['id'] ?>').getContext('2d');
-                                                new Chart(ctx, {
-                                                    type: 'bar',
-                                                    data: {
-                                                        labels: Object.keys(data),
-                                                        datasets: [{
-                                                            label: 'Responses',
-                                                            data: Object.values(data),
-                                                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                                                            borderColor: 'rgba(54, 162, 235, 1)',
-                                                            borderWidth: 1
-                                                        }]
-                                                    },
-                                                    options: {
-                                                        responsive: true,
-                                                        plugins: {
-                                                            legend: { display: false },
-                                                            tooltip: { enabled: true }
-                                                        }
-                                                    }
-                                                });
-                                            });
-                                    });
-                                </script>
-                            <?php else: ?>
-                                <p>No graphical representation available for this field type.</p>
-                            <?php endif; ?>
-
-                            <div class="field-meta">
-                                <div class="meta-row">
-                                    <span><strong>Type:</strong> <?= ucfirst(str_replace('_', ' ', $field['field_type'])) ?></span>
-                                    <span><strong>Technical Name:</strong> <code><?= htmlspecialchars($field['field_name']) ?></code></span>
-                                    <span><strong>Required:</strong> <?= $field['is_required'] ? 'Yes' : 'No' ?></span>
-                                </div>
-                            </div>
+                <div class="preview-container" aria-label="Survey Fields Preview">
+                    <?php if (empty($fields)): ?>
+                        <div class="alert alert-info" role="alert" style="text-align:center;">
+                            No fields have been added to this survey yet.
                         </div>
-                    <?php endforeach; ?>
+                    <?php else: ?>
+                        <?php foreach ($fields as $field): ?>
+                            <div class="preview-field" tabindex="0" aria-label="Field Preview" style="display: flex; flex-direction: column; gap: 10px;">
+                                <div class="field-header" style="display: flex; align-items: center; gap: 8px;">
+                                    <h3 style="margin: 0;"><?= htmlspecialchars($field['field_label']) ?>
+                                        <?php if ($field['is_required']): ?>
+                                            <span class="required" aria-label="Required">*</span>
+                                        <?php endif; ?>
+                                    </h3>
+                                </div>
+                                
+                                <?php if ($field['field_type'] === 'text'): ?>
+                                    <input type="text" class="form-control" disabled placeholder="Text input" aria-label="Text input preview">
 
-                    <div class="form-actions">
+                                <?php elseif ($field['field_type'] === 'textarea'): ?>
+                                    <textarea class="form-control" rows="4" disabled placeholder="Textarea input" aria-label="Textarea input preview"></textarea>
+
+                                <?php elseif (in_array($field['field_type'], ['radio', 'checkbox', 'dropdown'])): ?>
+                                    <div class="options" aria-label="Options" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                        <?php
+                                        $options = json_decode($field['field_options'], true);
+                                        if (is_array($options) && count($options) > 0):
+                                            foreach ($options as $option):
+                                        ?>
+                                            <div class="form-check" style="min-width: 120px;">
+                                                <input class="form-check-input" 
+                                                       type="<?= $field['field_type'] === 'radio' ? 'radio' : 'checkbox' ?>" 
+                                                       disabled>
+                                                <label class="form-check-label">
+                                                    <?= htmlspecialchars($option) ?>
+                                                </label>
+                                            </div>
+                                        <?php
+                                            endforeach;
+                                        else:
+                                        ?>
+                                            <div class="form-check">
+                                                <em>No options defined.</em>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                <?php elseif ($field['field_type'] === 'rating'): ?>
+                                    <div class="rating-container" aria-label="Rating preview" style="display: flex; gap: 2px;">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <span class="rating-star" aria-hidden="true">★</span>
+                                        <?php endfor; ?>
+                                    </div>
+
+                                <?php elseif ($field['field_type'] === 'file'): ?>
+                                    <div class="file-preview">
+                                        <input type="file" class="form-control" disabled aria-label="File upload preview">
+                                        <small class="form-text text-muted">File upload preview</small>
+                                    </div>
+
+                                <?php endif; ?>
+
+                                <?php if (in_array($field['field_type'], ['radio', 'checkbox', 'select'])): ?>
+                                    <canvas id="chart-<?= $field['id'] ?>" class="response-chart" aria-label="Response Chart"></canvas>
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function () {
+                                            fetch(`../api/response_data.php?field_id=<?= $field['id'] ?>`)
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    const ctx = document.getElementById('chart-<?= $field['id'] ?>').getContext('2d');
+                                                    new Chart(ctx, {
+                                                        type: 'bar',
+                                                        data: {
+                                                            labels: Object.keys(data),
+                                                            datasets: [{
+                                                                label: 'Responses',
+                                                                data: Object.values(data),
+                                                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                                                borderColor: 'rgba(54, 162, 235, 1)',
+                                                                borderWidth: 1
+                                                            }]
+                                                        },
+                                                        options: {
+                                                            responsive: true,
+                                                            plugins: {
+                                                                legend: { display: false },
+                                                                tooltip: { enabled: true }
+                                                            }
+                                                        }
+                                                    });
+                                                });
+                                        });
+                                    </script>
+                                <?php else: ?>
+                                    <p><em>No graphical representation available for this field type.</em></p>
+                                <?php endif; ?>
+
+                                <div class="field-meta" style="display: flex; flex-wrap: wrap; gap: 20px; font-size: 0.95em;">
+                                    <div class="meta-row" style="display: flex; gap: 18px;">
+                                        <span><strong>Type:</strong> <?= ucfirst(str_replace('_', ' ', $field['field_type'])) ?></span>
+                                        <span><strong>Technical Name:</strong> <code><?= htmlspecialchars($field['field_name']) ?></code></span>
+                                        <span><strong>Required:</strong> <?= $field['is_required'] ? 'Yes' : 'No' ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <div class="form-actions" style="display: flex; justify-content: center; gap: 20px;">
                         <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-edit">
                             <i class="fas fa-edit"></i> Edit Survey
                         </a>
