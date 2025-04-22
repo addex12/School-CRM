@@ -85,13 +85,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $update_stmt = $pdo->prepare("
         UPDATE teachers 
         SET qualification = ?, subject_specialization = ?, date_of_birth = ?, 
-            gender = ?, address = ?, status = ?, class_id = ?
+            gender = ?, address = ?, status = ?
         WHERE id = ?
     ");
     
     if ($update_stmt->execute([
         $qualification, $subject_specialization, $date_of_birth,
-        $gender, $address, $status, $class_id, $teacher_id
+        $gender, $address, $status, $teacher_id
     ])) {
         $success = "Teacher information updated successfully.";
     } else {
