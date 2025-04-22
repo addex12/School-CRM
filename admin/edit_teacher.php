@@ -58,11 +58,12 @@ while ($subject = $subjects_stmt->fetch(PDO::FETCH_ASSOC)) {
 
 // Fetch subjects taught by this teacher
 $teacher_subjects_stmt = $pdo->prepare("
-    SELECT ts.id, ts.subject, ts.class_id, ts.section_id, 
-           s.subject_name, c.class_name, sec.section_name
+    SELECT ts.id, cs.subject_id, cs.class_id, s.subject_name, 
+           c.class_name, sec.section_name, sec.id as section_id
     FROM teacher_subjects ts
-    JOIN subjects s ON ts.subject = s.id
-    LEFT JOIN classes c ON ts.class_id = c.id
+    JOIN class_subjects cs ON ts.class_subject_id = cs.id
+    JOIN subjects s ON cs.subject_id = s.id
+    LEFT JOIN classes c ON cs.class_id = c.id
     LEFT JOIN sections sec ON ts.section_id = sec.id
     WHERE ts.teacher_id = ?
     ORDER BY c.class_name, sec.section_name, s.subject_name
