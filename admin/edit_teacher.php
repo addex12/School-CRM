@@ -123,21 +123,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Then add new assignments
         if (is_array($new_assignments)) {
-            $insert_stmt = $pdo->prepare("
-                INSERT INTO teacher_subjects (teacher_id, subject_id, class_id, section_id)
-                VALUES (?, ?, ?, ?)
-            ");
-            
-            foreach ($new_assignments as $assignment) {
-                $subject_id = intval($assignment['subject_id']);
-                $class_id = !empty($assignment['class_id']) ? intval($assignment['class_id']) : null;
-                $section_id = !empty($assignment['section_id']) ? intval($assignment['section_id']) : null;
-                
-                $insert_stmt->execute([
-                    $teacher_id, $subject_id, $class_id, $section_id
-                ]);
-            }
-        }
+            $class_subjects = [];
+$cs_stmt = $pdo->query("SELECT id, class_id, subject_id FROM class_subjects");
+while ($row = $cs_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $key = $row['class_id'] . '_' . $row['subject_id'];
+    $class_subjects[$key] = $row['id'];
+}
+
+$insert_stmt = $pdo->prepare("
+    INSERT INTO teacher_subjects (teacher_id, class_subject_id, section_id)
+    VALUES (?, ?, ?)
+");
+
+foreach ($new_assignments as $assignment) {
+    $subject_id = intval($assignment['subject_id']);
+    $class_id = !empty($assignment['class_id']) ? intval($assignment['class_id']) : null;
+    $section_id = !empty($assignment['section_id']) ? intval($assignment['section_id']) : null;
+    
+    // Find the class_subject_id
+    $key = ($class_id ?: '0') . '_' . $subject_id;
+    $class_subject_id = $class_subjects[$key] ?? null;
+    
+    if ($class_subject_id) {
+        $insert_stmt->execute([
+            $teacher_id, $class_subject_id, $section_id
+        ]);
     }
 }
 
