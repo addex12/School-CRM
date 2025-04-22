@@ -55,6 +55,85 @@ $questions = $stmt->fetchAll();
     <meta charset="UTF-8">
     <title>Manage Questions - Parent Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            margin-bottom: 20px;
+        }
+        nav {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            margin-right: 15px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .question-item {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 18px;
+        }
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 18px;
+            border-radius: 4px;
+            border: none;
+            background: #3498db;
+            color: #fff;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #2ecc71;
+        }
+        .success-message {
+            background: #eafaf1;
+            color: #27ae60;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        .no-questions {
+            color: #888;
+            font-style: italic;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 8px;
+            }
+            .form-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .question-header {
+                flex-direction: column;
+                gap: 6px;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">

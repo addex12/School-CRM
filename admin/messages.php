@@ -29,25 +29,31 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             height: 70vh;
             border: 1px solid #ddd;
             border-radius: 5px;
+            background: #fff;
+            overflow: hidden;
         }
         .contact-list {
             width: 250px;
             border-right: 1px solid #ddd;
             overflow-y: auto;
+            background: #f8f9fa;
         }
         .chat-section {
             flex: 1;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
         .chat-messages {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
+            background: #f9f9f9;
         }
         .message-form {
             padding: 15px;
             border-top: 1px solid #ddd;
+            background: #fff;
         }
         .user-list li {
             padding: 10px;
@@ -73,6 +79,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             padding: 10px;
             border-radius: 5px;
             max-width: 70%;
+            word-break: break-word;
         }
         .chat-message.own {
             background-color: #e3f2fd;
@@ -87,6 +94,46 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             color: #777;
             display: block;
             margin-top: 5px;
+        }
+        @media (max-width: 900px) {
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 400px;
+            }
+            .contact-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                min-height: 60px;
+                max-height: 120px;
+            }
+            .chat-section {
+                min-width: 0;
+            }
+        }
+        @media (max-width: 600px) {
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .contact-list {
+                width: 100%;
+                min-width: 0;
+                max-width: 100vw;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+                font-size: 0.98em;
+            }
+            .chat-section {
+                min-width: 0;
+            }
+            .chat-messages {
+                padding: 8px;
+            }
+            .message-form {
+                padding: 8px;
+            }
         }
     </style>
 </head>
