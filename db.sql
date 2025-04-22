@@ -1051,6 +1051,9 @@ ALTER TABLE `student_parents`
 ALTER TABLE `subjects`
   ADD CONSTRAINT `subjects_ibfk_1` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE subjects
+    ADD COLUMN class_level_id INT NULL AFTER curriculum_id;
+
 --
 -- Constraints for table `surveys`
 --

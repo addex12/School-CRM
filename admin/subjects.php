@@ -5,11 +5,11 @@ require_once '../includes/config.php';
 
 $pageTitle = "Subjects Management";
 
-// Fetch curriculums and levels for dropdowns
+// Fetch curriculums and class levels for dropdowns
 $curriculums = $pdo->query("SELECT id, name FROM curriculums ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 $class_levels = $pdo->query("SELECT id, curriculum_id, level_name FROM class_levels ORDER BY curriculum_id, level_order, level_name")->fetchAll(PDO::FETCH_ASSOC);
 
-// Helper: group levels by curriculum for JS
+// Group levels by curriculum for JS
 $levelsByCurriculum = [];
 foreach ($class_levels as $level) {
     $levelsByCurriculum[$level['curriculum_id']][] = $level;
@@ -81,12 +81,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_subject'])) {
     }
 }
 
-// Fetch all subjects with curriculum info only (no class_level_id join)
+// Fetch all subjects with curriculum and class level info
 $stmt = $pdo->query("
-    SELECT s.id, s.subject_name, cu.name AS curriculum
+    SELECT s.id, s.subject_name, cu.name AS curriculum, lv.level_name
     FROM subjects s
     LEFT JOIN curriculums cu ON s.curriculum_id = cu.id
-    ORDER BY cu.name, s.subject_name
+    LEFT JOIN class_levels lv ON s.class_level_id = lv.id
+    ORDER BY cu.name, lv.level_name, s.subject_name
 ");
 $subjects = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -256,6 +257,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                 <tr>
                                     <th>ID</th>
                                     <th>Curriculum</th>
+                                    <th>Class Level</th>
                                     <th>Subject Name</th>
                                     <th>Actions</th>
                                 </tr>
@@ -266,6 +268,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                         <tr>
                                             <td><?= esc($subject['id']) ?></td>
                                             <td><?= esc($subject['curriculum'] ?? '-') ?></td>
+                                            <td><?= esc($subject['level_name'] ?? '-') ?></td>
                                             <td><?= esc($subject['subject_name']) ?></td>
                                             <td class="subject-actions">
                                                 <a href="subjects.php?edit_id=<?= esc($subject['id']) ?>" title="Edit"><i class="fas fa-edit"></i></a>
@@ -275,7 +278,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="4">No subjects found.</td>
+                                        <td colspan="5">No subjects found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
