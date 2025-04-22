@@ -83,20 +83,40 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .dashboard-section {
+            max-width: 700px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+        }
         .grading-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
         .grading-header h2 {
             margin: 0;
             font-size: 1.5rem;
             color: #34495e;
         }
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .form-row > div {
+            flex: 1 1 160px;
+            min-width: 140px;
+        }
         .grading-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 600px;
         }
         .grading-table th, .grading-table td {
             padding: 12px 16px;
@@ -120,30 +140,37 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         .grading-actions a:last-child {
             margin-right: 0;
         }
-        .dashboard-section {
-            max-width: 700px;
-            margin: 2rem auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-        }
-        .form-row {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .form-row > div {
-            flex: 1 1 160px;
-        }
         @media (max-width: 900px) {
             .dashboard-section { max-width: 98vw; padding: 1rem 0.5rem; }
             .form-row { flex-direction: column; gap: 0.5rem; }
+            .grading-table { min-width: 400px; }
         }
         @media (max-width: 600px) {
             .dashboard-section { padding: 0.5rem 0.2rem; }
             .grading-table th, .grading-table td { padding: 8px 6px; }
+            .form-row > div { min-width: 100px; }
         }
+        .btn, button.btn {
+            padding: 8px 18px;
+            border-radius: 5px;
+            font-size: 1em;
+            border: none;
+            background: #3498db;
+            color: #fff;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.18s;
+        }
+        .btn:hover, button.btn:hover {
+            background: #217dbb;
+        }
+        .btn[style*="background:#aaa"], button.btn[style*="background:#aaa"] {
+            background: #aaa !important;
+            color: #fff !important;
+        }
+        .success, .alert-success { color: #27ae60; margin-bottom: 1rem; }
+        .error, .alert-error { color: #e74c3c; margin-bottom: 1rem; }
+        .table-responsive { overflow-x: auto; }
     </style>
 </head>
 <body>
@@ -159,9 +186,9 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                         <h2><?= $edit_scale ? 'Edit Grading Scale' : 'Add Grading Scale' ?></h2>
                     </div>
                     <?php if ($error): ?>
-                        <div style="color:#e74c3c;"><?= esc($error) ?></div>
+                        <div class="error"><?= esc($error) ?></div>
                     <?php elseif ($success): ?>
-                        <div style="color:#27ae60;"><?= esc($success) ?></div>
+                        <div class="success"><?= esc($success) ?></div>
                     <?php endif; ?>
                     <form method="post" autocomplete="off">
                         <?php if ($edit_scale): ?>
@@ -200,7 +227,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                 <input type="text" name="remark" id="remark" value="<?= esc($edit_scale['remark'] ?? '') ?>">
                             </div>
                         </div>
-                        <div style="margin-top:1.2rem;">
+                        <div>
                             <?php if ($edit_scale): ?>
                                 <button type="submit" name="update_scale" class="btn">Update</button>
                                 <a href="grading_scales.php" class="btn" style="background:#aaa;">Cancel</a>
