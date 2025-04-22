@@ -66,6 +66,18 @@ $widgets = [
         "icon" => "fa-ticket-alt",
         "color" => "red",
         "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
+    ],
+    [
+        "title" => "Number of Classes",
+        "icon" => "fa-school",
+        "color" => "orange",
+        "query" => "SELECT COUNT(*) FROM classes"
+    ],
+    [
+        "title" => "Number of Sections",
+        "icon" => "fa-th-large",
+        "color" => "teal",
+        "query" => "SELECT COUNT(*) FROM sections"
     ]
 ];
 
@@ -112,6 +124,63 @@ $errorLogPath = realpath(__DIR__ . '/../error.log');
 if ($errorLogPath && is_readable($errorLogPath)) {
     $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $errorLogLines = array_slice($lines, -20);
+}
+
+// Fetch grade distribution for chart
+$gradeChartData = [];
+try {
+    $stmt = $pdo->query("SELECT grade_letter, COUNT(*) as count FROM grades GROUP BY grade_letter ORDER BY grade_letter");
+    $gradeChartData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+} catch (Exception $e) {
+    $gradeChartData = [];
+}
+
+// Fetch grade distribution by class
+$gradeByClass = [];
+try {
+    $stmt = $pdo->query("SELECT c.class_name, g.grade_letter, COUNT(*) as count
+        FROM grades g
+        LEFT JOIN students s ON g.student_id = s.id
+        LEFT JOIN classes c ON s.class_id = c.id
+        GROUP BY c.class_name, g.grade_letter
+        ORDER BY c.class_name, g.grade_letter");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $gradeByClass[$row['class_name']][$row['grade_letter']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $gradeByClass = [];
+}
+
+// Fetch grade distribution by section
+$gradeBySection = [];
+try {
+    $stmt = $pdo->query("SELECT sec.section_name, g.grade_letter, COUNT(*) as count
+        FROM grades g
+        LEFT JOIN sections sec ON g.section_id = sec.id
+        GROUP BY sec.section_name, g.grade_letter
+        ORDER BY sec.section_name, g.grade_letter");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $gradeBySection[$row['section_name']][$row['grade_letter']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $gradeBySection = [];
+}
+
+// Fetch grade distribution by level/grade
+$gradeByLevel = [];
+try {
+    $stmt = $pdo->query("SELECT lv.level_name, g.grade_letter, COUNT(*) as count
+        FROM grades g
+        LEFT JOIN students s ON g.student_id = s.id
+        LEFT JOIN classes c ON s.class_id = c.id
+        LEFT JOIN class_levels lv ON c.class_level_id = lv.id
+        GROUP BY lv.level_name, g.grade_letter
+        ORDER BY lv.level_name, g.grade_letter");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $gradeByLevel[$row['level_name']][$row['grade_letter']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $gradeByLevel = [];
 }
 ?>
 
@@ -334,6 +403,30 @@ if ($errorLogPath && is_readable($errorLogPath)) {
                     <?php endforeach; ?>
                 </div>
 
+                <!-- Grade Scale Chart -->
+                <div class="dashboard-section">
+                    <h2>Grade Scale Distribution (All Students)</h2>
+                    <canvas id="gradeScaleChart" height="80"></canvas>
+                </div>
+
+                <!-- Grade Distribution by Class -->
+                <div class="dashboard-section">
+                    <h2>Grade Distribution by Class</h2>
+                    <canvas id="gradeByClassChart" height="100"></canvas>
+                </div>
+
+                <!-- Grade Distribution by Section -->
+                <div class="dashboard-section">
+                    <h2>Grade Distribution by Section</h2>
+                    <canvas id="gradeBySectionChart" height="100"></canvas>
+                </div>
+
+                <!-- Grade Distribution by Level/Grade -->
+                <div class="dashboard-section">
+                    <h2>Grade Distribution by Level/Grade</h2>
+                    <canvas id="gradeByLevelChart" height="100"></canvas>
+                </div>
+
                 <!-- System Stats Section -->
                 <div class="dashboard-section">
                     <h2>System Stats</h2>
@@ -469,6 +562,67 @@ if ($errorLogPath && is_readable($errorLogPath)) {
         </div>
         <?php include 'includes/footer.php'; ?>
     </div>
+    <script>
+        // Grade Scale Chart
+        const gradeScaleCtx = document.getElementById('gradeScaleChart').getContext('2d');
+        new Chart(gradeScaleCtx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode(array_keys($gradeChartData)) ?>,
+                datasets: [{
+                    label: 'Number of Students',
+                    data: <?= json_encode(array_values($gradeChartData)) ?>,
+                    backgroundColor: '#3498db'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        // Grade By Class Chart
+        const gradeByClassData = <?= json_encode($gradeByClass) ?>;
+        const classLabels = Object.keys(gradeByClassData);
+        const gradeLetters = [...new Set([].concat(...Object.values(gradeByClassData).map(Object.keys)))];
+        const datasetsByClass = gradeLetters.map(letter => ({
+            label: letter,
+            data: classLabels.map(cls => gradeByClassData[cls][letter] ?? 0),
+            backgroundColor: '#' + Math.floor(Math.random()*16777215).toString(16)
+        }));
+        new Chart(document.getElementById('gradeByClassChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: classLabels, datasets: datasetsByClass },
+            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
+        });
+
+        // Grade By Section Chart
+        const gradeBySectionData = <?= json_encode($gradeBySection) ?>;
+        const sectionLabels = Object.keys(gradeBySectionData);
+        const gradeLettersSection = [...new Set([].concat(...Object.values(gradeBySectionData).map(Object.keys)))];
+        const datasetsBySection = gradeLettersSection.map(letter => ({
+            label: letter,
+            data: sectionLabels.map(sec => gradeBySectionData[sec][letter] ?? 0),
+            backgroundColor: '#' + Math.floor(Math.random()*16777215).toString(16)
+        }));
+        new Chart(document.getElementById('gradeBySectionChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: sectionLabels, datasets: datasetsBySection },
+            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
+        });
+
+        // Grade By Level Chart
+        const gradeByLevelData = <?= json_encode($gradeByLevel) ?>;
+        const levelLabels = Object.keys(gradeByLevelData);
+        const gradeLettersLevel = [...new Set([].concat(...Object.values(gradeByLevelData).map(Object.keys)))];
+        const datasetsByLevel = gradeLettersLevel.map(letter => ({
+            label: letter,
+            data: levelLabels.map(lv => gradeByLevelData[lv][letter] ?? 0),
+            backgroundColor: '#' + Math.floor(Math.random()*16777215).toString(16)
+        }));
+        new Chart(document.getElementById('gradeByLevelChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: levelLabels, datasets: datasetsByLevel },
+            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
+        });
+    </script>
 </body>
 </html>
 <?php
