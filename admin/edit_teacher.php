@@ -104,7 +104,19 @@ function esc($value) {
             <option value="">-- Select --</option>
             <?php foreach ($teachers as $teacher): ?>
                 <option value="<?= esc($teacher['id']) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
-                    <?= esc($teacher['name']) ?> (<?= esc($teacher['username']) ?>)
+                    <?php
+                        $display_name = trim(esc($teacher['name']));
+                        $display_username = trim(esc($teacher['username']));
+                        if ($display_name && $display_username) {
+                            echo $display_name . " (" . $display_username . ")";
+                        } elseif ($display_name) {
+                            echo $display_name;
+                        } elseif ($display_username) {
+                            echo $display_username;
+                        } else {
+                            echo "Teacher #" . esc($teacher['id']);
+                        }
+                    ?>
                 </option>
             <?php endforeach; ?>
         </select>
