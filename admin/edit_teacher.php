@@ -7,12 +7,12 @@ $pageTitle = "Add Teacher";
 
 // Fetch users with Teacher role who are not yet in teachers table
 $stmt = $pdo->prepare("
-    SELECT u.id, u.username, u.email
+    SELECT u.id, u.username, u.email, u.first_name, u.last_name
     FROM users u
     INNER JOIN roles r ON u.role_id = r.id
     LEFT JOIN teachers t ON t.user_id = u.id
     WHERE LOWER(r.role_name) = 'teacher' AND t.id IS NULL
-    ORDER BY u.username
+    ORDER BY u.first_name, u.last_name, u.username
 ");
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -87,7 +87,8 @@ $preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
                                 <option value="">-- Select --</option>
                                 <?php foreach ($users as $user): ?>
                                     <option value="<?= $user['id'] ?>" <?= ($preselect_user_id == $user['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['email']) ?>)
+                                        <?= htmlspecialchars(trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))) ?>
+                                        (<?= htmlspecialchars($user['username']) ?>, <?= htmlspecialchars($user['email']) ?>)
                                     </option>
                                 <?php endforeach; ?>
                             </select>
