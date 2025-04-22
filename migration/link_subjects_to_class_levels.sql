@@ -96,5 +96,39 @@ WHERE NOT EXISTS (SELECT 1 FROM subjects WHERE subject_name = 'Geography' AND cu
 -- Link new Ethiopian subjects to Cambridge classes as additional
 -- (Assuming students in Cambridge classes also take these Ethiopian subjects for the same class_level_id)
 
+-- Add sections A-D for all classes (grades)
+-- This will insert section A, B, C, D for every class_id in the classes table if not already present
+
+INSERT INTO sections (class_id, section_name)
+SELECT c.id, 'A'
+FROM classes c
+WHERE NOT EXISTS (
+    SELECT 1 FROM sections s WHERE s.class_id = c.id AND s.section_name = 'A'
+);
+
+INSERT INTO sections (class_id, section_name)
+SELECT c.id, 'B'
+FROM classes c
+WHERE NOT EXISTS (
+    SELECT 1 FROM sections s WHERE s.class_id = c.id AND s.section_name = 'B'
+);
+
+INSERT INTO sections (class_id, section_name)
+SELECT c.id, 'C'
+FROM classes c
+WHERE NOT EXISTS (
+    SELECT 1 FROM sections s WHERE s.class_id = c.id AND s.section_name = 'C'
+);
+
+INSERT INTO sections (class_id, section_name)
+SELECT c.id, 'D'
+FROM classes c
+WHERE NOT EXISTS (
+    SELECT 1 FROM sections s WHERE s.class_id = c.id AND s.section_name = 'D'
+);
+
 -- You can verify the mapping with:
 -- SELECT id, subject_name, curriculum_id, class_level_id FROM subjects ORDER BY id;
+
+-- You can verify with:
+-- SELECT class_id, section_name FROM sections ORDER BY class_id, section_name;
