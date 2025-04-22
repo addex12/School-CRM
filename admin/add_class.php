@@ -16,6 +16,10 @@ $curriculums = [
 $error = '';
 $success = '';
 
+// --- Database schema update hint ---
+// You should update your classes table to support curriculum info:
+// ALTER TABLE classes ADD COLUMN curriculum VARCHAR(50) NOT NULL AFTER id;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $curriculum = $_POST['curriculum'] ?? '';
     $class_name = trim($_POST['class_name'] ?? '');
@@ -23,8 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$curriculum || !$class_name) {
         $error = "All fields are required.";
     } else {
-        $stmt = $pdo->prepare("INSERT INTO classes (class_name) VALUES (?)");
-        if ($stmt->execute([$class_name])) {
+        // Insert both curriculum and class_name
+        $stmt = $pdo->prepare("INSERT INTO classes (curriculum, class_name) VALUES (?, ?)");
+        if ($stmt->execute([$curriculum, $class_name])) {
             header("Location: classes.php?msg=Class+added+successfully");
             exit;
         } else {
