@@ -3,16 +3,16 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-$pageTitle = "Feedback";
+$pageTitle = "Support Tickets";
 
-// Fetch all feedback
+// Fetch all support tickets
 $stmt = $pdo->query("
-    SELECT f.id, u.username, u.email, f.subject, f.message, f.rating, f.created_at
-    FROM feedback f
-    LEFT JOIN users u ON f.user_id = u.id
-    ORDER BY f.created_at DESC
+    SELECT t.id, u.username, u.email, t.subject, t.status, t.priority, t.created_at
+    FROM support_tickets t
+    LEFT JOIN users u ON t.user_id = u.id
+    ORDER BY t.created_at DESC
 ");
-$feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,36 +23,36 @@ $feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .feedback-header {
+        .tickets-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-        .feedback-header h2 {
+        .tickets-header h2 {
             margin: 0;
             font-size: 1.5rem;
             color: #34495e;
         }
-        .feedback-table {
+        .tickets-table {
             width: 100%;
             border-collapse: collapse;
         }
-        .feedback-table th, .feedback-table td {
+        .tickets-table th, .tickets-table td {
             padding: 12px 16px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
         }
-        .feedback-table th {
+        .tickets-table th {
             background: #f8f9fa;
             font-weight: 600;
             color: #34495e;
         }
-        .feedback-table tr:hover {
+        .tickets-table tr:hover {
             background: #f4f8fb;
         }
         @media (max-width: 600px) {
-            .feedback-table th, .feedback-table td {
+            .tickets-table th, .tickets-table td {
                 padding: 8px 6px;
             }
         }
@@ -67,38 +67,38 @@ $feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </header>
             <div class="content">
                 <div class="dashboard-section">
-                    <div class="feedback-header">
-                        <h2>Feedback List</h2>
+                    <div class="tickets-header">
+                        <h2>Support Tickets</h2>
                     </div>
                     <div class="table-responsive">
-                        <table class="feedback-table">
+                        <table class="tickets-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>User</th>
                                     <th>Email</th>
                                     <th>Subject</th>
-                                    <th>Message</th>
-                                    <th>Rating</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
                                     <th>Created At</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($feedbacks)): ?>
-                                    <?php foreach ($feedbacks as $f): ?>
+                                <?php if (!empty($tickets)): ?>
+                                    <?php foreach ($tickets as $ticket): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($f['id']) ?></td>
-                                            <td><?= htmlspecialchars($f['username'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($f['email'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($f['subject']) ?></td>
-                                            <td><?= htmlspecialchars($f['message']) ?></td>
-                                            <td><?= htmlspecialchars($f['rating']) ?></td>
-                                            <td><?= date('M j, Y g:i A', strtotime($f['created_at'])) ?></td>
+                                            <td><?= htmlspecialchars($ticket['id']) ?></td>
+                                            <td><?= htmlspecialchars($ticket['username'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($ticket['email'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
+                                            <td><?= htmlspecialchars($ticket['status']) ?></td>
+                                            <td><?= htmlspecialchars($ticket['priority']) ?></td>
+                                            <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="7">No feedback found.</td>
+                                        <td colspan="7">No tickets found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
