@@ -14,6 +14,12 @@ $stmt = $pdo->prepare("
         r.role_name,
         t.id AS teacher_id,
         t.created_at AS teacher_created_at,
+        t.address,
+        t.date_of_birth,
+        t.gender,
+        t.qualification,
+        t.subject_specialization,
+        t.status,
         c.class_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
@@ -256,6 +262,12 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Class</th>
+                                    <th>Address</th>
+                                    <th>Date of Birth</th>
+                                    <th>Gender</th>
+                                    <th>Qualification</th>
+                                    <th>Subject Specialization</th>
+                                    <th>Status</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
@@ -284,10 +296,15 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><span class="badge-role"><?= htmlspecialchars($teacher['role_name'] ?? 'N/A') ?></span></td>
                                             <td>
                                                 <?php
-                                                // Show class name or "Unassigned" if null/empty
                                                 echo !empty($teacher['class_name']) ? htmlspecialchars($teacher['class_name']) : '<span style="color:#888;">Unassigned</span>';
                                                 ?>
                                             </td>
+                                            <td><?= htmlspecialchars($teacher['address'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['date_of_birth'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['gender'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['qualification'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['subject_specialization'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($teacher['status'] ?? '-') ?></td>
                                             <td>
                                                 <?= $teacher['teacher_created_at'] 
                                                     ? date('M j, Y g:i A', strtotime($teacher['teacher_created_at'])) 
@@ -305,7 +322,7 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="7">No teachers found.</td>
+                                        <td colspan="13">No teachers found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
