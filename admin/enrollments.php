@@ -38,6 +38,22 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'batches' && isset($_GET['program_
     exit;
 }
 
+// AJAX: Enrollment stats for chart
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'enrollment_stats') {
+    $stats = $pdo->query("
+        SELECT b.name, COUNT(e.id) as count
+        FROM batches b
+        LEFT JOIN enrollments e ON b.id = e.batch_id
+        GROUP BY b.id
+        ORDER BY b.name
+    ")->fetchAll(PDO::FETCH_ASSOC);
+    echo json_encode([
+        'labels' => array_column($stats, 'name'),
+        'counts' => array_column($stats, 'count')
+    ]);
+    exit;
+}
+
 // Fetch all enrollments
 $stmt = $pdo->query("
     SELECT e.id, u.username AS student, b.name AS batch, e.enrolled_on
@@ -150,6 +166,39 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                     </tbody>
                 </table>
             </div>
+            <!-- Add analytics/reporting for enrollments -->
+            <div class="dashboard-section">
+                <h2>Enrollment Analytics</h2>
+                <div style="max-width:500px;margin-bottom:24px;">
+                    <canvas id="enrollmentChart" height="180"></canvas>
+                </div>
+            </div>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Enrollment count per batch for analytics
+                fetch('enrollments.php?ajax=enrollment_stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        const ctx = document.getElementById('enrollmentChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{
+                                    label: 'Number of Students',
+                                    data: data.counts,
+                                    backgroundColor: '#3498db'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: { legend: { display: false } }
+                            }
+                        });
+                    });
+            });
+            </script>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
