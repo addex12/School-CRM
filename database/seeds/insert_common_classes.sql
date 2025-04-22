@@ -1,11 +1,3 @@
---
--- Create class_names table if it does not exist
---
-CREATE TABLE IF NOT EXISTS class_names (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    grade VARCHAR(100) NOT NULL
-);
-
 -- Insert common class levels
 INSERT INTO class_levels (curriculum_id, level_name) VALUES
 (1, 'Kindergarten'),
