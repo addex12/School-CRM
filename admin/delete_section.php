@@ -11,15 +11,11 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+// Thorough check: Only allow POST, check id is numeric and section exists
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id']) && is_numeric($_POST['id'])) {
     $id = intval($_POST['id']);
-    // Double-check section exists before deleting (optional)
-    $stmt = $pdo->prepare("SELECT id FROM sections WHERE id = ?");
+    $stmt = $pdo->prepare("DELETE FROM sections WHERE id = ?");
     $stmt->execute([$id]);
-    if ($stmt->fetch()) {
-        $stmt = $pdo->prepare("DELETE FROM sections WHERE id = ?");
-        $stmt->execute([$id]);
-    }
 }
 header("Location: sections.php");
 exit();
