@@ -22,7 +22,7 @@ $stmt->execute([$id]);
 if ($user && !empty($user['email'])) {
     $to = $user['email'];
     $mailSubject = "Your Support Ticket Has Been Deleted";
-    $loginUrl = "https://" . $_SERVER['HTTP_HOST'] . "/School-CRM/login.php";
+    $loginUrl = "https://" . $_SERVER['HTTP_HOST'] . "/login.php";
     $mailMessage = "Hello " . htmlspecialchars($user['username']) . ",\n\n"
         . "Your support ticket (ID: $id) has been deleted by the admin.\n"
         . "If you have further issues, please create a new ticket.\n\n"

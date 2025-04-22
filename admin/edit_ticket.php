@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user && !empty($user['email'])) {
                 $to = $user['email'];
                 $mailSubject = "Your Support Ticket Status Updated";
-                $loginUrl = "https://" . $_SERVER['HTTP_HOST'] . "/School-CRM/login.php";
+                $loginUrl = "https://" . $_SERVER['HTTP_HOST'] . "/login.php";
                 $mailMessage = "Hello " . htmlspecialchars($user['username']) . ",\n\n"
                     . "Your support ticket (ID: $id) has been updated by the admin.\n"
                     . "Subject: $subject\n"
