@@ -85,7 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['import_file']) && is
 
     header("Location: teachers.php?imported=$success&failed=$fail");
     exit;
-} else {
-    header("Location: teachers.php?error=1");
-    exit;
 }
+
+// Optionally, show a simple error message or the upload form here:
+echo "Invalid request. Please upload a CSV file.";
+exit;
