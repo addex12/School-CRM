@@ -1,4 +1,6 @@
+--
 -- Create class_names table if it does not exist
+--
 CREATE TABLE IF NOT EXISTS class_names (
     id INT AUTO_INCREMENT PRIMARY KEY,
     grade VARCHAR(100) NOT NULL
