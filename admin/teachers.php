@@ -14,11 +14,11 @@ $stmt = $pdo->prepare("
         r.role_name,
         t.id AS teacher_id,
         t.created_at AS teacher_created_at,
-        c.class_name
+        cn.grade AS class_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
     LEFT JOIN teachers t ON t.user_id = u.id
-    LEFT JOIN classes c ON t.class_id = c.id
+    LEFT JOIN class_names cn ON t.class_name_id = cn.id
     WHERE LOWER(r.role_name) = 'teacher'
     ORDER BY COALESCE(t.created_at, u.created_at) DESC
 ");
