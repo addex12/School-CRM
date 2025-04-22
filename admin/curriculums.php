@@ -9,10 +9,9 @@ $edit_id = isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0;
 // Handle Create
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_curriculum'])) {
     $name = trim($_POST['name']);
-    $description = trim($_POST['description']);
     if ($name) {
-        $stmt = $pdo->prepare("INSERT INTO curriculums (name, description) VALUES (?, ?)");
-        $stmt->execute([$name, $description]);
+        $stmt = $pdo->prepare("INSERT INTO curriculums (name) VALUES (?)");
+        $stmt->execute([$name]);
         $message = "Curriculum added successfully!";
     }
 }
@@ -21,10 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_curriculum'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_curriculum'])) {
     $curriculum_id = intval($_POST['curriculum_id']);
     $name = trim($_POST['name']);
-    $description = trim($_POST['description']);
     if ($name && $curriculum_id) {
-        $stmt = $pdo->prepare("UPDATE curriculums SET name=?, description=? WHERE id=?");
-        $stmt->execute([$name, $description, $curriculum_id]);
+        $stmt = $pdo->prepare("UPDATE curriculums SET name=? WHERE id=?");
+        $stmt->execute([$name, $curriculum_id]);
         $message = "Curriculum updated successfully!";
         $edit_id = 0;
     }
@@ -116,8 +114,8 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                         <?php endif; ?>
                         <label for="name">Name:</label>
                         <input type="text" name="name" id="name" value="<?= esc($edit_curriculum['name'] ?? '') ?>" required>
-                        <label for="description">Description:</label>
-                        <textarea name="description" id="description"><?= esc($edit_curriculum['description'] ?? '') ?></textarea>
+                        <?php /* <label for="description">Description:</label>
+                        <textarea name="description" id="description"><?= esc($edit_curriculum['description'] ?? '') ?></textarea> */ ?>
                         <?php if ($edit_curriculum): ?>
                             <button type="submit" name="update_curriculum" class="btn">Update</button>
                             <a href="curriculums.php" class="btn">Cancel</a>
@@ -135,7 +133,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                 <tr>
                                     <th>ID</th>
                                     <th>Name</th>
-                                    <th>Description</th>
                                     <th>Class Levels</th>
                                     <th>Actions</th>
                                 </tr>
@@ -145,7 +142,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <tr>
                                         <td><?= esc($curriculum['id']) ?></td>
                                         <td><?= esc($curriculum['name']) ?></td>
-                                        <td><?= esc($curriculum['description'] ?? '') ?></td>
                                         <td>
                                             <ul class="level-list">
                                                 <?php if (!empty($levelsByCurriculum[$curriculum['id']])): ?>
@@ -175,7 +171,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                 <?php endforeach; ?>
                                 <?php if (empty($curriculums)): ?>
                                     <tr>
-                                        <td colspan="5">No curriculums found.</td>
+                                        <td colspan="4">No curriculums found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
