@@ -22,7 +22,7 @@ $teachers = $db->query("SELECT t.id, t.name, t.email, t.username, t.subject_id, 
 // Fetch all subjects, grades, and sections for dropdowns
 $subjects = $db->query("SELECT id, subject_name FROM subjects")->fetchAll(PDO::FETCH_ASSOC);
 $class_names = $db->query("SELECT id, grade FROM class_names")->fetchAll(PDO::FETCH_ASSOC);
-$sections = $db->query("SELECT id, section FROM sections")->fetchAll(PDO::FETCH_ASSOC);
+$sections = $db->query("SELECT id, section_name FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
 
 $message = '';
 $selected_teacher = null;
@@ -302,7 +302,7 @@ function esc($value) {
                                 <option value="">-- Select Section --</option>
                                 <?php foreach ($sections as $section): ?>
                                     <option value="<?= esc($section['id']) ?>" <?= ($selected_teacher['section_id'] ?? '') == $section['id'] ? 'selected' : '' ?>>
-                                        <?= esc($section['section']) ?>
+                                        <?= esc($section['section_name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
@@ -353,7 +353,7 @@ function esc($value) {
                                 <td>
                                     <?php
                                     if (!empty($teacher['section_id'])) {
-                                        $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
+                                        $sec = $db->prepare("SELECT section_name FROM sections WHERE id = ?");
                                         $sec->execute([$teacher['section_id']]);
                                         echo esc($sec->fetchColumn());
                                     }
