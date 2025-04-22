@@ -145,7 +145,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <tr>
                                         <td><?= esc($curriculum['id']) ?></td>
                                         <td><?= esc($curriculum['name']) ?></td>
-                                        <td><?= esc($curriculum['description']) ?></td>
+                                        <td><?= esc($curriculum['description'] ?? '') ?></td>
                                         <td>
                                             <ul class="level-list">
                                                 <?php if (!empty($levelsByCurriculum[$curriculum['id']])): ?>
