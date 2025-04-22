@@ -54,9 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['import_file']) && is
 
         if ($teacher) {
             // Update teacher
-            $stmt = $pdo->prepare("UPDATE teachers SET phone=?, address=?, date_of_birth=?, gender=?, qualification=?, subject_specialization=?, status=?, class_id=? WHERE user_id=?");
+            $stmt = $pdo->prepare("UPDATE teachers SET address=?, date_of_birth=?, gender=?, qualification=?, subject_specialization=?, status=?, class_id=? WHERE user_id=?");
             $stmt->execute([
-                $data['phone'] ?? null,
                 $data['address'] ?? null,
                 $data['date_of_birth'] ?? null,
                 $data['gender'] ?? null,
@@ -68,10 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['import_file']) && is
             ]);
         } else {
             // Insert teacher
-            $stmt = $pdo->prepare("INSERT INTO teachers (user_id, phone, address, date_of_birth, gender, qualification, subject_specialization, status, class_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+            $stmt = $pdo->prepare("INSERT INTO teachers (user_id, address, date_of_birth, gender, qualification, subject_specialization, status, class_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $userId,
-                $data['phone'] ?? null,
                 $data['address'] ?? null,
                 $data['date_of_birth'] ?? null,
                 $data['gender'] ?? null,

@@ -5,7 +5,6 @@ header('Content-Disposition: attachment; filename="teacher_import_template.csv"'
 $columns = [
     'username',
     'email',
-    'phone',
     'address',
     'date_of_birth',
     'gender',
