@@ -187,6 +187,13 @@ try {
             th, td {
                 padding: 8px 6px;
             }
+            .widget-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .dashboard-section h2 {
+                font-size: 1.1rem;
+            }
         }
     </style>
 </head>
