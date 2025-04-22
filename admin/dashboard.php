@@ -23,13 +23,31 @@ if (!isset($pdo) || !$pdo) {
     error_log("Database connection established successfully.");
 }
 
-// Fetch widget data
+// Add more widgets for dashboard revamp
 $widgets = [
     [
         "title" => "Total Users",
         "icon" => "fa-users",
         "color" => "blue",
         "query" => "SELECT COUNT(*) FROM users"
+    ],
+    [
+        "title" => "Total Students",
+        "icon" => "fa-user-graduate",
+        "color" => "purple",
+        "query" => "SELECT COUNT(*) FROM students"
+    ],
+    [
+        "title" => "Total Teachers",
+        "icon" => "fa-chalkboard-teacher",
+        "color" => "teal",
+        "query" => "SELECT COUNT(*) FROM teachers"
+    ],
+    [
+        "title" => "Total Classes",
+        "icon" => "fa-school",
+        "color" => "orange",
+        "query" => "SELECT COUNT(*) FROM classes"
     ],
     [
         "title" => "Active Surveys",
@@ -40,7 +58,7 @@ $widgets = [
     [
         "title" => "Feedback Received",
         "icon" => "fa-comments",
-        "color" => "orange",
+        "color" => "yellow",
         "query" => "SELECT COUNT(*) FROM feedback"
     ],
     [
@@ -86,6 +104,14 @@ try {
     $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Tickets Error: " . $e->getMessage());
+}
+
+// Error log viewer: read last 20 lines of error.log
+$errorLogLines = [];
+$errorLogPath = realpath(__DIR__ . '/../error.log');
+if ($errorLogPath && is_readable($errorLogPath)) {
+    $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $errorLogLines = array_slice($lines, -20);
 }
 ?>
 
@@ -158,6 +184,9 @@ try {
         .widget-green { border-top: 4px solid #27ae60; }
         .widget-orange { border-top: 4px solid #f39c12; }
         .widget-red { border-top: 4px solid #e74c3c; }
+        .widget-purple { border-top: 4px solid #8e44ad; }
+        .widget-teal { border-top: 4px solid #16a085; }
+        .widget-yellow { border-top: 4px solid #f1c40f; }
         .dashboard-widget h3 {
             font-size: 2.1rem;
             margin: 0.5rem 0 0.2rem 0;
@@ -203,6 +232,44 @@ try {
         tr:hover {
             background: #f4f8fb;
         }
+        .dashboard-section pre.error-log {
+            background: #222;
+            color: #f1c40f;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .quick-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+        .quick-link {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 1.2rem 1.5rem;
+            text-align: center;
+            min-width: 140px;
+            transition: box-shadow 0.15s;
+        }
+        .quick-link:hover {
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+        }
+        .quick-link i {
+            font-size: 1.7rem;
+            margin-bottom: 0.5rem;
+            color: #3498db;
+        }
+        .quick-link span {
+            display: block;
+            margin-top: 0.3rem;
+            color: #34495e;
+            font-weight: 500;
+        }
         @media (max-width: 900px) {
             .widget-grid {
                 grid-template-columns: 1fr;
@@ -239,6 +306,18 @@ try {
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
+
+                <!-- Quick Links Section -->
+                <div class="quick-links">
+                    <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
+                    <a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+                    <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
+                    <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
+                    <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
+                    <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
+                    <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                </div>
+
                 <!-- Widgets Section -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
@@ -248,6 +327,27 @@ try {
                             <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
                     <?php endforeach; ?>
+                </div>
+
+                <!-- System Stats Section -->
+                <div class="dashboard-section">
+                    <h2>System Stats</h2>
+                    <ul>
+                        <li>PHP Version: <?= phpversion() ?></li>
+                        <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
+                        <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
+                        <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
+                    </ul>
+                </div>
+
+                <!-- Error Log Section -->
+                <div class="dashboard-section">
+                    <h2>Recent Error Log</h2>
+                    <?php if (!empty($errorLogLines)): ?>
+                        <pre class="error-log"><?= htmlspecialchars(implode("\n", $errorLogLines)) ?></pre>
+                    <?php else: ?>
+                        <p>No recent errors found or error.log not readable.</p>
+                    <?php endif; ?>
                 </div>
 
                 <!-- Activity Log Section -->
