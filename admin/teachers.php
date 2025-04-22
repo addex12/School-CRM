@@ -12,12 +12,11 @@ require_once '../includes/config.php';
 
 $pageTitle = "Teachers";
 
-// Fetch all teachers with user and class info (only existing columns)
+// Fetch all teachers with user info only (no class join)
 $stmt = $pdo->query("
-    SELECT t.id AS teacher_id, u.username, u.email, c.class_name
+    SELECT t.id AS teacher_id, u.username, u.email
     FROM teachers t
     LEFT JOIN users u ON t.user_id = u.id
-    LEFT JOIN classes c ON t.class_id = c.id
     ORDER BY u.username
 ");
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -121,7 +120,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <th>ID</th>
                                     <th>Username</th>
                                     <th>Email</th>
-                                    <th>Class</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -132,7 +130,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                             <td><?= esc($teacher['teacher_id']) ?></td>
                                             <td><?= esc($teacher['username']) ?></td>
                                             <td><?= esc($teacher['email']) ?></td>
-                                            <td><?= esc($teacher['class_name'] ?? '-') ?></td>
                                             <td class="teacher-actions">
                                                 <a href="edit_teacher.php?id=<?= esc($teacher['teacher_id']) ?>" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="view_teacher.php" title="View All"><i class="fas fa-eye"></i></a>
@@ -141,7 +138,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="5">No teachers found.</td>
+                                        <td colspan="4">No teachers found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
