@@ -36,12 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($user && !empty($user['email'])) {
                 $to = $user['email'];
                 $mailSubject = "Your Support Ticket Status Updated";
+                $loginUrl = "https://" . $_SERVER['HTTP_HOST'] . "/School-CRM/login.php";
                 $mailMessage = "Hello " . htmlspecialchars($user['username']) . ",\n\n"
                     . "Your support ticket (ID: $id) has been updated by the admin.\n"
                     . "Subject: $subject\n"
                     . "Status: $status\n"
                     . "Priority: $priority\n\n"
-                    . "Please log in to your account for more details.\n\n"
+                    . "You can log in to your account here: $loginUrl\n\n"
                     . "Regards,\nSchool CRM Support";
                 @mail($to, $mailSubject, $mailMessage);
             }
@@ -99,7 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
+            <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
