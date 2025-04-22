@@ -5,15 +5,16 @@ require_once '../includes/config.php';
 
 $pageTitle = "Students";
 
-// Fetch students with user, role, and class info
-$stmt = $pdo->query("
-    SELECT s.id AS student_id, u.username, u.email, r.role_name, c.class_name, s.enrollment_no, s.created_at
+// Fetch students with user and role info (only users with role 'Student')
+$stmt = $pdo->prepare("
+    SELECT s.id AS student_id, u.username, u.email, r.role_name, s.enrollment_no, s.created_at
     FROM students s
     JOIN users u ON s.user_id = u.id
     LEFT JOIN roles r ON u.role_id = r.id
-    LEFT JOIN classes c ON s.class_id = c.id
+    WHERE LOWER(r.role_name) = 'student'
     ORDER BY s.created_at DESC
 ");
+$stmt->execute();
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -110,7 +111,6 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Role</th>
-                                    <th>Class</th>
                                     <th>Enrollment No</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
@@ -124,7 +124,6 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($student['username']) ?></td>
                                             <td><?= htmlspecialchars($student['email']) ?></td>
                                             <td><?= htmlspecialchars($student['role_name'] ?? 'N/A') ?></td>
-                                            <td><?= htmlspecialchars($student['class_name'] ?? 'N/A') ?></td>
                                             <td><?= htmlspecialchars($student['enrollment_no']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($student['created_at'])) ?></td>
                                             <td class="student-actions">
@@ -135,7 +134,7 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="8">No students found.</td>
+                                        <td colspan="7">No students found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
