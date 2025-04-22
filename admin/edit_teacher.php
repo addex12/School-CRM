@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -27,19 +34,19 @@ if (!$teacher) {
     exit;
 }
 
-// Fetch available classes with their curriculum
-$classes_stmt = $pdo->query("
-    SELECT c.id, c.class_name, cu.name AS curriculum_name 
-    FROM classes c
-    JOIN curriculums cu ON c.curriculum_id = cu.id
-    ORDER BY c.class_name
-");
-$classes = $classes_stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch available classes
+$classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch subjects taught by this teacher
 $teacher_subjects_stmt = $pdo->prepare("
-    SELECT ts.id, cs.subject_id, cs.class_id, s.subject_name, 
-           c.class_name, sec.section_name, sec.id as section_id
+    SELECT 
+        ts.id,
+        cs.subject_id,
+        cs.class_id,
+        s.subject_name,
+        c.class_name,
+        ts.section_id,
+        sec.section_name
     FROM teacher_subjects ts
     JOIN class_subjects cs ON ts.class_subject_id = cs.id
     JOIN subjects s ON cs.subject_id = s.id
@@ -51,17 +58,8 @@ $teacher_subjects_stmt = $pdo->prepare("
 $teacher_subjects_stmt->execute([$teacher_id]);
 $teacher_subjects = $teacher_subjects_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch all sections grouped by class
-$sections_by_class = [];
-$sections_stmt = $pdo->query("
-    SELECT s.id, s.section_name, s.class_id, c.class_name
-    FROM sections s
-    JOIN classes c ON s.class_id = c.id
-    ORDER BY c.class_name, s.section_name
-");
-while ($section = $sections_stmt->fetch(PDO::FETCH_ASSOC)) {
-    $sections_by_class[$section['class_id']][] = $section;
-}
+// Fetch all sections
+$sections = $pdo->query("SELECT id, section_name, class_id FROM sections ORDER BY class_id, section_name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Handle form submission
 $error = '';
@@ -74,19 +72,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gender = $_POST['gender'] ?? '';
     $address = $_POST['address'] ?? '';
     $status = $_POST['status'] ?? 'active';
-    $class_id = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
 
     // Update teacher record
     $update_stmt = $pdo->prepare("
         UPDATE teachers 
         SET qualification = ?, subject_specialization = ?, date_of_birth = ?, 
-            gender = ?, address = ?, status = ?, class_id = ?
+            gender = ?, address = ?, status = ?
         WHERE id = ?
     ");
     
     if ($update_stmt->execute([
         $qualification, $subject_specialization, $date_of_birth,
-        $gender, $address, $status, $class_id, $teacher_id
+        $gender, $address, $status, $teacher_id
     ])) {
         $success = "Teacher information updated successfully.";
     } else {
@@ -103,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Then add new assignments
         if (is_array($new_assignments)) {
-            // Get all valid class-subject combinations
+            // Get all class-subject combinations
             $class_subjects = [];
             $cs_stmt = $pdo->query("SELECT id, class_id, subject_id FROM class_subjects");
             while ($row = $cs_stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -134,9 +131,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Prepare data for JS
-$js_teacher_subjects = json_encode($teacher_subjects);
-$js_sections_by_class = json_encode($sections_by_class);
-$js_classes = json_encode($classes);
+$js_data = [
+    'teacherSubjects' => $teacher_subjects,
+    'classes' => $classes,
+    'sections' => $sections
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
