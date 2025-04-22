@@ -97,10 +97,20 @@ try {
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
     <style>
-                .users-header {
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: #f4f6fa;
+        }
+        .admin-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+        }
+        .users-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -352,8 +362,8 @@ try {
                 </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
 <?php
