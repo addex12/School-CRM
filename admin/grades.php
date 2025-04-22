@@ -48,6 +48,20 @@ $grading_scales = $pdo->query("
     ORDER BY cu.name, gs.scale_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
+// Fetch grading scales by class_level_id for auto grade letter
+$gradingScalesByLevel = [];
+$grading_scale_rows = $pdo->query("
+    SELECT gs.*, lv.id AS class_level_id
+    FROM grading_scales gs
+    LEFT JOIN curriculums cu ON gs.curriculum_id = cu.id
+    LEFT JOIN class_levels lv ON cu.id = lv.curriculum_id
+")->fetchAll(PDO::FETCH_ASSOC);
+foreach ($grading_scale_rows as $row) {
+    if ($row['class_level_id']) {
+        $gradingScalesByLevel[$row['class_level_id']][] = $row;
+    }
+}
+
 // --- AUTO-INSERT COMMON CURRICULUMS, SUBJECTS, AND GRADING SCALES IF TABLES ARE EMPTY ---
 
 // Insert common curriculums if not present
@@ -198,6 +212,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     // Dynamically update subject dropdown based on selected student
     var subjectsByLevel = <?= json_encode($subjectsByLevel) ?>;
     var studentClassLevel = <?= json_encode($studentClassLevel) ?>;
+    var gradingScalesByLevel = <?= json_encode($gradingScalesByLevel) ?>;
     function updateSubjects() {
         var studentId = document.getElementById('student_id').value;
         var subjectSelect = document.getElementById('subject_id');
@@ -210,6 +225,28 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 subjectSelect.appendChild(opt);
             });
         }
+    }
+    function autoFillGradeLetter() {
+        var studentId = document.getElementById('student_id').value;
+        var score = parseFloat(document.getElementById('score').value);
+        var gradeLetterInput = document.getElementById('grade_letter');
+        if (!studentId || isNaN(score)) {
+            gradeLetterInput.value = '';
+            return;
+        }
+        var classLevelId = studentClassLevel[studentId];
+        var scales = gradingScalesByLevel[classLevelId] || [];
+        var found = false;
+        for (var i = 0; i < scales.length; i++) {
+            var min = parseFloat(scales[i].min_score);
+            var max = parseFloat(scales[i].max_score);
+            if (score >= min && score <= max) {
+                gradeLetterInput.value = scales[i].grade_letter;
+                found = true;
+                break;
+            }
+        }
+        if (!found) gradeLetterInput.value = '';
     }
     </script>
 </head>
@@ -265,11 +302,11 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label for="score">Score</label>
-                            <input type="number" step="0.01" name="score" id="score" required>
+                            <input type="number" step="0.01" name="score" id="score" required oninput="autoFillGradeLetter()">
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label for="grade_letter">Grade Letter</label>
-                            <input type="text" name="grade_letter" id="grade_letter" required>
+                            <input type="text" name="grade_letter" id="grade_letter" required readonly>
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label for="term">Term</label>
@@ -386,6 +423,11 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     document.addEventListener('DOMContentLoaded', function() {
         updateSubjects();
     });
+    document.getElementById('student_id').addEventListener('change', function() {
+        updateSubjects();
+        autoFillGradeLetter();
+    });
+    document.getElementById('score').addEventListener('input', autoFillGradeLetter);
     </script>
 </body>
 </html>
