@@ -56,6 +56,58 @@ UNION ALL
 SELECT * FROM (SELECT 'IGCSE', 'International') AS tmp
 WHERE NOT EXISTS (SELECT 1 FROM curriculums WHERE name = 'IGCSE');
 
+-- Add Ethiopian Curriculum if not exists
+INSERT INTO curriculums (name, country)
+SELECT * FROM (SELECT 'Ethiopian Curriculum', 'Ethiopia') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM curriculums WHERE name = 'Ethiopian Curriculum');
+
+-- Add Ethiopian Grading Scale if not exists
+INSERT INTO grading_scales (name, description)
+SELECT * FROM (SELECT 'Ethiopian 100-point', '0-100 scale, Pass mark 50, Distinction 85+') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM grading_scales WHERE name = 'Ethiopian 100-point');
+
+-- Insert all subjects (global, including Ethiopian curriculum) if not exists
+-- MySQL does not support INSERT ... WHERE NOT EXISTS for multiple rows directly.
+-- Use individual INSERT IGNORE statements for each subject to avoid duplicates.
+
+INSERT IGNORE INTO subjects (name) VALUES ('Mathematics');
+INSERT IGNORE INTO subjects (name) VALUES ('English');
+INSERT IGNORE INTO subjects (name) VALUES ('Physics');
+INSERT IGNORE INTO subjects (name) VALUES ('Chemistry');
+INSERT IGNORE INTO subjects (name) VALUES ('Biology');
+INSERT IGNORE INTO subjects (name) VALUES ('Geography');
+INSERT IGNORE INTO subjects (name) VALUES ('History');
+INSERT IGNORE INTO subjects (name) VALUES ('Civics');
+INSERT IGNORE INTO subjects (name) VALUES ('Economics');
+INSERT IGNORE INTO subjects (name) VALUES ('ICT');
+INSERT IGNORE INTO subjects (name) VALUES ('Amharic');
+INSERT IGNORE INTO subjects (name) VALUES ('Afan Oromo');
+INSERT IGNORE INTO subjects (name) VALUES ('Somali');
+INSERT IGNORE INTO subjects (name) VALUES ('Tigrigna');
+INSERT IGNORE INTO subjects (name) VALUES ('HPE');
+INSERT IGNORE INTO subjects (name) VALUES ('Moral Education');
+INSERT IGNORE INTO subjects (name) VALUES ('Technical Drawing');
+INSERT IGNORE INTO subjects (name) VALUES ('Agriculture');
+INSERT IGNORE INTO subjects (name) VALUES ('Business');
+INSERT IGNORE INTO subjects (name) VALUES ('Accounting');
+INSERT IGNORE INTO subjects (name) VALUES ('General Science');
+INSERT IGNORE INTO subjects (name) VALUES ('Social Studies');
+INSERT IGNORE INTO subjects (name) VALUES ('Music');
+INSERT IGNORE INTO subjects (name) VALUES ('Art');
+INSERT IGNORE INTO subjects (name) VALUES ('French');
+INSERT IGNORE INTO subjects (name) VALUES ('Arabic');
+INSERT IGNORE INTO subjects (name) VALUES ('Religious Education');
+INSERT IGNORE INTO subjects (name) VALUES ('Environmental Science');
+INSERT IGNORE INTO subjects (name) VALUES ('Science');
+INSERT IGNORE INTO subjects (name) VALUES ('Reading');
+INSERT IGNORE INTO subjects (name) VALUES ('Writing');
+INSERT IGNORE INTO subjects (name) VALUES ('Handwriting');
+INSERT IGNORE INTO subjects (name) VALUES ('Drama');
+INSERT IGNORE INTO subjects (name) VALUES ('Physical Education');
+INSERT IGNORE INTO subjects (name) VALUES ('Home Economics');
+INSERT IGNORE INTO subjects (name) VALUES ('Technology');
+INSERT IGNORE INTO subjects (name) VALUES ('Ethics');
+
 -- Seed grades/classes for US K-12
 INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
 (1, 'Kindergarten', 0),
