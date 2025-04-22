@@ -34,27 +34,7 @@ $classes_stmt = $pdo->query("
     JOIN curriculums cu ON c.curriculum_id = cu.id
     ORDER BY c.class_name
 ");
-$classes = [];
-while ($row = $classes_stmt->fetch(PDO::FETCH_ASSOC)) {
-    // Use 'id' as the key for the value attribute in the select dropdown
-    $classes[] = [
-        'id' => isset($row['id']) ? $row['id'] : '',
-        'class_name' => isset($row['class_name']) ? $row['class_name'] : '',
-        'curriculum_name' => isset($row['curriculum_name']) ? $row['curriculum_name'] : ''
-    ];
-}
-
-// Fetch subjects grouped by curriculum
-$subjects_by_curriculum = [];
-$subjects_stmt = $pdo->query("
-    SELECT s.id, s.subject_name, s.curriculum_id, cu.name AS curriculum_name
-    FROM subjects s
-    JOIN curriculums cu ON s.curriculum_id = cu.id
-    ORDER BY cu.name, s.subject_name
-");
-while ($subject = $subjects_stmt->fetch(PDO::FETCH_ASSOC)) {
-    $subjects_by_curriculum[$subject['curriculum_name']][] = $subject;
-}
+$classes = $classes_stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch subjects taught by this teacher
 $teacher_subjects_stmt = $pdo->prepare("
@@ -123,10 +103,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Then add new assignments
         if (is_array($new_assignments)) {
+            // Get all valid class-subject combinations
             $class_subjects = [];
             $cs_stmt = $pdo->query("SELECT id, class_id, subject_id FROM class_subjects");
             while ($row = $cs_stmt->fetch(PDO::FETCH_ASSOC)) {
-                $key = $row['class_id'] . '_' . $row['subject_id'];
+                $key = ($row['class_id'] ?: '0') . '_' . $row['subject_id'];
                 $class_subjects[$key] = $row['id'];
             }
             
@@ -145,9 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $class_subject_id = $class_subjects[$key] ?? null;
                 
                 if ($class_subject_id) {
-                    $insert_stmt->execute([
-                        $teacher_id, $class_subject_id, $section_id
-                    ]);
+                    $insert_stmt->execute([$teacher_id, $class_subject_id, $section_id]);
                 }
             }
         }
@@ -156,7 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Prepare data for JS
 $js_teacher_subjects = json_encode($teacher_subjects);
-$js_subjects_by_curriculum = json_encode($subjects_by_curriculum);
 $js_sections_by_class = json_encode($sections_by_class);
 $js_classes = json_encode($classes);
 ?>
@@ -343,10 +321,57 @@ $js_classes = json_encode($classes);
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-    <script>
+        <script>
+
+        $(document).ready(function() {
+            // Initialize data
+            const teacherSubjects = <?= $js_teacher_subjects ?>;
+            const sectionsByClass = <?= $js_sections_by_class ?>;
+            const allClasses = <?= $js_classes ?>;
+            
+            let assignments = [...teacherSubjects];
+            renderAssignments();
+            
+            // Update sections dropdown when class changes
+            $('#new_class_id').on('change', function() {
+                const classId = $(this).val();
+                const $sectionSelect = $('#new_section_id');
+                
+                $sectionSelect.empty().append('<option value="">-- Select Section --</option>');
+                
+                if (classId && sectionsByClass[classId]) {
+                    sectionsByClass[classId].forEach(section => {
+                        $sectionSelect.append(`<option value="${section.id}">${section.section_name}</option>`);
+                    });
+                }
+                
+                $sectionSelect.trigger('change');
+            });
+            
+            // AJAX call to get subjects for selected class
+            $('#new_class_id').on('change', function() {
+                const classId = $(this).val();
+                const $subjectSelect = $('#new_subject_id');
+                
+                $subjectSelect.empty().append('<option value="">-- Select Subject --</option>');
+                
+                if (classId) {
+                    $.ajax({
+                        url: 'ajax/get_subjects.php',
+                        data: { class_id: classId },
+                        success: function(subjects) {
+                            subjects.forEach(subject => {
+                                $subjectSelect.append(`<option value="${subject.id}">${subject.subject_name}</option>`);
+                            });
+                            $subjectSelect.trigger('change');
+                        }
+                    });
+                }
+            });
+
+
         $(document).ready(function() {
             // Initialize Select2
             $('.select2-subject').select2();
@@ -476,6 +501,7 @@ $js_classes = json_encode($classes);
                 
                 $('#subject_assignments').val(JSON.stringify(assignmentsForSubmit));
             }
+        });
         });
     </script>
 </body>
