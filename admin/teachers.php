@@ -33,7 +33,7 @@ $stmt = $pdo->prepare("
         u.avatar,
         r.role_name,
         GROUP_CONCAT(DISTINCT s.subject_name ORDER BY s.subject_name SEPARATOR ', ') AS subjects,
-        GROUP_CONCAT(DISTINCT CONCAT(cls.class_name, IF(sec.section_name IS NULL, '', CONCAT(' (', sec.section_name, ')')) ORDER BY cls.class_name SEPARATOR ', ') AS classes
+        GROUP_CONCAT(DISTINCT CONCAT(cls.class_name, IF(sec.section_name IS NULL, '', CONCAT(' (', sec.section_name, ')'))) SEPARATOR ', ') AS classess
     FROM teachers t
     JOIN users u ON t.user_id = u.id
     JOIN roles r ON u.role_id = r.id
