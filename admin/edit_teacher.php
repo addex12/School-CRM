@@ -124,23 +124,91 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <style>
-        .dashboard-section { max-width: 600px; margin: 2rem auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(44,62,80,0.07); padding: 2rem 1.5rem; }
-        label { display: block; margin-top: 1rem; font-weight: 500; }
-        input, select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-top: 4px; }
-        .btn { margin-top: 1.2rem; }
-        .success { color: #27ae60; margin-bottom: 1rem; }
-        .error { color: #e74c3c; margin-bottom: 1rem; }
-        .assignment-table { width:100%; border-collapse:collapse; margin-top:2rem; }
-        .assignment-table th, .assignment-table td { border:1px solid #eee; padding:6px 8px; font-size:0.97em; }
-        .assignment-table th { background:#f8f9fa; }
-        .assignment-table tr:nth-child(even) { background:#fafbfc; }
-        .assignment-table label { font-weight:normal; }
+        .dashboard-section {
+            max-width: 700px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+        }
+        label {
+            display: block;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-top: 4px;
+        }
+        .btn {
+            margin-top: 1.2rem;
+        }
+        .success {
+            color: #27ae60;
+            margin-bottom: 1rem;
+        }
+        .error {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        .assignment-table-container {
+            max-height: 340px;
+            overflow-y: auto;
+            margin-top: 2rem;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            background: #fafbfc;
+        }
+        .assignment-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        .assignment-table th, .assignment-table td {
+            border: 1px solid #eee;
+            padding: 6px 8px;
+            font-size: 0.97em;
+        }
+        .assignment-table th {
+            background: #f8f9fa;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        .assignment-table tr:nth-child(even) {
+            background: #f9f9fb;
+        }
+        .assignment-table label {
+            font-weight: normal;
+        }
+        @media (max-width: 900px) {
+            .dashboard-section {
+                max-width: 98vw;
+                padding: 1rem 0.5rem;
+            }
+            .assignment-table {
+                min-width: 400px;
+            }
+        }
+        @media (max-width: 600px) {
+            .dashboard-section {
+                padding: 0.5rem 0.2rem;
+            }
+            .assignment-table th, .assignment-table td {
+                padding: 5px 3px;
+                font-size: 0.93em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main"></div>
+        <div class="admin-main">
             <header class="admin-header">
                 <h1><?= esc($pageTitle) ?></h1>
             </header>
@@ -184,39 +252,40 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                         </label>
 
                         <h3 style="margin-top:2.5rem;">Assign Classes, Sections & Subjects</h3>
-                        <table class="assignment-table">
-                            <thead>
-                                <tr>
-                                    <th>Class</th>
-                                    <th>Section</th>
-                                    <th>Subject</th>
-                                    <th>Assign</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($classes as $class): ?>
-                                    <?php
-                                    $class_id = $class['id'];
-                                    if (empty($sections[$class_id]) || empty($class_subjects[$class_id])) continue;
-                                    foreach ($sections[$class_id] as $section):
-                                        foreach ($class_subjects[$class_id] as $subject):
-                                            $key = $subject['class_subject_id'] . '_' . $section['id'];
-                                            ?>
-                                            <tr>
-                                                <td><?= esc($class['class_name']) ?></td>
-                                                <td><?= esc($section['section_name']) ?></td>
-                                                <td><?= esc($subject['subject_name']) ?></td>
-                                                <td></td>
-                                                    <input type="checkbox" name="assignments[]" value="<?= $key ?>" <?= isset($assigned[$key]) ? 'checked' : '' ?>>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach;
-                                    endforeach;
-                                    ?>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-
+                        <div class="assignment-table-container">
+                            <table class="assignment-table">
+                                <thead>
+                                    <tr>
+                                        <th>Class</th>
+                                        <th>Section</th>
+                                        <th>Subject</th>
+                                        <th>Assign</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($classes as $class): ?>
+                                        <?php
+                                        $class_id = $class['id'];
+                                        if (empty($sections[$class_id]) || empty($class_subjects[$class_id])) continue;
+                                        foreach ($sections[$class_id] as $section):
+                                            foreach ($class_subjects[$class_id] as $subject):
+                                                $key = $subject['class_subject_id'] . '_' . $section['id'];
+                                                ?>
+                                                <tr>
+                                                    <td><?= esc($class['class_name']) ?></td>
+                                                    <td><?= esc($section['section_name']) ?></td>
+                                                    <td><?= esc($subject['subject_name']) ?></td>
+                                                    <td style="text-align:center;">
+                                                        <input type="checkbox" name="assignments[]" value="<?= $key ?>" <?= isset($assigned[$key]) ? 'checked' : '' ?>>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach;
+                                        endforeach;
+                                        ?>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                         <button type="submit" name="update_teacher" class="btn">Update</button>
                         <a href="teachers.php" class="btn" style="background:#aaa;">Cancel</a>
                     </form>
