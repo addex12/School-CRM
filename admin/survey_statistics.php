@@ -98,13 +98,73 @@ $chart_json = json_encode($chart_data);
     <title>Survey Statistics - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+        }
+        .chart-title {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.2rem;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin: 15px 0;
+        }
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            margin-right: 5px;
+            display: inline-block;
+        }
+        .survey-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
+        }
+        .survey-summary p {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .survey-summary strong {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1>Survey Statistics</h1>
+                <h1><i class="fas fa-chart-pie"></i> Survey Statistics</h1>
             </header>
             <div class="content">
                 <div class="filter-section">
@@ -122,7 +182,7 @@ $chart_json = json_encode($chart_data);
                 </div>
 
                 <?php if ($selected_survey_id && $survey): ?>
-                    <div class="survey-summary mb-4">
+                    <div class="survey-summary">
                         <p><strong>Title:</strong> <?= htmlspecialchars($survey['title']) ?></p>
                         <p><strong>Start Date:</strong> <?= date('M j, Y', strtotime($survey['starts_at'])) ?></p>
                         <p><strong>End Date:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
@@ -134,7 +194,10 @@ $chart_json = json_encode($chart_data);
                         <?php foreach ($fields as $field): ?>
                             <div class="chart-container">
                                 <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
-                                <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
+                                <div class="chart-wrapper">
+                                    <canvas id="fieldChart-<?= $field['id'] ?>"></canvas>
+                                </div>
+                                <div class="chart-legend" id="legend-<?= $field['id'] ?>"></div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -149,237 +212,275 @@ $chart_json = json_encode($chart_data);
                 <?php endif; ?>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
 
     <script>
+        // Color palette for charts
+        const colorPalette = [
+            '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe',
+            '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5',
+            '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7',
+            '#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fee2e2'
+        ];
+
         const chartData = <?= $chart_json ?>;
 
         document.addEventListener('DOMContentLoaded', function() {
             if (chartData.total_responses > 0) {
-                chartData.fields.forEach(field => {
+                chartData.fields.forEach((field, index) => {
                     const fieldAnalytics = chartData.analytics[field.id] || [];
                     const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
-
+                    
                     if (fieldAnalytics.length > 0) {
-                        switch(field.field_type) {
-                            case 'radio':
-                            case 'select':
-                            case 'rating':
-                                new Chart(ctx, {
-                                    type: 'doughnut',
-                                    data: {
-                                        labels: fieldAnalytics.map(item => item.field_value),
-                                        datasets: [{
-                                            data: fieldAnalytics.map(item => item.count),
-                                            backgroundColor: [
-                                                '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', 
-                                                '#560bad', '#7209b7', '#b5179e', '#f72585',
-                                                '#3a0ca3', '#480ca8'
-                                            ],
-                                            borderWidth: 1
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        cutout: '60%',
-                                        plugins: {
-                                            title: {
-                                                display: true,
-                                                text: field.field_label,
-                                                font: { size: 14 }
-                                            },
-                                            legend: {
-                                                position: 'right',
-                                                labels: {
-                                                    padding: 20,
-                                                    usePointStyle: true,
-                                                    pointStyle: 'circle'
-                                                }
-                                            },
-                                            datalabels: {
-                                                formatter: (value, ctx) => {
-                                                    const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                                    return `${Math.round(value / total * 100)}%`;
-                                                },
-                                                color: '#fff',
-                                                font: { weight: 'bold' }
-                                            }
-                                        }
-                                    },
-                                    plugins: [ChartDataLabels]
-                                });
-                                break;
-
-                            case 'checkbox':
-                                new Chart(ctx, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: fieldAnalytics.map(item => item.field_value),
-                                        datasets: [{
-                                            label: 'Selections',
-                                            data: fieldAnalytics.map(item => item.count),
-                                            backgroundColor: '#4361ee',
-                                            borderWidth: 0,
-                                            borderRadius: 4
-                                        }]
-                                    },
-                                    options: {
-                                        indexAxis: 'y',
-                                        responsive: true,
-                                        plugins: {
-                                            title: {
-                                                display: true,
-                                                text: field.field_label,
-                                                font: { size: 14 }
-                                            },
-                                            legend: { display: false },
-                                            datalabels: {
-                                                anchor: 'end',
-                                                align: 'end',
-                                                formatter: value => value,
-                                                color: '#4361ee',
-                                                font: { weight: 'bold' }
-                                            }
-                                        },
-                                        scales: {
-                                            x: {
-                                                beginAtZero: true,
-                                                ticks: { precision: 0 },
-                                                grid: {
-                                                    color: 'rgba(0, 0, 0, 0.05)'
-                                                }
-                                            },
-                                            y: {
-                                                grid: {
-                                                    display: false
-                                                }
-                                            }
-                                        }
-                                    },
-                                    plugins: [ChartDataLabels]
-                                });
-                                break;
-
-                            case 'number':
-                                const numericValues = fieldAnalytics
-                                    .filter(item => !isNaN(parseFloat(item.field_value)))
-                                    .map(item => parseFloat(item.field_value));
-
-                                if (numericValues.length > 0) {
-                                    const min = Math.min(...numericValues);
-                                    const max = Math.max(...numericValues);
-                                    const binCount = Math.min(10, Math.ceil(Math.sqrt(numericValues.length)));
-                                    const binSize = (max - min) / binCount;
-
-                                    const bins = Array(binCount).fill(0);
-                                    const labels = [];
-
-                                    for (let i = 0; i < binCount; i++) {
-                                        const binStart = min + i * binSize;
-                                        const binEnd = binStart + binSize;
-                                        labels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
-
-                                        bins[i] = numericValues.filter(val => 
-                                            val >= binStart && (i === binCount - 1 ? val <= binEnd : val < binEnd)
-                                        ).length;
-                                    }
-
-                                    new Chart(ctx, {
-                                        type: 'bar',
-                                        data: {
-                                            labels: labels,
-                                            datasets: [{
-                                                label: 'Frequency',
-                                                data: bins,
-                                                backgroundColor: '#4361ee',
-                                                borderWidth: 0,
-                                                borderRadius: 4
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            plugins: {
-                                                title: {
-                                                    display: true,
-                                                    text: `${field.field_label} Distribution`,
-                                                    font: { size: 14 }
-                                                },
-                                                legend: { display: false }
-                                            },
-                                            scales: {
-                                                y: {
-                                                    beginAtZero: true,
-                                                    title: { 
-                                                        display: true, 
-                                                        text: 'Count',
-                                                        font: { weight: 'bold' }
-                                                    },
-                                                    grid: {
-                                                        color: 'rgba(0, 0, 0, 0.05)'
-                                                    }
-                                                },
-                                                x: {
-                                                    title: { 
-                                                        display: true, 
-                                                        text: 'Value Range',
-                                                        font: { weight: 'bold' }
-                                                    },
-                                                    grid: {
-                                                        display: false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                                break;
-
-                            default:
-                                new Chart(ctx, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: fieldAnalytics.map(item => `Option ${item.field_value}`),
-                                        datasets: [{
-                                            label: 'Responses',
-                                            data: fieldAnalytics.map(item => item.count),
-                                            backgroundColor: '#4895ef',
-                                            borderWidth: 0,
-                                            borderRadius: 4
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        plugins: {
-                                            title: {
-                                                display: true,
-                                                text: field.field_label,
-                                                font: { size: 14 }
-                                            },
-                                            legend: { display: false }
-                                        },
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                grid: {
-                                                    color: 'rgba(0, 0, 0, 0.05)'
-                                                }
-                                            },
-                                            x: {
-                                                grid: {
-                                                    display: false
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-                        }
+                        const chartType = getChartType(field.field_type);
+                        createChart(ctx, field, fieldAnalytics, chartType, index);
                     } else {
-                        ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
+                        ctx.canvas.parentNode.innerHTML += `
+                            <div class="alert alert-info" style="margin-top: 15px;">
+                                <i class="fas fa-info-circle"></i> No response data available for this question.
+                            </div>
+                        `;
                     }
                 });
             }
         });
+
+        function getChartType(fieldType) {
+            switch(fieldType) {
+                case 'radio':
+                case 'select':
+                case 'rating':
+                    return 'doughnut';
+                case 'checkbox':
+                    return 'bar';
+                case 'number':
+                    return 'histogram';
+                default:
+                    return 'bar';
+            }
+        }
+
+        function createChart(ctx, field, data, chartType, index) {
+            switch(chartType) {
+                case 'doughnut':
+                    const doughnutChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.map(item => item.field_value),
+                            datasets: [{
+                                data: data.map(item => item.count),
+                                backgroundColor: colorPalette,
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '70%',
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = Math.round((context.raw / total) * 100);
+                                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                                        }
+                                    }
+                                },
+                                datalabels: {
+                                    display: false
+                                }
+                            },
+                            animation: {
+                                animateScale: true,
+                                animateRotate: true
+                            }
+                        }
+                    });
+                    
+                    // Create custom legend
+                    generateLegend(field.id, doughnutChart);
+                    break;
+
+                case 'bar':
+                    const barChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => item.field_value),
+                            datasets: [{
+                                label: 'Responses',
+                                data: data.map(item => item.count),
+                                backgroundColor: colorPalette[index % colorPalette.length],
+                                borderWidth: 0,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `${context.dataset.label}: ${context.raw}`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 },
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    break;
+
+                case 'histogram':
+                    const numericValues = data
+                        .filter(item => !isNaN(parseFloat(item.field_value)))
+                        .map(item => parseFloat(item.field_value));
+
+                    if (numericValues.length > 0) {
+                        const min = Math.min(...numericValues);
+                        const max = Math.max(...numericValues);
+                        const binCount = Math.min(10, Math.ceil(Math.sqrt(numericValues.length)));
+                        const binSize = (max - min) / binCount;
+
+                        const bins = Array(binCount).fill(0);
+                        const labels = [];
+
+                        for (let i = 0; i < binCount; i++) {
+                            const binStart = min + i * binSize;
+                            const binEnd = binStart + binSize;
+                            labels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
+
+                            bins[i] = numericValues.filter(val => 
+                                val >= binStart && (i === binCount - 1 ? val <= binEnd : val < binEnd)
+                            ).length;
+                        }
+
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Frequency',
+                                    data: bins,
+                                    backgroundColor: colorPalette[10],
+                                    borderWidth: 0,
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function(context) {
+                                                return `Count: ${context.raw}`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)'
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    break;
+
+                default:
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.map(item => `Option ${item.field_value}`),
+                            datasets: [{
+                                label: 'Responses',
+                                data: data.map(item => item.count),
+                                backgroundColor: colorPalette[index % colorPalette.length],
+                                borderWidth: 0,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+            }
+        }
+
+        function generateLegend(chartId, chart) {
+            const legendContainer = document.getElementById(`legend-${chartId}`);
+            if (!legendContainer) return;
+            
+            const ul = document.createElement('div');
+            ul.className = 'chart-legend';
+            
+            chart.data.labels.forEach((label, i) => {
+                const li = document.createElement('div');
+                li.className = 'legend-item';
+                
+                const colorSpan = document.createElement('span');
+                colorSpan.className = 'legend-color';
+                colorSpan.style.backgroundColor = chart.data.datasets[0].backgroundColor[i];
+                
+                const textSpan = document.createElement('span');
+                textSpan.textContent = label;
+                
+                li.appendChild(colorSpan);
+                li.appendChild(textSpan);
+                ul.appendChild(li);
+            });
+            
+            legendContainer.appendChild(ul);
+        }
     </script>
 </body>
 </html>
