@@ -6,11 +6,6 @@ require_once '../includes/db.php';
 
 $pageTitle = "Edit Teacher";
 
-// Enable error reporting for debugging (remove or comment out in production)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 // Get teacher ID from URL
 $teacher_id = isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0;
 if (!$teacher_id) {
@@ -43,16 +38,13 @@ foreach ($sections as $section) {
     $sections_by_class[$section['class_id']][] = $section;
 }
 
-// Fetch all class_subjects for subject/class mapping
-$class_subjects = [];
+// Fetch all class_subjects for lookup
+$class_subjects_lookup = [];
 $class_subjects_stmt = $pdo->query("SELECT id, class_id, subject_id FROM class_subjects");
 while ($row = $class_subjects_stmt->fetch(PDO::FETCH_ASSOC)) {
-    $key = ($row['class_id'] ?: '0') . '_' . $row['subject_id'];
-    $class_subjects[$key] = $row['id'];
+    $key = $row['class_id'] . '_' . $row['subject_id'];
+    $class_subjects_lookup[$key] = $row['id'];
 }
-
-// Fetch all subjects (for dropdown)
-$subjects = $pdo->query("SELECT id, subject_name FROM subjects ORDER BY subject_name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch subjects taught by this teacher
 $teacher_subjects_stmt = $pdo->prepare("
@@ -79,63 +71,67 @@ $teacher_subjects = $teacher_subjects_stmt->fetchAll(PDO::FETCH_ASSOC);
 $error = '';
 $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $qualification = $_POST['qualification'] ?? null;
-    $subject_specialization = $_POST['subject_specialization'] ?? null;
-    $date_of_birth = !empty($_POST['date_of_birth']) ? $_POST['date_of_birth'] : null;
-    $gender = !empty($_POST['gender']) ? $_POST['gender'] : null;
-    $address = $_POST['address'] ?? null;
+    // Basic teacher info
+    $qualification = $_POST['qualification'] ?? '';
+    $subject_specialization = $_POST['subject_specialization'] ?? '';
+    $date_of_birth = $_POST['date_of_birth'] ?? '';
+    $gender = $_POST['gender'] ?? '';
+    $address = $_POST['address'] ?? '';
     $status = $_POST['status'] ?? 'active';
 
+    // Update teacher record
     $update_stmt = $pdo->prepare("
         UPDATE teachers 
         SET qualification = ?, subject_specialization = ?, date_of_birth = ?, 
             gender = ?, address = ?, status = ?
         WHERE id = ?
     ");
-    $result = $update_stmt->execute([
-        $qualification,
-        $subject_specialization,
-        $date_of_birth,
-        $gender,
-        $address,
-        $status,
-        $teacher_id
+    
+    $update_result = $update_stmt->execute([
+        $qualification, $subject_specialization, $date_of_birth,
+        $gender, $address, $status, $teacher_id
     ]);
 
-    if ($result === false) {
-        $error = "Failed to update teacher information.";
-    } else {
+    if ($update_result) {
         $success = "Teacher information updated successfully.";
-        $teacher_stmt->execute([$teacher_id]);
-        $teacher = $teacher_stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    // Handle subject assignments
-    if (isset($_POST['subject_assignments'])) {
-        $new_assignments = json_decode($_POST['subject_assignments'], true);
-
-        // Delete all existing assignments
-        $delete_stmt = $pdo->prepare("DELETE FROM teacher_subjects WHERE teacher_id = ?");
-        $delete_stmt->execute([$teacher_id]);
-
-        // Add new assignments
-        if (is_array($new_assignments)) {
-            $insert_stmt = $pdo->prepare("
-                INSERT INTO teacher_subjects (teacher_id, class_subject_id, section_id)
-                VALUES (?, ?, ?)
-            ");
-            foreach ($new_assignments as $assignment) {
-                $subject_id = intval($assignment['subject_id']);
-                $class_id = !empty($assignment['class_id']) ? intval($assignment['class_id']) : null;
-                $section_id = !empty($assignment['section_id']) ? intval($assignment['section_id']) : null;
-                $key = ($class_id ?: '0') . '_' . $subject_id;
-                $class_subject_id = $class_subjects[$key] ?? null;
-                if ($class_subject_id) {
-                    $insert_stmt->execute([$teacher_id, $class_subject_id, $section_id]);
+        
+        // Handle subject assignments
+        if (isset($_POST['subject_assignments'])) {
+            $new_assignments = json_decode($_POST['subject_assignments'], true);
+            
+            // First, delete all existing assignments
+            $delete_stmt = $pdo->prepare("DELETE FROM teacher_subjects WHERE teacher_id = ?");
+            $delete_result = $delete_stmt->execute([$teacher_id]);
+            
+            if ($delete_result && is_array($new_assignments)) {
+                $insert_stmt = $pdo->prepare("
+                    INSERT INTO teacher_subjects (teacher_id, class_subject_id, section_id)
+                    VALUES (?, ?, ?)
+                ");
+                
+                foreach ($new_assignments as $assignment) {
+                    $subject_id = intval($assignment['subject_id']);
+                    $class_id = intval($assignment['class_id']);
+                    $section_id = !empty($assignment['section_id']) ? intval($assignment['section_id']) : null;
+                    
+                    // Find the class_subject_id
+                    $key = $class_id . '_' . $subject_id;
+                    $class_subject_id = $class_subjects_lookup[$key] ?? null;
+                    
+                    if ($class_subject_id) {
+                        $insert_stmt->execute([$teacher_id, $class_subject_id, $section_id]);
+                    }
                 }
+                $success .= " Subject assignments updated successfully.";
             }
         }
+    } else {
+        $error = "Failed to update teacher information.";
     }
+    
+    // Refresh teacher data
+    $teacher_stmt->execute([$teacher_id]);
+    $teacher = $teacher_stmt->fetch(PDO::FETCH_ASSOC);
 }
 
 // Prepare data for JS
@@ -143,9 +139,10 @@ $js_data = [
     'teacherSubjects' => $teacher_subjects,
     'classes' => $classes,
     'sectionsByClass' => $sections_by_class,
-    'subjects' => $subjects
+    'classSubjects' => $class_subjects_lookup
 ];
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -154,9 +151,6 @@ $js_data = [
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
-    <style>
-        /* ...existing code... */
-    </style>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -174,7 +168,8 @@ $js_data = [
                     <?php if ($success): ?>
                         <div class="success"><?= htmlspecialchars($success) ?></div>
                     <?php endif; ?>
-                    <form method="post" autocomplete="off">
+                    
+                    <form method="post" autocomplete="off" id="teacherForm">
                         <div class="form-row">
                             <div>
                                 <label for="first_name">First Name</label>
