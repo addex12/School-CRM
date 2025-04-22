@@ -29,6 +29,15 @@ if (isset($_GET['delete_id'])) {
     $success = "Enrollment deleted!";
 }
 
+// AJAX: Fetch batches for a selected program (for dynamic dropdowns)
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'batches' && isset($_GET['program_id'])) {
+    $program_id = intval($_GET['program_id']);
+    $stmt = $pdo->prepare("SELECT id, name FROM batches WHERE program_id = ? ORDER BY name");
+    $stmt->execute([$program_id]);
+    echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    exit;
+}
+
 // Fetch all enrollments
 $stmt = $pdo->query("
     SELECT e.id, u.username AS student, b.name AS batch, e.enrolled_on
@@ -50,6 +59,24 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
     <title><?= esc($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <script>
+    // AJAX: Update batches dropdown when program is selected
+    function updateBatches(programId) {
+        var batchSelect = document.getElementById('batch_id');
+        batchSelect.innerHTML = '<option value="">Loading...</option>';
+        fetch('enrollments.php?ajax=batches&program_id=' + programId)
+            .then(response => response.json())
+            .then(data => {
+                batchSelect.innerHTML = '<option value="">Select Batch</option>';
+                data.forEach(function(batch) {
+                    var opt = document.createElement('option');
+                    opt.value = batch.id;
+                    opt.text = batch.name;
+                    batchSelect.appendChild(opt);
+                });
+            });
+    }
+    </script>
 </head>
 <body>
 <div class="admin-dashboard">
@@ -72,8 +99,18 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                             <?php endforeach; ?>
                         </select>
                     </label>
+                    <label>Program:
+                        <select name="program_id" id="program_id" onchange="updateBatches(this.value)" required>
+                            <option value="">Select Program</option>
+                            <?php
+                            $programs = $pdo->query("SELECT id, name FROM programs ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+                            foreach ($programs as $p): ?>
+                                <option value="<?= esc($p['id']) ?>"><?= esc($p['name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
                     <label>Batch:
-                        <select name="batch_id" required>
+                        <select name="batch_id" id="batch_id" required>
                             <option value="">Select Batch</option>
                             <?php foreach ($batches as $b): ?>
                                 <option value="<?= esc($b['id']) ?>"><?= esc($b['name']) ?></option>
