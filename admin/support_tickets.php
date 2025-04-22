@@ -56,6 +56,17 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 padding: 8px 6px;
             }
         }
+        .status-open { color: #27ae60; font-weight: 500; }
+        .status-closed { color: #e74c3c; font-weight: 500; }
+        .ticket-actions a {
+            margin-right: 8px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+        .ticket-actions a:last-child {
+            margin-right: 0;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +80,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="dashboard-section">
                     <div class="tickets-header">
                         <h2>Support Tickets</h2>
+                        <a href="add_ticket.php" class="btn"><i class="fas fa-plus"></i> Add Ticket</a>
                     </div>
                     <div class="table-responsive">
                         <table class="tickets-table">
@@ -81,6 +93,7 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Status</th>
                                     <th>Priority</th>
                                     <th>Created At</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -91,14 +104,27 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($ticket['username'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($ticket['email'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($ticket['subject']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['status']) ?></td>
+                                            <td>
+                                                <?php if (strtolower($ticket['status']) == 'open'): ?>
+                                                    <span class="status-open">Open</span>
+                                                <?php elseif (strtolower($ticket['status']) == 'closed'): ?>
+                                                    <span class="status-closed">Closed</span>
+                                                <?php else: ?>
+                                                    <?= htmlspecialchars($ticket['status']) ?>
+                                                <?php endif; ?>
+                                            </td>
                                             <td><?= htmlspecialchars($ticket['priority']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
+                                            <td class="ticket-actions">
+                                                <a href="view_ticket.php?id=<?= $ticket['id'] ?>" title="View"><i class="fas fa-eye"></i></a>
+                                                <a href="edit_ticket.php?id=<?= $ticket['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
+                                                <a href="delete_ticket.php?id=<?= $ticket['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this ticket?')"><i class="fas fa-trash-alt"></i></a>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="7">No tickets found.</td>
+                                        <td colspan="8">No tickets found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
