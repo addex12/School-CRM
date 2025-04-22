@@ -220,6 +220,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .add-question {
             margin-bottom: 20px;
         }
+        @media (max-width: 900px) {
+            .container {
+                padding: 10px;
+            }
+            .question-content {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 4px;
+            }
+            .question-header {
+                flex-direction: column;
+                gap: 6px;
+                align-items: flex-start;
+            }
+            .question-content {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            .btn, .btn-primary {
+                padding: 6px 10px;
+                font-size: 0.95em;
+            }
+        }
     </style>
 </head>
 <body>

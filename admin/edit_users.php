@@ -97,6 +97,29 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
             display: grid;
             gap: 1.5rem;
         }
+        
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .main-content {
+                padding: 1rem;
+            }
+            .form-container {
+                padding: 1rem;
+                margin: 1rem auto;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .form-container {
+                padding: 0.5rem;
+                margin: 0.5rem auto;
+            }
+            .form-grid {
+                gap: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body>

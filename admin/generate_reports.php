@@ -69,6 +69,27 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
         .report-table { width: 100%; border-collapse: collapse; }
         .report-table th, .report-table td { border: 1px solid #ddd; padding: 8px; }
         .report-table th { background: #f0f0f0; }
+        @media (max-width: 900px) {
+            .report-filters, .report-actions {
+                padding: 10px !important;
+                margin-bottom: 10px !important;
+            }
+        }
+        @media (max-width: 600px) {
+            .report-filters, .report-actions {
+                padding: 6px !important;
+                margin-bottom: 6px !important;
+            }
+            .report-table, .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+            th, td {
+                white-space: nowrap;
+                font-size: 0.95em;
+            }
+        }
     </style>
 </head>
 <body>

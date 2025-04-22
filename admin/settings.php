@@ -195,6 +195,46 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
         .form-actions .btn:hover {
             background-color: var(--secondary-color);
         }
+
+        @media (max-width: 900px) {
+            .settings-group {
+                padding: 12px !important;
+                margin: 10px 0 !important;
+            }
+            .settings-tabs {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+        @media (max-width: 600px) {
+            .settings-group {
+                padding: 8px !important;
+                margin: 6px 0 !important;
+            }
+            .settings-tabs {
+                flex-direction: column;
+                gap: 4px;
+            }
+            .form-actions {
+                text-align: left;
+            }
+            .settings-tab, .form-actions .btn {
+                padding: 8px 10px;
+                font-size: 0.95em;
+            }
+            .settings-tab-content {
+                padding: 0 !important;
+            }
+            .table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+            th, td {
+                white-space: nowrap;
+                font-size: 0.95em;
+            }
+        }
     </style>
 </head>
 <body>

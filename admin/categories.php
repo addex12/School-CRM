@@ -216,6 +216,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
             text-decoration: none;
             cursor: pointer;
         }
+
+        @media (max-width: 900px) {
+            .form-section, .table-section {
+                padding: 12px !important;
+                margin: 10px 0 !important;
+            }
+        }
+        @media (max-width: 600px) {
+            .form-section, .table-section {
+                padding: 8px !important;
+                margin: 6px 0 !important;
+            }
+            .form-actions {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            .admin-header {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+            .page-title, h1, h2 {
+                font-size: 1.2rem !important;
+            }
+            .table-responsive, .table {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+            th, td {
+                white-space: nowrap;
+                font-size: 0.95em;
+            }
+            .modal-content {
+                width: 95% !important;
+                min-width: 0 !important;
+            }
+        }
     </style>
     <?php include 'includes/footer.php'; ?>
 </body>
