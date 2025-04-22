@@ -5,26 +5,90 @@ require_once '../includes/config.php';
 
 $pageTitle = "Students";
 
-// Fetch all users with Student role, join students table for enrollment info if exists
-$stmt = $pdo->prepare("
-    SELECT 
-        u.id AS user_id,
-        u.username,
-        u.email,
-        r.role_name,
-        s.id AS student_id,
-        s.enrollment_no,
-        s.created_at AS student_created_at,
-        c.class_name
-    FROM users u
-    LEFT JOIN roles r ON u.role_id = r.id
-    LEFT JOIN students s ON s.user_id = u.id
+// Fetch students with class and section info
+$stmt = $pdo->query("
+    SELECT s.*, u.username, u.email, c.class_name, sec.section_name
+    FROM students s
+    LEFT JOIN users u ON s.user_id = u.id
     LEFT JOIN classes c ON s.class_id = c.id
-    WHERE LOWER(r.role_name) = 'student'
-    ORDER BY COALESCE(s.created_at, u.created_at) DESC
+    LEFT JOIN enrollments e ON s.id = e.student_id
+    LEFT JOIN batches b ON e.batch_id = b.id
+    LEFT JOIN sections sec ON b.section_id = sec.id
+    ORDER BY u.username
 ");
-$stmt->execute();
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch all classes and sections for dropdowns
+$classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
+$sections = $pdo->query("SELECT id, section_name FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
+
+// Handle bulk assign (CSV import)
+$bulk_error = $bulk_success = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
+    if (!empty($_FILES['csv_file']['tmp_name'])) {
+        $file = fopen($_FILES['csv_file']['tmp_name'], 'r');
+        $row = 0; $assigned = 0; $errors = [];
+        while (($data = fgetcsv($file)) !== false) {
+            $row++;
+            if ($row == 1) continue; // skip header
+            $username = trim($data[0] ?? '');
+            $class_id = intval($data[1] ?? 0);
+            $section_id = intval($data[2] ?? 0);
+            if (!$username || !$class_id) {
+                $errors[] = "Row $row: Missing username or class_id";
+                continue;
+            }
+            $stmt = $pdo->prepare("SELECT id FROM users WHERE username=?");
+            $stmt->execute([$username]);
+            $user = $stmt->fetch();
+            if (!$user) {
+                $errors[] = "Row $row: User not found";
+                continue;
+            }
+            $student_id = $pdo->query("SELECT id FROM students WHERE user_id=" . intval($user['id']))->fetchColumn();
+            if (!$student_id) {
+                $errors[] = "Row $row: Student not found";
+                continue;
+            }
+            $pdo->prepare("UPDATE students SET class_id=? WHERE id=?")->execute([$class_id, $student_id]);
+            if ($section_id) {
+                // Find or create batch for this class/section
+                $batch = $pdo->prepare("SELECT id FROM batches WHERE class_id=? AND section_id=?");
+                $batch->execute([$class_id, $section_id]);
+                $batch_id = $batch->fetchColumn();
+                if (!$batch_id) {
+                    $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (NULL,?,?,?)")
+                        ->execute([$class_id, $section_id, "Class $class_id - Section $section_id"]);
+                    $batch_id = $pdo->lastInsertId();
+                }
+                // Enroll student in batch
+                $exists = $pdo->prepare("SELECT id FROM enrollments WHERE student_id=? AND batch_id=?");
+                $exists->execute([$student_id, $batch_id]);
+                if (!$exists->fetch()) {
+                    $pdo->prepare("INSERT INTO enrollments (student_id, batch_id) VALUES (?,?)")->execute([$student_id, $batch_id]);
+                }
+            }
+            $assigned++;
+        }
+        fclose($file);
+        $bulk_success = "$assigned students assigned. " . (count($errors) ? implode("; ", $errors) : "");
+    } else {
+        $bulk_error = "Please upload a valid CSV file.";
+    }
+}
+
+// Export students
+if (isset($_GET['export'])) {
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment; filename="students_export.csv"');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['username', 'class_id', 'section_id']);
+    foreach ($students as $s) {
+        fputcsv($out, [$s['username'], $s['class_id'], $s['section_id'] ?? '']);
+    }
+    fclose($out);
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -108,58 +172,75 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </header>
             <div class="content">
                 <div class="dashboard-section">
-                    <div class="table-responsive">
-                        <table class="students-table">
-                            <thead>
+                    <h2>Bulk Assign Students to Classes/Sections</h2>
+                    <?php if ($bulk_error): ?><div class="error"><?= htmlspecialchars($bulk_error) ?></div><?php endif; ?>
+                    <?php if ($bulk_success): ?><div class="success"><?= htmlspecialchars($bulk_success) ?></div><?php endif; ?>
+                    <form method="post" enctype="multipart/form-data">
+                        <input type="file" name="csv_file" accept=".csv" required>
+                        <button type="submit" name="bulk_assign" class="btn">Bulk Assign</button>
+                        <a href="students.php?export=1" class="btn btn-secondary">Export Students</a>
+                        <a href="download_template.php?type=students_assign" class="btn btn-secondary">Download CSV Template</a>
+                    </form>
+                    <p>CSV columns: username, class_id, section_id (section_id optional)</p>
+                </div>
+                <div class="dashboard-section">
+                    <h2>Assign Student to Class/Section</h2>
+                    <form method="post">
+                        <label>Student:
+                            <select name="student_id" required>
+                                <option value="">Select Student</option>
+                                <?php foreach ($students as $s): ?>
+                                    <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['username']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                        <label>Class:
+                            <select name="class_id" required>
+                                <option value="">Select Class</option>
+                                <?php foreach ($classes as $c): ?>
+                                    <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['class_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                        <label>Section (optional):
+                            <select name="section_id">
+                                <option value="">Select Section</option>
+                                <?php foreach ($sections as $sec): ?>
+                                    <option value="<?= $sec['id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                        <button type="submit" name="assign_single" class="btn">Assign</button>
+                    </form>
+                </div>
+                <div class="dashboard-section">
+                    <h2>Student List</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <!-- ...other columns... -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($students as $s): ?>
                                 <tr>
-                                    <th>User ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Class</th>
-                                    <th>Enrollment No</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
+                                    <td><?= htmlspecialchars($s['username']) ?></td>
+                                    <td><?= htmlspecialchars($s['email']) ?></td>
+                                    <td><?= htmlspecialchars($s['class_name']) ?></td>
+                                    <td><?= htmlspecialchars($s['section_name'] ?? '-') ?></td>
+                                    <!-- ...other columns... -->
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($students)): ?>
-                                    <?php foreach ($students as $student): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($student['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($student['username']) ?></td>
-                                            <td><?= htmlspecialchars($student['email']) ?></td>
-                                            <td><?= htmlspecialchars($student['role_name'] ?? 'N/A') ?></td>
-                                            <td><?= htmlspecialchars($student['class_name'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($student['enrollment_no'] ?? '-') ?></td>
-                                            <td>
-                                                <?= $student['student_created_at'] 
-                                                    ? date('M j, Y g:i A', strtotime($student['student_created_at'])) 
-                                                    : '-' ?>
-                                            </td>
-                                            <td class="student-actions">
-                                                <?php if ($student['student_id']): ?>
-                                                    <a href="edit_student.php?id=<?= $student['student_id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                                    <a href="delete_student.php?id=<?= $student['student_id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this student?')"><i class="fas fa-trash-alt"></i></a>
-                                                <?php else: ?>
-                                                    <a href="add_student.php?user_id=<?= $student['user_id'] ?>" title="Add Enrollment"><i class="fas fa-plus"></i></a>
-                                                <?php endif; ?>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="8">No students found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
