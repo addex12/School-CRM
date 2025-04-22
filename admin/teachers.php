@@ -13,35 +13,36 @@ require_once '../includes/db.php';
 
 $pageTitle = "Teachers";
 
-// Fetch all teacher data with related information
+// Fetch all teachers with their related information
 $stmt = $pdo->prepare("
     SELECT 
         t.id AS teacher_id,
-        t.name,
-        t.email,
-        t.username,
-        t.address,
-        t.date_of_birth,
-        t.gender,
+        t.user_id,
         t.qualification,
         t.subject_specialization,
+        t.date_of_birth,
+        t.gender,
+        t.address,
         t.status,
         t.created_at,
-        t.updated_at,
-        sub.subject_name,
-        cn.grade AS class_grade,
-        sec.section_name,
-        cls.class_name,
         u.id AS user_id,
-        r.role_name
+        u.username,
+        u.email,
+        u.first_name,
+        u.last_name,
+        u.avatar,
+        r.role_name,
+        GROUP_CONCAT(DISTINCT s.subject_name ORDER BY s.subject_name SEPARATOR ', ') AS subjects,
+        GROUP_CONCAT(DISTINCT CONCAT(cls.class_name, IF(sec.section_name IS NULL, '', CONCAT(' (', sec.section_name, ')')) ORDER BY cls.class_name SEPARATOR ', ') AS classes
     FROM teachers t
-    LEFT JOIN users u ON t.username = u.username
-    LEFT JOIN roles r ON u.role_id = r.id
-    LEFT JOIN subjects sub ON t.subject_id = sub.id
-    LEFT JOIN class_names cn ON t.class_name_id = cn.id
-    LEFT JOIN sections sec ON t.section_id = sec.id
-    LEFT JOIN classes cls ON t.class_id = cls.id
-    ORDER BY t.name ASC
+    JOIN users u ON t.user_id = u.id
+    JOIN roles r ON u.role_id = r.id
+    LEFT JOIN teacher_subjects ts ON t.id = ts.teacher_id
+    LEFT JOIN subjects s ON ts.subject_id = s.id
+    LEFT JOIN classes cls ON ts.class_id = cls.id
+    LEFT JOIN sections sec ON ts.section_id = sec.id
+    GROUP BY t.id
+    ORDER BY u.first_name, u.last_name
 ");
 $stmt->execute();
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -56,30 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
         
         try {
             if ($action === 'delete') {
-                // Delete teachers and associated user accounts
-                $stmt = $pdo->prepare("
-                    DELETE t, u FROM teachers t
-                    JOIN users u ON t.username = u.username
-                    WHERE t.id IN ($placeholders)
-                ");
+                // Delete teacher records (users remain active)
+                $stmt = $pdo->prepare("DELETE FROM teachers WHERE id IN ($placeholders)");
                 $stmt->execute($teacher_ids);
                 $message = count($teacher_ids) . " teacher(s) deleted successfully.";
             } elseif ($action === 'activate') {
-                $stmt = $pdo->prepare("
-                    UPDATE teachers t
-                    JOIN users u ON t.username = u.username
-                    SET t.status = 'Active', u.is_active = 1
-                    WHERE t.id IN ($placeholders)
-                ");
+                $stmt = $pdo->prepare("UPDATE teachers SET status = 'active' WHERE id IN ($placeholders)");
                 $stmt->execute($teacher_ids);
                 $message = count($teacher_ids) . " teacher(s) activated successfully.";
             } elseif ($action === 'deactivate') {
-                $stmt = $pdo->prepare("
-                    UPDATE teachers t
-                    JOIN users u ON t.username = u.username
-                    SET t.status = 'Inactive', u.is_active = 0
-                    WHERE t.id IN ($placeholders)
-                ");
+                $stmt = $pdo->prepare("UPDATE teachers SET status = 'inactive' WHERE id IN ($placeholders)");
                 $stmt->execute($teacher_ids);
                 $message = count($teacher_ids) . " teacher(s) deactivated successfully.";
             }
@@ -94,11 +81,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
     }
 }
 
-// Handle import/export messages
-if (isset($_GET['imported'])) {
-    $imported = intval($_GET['imported']);
-    $failed = intval($_GET['failed'] ?? 0);
-    $message = "Imported $imported teachers successfully" . ($failed > 0 ? " ($failed failed)" : "");
+// Handle success/error messages
+if (isset($_GET['success'])) {
+    $success = htmlspecialchars($_GET['success']);
+}
+if (isset($_GET['error'])) {
+    $error = htmlspecialchars($_GET['error']);
 }
 ?>
 <!DOCTYPE html>
@@ -295,6 +283,19 @@ if (isset($_GET['imported'])) {
         .bulk-actions button:hover {
             background: #c0392b;
         }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .alert-error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
         @media (max-width: 900px) {
             .dashboard-section { padding: 1.2rem 0.5rem; }
             .import-export-bar { flex-direction: column; align-items: flex-start; }
@@ -314,14 +315,11 @@ if (isset($_GET['imported'])) {
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <?php if (isset($_GET['success'])): ?>
-                    <div class="alert alert-success"><?= htmlspecialchars($_GET['success']) ?></div>
+                <?php if (isset($success)): ?>
+                    <div class="alert alert-success"><?= $success ?></div>
                 <?php endif; ?>
-                <?php if (isset($_GET['error'])): ?>
-                    <div class="alert alert-error"><?= htmlspecialchars($_GET['error']) ?></div>
-                <?php endif; ?>
-                <?php if (isset($message)): ?>
-                    <div class="alert alert-success"><?= htmlspecialchars($message) ?></div>
+                <?php if (isset($error)): ?>
+                    <div class="alert alert-error"><?= $error ?></div>
                 <?php endif; ?>
 
                 <div class="dashboard-section">
@@ -360,8 +358,8 @@ if (isset($_GET['imported'])) {
                                         <th width="30"><input type="checkbox" id="select-all"></th>
                                         <th>Teacher</th>
                                         <th>Contact</th>
-                                        <th>Subject</th>
-                                        <th>Class/Grade</th>
+                                        <th>Subjects</th>
+                                        <th>Classes</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -375,40 +373,30 @@ if (isset($_GET['imported'])) {
                                                     <span class="teacher-avatar">
                                                         <?php
                                                         $initials = '';
-                                                        if (!empty($teacher['name'])) {
-                                                            $parts = explode(' ', $teacher['name']);
-                                                            foreach ($parts as $p) { 
-                                                                $initials .= strtoupper($p[0]); 
-                                                                if (strlen($initials) == 2) break; 
-                                                            }
-                                                        } else {
+                                                        if (!empty($teacher['first_name'])) {
+                                                            $initials .= strtoupper(substr($teacher['first_name'], 0, 1));
+                                                        }
+                                                        if (!empty($teacher['last_name'])) {
+                                                            $initials .= strtoupper(substr($teacher['last_name'], 0, 1));
+                                                        }
+                                                        if (empty($initials)) {
                                                             $initials = strtoupper(substr($teacher['username'], 0, 2));
                                                         }
                                                         echo htmlspecialchars($initials);
                                                         ?>
                                                     </span>
-                                                    <?= htmlspecialchars($teacher['name']) ?>
+                                                    <?= htmlspecialchars($teacher['first_name'] . ' ' . $teacher['last_name']) ?>
                                                     <span class="badge-role"><?= htmlspecialchars($teacher['role_name'] ?? 'Teacher') ?></span>
                                                 </td>
                                                 <td>
                                                     <div><?= htmlspecialchars($teacher['email']) ?></div>
                                                     <small class="text-muted"><?= htmlspecialchars($teacher['username']) ?></small>
                                                 </td>
-                                                <td><?= htmlspecialchars($teacher['subject_name'] ?? 'N/A') ?></td>
-                                                <td>
-                                                    <?php if ($teacher['class_name'] || $teacher['class_grade']): ?>
-                                                        <div><?= htmlspecialchars($teacher['class_name'] ?? 'N/A') ?></div>
-                                                        <small class="text-muted">
-                                                            <?= htmlspecialchars($teacher['class_grade'] ?? '') ?>
-                                                            <?= $teacher['section_name'] ? ' - ' . htmlspecialchars($teacher['section_name']) : '' ?>
-                                                        </small>
-                                                    <?php else: ?>
-                                                        Unassigned
-                                                    <?php endif; ?>
-                                                </td>
+                                                <td><?= htmlspecialchars($teacher['subjects'] ?? 'N/A') ?></td>
+                                                <td><?= htmlspecialchars($teacher['classes'] ?? 'Unassigned') ?></td>
                                                 <td>
                                                     <span class="<?= strtolower($teacher['status']) === 'active' ? 'status-active' : 'status-inactive' ?>">
-                                                        <?= htmlspecialchars($teacher['status'] ?? 'Inactive') ?>
+                                                        <?= htmlspecialchars(ucfirst($teacher['status'] ?? 'Inactive') ?>
                                                     </span>
                                                 </td>
                                                 <td class="teacher-actions">
