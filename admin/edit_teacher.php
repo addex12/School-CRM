@@ -6,7 +6,7 @@ require_once '../includes/config.php';
 $pageTitle = "Edit Teacher";
 
 // Get teacher ID from URL
-$teacher_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$teacher_id = isset($_GET['edit_id']) ? intval($_GET['edit_id']) : 0;
 if (!$teacher_id) {
     header("Location: teachers.php?error=Invalid+teacher+ID");
     exit;
