@@ -23,20 +23,14 @@ if ($student_id > 0) {
 // Handle update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_student'])) {
     $student_id = intval($_POST['student_id']);
-    $address = $_POST['address'] ?? null;
-    $date_of_birth = $_POST['date_of_birth'] ?? null;
-    $gender = $_POST['gender'] ?? null;
+    // Only update columns that exist in your students table
+    // Remove address, date_of_birth, gender, status if they do not exist in your DB
     $class_id = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
-    $status = $_POST['status'] ?? null;
 
-    // Update students table
-    $stmt = $pdo->prepare("UPDATE students SET address=?, date_of_birth=?, gender=?, class_id=?, status=? WHERE id=?");
+    // Update students table (only class_id, adjust as per your schema)
+    $stmt = $pdo->prepare("UPDATE students SET class_id=? WHERE id=?");
     $stmt->execute([
-        $address,
-        $date_of_birth,
-        $gender,
         $class_id,
-        $status,
         $student_id
     ]);
     $message = "Student details updated successfully!";
