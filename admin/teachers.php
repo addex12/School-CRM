@@ -14,7 +14,6 @@ $stmt = $pdo->prepare("
         r.role_name,
         t.id AS teacher_id,
         t.created_at AS teacher_created_at,
-        t.address,
         t.date_of_birth,
         t.gender,
         t.qualification,
@@ -262,7 +261,6 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Email</th>
                                     <th>Role</th>
                                     <th>Class</th>
-                                    <th>Address</th>
                                     <th>Date of Birth</th>
                                     <th>Gender</th>
                                     <th>Qualification</th>
@@ -299,7 +297,6 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 echo !empty($teacher['class_name']) ? htmlspecialchars($teacher['class_name']) : '<span style="color:#888;">Unassigned</span>';
                                                 ?>
                                             </td>
-                                            <td><?= htmlspecialchars($teacher['address'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($teacher['date_of_birth'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($teacher['gender'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($teacher['qualification'] ?? '-') ?></td>
