@@ -97,17 +97,51 @@ function esc($value) {
     <style>
         .admin-dashboard {
             display: flex;
+            flex-direction: row;
             min-height: 100vh;
             background: #f4f6fa;
         }
         .admin-main {
             flex: 1;
+            margin-left: 250px;
             padding: 2rem 2.5rem;
             max-width: 100%;
-            margin: 0;
             background: none;
             border-radius: 0;
             box-shadow: none;
+            transition: margin-left 0.2s;
+        }
+        @media (max-width: 900px) {
+            .admin-dashboard {
+                flex-direction: column;
+            }
+            .admin-main {
+                margin-left: 60px;
+                padding: 10px 5px 80px;
+            }
+        }
+        @media (max-width: 600px) {
+            .admin-dashboard {
+                flex-direction: column;
+            }
+            .admin-main {
+                margin-left: 0;
+                width: 100%;
+                padding: 5px 2px 80px;
+            }
+            .sidebar-overlay {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.3);
+                z-index: 199;
+            }
+        }
+        .sidebar-overlay {
+            display: none;
         }
         .users-header {
             display: flex;
@@ -197,6 +231,7 @@ function esc($value) {
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="document.getElementById('adminSidebar').classList.remove('open');this.style.display='none';"></div>
         <div class="admin-main">
             <header class="admin-header">
                 <h1>Edit Teacher</h1>
@@ -332,6 +367,32 @@ function esc($value) {
             </div>
         </div>
     </div>
+    <script>
+    // Show overlay when sidebar is open on mobile
+    document.addEventListener('DOMContentLoaded', function() {
+        var sidebar = document.getElementById('adminSidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        var toggle = document.getElementById('sidebarToggle');
+        if (sidebar && overlay && toggle) {
+            toggle.addEventListener('click', function() {
+                if (window.innerWidth <= 600) {
+                    setTimeout(function() {
+                        if (sidebar.classList.contains('open')) {
+                            overlay.style.display = 'block';
+                        } else {
+                            overlay.style.display = 'none';
+                        }
+                    }, 10);
+                }
+            });
+        }
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 600) {
+                overlay.style.display = 'none';
+            }
+        });
+    });
+    </script>
                 <?php include 'includes/footer.php'; ?>
 </body>
 </html>
