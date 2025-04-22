@@ -7,9 +7,27 @@ $pageTitle = "Grade Reports";
 
 // Fetch students, subjects, sections for dropdowns
 $students = $pdo->query("SELECT s.id, u.username FROM students s LEFT JOIN users u ON s.user_id = u.id ORDER BY u.username")->fetchAll(PDO::FETCH_ASSOC);
-$subjects = $pdo->query("SELECT id, subject_name FROM subjects ORDER BY subject_name")->fetchAll(PDO::FETCH_ASSOC);
 $sections = $pdo->query("SELECT id, section_name FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
-$grading_scales = $pdo->query("SELECT id, scale_name FROM grading_scales ORDER BY scale_name")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch curriculums for subject and grading scale filtering
+$curriculums = $pdo->query("SELECT id, name FROM curriculums ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch subjects with curriculum and class level info
+$subjects = $pdo->query("
+    SELECT s.id, s.subject_name, cu.name AS curriculum, lv.level_name
+    FROM subjects s
+    LEFT JOIN curriculums cu ON s.curriculum_id = cu.id
+    LEFT JOIN class_levels lv ON s.class_level_id = lv.id
+    ORDER BY cu.name, lv.level_name, s.subject_name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch grading scales with curriculum info
+$grading_scales = $pdo->query("
+    SELECT gs.id, gs.scale_name, cu.name AS curriculum
+    FROM grading_scales gs
+    LEFT JOIN curriculums cu ON gs.curriculum_id = cu.id
+    ORDER BY cu.name, gs.scale_name
+")->fetchAll(PDO::FETCH_ASSOC);
 
 // Handle add grade
 $error = '';
@@ -81,7 +99,11 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <select name="subject_id" id="subject_id" required>
                                 <option value="">-- Select Subject --</option>
                                 <?php foreach ($subjects as $s): ?>
-                                    <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['subject_name']) ?></option>
+                                    <option value="<?= $s['id'] ?>">
+                                        <?= htmlspecialchars($s['subject_name']) ?>
+                                        (<?= htmlspecialchars($s['curriculum'] ?? '-') ?>
+                                        <?= $s['level_name'] ? ' - ' . htmlspecialchars($s['level_name']) : '' ?>)
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -99,7 +121,10 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <select name="grading_scale_id" id="grading_scale_id">
                                 <option value="">-- Any Scale --</option>
                                 <?php foreach ($grading_scales as $gs): ?>
-                                    <option value="<?= $gs['id'] ?>"><?= htmlspecialchars($gs['scale_name']) ?></option>
+                                    <option value="<?= $gs['id'] ?>">
+                                        <?= htmlspecialchars($gs['scale_name']) ?>
+                                        (<?= htmlspecialchars($gs['curriculum'] ?? '-') ?>)
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -159,6 +184,59 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td colspan="10">No grades found.</td>
                                     </tr>
                                 <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                    <h2>Curriculum Subjects & Grading Scales Reference</h2>
+                    <div class="table-responsive">
+                        <table class="classes-table">
+                            <thead>
+                                <tr>
+                                    <th>Curriculum</th>
+                                    <th>Subjects</th>
+                                    <th>Grading Scales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($curriculums as $curriculum): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($curriculum['name']) ?></td>
+                                        <td>
+                                            <?php
+                                            $currSubjects = array_filter($subjects, function($s) use ($curriculum) {
+                                                return $s['curriculum'] === $curriculum['name'];
+                                            });
+                                            if ($currSubjects) {
+                                                echo '<ul style="margin:0;padding-left:1.2em;">';
+                                                foreach ($currSubjects as $s) {
+                                                    echo '<li>' . htmlspecialchars($s['subject_name']);
+                                                    if ($s['level_name']) echo ' <small>(' . htmlspecialchars($s['level_name']) . ')</small>';
+                                                    echo '</li>';
+                                                }
+                                                echo '</ul>';
+                                            } else {
+                                                echo '<em>No subjects</em>';
+                                            }
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $currScales = array_filter($grading_scales, function($gs) use ($curriculum) {
+                                                return $gs['curriculum'] === $curriculum['name'];
+                                            });
+                                            if ($currScales) {
+                                                echo '<ul style="margin:0;padding-left:1.2em;">';
+                                                foreach ($currScales as $gs) {
+                                                    echo '<li>' . htmlspecialchars($gs['scale_name']) . '</li>';
+                                                }
+                                                echo '</ul>';
+                                            } else {
+                                                echo '<em>No grading scales</em>';
+                                            }
+                                            ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
