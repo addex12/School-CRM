@@ -19,13 +19,12 @@ if (!$teacher_id) {
     exit;
 }
 
-// Fetch teacher info with user and class
+// Fetch teacher info with user
 $stmt = $pdo->prepare("
-    SELECT t.id AS teacher_id, t.user_id, t.class_id, u.username, u.email, u.address, u.date_of_birth, u.gender, u.status, 
-           c.class_name
+    SELECT t.id AS teacher_id, t.user_id, t.qualification, t.subject_specialization, t.date_of_birth, t.gender, t.address, t.status, 
+           u.username, u.email
     FROM teachers t
     LEFT JOIN users u ON t.user_id = u.id
-    LEFT JOIN classes c ON t.class_id = c.id
     WHERE t.id = ?
 ");
 $stmt->execute([$teacher_id]);
@@ -36,35 +35,28 @@ if (!$teacher) {
     exit;
 }
 
-// Fetch all classes for dropdown
-$classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
-
 // Handle update
 $success = $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_teacher'])) {
-    $class_id = !empty($_POST['class_id']) ? intval($_POST['class_id']) : null;
-    // Optionally update user info (address, dob, gender, status)
+    // Only update columns that exist in your teachers table
+    $qualification = trim($_POST['qualification'] ?? '');
+    $subject_specialization = trim($_POST['subject_specialization'] ?? '');
     $address = trim($_POST['address'] ?? '');
     $date_of_birth = trim($_POST['date_of_birth'] ?? '');
     $gender = trim($_POST['gender'] ?? '');
     $status = trim($_POST['status'] ?? '');
 
-    // Update teacher's class assignment
-    $stmt = $pdo->prepare("UPDATE teachers SET class_id=? WHERE id=?");
-    $stmt->execute([$class_id, $teacher_id]);
-
-    // Update user info
-    $stmt = $pdo->prepare("UPDATE users SET address=?, date_of_birth=?, gender=?, status=? WHERE id=?");
-    $stmt->execute([$address, $date_of_birth, $gender, $status, $teacher['user_id']]);
+    // Update teacher info
+    $stmt = $pdo->prepare("UPDATE teachers SET qualification=?, subject_specialization=?, address=?, date_of_birth=?, gender=?, status=? WHERE id=?");
+    $stmt->execute([$qualification, $subject_specialization, $address, $date_of_birth, $gender, $status, $teacher_id]);
 
     $success = "Teacher details updated successfully!";
     // Refresh teacher data
     $stmt = $pdo->prepare("
-        SELECT t.id AS teacher_id, t.user_id, t.class_id, u.username, u.email, u.address, u.date_of_birth, u.gender, u.status, 
-               c.class_name
+        SELECT t.id AS teacher_id, t.user_id, t.qualification, t.subject_specialization, t.date_of_birth, t.gender, t.address, t.status, 
+               u.username, u.email
         FROM teachers t
         LEFT JOIN users u ON t.user_id = u.id
-        LEFT JOIN classes c ON t.class_id = c.id
         WHERE t.id = ?
     ");
     $stmt->execute([$teacher_id]);
@@ -112,6 +104,12 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                         <label>Email:
                             <input type="text" value="<?= esc($teacher['email']) ?>" disabled>
                         </label>
+                        <label>Qualification:
+                            <input type="text" name="qualification" value="<?= esc($teacher['qualification'] ?? '') ?>">
+                        </label>
+                        <label>Subject Specialization:
+                            <input type="text" name="subject_specialization" value="<?= esc($teacher['subject_specialization'] ?? '') ?>">
+                        </label>
                         <label>Address:
                             <input type="text" name="address" value="<?= esc($teacher['address'] ?? '') ?>">
                         </label>
@@ -124,16 +122,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                 <option value="Male" <?= ($teacher['gender'] ?? '') === 'Male' ? 'selected' : '' ?>>Male</option>
                                 <option value="Female" <?= ($teacher['gender'] ?? '') === 'Female' ? 'selected' : '' ?>>Female</option>
                                 <option value="Other" <?= ($teacher['gender'] ?? '') === 'Other' ? 'selected' : '' ?>>Other</option>
-                            </select>
-                        </label>
-                        <label>Class Assignment:
-                            <select name="class_id">
-                                <option value="">Unassigned</option>
-                                <?php foreach ($classes as $class): ?>
-                                    <option value="<?= esc($class['id']) ?>" <?= ($teacher['class_id'] ?? null) == $class['id'] ? 'selected' : '' ?>>
-                                        <?= esc($class['class_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
                             </select>
                         </label>
                         <label>Status:

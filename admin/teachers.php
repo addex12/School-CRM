@@ -14,7 +14,7 @@ $pageTitle = "Teachers";
 
 // Fetch all teachers with user info only (no class join)
 $stmt = $pdo->query("
-    SELECT t.id AS teacher_id, u.username, u.email
+    SELECT t.id AS teacher_id, u.username, u.email, t.qualification, t.subject_specialization, t.date_of_birth, t.gender, t.address, t.status, t.created_at
     FROM teachers t
     LEFT JOIN users u ON t.user_id = u.id
     ORDER BY u.username
@@ -120,6 +120,13 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <th>ID</th>
                                     <th>Username</th>
                                     <th>Email</th>
+                                    <th>Qualification</th>
+                                    <th>Subject Specialization</th>
+                                    <th>Date of Birth</th>
+                                    <th>Gender</th>
+                                    <th>Address</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -130,6 +137,13 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                             <td><?= esc($teacher['teacher_id']) ?></td>
                                             <td><?= esc($teacher['username']) ?></td>
                                             <td><?= esc($teacher['email']) ?></td>
+                                            <td><?= esc($teacher['qualification'] ?? '-') ?></td>
+                                            <td><?= esc($teacher['subject_specialization'] ?? '-') ?></td>
+                                            <td><?= esc($teacher['date_of_birth'] ?? '-') ?></td>
+                                            <td><?= esc($teacher['gender'] ?? '-') ?></td>
+                                            <td><?= esc($teacher['address'] ?? '-') ?></td>
+                                            <td><?= esc($teacher['status'] ?? '-') ?></td>
+                                            <td><?= esc($teacher['created_at'] ?? '-') ?></td>
                                             <td class="teacher-actions">
                                                 <a href="edit_teacher.php?id=<?= esc($teacher['teacher_id']) ?>" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="view_teacher.php" title="View All"><i class="fas fa-eye"></i></a>
@@ -138,7 +152,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="4">No teachers found.</td>
+                                        <td colspan="11">No teachers found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
