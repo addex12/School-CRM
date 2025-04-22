@@ -38,15 +38,15 @@ $stmt = $pdo->prepare("
     JOIN users u ON t.user_id = u.id
     JOIN roles r ON u.role_id = r.id
     LEFT JOIN teacher_subjects ts ON t.id = ts.teacher_id
-    LEFT JOIN subjects s ON ts.subject_id = s.id
-    LEFT JOIN classes cls ON ts.class_id = cls.id
+    LEFT JOIN class_subjects cs ON ts.class_subject_id = cs.id
+    LEFT JOIN subjects s ON cs.subject_id = s.id
+    LEFT JOIN classes cls ON cs.class_id = cls.id
     LEFT JOIN sections sec ON ts.section_id = sec.id
     GROUP BY t.id
     ORDER BY u.first_name, u.last_name
 ");
 $stmt->execute();
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 // Handle bulk actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
     $action = $_POST['bulk_action'];
