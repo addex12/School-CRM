@@ -10,6 +10,11 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
+// Make sure $pdo is initialized
+if (!isset($pdo) || !$pdo) {
+    require_once '../includes/db.php';
+}
+
 $pageTitle = "Edit Teacher";
 
 // Enable error reporting for debugging (remove or comment out in production)
