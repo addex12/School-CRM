@@ -313,6 +313,8 @@ if ($errorLogPath && is_readable($errorLogPath)) {
                     <a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
                     <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
                     <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
+                    <a href="curriculums.php" class="quick-link"><i class="fas fa-list"></i><span>Curriculums</span></a>
+                    <a href="sections.php" class="quick-link"><i class="fas fa-th-large"></i><span>Sections</span></a>
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
