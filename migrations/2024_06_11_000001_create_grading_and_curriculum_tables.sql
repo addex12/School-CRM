@@ -1,27 +1,37 @@
--- Table for internationally known grading scales
-CREATE TABLE grading_scales (
+-- Add grading_scales table if it does not exist
+CREATE TABLE IF NOT EXISTS grading_scales (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT
 );
 
--- Table for curricula
-CREATE TABLE curricula (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    country VARCHAR(100)
-);
+-- Drop foreign key constraint if it exists (safe for reruns)
+ALTER TABLE grading_scales DROP FOREIGN KEY grading_scales_ibfk_1;
 
--- Table for grades/classes per curriculum
-CREATE TABLE curriculum_grades (
+-- Add foreign key constraint
+ALTER TABLE grading_scales ADD CONSTRAINT grading_scales_ibfk_1 FOREIGN KEY (curriculum_id) REFERENCES curriculums(id) ON DELETE CASCADE;
+
+-- Make curriculum_id nullable
+ALTER TABLE grading_scales MODIFY COLUMN curriculum_id INT NULL;
+
+-- Add country column to curriculums if not exists
+ALTER TABLE curriculums ADD COLUMN IF NOT EXISTS country VARCHAR(100);
+
+-- Add curriculum_grades table if it does not exist
+CREATE TABLE IF NOT EXISTS curriculum_grades (
     id INT AUTO_INCREMENT PRIMARY KEY,
     curriculum_id INT NOT NULL,
     grade_name VARCHAR(50) NOT NULL,
     grade_order INT,
-    FOREIGN KEY (curriculum_id) REFERENCES curricula(id) ON DELETE CASCADE
+    FOREIGN KEY (curriculum_id) REFERENCES curriculums(id) ON DELETE CASCADE
 );
 
--- Seed grading scales
+-- Fix foreign key constraint to reference the correct table name (curriculums, not curricula)
+ALTER TABLE curriculum_grades DROP FOREIGN KEY curriculum_grades_ibfk_1;
+ALTER TABLE curriculum_grades
+  ADD CONSTRAINT curriculum_grades_ibfk_1 FOREIGN KEY (curriculum_id) REFERENCES curriculums(id) ON DELETE CASCADE;
+
+-- Seed grading scales (general, not tied to a curriculum)
 INSERT INTO grading_scales (name, description) VALUES
 ('A-F', 'A (Excellent), B (Good), C (Average), D (Below Average), F (Fail)'),
 ('Percentage', '0-100% scale'),
@@ -29,13 +39,22 @@ INSERT INTO grading_scales (name, description) VALUES
 ('GPA 5.0', 'Grade Point Average on a 5.0 scale'),
 ('IGCSE', 'International General Certificate of Secondary Education grading (A*-G)');
 
--- Seed curricula
-INSERT INTO curricula (name, country) VALUES
-('US K-12', 'USA'),
-('British Curriculum', 'UK'),
-('CBSE', 'India'),
-('IB', 'International'),
-('IGCSE', 'International');
+-- Seed curriculums (only insert if not exists to avoid duplicate entry error)
+INSERT INTO curriculums (name, country)
+SELECT * FROM (SELECT 'US K-12', 'USA') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM curriculums WHERE name = 'US K-12')
+UNION ALL
+SELECT * FROM (SELECT 'British Curriculum', 'UK') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM curriculums WHERE name = 'British Curriculum')
+UNION ALL
+SELECT * FROM (SELECT 'CBSE', 'India') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM curriculums WHERE name = 'CBSE')
+UNION ALL
+SELECT * FROM (SELECT 'IB', 'International') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM curriculums WHERE name = 'IB')
+UNION ALL
+SELECT * FROM (SELECT 'IGCSE', 'International') AS tmp
+WHERE NOT EXISTS (SELECT 1 FROM curriculums WHERE name = 'IGCSE');
 
 -- Seed grades/classes for US K-12
 INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
@@ -104,3 +123,4 @@ INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
 INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
 (5, 'Year 10', 10),
 (5, 'Year 11', 11);
+
