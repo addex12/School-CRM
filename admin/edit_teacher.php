@@ -93,8 +93,8 @@ if (isset($_GET['updated'])) {
         <select name="edit_id" id="edit_id" onchange="this.form.submit()">
             <option value="">-- Select --</option>
             <?php foreach ($teachers as $teacher): ?>
-                <option value="<?= $teacher['id'] ?>" <?= (isset($selected_teacher) && $selected_teacher['id'] == $teacher['id']) ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($teacher['name']) ?> (<?= htmlspecialchars($teacher['username']) ?>)
+                <option value="<?= htmlspecialchars((string)($teacher['id'] ?? '')) ?>" <?= (isset($selected_teacher) && ($selected_teacher['id'] ?? null) == $teacher['id']) ? 'selected' : '' ?>>
+                    <?= htmlspecialchars((string)($teacher['name'] ?? '')) ?> (<?= htmlspecialchars((string)($teacher['username'] ?? '')) ?>)
                 </option>
             <?php endforeach; ?>
         </select>
@@ -102,7 +102,7 @@ if (isset($_GET['updated'])) {
     </form>
 
     <?php if ($selected_teacher): ?>
-        <h3>Editing: <?= htmlspecialchars($selected_teacher['name']) ?></h3>
+        <h3>Editing: <?= htmlspecialchars((string)($selected_teacher['name'] ?? '')) ?></h3>
         <form method="post">
             <input type="hidden" name="teacher_id" value="<?= $selected_teacher['id'] ?>">
             <label for="name">Full Name:</label>
