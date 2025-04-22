@@ -95,57 +95,118 @@ function esc($value) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .admin-main {
-            max-width: 900px;
-            margin: 30px auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px #0001;
-            padding: 32px;
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: #f4f6fa;
         }
-        h2, h3 { color: #003366; }
-        .form-section { margin-bottom: 32px; }
-        .success { color: #28a745; }
-        .error { color: #dc3545; }
-        label { display: block; margin-top: 12px; font-weight: 500; }
-        input[type="text"], input[type="email"], input[type="password"], select {
+        .admin-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            max-width: 100%;
+            margin: 0;
+            background: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .users-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        .users-header .btn {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.18s;
+            text-decoration: none;
+        }
+        .users-header .btn:hover {
+            background: #217dbb;
+        }
+        .dashboard-section {
+            margin-bottom: 2.5rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+        }
+        .dashboard-section h2 {
+            font-size: 1.3rem;
+            color: #34495e;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid #f0f2f5;
+            padding-bottom: 0.5rem;
+        }
+        .form-section label { display: block; margin-top: 12px; font-weight: 500; }
+        .form-section input[type="text"], .form-section input[type="email"], .form-section input[type="password"], .form-section select {
             width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px;
         }
-        button { background: #003366; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; margin-top: 16px; }
-        button:hover { background: #00509e; }
-        table { border-collapse: collapse; width: 100%; margin-top: 24px; background: #fff; }
-        th, td { padding: 8px 12px; border: 1px solid #e0e0e0; }
-        th { background: #e9ecef; }
-        .footer-dev { font-size: 13px; color: #b0c4de; }
+        .form-section button { background: #003366; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; margin-top: 16px; }
+        .form-section button:hover { background: #00509e; }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            text-align: left;
+        }
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #34495e;
+        }
+        tr:hover {
+            background: #f4f8fb;
+        }
         @media (max-width: 900px) {
-            .admin-main { padding: 1rem 0.5rem; }
+            .dashboard-section {
+                padding: 1rem 0.5rem;
+            }
         }
         @media (max-width: 600px) {
-            .admin-main { padding: 10px 2px 80px; }
-            th, td { padding: 8px 6px; }
+            .admin-main {
+                padding: 10px 2px 80px;
+            }
+            .dashboard-section {
+                padding: 1rem 0.5rem;
+            }
+            th, td {
+                padding: 8px 6px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="admin-dashboard" style="display:flex;min-height:100vh;background:#f4f6fa;">
+    <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header style="background:#003366;color:#fff;padding:16px 0;text-align:center;">
-                <h1>Flipper School CRM - Admin Panel</h1>
-                <div class="footer-dev">
-                    Developed by: Adugna Gizaw &bull; Email: gizawadugna@gmail.com &bull;
-                    <a href="https://www.linkedin.com/in/eleganceict" style="color:#b0c4de" target="_blank">LinkedIn</a> &bull;
-                    <a href="https://twitter.com/eleganceict1" style="color:#b0c4de" target="_blank">Twitter</a> &bull;
-                    <a href="https://github.com/addex12" style="color:#b0c4de" target="_blank">GitHub</a>
-                </div>
+            <header class="admin-header">
+                <h1>Edit Teacher</h1>
             </header>
-            <main>
-                <h2>Edit Teacher</h2>
+            <div class="content">
                 <?php if ($message): ?>
                     <p class="<?= strpos($message, 'successfully') !== false ? 'success' : 'error' ?>"><?= esc($message) ?></p>
                 <?php endif; ?>
 
-                <div class="form-section">
+                <div class="dashboard-section">
                     <form method="get" action="edit_teacher.php">
                         <label for="edit_id">Select Teacher:</label>
                         <select name="edit_id" id="edit_id" onchange="this.form.submit()">
@@ -173,7 +234,7 @@ function esc($value) {
                 </div>
 
                 <?php if ($selected_teacher): ?>
-                    <div class="form-section">
+                    <div class="dashboard-section">
                         <h3>Editing: <?= esc($selected_teacher['name']) ?></h3>
                         <form method="post">
                             <input type="hidden" name="teacher_id" value="<?= esc($selected_teacher['id']) ?>">
@@ -217,63 +278,61 @@ function esc($value) {
                     </div>
                 <?php endif; ?>
 
-                <h3>All Teachers</h3>
-                <table>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Username</th>
-                        <th>Subject</th>
-                        <th>Grade</th>
-                        <th>Section</th>
-                    </tr>
-                    <?php foreach ($teachers as $teacher): ?>
-                    <tr>
-                        <td><?= esc($teacher['id']) ?></td>
-                        <td><?= esc($teacher['name']) ?></td>
-                        <td><?= esc($teacher['email']) ?></td>
-                        <td><?= esc($teacher['username']) ?></td>
-                        <td>
-                            <?php
-                            if (!empty($teacher['subject_id'])) {
-                                $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
-                                $subj->execute([$teacher['subject_id']]);
-                                echo esc($subj->fetchColumn());
-                            }
-                            ?>
-                        </td>
-                        <td>
-                            <?php
-                            if (!empty($teacher['class_name_id'])) {
-                                $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
-                                $grd->execute([$teacher['class_name_id']]);
-                                echo esc($grd->fetchColumn());
-                            }
-                            ?>
-                        </td>
-                        <td>
-                            <?php
-                            if (!empty($teacher['section_id'])) {
-                                $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
-                                $sec->execute([$teacher['section_id']]);
-                                echo esc($sec->fetchColumn());
-                            }
-                            ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </table>
-            </main>
-            <footer style="background:#003366;color:#fff;padding:16px 0;text-align:center;">
-                <div class="footer-dev">
-                    &copy; <?= date('Y') ?> Flipper School CRM. Developed by Adugna Gizaw &bull; Email: gizawadugna@gmail.com &bull;
-                    <a href="https://www.linkedin.com/in/eleganceict" style="color:#b0c4de" target="_blank">LinkedIn</a> &bull;
-                    <a href="https://twitter.com/eleganceict1" style="color:#b0c4de" target="_blank">Twitter</a> &bull;
-                    <a href="https://github.com/addex12" style="color:#b0c4de" target="_blank">GitHub</a>
+                <div class="dashboard-section">
+                    <h3>All Teachers</h3>
+                    <div class="table-container">
+                        <table>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Username</th>
+                                <th>Subject</th>
+                                <th>Grade</th>
+                                <th>Section</th>
+                            </tr>
+                            <?php foreach ($teachers as $teacher): ?>
+                            <tr>
+                                <td><?= esc($teacher['id']) ?></td>
+                                <td><?= esc($teacher['name']) ?></td>
+                                <td><?= esc($teacher['email']) ?></td>
+                                <td><?= esc($teacher['username']) ?></td>
+                                <td>
+                                    <?php
+                                    if (!empty($teacher['subject_id'])) {
+                                        $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
+                                        $subj->execute([$teacher['subject_id']]);
+                                        echo esc($subj->fetchColumn());
+                                    }
+                                    ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    if (!empty($teacher['class_name_id'])) {
+                                        $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
+                                        $grd->execute([$teacher['class_name_id']]);
+                                        echo esc($grd->fetchColumn());
+                                    }
+                                    ?>
+                                </td>
+                                <td>
+                                    <?php
+                                    if (!empty($teacher['section_id'])) {
+                                        $sec = $db->prepare("SELECT section FROM sections WHERE id = ?");
+                                        $sec->execute([$teacher['section_id']]);
+                                        echo esc($sec->fetchColumn());
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    </div>
                 </div>
-            </footer>
+            </div>
         </div>
     </div>
+                <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
