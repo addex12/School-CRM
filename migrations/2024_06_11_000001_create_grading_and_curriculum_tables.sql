@@ -1,0 +1,106 @@
+-- Table for internationally known grading scales
+CREATE TABLE grading_scales (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT
+);
+
+-- Table for curricula
+CREATE TABLE curricula (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    country VARCHAR(100)
+);
+
+-- Table for grades/classes per curriculum
+CREATE TABLE curriculum_grades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    curriculum_id INT NOT NULL,
+    grade_name VARCHAR(50) NOT NULL,
+    grade_order INT,
+    FOREIGN KEY (curriculum_id) REFERENCES curricula(id) ON DELETE CASCADE
+);
+
+-- Seed grading scales
+INSERT INTO grading_scales (name, description) VALUES
+('A-F', 'A (Excellent), B (Good), C (Average), D (Below Average), F (Fail)'),
+('Percentage', '0-100% scale'),
+('GPA 4.0', 'Grade Point Average on a 4.0 scale'),
+('GPA 5.0', 'Grade Point Average on a 5.0 scale'),
+('IGCSE', 'International General Certificate of Secondary Education grading (A*-G)');
+
+-- Seed curricula
+INSERT INTO curricula (name, country) VALUES
+('US K-12', 'USA'),
+('British Curriculum', 'UK'),
+('CBSE', 'India'),
+('IB', 'International'),
+('IGCSE', 'International');
+
+-- Seed grades/classes for US K-12
+INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
+(1, 'Kindergarten', 0),
+(1, 'Grade 1', 1),
+(1, 'Grade 2', 2),
+(1, 'Grade 3', 3),
+(1, 'Grade 4', 4),
+(1, 'Grade 5', 5),
+(1, 'Grade 6', 6),
+(1, 'Grade 7', 7),
+(1, 'Grade 8', 8),
+(1, 'Grade 9 (Freshman)', 9),
+(1, 'Grade 10 (Sophomore)', 10),
+(1, 'Grade 11 (Junior)', 11),
+(1, 'Grade 12 (Senior)', 12);
+
+-- Seed grades/classes for British Curriculum
+INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
+(2, 'Reception', 0),
+(2, 'Year 1', 1),
+(2, 'Year 2', 2),
+(2, 'Year 3', 3),
+(2, 'Year 4', 4),
+(2, 'Year 5', 5),
+(2, 'Year 6', 6),
+(2, 'Year 7', 7),
+(2, 'Year 8', 8),
+(2, 'Year 9', 9),
+(2, 'Year 10', 10),
+(2, 'Year 11', 11),
+(2, 'Year 12', 12),
+(2, 'Year 13', 13);
+
+-- Seed grades/classes for CBSE
+INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
+(3, 'Class 1', 1),
+(3, 'Class 2', 2),
+(3, 'Class 3', 3),
+(3, 'Class 4', 4),
+(3, 'Class 5', 5),
+(3, 'Class 6', 6),
+(3, 'Class 7', 7),
+(3, 'Class 8', 8),
+(3, 'Class 9', 9),
+(3, 'Class 10', 10),
+(3, 'Class 11', 11),
+(3, 'Class 12', 12);
+
+-- Seed grades/classes for IB
+INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
+(4, 'PYP 1', 1),
+(4, 'PYP 2', 2),
+(4, 'PYP 3', 3),
+(4, 'PYP 4', 4),
+(4, 'PYP 5', 5),
+(4, 'MYP 1', 6),
+(4, 'MYP 2', 7),
+(4, 'MYP 3', 8),
+(4, 'MYP 4', 9),
+(4, 'MYP 5', 10),
+(4, 'DP 1', 11),
+(4, 'DP 2', 12);
+
+-- Seed grades/classes for IGCSE
+INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
+(5, 'Year 10', 10),
+(5, 'Year 11', 11);
