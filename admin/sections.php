@@ -131,6 +131,7 @@ $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <a href="delete_section.php?id=<?= $section['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this section?')"><i class="fas fa-trash-alt"></i></a>
                                             </td>
                                         </tr>
+                                        
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
@@ -139,6 +140,32 @@ $sections = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php endif; ?>
                             </tbody>
                         </table>
+                        <table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Section Name</th>
+            <th>Section</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        // ...existing code to fetch $sections...
+        foreach ($sections as $section) {
+            echo "<tr>";
+            echo "<td>{$section['id']}</td>";
+            echo "<td>{$section['section_name']}</td>";
+            echo "<td>{$section['section']}</td>";
+            echo "<td>
+                <a href='edit_section.php?id={$section['id']}'>Edit</a> |
+                <a href='delete_section.php?id={$section['id']}' onclick=\"return confirm('Are you sure you want to delete this section?');\">Delete</a>
+            </td>";
+            echo "</tr>";
+        }
+        ?>
+    </tbody>
+</table>
                     </div>
                 </div>
             </div>
