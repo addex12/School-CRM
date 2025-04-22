@@ -29,6 +29,111 @@ $grading_scales = $pdo->query("
     ORDER BY cu.name, gs.scale_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 
+// --- AUTO-INSERT COMMON CURRICULUMS, SUBJECTS, AND GRADING SCALES IF TABLES ARE EMPTY ---
+
+// Insert common curriculums if not present
+$curriculumCount = $pdo->query("SELECT COUNT(*) FROM curriculums")->fetchColumn();
+if ($curriculumCount == 0) {
+    $commonCurriculums = [
+        'Cambridge',
+        'Ethiopian',
+        'American',
+        'IB',
+        'French',
+        'Standard'
+    ];
+    $stmt = $pdo->prepare("INSERT INTO curriculums (name) VALUES (?)");
+    foreach ($commonCurriculums as $c) {
+        $stmt->execute([$c]);
+    }
+}
+
+// Insert common class levels if not present
+$classLevelCount = $pdo->query("SELECT COUNT(*) FROM class_levels")->fetchColumn();
+if ($classLevelCount == 0) {
+    // Map: curriculum => [levels]
+    $levelsMap = [
+        'Cambridge' => ['Foundation', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12'],
+        'Ethiopian' => ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'],
+        'American'  => ['Kindergarten', 'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'],
+        'IB'        => ['PYP', 'MYP', 'DP'],
+        'French'    => ['CP', 'CE1', 'CE2', 'CM1', 'CM2', '6ème', '5ème', '4ème', '3ème', '2nde', '1ère', 'Terminale'],
+        'Standard'  => ['Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6']
+    ];
+    $curriculumIds = $pdo->query("SELECT id, name FROM curriculums")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $stmt = $pdo->prepare("INSERT INTO class_levels (curriculum_id, level_name, level_order) VALUES (?, ?, ?)");
+    foreach ($levelsMap as $currName => $levels) {
+        if (!isset($curriculumIds[$currName])) continue;
+        $currId = $curriculumIds[$currName];
+        foreach ($levels as $order => $level) {
+            $stmt->execute([$currId, $level, $order]);
+        }
+    }
+}
+
+// Insert common subjects if not present
+$subjectCount = $pdo->query("SELECT COUNT(*) FROM subjects")->fetchColumn();
+if ($subjectCount == 0) {
+    $subjectsMap = [
+        'Cambridge' => [
+            'English', 'Mathematics', 'Science', 'ICT', 'Geography', 'History', 'Art & Design', 'Physical Education', 'French', 'Biology', 'Chemistry', 'Physics', 'Business Studies', 'Economics'
+        ],
+        'Ethiopian' => [
+            'English', 'Mathematics', 'Amharic', 'Science', 'Civics', 'ICT', 'Biology', 'Chemistry', 'Physics', 'Geography', 'History', 'Economics'
+        ],
+        'American' => [
+            'English', 'Mathematics', 'Science', 'Social Studies', 'Physical Education', 'Art', 'Music', 'Computer Science', 'Biology', 'Chemistry', 'Physics', 'Economics'
+        ],
+        'IB' => [
+            'Language and Literature', 'Individuals and Societies', 'Sciences', 'Mathematics', 'Arts', 'Physical and Health Education', 'Design'
+        ],
+        'French' => [
+            'Français', 'Mathématiques', 'Histoire-Géographie', 'Sciences', 'Anglais', 'Arts Plastiques', 'EPS', 'Physique-Chimie', 'SVT', 'Technologie'
+        ],
+        'Standard' => [
+            'English', 'Mathematics', 'Science', 'Social Studies'
+        ]
+    ];
+    $curriculumIds = $pdo->query("SELECT id, name FROM curriculums")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $stmt = $pdo->prepare("INSERT INTO subjects (curriculum_id, subject_name) VALUES (?, ?)");
+    foreach ($subjectsMap as $currName => $subjects) {
+        if (!isset($curriculumIds[$currName])) continue;
+        $currId = $curriculumIds[$currName];
+        foreach ($subjects as $subject) {
+            $stmt->execute([$currId, $subject]);
+        }
+    }
+}
+
+// Insert common grading scales if not present
+$scaleCount = $pdo->query("SELECT COUNT(*) FROM grading_scales")->fetchColumn();
+if ($scaleCount == 0) {
+    $scales = [
+        // Cambridge/IB/International
+        ['A*', 90, 100, 'Excellent'],
+        ['A', 80, 89.99, 'Very Good'],
+        ['B', 70, 79.99, 'Good'],
+        ['C', 60, 69.99, 'Satisfactory'],
+        ['D', 50, 59.99, 'Pass'],
+        ['E', 40, 49.99, 'Weak Pass'],
+        ['F', 0, 39.99, 'Fail'],
+        // American (GPA style)
+        ['A', 90, 100, 'Excellent'],
+        ['B', 80, 89.99, 'Good'],
+        ['C', 70, 79.99, 'Average'],
+        ['D', 60, 69.99, 'Below Average'],
+        ['F', 0, 59.99, 'Fail'],
+        // Ethiopian (can be similar to above)
+    ];
+    $curriculumIds = $pdo->query("SELECT id, name FROM curriculums")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $stmt = $pdo->prepare("INSERT INTO grading_scales (curriculum_id, scale_name, min_score, max_score, grade_letter, remark) VALUES (?, ?, ?, ?, ?, ?)");
+    foreach ($curriculumIds as $currId) {
+        foreach ($scales as $scale) {
+            $stmt->execute([$currId, 'Default', $scale[1], $scale[2], $scale[0], $scale[3]]);
+        }
+    }
+}
+
 // Handle add grade
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_grade'])) {
