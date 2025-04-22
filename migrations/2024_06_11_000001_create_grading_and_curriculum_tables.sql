@@ -69,50 +69,59 @@ WHERE NOT EXISTS (SELECT 1 FROM grading_scales WHERE name = 'Ethiopian 100-point
 -- Ensure the subjects table exists and has a 'name' column before inserting
 CREATE TABLE IF NOT EXISTS subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE
+    curriculum_id INT NOT NULL,
+    subject_name VARCHAR(100) NOT NULL UNIQUE,
+    FOREIGN KEY (curriculum_id) REFERENCES curriculums(id) ON DELETE CASCADE
 );
 
--- Insert all subjects (global, including Ethiopian curriculum) if not exists
--- MySQL does not support INSERT ... WHERE NOT EXISTS for multiple rows directly.
--- Use individual INSERT IGNORE statements for each subject to avoid duplicates.
+-- If the table exists but does not have the 'name' column, add it
+ALTER TABLE subjects ADD COLUMN IF NOT EXISTS curriculum_id INT NOT NULL;
+ALTER TABLE subjects ADD COLUMN IF NOT EXISTS subject_name VARCHAR(100) NOT NULL UNIQUE;
 
-INSERT IGNORE INTO subjects (name) VALUES ('Mathematics');
-INSERT IGNORE INTO subjects (name) VALUES ('English');
-INSERT IGNORE INTO subjects (name) VALUES ('Physics');
-INSERT IGNORE INTO subjects (name) VALUES ('Chemistry');
-INSERT IGNORE INTO subjects (name) VALUES ('Biology');
-INSERT IGNORE INTO subjects (name) VALUES ('Geography');
-INSERT IGNORE INTO subjects (name) VALUES ('History');
-INSERT IGNORE INTO subjects (name) VALUES ('Civics');
-INSERT IGNORE INTO subjects (name) VALUES ('Economics');
-INSERT IGNORE INTO subjects (name) VALUES ('ICT');
-INSERT IGNORE INTO subjects (name) VALUES ('Amharic');
-INSERT IGNORE INTO subjects (name) VALUES ('Afan Oromo');
-INSERT IGNORE INTO subjects (name) VALUES ('Somali');
-INSERT IGNORE INTO subjects (name) VALUES ('Tigrigna');
-INSERT IGNORE INTO subjects (name) VALUES ('HPE');
-INSERT IGNORE INTO subjects (name) VALUES ('Moral Education');
-INSERT IGNORE INTO subjects (name) VALUES ('Technical Drawing');
-INSERT IGNORE INTO subjects (name) VALUES ('Agriculture');
-INSERT IGNORE INTO subjects (name) VALUES ('Business');
-INSERT IGNORE INTO subjects (name) VALUES ('Accounting');
-INSERT IGNORE INTO subjects (name) VALUES ('General Science');
-INSERT IGNORE INTO subjects (name) VALUES ('Social Studies');
-INSERT IGNORE INTO subjects (name) VALUES ('Music');
-INSERT IGNORE INTO subjects (name) VALUES ('Art');
-INSERT IGNORE INTO subjects (name) VALUES ('French');
-INSERT IGNORE INTO subjects (name) VALUES ('Arabic');
-INSERT IGNORE INTO subjects (name) VALUES ('Religious Education');
-INSERT IGNORE INTO subjects (name) VALUES ('Environmental Science');
-INSERT IGNORE INTO subjects (name) VALUES ('Science');
-INSERT IGNORE INTO subjects (name) VALUES ('Reading');
-INSERT IGNORE INTO subjects (name) VALUES ('Writing');
-INSERT IGNORE INTO subjects (name) VALUES ('Handwriting');
-INSERT IGNORE INTO subjects (name) VALUES ('Drama');
-INSERT IGNORE INTO subjects (name) VALUES ('Physical Education');
-INSERT IGNORE INTO subjects (name) VALUES ('Home Economics');
-INSERT IGNORE INTO subjects (name) VALUES ('Technology');
-INSERT IGNORE INTO subjects (name) VALUES ('Ethics');
+-- Example: Insert subjects for Ethiopian Curriculum (replace 6 with the actual id if different)
+-- You may need to SELECT the id for 'Ethiopian Curriculum' if not known
+SET @ethiopian_curriculum_id = (SELECT id FROM curriculums WHERE name = 'Ethiopian Curriculum' LIMIT 1);
+
+INSERT IGNORE INTO subjects (curriculum_id, subject_name) VALUES
+(@ethiopian_curriculum_id, 'Mathematics'),
+(@ethiopian_curriculum_id, 'English'),
+(@ethiopian_curriculum_id, 'Physics'),
+(@ethiopian_curriculum_id, 'Chemistry'),
+(@ethiopian_curriculum_id, 'Biology'),
+(@ethiopian_curriculum_id, 'Geography'),
+(@ethiopian_curriculum_id, 'History'),
+(@ethiopian_curriculum_id, 'Civics'),
+(@ethiopian_curriculum_id, 'Economics'),
+(@ethiopian_curriculum_id, 'ICT'),
+(@ethiopian_curriculum_id, 'Amharic'),
+(@ethiopian_curriculum_id, 'Afan Oromo'),
+(@ethiopian_curriculum_id, 'Somali'),
+(@ethiopian_curriculum_id, 'Tigrigna'),
+(@ethiopian_curriculum_id, 'HPE'),
+(@ethiopian_curriculum_id, 'Moral Education'),
+(@ethiopian_curriculum_id, 'Technical Drawing'),
+(@ethiopian_curriculum_id, 'Agriculture'),
+(@ethiopian_curriculum_id, 'Business'),
+(@ethiopian_curriculum_id, 'Accounting'),
+(@ethiopian_curriculum_id, 'General Science'),
+(@ethiopian_curriculum_id, 'Social Studies'),
+(@ethiopian_curriculum_id, 'Music'),
+(@ethiopian_curriculum_id, 'Art'),
+(@ethiopian_curriculum_id, 'French'),
+(@ethiopian_curriculum_id, 'Arabic'),
+(@ethiopian_curriculum_id, 'Religious Education'),
+(@ethiopian_curriculum_id, 'Environmental Science'),
+(@ethiopian_curriculum_id, 'Science'),
+(@ethiopian_curriculum_id, 'Reading'),
+(@ethiopian_curriculum_id, 'Writing'),
+(@ethiopian_curriculum_id, 'Handwriting'),
+(@ethiopian_curriculum_id, 'Drama'),
+(@ethiopian_curriculum_id, 'Physical Education'),
+(@ethiopian_curriculum_id, 'Home Economics'),
+(@ethiopian_curriculum_id, 'Technology'),
+(@ethiopian_curriculum_id, 'Ethics');
+
+-- Repeat similar blocks for other curriculums if needed, changing @ethiopian_curriculum_id to the appropriate curriculum id.
 
 -- Seed grades/classes for US K-12
 INSERT INTO curriculum_grades (curriculum_id, grade_name, grade_order) VALUES
