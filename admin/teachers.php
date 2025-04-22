@@ -96,6 +96,101 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 padding: 8px 6px;
             }
         }
+        .dashboard-section {
+            background: linear-gradient(135deg, #f8fafc 80%, #e3e9f7 100%);
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.10);
+            padding: 2.5rem 2rem;
+            margin-bottom: 2.5rem;
+            transition: box-shadow 0.2s;
+        }
+        .dashboard-section:hover {
+            box-shadow: 0 8px 32px rgba(44,62,80,0.13);
+        }
+        .teachers-header h2 {
+            font-size: 1.5rem;
+            color: #2d3a4b;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .teachers-header .btn {
+            background: linear-gradient(90deg, #3498db 60%, #217dbb 100%);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 28px;
+            margin-left: 10px;
+            transition: background 0.18s;
+        }
+        .teachers-header .btn:hover {
+            background: #00509e;
+        }
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            background: #fff;
+        }
+        .teachers-table th, .teachers-table td {
+            vertical-align: middle;
+        }
+        .teacher-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #3498db;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+        }
+        .badge-role {
+            background: #eaf6ff;
+            color: #3498db;
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .teacher-actions a {
+            background: #eaf6ff;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-right: 6px;
+            color: #3498db;
+            font-size: 1.1em;
+            transition: background 0.18s;
+        }
+        .teacher-actions a:hover {
+            background: #3498db;
+            color: #fff;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .search-bar input {
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            padding: 8px 14px;
+            font-size: 1em;
+            width: 220px;
+        }
+        @media (max-width: 900px) {
+            .dashboard-section { padding: 1.2rem 0.5rem; }
+        }
+        @media (max-width: 600px) {
+            .dashboard-section { padding: 0.7rem 0.2rem; }
+            .teacher-avatar { width: 30px; height: 30px; font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
@@ -128,10 +223,24 @@ $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php if (!empty($teachers)): ?>
                                     <?php foreach ($teachers as $teacher): ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($teacher['user_id']) ?></td>
+                                            <td>
+                                                <span class="teacher-avatar">
+                                                    <?php
+                                                    $initials = '';
+                                                    if (!empty($teacher['username'])) {
+                                                        $parts = explode(' ', $teacher['username']);
+                                                        foreach ($parts as $p) { $initials .= strtoupper($p[0]); if (strlen($initials) == 2) break; }
+                                                    } else {
+                                                        $initials = strtoupper(substr($teacher['email'], 0, 2));
+                                                    }
+                                                    echo htmlspecialchars($initials);
+                                                    ?>
+                                                </span>
+                                                <?= htmlspecialchars($teacher['user_id']) ?>
+                                            </td>
                                             <td><?= htmlspecialchars($teacher['username']) ?></td>
                                             <td><?= htmlspecialchars($teacher['email']) ?></td>
-                                            <td><?= htmlspecialchars($teacher['role_name'] ?? 'N/A') ?></td>
+                                            <td><span class="badge-role"><?= htmlspecialchars($teacher['role_name'] ?? 'N/A') ?></span></td>
                                             <td><?= htmlspecialchars($teacher['class_name'] ?? '-') ?></td>
                                             <td>
                                                 <?= $teacher['teacher_created_at'] 

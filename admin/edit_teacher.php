@@ -167,64 +167,103 @@ function esc($value) {
         .users-header .btn:hover {
             background: #217dbb;
         }
-        .dashboard-section {
+        .dashboard-section, .form-section {
+            background: linear-gradient(135deg, #f8fafc 80%, #e3e9f7 100%);
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(44,62,80,0.10);
+            padding: 2.5rem 2rem;
             margin-bottom: 2.5rem;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
+            transition: box-shadow 0.2s;
         }
-        .dashboard-section h2 {
-            font-size: 1.3rem;
-            color: #34495e;
+        .dashboard-section:hover, .form-section:hover {
+            box-shadow: 0 8px 32px rgba(44,62,80,0.13);
+        }
+        .dashboard-section h3, .dashboard-section h2 {
+            font-size: 1.5rem;
+            color: #2d3a4b;
             margin-bottom: 1.2rem;
-            border-bottom: 1px solid #f0f2f5;
-            padding-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
-        .form-section label { display: block; margin-top: 12px; font-weight: 500; }
-        .form-section input[type="text"], .form-section input[type="email"], .form-section input[type="password"], .form-section select {
-            width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px;
+        .teacher-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #3498db;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-right: 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.10);
         }
-        .form-section button { background: #003366; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; margin-top: 16px; }
-        .form-section button:hover { background: #00509e; }
-        .success { color: #27ae60; }
-        .error { color: #e74c3c; }
+        .badge-role {
+            background: #eaf6ff;
+            color: #3498db;
+            border-radius: 12px;
+            padding: 2px 10px;
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .success, .error {
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-size: 1.1em;
+            margin-bottom: 1.2rem;
+        }
+        .success { background: #eafaf1; color: #27ae60; }
+        .error { background: #fee2e2; color: #e74c3c; }
         .table-container {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
             background: #fff;
         }
-        th, td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
+        table th, table td {
+            vertical-align: middle;
         }
-        th {
-            background: #f8f9fa;
+        .dashboard-section label {
             font-weight: 600;
             color: #34495e;
         }
-        tr:hover {
-            background: #f4f8fb;
+        .dashboard-section input, .dashboard-section select {
+            margin-bottom: 1rem;
+        }
+        .dashboard-section button {
+            background: linear-gradient(90deg, #3498db 60%, #217dbb 100%);
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 28px;
+            margin-top: 10px;
+            transition: background 0.18s;
+        }
+        .dashboard-section button:hover {
+            background: #00509e;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        .search-bar input {
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            padding: 8px 14px;
+            font-size: 1em;
+            width: 220px;
         }
         @media (max-width: 900px) {
-            .dashboard-section {
-                padding: 1rem 0.5rem;
-            }
+            .dashboard-section, .form-section { padding: 1.2rem 0.5rem; }
         }
         @media (max-width: 600px) {
-            .admin-main {
-                padding: 10px 2px 80px;
-            }
-            .dashboard-section {
-                padding: 1rem 0.5rem;
-            }
-            th, td {
-                padding: 8px 6px;
-            }
+            .dashboard-section, .form-section { padding: 0.7rem 0.2rem; }
+            .teacher-avatar { width: 30px; height: 30px; font-size: 0.95rem; }
         }
     </style>
 </head>
@@ -326,41 +365,57 @@ function esc($value) {
                                 <th>Grade</th>
                                 <th>Section</th>
                             </tr>
-                            <?php foreach ($teachers as $teacher): ?>
-                            <tr>
-                                <td><?= esc($teacher['id']) ?></td>
-                                <td><?= esc($teacher['name']) ?></td>
-                                <td><?= esc($teacher['email']) ?></td>
-                                <td><?= esc($teacher['username']) ?></td>
-                                <td>
-                                    <?php
-                                    if (!empty($teacher['subject_id'])) {
-                                        $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
-                                        $subj->execute([$teacher['subject_id']]);
-                                        echo esc($subj->fetchColumn());
-                                    }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if (!empty($teacher['class_name_id'])) {
-                                        $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
-                                        $grd->execute([$teacher['class_name_id']]);
-                                        echo esc($grd->fetchColumn());
-                                    }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if (!empty($teacher['section_id'])) {
-                                        $sec = $db->prepare("SELECT section_name FROM sections WHERE id = ?");
-                                        $sec->execute([$teacher['section_id']]);
-                                        echo esc($sec->fetchColumn());
-                                    }
-                                    ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
+                            <tbody>
+                                <?php foreach ($teachers as $teacher): ?>
+                                <tr>
+                                    <td>
+                                        <span class="teacher-avatar">
+                                            <?php
+                                            $initials = '';
+                                            if (!empty($teacher['name'])) {
+                                                $parts = explode(' ', $teacher['name']);
+                                                foreach ($parts as $p) { $initials .= strtoupper($p[0]); if (strlen($initials) == 2) break; }
+                                            } else {
+                                                $initials = strtoupper(substr($teacher['username'], 0, 2));
+                                            }
+                                            echo esc($initials);
+                                            ?>
+                                        </span>
+                                        <?= esc($teacher['id']) ?>
+                                    </td>
+                                    <td><?= esc($teacher['name']) ?></td>
+                                    <td><?= esc($teacher['email']) ?></td>
+                                    <td><?= esc($teacher['username']) ?></td>
+                                    <td>
+                                        <?php
+                                        if (!empty($teacher['subject_id'])) {
+                                            $subj = $db->prepare("SELECT subject_name FROM subjects WHERE id = ?");
+                                            $subj->execute([$teacher['subject_id']]);
+                                            echo esc($subj->fetchColumn());
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if (!empty($teacher['class_name_id'])) {
+                                            $grd = $db->prepare("SELECT grade FROM class_names WHERE id = ?");
+                                            $grd->execute([$teacher['class_name_id']]);
+                                            echo esc($grd->fetchColumn());
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <?php
+                                        if (!empty($teacher['section_id'])) {
+                                            $sec = $db->prepare("SELECT section_name FROM sections WHERE id = ?");
+                                            $sec->execute([$teacher['section_id']]);
+                                            echo esc($sec->fetchColumn());
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
                         </table>
                     </div>
                 </div>
