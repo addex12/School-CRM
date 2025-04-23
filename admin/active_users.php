@@ -575,7 +575,8 @@ else:
         const orig = {
             username: usernameTd.textContent.trim(),
             role_id: roleTd.getAttribute('data-role-id'),
-            online: /Online/i.test(onlineTd.textContent),
+            // Use data attribute to reliably get online status
+            online: onlineTd.querySelector('.online-dot') !== null,
             role_name: roleTd.textContent.trim()
         };
 
@@ -587,7 +588,7 @@ else:
             roleOptions += `<option value="<?= htmlspecialchars($id) ?>" ${orig.role_id == "<?= htmlspecialchars($id) ?>" ? 'selected' : ''}><?= htmlspecialchars($name) ?></option>`;
         <?php endforeach; ?>
         roleTd.innerHTML = `<select class="crud-editable" name="role">${roleOptions}</select>`;
-        // Online checkbox
+        // Online checkbox (preserve original state)
         onlineTd.innerHTML = `<label><input type="checkbox" name="online" ${orig.online ? 'checked' : ''}> Online</label>`;
 
         // Actions: Save/Cancel
