@@ -214,7 +214,6 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
     <script>
         // Interactive row highlight
@@ -225,27 +224,51 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // ERPNext-style search/filter
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.createElement('input');
-            searchInput.type = 'text';
-            searchInput.placeholder = 'Search surveys...';
-            searchInput.style = 'margin-bottom:1.2rem;padding:8px 14px;width:100%;border:1px solid #e5e7eb;border-radius:4px;font-size:1rem;';
+            // Add ERPNext-style search bar
+            const searchBar = document.createElement('div');
+            searchBar.style = 'display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;';
+            searchBar.innerHTML = `
+                <input type="text" id="surveySearch" placeholder="Search surveys..." style="flex:1;padding:10px 16px;border:1px solid #e5e7eb;border-radius:6px;font-size:1rem;background:#f9fafb;">
+                <button class="erpnext-btn btn-primary" id="clearSearch" style="padding:10px 18px;">Clear</button>
+            `;
             const table = document.querySelector('.surveys-table');
             const container = table.parentElement;
-            container.insertBefore(searchInput, table);
+            container.insertBefore(searchBar, table);
 
+            const searchInput = document.getElementById('surveySearch');
+            const clearBtn = document.getElementById('clearSearch');
             searchInput.addEventListener('input', function() {
                 const val = this.value.toLowerCase();
                 document.querySelectorAll('.surveys-table tbody tr').forEach(function(row) {
                     row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
                 });
             });
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+            });
         });
 
+        // ERPNext-style row click for preview
+        document.querySelectorAll('.surveys-table tbody tr').forEach(function(row) {
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', function(e) {
+                // Only trigger if not clicking an action icon
+                if (!e.target.closest('.survey-actions')) {
+                    const idCell = row.querySelector('td');
+                    if (idCell) {
+                        const id = idCell.textContent.trim();
+                        window.location.href = 'survey_preview.php?id=' + encodeURIComponent(id);
+                    }
+                }
+            });
+        });
         // ERPNext-style action dropdown (for future extensibility)
         document.querySelectorAll('.survey-actions').forEach(function(cell) {
             // Could add dropdown here if needed
         });
     </script>
+            <?php include 'includes/footer.php'; ?>
 </body>
 </html>
 <?php ob_end_flush(); ?>
