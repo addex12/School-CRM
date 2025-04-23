@@ -116,17 +116,18 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         foreach ($all_users as $user) {
             echo '<tr data-id="' . htmlspecialchars($user['id']) . '">';
             echo '<td>' . htmlspecialchars($user['id']) . '</td>';
-            echo '<td><input class="crud-editable username" type="text" value="' . htmlspecialchars($user['username']) . '"></td>';
+            echo '<td class="username">' . htmlspecialchars($user['username']) . '</td>';
             echo '<td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>';
-            echo '<td><label><input type="checkbox" class="crud-editable online" ' . (!empty($user['online']) ? 'checked' : '') . '> Online</label></td>';
-            echo '<td><select class="crud-editable role">';
-            foreach ($roles as $id => $name) {
-                $selected = ($user['role_id'] == $id) ? 'selected' : '';
-                echo '<option value="' . htmlspecialchars($id) . '" ' . $selected . '>' . htmlspecialchars($name) . '</option>';
+            echo '<td class="online">';
+            if (!empty($user['online'])) {
+                echo '<span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>';
+            } else {
+                echo '<span style="color:#aaa;">Offline</span>';
             }
-            echo '</select></td>';
+            echo '</td>';
+            echo '<td class="role" data-role-id="' . htmlspecialchars($user['role_id']) . '">' . htmlspecialchars($user['role_name']) . '</td>';
             echo '<td>
-                <button class="crud-btn save">Save</button>
+                <button class="crud-btn edit">Edit</button>
                 <button class="crud-btn delete">Delete</button>
             </td>';
             echo '</tr>';
@@ -412,26 +413,18 @@ if ($has_users):
 ?>
 <tr data-id="<?= htmlspecialchars($user['id']) ?>">
     <td><?= htmlspecialchars($user['id']) ?></td>
-    <td>
-        <input class="crud-editable username" type="text" value="<?= htmlspecialchars($user['username']) ?>">
-    </td>
+    <td class="username"><?= htmlspecialchars($user['username']) ?></td>
     <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
-    <td>
-        <label>
-            <input type="checkbox" class="crud-editable online" <?= !empty($user['online']) ? 'checked' : '' ?>> Online
-        </label>
+    <td class="online">
+        <?php if (!empty($user['online'])): ?>
+            <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
+        <?php else: ?>
+            <span style="color:#aaa;">Offline</span>
+        <?php endif; ?>
     </td>
+    <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
     <td>
-        <select class="crud-editable role">
-            <?php foreach ($roles as $id => $name): ?>
-                <option value="<?= htmlspecialchars($id) ?>" <?= $user['role_id'] == $id ? 'selected' : '' ?>>
-                    <?= htmlspecialchars($name) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-    </td>
-    <td>
-        <button class="crud-btn save">Save</button>
+        <button class="crud-btn edit">Edit</button>
         <button class="crud-btn delete">Delete</button>
     </td>
 </tr>
@@ -569,6 +562,108 @@ else:
 
     // Ensure delegateCrud is called after every AJAX update and on page load
     delegateCrud();
+
+    // Inline edit logic
+    function makeEditableRow(tr) {
+        const id = tr.getAttribute('data-id');
+        const usernameTd = tr.querySelector('.username');
+        const roleTd = tr.querySelector('.role');
+        const onlineTd = tr.querySelector('.online');
+        const actionsTd = tr.querySelector('td:last-child');
+
+        // Save original values
+        const orig = {
+            username: usernameTd.textContent.trim(),
+            role_id: roleTd.getAttribute('data-role-id'),
+            online: /Online/i.test(onlineTd.textContent),
+            role_name: roleTd.textContent.trim()
+        };
+
+        // Replace with inputs
+        usernameTd.innerHTML = `<input class="crud-editable" name="username" value="${orig.username}">`;
+        // Role select
+        let roleOptions = `<option value="">Select</option>`;
+        <?php foreach ($roles as $id => $name): ?>
+            roleOptions += `<option value="<?= htmlspecialchars($id) ?>" ${orig.role_id == "<?= htmlspecialchars($id) ?>" ? 'selected' : ''}><?= htmlspecialchars($name) ?></option>`;
+        <?php endforeach; ?>
+        roleTd.innerHTML = `<select class="crud-editable" name="role">${roleOptions}</select>`;
+        // Online checkbox
+        onlineTd.innerHTML = `<label><input type="checkbox" name="online" ${orig.online ? 'checked' : ''}> Online</label>`;
+
+        // Actions: Save/Cancel
+        actionsTd.innerHTML =
+            `<button class="crud-btn save">Save</button>
+             <button class="crud-btn cancel">Cancel</button>`;
+
+        // Save handler
+        actionsTd.querySelector('.save').onclick = function() {
+            const username = usernameTd.querySelector('input').value.trim();
+            const role_id = roleTd.querySelector('select').value;
+            const online = onlineTd.querySelector('input[type="checkbox"]').checked ? 1 : 0;
+            fetch('active_users.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: new URLSearchParams({
+                    ajax: 'update_user',
+                    id: id,
+                    username: username,
+                    role_id: role_id,
+                    online: online,
+                    active: 1
+                })
+            }).then(res => res.text()).then(resp => {
+                if (resp.trim() === 'success') {
+                    fetchUsers();
+                } else {
+                    alert('Update failed');
+                }
+            });
+        };
+        // Cancel handler
+        actionsTd.querySelector('.cancel').onclick = function() {
+            fetchUsers();
+        };
+    }
+
+    // Delete handler
+    function deleteRow(tr) {
+        const id = tr.getAttribute('data-id');
+        if (!confirm('Are you sure you want to delete this user?')) return;
+        fetch('active_users.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                ajax: 'delete_user',
+                id: id
+            })
+        }).then(res => res.text()).then(resp => {
+            if (resp.trim() === 'success') {
+                fetchUsers();
+            } else {
+                alert('Delete failed');
+            }
+        });
+    }
+
+    // Delegate edit/delete buttons
+    function delegateCrud() {
+        document.querySelectorAll('#usersTableBody tr').forEach(tr => {
+            const editBtn = tr.querySelector('.edit');
+            const deleteBtn = tr.querySelector('.delete');
+            if (editBtn) {
+                editBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    makeEditableRow(tr);
+                };
+            }
+            if (deleteBtn) {
+                deleteBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    deleteRow(tr);
+                };
+            }
+        });
+    }
     </script>
 </body>
 </html>
