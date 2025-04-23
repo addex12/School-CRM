@@ -5,15 +5,7 @@
       "icon": "tachometer-alt",
       "link": "dashboard.php"
     },
-    {
-        "title": "Users",
-        "icon": "users",
-        "items": [
-            { "title": "User List", "icon": "users", "link": "users.php" },
-            { "title": "Add User", "icon": "user-plus", "link": "add_users.php" }
-        ],
-        "id": "users-menu"
-    },
+    
     {
       "title": "Surveys",
       "icon": "poll",
