@@ -7,8 +7,8 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // Include required files
 require '../includes/db.php';
-require '../includes/auth.php';
 require '../includes/config.php';
+require '../includes/auth.php';
 
 // Verify admin access
 requireAdmin();
