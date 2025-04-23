@@ -138,12 +138,12 @@ $current = basename($_SERVER['PHP_SELF']);
                 </li>
             <?php endif; ?>
         <?php endforeach; ?>
-        <li>
+       <!-- <li>
             <a href="grade_report.php">
                 <i class="fa fa-chart-bar"></i>
                 <span>Grade Reports & Analytics</span>
             </a>
-        </li>
+        </li> -->
     </ul>
 </aside>
 
