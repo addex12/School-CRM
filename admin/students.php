@@ -235,6 +235,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_student'])) {
     exit;
 }
 
+// --- AJAX handler for editing a student (class/section/status) ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_edit_student'])) {
+    $student_id = intval($_POST['student_id']);
+    $class_id = intval($_POST['class_id']);
+    $section_id = $_POST['section_id'] !== "" ? intval($_POST['section_id']) : null;
+    $status = trim($_POST['status']);
+    $pdo->prepare("UPDATE students SET class_id=?, section_id=?, status=? WHERE id=?")
+        ->execute([$class_id, $section_id, $status, $student_id]);
+    // Also update enrollments if section is set
+    if ($section_id) {
+        $pdo->prepare("DELETE FROM enrollments WHERE student_id=?")->execute([$student_id]);
+        $batch = $pdo->prepare("SELECT id FROM batches WHERE class_id=? AND section_id=?");
+        $batch->execute([$class_id, $section_id]);
+        $batch_id = $batch->fetchColumn();
+        if (!$batch_id) {
+            $program_id = $pdo->query("SELECT id FROM programs LIMIT 1")->fetchColumn();
+            if (!$program_id) {
+                $pdo->prepare("INSERT INTO programs (name) VALUES ('Default Program')")->execute();
+                $program_id = $pdo->lastInsertId();
+            }
+            $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (?, ?, ?, ?)")
+                ->execute([$program_id, $class_id, $section_id, "Class $class_id - Section $section_id"]);
+            $batch_id = $pdo->lastInsertId();
+        }
+        $exists = $pdo->prepare("SELECT id FROM enrollments WHERE student_id=? AND batch_id=?");
+        $exists->execute([$student_id, $batch_id]);
+        if (!$exists->fetch()) {
+            $pdo->prepare("INSERT INTO enrollments (student_id, batch_id) VALUES (?,?)")->execute([$student_id, $batch_id]);
+        }
+    }
+    echo json_encode(['success' => true]);
+    exit;
+}
+
+// --- AJAX handler for bulk assign selected students ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_bulk_assign_selected'])) {
+    $selected_students = $_POST['selected_students'] ?? [];
+    $class_id = intval($_POST['bulk_class_id'] ?? 0);
+    $section_id = $_POST['bulk_section_id'] !== "" ? intval($_POST['bulk_section_id']) : null;
+    $assigned = 0;
+    foreach ($selected_students as $student_id) {
+        $student_id = intval($student_id);
+        if (!$student_id || !$class_id) continue;
+        $pdo->prepare("UPDATE students SET class_id=?, section_id=? WHERE id=?")->execute([$class_id, $section_id, $student_id]);
+        if ($section_id) {
+            $pdo->prepare("DELETE FROM enrollments WHERE student_id=?")->execute([$student_id]);
+            $batch = $pdo->prepare("SELECT id FROM batches WHERE class_id=? AND section_id=?");
+            $batch->execute([$class_id, $section_id]);
+            $batch_id = $batch->fetchColumn();
+            if (!$batch_id) {
+                $program_id = $pdo->query("SELECT id FROM programs LIMIT 1")->fetchColumn();
+                if (!$program_id) {
+                    $pdo->prepare("INSERT INTO programs (name) VALUES ('Default Program')")->execute();
+                    $program_id = $pdo->lastInsertId();
+                }
+                $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (?, ?, ?, ?)")
+                    ->execute([$program_id, $class_id, $section_id, "Class $class_id - Section $section_id"]);
+                $batch_id = $pdo->lastInsertId();
+            }
+            $exists = $pdo->prepare("SELECT id FROM enrollments WHERE student_id=? AND batch_id=?");
+            $exists->execute([$student_id, $batch_id]);
+            if (!$exists->fetch()) {
+                $pdo->prepare("INSERT INTO enrollments (student_id, batch_id) VALUES (?,?)")->execute([$student_id, $batch_id]);
+            }
+        }
+        $assigned++;
+    }
+    echo json_encode(['success' => true, 'assigned' => $assigned]);
+    exit;
+}
+
 function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
 function sort_link($col, $label, $current_sort, $current_order) {
     $next_order = ($current_sort === $col && $current_order === 'asc') ? 'desc' : 'asc';
@@ -472,10 +543,10 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="students-tbody">
                                     <?php if (!empty($students)): ?>
                                         <?php foreach ($students as $s): ?>
-                                            <tr>
+                                            <tr data-student-id="<?= esc($s['student_id']) ?>">
                                                 <td><input type="checkbox" name="selected_students[]" value="<?= esc($s['student_id']) ?>" class="student-checkbox"></td>
                                                 <td><?= esc($s['user_id']) ?></td>
                                                 <td><?= esc($s['username']) ?></td>
@@ -485,14 +556,13 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                                 <td><?= esc($s['status'] ?? '-') ?></td>
                                                 <td><?= esc($s['created_at'] ?? '-') ?></td>
                                                 <td>
-                                                    <a href="students.php?edit_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                    <button type="button" class="erpnext-btn btn-sm btn-secondary edit-student-btn" data-student-id="<?= esc($s['student_id']) ?>">Edit</button>
                                                     <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
                                                 </td>
                                             </tr>
-                                            <?php if (isset($_GET['edit_student']) && $_GET['edit_student'] == $s['student_id']): ?>
-                                            <tr>
+                                            <tr class="edit-row" id="edit-row-<?= esc($s['student_id']) ?>" style="display:none;">
                                                 <td colspan="9">
-                                                    <form method="post" style="display:flex;gap:1rem;align-items:center;">
+                                                    <form class="edit-student-form" data-student-id="<?= esc($s['student_id']) ?>" style="display:flex;gap:1rem;align-items:center;">
                                                         <input type="hidden" name="student_id" value="<?= esc($s['student_id']) ?>">
                                                         <label>Class:
                                                             <select name="class_id" required>
@@ -512,12 +582,11 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                                         <label>Status:
                                                             <input type="text" name="status" value="<?= esc($s['status']) ?>">
                                                         </label>
-                                                        <button type="submit" name="edit_student" class="erpnext-btn btn-sm btn-success">Save</button>
-                                                        <a href="students.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
+                                                        <button type="submit" class="erpnext-btn btn-sm btn-success">Save</button>
+                                                        <button type="button" class="erpnext-btn btn-sm btn-secondary cancel-edit-btn">Cancel</button>
                                                     </form>
                                                 </td>
                                             </tr>
-                                            <?php endif; ?>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
@@ -583,6 +652,63 @@ function sort_link($col, $label, $current_sort, $current_order) {
 
             classSelect.addEventListener('change', filterSections);
             filterSections();
+        });
+
+        // Edit student row show/hide and AJAX save
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show edit row
+            document.querySelectorAll('.edit-student-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var id = btn.getAttribute('data-student-id');
+                    document.querySelectorAll('.edit-row').forEach(function(row) { row.style.display = 'none'; });
+                    var editRow = document.getElementById('edit-row-' + id);
+                    if (editRow) editRow.style.display = '';
+                });
+            });
+            // Cancel edit
+            document.querySelectorAll('.cancel-edit-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    btn.closest('.edit-row').style.display = 'none';
+                });
+            });
+            // AJAX save
+            document.querySelectorAll('.edit-student-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var fd = new FormData(form);
+                    fd.append('ajax_edit_student', '1');
+                    fetch('students.php', {
+                        method: 'POST',
+                        body: fd
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        }
+                    });
+                });
+            });
+        });
+
+        // AJAX bulk assign selected students
+        document.addEventListener('DOMContentLoaded', function() {
+            var bulkForm = document.getElementById('bulkAssignForm');
+            if (bulkForm) {
+                bulkForm.addEventListener('submit', function(e) {
+                    if (bulkForm.querySelector('button[name="bulk_assign_selected"]')) {
+                        e.preventDefault();
+                        var fd = new FormData(bulkForm);
+                        fd.append('ajax_bulk_assign_selected', '1');
+                        fetch('students.php', {
+                            method: 'POST',
+                            body: fd
+                        }).then(res => res.json()).then(data => {
+                            if (data.success) {
+                                window.location.reload();
+                            }
+                        });
+                    }
+                });
+            }
         });
     </script>
     <script src="bulk_import_progress.js"></script>
