@@ -116,7 +116,6 @@ function getUserRoleName($roleId) {
         </div>
     </div>
 </div>
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
 <script
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search');
@@ -257,7 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 };
 </script>
-
+<?php include_once __DIR__ . '/includes/footer.php'; ?>
+<?php ob_end_flush(); ?>
 <style>
 .inbox-container {
     max-width: 1200px;

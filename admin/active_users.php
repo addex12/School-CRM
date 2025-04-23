@@ -164,8 +164,10 @@ try {
                     Online:&nbsp;
                     <?php
                     $onlineList = [];
-                    foreach ($activeUsers as $user) {
-                        $onlineList[] = '<span class="online-user-pill">' . htmlspecialchars($user['username']) . '</span>';
+                    if (!empty($activeUsers) && is_array($activeUsers)) {
+                        foreach ($activeUsers as $user) {
+                            $onlineList[] = '<span class="online-user-pill">' . htmlspecialchars($user['username']) . '</span>';
+                        }
                     }
                     echo $onlineList ? implode('', $onlineList) : '<span style="color:#888;">No users online</span>';
                     ?>
