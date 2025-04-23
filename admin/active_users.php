@@ -52,9 +52,9 @@ try {
         }
     }
 
-    // For stats
-    $total_active = $pdo->query("SELECT COUNT(*) FROM users WHERE active = 1")->fetchColumn();
-    $total_online = $pdo->query("SELECT COUNT(*) FROM users WHERE online = 1")->fetchColumn();
+    // For stats: count active and online users based on current filter
+    $total_active = count($online_users) + count($offline_users);
+    $total_online = count($online_users);
 
     unset($error);
 } catch (PDOException $e) {
