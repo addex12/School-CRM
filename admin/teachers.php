@@ -285,7 +285,7 @@ function sort_link($col, $label, $current_sort, $current_order) {
                             <button type="submit" name="bulk_assign_selected_teachers" class="erpnext-btn btn-sm btn-success">Update Selected</button>
                         </div>
                         <div class="table-responsive">
-                            <table class="excel-table">
+                            <table class="excel-table" id="teachersTable">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -302,7 +302,7 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="teachersTbody">
                                     <?php if (!empty($teachers)): ?>
                                         <?php foreach ($teachers as $teacher): ?>
                                             <tr>
@@ -377,33 +377,87 @@ function sort_link($col, $label, $current_sort, $current_order) {
                 if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
             });
 
-            // Search/filter functionality
+            // Real-time search/filter functionality using JSON data
+            document.addEventListener('DOMContentLoaded', function() {
+                const searchInput = document.getElementById('teacherSearch');
+                const searchBtn = document.getElementById('searchBtn');
+                const clearBtn = document.getElementById('clearSearch');
+                const tbody = document.getElementById('teachersTbody');
 
+                // Prepare teachers data as JSON for client-side filtering
+                const teachersData = <?=
+                    json_encode(array_map(function($t) {
+                        return [
+                            'teacher_id' => $t['teacher_id'],
+                            'user_id' => $t['user_id'],
+                            'username' => $t['username'],
+                            'email' => $t['email'],
+                            'qualification' => $t['qualification'],
+                            'subject_specialization' => $t['subject_specialization'],
+                            'date_of_birth' => $t['date_of_birth'],
+                            'gender' => $t['gender'],
+                            'address' => $t['address'],
+                            'status' => $t['status'],
+                            'created_at' => $t['created_at']
+                        ];
+                    }, $teachers));
+                ?>;
 
+                function renderRows(filtered) {
+                    if (!filtered.length) {
+                        tbody.innerHTML = '<tr><td colspan="12">No teachers found.</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = filtered.map(function(t) {
+                        return `<tr>
+                            <td><input type="checkbox" name="selected_teachers[]" value="${t.teacher_id || ''}" class="teacher-checkbox"></td>
+                            <td>${t.user_id || ''}</td>
+                            <td>${t.username || ''}</td>
+                            <td>${t.email || ''}</td>
+                            <td>${t.qualification || '-'}</td>
+                            <td>${t.subject_specialization || '-'}</td>
+                            <td>${t.date_of_birth || '-'}</td>
+                            <td>${t.gender || '-'}</td>
+                            <td>${t.address || '-'}</td>
+                            <td>${t.status || '-'}</td>
+                            <td>${t.created_at || '-'}</td>
+                            <td>
+                                <a href="edit_user.php?id=${t.user_id}" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                <a href="teachers.php?delete_teacher=${t.teacher_id}" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher and user?')">Delete</a>
+                            </td>
+                        </tr>`;
+                    }).join('');
+                }
 
+                function filterRows() {
+                    const val = searchInput.value.toLowerCase();
+                    const filtered = teachersData.filter(function(t) {
+                        return Object.values(t).join(' ').toLowerCase().includes(val);
+                    });
+                    renderRows(filtered);
+                }
 
+                // Real-time filtering as you type
+                searchInput.addEventListener('input', filterRows);
 
+                // On search button click, show only filtered results (same as real-time)
+                searchBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    filterRows();
+                });
 
+                // Clear search
+                clearBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    searchInput.value = '';
+                    renderRows(teachersData);
+                });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-</html></body>    </div>        <?php include './includes/footer.php'; ?>        </script>            });                });                    filterRows();                    searchInput.value = '';                    e.preventDefault();                clearBtn.addEventListener('click', function(e) {                });                    filterRows();                    e.preventDefault();                searchBtn.addEventListener('click', function(e) {                searchInput.addEventListener('input', filterRows);                }                    });                        row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';                    rows.forEach(function(row) {                    const val = searchInput.value.toLowerCase();                function filterRows() {                const rows = document.querySelectorAll('.excel-table tbody tr');                const clearBtn = document.getElementById('clearSearch');                const searchBtn = document.getElementById('searchBtn');                const searchInput = document.getElementById('teacherSearch');            document.addEventListener('DOMContentLoaded', function() {
+                // Initial render
+                renderRows(teachersData);
+            });
+        </script>
+        <?php include './includes/footer.php'; ?>
+    </div>
+</body>
+</html>
