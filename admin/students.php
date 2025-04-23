@@ -78,6 +78,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
     }
 }
 
+// Handle single assign (form below)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_single'])) {
+    $student_id = intval($_POST['student_id'] ?? 0);
+    $class_id = intval($_POST['class_id'] ?? 0);
+    $section_id = intval($_POST['section_id'] ?? 0);
+
+    if ($student_id && $class_id) {
+        // Update student's class
+        $pdo->prepare("UPDATE students SET class_id=? WHERE id=?")->execute([$class_id, $student_id]);
+        if ($section_id) {
+            // Find or create batch for this class/section
+            $batch = $pdo->prepare("SELECT id FROM batches WHERE class_id=? AND section_id=?");
+            $batch->execute([$class_id, $section_id]);
+            $batch_id = $batch->fetchColumn();
+            if (!$batch_id) {
+                $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (NULL,?,?,?)")
+                    ->execute([$class_id, $section_id, "Class $class_id - Section $section_id"]);
+                $batch_id = $pdo->lastInsertId();
+            }
+            // Enroll student in batch if not already enrolled
+            $exists = $pdo->prepare("SELECT id FROM enrollments WHERE student_id=? AND batch_id=?");
+            $exists->execute([$student_id, $batch_id]);
+            if (!$exists->fetch()) {
+                $pdo->prepare("INSERT INTO enrollments (student_id, batch_id) VALUES (?,?)")->execute([$student_id, $batch_id]);
+            }
+        }
+        // Optionally, add a success message (not required)
+        header("Location: students.php?assigned=1");
+        exit;
+    }
+}
+
 // Export students
 if (isset($_GET['export'])) {
     header('Content-Type: text/csv');
