@@ -59,7 +59,7 @@ try {
     unset($error);
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
-    //$error = "A database error occurred. Please try again later.";
+    $error = "A database error occurred. Please try again later.";
     $users = [];
     $total_active = 0;
     $total_online = 0;
