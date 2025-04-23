@@ -255,12 +255,12 @@ if (isset($_GET['export_word']) && is_numeric($_GET['export_word'])) {
     $grade->execute([$grade_id]);
     $grade = $grade->fetch(PDO::FETCH_ASSOC);
 
-    // Load a Word template and replace placeholders
-    require_once '../vendor/autoload.php'; // Ensure Composer autoloader is included
-    if (!class_exists('\PhpOffice\PhpWord\TemplateProcessor')) {
-        die('PhpOffice\PhpWord\TemplateProcessor class not found. Ensure phpoffice/phpword is installed.');
+    // Use an absolute path for the template
+    require_once '../vendor/autoload.php';
+    $templatePath = realpath(__DIR__ . '/../templates/report_card_template.docx');
+    if (!$templatePath || !file_exists($templatePath)) {
+        die('Report card template not found at: ' . htmlspecialchars(__DIR__ . '/../templates/report_card_template.docx'));
     }
-    $templatePath = '../templates/report_card_template.docx';
     $phpWord = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
 
     // Set placeholders (example: {{student}}, {{subject}}, etc.)
