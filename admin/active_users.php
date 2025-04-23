@@ -160,7 +160,7 @@ try {
                 <form method="get" class="search-bar" id="allUserSearchForm" style="margin-bottom:1.5rem;">
                     <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username, name, or email..." value="<?= htmlspecialchars($allSearch ?? '') ?>">
                     <!-- Remove role filter dropdown -->
-                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
+                    <!-- <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button> -->
                     <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
                 </form>
                 <table class="users-table" id="allUsersTable">
