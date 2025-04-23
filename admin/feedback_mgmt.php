@@ -9,7 +9,7 @@ $pageTitle = "Feedback Management";
 $users = $pdo->query("SELECT id, username FROM users ORDER BY username")->fetchAll();
 
 // Fetch all active feedback subjects for dropdown
-$subjects = $pdo->query("SELECT subject FROM feedback_subject WHERE status = 'active' ORDER BY subject")->fetchAll(PDO::FETCH_COLUMN);
+$subjects = $pdo->query("SELECT subject FROM feedback_subjects WHERE status = 'active' ORDER BY subject")->fetchAll(PDO::FETCH_COLUMN);
 
 // Fetch all feedback
 $stmt = $pdo->query("SELECT f.*, u.username FROM feedback f LEFT JOIN users u ON f.user_id = u.id ORDER BY f.created_at DESC");
