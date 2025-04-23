@@ -259,7 +259,12 @@ if (isset($_GET['export_word']) && is_numeric($_GET['export_word'])) {
     require_once '../vendor/autoload.php';
     $templatePath = realpath(__DIR__ . '/../templates/report_card_template.docx');
     if (!$templatePath || !file_exists($templatePath)) {
-        die('Report card template not found at: ' . htmlspecialchars(__DIR__ . '/../templates/report_card_template.docx'));
+        // Show a user-friendly error and stop further execution
+        echo '<div style="color:red;font-weight:bold;padding:2em;text-align:center;">';
+        echo 'Report card template not found at: <code>' . htmlspecialchars(__DIR__ . '/../templates/report_card_template.docx') . '</code><br>';
+        echo 'Please upload <b>report_card_template.docx</b> to the <b>templates</b> folder.';
+        echo '</div>';
+        exit;
     }
     $phpWord = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
 
