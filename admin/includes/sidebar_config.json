@@ -20,7 +20,8 @@
       "items": [
         { "title": "All Surveys", "icon": "poll", "link": "surveys.php" },
         { "title": "Create Survey", "icon": "plus-circle", "link": "survey_builder.php" },
-        { "title": "Survey Results", "icon": "chart-bar", "link": "survey_statistics.php" }
+        { "title": "Survey Results", "icon": "chart-bar", "link": "survey_statistics.php" },
+        { "title": "Survey Categories", "icon": "file-alt", "link": "Categories.php" }
       ],
       "id": "surveys-menu"
     },
@@ -29,6 +30,7 @@
       "icon": "user-graduate",
       "items": [
         { "title": "Student List", "icon": "user-graduate", "link": "students.php" }
+        { "title": "Add Student", "icon": "user-plus", "link": "add_users.php" }
       ],
       "id": "students-menu"
     },
@@ -55,7 +57,8 @@
       "icon": "envelope",
       "items": [
         { "title": "Messages", "icon": "envelope", "link": "messages.php" },
-        { "title": "Announcements", "icon": "bullhorn", "link": "announcements.php" }
+        { "title": "Announcements", "icon": "bullhorn", "link": "announcements.php" },
+        { "title": "Bulk Emails", "icon": "bell", "link": "bulk_email.php" }
       ],
       "id": "communications-menu"
     },
@@ -83,6 +86,11 @@
       "icon": "cogs",
       "items": [
         { "title": "General Settings", "icon": "cogs", "link": "settings.php" }
+        { "title": "User Roles", "icon": "user-tag", "link": "user_roles.php" },
+        { "title": "Permissions", "icon": "shield-alt", "link": "permissions.php" },
+        { "title": "Backup & Restore", "icon": "database", "link": "backup_restore.php" }
+        { "title": "System Logs", "icon": "file-alt", "link": "system_logs.php" }
+        { "title": "Audit Trail", "icon": "history", "link": "audit_trail.php" }    
       ],
       "id": "settings-menu"
     }
