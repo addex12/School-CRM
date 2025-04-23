@@ -52,6 +52,9 @@ try {
     // Fetch all roles for filter dropdown
     $roles = $pdo->query("SELECT DISTINCT role_name FROM roles WHERE role_name IS NOT NULL ORDER BY role_name")->fetchAll(PDO::FETCH_COLUMN);
 
+    // Ensure $error is not set if query is successful
+    unset($error);
+
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
