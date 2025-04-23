@@ -33,7 +33,8 @@ if ($role_id !== '') {
 $where_sql = implode(' AND ', $where);
 
 try {
-    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, r.name AS role_name
+    // Fix: Use correct role name column for both main and AJAX queries
+    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, r.role_name AS role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         WHERE $where_sql
