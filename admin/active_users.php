@@ -603,6 +603,11 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
     // Add MutationObserver to handle dynamic table updates
     const observer = new MutationObserver(delegateCrud);
     observer.observe(usersTableBody, { childList: true });
+
+    // On page load, fetch all users by default (no filter)
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchUsers();
+    });
     </script>
 </body>
 </html>
