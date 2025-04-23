@@ -34,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            // Update last_login and last_active
-            $pdo->prepare("UPDATE users SET last_login = NOW(), last_active = NOW() WHERE id = ?")->execute([$user['id']]);
+            // Update last_login, last_active, and set online=1
+            $pdo->prepare("UPDATE users SET last_login = NOW(), last_active = NOW(), online = 1 WHERE id = ?")->execute([$user['id']]);
 
             // Log the login action to audit_logs
             try {

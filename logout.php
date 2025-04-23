@@ -7,8 +7,9 @@
  * GitHub: https://github.com/addex12
  */
 
-require_once 'includes/auth.php';
-require_once 'includes/config.php';
+require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db.php';
+session_start();
 
 // Log the logout action to audit_logs if user is logged in
 if (isset($_SESSION['user_id'])) {
@@ -23,10 +24,16 @@ if (isset($_SESSION['user_id'])) {
     } catch (Exception $e) {
         error_log('Audit log insert failed (logout): ' . $e->getMessage());
     }
+
+    // Set online=0 on logout
+    $stmt = $pdo->prepare("UPDATE users SET online = 0 WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
 }
 
 // Destroy the session
+session_unset();
 session_destroy();
+setcookie('remember_token', '', time() - 3600, '/');
 
 // Redirect to login page
 header("Location: login.php");

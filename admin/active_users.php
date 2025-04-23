@@ -22,27 +22,20 @@ $roleSql = $roleFilter ? "AND r.role_name = :role" : "";
 $searchSql = $search ? "AND (u.username LIKE :search OR u.email LIKE :search)" : "";
 
 try {
-    // --- Fix: Use last_active (not last_activity) and status column as in db.sql ---
-    $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
-
+    // Only show users with status 'active' and online=1
     $sql = "
-        SELECT u.id, u.username, u.email, u.last_active, u.last_login, u.status,
+        SELECT u.id, u.username, u.email, u.last_active, u.last_login, u.status, u.online,
                COALESCE(r.role_name, 'No Role') as role_name 
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         WHERE u.status = 'active'
-          AND (
-                (u.last_active IS NOT NULL AND u.last_active >= :threshold)
-                OR
-                (u.last_active IS NULL AND u.last_login >= :threshold)
-              )
+          AND u.online = 1
         $roleSql
         $searchSql
         ORDER BY 
             COALESCE(u.last_active, u.last_login) DESC
     ";
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':threshold', $activeThreshold);
     if ($roleFilter) $stmt->bindValue(':role', $roleFilter);
     if ($search) $stmt->bindValue(':search', '%' . $search . '%');
     $stmt->execute();
