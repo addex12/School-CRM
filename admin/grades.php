@@ -474,8 +474,11 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         var subjectSelect = document.getElementById('subject_id');
         var sectionSelect = document.getElementById('section_id');
         var infoDiv = document.getElementById('student_info');
+<<<<<<< HEAD
         var termInput = document.getElementById('term');
         var yearInput = document.getElementById('academic_year');
+=======
+>>>>>>> 6746b9d8272ac9f9829b1e70111d10ad99ed62ac
         subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
         sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
 
