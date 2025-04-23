@@ -62,7 +62,21 @@
     {
       "title": "Feedback",
       "icon": "comments",
-      "link": "feedback.php"
+        "items": [
+            { "title": "Manage", "icon": "comments", "link": "feedback_mgmt.php" },
+            { "title": "View Feedbacks", "icon": "plus-circle", "link": "feedback.php" }
+        ],
+      "id": "feedback-menu"
+     
+    },
+    {
+      "title": "Settings",
+      "icon": "cogs",
+      "items": [
+        { "title": "General Settings", "icon": "cogs", "link": "settings.php" },
+      ],
+      "id": "settings-menu"
     }
+
   ]
 }
