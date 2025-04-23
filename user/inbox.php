@@ -1,8 +1,7 @@
-<div?php
+<?php
 ob_start();
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../includes/db.php';
 requireLogin();
 
 $userId = $_SESSION['user_id'];
@@ -116,7 +115,6 @@ function getUserRoleName($roleId) {
             </div>
         </div>
     </div>
-</div>
 </div>
 <script
 document.addEventListener('DOMContentLoaded', () => {
