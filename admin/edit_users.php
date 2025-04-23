@@ -1,186 +1,177 @@
 <?php
-require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
+require_once '../includes/config.php';
+$pageTitle ='Edit Users';
+// CSRF Protection
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-if (!isset($_GET['id'])) {
+// Get User Data
+$user_id = $_GET['id'] ?? null;
+if (!$user_id) {
     header("Location: users.php");
     exit();
 }
-$pageTitle = 'Edit User';
 
-$id = $_GET['id'];
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$id]);
+$stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
 if (!$user) {
-    $_SESSION['error'] = "User not found!";
+    $_SESSION['error'] = "User not found";
     header("Location: users.php");
     exit();
 }
 
-// Fetch all roles for the form select
-$roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
-    $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
-    $role_id = $_POST['role_id'];
-    $validation_error = '';
-
-    // Validate email format
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $validation_error = 'Please enter a valid email address.';
-    }
-    // Validate username (optional: add more rules if needed)
-    elseif (empty($username)) {
-        $validation_error = 'Username cannot be empty.';
-    }
-
-    // Check if username or email already exists (excluding current user)
-    if (!$validation_error) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE (username = ? OR email = ?) AND id != ?");
-        $stmt->execute([$username, $email, $id]);
-        $count = $stmt->fetchColumn();
-        if ($count > 0) {
-            $validation_error = 'Username or email already exists!';
-        }
-    }
-
-    if ($validation_error) {
-        $_SESSION['error'] = $validation_error;
-    } else {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $role_id, $id]);
-        $_SESSION['success'] = "User updated successfully!";
+// Handle Form Submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $_SESSION['error'] = "Invalid CSRF token";
         header("Location: users.php");
         exit();
     }
-}
-?>
 
+    $username = htmlspecialchars($_POST['username']);
+    $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+    $role_id = (int)$_POST['role_id'];
+
+    try {
+        // Check duplicates
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users 
+                             WHERE (username = ? OR email = ?) AND id != ?");
+        $stmt->execute([$username, $email, $user_id]);
+        
+        if ($stmt->fetchColumn() > 0) {
+            throw new Exception("Username or email already exists");
+        }
+
+        // Update user
+        $stmt = $pdo->prepare("UPDATE users 
+                             SET username = ?, email = ?, role_id = ?
+                             WHERE id = ?");
+        $stmt->execute([$username, $email, $role_id, $user_id]);
+        
+        $_SESSION['success'] = "User updated successfully";
+        header("Location: users.php");
+        exit();
+
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+    }
+}
+
+// Get Roles
+$roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2.2rem 2rem 2.5rem 2rem;
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
         }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #215967; }
-        input[type="text"], input[type="email"], select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            background: #f9fafb;
-            font-size: 1rem;
-        }
-        .form-actions {
-            margin-top: 2rem;
-            display: flex;
-            gap: 1rem;
-        }
-        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
-            display: inline-block;
-            padding: 10px 22px;
-            font-size: 15px;
-            border-radius: 4px;
-            border: none;
+        
+        .main-content {
+            padding: 2rem;
             background: #f5f7fa;
-            color: #215967;
-            font-weight: 600;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
-            cursor: pointer;
-            text-decoration: none;
         }
-        .btn-primary, .erpnext-btn.btn-primary {
-            background: #3b82f6;
-            color: #fff;
+        
+        .form-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 2rem;
+            max-width: 800px;
+            margin: 2rem auto; /* Center align the form */
         }
-        .btn-primary:hover, .erpnext-btn.btn-primary:hover {
-            background: #2563eb;
+        
+        .form-grid {
+            display: grid;
+            gap: 1.5rem;
         }
-        .btn-secondary, .erpnext-btn.btn-secondary {
-            background: #eaeaea;
-            color: #666;
-        }
-        .btn-secondary:hover, .erpnext-btn.btn-secondary:hover {
-            background: #e2efda;
-            color: #215967;
-        }
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #fca5a5;
-        }
+        
         @media (max-width: 900px) {
-            .form-container, .admin-main { padding: 1rem; }
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .main-content {
+                padding: 1rem;
+            }
+            .form-container {
+                padding: 1rem;
+                margin: 1rem auto;
+            }
         }
+        
         @media (max-width: 600px) {
-            .form-container, .admin-main { padding: 4px; }
-            .erpnext-btn, .btn, .btn-primary { padding: 6px 10px; font-size: 0.95em; }
+            .form-container {
+                padding: 0.5rem;
+                margin: 0.5rem auto;
+            }
+            .form-grid {
+                gap: 0.75rem;
+            }
         }
     </style>
-    <script src="../assets/js/edit_user_validation.js"></script>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-user-edit"></i> <?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="form-container">
+        
+        <div class="main-content">
+            <h1>Edit User</h1>
+            
+            <div class="form-container"> <!-- Changed class name from 'card' to 'form-container' -->
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                    <sl-alert variant="danger" open>
+                        <?= htmlspecialchars($_SESSION['error']) ?>
+                        <?php unset($_SESSION['error']) ?>
+                    </sl-alert>
                 <?php endif; ?>
-                <form method="POST">
-                    <input type="hidden" name="update_user">
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username']); ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']); ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Role:</label>
-                        <select id="role" name="role_id" required>
-                            <?php foreach ($roles as $role): ?>
-                                <option value="<?= $role['id']; ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : ''; ?>>
-                                    <?= htmlspecialchars($role['role_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+
+                <form method="POST" class="form-grid">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    
+                    <sl-input 
+                        name="username" 
+                        label="Username" 
+                        value="<?= htmlspecialchars($user['username']) ?>"
+                        required
+                    ></sl-input>
+                    
+                    <sl-input 
+                        type="email" 
+                        name="email" 
+                        label="Email"
+                        value="<?= htmlspecialchars($user['email']) ?>"
+                        required
+                    ></sl-input>
+                    
+                    <sl-select name="role_id" label="Role" value="<?= $user['role_id'] ?>">
+                        <?php foreach ($roles as $role): ?>
+                            <sl-option value="<?= $role['id'] ?>">
+                                <?= htmlspecialchars($role['role_name']) ?>
+                            </sl-option>
+                        <?php endforeach; ?>
+                    </sl-select>
+                    
                     <div class="form-actions">
-                        <a href="users.php" class="erpnext-btn btn-secondary">Cancel</a>
-                        <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-save"></i> Update User</button>
+                        <sl-button type="submit" variant="primary">Update User</sl-button>
+                        <sl-button href="users.php" variant="neutral">Cancel</sl-button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <?php include 'includes/footer.php'; ?>
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.25/dist/shoelace/shoelace.esm.js"></script>
 </body>
 </html>
-<?php ob_end_flush(); ?>
