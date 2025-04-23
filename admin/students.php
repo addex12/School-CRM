@@ -58,7 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
                 $batch->execute([$class_id, $section_id]);
                 $batch_id = $batch->fetchColumn();
                 if (!$batch_id) {
-                    $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (NULL,?,?,?)")
+                    // Set program_id to 0 (or a valid default) instead of NULL
+                    $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (0,?,?,?)")
                         ->execute([$class_id, $section_id, "Class $class_id - Section $section_id"]);
                     $batch_id = $pdo->lastInsertId();
                 }
@@ -93,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_single'])) {
             $batch->execute([$class_id, $section_id]);
             $batch_id = $batch->fetchColumn();
             if (!$batch_id) {
-                $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (NULL,?,?,?)")
+                // Set program_id to 0 (or a valid default) instead of NULL
+                $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (0,?,?,?)")
                     ->execute([$class_id, $section_id, "Class $class_id - Section $section_id"]);
                 $batch_id = $pdo->lastInsertId();
             }
