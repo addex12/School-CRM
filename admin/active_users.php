@@ -33,8 +33,11 @@ try {
     // Only select id, username, last_active, correct WHERE syntax
     $allSql = "SELECT id, username, last_active FROM users $allWhereSql ORDER BY username";
     $stmtAll = $pdo->prepare($allSql);
-    foreach ($allParams as $key => $val) {
-        $stmtAll->bindValue($key, $val);
+    // Fix: Only bind if $allParams is not empty
+    if (!empty($allParams)) {
+        foreach ($allParams as $key => $val) {
+            $stmtAll->bindValue($key, $val);
+        }
     }
     $stmtAll->execute();
     $allUsers = $stmtAll->fetchAll(PDO::FETCH_ASSOC);
