@@ -412,8 +412,8 @@ $terms = $pdo->query("
                                     <tbody>
                                         <?php foreach ($users as $user): ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($user['username']); ?></td>
-                                                <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                                <td><?php echo htmlspecialchars($user['username'] ?? ''); ?></td>
+                                                <td><?php echo htmlspecialchars($user['email'] ?? ''); ?></td>
                                                 <td><?php echo $user['active'] ? 'Active' : 'Inactive'; ?></td>
                                                 <td>
                                                     <button type="submit" name="user_action" value="deactivate" <?php echo !$user['active'] ? 'disabled' : ''; ?>>Deactivate</button>
@@ -433,7 +433,7 @@ $terms = $pdo->query("
                                 <h3>System Logs</h3>
                                 <ul>
                                     <?php foreach ($logs as $log): ?>
-                                        <li><?php echo htmlspecialchars($log['action']); ?> - <?php echo $log['created_at']; ?></li>
+                                        <li><?php echo htmlspecialchars($log['action'] ?? ''); ?> - <?php echo $log['created_at']; ?></li>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
@@ -488,7 +488,7 @@ $terms = $pdo->query("
                                     <select name="term_year_id" required>
                                         <option value="">Select Year</option>
                                         <?php foreach ($years as $year): ?>
-                                            <option value="<?= $year['id'] ?>"><?= htmlspecialchars($year['name']) ?></option>
+                                            <option value="<?= $year['id'] ?>"><?= htmlspecialchars($year['name'] ?? '') ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <input type="text" name="term_name" placeholder="Term Name (e.g. Term 1)" required>
@@ -518,7 +518,7 @@ $terms = $pdo->query("
                                                         <select name="term_year_id" required>
                                                             <?php foreach ($years as $year): ?>
                                                                 <option value="<?= $year['id'] ?>" <?= $year['id'] == $term['academic_year_id'] ? 'selected' : '' ?>>
-                                                                    <?= htmlspecialchars($year['name']) ?>
+                                                                    <?= htmlspecialchars($year['name'] ?? '') ?>
                                                                 </option>
                                                             <?php endforeach; ?>
                                                         </select>
