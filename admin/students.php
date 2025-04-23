@@ -1,4 +1,12 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
+ob_start();
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
