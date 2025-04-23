@@ -136,73 +136,108 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <title>Edit Survey</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body {
+            background: #f5f7fa;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        }
+        .admin-main {
+            margin-left: 260px;
+            padding: 2rem 2.5rem;
+        }
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 2rem 2.5rem;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
         }
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #215967;
         }
-        input[type="text"], textarea, select {
+        input[type="text"], textarea, select, input[type="datetime-local"] {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 1rem;
         }
         textarea {
             min-height: 100px;
         }
         .error-message {
-            color: #dc3545;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #dc3545;
-            border-radius: 4px;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #fca5a5;
         }
         .success-message {
-            color: #28a745;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #28a745;
-            border-radius: 4px;
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #bbf7d0;
         }
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
+        .btn, .btn-primary, .btn-secondary {
             display: inline-block;
+            padding: 10px 22px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #215967;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            cursor: pointer;
+            margin-right: 4px;
+            text-decoration: none;
         }
         .btn-primary {
-            background: #007bff;
-            color: white;
+            background: #3b82f6;
+            color: #fff;
         }
         .btn-primary:hover {
-            background: #0069d9;
+            background: #2563eb;
+        }
+        .btn-secondary {
+            background: #eaeaea;
+            color: #666;
+        }
+        .btn-secondary:hover {
+            background: #e2efda;
+            color: #215967;
         }
         .role-checkbox {
             display: inline-block;
             margin-right: 15px;
         }
         .question-box {
-            border: 1px solid #ddd;
+            border: 1px solid #e5e7eb;
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 4px;
+            border-radius: 6px;
             background: #f9f9f9;
         }
         .question-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
+            font-weight: 600;
+            color: #215967;
         }
         .question-content {
             display: grid;
@@ -213,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             grid-column: span 2;
         }
         .help-text {
-            font-size: 0.8em;
+            font-size: 0.9em;
             color: #666;
             margin-top: 5px;
         }
@@ -221,184 +256,153 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-bottom: 20px;
         }
         @media (max-width: 900px) {
-            .container {
-                padding: 10px;
-            }
-            .question-content {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
+            .container, .admin-main { padding: 1rem; }
+            .question-content { grid-template-columns: 1fr; gap: 10px; }
         }
         @media (max-width: 600px) {
-            .container {
-                padding: 4px;
-            }
-            .question-header {
-                flex-direction: column;
-                gap: 6px;
-                align-items: flex-start;
-            }
-            .question-content {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            .btn, .btn-primary {
-                padding: 6px 10px;
-                font-size: 0.95em;
-            }
+            .container, .admin-main { padding: 4px; }
+            .question-header { flex-direction: column; gap: 6px; align-items: flex-start; }
+            .question-content { grid-template-columns: 1fr; gap: 8px; }
+            .btn, .btn-primary { padding: 6px 10px; font-size: 0.95em; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Edit Survey</h1>
-        
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="error-message"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
-        <?php endif; ?>
-        
-        <form method="POST">
-            <div class="form-group">
-                <label for="title">Survey Title *</label>
-                <input type="text" id="title" name="title" value="<?= htmlspecialchars($survey['title']); ?>" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description"><?= htmlspecialchars($survey['description']); ?></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label for="category_id">Category *</label>
-                <select id="category_id" name="category_id" required>
-                    <option value="">Select Category</option>
-                    <?php foreach ($categories as $category): ?>
-                        <option value="<?= $category['id']; ?>" <?= $category['id'] == $survey['category_id'] ? 'selected' : ''; ?>>
-                            <?= htmlspecialchars($category['name']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Target Roles *</label>
-                <div>
-                    <?php foreach ($roles as $role): ?>
-                        <div class="role-checkbox">
-                            <label>
-                                <input type="checkbox" name="target_roles[]" value="<?= $role['id']; ?>" 
-                                    <?= in_array($role['id'], explode(',', $survey['target_roles'] ?? '')) ? 'checked' : ''; ?>>
-                                <?= htmlspecialchars($role['role_name']); ?>
-                            </label>
+    <?php include 'includes/admin_sidebar.php'; ?>
+    <div class="admin-main">
+        <div class="container">
+            <h1 style="color:#215967;font-weight:700;">Edit Survey</h1>
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="error-message"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="title">Survey Title *</label>
+                    <input type="text" id="title" name="title" value="<?= htmlspecialchars($survey['title']); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description"><?= htmlspecialchars($survey['description']); ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="category_id">Category *</label>
+                    <select id="category_id" name="category_id" required>
+                        <option value="">Select Category</option>
+                        <?php foreach ($categories as $category): ?>
+                            <option value="<?= $category['id']; ?>" <?= $category['id'] == $survey['category_id'] ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($category['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Target Roles *</label>
+                    <div>
+                        <?php foreach ($roles as $role): ?>
+                            <div class="role-checkbox">
+                                <label>
+                                    <input type="checkbox" name="target_roles[]" value="<?= $role['id']; ?>" 
+                                        <?= in_array($role['id'], explode(',', $survey['target_roles'] ?? '')) ? 'checked' : ''; ?>>
+                                    <?= htmlspecialchars($role['role_name']); ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="starts_at">Start Date/Time *</label>
+                    <input type="datetime-local" id="starts_at" name="starts_at" 
+                           value="<?= date('Y-m-d\TH:i', strtotime($survey['starts_at'])); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label for="ends_at">End Date/Time *</label>
+                    <input type="datetime-local" id="ends_at" name="ends_at" 
+                           value="<?= date('Y-m-d\TH:i', strtotime($survey['ends_at'])); ?>" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_active" <?= $survey['is_active'] ? 'checked' : ''; ?>>
+                        Active Survey
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_anonymous" <?= $survey['is_anonymous'] ? 'checked' : ''; ?>>
+                        Anonymous Responses
+                    </label>
+                </div>
+                <h2 style="color:#215967;">Survey Questions</h2>
+                <div id="questions-container">
+                    <?php foreach ($questions as $index => $question): ?>
+                        <div class="question-box">
+                            <div class="question-header">
+                                <span>Question <?= $index + 1 ?></span>
+                                <button type="button" class="btn btn-secondary remove-question">Remove</button>
+                            </div>
+                            <div class="question-content">
+                                <div class="form-group">
+                                    <label>Question Text *</label>
+                                    <input type="text" name="questions[]" value="<?= htmlspecialchars($question['field_label']); ?>" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Field Type *</label>
+                                    <select name="field_types[]" required>
+                                        <option value="text" <?= $question['field_type'] == 'text' ? 'selected' : ''; ?>>Text</option>
+                                        <option value="textarea" <?= $question['field_type'] == 'textarea' ? 'selected' : ''; ?>>Textarea</option>
+                                        <option value="radio" <?= $question['field_type'] == 'radio' ? 'selected' : ''; ?>>Radio</option>
+                                        <option value="checkbox" <?= $question['field_type'] == 'checkbox' ? 'selected' : ''; ?>>Checkbox</option>
+                                        <option value="select" <?= $question['field_type'] == 'select' ? 'selected' : ''; ?>>Dropdown</option>
+                                        <option value="number" <?= $question['field_type'] == 'number' ? 'selected' : ''; ?>>Number</option>
+                                        <option value="date" <?= $question['field_type'] == 'date' ? 'selected' : ''; ?>>Date</option>
+                                        <option value="rating" <?= $question['field_type'] == 'rating' ? 'selected' : ''; ?>>Rating</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" name="required[]" <?= $question['is_required'] ? 'checked' : ''; ?>>
+                                        Required
+                                    </label>
+                                </div>
+                                <div class="form-group options-group">
+                                    <label>Options (for radio, checkbox, dropdown)</label>
+                                    <textarea name="options[]" rows="3"><?= 
+                                        $question['field_options'] ? 
+                                        htmlspecialchars(implode("\n", json_decode($question['field_options']))) : 
+                                        '' 
+                                    ?></textarea>
+                                    <p class="help-text">Enter each option on a new line</p>
+                                </div>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="starts_at">Start Date/Time *</label>
-                <input type="datetime-local" id="starts_at" name="starts_at" 
-                       value="<?= date('Y-m-d\TH:i', strtotime($survey['starts_at'])); ?>" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="ends_at">End Date/Time *</label>
-                <input type="datetime-local" id="ends_at" name="ends_at" 
-                       value="<?= date('Y-m-d\TH:i', strtotime($survey['ends_at'])); ?>" required>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="is_active" <?= $survey['is_active'] ? 'checked' : ''; ?>>
-                    Active Survey
-                </label>
-            </div>
-            
-            <div class="form-group">
-                <label>
-                    <input type="checkbox" name="is_anonymous" <?= $survey['is_anonymous'] ? 'checked' : ''; ?>>
-                    Anonymous Responses
-                </label>
-            </div>
-            
-            <h2>Survey Questions</h2>
-            <div id="questions-container">
-                <?php foreach ($questions as $index => $question): ?>
-                    <div class="question-box">
-                        <div class="question-header">
-                            <span>Question <?= $index + 1 ?></span>
-                            <button type="button" class="btn remove-question">Remove</button>
-                        </div>
-                        <div class="question-content">
-                            <div class="form-group">
-                                <label>Question Text *</label>
-                                <input type="text" name="questions[]" value="<?= htmlspecialchars($question['field_label']); ?>" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Field Type *</label>
-                                <select name="field_types[]" required>
-                                    <option value="text" <?= $question['field_type'] == 'text' ? 'selected' : ''; ?>>Text</option>
-                                    <option value="textarea" <?= $question['field_type'] == 'textarea' ? 'selected' : ''; ?>>Textarea</option>
-                                    <option value="radio" <?= $question['field_type'] == 'radio' ? 'selected' : ''; ?>>Radio</option>
-                                    <option value="checkbox" <?= $question['field_type'] == 'checkbox' ? 'selected' : ''; ?>>Checkbox</option>
-                                    <option value="select" <?= $question['field_type'] == 'select' ? 'selected' : ''; ?>>Dropdown</option>
-                                    <option value="number" <?= $question['field_type'] == 'number' ? 'selected' : ''; ?>>Number</option>
-                                    <option value="date" <?= $question['field_type'] == 'date' ? 'selected' : ''; ?>>Date</option>
-                                    <option value="rating" <?= $question['field_type'] == 'rating' ? 'selected' : ''; ?>>Rating</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox" name="required[]" <?= $question['is_required'] ? 'checked' : ''; ?>>
-                                    Required
-                                </label>
-                            </div>
-                            
-                            <div class="form-group options-group">
-                                <label>Options (for radio, checkbox, dropdown)</label>
-                                <textarea name="options[]" rows="3"><?= 
-                                    $question['field_options'] ? 
-                                    htmlspecialchars(implode("\n", json_decode($question['field_options']))) : 
-                                    '' 
-                                ?></textarea>
-                                <p class="help-text">Enter each option on a new line</p>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-            
-            <button type="button" id="add-question" class="btn add-question">Add Question</button>
-            
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Update Survey</button>
-                <a href="surveys.php" class="btn">Cancel</a>
-            </div>
-        </form>
+                <button type="button" id="add-question" class="btn btn-secondary add-question">Add Question</button>
+                <div class="form-group" style="margin-top:2rem;">
+                    <button type="submit" class="btn btn-primary">Update Survey</button>
+                    <a href="surveys.php" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
     </div>
-
+    <?php include 'includes/footer.php'; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Add question button
             document.getElementById('add-question').addEventListener('click', function() {
                 const container = document.getElementById('questions-container');
                 const index = container.children.length;
-                
                 const questionBox = document.createElement('div');
                 questionBox.className = 'question-box';
                 questionBox.innerHTML = `
                     <div class="question-header">
                         <span>Question ${index + 1}</span>
-                        <button type="button" class="btn remove-question">Remove</button>
+                        <button type="button" class="btn btn-secondary remove-question">Remove</button>
                     </div>
                     <div class="question-content">
                         <div class="form-group">
                             <label>Question Text *</label>
                             <input type="text" name="questions[]" required>
                         </div>
-                        
                         <div class="form-group">
                             <label>Field Type *</label>
                             <select name="field_types[]" required>
@@ -412,14 +416,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="rating">Rating</option>
                             </select>
                         </div>
-                        
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" name="required[]">
                                 Required
                             </label>
                         </div>
-                        
                         <div class="form-group options-group">
                             <label>Options (for radio, checkbox, dropdown)</label>
                             <textarea name="options[]" rows="3"></textarea>
@@ -427,10 +429,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     </div>
                 `;
-                
                 container.appendChild(questionBox);
             });
-            
             // Remove question button
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('remove-question')) {
