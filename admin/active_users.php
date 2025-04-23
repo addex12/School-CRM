@@ -598,7 +598,6 @@ else:
             const username = usernameTd.querySelector('input').value.trim();
             const role_id = roleTd.querySelector('select').value;
             // Online status is not editable, so get the current value from the DOM
-            const online = onlineTd.querySelector('.online-dot') !== null ? 1 : 0;
             fetch('active_users.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
