@@ -18,15 +18,15 @@ $searchSql = $search ? "AND (username LIKE :search)" : "";
 $roleSql = $roleFilter ? "AND role = :role" : "";
 
 try {
-    // Online users only
-    $onlineSql = "SELECT id, username, last_active FROM users WHERE online = 1 $roleSql $searchSql ORDER BY username";
+    // Online users only (must also be active)
+    $onlineSql = "SELECT id, username, last_active FROM users WHERE online = 1 AND status = 'active' $roleSql $searchSql ORDER BY username";
     $stmtOnline = $pdo->prepare($onlineSql);
     if ($roleFilter) $stmtOnline->bindValue(':role', $roleFilter);
     if ($search) $stmtOnline->bindValue(':search', '%' . $search . '%');
     $stmtOnline->execute();
     $onlineUsers = $stmtOnline->fetchAll(PDO::FETCH_ASSOC);
 
-    // All active users, online users will be sorted first
+    // All active users (regardless of online)
     $allSql = "SELECT id, username, last_active, online FROM users WHERE status = 'active' $roleSql $searchSql ORDER BY online DESC, username";
     $stmtAll = $pdo->prepare($allSql);
     if ($roleFilter) $stmtAll->bindValue(':role', $roleFilter);
