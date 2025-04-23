@@ -99,7 +99,7 @@ $current = basename($_SERVER['PHP_SELF']);
     <i class="fas fa-bars"></i>
 </button>
 <aside class="admin-sidebar" id="adminSidebar">
-    <ul>
+    <ul class="sidebar-menu">
         <?php foreach ($sidebarItems as $item): ?>
             <?php if (isset($item['items'])): // Category with subitems ?>
                 <li class="menu-category">
@@ -138,6 +138,12 @@ $current = basename($_SERVER['PHP_SELF']);
                 </li>
             <?php endif; ?>
         <?php endforeach; ?>
+        <li>
+            <a href="grade_report.php">
+                <i class="fa fa-chart-bar"></i>
+                <span>Grade Reports & Analytics</span>
+            </a>
+        </li>
     </ul>
 </aside>
 

@@ -1,0 +1,49 @@
+{
+  "menu": [
+    {
+      "title": "Dashboard",
+      "icon": "tachometer-alt",
+      "link": "index.php"
+    },
+    {
+      "title": "Students",
+      "icon": "user-graduate",
+      "link": "students.php"
+    },
+    {
+      "title": "Teachers",
+      "icon": "chalkboard-teacher",
+      "link": "teachers.php"
+    },
+    {
+      "title": "Classes",
+      "icon": "school",
+      "link": "classes.php"
+    },
+    {
+      "title": "Subjects",
+      "icon": "book",
+      "link": "subjects.php"
+    },
+    {
+      "title": "Exams",
+      "icon": "file-alt",
+      "link": "exams.php"
+    },
+    {
+      "title": "Results",
+      "icon": "chart-line",
+      "link": "results.php"
+    },
+    {
+      "title": "Grade Reports & Analytics",
+      "icon": "chart-bar",
+      "link": "grade_report.php"
+    },
+    {
+      "title": "Settings",
+      "icon": "cogs",
+      "link": "settings.php"
+    }
+  ]
+}
