@@ -1,6 +1,8 @@
 <?php
 ob_start();
 // Error reporting (remove in production)
+error_log($allSql);
+error_log(print_r($allParams, true));
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // Include required files
