@@ -26,14 +26,14 @@ try {
     $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
 
     $sql = "
-        SELECT u.id, u.username, u.email, u.last_login, 
+        SELECT u.id, u.username, u.email, u.last_activity, 
                COALESCE(r.role_name, 'No Role') as role_name 
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.last_login >= :threshold
+        WHERE u.last_activity >= :threshold
         $roleSql
         $searchSql
-        ORDER BY u.last_login DESC
+        ORDER BY u.last_activity DESC
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':threshold', $activeThreshold);
@@ -44,7 +44,7 @@ try {
 
     // Format last activity time
     foreach ($activeUsers as &$user) {
-        $user['last_login'] = date('M j, Y g:i A', strtotime($user['last_login']));
+        $user['last_active'] = date('M j, Y g:i A', strtotime($user['last_activity']));
     }
     unset($user);
 
@@ -164,10 +164,8 @@ try {
                     Online:&nbsp;
                     <?php
                     $onlineList = [];
-                    if (!empty($activeUsers) && is_array($activeUsers)) {
-                        foreach ($activeUsers as $user) {
-                            $onlineList[] = '<span class="online-user-pill">' . htmlspecialchars($user['username']) . '</span>';
-                        }
+                    foreach ($activeUsers as $user) {
+                        $onlineList[] = '<span class="online-user-pill">' . htmlspecialchars($user['username']) . '</span>';
                     }
                     echo $onlineList ? implode('', $onlineList) : '<span style="color:#888;">No users online</span>';
                     ?>
@@ -194,7 +192,7 @@ try {
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= htmlspecialchars($user['last_login) ?></td>
+                                    <td><?= htmlspecialchars($user['last_active']) ?></td>
                                     <td class="status-active">Active</td>
                                 </tr>
                                 <?php endforeach; ?>
