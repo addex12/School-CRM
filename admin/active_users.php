@@ -41,7 +41,11 @@ try {
     $stmt->execute($params);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Split users into online and offline
+    // For stats: count active and online users from the FULL users table, not filtered
+    $total_active = $pdo->query("SELECT COUNT(*) FROM users WHERE active = 1")->fetchColumn();
+    $total_online = $pdo->query("SELECT COUNT(*) FROM users WHERE active = 1 AND online = 1")->fetchColumn();
+
+    // Split users into online and offline for display
     $online_users = [];
     $offline_users = [];
     foreach ($users as $user) {
@@ -51,10 +55,6 @@ try {
             $offline_users[] = $user;
         }
     }
-
-    // For stats: count active and online users based on current filter
-    $total_active = count($online_users) + count($offline_users);
-    $total_online = count($online_users);
 
     unset($error);
 } catch (PDOException $e) {
