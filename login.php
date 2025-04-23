@@ -34,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            // Update last login
-            $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?")->execute([$user['id']]);
+            // Update last_login and last_active
+            $pdo->prepare("UPDATE users SET last_login = NOW(), last_active = NOW() WHERE id = ?")->execute([$user['id']]);
 
             // Log the login action to audit_logs
             try {
@@ -464,6 +464,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </html>
 
 <?php
+// Show public announcements after login
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
+    try {
+        $announcements = $pdo->query("SELECT title, content, created_at FROM announcements WHERE is_public = 1 ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+        if ($announcements) {
+            echo '<div class="public-announcements" style="max-width:500px;margin:2rem auto 0 auto;background:#f9fafb;border-radius:8px;padding:1.5rem 2rem;box-shadow:0 2px 8px rgba(44,62,80,0.07);">';
+            echo '<h3 style="color:#215967;margin-bottom:1rem;"><i class="fas fa-bullhorn"></i> Announcements</h3>';
+            foreach ($announcements as $ann) {
+                echo '<div style="margin-bottom:1.2rem;">';
+                echo '<strong style="color:#3b82f6;">' . htmlspecialchars($ann['title']) . '</strong><br>';
+                echo '<span style="color:#666;font-size:0.95em;">' . date('M j, Y g:i A', strtotime($ann['created_at'])) . '</span>';
+                echo '<div style="margin-top:0.5em;color:#333;">' . nl2br(htmlspecialchars($ann['content'])) . '</div>';
+                echo '</div>';
+            }
+            echo '</div>';
+        }
+    } catch (Exception $e) {
+        // Ignore announcement errors
+    }
+}
+
 // Flush output buffer
 ob_end_flush();
 ?>
