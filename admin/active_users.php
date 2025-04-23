@@ -22,18 +22,24 @@ $roleSql = $roleFilter ? "AND r.role_name = :role" : "";
 $searchSql = $search ? "AND (u.username LIKE :search OR u.email LIKE :search)" : "";
 
 try {
-    // Get active users (last 15 minutes)
+    // Get active users (status = active, last_active or last_login in last 15 minutes)
     $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
 
     $sql = "
-        SELECT u.id, u.username, u.email, u.last_activity, 
+        SELECT u.id, u.username, u.email, u.last_active, u.last_login, u.status,
                COALESCE(r.role_name, 'No Role') as role_name 
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.last_activity >= :threshold
+        WHERE u.status = 'active'
+          AND (
+                (u.last_active IS NOT NULL AND u.last_active >= :threshold)
+                OR
+                (u.last_active IS NULL AND u.last_login >= :threshold)
+              )
         $roleSql
         $searchSql
-        ORDER BY u.last_activity DESC
+        ORDER BY 
+            COALESCE(u.last_active, u.last_login) DESC
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':threshold', $activeThreshold);
@@ -44,7 +50,9 @@ try {
 
     // Format last activity time
     foreach ($activeUsers as &$user) {
-        $user['last_active'] = date('M j, Y g:i A', strtotime($user['last_activity']));
+        $user['last_active_display'] = $user['last_active'] 
+            ? date('M j, Y g:i A', strtotime($user['last_active']))
+            : ($user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : '-');
     }
     unset($user);
 
@@ -54,9 +62,13 @@ try {
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
+    $activeUsers = [];
+    $roles = [];
 } catch (Exception $e) {
     error_log("Application Error: " . $e->getMessage());
     $error = "An error occurred: " . $e->getMessage();
+    $activeUsers = [];
+    $roles = [];
 }
 ?>
 <!DOCTYPE html>
@@ -164,8 +176,10 @@ try {
                     Online:&nbsp;
                     <?php
                     $onlineList = [];
-                    foreach ($activeUsers as $user) {
-                        $onlineList[] = '<span class="online-user-pill">' . htmlspecialchars($user['username']) . '</span>';
+                    if (!empty($activeUsers) && is_array($activeUsers)) {
+                        foreach ($activeUsers as $user) {
+                            $onlineList[] = '<span class="online-user-pill">' . htmlspecialchars($user['username']) . '</span>';
+                        }
                     }
                     echo $onlineList ? implode('', $onlineList) : '<span style="color:#888;">No users online</span>';
                     ?>
@@ -192,7 +206,7 @@ try {
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= htmlspecialchars($user['last_active']) ?></td>
+                                    <td><?= htmlspecialchars($user['last_active_display']) ?></td>
                                     <td class="status-active">Active</td>
                                 </tr>
                                 <?php endforeach; ?>
