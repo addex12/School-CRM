@@ -392,11 +392,10 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             infoDiv.textContent = '';
         }
 
-        // Populate subjects based on student's class_level_id
-        // Fix: Use studentClassLevel mapping to get class_level_id for the selected student
-        var classLevelId = studentClassLevel[studentId];
-        if (classLevelId && subjectsByLevel[classLevelId]) {
-            subjectsByLevel[classLevelId].forEach(function(subj) {
+        // --- FIX: Always use string keys for mapping ---
+        var classLevelId = studentClassLevel[String(studentId)];
+        if (classLevelId && subjectsByLevel[String(classLevelId)]) {
+            subjectsByLevel[String(classLevelId)].forEach(function(subj) {
                 var opt = document.createElement('option');
                 opt.value = subj.id;
                 opt.text = subj.subject_name;
@@ -405,8 +404,8 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         // Populate sections based on student's class_id
-        if (student && student.class_id && sectionsByClass[student.class_id]) {
-            sectionsByClass[student.class_id].forEach(function(sec) {
+        if (student && student.class_id && sectionsByClass[String(student.class_id)]) {
+            sectionsByClass[String(student.class_id)].forEach(function(sec) {
                 var opt = document.createElement('option');
                 opt.value = sec.id;
                 opt.text = sec.section_name;
@@ -414,9 +413,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         }
 
-        // Autofill current term and academic year
-        if (termInput) termInput.value = currentTerm;
-        if (yearInput) yearInput.value = currentAcademicYear;
+        // Set dropdown to current term/year if student changes (if not already selected)
+        if (termInput && currentTerm) termInput.value = currentTerm;
+        if (yearInput && currentAcademicYear) yearInput.value = currentAcademicYear;
     }
 
     function autoFillGradeLetter() {
@@ -531,11 +530,11 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="<?= $editGrade ? 'update_grade' : 'add_grade' ?>" class="btn" style="background:#3498db;color:#fff;margin-top:10px;">
+                        <button type="submit" name="<?= $editGrade ? 'update_grade' : 'add_grade' ?>" class="btn" size="small" style="background:#3498db;color:#fff;margin-top:10px;">
                             <?= $editGrade ? 'Update Grade' : 'Add Grade' ?>
                         </button>
                         <?php if ($editGrade): ?>
-                            <a href="grades.php" class="btn btn-secondary" style="margin-left:10px;">Cancel</a>
+                            <a href="grades.php" class="btn btn-secondary" size="small" style="margin-left:10px;">Cancel</a>
                         <?php endif; ?>
                     </form>
                     <h2>Grade Reports</h2>
@@ -571,9 +570,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($grade['academic_year']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($grade['created_at'])) ?></td>
                                             <td>
-                                                <a href="grades.php?edit_grade=<?= $grade['id'] ?>" class="btn">Edit</a>
-                                                <a href="grades.php?delete_grade=<?= $grade['id'] ?>" class="btn"return confirm('Delete this grade?')">Delete</a>
-                                                <a href="grades.php?export_word=<?= $grade['id'] ?>" class="btn">Export Word</a>
+                                                <a href="grades.php?edit_grade=<?= $grade['id'] ?>" class="btn" size="small">Edit</a>
+                                                <a href="grades.php?delete_grade=<?= $grade['id'] ?>" class="btn"rsize="small" onclick="return confirm('Delete this grade?')">Delete</a>
+                                                <a href="grades.php?export_word=<?= $grade['id'] ?>" class="btn" size="small">Export Word</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
