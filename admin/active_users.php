@@ -110,35 +110,29 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     }
 
     ob_clean();
-    if (count($online_users) + count($offline_users) === 0) {
-        echo '<tr><td colspan="6" class="text-center">No active users found</td></tr>';
+    $has_users = (count($online_users) > 0) || (count($offline_users) > 0);
+    if ($has_users) {
+        $all_users = array_merge($online_users, $offline_users);
+        foreach ($all_users as $user) {
+            echo '<tr data-id="' . htmlspecialchars($user['id']) . '">';
+            echo '<td>' . htmlspecialchars($user['id']) . '</td>';
+            echo '<td><input class="crud-editable username" type="text" value="' . htmlspecialchars($user['username']) . '"></td>';
+            echo '<td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>';
+            echo '<td><label><input type="checkbox" class="crud-editable online" ' . (!empty($user['online']) ? 'checked' : '') . '> Online</label></td>';
+            echo '<td><select class="crud-editable role">';
+            foreach ($roles as $id => $name) {
+                $selected = ($user['role_id'] == $id) ? 'selected' : '';
+                echo '<option value="' . htmlspecialchars($id) . '" ' . $selected . '>' . htmlspecialchars($name) . '</option>';
+            }
+            echo '</select></td>';
+            echo '<td>
+                <button class="crud-btn save">Save</button>
+                <button class="crud-btn delete">Delete</button>
+            </td>';
+            echo '</tr>';
+        }
     } else {
-        foreach ($online_users as $user) {
-            echo '<tr>
-                <td>' . htmlspecialchars($user['id']) . '</td>
-                <td>' . htmlspecialchars($user['username']) . '</td>
-                <td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>
-                <td><span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span></td>
-                <td>' . htmlspecialchars($user['role_name']) . '</td>
-                <td>
-                    <button class="crud-btn edit">Edit</button>
-                    <button class="crud-btn delete">Delete</button>
-                </td>
-            </tr>';
-        }
-        foreach ($offline_users as $user) {
-            echo '<tr>
-                <td>' . htmlspecialchars($user['id']) . '</td>
-                <td>' . htmlspecialchars($user['username']) . '</td>
-                <td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>
-                <td><span style="color:#aaa;">Offline</span></td>
-                <td>' . htmlspecialchars($user['role_name']) . '</td>
-                <td>
-                    <button class="crud-btn edit">Edit</button>
-                    <button class="crud-btn delete">Delete</button>
-                </td>
-            </tr>';
-        }
+        echo '<tr><td colspan="6" class="text-center">No active users found</td></tr>';
     }
     exit;
 }
