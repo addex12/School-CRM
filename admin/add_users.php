@@ -121,7 +121,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $role_id,
                     password_hash($temp_password, PASSWORD_DEFAULT)
                 ]);
+                $user_id = $pdo->lastInsertId();
                 $imported++;
+
+                // Assign to respective table based on role
+                if (strtolower($roleName) === 'student') {
+                    $pdo->prepare("INSERT INTO students (user_id, status) VALUES (?, 'active')")->execute([$user_id]);
+                } elseif (strtolower($roleName) === 'teacher') {
+                    $pdo->prepare("INSERT INTO teachers (user_id, status) VALUES (?, 'active')")->execute([$user_id]);
+                } elseif (strtolower($roleName) === 'parent') {
+                    $pdo->prepare("INSERT INTO parents (user_id) VALUES (?)")->execute([$user_id]);
+                }
 
                 // Send email (optional)
                 $to = $email;
@@ -183,6 +193,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Username or email already exists.");
             }
 
+            // Get role name for assignment
+            $roleName = '';
+            foreach ($roles as $role) {
+                if ($role['id'] == $role_id) {
+                    $roleName = strtolower($role['role_name']);
+                    break;
+                }
+            }
+
             // Create user
             $temp_password = bin2hex(random_bytes(8));
             $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
@@ -192,6 +211,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $role_id,
                 password_hash($temp_password, PASSWORD_DEFAULT)
             ]);
+            $user_id = $pdo->lastInsertId();
+
+            // Assign to respective table based on role
+            if ($roleName === 'student') {
+                $pdo->prepare("INSERT INTO students (user_id, status) VALUES (?, 'active')")->execute([$user_id]);
+            } elseif ($roleName === 'teacher') {
+                $pdo->prepare("INSERT INTO teachers (user_id, status) VALUES (?, 'active')")->execute([$user_id]);
+            } elseif ($roleName === 'parent') {
+                $pdo->prepare("INSERT INTO parents (user_id) VALUES (?)")->execute([$user_id]);
+            }
 
             // Send email (optional)
             $to = $email;

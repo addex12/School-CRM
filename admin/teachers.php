@@ -12,11 +12,15 @@ require_once '../includes/config.php';
 
 $pageTitle = "Teachers";
 
-// Fetch all teachers with user info only (no class join)
+// Fetch all users with teacher role (role_id = 2 or role_name = 'teacher')
 $stmt = $pdo->query("
-    SELECT t.id AS teacher_id, u.username, u.email, t.qualification, t.subject_specialization, t.date_of_birth, t.gender, t.address, t.status, t.created_at
-    FROM teachers t
-    LEFT JOIN users u ON t.user_id = u.id
+    SELECT 
+        u.id AS user_id, u.username, u.email, 
+        t.id AS teacher_id, t.qualification, t.subject_specialization, t.date_of_birth, t.gender, t.address, t.status, t.created_at
+    FROM users u
+    LEFT JOIN teachers t ON t.user_id = u.id
+    LEFT JOIN roles r ON u.role_id = r.id
+    WHERE r.role_name = 'teacher'
     ORDER BY u.username
 ");
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -95,6 +99,28 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                 padding: 8px 6px;
             }
         }
+        .excel-table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #fff;
+        }
+        .excel-table th, .excel-table td {
+            border: 1px solid #bdbdbd;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 1em;
+        }
+        .excel-table th {
+            background: #e2efda;
+            color: #215967;
+            font-weight: bold;
+        }
+        .excel-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .excel-table tr:hover {
+            background: #f4f8fb;
+        }
     </style>
 </head>
 <body>
@@ -114,10 +140,10 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="teachers-table">
+                        <table class="excel-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>User ID</th>
                                     <th>Username</th>
                                     <th>Email</th>
                                     <th>Qualification</th>
@@ -134,7 +160,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                 <?php if (!empty($teachers)): ?>
                                     <?php foreach ($teachers as $teacher): ?>
                                         <tr>
-                                            <td><?= esc($teacher['teacher_id']) ?></td>
+                                            <td><?= esc($teacher['user_id']) ?></td>
                                             <td><?= esc($teacher['username']) ?></td>
                                             <td><?= esc($teacher['email']) ?></td>
                                             <td><?= esc($teacher['qualification'] ?? '-') ?></td>

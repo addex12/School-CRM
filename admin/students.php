@@ -5,17 +5,17 @@ require_once '../includes/config.php';
 
 $pageTitle = "Students";
 
-// Fetch students with class and section info (only users with 'student' role)
-// FIX: Remove user_roles join (table does not exist), use users.role_id = 4 for student role
+// Fetch all users with student role (role_id = 4 or role_name = 'student')
 $stmt = $pdo->query("
-    SELECT s.*, u.username, u.email, c.class_name, sec.section_name
-    FROM students s
-    LEFT JOIN users u ON s.user_id = u.id
+    SELECT 
+        u.id AS user_id, u.username, u.email, 
+        s.id AS student_id, s.class_id, s.section_id, c.class_name, sec.section_name, s.status, s.created_at
+    FROM users u
+    LEFT JOIN students s ON s.user_id = u.id
     LEFT JOIN classes c ON s.class_id = c.id
-    LEFT JOIN enrollments e ON s.id = e.student_id
-    LEFT JOIN batches b ON e.batch_id = b.id
-    LEFT JOIN sections sec ON b.section_id = sec.id
-    WHERE u.role_id = 4
+    LEFT JOIN sections sec ON s.section_id = sec.id
+    LEFT JOIN roles r ON u.role_id = r.id
+    WHERE r.role_name = 'student'
     ORDER BY u.username
 ");
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -151,12 +151,14 @@ if (isset($_GET['export'])) {
     fclose($out);
     exit;
 }
+
+function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <title><?= esc($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -257,6 +259,28 @@ if (isset($_GET['export'])) {
             padding: 4px 12px;
             font-size: 13px;
         }
+        .excel-table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #fff;
+        }
+        .excel-table th, .excel-table td {
+            border: 1px solid #bdbdbd;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 1em;
+        }
+        .excel-table th {
+            background: #e2efda;
+            color: #215967;
+            font-weight: bold;
+        }
+        .excel-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .excel-table tr:hover {
+            background: #f4f8fb;
+        }
     </style>
 </head>
 <body>
@@ -264,13 +288,13 @@ if (isset($_GET['export'])) {
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1><?= esc($pageTitle) ?></h1>
             </header>
             <div class="content">
                 <div class="dashboard-section">
                     <h2>Bulk Assign Students to Classes/Sections</h2>
-                    <?php if ($bulk_error): ?><div class="error"><?= htmlspecialchars($bulk_error) ?></div><?php endif; ?>
-                    <?php if ($bulk_success): ?><div class="success"><?= htmlspecialchars($bulk_success) ?></div><?php endif; ?>
+                    <?php if ($bulk_error): ?><div class="error"><?= esc($bulk_error) ?></div><?php endif; ?>
+                    <?php if ($bulk_success): ?><div class="success"><?= esc($bulk_success) ?></div><?php endif; ?>
                     <form method="post" enctype="multipart/form-data">
                         <input type="file" name="csv_file" accept=".csv" required>
                         <button type="submit" name="bulk_assign" class="erpnext-btn btn-sm btn-success">Bulk Assign</button>
@@ -286,7 +310,7 @@ if (isset($_GET['export'])) {
                             <select name="student_id" required>
                                 <option value="">Select Student</option>
                                 <?php foreach ($students as $s): ?>
-                                    <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['username']) ?></option>
+                                    <option value="<?= $s['id'] ?>"><?= esc($s['username']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
@@ -294,7 +318,7 @@ if (isset($_GET['export'])) {
                             <select name="class_id" id="class_id_select" required>
                                 <option value="">Select Class</option>
                                 <?php foreach ($classes as $c): ?>
-                                    <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['class_name']) ?></option>
+                                    <option value="<?= $c['id'] ?>"><?= esc($c['class_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
@@ -302,7 +326,7 @@ if (isset($_GET['export'])) {
                             <select name="section_id" id="section_id_select">
                                 <option value="">Select Section</option>
                                 <?php foreach ($sections as $sec): ?>
-                                    <option value="<?= $sec['id'] ?>" data-class="<?= $sec['class_id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
+                                    <option value="<?= $sec['id'] ?>" data-class="<?= $sec['class_id'] ?>"><?= esc($sec['section_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
@@ -311,28 +335,42 @@ if (isset($_GET['export'])) {
                 </div>
                 <div class="dashboard-section">
                     <h2>Student List</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Class</th>
-                                <th>Section</th>
-                                <!-- ...other columns... -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($students as $s): ?>
+                    <div class="table-responsive">
+                        <table class="excel-table">
+                            <thead>
                                 <tr>
-                                    <td><?= htmlspecialchars($s['username']) ?></td>
-                                    <td><?= htmlspecialchars($s['email']) ?></td>
-                                    <td><?= htmlspecialchars($s['class_name']) ?></td>
-                                    <td><?= htmlspecialchars($s['section_name'] ?? '-') ?></td>
+                                    <th>User ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Class</th>
+                                    <th>Section</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
                                     <!-- ...other columns... -->
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($students)): ?>
+                                    <?php foreach ($students as $s): ?>
+                                        <tr>
+                                            <td><?= esc($s['user_id']) ?></td>
+                                            <td><?= esc($s['username']) ?></td>
+                                            <td><?= esc($s['email']) ?></td>
+                                            <td><?= esc($s['class_name'] ?? '-') ?></td>
+                                            <td><?= esc($s['section_name'] ?? '-') ?></td>
+                                            <td><?= esc($s['status'] ?? '-') ?></td>
+                                            <td><?= esc($s['created_at'] ?? '-') ?></td>
+                                            <!-- ...other columns... -->
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="7">No students found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
