@@ -48,7 +48,6 @@ try {
 
     // Fetch all roles for filter dropdown
     $roles = $pdo->query("SELECT DISTINCT role_name FROM roles WHERE role_name IS NOT NULL AND role_name != '' ORDER BY role_name")->fetchAll(PDO::FETCH_COLUMN);
-    $users = $pdo->query("SELECT id, username, last_active FROM users WHERE online == 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
     // Ensure $error is not set if query is successful
     unset($error);
