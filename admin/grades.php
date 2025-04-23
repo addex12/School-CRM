@@ -286,13 +286,13 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         var subjectSelect = document.getElementById('subject_id');
         var sectionSelect = document.getElementById('section_id');
         var infoDiv = document.getElementById('student_info');
-        var termSelect = document.getElementById('term');
-        var yearSelect = document.getElementById('academic_year');
+        var termInput = document.getElementById('term');
+        var yearInput = document.getElementById('academic_year');
         subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
         sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
 
         // Detect student's class and section, and show as info
-        var student = students.find(function(s) { return s.id == studentId; });
+        var student = students.find(function(s) { return String(s.id) === String(studentId); });
         if (student) {
             var classText = student.class_id ? 'Class ID: ' + student.class_id : 'Class: -';
             // Find section name if available
@@ -309,8 +309,8 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         // Populate subjects based on student's class_level_id
-        if (studentId && studentClassLevel[studentId] && subjectsByLevel[studentClassLevel[studentId]]) {
-            subjectsByLevel[studentClassLevel[studentId]].forEach(function(subj) {
+        if (student && student.class_level_id && subjectsByLevel[student.class_level_id]) {
+            subjectsByLevel[student.class_level_id].forEach(function(subj) {
                 var opt = document.createElement('option');
                 opt.value = subj.id;
                 opt.text = subj.subject_name;
@@ -328,9 +328,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         }
 
-        // Set dropdown to current term/year if student changes (if not already selected)
-        if (termSelect && currentTerm) termSelect.value = currentTerm;
-        if (yearSelect && currentAcademicYear) yearSelect.value = currentAcademicYear;
+        // Autofill current term and academic year
+        if (termInput) termInput.value = currentTerm;
+        if (yearInput) yearInput.value = currentAcademicYear;
     }
 
     function autoFillGradeLetter() {
@@ -602,9 +602,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         }
 
-        // Autofill current term and academic year
-        if (termInput) termInput.value = currentTerm;
-        if (yearInput) yearInput.value = currentAcademicYear;
+        // Set dropdown to current term/year if student changes (if not already selected)
+        if (termInput && currentTerm) termInput.value = currentTerm;
+        if (yearInput && currentAcademicYear) yearInput.value = currentAcademicYear;
     }
 
     function autoFillGradeLetter() {
@@ -640,5 +640,6 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         updateSubjects();
     });
     </script>
-</body>
+</body>cript>
+</html>
 </html>
