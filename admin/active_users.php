@@ -11,46 +11,63 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
-// Filtering logic
-$search = trim($_GET['search'] ?? '');
-$roleFilter = $_GET['role'] ?? '';
-$baseConditions = ["status = 'active'"];
-$params = [];
+// Fetch all roles for filter dropdown (do this first, always)
+try {
+    $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
+} catch (PDOException $e) {
+    $roles = [];
+}
 
-if ($roleFilter) {
-    $baseConditions[] = "role = :role";
-    $params[':role'] = $roleFilter;
+// Online Users filter
+$onlineSearch = trim($_GET['online_search'] ?? '');
+$onlineRoleFilter = $_GET['online_role'] ?? '';
+$onlineConditions = ["status = 'active'", "online = 1"];
+$onlineParams = [];
+
+if ($onlineRoleFilter) {
+    $onlineConditions[] = "role = :online_role";
+    $onlineParams[':online_role'] = $onlineRoleFilter;
 }
-if ($search) {
-    $baseConditions[] = "username LIKE :search";
-    $params[':search'] = '%' . $search . '%';
+if ($onlineSearch) {
+    $onlineConditions[] = "username LIKE :online_search";
+    $onlineParams[':online_search'] = '%' . $onlineSearch . '%';
 }
+$onlineWhereSql = 'WHERE ' . implode(' AND ', $onlineConditions);
+
+// All Active Users filter
+$allSearch = trim($_GET['all_search'] ?? '');
+$allRoleFilter = $_GET['all_role'] ?? '';
+$allConditions = ["status = 'active'"];
+$allParams = [];
+
+if ($allRoleFilter) {
+    $allConditions[] = "role = :all_role";
+    $allParams[':all_role'] = $allRoleFilter;
+}
+if ($allSearch) {
+    $allConditions[] = "username LIKE :all_search";
+    $allParams[':all_search'] = '%' . $allSearch . '%';
+}
+$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 try {
     // Online users only (must also be active)
-    $onlineConditions = $baseConditions;
-    $onlineConditions[] = "online = 1";
-    $onlineWhereSql = 'WHERE ' . implode(' AND ', $onlineConditions);
     $onlineSql = "SELECT id, username, last_active FROM users $onlineWhereSql ORDER BY username";
     $stmtOnline = $pdo->prepare($onlineSql);
-    foreach ($params as $key => $val) {
+    foreach ($onlineParams as $key => $val) {
         $stmtOnline->bindValue($key, $val);
     }
     $stmtOnline->execute();
     $onlineUsers = $stmtOnline->fetchAll(PDO::FETCH_ASSOC);
 
     // All active users (regardless of online)
-    $allWhereSql = 'WHERE ' . implode(' AND ', $baseConditions);
     $allSql = "SELECT id, username, last_active, online FROM users $allWhereSql ORDER BY online DESC, username";
     $stmtAll = $pdo->prepare($allSql);
-    foreach ($params as $key => $val) {
+    foreach ($allParams as $key => $val) {
         $stmtAll->bindValue($key, $val);
     }
     $stmtAll->execute();
     $allUsers = $stmtAll->fetchAll(PDO::FETCH_ASSOC);
-
-    // Fetch all roles for filter dropdown
-    $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
 
     unset($error);
 } catch (PDOException $e) {
@@ -58,7 +75,6 @@ try {
     $error = "A database error occurred. Please try again later.";
     $onlineUsers = [];
     $allUsers = [];
-    $roles = [];
 }
 ?>
 <!DOCTYPE html>
@@ -169,18 +185,19 @@ try {
                 <?php if (!empty($error)): ?>
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
-                <form method="get" class="search-bar" id="activeUserSearchForm" style="margin-bottom:1.5rem;">
-                    <input type="text" name="search" id="activeUserSearch" placeholder="Search by username..." value="<?= htmlspecialchars($search) ?>">
-                    <select name="role" id="roleFilter">
+
+                <h3 style="margin-top:2rem;">Online Users</h3>
+                <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.5rem;">
+                    <input type="text" name="online_search" id="onlineUserSearch" placeholder="Search by username..." value="<?= htmlspecialchars($onlineSearch) ?>">
+                    <select name="online_role" id="onlineRoleFilter">
                         <option value="">All Roles</option>
                         <?php foreach ($roles as $role): ?>
-                            <option value="<?= htmlspecialchars($role) ?>" <?= $role === $roleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
+                            <option value="<?= htmlspecialchars($role) ?>" <?= $role === $onlineRoleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
                         <?php endforeach; ?>
                     </select>
                     <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
                     <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
                 </form>
-                <h3 style="margin-top:2rem;">Online Users</h3>
                 <table class="users-table" id="onlineUsersTable">
                     <thead>
                         <tr>
@@ -205,7 +222,19 @@ try {
                         <?php endif; ?>
                     </tbody>
                 </table>
+
                 <h3 style="margin-top:2.5rem;">All Active Users</h3>
+                <form method="get" class="search-bar" id="allUserSearchForm" style="margin-bottom:1.5rem;">
+                    <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username..." value="<?= htmlspecialchars($allSearch) ?>">
+                    <select name="all_role" id="allRoleFilter">
+                        <option value="">All Roles</option>
+                        <?php foreach ($roles as $role): ?>
+                            <option value="<?= htmlspecialchars($role) ?>" <?= $role === $allRoleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
+                    <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
+                </form>
                 <table class="users-table" id="allUsersTable">
                     <thead>
                         <tr>
