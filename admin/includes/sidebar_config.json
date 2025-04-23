@@ -73,7 +73,7 @@
       "title": "Settings",
       "icon": "cogs",
       "items": [
-        { "title": "General Settings", "icon": "cogs", "link": "settings.php" },
+        { "title": "General Settings", "icon": "cogs", "link": "settings.php" }
       ],
       "id": "settings-menu"
     }
