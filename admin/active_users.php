@@ -12,45 +12,33 @@ requireAdmin();
 $pageTitle = "Active Users";
 
 // Filtering logic
-$roleFilter = $_GET['role'] ?? '';
 $search = trim($_GET['search'] ?? '');
-$roleSql = $roleFilter ? "AND r.role_name = :role" : "";
-$searchSql = $search ? "AND (u.username LIKE :search OR u.email LIKE :search)" : "";
+$searchSql = $search ? "AND (username LIKE :search OR email LIKE :search)" : "";
+$roleFilter = $_GET['role'] ?? '';
+$roleSql = $roleFilter ? "AND role = :role" : "";
 
+// Fetch all users with status active, online users first
 try {
-    // Fetch all active users, online users will be sorted first
-    $sql = "
-        SELECT u.id, u.username, u.email, u.last_active, u.last_login, u.status, u.online,
-               COALESCE(r.role_name, 'No Role') as role_name 
-        FROM users u
-        LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.status = 'active'
-        $roleSql
-        $searchSql
-        ORDER BY u.online DESC, COALESCE(u.last_active, u.last_login) DESC
-    ";
+    $sql = "SELECT id, username, email, last_active, role, status, online 
+            FROM users 
+            WHERE status = 'active' 
+            $roleSql
+            $searchSql
+            ORDER BY online DESC, username ASC";
     $stmt = $pdo->prepare($sql);
     if ($roleFilter) $stmt->bindValue(':role', $roleFilter);
     if ($search) $stmt->bindValue(':search', '%' . $search . '%');
     $stmt->execute();
-    $activeUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    // Format last activity time
-    foreach ($activeUsers as &$user) {
-        $user['last_active_display'] = $user['last_active'] 
-            ? date('M j, Y g:i A', strtotime($user['last_active']))
-            : ($user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : '-');
-    }
-    unset($user);
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Fetch all roles for filter dropdown
-    $roles = $pdo->query("SELECT DISTINCT role_name FROM roles WHERE role_name IS NOT NULL AND role_name != '' ORDER BY role_name")->fetchAll(PDO::FETCH_COLUMN);
+    $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
 
     unset($error);
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
-    $activeUsers = [];
+    $users = [];
     $roles = [];
 }
 ?>
@@ -154,11 +142,11 @@ try {
                         </button>
                         <span class="active-count">
                             <i class="fas fa-circle"></i>
-                            <?= count($activeUsers ?? []) ?> active now
+                            <?= count($users ?? []) ?> active now
                         </span>
                     </div>
                 </div>
-                <form method="get" class="search-bar" id="activeUserSearchForm" style="margin-bottom:1.5rem;"></form>
+                <form method="get" class="search-bar" id="activeUserSearchForm" style="margin-bottom:1.5rem;">
                     <input type="text" name="search" id="activeUserSearch" placeholder="Search by username or email..." value="<?= htmlspecialchars($search) ?>">
                     <select name="role" id="roleFilter">
                         <option value="">All Roles</option>
@@ -169,13 +157,13 @@ try {
                     <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
                     <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
                 </form>
-                <div class="online-users-list"></div>
+                <div class="online-users-list">
                     <i class="fas fa-circle" style="color:#27ae60;font-size:0.9em;"></i>
                     Online:&nbsp;
                     <?php
                     $onlineList = [];
-                    if (!empty($activeUsers) && is_array($activeUsers)) {
-                        foreach ($activeUsers as $user) {
+                    if (!empty($users) && is_array($users)) {
+                        foreach ($users as $user) {
                             if ($user['online']) {
                                 $onlineList[] = '<span class="online-user-pill">' . htmlspecialchars($user['username']) . '</span>';
                             }
@@ -199,19 +187,19 @@ try {
                             </tr>
                         </thead>
                         <tbody id="activeUsersTbody">
-                            <?php if (!empty($activeUsers)): ?>
-                                <?php foreach ($activeUsers as $user): ?>
+                            <?php if (!empty($users)): ?>
+                                <?php foreach ($users as $user): ?>
                                 <tr>
                                     <td><?= htmlspecialchars($user['id']) ?></td>
-                                    <td></td>
+                                    <td>
                                         <?php if ($user['online']): ?>
                                             <span class="online-dot"></span>
                                         <?php endif; ?>
                                         <?= htmlspecialchars($user['username']) ?>
                                     </td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
-                                    <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= htmlspecialchars($user['last_active_display']) ?></td>
+                                    <td><?= htmlspecialchars($user['role']) ?></td>
+                                    <td><?= htmlspecialchars($user['last_active']) ?></td>
                                     <td class="status-active">Active</td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -227,7 +215,7 @@ try {
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-    <script></script>
+    <script>
         // Real-time search/filter (client-side for current page)
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('activeUserSearch');
