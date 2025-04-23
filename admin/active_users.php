@@ -10,9 +10,9 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
-// Remove all search/filter logic, just fetch active users
+// Only fetch id, username, last_active for active users, ordered by username
 try {
-    $users = $pdo->query("SELECT id, username, last_active, online FROM users WHERE status = 'active' ORDER BY online DESC, username")->fetchAll(PDO::FETCH_ASSOC);
+    $users = $pdo->query("SELECT id, username, last_active FROM users WHERE status = 'active' ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
     unset($error);
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
@@ -136,7 +136,6 @@ try {
                             <th>ID</th>
                             <th>Username</th>
                             <th>Last Active</th>
-                            <th>Online</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -146,18 +145,11 @@ try {
                                 <td><?= htmlspecialchars($user['id']) ?></td>
                                 <td><?= htmlspecialchars($user['username']) ?></td>
                                 <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
-                                <td>
-                                    <?php if (!empty($user['online'])): ?>
-                                        <span class="online-dot"></span> Online
-                                    <?php else: ?>
-                                        Offline
-                                    <?php endif; ?>
-                                </td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="text-center">No active users found</td>
+                                <td colspan="3" class="text-center">No active users found</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
