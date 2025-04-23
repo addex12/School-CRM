@@ -6,17 +6,16 @@ require_once '../includes/config.php';
 $pageTitle = "Students";
 
 // Fetch students with class and section info (only users with 'student' role)
+// FIX: Remove user_roles join (table does not exist), use users.role_id = 4 for student role
 $stmt = $pdo->query("
     SELECT s.*, u.username, u.email, c.class_name, sec.section_name
     FROM students s
     LEFT JOIN users u ON s.user_id = u.id
-    LEFT JOIN user_roles ur ON ur.user_id = u.id
-    LEFT JOIN roles r ON ur.role_id = r.id
     LEFT JOIN classes c ON s.class_id = c.id
     LEFT JOIN enrollments e ON s.id = e.student_id
     LEFT JOIN batches b ON e.batch_id = b.id
     LEFT JOIN sections sec ON b.section_id = sec.id
-    WHERE r.role_name = 'student'
+    WHERE u.role_id = 4
     ORDER BY u.username
 ");
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -224,6 +223,40 @@ if (isset($_GET['export'])) {
                 padding: 8px 6px;
             }
         }
+        .erpnext-btn, .btn, .btn-secondary {
+            display: inline-block;
+            padding: 6px 18px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #222d32;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            cursor: pointer;
+            margin-right: 4px;
+        }
+        .erpnext-btn:hover, .btn:hover, .btn-secondary:hover {
+            background: #e2efda;
+            color: #215967;
+        }
+        .btn-secondary {
+            background: #eaeaea;
+            color: #666;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: #fff;
+        }
+        .btn-sm, .erpnext-btn.btn-sm {
+            padding: 4px 12px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -240,9 +273,9 @@ if (isset($_GET['export'])) {
                     <?php if ($bulk_success): ?><div class="success"><?= htmlspecialchars($bulk_success) ?></div><?php endif; ?>
                     <form method="post" enctype="multipart/form-data">
                         <input type="file" name="csv_file" accept=".csv" required>
-                        <button type="submit" name="bulk_assign" class="btn">Bulk Assign</button>
-                        <a href="students.php?export=1" class="btn btn-secondary">Export Students</a>
-                        <a href="download_template.php?type=students_assign" class="btn btn-secondary">Download CSV Template</a>
+                        <button type="submit" name="bulk_assign" class="erpnext-btn btn-sm btn-success">Bulk Assign</button>
+                        <a href="students.php?export=1" class="erpnext-btn btn-sm btn-secondary">Export Students</a>
+                        <a href="download_template.php?type=students_assign" class="erpnext-btn btn-sm btn-secondary">Download CSV Template</a>
                     </form>
                     <p>CSV columns: username, class_id, section_id (section_id optional)</p>
                 </div>
@@ -273,7 +306,7 @@ if (isset($_GET['export'])) {
                                 <?php endforeach; ?>
                             </select>
                         </label>
-                        <button type="submit" name="assign_single" class="btn">Assign</button>
+                        <button type="submit" name="assign_single" class="erpnext-btn btn-sm btn-success">Assign</button>
                     </form>
                 </div>
                 <div class="dashboard-section">
