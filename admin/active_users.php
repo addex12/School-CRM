@@ -10,14 +10,39 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
-// Only fetch id, username, last_active for active users, ordered by username
+// Handle search/filter
+$search = trim($_GET['search'] ?? '');
+$filter_online = isset($_GET['online']) && $_GET['online'] === '1';
+
+$where = ["active = 1"];
+$params = [];
+
+if ($search !== '') {
+    $where[] = "username LIKE :search";
+    $params[':search'] = "%$search%";
+}
+if ($filter_online) {
+    $where[] = "online = 1";
+}
+
+$where_sql = implode(' AND ', $where);
+
 try {
-    $users = $pdo->query("SELECT id, username, last_active FROM users WHERE active = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->prepare("SELECT id, username, last_active, online FROM users WHERE $where_sql ORDER BY username");
+    $stmt->execute($params);
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // For stats
+    $total_active = $pdo->query("SELECT COUNT(*) FROM users WHERE active = 1")->fetchColumn();
+    $total_online = $pdo->query("SELECT COUNT(*) FROM users WHERE online = 1")->fetchColumn();
+
     unset($error);
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
     $users = [];
+    $total_active = 0;
+    $total_online = 0;
 }
 ?>
 <!DOCTYPE html>
@@ -30,59 +55,71 @@ try {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body {
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            background: #f4f7fa;
+        }
         .active-users-container {
-            padding: 20px;
+            padding: 24px 32px;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+            margin-top: 32px;
         }
         .active-users-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e3e8ee;
         }
         .active-count {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             color: #555;
+            font-size: 1.08em;
         }
         .active-count i {
             color: #4CAF50;
         }
-        .refresh-btn {
-            background: #3498db;
+        .refresh-btn, .search-btn {
+            background: #1976d2;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 8px 18px;
+            border-radius: 6px;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 7px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background 0.2s;
         }
-        .refresh-btn:hover {
-            background: #2980b9;
+        .refresh-btn:hover, .search-btn:hover {
+            background: #125ea2;
         }
         .users-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 1.04em;
         }
         .users-table th {
-            background: #f8f9fa;
-            padding: 12px;
+            background: #f1f5fa;
+            padding: 13px 10px;
             text-align: left;
-            border-bottom: 2px solid #dee2e6;
+            border-bottom: 2px solid #e3e8ee;
+            color: #1976d2;
+            font-weight: 600;
         }
         .users-table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
+            padding: 12px 10px;
+            border-bottom: 1px solid #f0f0f0;
         }
         .users-table tr:hover {
-            background-color: #f5f5f5;
+            background-color: #f6fafd;
         }
         .status-active {
             color: #4CAF50;
@@ -96,14 +133,37 @@ try {
             border-radius: 50%;
             margin-right: 7px;
         }
-        .online-user-pill {
-            display: inline-block;
-            background: #27ae60;
-            color: #fff;
-            border-radius: 1em;
-            padding: 0.2em 0.9em;
-            font-size: 0.97em;
-            margin-right: 0.4em;
+        .erpnext-search-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .erpnext-search-form input[type="text"] {
+            padding: 7px 12px;
+            border: 1px solid #cfd8dc;
+            border-radius: 5px;
+            font-size: 1em;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .erpnext-search-form input[type="text"]:focus {
+            border: 1.5px solid #1976d2;
+        }
+        .erpnext-search-form label {
+            font-size: 1em;
+            color: #1976d2;
+            font-weight: 500;
+        }
+        .erpnext-search-form input[type="checkbox"] {
+            accent-color: #1976d2;
+            width: 16px;
+            height: 16px;
+        }
+        @media (max-width: 700px) {
+            .active-users-container { padding: 10px; }
+            .users-table th, .users-table td { padding: 7px 4px; }
+            .erpnext-search-form { flex-direction: column; align-items: flex-start; gap: 7px; }
         }
     </style>
 </head>
@@ -113,14 +173,15 @@ try {
         <div class="admin-main">
             <div class="active-users-container">
                 <div class="active-users-header">
-                    <h2>Active Users</h2>
+                    <h2 style="font-size:1.45em; color:#1976d2; font-weight:600;">Active Users</h2>
                     <div>
                         <button class="refresh-btn" onclick="window.location.reload()">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                         <span class="active-count">
-                            <i class="fas fa-circle"></i>
-                            <?= count($users ?? []) ?> active
+                            <i class="fas fa-users"></i>
+                            <?= (int)$total_active ?> active,
+                            <span style="color:#27ae60;"><i class="fas fa-circle"></i> <?= (int)$total_online ?> online</span>
                         </span>
                     </div>
                 </div>
@@ -128,7 +189,14 @@ try {
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
-                <!-- Remove search form entirely -->
+                <form class="erpnext-search-form" method="get" action="">
+                    <input type="text" name="search" placeholder="Search username..." value="<?= htmlspecialchars($search) ?>">
+                    <label>
+                        <input type="checkbox" name="online" value="1" <?= $filter_online ? 'checked' : '' ?>>
+                        Online only
+                    </label>
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search</button>
+                </form>
 
                 <table class="users-table" id="allUsersTable">
                     <thead>
@@ -136,6 +204,7 @@ try {
                             <th>ID</th>
                             <th>Username</th>
                             <th>Last Active</th>
+                            <th>Online</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,11 +214,18 @@ try {
                                 <td><?= htmlspecialchars($user['id']) ?></td>
                                 <td><?= htmlspecialchars($user['username']) ?></td>
                                 <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
+                                <td>
+                                    <?php if (!empty($user['online'])): ?>
+                                        <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
+                                    <?php else: ?>
+                                        <span style="color:#aaa;">Offline</span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3" class="text-center">No active users found</td>
+                                <td colspan="4" class="text-center">No active users found</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
