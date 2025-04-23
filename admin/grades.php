@@ -350,11 +350,29 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label for="term">Term</label>
-                            <input type="text" name="term" id="term" required>
+                            <select name="term" id="term" required>
+                                <?php
+                                // Fetch all academic terms for dropdown
+                                $terms = $pdo->query("SELECT name FROM academic_terms ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
+                                $currentTerm = $pdo->query("SELECT name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn();
+                                foreach ($terms as $t):
+                                ?>
+                                    <option value="<?= htmlspecialchars($t) ?>" <?= ($t == $currentTerm) ? 'selected' : '' ?>><?= htmlspecialchars($t) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label for="academic_year">Academic Year</label>
-                            <input type="text" name="academic_year" id="academic_year" required>
+                            <select name="academic_year" id="academic_year" required>
+                                <?php
+                                // Fetch all academic years for dropdown
+                                $years = $pdo->query("SELECT year_name FROM academic_years ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
+                                $currentAcademicYear = $pdo->query("SELECT year_name FROM academic_years WHERE end_date >= CURDATE() ORDER BY start_date DESC LIMIT 1")->fetchColumn();
+                                foreach ($years as $y):
+                                ?>
+                                    <option value="<?= htmlspecialchars($y) ?>" <?= ($y == $currentAcademicYear) ? 'selected' : '' ?>><?= htmlspecialchars($y) ?></option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <button type="submit" name="add_grade" class="btn" style="background:#3498db;color:#fff;">Add Grade</button>
                     </form>
@@ -474,11 +492,8 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         var subjectSelect = document.getElementById('subject_id');
         var sectionSelect = document.getElementById('section_id');
         var infoDiv = document.getElementById('student_info');
-<<<<<<< HEAD
         var termInput = document.getElementById('term');
         var yearInput = document.getElementById('academic_year');
-=======
->>>>>>> 6746b9d8272ac9f9829b1e70111d10ad99ed62ac
         subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
         sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
 
