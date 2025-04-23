@@ -48,6 +48,20 @@ INSERT INTO `academic_terms` (`id`, `academic_year`, `term_name`, `start_date`, 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `academic_years`
+--
+
+CREATE TABLE `academic_years` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `year_name` varchar(50) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `announcements`
 --
 
