@@ -28,7 +28,7 @@
       "icon": "chalkboard-teacher",
       "items": [
         { "title": "Teacher List", "icon": "chalkboard-teacher", "link": "teachers.php" },
-        { "title": "Add Teacher", "icon": "user-plus", "link": "add_teacher.php" }
+        { "title": "Add Teacher", "icon": "user-plus", "link": "add_users.php" }
       ],
       "id": "teachers-menu"
     },
