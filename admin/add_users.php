@@ -24,8 +24,8 @@ function ensurePdoConnection($pdo) {
 // Ensure connection before any queries
 $pdo = ensurePdoConnection($pdo);
 
-// Get roles with IDs
-$roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
+// Get roles with IDs (fix: fetch as associative array)
+$roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -46,85 +46,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new Exception("Failed to open uploaded file");
             }
 
-            $pdo->beginTransaction();
-            try {
-                // Skip header
-                fgetcsv($handle);
+            // Remove transaction for bulk import to avoid "server has gone away" on large files
+            // $pdo->beginTransaction();
 
-                $rowNumber = 1; // Start counting from header row
-                $errors = [];
+            // Skip header
+            fgetcsv($handle);
 
-                while (($data = fgetcsv($handle)) !== false) {
-                    $rowNumber++;
-                    $username = trim($data[0] ?? '');
-                    $email = trim($data[1] ?? '');
-                    $roleName = trim($data[2] ?? ''); // Now using role name
+            $rowNumber = 1; // Start counting from header row
+            $errors = [];
+            $imported = 0;
 
-                    // Validate required fields
-                    if (empty($username) || empty($email) || empty($roleName)) {
-                        $errors[] = "Row $rowNumber: Missing required fields (username, email, or role)";
-                        continue;
-                    }
+            while (($data = fgetcsv($handle)) !== false) {
+                $rowNumber++;
+                $username = trim($data[0] ?? '');
+                $email = trim($data[1] ?? '');
+                $roleName = trim($data[2] ?? ''); // Now using role name
 
-                    // Validate email format
-                    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                        $errors[] = "Row $rowNumber: Invalid email format";
-                        continue;
-                    }
-
-                    // Get role ID from role name
-                    $stmt = $pdo->prepare("SELECT id FROM roles WHERE role_name = ?");
-                    $stmt->execute([$roleName]);
-                    $role = $stmt->fetch();
-                    
-                    if (!$role) {
-                        $errors[] = "Row $rowNumber: Role '$roleName' does not exist";
-                        continue;
-                    }
-                    $role_id = (int)$role['id'];
-
-                    // Check for existing users
-                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
-                    $stmt->execute([$username, $email]);
-                    if ($stmt->fetchColumn() > 0) {
-                        $errors[] = "Row $rowNumber: Username or email already exists";
-                        continue;
-                    }
-
-                    // Create user
-                    $temp_password = bin2hex(random_bytes(8));
-                    $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([
-                        $username,
-                        $email,
-                        $role_id,
-                        password_hash($temp_password, PASSWORD_DEFAULT)
-                    ]);
-
-                    // Send email (optional)
-                    $to = $email;
-                    $subject = "Your New Account";
-                    $message = "Dear School CRM Family! As per your request, following are your temporary credentials.\nUsername: $username\nTemporary Password: $temp_password";
-                    $headers = "From: adugna.gizaw@flipperschools.com";
-                    @mail($to, $subject, $message, $headers);
+                // Validate required fields
+                if (empty($username) || empty($email) || empty($roleName)) {
+                    $errors[] = "Row $rowNumber: Missing required fields (username, email, or role)";
+                    continue;
                 }
 
-                $pdo->commit();
-
-                if (!empty($errors)) {
-                    $_SESSION['bulk_import_errors'] = $errors;
-                } else {
-                    $_SESSION['success'] = "Bulk import completed successfully!";
+                // Validate email format
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $errors[] = "Row $rowNumber: Invalid email format";
+                    continue;
                 }
 
-                header("Location: add_users.php");
-                exit();
-            } catch (Exception $e) {
-                $pdo->rollBack();
-                $_SESSION['error'] = "Bulk import failed: " . $e->getMessage();
-            } finally {
-                fclose($handle);
+                // Get role ID from role name (case-insensitive)
+                $stmt = $pdo->prepare("SELECT id FROM roles WHERE LOWER(role_name) = LOWER(?)");
+                $stmt->execute([$roleName]);
+                $role = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$role) {
+                    $errors[] = "Row $rowNumber: Role '$roleName' does not exist";
+                    continue;
+                }
+                $role_id = (int)$role['id'];
+
+                // Check for existing users
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+                $stmt->execute([$username, $email]);
+                if ($stmt->fetchColumn() > 0) {
+                    $errors[] = "Row $rowNumber: Username or email already exists";
+                    continue;
+                }
+
+                // Create user
+                $temp_password = bin2hex(random_bytes(8));
+                $stmt = $pdo->prepare("INSERT INTO users (username, email, role_id, password) VALUES (?, ?, ?, ?)");
+                $stmt->execute([
+                    $username,
+                    $email,
+                    $role_id,
+                    password_hash($temp_password, PASSWORD_DEFAULT)
+                ]);
+                $imported++;
+
+                // Send email (optional)
+                $to = $email;
+                $subject = "Your New Account";
+                $message = "Dear School CRM Family! As per your request, following are your temporary credentials.\nUsername: $username\nTemporary Password: $temp_password";
+                $headers = "From: adugna.gizaw@flipperschools.com";
+                @mail($to, $subject, $message, $headers);
             }
+
+            fclose($handle);
+
+            // $pdo->commit();
+
+            if (!empty($errors)) {
+                $_SESSION['bulk_import_errors'] = $errors;
+            }
+            $_SESSION['success'] = "Bulk import completed. $imported users imported." . (empty($errors) ? "" : " Some rows had errors.");
+
+            header("Location: add_users.php");
+            exit();
         }
 
         if (isset($_POST['create_user'])) {
