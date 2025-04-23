@@ -565,6 +565,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
             filterSections();
         });
     </script>
-    <?php include 'includes/footer.php'; ?>
+    <script src="bulk_import_progress.js"></script>
+    <?php require_once '../includes/footer.php';?>
 </body>
 </html>
