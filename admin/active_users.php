@@ -579,15 +579,19 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
         document.querySelectorAll('#usersTableBody tr').forEach(tr => {
             const editBtn = tr.querySelector('.edit');
             const deleteBtn = tr.querySelector('.delete');
-            if (editBtn) editBtn.onclick = () => makeEditableRow(tr);
-            if (deleteBtn) deleteBtn.onclick = () => deleteRow(tr);
+            if (editBtn) {
+                editBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    makeEditableRow(tr);
+                };
+            }
+            if (deleteBtn) {
+                deleteBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    deleteRow(tr);
+                };
+            }
         });
-    }
-
-    // After AJAX update, re-delegate events
-    function fetchUsersAndDelegate() {
-        fetchUsers();
-        setTimeout(delegateCrud, 350);
     }
 
     // Patch fetchUsers to call delegateCrud after update
@@ -601,7 +605,6 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
     delegateCrud();
 
     // Ensure delegateCrud is called after every AJAX update
-    // Add MutationObserver to handle dynamic table updates
     const observer = new MutationObserver(delegateCrud);
     observer.observe(usersTableBody, { childList: true });
 
