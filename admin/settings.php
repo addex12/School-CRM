@@ -83,17 +83,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    foreach ($_POST['settings'] as $key => $value) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM system_settings WHERE setting_key = ?");
-        $stmt->execute([$key]);
-        $exists = $stmt->fetchColumn();
+    // Only process settings if they exist in POST
+    if (isset($_POST['settings']) && is_array($_POST['settings'])) {
+        foreach ($_POST['settings'] as $key => $value) {
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM system_settings WHERE setting_key = ?");
+            $stmt->execute([$key]);
+            $exists = $stmt->fetchColumn();
 
-        if ($exists) {
-            $stmt = $pdo->prepare("UPDATE system_settings SET setting_value = ? WHERE setting_key = ?");
-            $stmt->execute([$value, $key]);
-        } else {
-            $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value, setting_group) VALUES (?, ?, 'general')");
-            $stmt->execute([$key, $value]);
+            if ($exists) {
+                $stmt = $pdo->prepare("UPDATE system_settings SET setting_value = ? WHERE setting_key = ?");
+                $stmt->execute([$value, $key]);
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value, setting_group) VALUES (?, ?, 'general')");
+                $stmt->execute([$key, $value]);
+            }
         }
     }
 
@@ -118,8 +121,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $_SESSION['success'] = "Settings updated successfully!";
-    header("Location: settings.php");
-    exit();
+    // Prevent header errors by exiting before any output
+    if (!headers_sent()) {
+        header("Location: settings.php");
+        exit();
+    }
 }
 
 // Fetch settings grouped by category
