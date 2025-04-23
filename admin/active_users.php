@@ -73,7 +73,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     require_once '../includes/config.php';
     $search = trim($_GET['search'] ?? '');
     $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
-    $role_id = trim($_GET['role'] ?? '');
+    $role_id = trim($_GET['role_id'] ?? '');
 
     $where = ["u.active = 1"];
     $params = [];
