@@ -354,6 +354,40 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         @media (max-width: 900px) {
             .excel-form-row { flex-direction: column; }
         }
+        .erpnext-btn, .btn, .btn-secondary {
+            display: inline-block;
+            padding: 6px 18px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #222d32;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            cursor: pointer;
+            margin-right: 4px;
+        }
+        .erpnext-btn:hover, .btn:hover, .btn-secondary:hover {
+            background: #e2efda;
+            color: #215967;
+        }
+        .btn-secondary {
+            background: #eaeaea;
+            color: #666;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .btn-success {
+            background: #27ae60;
+            color: #fff;
+        }
+        .btn-sm, .erpnext-btn.btn-sm {
+            padding: 4px 12px;
+            font-size: 13px;
+        }
     </style>
     <script>
     // Dynamically update subject dropdown based on selected student
@@ -381,8 +415,8 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             var classText = student.class_id ? 'Class ID: ' + student.class_id : 'Class: -';
             // Find section name if available
             var sectionName = '-';
-            if (student.class_id && sectionsByClass[student.class_id]) {
-                var secList = sectionsByClass[student.class_id];
+            if (student.class_id && sectionsByClass[String(student.class_id)]) {
+                var secList = sectionsByClass[String(student.class_id)];
                 if (secList.length === 1) {
                     sectionName = secList[0].section_name;
                 }
@@ -392,20 +426,29 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             infoDiv.textContent = '';
         }
 
-        // --- FIX: Always use string keys for mapping ---
+        // --- FIX: Always use string keys for mapping and fallback to empty array ---
         var classLevelId = studentClassLevel[String(studentId)];
-        if (classLevelId && subjectsByLevel[String(classLevelId)]) {
-            subjectsByLevel[String(classLevelId)].forEach(function(subj) {
+        var subjectList = (classLevelId && subjectsByLevel[String(classLevelId)]) ? subjectsByLevel[String(classLevelId)] : [];
+        if (subjectList.length > 0) {
+            subjectList.forEach(function(subj) {
                 var opt = document.createElement('option');
                 opt.value = subj.id;
                 opt.text = subj.subject_name;
                 subjectSelect.appendChild(opt);
             });
+        } else {
+            // If no subjects, show a disabled option
+            var opt = document.createElement('option');
+            opt.value = "";
+            opt.text = "-- No subjects for this class --";
+            opt.disabled = true;
+            subjectSelect.appendChild(opt);
         }
 
         // Populate sections based on student's class_id
-        if (student && student.class_id && sectionsByClass[String(student.class_id)]) {
-            sectionsByClass[String(student.class_id)].forEach(function(sec) {
+        var sectionList = (student && student.class_id && sectionsByClass[String(student.class_id)]) ? sectionsByClass[String(student.class_id)] : [];
+        if (sectionList.length > 0) {
+            sectionList.forEach(function(sec) {
                 var opt = document.createElement('option');
                 opt.value = sec.id;
                 opt.text = sec.section_name;
@@ -449,6 +492,14 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
         document.getElementById('score').addEventListener('input', autoFillGradeLetter);
         updateSubjects();
+        <?php if ($editGrade): ?>
+        setTimeout(function() {
+            document.getElementById('student_id').value = "<?= $editGrade['student_id'] ?>";
+            updateSubjects();
+            document.getElementById('subject_id').value = "<?= $editGrade['subject_id'] ?>";
+            document.getElementById('section_id').value = "<?= $editGrade['section_id'] ?>";
+        }, 100);
+        <?php endif; ?>
     });
     </script>
 </head>
@@ -530,11 +581,11 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="<?= $editGrade ? 'update_grade' : 'add_grade' ?>" class="btn" size="small" style="background:#3498db;color:#fff;margin-top:10px;">
+                        <button type="submit" name="<?= $editGrade ? 'update_grade' : 'add_grade' ?>" class="erpnext-btn btn-sm btn-success" style="margin-top:10px;">
                             <?= $editGrade ? 'Update Grade' : 'Add Grade' ?>
                         </button>
                         <?php if ($editGrade): ?>
-                            <a href="grades.php" class="btn btn-secondary" size="small" style="margin-left:10px;">Cancel</a>
+                            <a href="grades.php" class="erpnext-btn btn-sm btn-secondary" style="margin-left:10px;">Cancel</a>
                         <?php endif; ?>
                     </form>
                     <h2>Grade Reports</h2>
@@ -570,9 +621,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($grade['academic_year']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($grade['created_at'])) ?></td>
                                             <td>
-                                                <a href="grades.php?edit_grade=<?= $grade['id'] ?>" class="btn" size="small">Edit</a>
-                                                <a href="grades.php?delete_grade=<?= $grade['id'] ?>" class="btn"rsize="small" onclick="return confirm('Delete this grade?')">Delete</a>
-                                                <a href="grades.php?export_word=<?= $grade['id'] ?>" class="btn" size="small">Export Word</a>
+                                                <a href="grades.php?edit_grade=<?= $grade['id'] ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                <a href="grades.php?delete_grade=<?= $grade['id'] ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this grade?')">Delete</a>
+                                                <a href="grades.php?export_word=<?= $grade['id'] ?>" class="erpnext-btn btn-sm btn-success">Export Word</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
