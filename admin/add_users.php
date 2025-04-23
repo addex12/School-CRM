@@ -280,7 +280,54 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             background: #f8fafc;
         }
 
-
+        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
+            display: inline-block;
+            padding: 10px 22px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #222d32;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            cursor: pointer;
+            margin-right: 4px;
+        }
+        .erpnext-btn:hover, .btn:hover, .btn-primary:hover, .btn-secondary:hover {
+            background: #e2efda;
+            color: #215967;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-secondary {
+            background: #eaeaea;
+            color: #666;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background: #f3f4f6;
+            border-radius: 6px;
+            margin: 1rem 0;
+            height: 28px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+        }
+        .progress-bar {
+            height: 100%;
+            background: #3b82f6;
+            color: #fff;
+            font-weight: 600;
+            text-align: center;
+            line-height: 28px;
+            border-radius: 6px 0 0 6px;
+            transition: width 0.3s;
+        }
     </style>
 </head>
 <body>
@@ -372,20 +419,22 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         <h2>Bulk Import Users</h2>
                         <div class="file-upload">
                             <p>Download our CSV template to ensure proper formatting:</p>
-                            <a href="download_template.php" class="btn btn-secondary">
+                            <a href="download_template.php" class="erpnext-btn btn-secondary">
                                 Download Template
                             </a>
                         </div>
                         
-                        <form method="POST" enctype="multipart/form-data" class="mt-4">
+                        <form method="POST" enctype="multipart/form-data" class="mt-4" id="bulkImportForm">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             
                             <div class="form-group">
                                 <label>Upload CSV File</label>
-                                <input type="file" name="csv_file" accept=".csv" required>
+                                <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
                             </div>
-                            
-                            <button type="submit" name="bulk_import" class="btn btn-primary">
+                            <div class="progress-bar-container" id="progressContainer" style="display:none;">
+                                <div class="progress-bar" id="progressBar" style="width:0%;">0%</div>
+                            </div>
+                            <button type="submit" name="bulk_import" class="erpnext-btn btn-primary" id="importBtn">
                                 Import Users
                             </button>
                         </form>
@@ -394,5 +443,43 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             </div>
         </div>
     </div>
+<script>
+// Progress bar for bulk import (client-side simulation)
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('bulkImportForm');
+    var progressContainer = document.getElementById('progressContainer');
+    var progressBar = document.getElementById('progressBar');
+    var importBtn = document.getElementById('importBtn');
+    var csvInput = document.getElementById('csv_file');
+
+    if (form && progressContainer && progressBar && importBtn && csvInput) {
+        form.addEventListener('submit', function(e) {
+            if (!csvInput.files.length) return;
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressBar.textContent = '0%';
+            importBtn.disabled = true;
+
+            // Simulate progress (since PHP can't update progress in real time)
+            var fakeProgress = 0;
+            var interval = setInterval(function() {
+                fakeProgress += Math.floor(Math.random() * 15) + 10;
+                if (fakeProgress > 95) fakeProgress = 95;
+                progressBar.style.width = fakeProgress + '%';
+                progressBar.textContent = fakeProgress + '%';
+            }, 200);
+
+            // Let the form submit after a short delay to show progress
+            setTimeout(function() {
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                progressBar.textContent = 'Uploading...';
+                form.submit();
+            }, 1200);
+            e.preventDefault();
+        });
+    }
+});
+</script>
 </body>
 </html>
