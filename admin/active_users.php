@@ -58,6 +58,8 @@ try {
 
 
     $total_online = count($online_users);
+    $total_offline = count($offline_users);
+    
 
     unset($error);
 } catch (PDOException $e) {
@@ -73,7 +75,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     require_once '../includes/config.php';
     $search = trim($_GET['search'] ?? '');
     $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
-    $role_id = trim($_GET['role_id'] ?? '');
+    $role_id = trim($_GET['role'] ?? '');
 
     $where = ["u.active = 1"];
     $params = [];
