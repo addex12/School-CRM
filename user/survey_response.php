@@ -62,19 +62,18 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo->beginTransaction();
-        
+
         // Collect all answers for JSON storage
         $answers = [];
         foreach ($survey_data as $question) {
             $field_id = $question['field_id'];
             $value = $_POST['field_'.$field_id] ?? null;
-            
+
             // Validate required fields
-            if ($question['is_required'] && empty($value)) {
+            if ($question['is_required'] && (empty($value) && $value !== "0")) {
                 throw new Exception("Required question '{$question['field_label']}' was not answered");
             }
-            
-            // Store answer for JSON
+
             $answers[$field_id] = is_array($value) ? $value : (string)$value;
         }
 
@@ -90,33 +89,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             json_encode($answers, JSON_UNESCAPED_UNICODE)
         ]);
         $response_id = $pdo->lastInsertId();
-        
-        // Process individual responses for response_data table
+
+        // Fix: Insert survey_id into response_data for FK constraint
         foreach ($survey_data as $question) {
             $field_id = $question['field_id'];
             $value = $_POST['field_'.$field_id] ?? null;
-            
-            if (!empty($value)) {
+            if (!empty($value) || $value === "0") {
                 $values = is_array($value) ? $value : [$value];
-                
                 foreach ($values as $val) {
-                    if (!empty($val)) {
+                    if ($val !== "" && $val !== null) {
                         $stmt = $pdo->prepare("
                             INSERT INTO response_data 
-                            (response_id, field_id, field_value) 
-                            VALUES (?, ?, ?)
+                            (response_id, survey_id, field_id, field_value) 
+                            VALUES (?, ?, ?, ?)
                         ");
-                        $stmt->execute([$response_id, $field_id, $val]);
+                        $stmt->execute([$response_id, $survey_id, $field_id, $val]);
                     }
                 }
             }
         }
-        
+
         $pdo->commit();
         $_SESSION['success'] = "Thank you for completing the survey!";
         header("Location: survey.php");
         exit();
-        
+
     } catch (Exception $e) {
         $pdo->rollBack();
         error_log("Error saving survey response: " . $e->getMessage());
