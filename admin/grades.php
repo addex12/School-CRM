@@ -459,7 +459,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <div class="dashboard-section" style="max-width:100px;">
+                <div class="dashboard-section" >
                     <h2><?= $editGrade ? 'Edit Grade' : 'Add Grade' ?></h2>
                     <?php if ($error): ?>
                         <div style="color:#e74c3c;"><?= htmlspecialchars($error) ?></div>
