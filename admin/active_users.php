@@ -410,48 +410,46 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
-                        <?php
-                        $has_users = (isset($online_users) && count($online_users) > 0) || (isset($offline_users) && count($offline_users) > 0);
-                        if ($has_users):
-                        ?>
-                            <!-- Online users first -->
-                            <?php foreach ($online_users as $user): ?>
-                            <tr data-id="<?= htmlspecialchars($user['id']) ?>">
-                                <td><?= htmlspecialchars($user['id']) ?></td>
-                                <td class="username"><?= htmlspecialchars($user['username']) ?></td>
-                                <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
-                                <td class="online">
-                                    <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
-                                </td>
-                                <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
-                                <td>
-                                    <button class="crud-btn edit">Edit</button>
-                                    <button class="crud-btn delete">Delete</button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                            <!-- Offline users next -->
-                            <?php foreach ($offline_users as $user): ?>
-                            <tr data-id="<?= htmlspecialchars($user['id']) ?>">
-                                <td><?= htmlspecialchars($user['id']) ?></td>
-                                <td class="username"><?= htmlspecialchars($user['username']) ?></td>
-                                <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
-                                <td class="online">
-                                    <span style="color:#aaa;">Offline</span>
-                                </td>
-                                <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
-                                <td>
-                                    <button class="crud-btn edit">Edit</button>
-                                    <button class="crud-btn delete">Delete</button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="6" class="text-center">No active users found</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
+<?php
+$has_users = (isset($online_users) && count($online_users) > 0) || (isset($offline_users) && count($offline_users) > 0);
+if ($has_users):
+    $all_users = array_merge($online_users, $offline_users);
+    foreach ($all_users as $user):
+?>
+<tr data-id="<?= htmlspecialchars($user['id']) ?>">
+    <td><?= htmlspecialchars($user['id']) ?></td>
+    <td>
+        <input class="crud-editable username" type="text" value="<?= htmlspecialchars($user['username']) ?>">
+    </td>
+    <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
+    <td>
+        <label>
+            <input type="checkbox" class="crud-editable online" <?= !empty($user['online']) ? 'checked' : '' ?>> Online
+        </label>
+    </td>
+    <td>
+        <select class="crud-editable role">
+            <?php foreach ($roles as $id => $name): ?>
+                <option value="<?= htmlspecialchars($id) ?>" <?= $user['role_id'] == $id ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($name) ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </td>
+    <td>
+        <button class="crud-btn save">Save</button>
+        <button class="crud-btn delete">Delete</button>
+    </td>
+</tr>
+<?php
+    endforeach;
+else:
+?>
+<tr>
+    <td colspan="6" class="text-center">No active users found</td>
+</tr>
+<?php endif; ?>
+</tbody>
                 </table>
             </div>
         </div>
@@ -494,75 +492,40 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
     });
 
     // Inline CRUD logic
-    function makeEditableRow(tr) {
+    function saveRow(tr) {
         const id = tr.getAttribute('data-id');
-        const usernameTd = tr.querySelector('.username');
-        const roleTd = tr.querySelector('.role');
-        const onlineTd = tr.querySelector('.online');
-        const actionsTd = tr.querySelector('td:last-child');
-
-        // Save original values
-        const orig = {
-            username: usernameTd.textContent.trim(),
-            role_id: roleTd.getAttribute('data-role-id'),
-            online: /Online/i.test(onlineTd.textContent),
-        };
-
-        // Replace with inputs
-        usernameTd.innerHTML = `<input class="crud-editable" name="username" value="${orig.username}">`;
-        // Role select
-        let roleOptions = `<option value="">Select</option>`;
-        <?php foreach ($roles as $id => $name): ?>
-            roleOptions += `<option value="<?= htmlspecialchars($id) ?>" ${orig.role_id == "<?= htmlspecialchars($id) ?>" ? 'selected' : ''}><?= htmlspecialchars($name) ?></option>`;
-        <?php endforeach; ?>
-        roleTd.innerHTML = `<select class="crud-editable" name="role">${roleOptions}</select>`;
-        // Online checkbox
-        onlineTd.innerHTML = `<label><input type="checkbox" name="online" ${orig.online ? 'checked' : ''}> Online</label>`;
-
-        // Actions: Save/Cancel
-        actionsTd.innerHTML =
-            `<button class="crud-btn save">Save</button>
-             <button class="crud-btn cancel">Cancel</button>`;
-
-        // Save handler
-        actionsTd.querySelector('.save').onclick = function() {
-            const username = usernameTd.querySelector('input').value.trim();
-            const role_id = roleTd.querySelector('select').value;
-            const online = onlineTd.querySelector('input[type="checkbox"]').checked ? 1 : 0;
-            fetch('active_users.php', { // <-- changed from ../api/user_crud.php
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: new URLSearchParams({
-                    ajax: 'update_user', // <-- changed from action: 'update'
-                    id: id,
-                    username: username,
-                    role_id: role_id,
-                    online: online,
-                    active: 1
-                })
-            }).then(res => res.text()).then(resp => {
-                if (resp.trim() === 'success') {
-                    fetchUsers();
-                } else {
-                    alert('Update failed');
-                }
-            });
-        };
-        // Cancel handler
-        actionsTd.querySelector('.cancel').onclick = function() {
-            fetchUsers();
-        };
-    }
-
-    // Delete handler
-    function deleteRow(tr) {
-        const id = tr.getAttribute('data-id');
-        if (!confirm('Are you sure you want to delete this user?')) return;
-        fetch('active_users.php', { // <-- changed from ../api/user_crud.php
+        const username = tr.querySelector('.username').value.trim();
+        const role_id = tr.querySelector('.role').value;
+        const online = tr.querySelector('.online').checked ? 1 : 0;
+        fetch('active_users.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({
-                ajax: 'delete_user', // <-- changed from action: 'delete'
+                ajax: 'update_user',
+                id: id,
+                username: username,
+                role_id: role_id,
+                online: online,
+                active: 1
+            })
+        }).then(res => res.text()).then(resp => {
+            if (resp.trim() === 'success') {
+                fetchUsers();
+            } else {
+                alert('Update failed');
+            }
+        });
+    }
+
+    // Delete handler for Excel-style table
+    function deleteRow(tr) {
+        const id = tr.getAttribute('data-id');
+        if (!confirm('Are you sure you want to delete this user?')) return;
+        fetch('active_users.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                ajax: 'delete_user',
                 id: id
             })
         }).then(res => res.text()).then(resp => {
@@ -574,15 +537,15 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
         });
     }
 
-    // Delegate edit/delete buttons
+    // Delegate save/delete buttons
     function delegateCrud() {
         document.querySelectorAll('#usersTableBody tr').forEach(tr => {
-            const editBtn = tr.querySelector('.edit');
+            const saveBtn = tr.querySelector('.save');
             const deleteBtn = tr.querySelector('.delete');
-            if (editBtn) {
-                editBtn.onclick = function(e) {
+            if (saveBtn) {
+                saveBtn.onclick = function(e) {
                     e.stopPropagation();
-                    makeEditableRow(tr);
+                    saveRow(tr);
                 };
             }
             if (deleteBtn) {
