@@ -32,6 +32,17 @@ try {
     $stmt->execute($params);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Split users into online and offline
+    $online_users = [];
+    $offline_users = [];
+    foreach ($users as $user) {
+        if (!empty($user['online'])) {
+            $online_users[] = $user;
+        } else {
+            $offline_users[] = $user;
+        }
+    }
+
     // For stats
     $total_active = $pdo->query("SELECT COUNT(*) FROM users WHERE active = 1")->fetchColumn();
     $total_online = $pdo->query("SELECT COUNT(*) FROM users WHERE online = 1")->fetchColumn();
@@ -208,18 +219,29 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (isset($users) && is_array($users) && count($users) > 0): ?>
-                            <?php foreach ($users as $user): ?>
+                        <?php
+                        $has_users = (isset($online_users) && count($online_users) > 0) || (isset($offline_users) && count($offline_users) > 0);
+                        if ($has_users):
+                        ?>
+                            <!-- Online users first -->
+                            <?php foreach ($online_users as $user): ?>
                             <tr>
                                 <td><?= htmlspecialchars($user['id']) ?></td>
                                 <td><?= htmlspecialchars($user['username']) ?></td>
                                 <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
                                 <td>
-                                    <?php if (!empty($user['online'])): ?>
-                                        <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
-                                    <?php else: ?>
-                                        <span style="color:#aaa;">Offline</span>
-                                    <?php endif; ?>
+                                    <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <!-- Offline users next -->
+                            <?php foreach ($offline_users as $user): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($user['id']) ?></td>
+                                <td><?= htmlspecialchars($user['username']) ?></td>
+                                <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
+                                <td>
+                                    <span style="color:#aaa;">Offline</span>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
