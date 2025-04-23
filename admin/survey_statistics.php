@@ -6,7 +6,6 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-ob_start();
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -94,94 +93,16 @@ $chart_json = json_encode($chart_data);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= esc($pageTitle) ?> - Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Statistics - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .content { max-width: 1100px; margin: 0 auto; }
-        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
-            display: inline-block;
-            padding: 10px 22px;
-            font-size: 15px;
-            border-radius: 4px;
-            border: none;
-            background: #f5f7fa;
-            color: #215967;
-            font-weight: 600;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
-            cursor: pointer;
-            margin-right: 8px;
-            text-decoration: none;
-        }
-        .btn-primary { background: #3b82f6; color: #fff; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-secondary { background: #eaeaea; color: #666; }
-        .btn-secondary:hover { background: #e2efda; color: #215967; }
-        .admin-header h1 {
-            color: #215967;
-            font-weight: 700;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-        }
-        .filter-section {
-            margin-bottom: 2rem;
-            background: #fff;
-            border-radius: 10px;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-        }
-        .filter-form label {
-            font-weight: 600;
-            color: #215967;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        .filter-form select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            background: #f9fafb;
-            font-size: 1rem;
-        }
-        .survey-summary {
-            background: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e5e7eb;
-        }
-        .survey-summary p {
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
-        .survey-summary strong {
-            color: #4f46e5;
-            font-weight: 600;
-        }
-        .alert {
-            background: #e2efda;
-            color: #215967;
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #b7e4c7;
-            font-size: 1.05rem;
-        }
-        .alert-info {
-            background: #f1f5f9;
-            color: #2563eb;
-            border: 1px solid #c7d2fe;
-        }
         .chart-container {
-            background: #fff;
+            background: white;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 25px;
@@ -190,7 +111,7 @@ $chart_json = json_encode($chart_data);
         }
         .chart-title {
             margin-top: 0;
-            color: #215967;
+            color: #2c3e50;
             font-size: 1.2rem;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
@@ -210,7 +131,7 @@ $chart_json = json_encode($chart_data);
         .legend-item {
             display: flex;
             align-items: center;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
         }
         .legend-color {
             width: 15px;
@@ -219,14 +140,21 @@ $chart_json = json_encode($chart_data);
             margin-right: 5px;
             display: inline-block;
         }
-        @media (max-width: 900px) {
-            .admin-main, .content { padding: 1rem; }
-            .chart-wrapper { height: 220px; }
+        .survey-summary {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
         }
-        @media (max-width: 600px) {
-            .admin-main, .content { padding: 4px; }
-            .chart-title { font-size: 1rem; }
-            .survey-summary, .chart-container, .filter-section { padding: 1rem; }
+        .survey-summary p {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .survey-summary strong {
+            color: #4f46e5;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -235,13 +163,13 @@ $chart_json = json_encode($chart_data);
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><i class="fas fa-chart-pie"></i> {{ pageTitle }}</h1>
+                <h1><i class="fas fa-chart-pie"></i> Survey Statistics</h1>
             </header>
             <div class="content">
                 <div class="filter-section">
                     <form method="GET" class="filter-form">
                         <label for="survey_id">Select Survey</label>
-                        <select name="survey_id" id="survey_id" onchange="this.form.submit()">
+                        <select name="survey_id" id="survey_id" class="form-control" onchange="this.form.submit()">
                             <option value="">-- Select a Survey --</option>
                             <?php foreach ($allSurveys as $surveyOption): ?>
                                 <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($selected_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
@@ -553,7 +481,8 @@ $chart_json = json_encode($chart_data);
             legendContainer.appendChild(ul);
         }
     </script>
-    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
-<?php ob_end_flush(); ?>
+<?php
+ob_end_flush();
+?>
