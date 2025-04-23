@@ -53,11 +53,15 @@ $stmt = $pdo->query("
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Handle CRUD actions for teachers
+// Handle delete teacher (delete from both teachers and users table)
 if (isset($_GET['delete_teacher']) && is_numeric($_GET['delete_teacher'])) {
     $teacher_id = intval($_GET['delete_teacher']);
-    $pdo->prepare("DELETE FROM teachers WHERE id=?")->execute([$teacher_id]);
-    // Optionally, delete user as well (uncomment if needed)
-    // $pdo->prepare("DELETE FROM users WHERE id=(SELECT user_id FROM teachers WHERE id=?)")->execute([$teacher_id]);
+    // Get user_id before deleting
+    $user_id = $pdo->query("SELECT user_id FROM teachers WHERE id=" . $teacher_id)->fetchColumn();
+    if ($user_id) {
+        $pdo->prepare("DELETE FROM teachers WHERE id=?")->execute([$teacher_id]);
+        $pdo->prepare("DELETE FROM users WHERE id=?")->execute([$user_id]);
+    }
     header("Location: teachers.php?msg=Teacher+deleted");
     exit;
 }
@@ -252,7 +256,7 @@ function sort_link($col, $label, $current_sort, $current_order) {
                     <div class="teachers-header">
                         <h2>Teacher List</h2>
                         <div>
-                            <a href="add_teacher.php" class="erpnext-btn btn-sm btn-success"><i class="fas fa-plus"></i> Add Teacher</a>
+                            <a href="add_users.php?role=teacher" class="erpnext-btn btn-sm btn-success"><i class="fas fa-plus"></i> Add Teacher</a>
                             <a href="view_teacher.php" class="erpnext-btn btn-sm btn-secondary"><i class="fas fa-eye"></i> View All</a>
                         </div>
                     </div>
@@ -309,8 +313,8 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                                 <td><?= esc($teacher['status'] ?? '-') ?></td>
                                                 <td><?= esc($teacher['created_at'] ?? '-') ?></td>
                                                 <td>
-                                                    <a href="teachers.php?edit_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
-                                                    <a href="teachers.php?delete_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher?')">Delete</a>
+                                                    <a href="edit_user.php?id=<?= esc($teacher['user_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                    <a href="teachers.php?delete_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher and user?')">Delete</a>
                                                 </td>
                                             </tr>
                                             <?php if (isset($_GET['edit_teacher']) && $_GET['edit_teacher'] == $teacher['teacher_id']): ?>
@@ -355,6 +359,7 @@ function sort_link($col, $label, $current_sort, $current_order) {
                 </div>
             </div>
         </div>
+        </div>d
         <script>
             // Bulk select all checkboxes for teachers
             document.addEventListener('DOMContentLoaded', function() {
@@ -368,7 +373,9 @@ function sort_link($col, $label, $current_sort, $current_order) {
                 if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
             });
         </script>
-        <?php include './includes/footer.php'; ?>
-    </div>
-</body>
-</html>
+        <?php include './includes/footer.php'; ?><?php ob_end_flush(); ?>
+
+
+
+
+</html></body>   
