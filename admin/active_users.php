@@ -163,7 +163,7 @@ try {
                             <tr>
                                 <td><?= htmlspecialchars($user['id']) ?></td>
                                 <td><?= htmlspecialchars($user['username']) ?></td>
-                                <td><?= htmlspecialchars($user['last_active']) ?></td>
+                                <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
