@@ -19,7 +19,7 @@ try {
 
 // All Active Users filter
 $allSearch = trim($_GET['all_search'] ?? '');
-// Remove role filter logic, only show active users
+// Only show active users, correct SQL syntax
 $allConditions = ["status = 'active'"];
 $allParams = [];
 
@@ -32,8 +32,8 @@ if ($allSearch) {
 $allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 try {
-    // All active users
-    $allSql = "SELECT id, username, name, email, last_active, online FROM users $allWhereSql ORDER BY online DESC, username";
+    // Only select id, username, last_active, correct WHERE syntax
+    $allSql = "SELECT id, username, last_active FROM users $allWhereSql ORDER BY username";
     $stmtAll = $pdo->prepare($allSql);
     foreach ($allParams as $key => $val) {
         $stmtAll->bindValue($key, $val);
@@ -167,8 +167,6 @@ try {
                         <tr>
                             <th>ID</th>
                             <th>Username</th>
-                            <th>Name</th>
-                            <th>Email</th>
                             <th>Last Active</th>
                         </tr>
                     </thead>
@@ -177,20 +175,13 @@ try {
                             <?php foreach ($allUsers as $user): ?>
                             <tr>
                                 <td><?= htmlspecialchars($user['id']) ?></td>
-                                <td>
-                                    <?php if (!empty($user['online'])): ?>
-                                        <span class="online-dot"></span>
-                                    <?php endif; ?>
-                                    <?= htmlspecialchars($user['username']) ?>
-                                </td>
-                                <td><?= htmlspecialchars($user['name']) ?></td>
-                                <td><?= htmlspecialchars($user['email']) ?></td>
+                                <td><?= htmlspecialchars($user['username']) ?></td>
                                 <td><?= htmlspecialchars($user['last_active']) ?></td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center">No active users found</td>
+                                <td colspan="3" class="text-center">No active users found</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
