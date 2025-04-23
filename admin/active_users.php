@@ -227,7 +227,7 @@ try {
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-    <script>
+    <script></script>
         // Real-time search/filter (client-side for current page)
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('activeUserSearch');
@@ -254,7 +254,4 @@ try {
     </script>
 </body>
 </html>
-<?php
-ob_end_flush();
-// End of file
-// This file is part of the Admin Panel for a web application.?>
+<?php ob_end_flush(); ?>
