@@ -12,6 +12,16 @@ require_once '../includes/config.php';
 
 $pageTitle = "Teachers";
 
+// Ensure all users with teacher role are in teachers table
+$teacherUsers = $pdo->query("SELECT u.id FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE r.role_name = 'teacher'")->fetchAll(PDO::FETCH_COLUMN);
+foreach ($teacherUsers as $user_id) {
+    $exists = $pdo->prepare("SELECT id FROM teachers WHERE user_id=?");
+    $exists->execute([$user_id]);
+    if (!$exists->fetchColumn()) {
+        $pdo->prepare("INSERT INTO teachers (user_id, status) VALUES (?, 'active')")->execute([$user_id]);
+    }
+}
+
 // Fetch all users with teacher role (role_id = 2 or role_name = 'teacher')
 $stmt = $pdo->query("
     SELECT 

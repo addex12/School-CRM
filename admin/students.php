@@ -5,6 +5,16 @@ require_once '../includes/config.php';
 
 $pageTitle = "Students";
 
+// --- Ensure all users with student role are in students table ---
+$studentUsers = $pdo->query("SELECT u.id FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE r.role_name = 'student'")->fetchAll(PDO::FETCH_COLUMN);
+foreach ($studentUsers as $user_id) {
+    $exists = $pdo->prepare("SELECT id FROM students WHERE user_id=?");
+    $exists->execute([$user_id]);
+    if (!$exists->fetchColumn()) {
+        $pdo->prepare("INSERT INTO students (user_id, status) VALUES (?, 'active')")->execute([$user_id]);
+    }
+}
+
 // Fetch all users with student role (role_id = 4 or role_name = 'student')
 $stmt = $pdo->query("
     SELECT 
@@ -155,10 +165,7 @@ if (isset($_GET['export'])) {
 // Handle CRUD actions for students
 if (isset($_GET['delete_student']) && is_numeric($_GET['delete_student'])) {
     $student_id = intval($_GET['delete_student']);
-    // Delete from students table
     $pdo->prepare("DELETE FROM students WHERE id=?")->execute([$student_id]);
-    // Optionally, delete user as well (uncomment if needed)
-    // $pdo->prepare("DELETE FROM users WHERE id=(SELECT user_id FROM students WHERE id=?)")->execute([$student_id]);
     header("Location: students.php?msg=Student+deleted");
     exit;
 }
@@ -166,10 +173,10 @@ if (isset($_GET['delete_student']) && is_numeric($_GET['delete_student'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_student'])) {
     $student_id = intval($_POST['student_id']);
     $class_id = intval($_POST['class_id']);
-    $section_id = intval($_POST['section_id']);
+    $section_id = $_POST['section_id'] !== "" ? intval($_POST['section_id']) : null;
     $status = trim($_POST['status']);
     $pdo->prepare("UPDATE students SET class_id=?, section_id=?, status=? WHERE id=?")
-        ->execute([$class_id, $section_id ?: null, $status, $student_id]);
+        ->execute([$class_id, $section_id, $status, $student_id]);
     header("Location: students.php?msg=Student+updated");
     exit;
 }
