@@ -393,8 +393,10 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         // Populate subjects based on student's class_level_id
-        if (student && student.class_level_id && subjectsByLevel[student.class_level_id]) {
-            subjectsByLevel[student.class_level_id].forEach(function(subj) {
+        // Fix: Use studentClassLevel mapping to get class_level_id for the selected student
+        var classLevelId = studentClassLevel[studentId];
+        if (classLevelId && subjectsByLevel[classLevelId]) {
+            subjectsByLevel[classLevelId].forEach(function(subj) {
                 var opt = document.createElement('option');
                 opt.value = subj.id;
                 opt.text = subj.subject_name;
@@ -457,7 +459,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="admin-main">
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
+            </header>style="padding: 20px;">
             <div class="content">
                 <div class="dashboard-section" >
                     <h2><?= $editGrade ? 'Edit Grade' : 'Add Grade' ?></h2>
