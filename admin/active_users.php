@@ -151,6 +151,9 @@ try {
                         </span>
                     </div>
                 </div>
+                <?php if (!empty($error)): ?>
+                    <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
                 <form method="get" class="search-bar" id="activeUserSearchForm" style="margin-bottom:1.5rem;">
                     <input type="text" name="search" id="activeUserSearch" placeholder="Search by username..." value="<?= htmlspecialchars($search) ?>">
                     <select name="role" id="roleFilter">
@@ -172,7 +175,7 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($onlineUsers)): ?>
+                        <?php if (isset($onlineUsers) && is_array($onlineUsers) && count($onlineUsers) > 0): ?>
                             <?php foreach ($onlineUsers as $user): ?>
                             <tr>
                                 <td><?= htmlspecialchars($user['id']) ?></td>
@@ -197,7 +200,7 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (!empty($allUsers)): ?>
+                        <?php if (isset($allUsers) && is_array($allUsers) && count($allUsers) > 0): ?>
                             <?php foreach ($allUsers as $user): ?>
                             <tr>
                                 <td><?= htmlspecialchars($user['id']) ?></td>
