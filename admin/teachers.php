@@ -59,6 +59,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_teacher'])) {
     exit;
 }
 
+// --- Bulk assign selected teachers to qualification/subject/other fields ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_selected_teachers'])) {
+    $selected_teachers = $_POST['selected_teachers'] ?? [];
+    $qualification = trim($_POST['bulk_qualification'] ?? '');
+    $subject_specialization = trim($_POST['bulk_subject_specialization'] ?? '');
+    $status = trim($_POST['bulk_status'] ?? '');
+    $assigned = 0;
+    foreach ($selected_teachers as $teacher_id) {
+        $teacher_id = intval($teacher_id);
+        if (!$teacher_id) continue;
+        $fields = [];
+        $params = [];
+        if ($qualification !== '') {
+            $fields[] = "qualification=?";
+            $params[] = $qualification;
+        }
+        if ($subject_specialization !== '') {
+            $fields[] = "subject_specialization=?";
+            $params[] = $subject_specialization;
+        }
+        if ($status !== '') {
+            $fields[] = "status=?";
+            $params[] = $status;
+        }
+        if ($fields) {
+            $params[] = $teacher_id;
+            $pdo->prepare("UPDATE teachers SET " . implode(',', $fields) . " WHERE id=?")->execute($params);
+            $assigned++;
+        }
+    }
+    $bulk_success = "$assigned teachers updated.";
+}
+
 // Helper
 function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
 ?>
@@ -159,6 +192,23 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         @media (max-width: 600px) {
             .excel-table th, .excel-table td { padding: 8px 6px; }
         }
+        .bulk-select-bar {
+            background: #e2efda;
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .bulk-select-bar label {
+            margin: 0 0.5rem 0 0;
+            font-weight: 500;
+            color: #215967;
+        }
+        .bulk-select-bar select, .bulk-select-bar input {
+            min-width: 120px;
+        }
     </style>
 </head>
 <body>
@@ -177,83 +227,118 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                             <a href="view_teacher.php" class="erpnext-btn btn-sm btn-secondary"><i class="fas fa-eye"></i> View All</a>
                         </div>
                     </div>
-                    <div class="table-responsive">
-                        <table class="excel-table">
-                            <thead>
-                                <tr>
-                                    <th>User ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Qualification</th>
-                                    <th>Subject Specialization</th>
-                                    <th>Date of Birth</th>
-                                    <th>Gender</th>
-                                    <th>Address</th>
-                                    <th>Status</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($teachers)): ?>
-                                    <?php foreach ($teachers as $teacher): ?>
-                                        <tr>
-                                            <td><?= esc($teacher['user_id']) ?></td>
-                                            <td><?= esc($teacher['username']) ?></td>
-                                            <td><?= esc($teacher['email']) ?></td>
-                                            <td><?= esc($teacher['qualification'] ?? '-') ?></td>
-                                            <td><?= esc($teacher['subject_specialization'] ?? '-') ?></td>
-                                            <td><?= esc($teacher['date_of_birth'] ?? '-') ?></td>
-                                            <td><?= esc($teacher['gender'] ?? '-') ?></td>
-                                            <td><?= esc($teacher['address'] ?? '-') ?></td>
-                                            <td><?= esc($teacher['status'] ?? '-') ?></td>
-                                            <td><?= esc($teacher['created_at'] ?? '-') ?></td>
-                                            <td>
-                                                <a href="teachers.php?edit_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
-                                                <a href="teachers.php?delete_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher?')">Delete</a>
-                                            </td>
-                                        </tr>
-                                        <?php if (isset($_GET['edit_teacher']) && $_GET['edit_teacher'] == $teacher['teacher_id']): ?>
-                                        <tr>
-                                            <td colspan="11">
-                                                <form method="post" style="display:flex;gap:1rem;align-items:center;">
-                                                    <input type="hidden" name="teacher_id" value="<?= esc($teacher['teacher_id']) ?>">
-                                                    <label>Qualification:
-                                                        <input type="text" name="qualification" value="<?= esc($teacher['qualification']) ?>">
-                                                    </label>
-                                                    <label>Subject Specialization:
-                                                        <input type="text" name="subject_specialization" value="<?= esc($teacher['subject_specialization']) ?>">
-                                                    </label>
-                                                    <label>Date of Birth:
-                                                        <input type="date" name="date_of_birth" value="<?= esc($teacher['date_of_birth']) ?>">
-                                                    </label>
-                                                    <label>Gender:
-                                                        <input type="text" name="gender" value="<?= esc($teacher['gender']) ?>">
-                                                    </label>
-                                                    <label>Address:
-                                                        <input type="text" name="address" value="<?= esc($teacher['address']) ?>">
-                                                    </label>
-                                                    <label>Status:
-                                                        <input type="text" name="status" value="<?= esc($teacher['status']) ?>">
-                                                    </label>
-                                                    <button type="submit" name="edit_teacher" class="erpnext-btn btn-sm btn-success">Save</button>
-                                                    <a href="teachers.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                    <!-- Bulk selection bar -->
+                    <form method="post" id="bulkAssignTeachersForm">
+                        <div class="bulk-select-bar">
+                            <label><input type="checkbox" id="select_all_teachers"> Select All</label>
+                            <label>Qualification:
+                                <input type="text" name="bulk_qualification" placeholder="Qualification">
+                            </label>
+                            <label>Subject Specialization:
+                                <input type="text" name="bulk_subject_specialization" placeholder="Subject Specialization">
+                            </label>
+                            <label>Status:
+                                <select name="bulk_status">
+                                    <option value="">-- Status --</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </label>
+                            <button type="submit" name="bulk_assign_selected_teachers" class="erpnext-btn btn-sm btn-success">Update Selected</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="excel-table">
+                                <thead>
                                     <tr>
-                                        <td colspan="11">No teachers found.</td>
+                                        <th><input type="checkbox" id="select_all_teachers_head"></th>
+                                        <th>User ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Qualification</th>
+                                        <th>Subject Specialization</th>
+                                        <th>Date of Birth</th>
+                                        <th>Gender</th>
+                                        <th>Address</th>
+                                        <th>Status</th>
+                                        <th>Created At</th>
+                                        <th>Actions</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($teachers)): ?>
+                                        <?php foreach ($teachers as $teacher): ?>
+                                            <tr>
+                                                <td><input type="checkbox" name="selected_teachers[]" value="<?= esc($teacher['teacher_id']) ?>" class="teacher-checkbox"></td>
+                                                <td><?= esc($teacher['user_id']) ?></td>
+                                                <td><?= esc($teacher['username']) ?></td>
+                                                <td><?= esc($teacher['email']) ?></td>
+                                                <td><?= esc($teacher['qualification'] ?? '-') ?></td>
+                                                <td><?= esc($teacher['subject_specialization'] ?? '-') ?></td>
+                                                <td><?= esc($teacher['date_of_birth'] ?? '-') ?></td>
+                                                <td><?= esc($teacher['gender'] ?? '-') ?></td>
+                                                <td><?= esc($teacher['address'] ?? '-') ?></td>
+                                                <td><?= esc($teacher['status'] ?? '-') ?></td>
+                                                <td><?= esc($teacher['created_at'] ?? '-') ?></td>
+                                                <td>
+                                                    <a href="teachers.php?edit_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                    <a href="teachers.php?delete_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher?')">Delete</a>
+                                                </td>
+                                            </tr>
+                                            <?php if (isset($_GET['edit_teacher']) && $_GET['edit_teacher'] == $teacher['teacher_id']): ?>
+                                            <tr>
+                                                <td colspan="12">
+                                                    <form method="post" style="display:flex;gap:1rem;align-items:center;">
+                                                        <input type="hidden" name="teacher_id" value="<?= esc($teacher['teacher_id']) ?>">
+                                                        <label>Qualification:
+                                                            <input type="text" name="qualification" value="<?= esc($teacher['qualification']) ?>">
+                                                        </label>
+                                                        <label>Subject Specialization:
+                                                            <input type="text" name="subject_specialization" value="<?= esc($teacher['subject_specialization']) ?>">
+                                                        </label>
+                                                        <label>Date of Birth:
+                                                            <input type="date" name="date_of_birth" value="<?= esc($teacher['date_of_birth']) ?>">
+                                                        </label>
+                                                        <label>Gender:
+                                                            <input type="text" name="gender" value="<?= esc($teacher['gender']) ?>">
+                                                        </label>
+                                                        <label>Address:
+                                                            <input type="text" name="address" value="<?= esc($teacher['address']) ?>">
+                                                        </label>
+                                                        <label>Status:
+                                                            <input type="text" name="status" value="<?= esc($teacher['status']) ?>">
+                                                        </label>
+                                                        <button type="submit" name="edit_teacher" class="erpnext-btn btn-sm btn-success">Save</button>
+                                                        <a href="teachers.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="12">No teachers found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+        <script>
+            // Bulk select all checkboxes for teachers
+            document.addEventListener('DOMContentLoaded', function() {
+                const selectAll = document.getElementById('select_all_teachers');
+                const selectAllHead = document.getElementById('select_all_teachers_head');
+                const checkboxes = document.querySelectorAll('.teacher-checkbox');
+                function toggleAll(checked) {
+                    checkboxes.forEach(cb => cb.checked = checked);
+                }
+                if (selectAll) selectAll.addEventListener('change', e => toggleAll(e.target.checked));
+                if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
+            });
+        </script>
         <?php include 'includes/footer.php'; ?>
     </div>
 </body>
