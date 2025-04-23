@@ -5,6 +5,25 @@ requireAdmin();
 
 $pageTitle = "Add User";
 
+// Reconnect to MySQL if "server has gone away"
+function ensurePdoConnection($pdo) {
+    try {
+        $pdo->query('SELECT 1');
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'server has gone away') !== false) {
+            // Reconnect logic
+            require_once '../includes/config.php';
+            return $pdo; // $pdo is re-initialized in config.php
+        } else {
+            throw $e;
+        }
+    }
+    return $pdo;
+}
+
+// Ensure connection before any queries
+$pdo = ensurePdoConnection($pdo);
+
 // Get roles with IDs
 $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll();
 
