@@ -1,57 +1,71 @@
 <?php
 ob_start();
+session_start();
+
 // Error reporting (remove in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // Include required files
-require_once '../includes/config.php';
-require_once '../includes/auth.php';
+require '../includes/db.php';
+require '../includes/auth.php';
+require '../includes/config.php';
+
+// Verify admin access
 requireAdmin();
 
 $pageTitle = "Active Users";
 
-// Place this block here, after DB connection is established
-$allSearch = isset($_GET['all_search']) ? trim($_GET['all_search']) : '';
-$allConditions = ["status = 'active'"];
-$allParams = [];
-if ($allSearch) {
-    $allConditions[] = "(username LIKE :search_username OR name LIKE :search_name OR email LIKE :search_email)";
-    $allParams[':search_username'] = '%' . $allSearch . '%';
-    $allParams[':search_name'] = '%' . $allSearch . '%';
-    $allParams[':search_email'] = '%' . $allSearch . '%';
-}
-$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
-
-// Fetch all roles for filter dropdown (do this first, always)
-try {
-    $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
-} catch (PDOException $e) {
-    $roles = [];
-}
+// Get search term if exists
+$searchTerm = isset($_GET['all_search']) ? trim($_GET['all_search']) : '';
 
 try {
-    // Only select id, username, last_active, correct WHERE syntax
-    $allSql = "SELECT id, username, last_active FROM users $allWhereSql ORDER BY username";
-    // Debug: log the SQL and params before preparing/executing
-    error_log("SQL: " . $allSql);
-    error_log("PARAMS: " . print_r($allParams, true));
-    $stmtAll = $pdo->prepare($allSql);
-    // Fix: Only bind if $allParams is not empty
-    if (!empty($allParams)) {
-        foreach ($allParams as $key => $val) {
-            $stmtAll->bindValue($key, $val);
-        }
+    // Get active users (last 15 minutes)
+    $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
+    
+    // Base query
+    $sql = "
+        SELECT u.id, u.username, u.email, u.last_activity, 
+               COALESCE(r.role_name, 'No Role') as role_name 
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE u.last_activity >= :threshold
+    ";
+    
+    // Add search conditions if search term exists
+    $params = [':threshold' => $activeThreshold];
+    
+    if (!empty($searchTerm)) {
+        $sql .= " AND (u.username LIKE :search OR u.email LIKE :search)";
+        $params[':search'] = '%' . $searchTerm . '%';
     }
-    $stmtAll->execute();
-    $allUsers = $stmtAll->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Complete the query with ordering
+    $sql .= " ORDER BY u.last_activity DESC";
+    
+    $stmt = $pdo->prepare($sql);
+    
+    // Bind parameters
+    foreach ($params as $key => &$val) {
+        $stmt->bindParam($key, $val);
+    }
+    
+    $stmt->execute();
+    
+    $activeUsers = $stmt->fetchAll();
 
-    unset($error);
+    // Format last activity time
+    foreach ($activeUsers as &$user) {
+        $user['last_active'] = date('M j, Y g:i A', strtotime($user['last_activity']));
+    }
+    unset($user);
+
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
-    $allUsers = [];
+} catch (Exception $e) {
+    error_log("Application Error: " . $e->getMessage());
+    $error = "An error occurred: " . $e->getMessage();
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -121,28 +135,31 @@ try {
             color: #4CAF50;
             font-weight: 500;
         }
-        .online-dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background: #27ae60;
-            border-radius: 50%;
-            margin-right: 7px;
+        .search-container {
+            margin-bottom: 20px;
         }
-        .online-user-pill {
-            display: inline-block;
-            background: #27ae60;
-            color: #fff;
-            border-radius: 1em;
-            padding: 0.2em 0.9em;
-            font-size: 0.97em;
-            margin-right: 0.4em;
+        .search-input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+        }
+        .search-btn {
+            padding: 8px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 5px;
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+       
+    <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+
         <div class="admin-main">
             <div class="active-users-container">
                 <div class="active-users-header">
@@ -153,72 +170,61 @@ try {
                         </button>
                         <span class="active-count">
                             <i class="fas fa-circle"></i>
-                            <?= count($allUsers ?? []) ?> active
+                            <?= count($activeUsers ?? []) ?> active now
                         </span>
                     </div>
                 </div>
-                <?php if (!empty($error)): ?>
-                    <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
-                <?php endif; ?>
 
-                <form method="get" class="search-bar" id="allUserSearchForm" style="margin-bottom:1.5rem;">
-                    <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username, name, or email..." value="<?= htmlspecialchars($allSearch ?? '') ?>">
-                    <!-- Remove role filter dropdown -->
-                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
-                    <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
-                </form>
-                <table class="users-table" id="allUsersTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Last Active</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (isset($allUsers) && is_array($allUsers) && count($allUsers) > 0): ?>
-                            <?php foreach ($allUsers as $user): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($user['id']) ?></td>
-                                <td><?= htmlspecialchars($user['username']) ?></td>
-                                <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="3" class="text-center">No active users found</td>
-                            </tr>
+                <!-- Add search form -->
+                <div class="search-container">
+                    <form method="GET" action="">
+                        <input type="text" name="all_search" class="search-input" placeholder="Search by username or email..." value="<?= htmlspecialchars($searchTerm) ?>">
+                        <button type="submit" class="search-btn">Search</button>
+                        <?php if (!empty($searchTerm)): ?>
+                            <a href="?" class="search-btn">Clear</a>
                         <?php endif; ?>
-                    </tbody>
-                </table>
+                    </form>
+                </div>
+
+                <?php if (isset($error)): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                <?php else: ?>
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Last Active</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($activeUsers)): ?>
+                                <?php foreach ($activeUsers as $user): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($user['id']) ?></td>
+                                    <td><?= htmlspecialchars($user['username']) ?></td>
+                                    <td><?= htmlspecialchars($user['email']) ?></td>
+                                    <td><?= htmlspecialchars($user['role_name']) ?></td>
+                                    <td><?= htmlspecialchars($user['last_active']) ?></td>
+                                    <td class="status-active">Active</td>
+                                </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="6" class="text-center">No active users found</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                <?php endif; ?>
             </div>
         </div>
+        
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-    <script>
-        // Real-time search/filter (client-side for current page)
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('activeUserSearch');
-            const roleFilter = document.getElementById('roleFilter');
-            function filterTables() {
-                const val = searchInput.value.toLowerCase();
-                const role = roleFilter.value;
-                ['onlineUsersTable', 'allUsersTable'].forEach(function(tableId) {
-                    const tbody = document.getElementById(tableId).querySelector('tbody');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    rows.forEach(function(row) {
-                        const cells = row.querySelectorAll('td');
-                        if (!cells.length) return;
-                        const username = cells[1].textContent.toLowerCase();
-                        const match = (!val || username.includes(val));
-                        row.style.display = match ? '' : 'none';
-                    });
-                });
-            }
-            searchInput.addEventListener('input', filterTables);
-            roleFilter.addEventListener('change', filterTables);
-        });
-    </script>
 </body>
 </html>
 <?php ob_end_flush(); ?>
