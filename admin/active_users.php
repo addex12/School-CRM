@@ -28,8 +28,10 @@ if ($allRoleFilter) {
     $allParams[':all_role'] = $allRoleFilter;
 }
 if ($allSearch) {
-    $allConditions[] = "(username LIKE :all_search OR name LIKE :all_search OR email LIKE :all_search)";
-    $allParams[':all_search'] = '%' . $allSearch . '%';
+    $allConditions[] = "(username LIKE :search_username OR name LIKE :search_name OR email LIKE :search_email)";
+    $allParams[':search_username'] = '%' . $allSearch . '%';
+    $allParams[':search_name'] = '%' . $allSearch . '%';
+    $allParams[':search_email'] = '%' . $allSearch . '%';
 }
 $allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
