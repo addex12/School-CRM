@@ -104,6 +104,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
     }
 }
 
+// --- Bulk assign selected students to class/section ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_selected'])) {
+    $selected_students = $_POST['selected_students'] ?? [];
+    $class_id = intval($_POST['bulk_class_id'] ?? 0);
+    $section_id = intval($_POST['bulk_section_id'] ?? 0);
+    $assigned = 0; $errors = [];
+    foreach ($selected_students as $student_id) {
+        $student_id = intval($student_id);
+        if (!$student_id || !$class_id) continue;
+        $pdo->prepare("UPDATE students SET class_id=? WHERE id=?")->execute([$class_id, $student_id]);
+        if ($section_id) {
+            // Remove from all batches
+            $pdo->prepare("DELETE FROM enrollments WHERE student_id=?")->execute([$student_id]);
+            // Find or create batch
+            $batch = $pdo->prepare("SELECT id FROM batches WHERE class_id=? AND section_id=?");
+            $batch->execute([$class_id, $section_id]);
+            $batch_id = $batch->fetchColumn();
+            if (!$batch_id) {
+                $program_id = $pdo->query("SELECT id FROM programs LIMIT 1")->fetchColumn();
+                if (!$program_id) {
+                    $pdo->prepare("INSERT INTO programs (name) VALUES ('Default Program')")->execute();
+                    $program_id = $pdo->lastInsertId();
+                }
+                $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (?, ?, ?, ?)")
+                    ->execute([$program_id, $class_id, $section_id, "Class $class_id - Section $section_id"]);
+                $batch_id = $pdo->lastInsertId();
+            }
+            // Enroll student in batch
+            $exists = $pdo->prepare("SELECT id FROM enrollments WHERE student_id=? AND batch_id=?");
+            $exists->execute([$student_id, $batch_id]);
+            if (!$exists->fetch()) {
+                $pdo->prepare("INSERT INTO enrollments (student_id, batch_id) VALUES (?,?)")->execute([$student_id, $batch_id]);
+            }
+        }
+        $assigned++;
+    }
+    $bulk_success = "$assigned students assigned to class" . ($section_id ? " and section" : "") . ".";
+}
+
 // Handle single assign (form below)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_single'])) {
     $student_id = intval($_POST['student_id'] ?? 0);
@@ -295,6 +334,23 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         @media (max-width: 600px) {
             .excel-table th, .excel-table td { padding: 8px 6px; }
         }
+        .bulk-select-bar {
+            background: #e2efda;
+            border-radius: 6px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .bulk-select-bar label {
+            margin: 0 0.5rem 0 0;
+            font-weight: 500;
+            color: #215967;
+        }
+        .bulk-select-bar select {
+            min-width: 120px;
+        }
     </style>
 </head>
 <body>
@@ -358,79 +414,136 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                     <div class="students-header">
                         <h2>Student List</h2>
                     </div>
-                    <div class="table-responsive">
-                        <table class="excel-table">
-                            <thead>
-                                <tr>
-                                    <th>User ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Class</th>
-                                    <th>Section</th>
-                                    <th>Status</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($students)): ?>
-                                    <?php foreach ($students as $s): ?>
-                                        <tr>
-                                            <td><?= esc($s['user_id']) ?></td>
-                                            <td><?= esc($s['username']) ?></td>
-                                            <td><?= esc($s['email']) ?></td>
-                                            <td><?= esc($s['class_name'] ?? '-') ?></td>
-                                            <td><?= esc($s['section_name'] ?? '-') ?></td>
-                                            <td><?= esc($s['status'] ?? '-') ?></td>
-                                            <td><?= esc($s['created_at'] ?? '-') ?></td>
-                                            <td>
-                                                <a href="students.php?edit_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
-                                                <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
-                                            </td>
-                                        </tr>
-                                        <?php if (isset($_GET['edit_student']) && $_GET['edit_student'] == $s['student_id']): ?>
-                                        <tr>
-                                            <td colspan="8">
-                                                <form method="post" style="display:flex;gap:1rem;align-items:center;">
-                                                    <input type="hidden" name="student_id" value="<?= esc($s['student_id']) ?>">
-                                                    <label>Class:
-                                                        <select name="class_id" required>
-                                                            <?php foreach ($classes as $c): ?>
-                                                                <option value="<?= esc($c['id']) ?>" <?= ($s['class_id'] == $c['id']) ? 'selected' : '' ?>><?= esc($c['class_name']) ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </label>
-                                                    <label>Section:
-                                                        <select name="section_id">
-                                                            <option value="">Select Section</option>
-                                                            <?php foreach ($sections as $sec): ?>
-                                                                <option value="<?= esc($sec['id']) ?>" <?= ($s['section_id'] == $sec['id']) ? 'selected' : '' ?>><?= esc($sec['section_name']) ?></option>
-                                                            <?php endforeach; ?>
-                                                        </select>
-                                                    </label>
-                                                    <label>Status:
-                                                        <input type="text" name="status" value="<?= esc($s['status']) ?>">
-                                                    </label>
-                                                    <button type="submit" name="edit_student" class="erpnext-btn btn-sm btn-success">Save</button>
-                                                    <a href="students.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        <?php endif; ?>
+                    <!-- Bulk selection bar -->
+                    <form method="post" id="bulkAssignForm">
+                        <div class="bulk-select-bar">
+                            <label><input type="checkbox" id="select_all_students"> Select All</label>
+                            <label>Class:
+                                <select name="bulk_class_id" required>
+                                    <option value="">Select Class</option>
+                                    <?php foreach ($classes as $c): ?>
+                                        <option value="<?= esc($c['id']) ?>"><?= esc($c['class_name']) ?></option>
                                     <?php endforeach; ?>
-                                <?php else: ?>
+                                </select>
+                            </label>
+                            <label>Section (optional):
+                                <select name="bulk_section_id">
+                                    <option value="">Select Section</option>
+                                    <?php foreach ($sections as $sec): ?>
+                                        <option value="<?= esc($sec['id']) ?>" data-class="<?= esc($sec['class_id']) ?>"><?= esc($sec['section_name']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                            <button type="submit" name="bulk_assign_selected" class="erpnext-btn btn-sm btn-success">Assign Selected</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="excel-table">
+                                <thead>
                                     <tr>
-                                        <td colspan="8">No students found.</td>
+                                        <th><input type="checkbox" id="select_all_students_head"></th>
+                                        <th>User ID</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Class</th>
+                                        <th>Section</th>
+                                        <th>Status</th>
+                                        <th>Created At</th>
+                                        <th>Actions</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($students)): ?>
+                                        <?php foreach ($students as $s): ?>
+                                            <tr>
+                                                <td><input type="checkbox" name="selected_students[]" value="<?= esc($s['student_id']) ?>" class="student-checkbox"></td>
+                                                <td><?= esc($s['user_id']) ?></td>
+                                                <td><?= esc($s['username']) ?></td>
+                                                <td><?= esc($s['email']) ?></td>
+                                                <td><?= esc($s['class_name'] ?? '-') ?></td>
+                                                <td><?= esc($s['section_name'] ?? '-') ?></td>
+                                                <td><?= esc($s['status'] ?? '-') ?></td>
+                                                <td><?= esc($s['created_at'] ?? '-') ?></td>
+                                                <td>
+                                                    <a href="students.php?edit_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                    <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
+                                                </td>
+                                            </tr>
+                                            <?php if (isset($_GET['edit_student']) && $_GET['edit_student'] == $s['student_id']): ?>
+                                            <tr>
+                                                <td colspan="9">
+                                                    <form method="post" style="display:flex;gap:1rem;align-items:center;">
+                                                        <input type="hidden" name="student_id" value="<?= esc($s['student_id']) ?>">
+                                                        <label>Class:
+                                                            <select name="class_id" required>
+                                                                <?php foreach ($classes as $c): ?>
+                                                                    <option value="<?= esc($c['id']) ?>" <?= ($s['class_id'] == $c['id']) ? 'selected' : '' ?>><?= esc($c['class_name']) ?></option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </label>
+                                                        <label>Section:
+                                                            <select name="section_id">
+                                                                <option value="">Select Section</option>
+                                                                <?php foreach ($sections as $sec): ?>
+                                                                    <option value="<?= esc($sec['id']) ?>" <?= ($s['section_id'] == $sec['id']) ? 'selected' : '' ?>><?= esc($sec['section_name']) ?></option>
+                                                                <?php endforeach; ?>
+                                                            </select>
+                                                        </label>
+                                                        <label>Status:
+                                                            <input type="text" name="status" value="<?= esc($s['status']) ?>">
+                                                        </label>
+                                                        <button type="submit" name="edit_student" class="erpnext-btn btn-sm btn-success">Save</button>
+                                                        <a href="students.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="9">No students found.</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
     <script>
+        // Bulk select all checkboxes
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('select_all_students');
+            const selectAllHead = document.getElementById('select_all_students_head');
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            function toggleAll(checked) {
+                checkboxes.forEach(cb => cb.checked = checked);
+            }
+            if (selectAll) selectAll.addEventListener('change', e => toggleAll(e.target.checked));
+            if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
+        });
+
+        // Filter sections based on selected class (for bulk assign bar)
+        document.addEventListener('DOMContentLoaded', function() {
+            const classSelect = document.querySelector('select[name="bulk_class_id"]');
+            const sectionSelect = document.querySelector('select[name="bulk_section_id"]');
+            if (classSelect && sectionSelect) {
+                const allOptions = Array.from(sectionSelect.options);
+                function filterSections() {
+                    const classId = classSelect.value;
+                    sectionSelect.innerHTML = '';
+                    allOptions.forEach(opt => {
+                        if (!opt.value || !classId || opt.getAttribute('data-class') === classId) {
+                            sectionSelect.appendChild(opt.cloneNode(true));
+                        }
+                    });
+                }
+                classSelect.addEventListener('change', filterSections);
+                filterSections();
+            }
+        });
+
         // Filter sections based on selected class
         document.addEventListener('DOMContentLoaded', function() {
             const classSelect = document.getElementById('class_id_select');
