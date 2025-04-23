@@ -19,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $start = $_POST['year_start'];
         $end = $_POST['year_end'];
         if ($name && $start && $end) {
-            $stmt = $pdo->prepare("INSERT INTO academic_years (name, start_date, end_date) VALUES (?, ?, ?)");
+            // Changed 'name' to 'year_name'
+            $stmt = $pdo->prepare("INSERT INTO academic_years (year_name, start_date, end_date) VALUES (?, ?, ?)");
             $stmt->execute([$name, $start, $end]);
             $success = "Academic Year added!";
         }
@@ -31,8 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $start = $_POST['year_start'];
         $end = $_POST['year_end'];
         if ($id && $name && $start && $end) {
-            // Use correct column names: name, start_date, end_date
-            $stmt = $pdo->prepare("UPDATE academic_years SET name=?, start_date=?, end_date=? WHERE id=?");
+            // Changed 'name' to 'year_name'
+            $stmt = $pdo->prepare("UPDATE academic_years SET year_name=?, start_date=?, end_date=? WHERE id=?");
             $stmt->execute([$name, $start, $end, $id]);
             $success = "Academic Year updated!";
         }
@@ -169,11 +170,12 @@ $users = $pdo->query("SELECT id, username, email, active FROM users")->fetchAll(
 $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch Academic Years and Terms
+// Changed 'name' to 'year_name'
 $years = $pdo->query("SELECT * FROM academic_years ORDER BY start_date DESC")->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch Academic Terms with Academic Year info
 $terms = $pdo->query("
-    SELECT t.*, y.name AS year_name
+    SELECT t.*, y.year_name AS year_name
     FROM academic_terms t
     LEFT JOIN academic_years y ON t.academic_year_id = y.id
     ORDER BY t.start_date DESC
@@ -464,7 +466,8 @@ $terms = $pdo->query("
                                             <tr>
                                                 <form method="post">
                                                     <td>
-                                                        <input type="text" name="year_name" value="<?= htmlspecialchars($year['name']) ?>" required>
+                                                        <!-- Changed 'name' to 'year_name' -->
+                                                        <input type="text" name="year_name" value="<?= htmlspecialchars($year['year_name']) ?>" required>
                                                         <input type="hidden" name="year_id" value="<?= $year['id'] ?>">
                                                     </td>
                                                     <td><input type="date" name="year_start" value="<?= $year['start_date'] ?>" required></td>
@@ -489,7 +492,8 @@ $terms = $pdo->query("
                                     <select name="term_year_id" required>
                                         <option value="">Select Year</option>
                                         <?php foreach ($years as $year): ?>
-                                            <option value="<?= $year['id'] ?>"><?= htmlspecialchars($year['name'] ?? '') ?></option>
+                                            <!-- Changed 'name' to 'year_name' -->
+                                            <option value="<?= $year['id'] ?>"><?= htmlspecialchars($year['year_name'] ?? '') ?></option>
                                         <?php endforeach; ?>
                                     </select>
                                     <input type="text" name="term_name" placeholder="Term Name (e.g. Term 1)" required>
@@ -518,8 +522,9 @@ $terms = $pdo->query("
                                                     <td>
                                                         <select name="term_year_id" required>
                                                             <?php foreach ($years as $year): ?>
+                                                                <!-- Changed 'name' to 'year_name' -->
                                                                 <option value="<?= $year['id'] ?>" <?= $year['id'] == $term['academic_year_id'] ? 'selected' : '' ?>>
-                                                                    <?= htmlspecialchars($year['name'] ?? '') ?>
+                                                                    <?= htmlspecialchars($year['year_name'] ?? '') ?>
                                                                 </option>
                                                             <?php endforeach; ?>
                                                         </select>
