@@ -46,7 +46,6 @@
       "icon": "envelope",
       "items": [
         { "title": "Messages", "icon": "envelope", "link": "messages.php" },
-        { "title": "Chat", "icon": "comments", "link": "chat.php" },
         { "title": "Announcements", "icon": "bullhorn", "link": "announcements.php" }
       ],
       "id": "communications-menu"
