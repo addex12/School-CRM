@@ -226,7 +226,18 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     function updateSubjects() {
         var studentId = document.getElementById('student_id').value;
         var subjectSelect = document.getElementById('subject_id');
+        var sectionSelect = document.getElementById('section_id');
         subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+        sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
+
+        // Detect student's class and section, and show as info (optional)
+        var student = students.find(function(s) { return s.id == studentId; });
+        if (student) {
+            // Optionally, display class/section info somewhere
+            // Example: document.getElementById('student_class_info').textContent = 'Class: ' + (student.class_id || '-') + ', Section: ' + (student.section_id || '-');
+        }
+
+        // Populate subjects based on student's class_level_id
         if (studentId && studentClassLevel[studentId] && subjectsByLevel[studentClassLevel[studentId]]) {
             subjectsByLevel[studentClassLevel[studentId]].forEach(function(subj) {
                 var opt = document.createElement('option');
@@ -235,14 +246,8 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 subjectSelect.appendChild(opt);
             });
         }
-        updateSections();
-    }
 
-    function updateSections() {
-        var studentId = document.getElementById('student_id').value;
-        var sectionSelect = document.getElementById('section_id');
-        sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
-        var student = students.find(function(s) { return s.id == studentId; });
+        // Populate sections based on student's class_id
         if (student && student.class_id && sectionsByClass[student.class_id]) {
             sectionsByClass[student.class_id].forEach(function(sec) {
                 var opt = document.createElement('option');
@@ -275,6 +280,16 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         if (!found) gradeLetterInput.value = '';
     }
+
+    // Initialize subject and section dropdowns on page load if editing
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSubjects();
+    });
+    document.getElementById('student_id').addEventListener('change', function() {
+        updateSubjects();
+        autoFillGradeLetter();
+    });
+    document.getElementById('score').addEventListener('input', autoFillGradeLetter);
     </script>
 </head>
 <body>
@@ -443,7 +458,72 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php include 'includes/footer.php'; ?>
 
     <script>
-    // Initialize subject dropdown on page load if editing
+    // Dynamically update subject dropdown based on selected student
+    var subjectsByLevel = <?= json_encode($subjectsByLevel) ?>;
+    var studentClassLevel = <?= json_encode($studentClassLevel) ?>;
+    var gradingScalesByLevel = <?= json_encode($gradingScalesByLevel) ?>;
+    var sectionsByClass = <?= json_encode($sectionsByClass) ?>;
+    var students = <?= json_encode($students) ?>;
+
+    function updateSubjects() {
+        var studentId = document.getElementById('student_id').value;
+        var subjectSelect = document.getElementById('subject_id');
+        var sectionSelect = document.getElementById('section_id');
+        subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
+        sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
+
+        // Detect student's class and section, and show as info (optional)
+        var student = students.find(function(s) { return s.id == studentId; });
+        if (student) {
+            // Optionally, display class/section info somewhere
+            // Example: document.getElementById('student_class_info').textContent = 'Class: ' + (student.class_id || '-') + ', Section: ' + (student.section_id || '-');
+        }
+
+        // Populate subjects based on student's class_level_id
+        if (studentId && studentClassLevel[studentId] && subjectsByLevel[studentClassLevel[studentId]]) {
+            subjectsByLevel[studentClassLevel[studentId]].forEach(function(subj) {
+                var opt = document.createElement('option');
+                opt.value = subj.id;
+                opt.text = subj.subject_name;
+                subjectSelect.appendChild(opt);
+            });
+        }
+
+        // Populate sections based on student's class_id
+        if (student && student.class_id && sectionsByClass[student.class_id]) {
+            sectionsByClass[student.class_id].forEach(function(sec) {
+                var opt = document.createElement('option');
+                opt.value = sec.id;
+                opt.text = sec.section_name;
+                sectionSelect.appendChild(opt);
+            });
+        }
+    }
+
+    function autoFillGradeLetter() {
+        var studentId = document.getElementById('student_id').value;
+        var score = parseFloat(document.getElementById('score').value);
+        var gradeLetterInput = document.getElementById('grade_letter');
+        if (!studentId || isNaN(score)) {
+            gradeLetterInput.value = '';
+            return;
+        }
+        var classLevelId = studentClassLevel[studentId];
+        var scales = gradingScalesByLevel[classLevelId] || [];
+        var found = false;
+        for (var i = 0; i < scales.length; i++) {
+            var min = parseFloat(scales[i].min_score);
+            var max = parseFloat(scales[i].max_score);
+            if (score >= min && score <= max) {
+                gradeLetterInput.value = scales[i].grade_letter;
+                found = true;
+                break;
+            }
+        }
+        if (!found) gradeLetterInput.value = '';
+    }
+
+    // Initialize subject and section dropdowns on page load if editing
     document.addEventListener('DOMContentLoaded', function() {
         updateSubjects();
     });
