@@ -29,7 +29,7 @@
       "title": "Students",
       "icon": "user-graduate",
       "items": [
-        { "title": "Student List", "icon": "user-graduate", "link": "students.php" }
+        { "title": "Student List", "icon": "user-graduate", "link": "students.php" },
         { "title": "Add Student", "icon": "user-plus", "link": "add_users.php" }
       ],
       "id": "students-menu"
@@ -85,11 +85,11 @@
       "title": "Settings",
       "icon": "cogs",
       "items": [
-        { "title": "General Settings", "icon": "cogs", "link": "settings.php" }
+        { "title": "General Settings", "icon": "cogs", "link": "settings.php" },
         { "title": "User Roles", "icon": "user-tag", "link": "user_roles.php" },
         { "title": "Permissions", "icon": "shield-alt", "link": "permissions.php" },
-        { "title": "Backup & Restore", "icon": "database", "link": "backup_restore.php" }
-        { "title": "System Logs", "icon": "file-alt", "link": "system_logs.php" }
+        { "title": "Backup & Restore", "icon": "database", "link": "backup_restore.php" },
+        { "title": "System Logs", "icon": "file-alt", "link": "system_logs.php" },
         { "title": "Audit Trail", "icon": "history", "link": "audit_trail.php" }    
       ],
       "id": "settings-menu"
