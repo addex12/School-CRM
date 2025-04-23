@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 23, 2025 at 08:00 AM
+-- Generation Time: Apr 24, 2025 at 07:06 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -24,44 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `academic_terms`
---
-
-CREATE TABLE `academic_terms` (
-  `id` int(11) NOT NULL,
-  `academic_year` varchar(20) NOT NULL,
-  `term_name` varchar(50) NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  `is_current` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `academic_terms`
---
-
-INSERT INTO `academic_terms` (`id`, `academic_year`, `term_name`, `start_date`, `end_date`, `is_current`) VALUES
-(1, '2025-2026', 'Term 1', '2025-09-01', '2025-12-15', 1),
-(2, '2025-2026', 'Term 2', '2026-01-07', '2026-03-25', 0),
-(3, '2025-2026', 'Term 3', '2026-04-08', '2026-06-30', 0);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `academic_years`
---
-
-CREATE TABLE `academic_years` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `year_name` varchar(50) NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `announcements`
 --
 
@@ -74,20 +36,6 @@ CREATE TABLE `announcements` (
   `start_date` datetime NOT NULL,
   `end_date` datetime NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `attendance`
---
-
-CREATE TABLE `attendance` (
-  `id` int(11) NOT NULL,
-  `student_id` int(11) NOT NULL,
-  `date` date NOT NULL,
-  `status` enum('present','absent','late','excused') NOT NULL,
-  `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -112,198 +60,79 @@ CREATE TABLE `audit_logs` (
 INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `details`, `ip_address`, `created_at`) VALUES
 (1, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 20:48:37'),
 (2, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 21:21:46'),
-(3, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 21:26:14');
+(3, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-22 21:26:14'),
+(4, 4, 'login', 'User logged in', '196.190.62.29', '2025-04-23 01:41:22'),
+(5, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 12:28:02'),
+(6, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 13:25:19'),
+(7, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 14:09:36'),
+(8, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 15:42:10'),
+(9, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 15:44:03'),
+(10, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 16:35:56'),
+(11, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 16:59:53'),
+(12, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 18:50:56'),
+(13, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 18:58:10'),
+(14, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-23 19:04:48'),
+(15, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 20:08:56'),
+(16, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-23 20:20:28'),
+(17, 4, 'logout', 'User logged out', '196.189.144.197', '2025-04-23 20:35:34'),
+(18, 4458, 'login', 'User logged in', '196.189.144.197', '2025-04-23 20:35:41'),
+(19, 4458, 'logout', 'User logged out', '196.189.144.197', '2025-04-23 20:57:09'),
+(20, 4458, 'login', 'User logged in', '196.189.144.197', '2025-04-23 20:57:16');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `classes`
+-- Table structure for table `feedback`
 --
 
-CREATE TABLE `classes` (
+CREATE TABLE `feedback` (
   `id` int(11) NOT NULL,
-  `class_name` varchar(100) NOT NULL,
-  `class_level_id` int(11) DEFAULT NULL,
-  `curriculum_id` int(11) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `user_id` int(11) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `rating` tinyint(1) NOT NULL,
+  `admin_reply` text DEFAULT NULL,
+  `user_reply` text DEFAULT NULL,
+  `status` enum('open','in_progress','resolved') DEFAULT 'open',
+  `admin_notes` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Dumping data for table `classes`
+-- Dumping data for table `feedback`
 --
 
-INSERT INTO `classes` (`id`, `class_name`, `class_level_id`, `curriculum_id`, `created_at`) VALUES
-(1, 'Grade 1', 1, 1, '2025-04-23 05:15:10'),
-(2, 'Grade 2', 1, 1, '2025-04-23 05:15:10'),
-(3, 'Grade 3', 1, 1, '2025-04-23 05:15:10'),
-(4, 'Grade 4', 1, 1, '2025-04-23 05:15:10'),
-(5, 'Grade 5', 1, 1, '2025-04-23 05:15:10'),
-(6, 'Grade 6', 1, 1, '2025-04-23 05:15:10'),
-(7, 'Grade 7', 2, 1, '2025-04-23 05:15:10'),
-(8, 'Grade 8', 2, 1, '2025-04-23 05:15:10'),
-(9, 'Grade 9', 2, 1, '2025-04-23 05:15:10'),
-(10, 'Grade 10 (IGCSE Year 1)', 3, 1, '2025-04-23 05:15:10'),
-(11, 'Grade 11 (IGCSE Year 2)', 3, 1, '2025-04-23 05:15:10'),
-(12, 'Grade 12 (AS Level)', 4, 1, '2025-04-23 05:15:10'),
-(13, 'Grade 13 (A Level)', 4, 1, '2025-04-23 05:15:10');
+INSERT INTO `feedback` (`id`, `user_id`, `subject`, `message`, `rating`, `admin_reply`, `user_reply`, `status`, `admin_notes`, `created_at`) VALUES
+(1, 65, 'Good Job', 'great', 5, 'Thank you', 'You\'re Welcome', 'open', NULL, '2025-04-14 13:30:19'),
+(3, 65, 'I feel Good', 'Great job again', 1, NULL, NULL, 'open', NULL, '2025-04-15 03:14:52'),
+(4, 65, 'Academic Progress', 'Great progress', 5, NULL, NULL, 'open', NULL, '2025-04-15 03:29:58'),
+(5, 5, 'Cafeteria/Food Services', 'Delicious', 3, NULL, NULL, 'open', NULL, '2025-04-15 03:30:48'),
+(6, 65, 'Let&#39;s Check', '4 stars', 4, 'Okay', NULL, 'open', NULL, '2025-04-15 03:43:00'),
+(8, 65, 'Cafeteria/Food Services', 'check', 2, NULL, NULL, 'open', NULL, '2025-04-15 03:54:34'),
+(9, 65, 'Discipline and Safety', 'test again', 3, NULL, NULL, 'open', NULL, '2025-04-15 03:56:39');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `class_levels`
+-- Table structure for table `feedback_subjects`
 --
 
-CREATE TABLE `class_levels` (
+CREATE TABLE `feedback_subjects` (
   `id` int(11) NOT NULL,
-  `curriculum_id` int(11) NOT NULL,
-  `level_name` varchar(100) NOT NULL,
-  `level_order` int(11) DEFAULT 0
+  `subject` varchar(255) NOT NULL,
+  `status` enum('active','inactive') NOT NULL DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `class_levels`
+-- Dumping data for table `feedback_subjects`
 --
 
-INSERT INTO `class_levels` (`id`, `curriculum_id`, `level_name`, `level_order`) VALUES
-(1, 1, 'Primary (Grades 1-6)', 1),
-(2, 1, 'Lower Secondary (Grades 7-9)', 2),
-(3, 1, 'Upper Secondary (IGCSE - Grades 10-11)', 3),
-(4, 1, 'Advanced (AS & A Level - Grades 12-13)', 4);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `class_subjects`
---
-
-CREATE TABLE `class_subjects` (
-  `id` int(11) NOT NULL,
-  `class_id` int(11) NOT NULL,
-  `subject_id` int(11) NOT NULL,
-  `is_core` tinyint(1) DEFAULT 1
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `class_subjects`
---
-
-INSERT INTO `class_subjects` (`id`, `class_id`, `subject_id`, `is_core`) VALUES
-(1, 10, 16, 1),
-(2, 10, 18, 1),
-(3, 10, 20, 1),
-(4, 10, 21, 1),
-(5, 10, 22, 1),
-(6, 10, 23, 0),
-(7, 10, 24, 0),
-(8, 11, 16, 1),
-(9, 11, 18, 1),
-(10, 11, 20, 1),
-(11, 11, 21, 1),
-(12, 11, 22, 1),
-(13, 11, 23, 0),
-(14, 11, 24, 0);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `curriculums`
---
-
-CREATE TABLE `curriculums` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `curriculums`
---
-
-INSERT INTO `curriculums` (`id`, `name`, `country`, `description`) VALUES
-(1, 'Cambridge Curriculum', 'International', 'This is Cambridge Curriculum'),
-(2, 'US K-12', 'USA', NULL),
-(3, 'British Curriculum', 'UK', NULL),
-(4, 'CBSE', 'India', NULL),
-(5, 'IB', 'International', NULL),
-(6, 'IGCSE', 'International', NULL),
-(7, 'Ethiopian Curriculum', 'Ethiopia', NULL);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `grades`
---
-
-CREATE TABLE `grades` (
-  `id` int(11) NOT NULL,
-  `student_id` int(11) NOT NULL,
-  `subject_id` int(11) NOT NULL,
-  `class_subject_id` int(11) DEFAULT NULL,
-  `grading_scale_id` int(11) DEFAULT NULL,
-  `score` decimal(5,2) NOT NULL,
-  `grade_letter` varchar(10) DEFAULT NULL,
-  `term` varchar(50) DEFAULT NULL,
-  `academic_year` varchar(20) DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `section_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `grading_scales`
---
-
-CREATE TABLE `grading_scales` (
-  `id` int(11) NOT NULL,
-  `curriculum_id` int(11) DEFAULT NULL,
-  `scale_name` varchar(100) NOT NULL,
-  `min_score` decimal(5,2) NOT NULL,
-  `max_score` decimal(5,2) NOT NULL,
-  `grade_letter` varchar(10) NOT NULL,
-  `remark` varchar(100) DEFAULT NULL,
-  `description` text DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `grading_scales`
---
-
-INSERT INTO `grading_scales` (`id`, `curriculum_id`, `scale_name`, `min_score`, `max_score`, `grade_letter`, `remark`, `description`) VALUES
-(1, 1, 'Primary Checkpoint', 90.00, 100.00, 'A*', 'Outstanding', 'Primary Checkpoint Assessment Scale'),
-(2, 1, 'Primary Checkpoint', 80.00, 89.99, 'A', 'Excellent', 'Primary Checkpoint Assessment Scale'),
-(3, 1, 'Primary Checkpoint', 70.00, 79.99, 'B', 'Good', 'Primary Checkpoint Assessment Scale'),
-(4, 1, 'Primary Checkpoint', 60.00, 69.99, 'C', 'Satisfactory', 'Primary Checkpoint Assessment Scale'),
-(5, 1, 'Primary Checkpoint', 50.00, 59.99, 'D', 'Needs Improvement', 'Primary Checkpoint Assessment Scale'),
-(6, 1, 'Primary Checkpoint', 0.00, 49.99, 'E', 'Below Standard', 'Primary Checkpoint Assessment Scale'),
-(7, 1, 'Lower Secondary Checkpoint', 90.00, 100.00, 'A*', 'Outstanding', 'Lower Secondary Checkpoint Assessment Scale'),
-(8, 1, 'Lower Secondary Checkpoint', 80.00, 89.99, 'A', 'Excellent', 'Lower Secondary Checkpoint Assessment Scale'),
-(9, 1, 'Lower Secondary Checkpoint', 70.00, 79.99, 'B', 'Good', 'Lower Secondary Checkpoint Assessment Scale'),
-(10, 1, 'Lower Secondary Checkpoint', 60.00, 69.99, 'C', 'Satisfactory', 'Lower Secondary Checkpoint Assessment Scale'),
-(11, 1, 'Lower Secondary Checkpoint', 50.00, 59.99, 'D', 'Needs Improvement', 'Lower Secondary Checkpoint Assessment Scale'),
-(12, 1, 'Lower Secondary Checkpoint', 0.00, 49.99, 'E', 'Below Standard', 'Lower Secondary Checkpoint Assessment Scale'),
-(13, 1, 'IGCSE', 90.00, 100.00, 'A*', 'Exceptional', 'IGCSE Grading Scale'),
-(14, 1, 'IGCSE', 80.00, 89.99, 'A', 'Excellent', 'IGCSE Grading Scale'),
-(15, 1, 'IGCSE', 70.00, 79.99, 'B', 'Good', 'IGCSE Grading Scale'),
-(16, 1, 'IGCSE', 60.00, 69.99, 'C', 'Satisfactory', 'IGCSE Grading Scale'),
-(17, 1, 'IGCSE', 50.00, 59.99, 'D', 'Minimum Pass', 'IGCSE Grading Scale'),
-(18, 1, 'IGCSE', 40.00, 49.99, 'E', 'Below Pass', 'IGCSE Grading Scale'),
-(19, 1, 'IGCSE', 0.00, 39.99, 'F', 'Fail', 'IGCSE Grading Scale'),
-(20, 1, 'IGCSE', 0.00, 39.99, 'G', 'Fail', 'IGCSE Grading Scale'),
-(21, 1, 'AS Level', 90.00, 100.00, 'a', 'Outstanding', 'AS Level Grading Scale'),
-(22, 1, 'AS Level', 80.00, 89.99, 'b', 'Good', 'AS Level Grading Scale'),
-(23, 1, 'AS Level', 70.00, 79.99, 'c', 'Satisfactory', 'AS Level Grading Scale'),
-(24, 1, 'AS Level', 60.00, 69.99, 'd', 'Minimum Pass', 'AS Level Grading Scale'),
-(25, 1, 'AS Level', 50.00, 59.99, 'e', 'Below Pass', 'AS Level Grading Scale'),
-(26, 1, 'AS Level', 0.00, 49.99, 'f', 'Fail', 'AS Level Grading Scale'),
-(27, 1, 'A Level', 90.00, 100.00, 'A*', 'Exceptional', 'A Level Grading Scale'),
-(28, 1, 'A Level', 80.00, 89.99, 'A', 'Excellent', 'A Level Grading Scale'),
-(29, 1, 'A Level', 70.00, 79.99, 'B', 'Good', 'A Level Grading Scale'),
-(30, 1, 'A Level', 60.00, 69.99, 'C', 'Satisfactory', 'A Level Grading Scale'),
-(31, 1, 'A Level', 50.00, 59.99, 'D', 'Minimum Pass', 'A Level Grading Scale'),
-(32, 1, 'A Level', 40.00, 49.99, 'E', 'Below Pass', 'A Level Grading Scale'),
-(33, 1, 'A Level', 0.00, 39.99, 'F', 'Fail', 'A Level Grading Scale');
+INSERT INTO `feedback_subjects` (`id`, `subject`, `status`) VALUES
+(1, 'General', 'active'),
+(2, 'Fee Request', 'active'),
+(3, 'Technical Request', 'active'),
+(4, 'Complaint', 'active'),
+(5, 'Other', 'active');
 
 -- --------------------------------------------------------
 
@@ -336,6 +165,470 @@ CREATE TABLE `parents` (
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `parents`
+--
+
+INSERT INTO `parents` (`id`, `user_id`, `occupation`, `address`, `phone`, `created_at`) VALUES
+(1, 3185, NULL, NULL, NULL, '2025-04-24 01:42:36'),
+(2, 3187, NULL, NULL, NULL, '2025-04-24 01:42:36'),
+(3, 3192, NULL, NULL, NULL, '2025-04-24 01:42:37'),
+(4, 3193, NULL, NULL, NULL, '2025-04-24 01:42:38'),
+(5, 3194, NULL, NULL, NULL, '2025-04-24 01:42:38'),
+(6, 3196, NULL, NULL, NULL, '2025-04-24 01:42:38'),
+(7, 3197, NULL, NULL, NULL, '2025-04-24 01:42:38'),
+(8, 3199, NULL, NULL, NULL, '2025-04-24 01:42:39'),
+(9, 3202, NULL, NULL, NULL, '2025-04-24 01:42:40'),
+(10, 3203, NULL, NULL, NULL, '2025-04-24 01:42:40'),
+(11, 3213, NULL, NULL, NULL, '2025-04-24 01:42:43'),
+(12, 3216, NULL, NULL, NULL, '2025-04-24 01:42:43'),
+(13, 3217, NULL, NULL, NULL, '2025-04-24 01:42:43'),
+(14, 3218, NULL, NULL, NULL, '2025-04-24 01:42:44'),
+(15, 3220, NULL, NULL, NULL, '2025-04-24 01:42:44'),
+(16, 3221, NULL, NULL, NULL, '2025-04-24 01:42:44'),
+(17, 3222, NULL, NULL, NULL, '2025-04-24 01:42:45'),
+(18, 3229, NULL, NULL, NULL, '2025-04-24 01:42:46'),
+(19, 3230, NULL, NULL, NULL, '2025-04-24 01:42:46'),
+(20, 3232, NULL, NULL, NULL, '2025-04-24 01:42:47'),
+(21, 3240, NULL, NULL, NULL, '2025-04-24 01:42:49'),
+(22, 3249, NULL, NULL, NULL, '2025-04-24 01:42:51'),
+(23, 3250, NULL, NULL, NULL, '2025-04-24 01:42:51'),
+(24, 3254, NULL, NULL, NULL, '2025-04-24 01:42:52'),
+(25, 3255, NULL, NULL, NULL, '2025-04-24 01:42:52'),
+(26, 3257, NULL, NULL, NULL, '2025-04-24 01:42:53'),
+(27, 3259, NULL, NULL, NULL, '2025-04-24 01:42:53'),
+(28, 3260, NULL, NULL, NULL, '2025-04-24 01:42:54'),
+(29, 3262, NULL, NULL, NULL, '2025-04-24 01:42:54'),
+(30, 3271, NULL, NULL, NULL, '2025-04-24 01:42:56'),
+(31, 3273, NULL, NULL, NULL, '2025-04-24 01:42:56'),
+(32, 3276, NULL, NULL, NULL, '2025-04-24 01:42:57'),
+(33, 3278, NULL, NULL, NULL, '2025-04-24 01:42:58'),
+(34, 3284, NULL, NULL, NULL, '2025-04-24 01:42:59'),
+(35, 3286, NULL, NULL, NULL, '2025-04-24 01:43:00'),
+(36, 3287, NULL, NULL, NULL, '2025-04-24 01:43:00'),
+(37, 3292, NULL, NULL, NULL, '2025-04-24 01:43:01'),
+(38, 3294, NULL, NULL, NULL, '2025-04-24 01:43:02'),
+(39, 3303, NULL, NULL, NULL, '2025-04-24 01:43:04'),
+(40, 3307, NULL, NULL, NULL, '2025-04-24 01:43:05'),
+(41, 3308, NULL, NULL, NULL, '2025-04-24 01:43:05'),
+(42, 3309, NULL, NULL, NULL, '2025-04-24 01:43:05'),
+(43, 3310, NULL, NULL, NULL, '2025-04-24 01:43:05'),
+(44, 3312, NULL, NULL, NULL, '2025-04-24 01:43:06'),
+(45, 3314, NULL, NULL, NULL, '2025-04-24 01:43:06'),
+(46, 3318, NULL, NULL, NULL, '2025-04-24 01:43:07'),
+(47, 3322, NULL, NULL, NULL, '2025-04-24 01:43:08'),
+(48, 3324, NULL, NULL, NULL, '2025-04-24 01:43:08'),
+(49, 3326, NULL, NULL, NULL, '2025-04-24 01:43:09'),
+(50, 3328, NULL, NULL, NULL, '2025-04-24 01:43:09'),
+(51, 3329, NULL, NULL, NULL, '2025-04-24 01:43:09'),
+(52, 3332, NULL, NULL, NULL, '2025-04-24 01:43:10'),
+(53, 3333, NULL, NULL, NULL, '2025-04-24 01:43:10'),
+(54, 3334, NULL, NULL, NULL, '2025-04-24 01:43:10'),
+(55, 3335, NULL, NULL, NULL, '2025-04-24 01:43:10'),
+(56, 3337, NULL, NULL, NULL, '2025-04-24 01:43:11'),
+(57, 3342, NULL, NULL, NULL, '2025-04-24 01:43:12'),
+(58, 3343, NULL, NULL, NULL, '2025-04-24 01:43:12'),
+(59, 3345, NULL, NULL, NULL, '2025-04-24 01:43:13'),
+(60, 3354, NULL, NULL, NULL, '2025-04-24 01:43:49'),
+(61, 3357, NULL, NULL, NULL, '2025-04-24 01:43:50'),
+(62, 3359, NULL, NULL, NULL, '2025-04-24 01:43:50'),
+(63, 3360, NULL, NULL, NULL, '2025-04-24 01:43:51'),
+(64, 3361, NULL, NULL, NULL, '2025-04-24 01:43:51'),
+(65, 3365, NULL, NULL, NULL, '2025-04-24 01:43:52'),
+(66, 3371, NULL, NULL, NULL, '2025-04-24 01:43:53'),
+(67, 3372, NULL, NULL, NULL, '2025-04-24 01:43:53'),
+(68, 3373, NULL, NULL, NULL, '2025-04-24 01:43:54'),
+(69, 3374, NULL, NULL, NULL, '2025-04-24 01:43:54'),
+(70, 3375, NULL, NULL, NULL, '2025-04-24 01:43:54'),
+(71, 3377, NULL, NULL, NULL, '2025-04-24 01:43:55'),
+(72, 3378, NULL, NULL, NULL, '2025-04-24 01:43:55'),
+(73, 3381, NULL, NULL, NULL, '2025-04-24 01:43:56'),
+(74, 3385, NULL, NULL, NULL, '2025-04-24 01:43:56'),
+(75, 3389, NULL, NULL, NULL, '2025-04-24 01:43:57'),
+(76, 3392, NULL, NULL, NULL, '2025-04-24 01:43:58'),
+(77, 3393, NULL, NULL, NULL, '2025-04-24 01:43:58'),
+(78, 3395, NULL, NULL, NULL, '2025-04-24 01:43:59'),
+(79, 3401, NULL, NULL, NULL, '2025-04-24 01:44:00'),
+(80, 3402, NULL, NULL, NULL, '2025-04-24 01:44:00'),
+(81, 3403, NULL, NULL, NULL, '2025-04-24 01:44:00'),
+(82, 3406, NULL, NULL, NULL, '2025-04-24 01:44:01'),
+(83, 3413, NULL, NULL, NULL, '2025-04-24 01:44:03'),
+(84, 3414, NULL, NULL, NULL, '2025-04-24 01:44:03'),
+(85, 3415, NULL, NULL, NULL, '2025-04-24 01:44:03'),
+(86, 3421, NULL, NULL, NULL, '2025-04-24 01:44:05'),
+(87, 3422, NULL, NULL, NULL, '2025-04-24 01:44:05'),
+(88, 3424, NULL, NULL, NULL, '2025-04-24 01:44:06'),
+(89, 3428, NULL, NULL, NULL, '2025-04-24 01:44:07'),
+(90, 3429, NULL, NULL, NULL, '2025-04-24 01:44:07'),
+(91, 3430, NULL, NULL, NULL, '2025-04-24 01:44:07'),
+(92, 3432, NULL, NULL, NULL, '2025-04-24 01:44:07'),
+(93, 3437, NULL, NULL, NULL, '2025-04-24 01:44:08'),
+(94, 3440, NULL, NULL, NULL, '2025-04-24 01:44:09'),
+(95, 3442, NULL, NULL, NULL, '2025-04-24 01:44:10'),
+(96, 3443, NULL, NULL, NULL, '2025-04-24 01:44:10'),
+(97, 3444, NULL, NULL, NULL, '2025-04-24 01:44:10'),
+(98, 3450, NULL, NULL, NULL, '2025-04-24 01:44:11'),
+(99, 3455, NULL, NULL, NULL, '2025-04-24 01:44:13'),
+(100, 3457, NULL, NULL, NULL, '2025-04-24 01:44:13'),
+(101, 3458, NULL, NULL, NULL, '2025-04-24 01:44:13'),
+(102, 3459, NULL, NULL, NULL, '2025-04-24 01:44:14'),
+(103, 3460, NULL, NULL, NULL, '2025-04-24 01:44:14'),
+(104, 3463, NULL, NULL, NULL, '2025-04-24 01:44:15'),
+(105, 3464, NULL, NULL, NULL, '2025-04-24 01:44:15'),
+(106, 3466, NULL, NULL, NULL, '2025-04-24 01:44:15'),
+(107, 3467, NULL, NULL, NULL, '2025-04-24 01:44:15'),
+(108, 3469, NULL, NULL, NULL, '2025-04-24 01:44:16'),
+(109, 3471, NULL, NULL, NULL, '2025-04-24 01:44:16'),
+(110, 3472, NULL, NULL, NULL, '2025-04-24 01:44:17'),
+(111, 3480, NULL, NULL, NULL, '2025-04-24 01:44:19'),
+(112, 3482, NULL, NULL, NULL, '2025-04-24 01:44:19'),
+(113, 3483, NULL, NULL, NULL, '2025-04-24 01:44:19'),
+(114, 3484, NULL, NULL, NULL, '2025-04-24 01:44:20'),
+(115, 3488, NULL, NULL, NULL, '2025-04-24 01:44:20'),
+(116, 3491, NULL, NULL, NULL, '2025-04-24 01:44:21'),
+(117, 3493, NULL, NULL, NULL, '2025-04-24 01:44:22'),
+(118, 3498, NULL, NULL, NULL, '2025-04-24 01:44:23'),
+(119, 3499, NULL, NULL, NULL, '2025-04-24 01:44:23'),
+(120, 3501, NULL, NULL, NULL, '2025-04-24 01:44:24'),
+(121, 3502, NULL, NULL, NULL, '2025-04-24 01:44:24'),
+(122, 3503, NULL, NULL, NULL, '2025-04-24 01:44:24'),
+(123, 3514, NULL, NULL, NULL, '2025-04-24 01:44:27'),
+(124, 3515, NULL, NULL, NULL, '2025-04-24 01:44:27'),
+(125, 3519, NULL, NULL, NULL, '2025-04-24 01:44:28'),
+(126, 3541, NULL, NULL, NULL, '2025-04-24 01:44:33'),
+(127, 3546, NULL, NULL, NULL, '2025-04-24 01:44:35'),
+(128, 3547, NULL, NULL, NULL, '2025-04-24 01:44:35'),
+(129, 3549, NULL, NULL, NULL, '2025-04-24 01:44:35'),
+(130, 3550, NULL, NULL, NULL, '2025-04-24 01:44:36'),
+(131, 3552, NULL, NULL, NULL, '2025-04-24 01:44:36'),
+(132, 3554, NULL, NULL, NULL, '2025-04-24 01:44:36'),
+(133, 3555, NULL, NULL, NULL, '2025-04-24 01:44:37'),
+(134, 3563, NULL, NULL, NULL, '2025-04-24 01:44:39'),
+(135, 3564, NULL, NULL, NULL, '2025-04-24 01:44:39'),
+(136, 3566, NULL, NULL, NULL, '2025-04-24 01:44:39'),
+(137, 3567, NULL, NULL, NULL, '2025-04-24 01:44:40'),
+(138, 3569, NULL, NULL, NULL, '2025-04-24 01:44:40'),
+(139, 3577, NULL, NULL, NULL, '2025-04-24 01:44:42'),
+(140, 3582, NULL, NULL, NULL, '2025-04-24 01:44:43'),
+(141, 3584, NULL, NULL, NULL, '2025-04-24 01:44:44'),
+(142, 3590, NULL, NULL, NULL, '2025-04-24 01:44:45'),
+(143, 3596, NULL, NULL, NULL, '2025-04-24 01:44:47'),
+(144, 3601, NULL, NULL, NULL, '2025-04-24 01:44:48'),
+(145, 3606, NULL, NULL, NULL, '2025-04-24 01:44:49'),
+(146, 3607, NULL, NULL, NULL, '2025-04-24 01:44:50'),
+(147, 3612, NULL, NULL, NULL, '2025-04-24 01:44:51'),
+(148, 3613, NULL, NULL, NULL, '2025-04-24 01:44:51'),
+(149, 3618, NULL, NULL, NULL, '2025-04-24 01:44:52'),
+(150, 3620, NULL, NULL, NULL, '2025-04-24 01:44:53'),
+(151, 3626, NULL, NULL, NULL, '2025-04-24 01:44:54'),
+(152, 3627, NULL, NULL, NULL, '2025-04-24 01:44:54'),
+(153, 3630, NULL, NULL, NULL, '2025-04-24 01:44:55'),
+(154, 3631, NULL, NULL, NULL, '2025-04-24 01:44:55'),
+(155, 3632, NULL, NULL, NULL, '2025-04-24 01:44:56'),
+(156, 3633, NULL, NULL, NULL, '2025-04-24 01:44:56'),
+(157, 3637, NULL, NULL, NULL, '2025-04-24 01:44:57'),
+(158, 3638, NULL, NULL, NULL, '2025-04-24 01:44:57'),
+(159, 3640, NULL, NULL, NULL, '2025-04-24 01:44:57'),
+(160, 3641, NULL, NULL, NULL, '2025-04-24 01:44:58'),
+(161, 3643, NULL, NULL, NULL, '2025-04-24 01:44:58'),
+(162, 3646, NULL, NULL, NULL, '2025-04-24 01:44:59'),
+(163, 3652, NULL, NULL, NULL, '2025-04-24 01:45:00'),
+(164, 3654, NULL, NULL, NULL, '2025-04-24 01:45:01'),
+(165, 3655, NULL, NULL, NULL, '2025-04-24 01:45:01'),
+(166, 3660, NULL, NULL, NULL, '2025-04-24 01:45:03'),
+(167, 3663, NULL, NULL, NULL, '2025-04-24 01:45:04'),
+(168, 3665, NULL, NULL, NULL, '2025-04-24 01:45:04'),
+(169, 3672, NULL, NULL, NULL, '2025-04-24 01:45:06'),
+(170, 3673, NULL, NULL, NULL, '2025-04-24 01:45:06'),
+(171, 3674, NULL, NULL, NULL, '2025-04-24 01:45:06'),
+(172, 3680, NULL, NULL, NULL, '2025-04-24 01:45:08'),
+(173, 3682, NULL, NULL, NULL, '2025-04-24 01:45:08'),
+(174, 3690, NULL, NULL, NULL, '2025-04-24 01:45:10'),
+(175, 3694, NULL, NULL, NULL, '2025-04-24 01:45:11'),
+(176, 3697, NULL, NULL, NULL, '2025-04-24 01:45:12'),
+(177, 3698, NULL, NULL, NULL, '2025-04-24 01:45:12'),
+(178, 3702, NULL, NULL, NULL, '2025-04-24 01:45:13'),
+(179, 3705, NULL, NULL, NULL, '2025-04-24 01:45:13'),
+(180, 3707, NULL, NULL, NULL, '2025-04-24 01:45:14'),
+(181, 3708, NULL, NULL, NULL, '2025-04-24 01:45:14'),
+(182, 3711, NULL, NULL, NULL, '2025-04-24 01:45:15'),
+(183, 3712, NULL, NULL, NULL, '2025-04-24 01:45:15'),
+(184, 3724, NULL, NULL, NULL, '2025-04-24 01:45:18'),
+(185, 3725, NULL, NULL, NULL, '2025-04-24 01:45:18'),
+(186, 3728, NULL, NULL, NULL, '2025-04-24 01:45:19'),
+(187, 3732, NULL, NULL, NULL, '2025-04-24 01:45:20'),
+(188, 3733, NULL, NULL, NULL, '2025-04-24 01:45:20'),
+(189, 3739, NULL, NULL, NULL, '2025-04-24 01:45:21'),
+(190, 3751, NULL, NULL, NULL, '2025-04-24 01:45:24'),
+(191, 3756, NULL, NULL, NULL, '2025-04-24 01:45:25'),
+(192, 3757, NULL, NULL, NULL, '2025-04-24 01:45:25'),
+(193, 3763, NULL, NULL, NULL, '2025-04-24 01:45:27'),
+(194, 3765, NULL, NULL, NULL, '2025-04-24 01:45:27'),
+(195, 3771, NULL, NULL, NULL, '2025-04-24 01:45:29'),
+(196, 3775, NULL, NULL, NULL, '2025-04-24 01:45:30'),
+(197, 3776, NULL, NULL, NULL, '2025-04-24 01:45:30'),
+(198, 3784, NULL, NULL, NULL, '2025-04-24 01:45:32'),
+(199, 3785, NULL, NULL, NULL, '2025-04-24 01:45:32'),
+(200, 3790, NULL, NULL, NULL, '2025-04-24 01:45:34'),
+(201, 3791, NULL, NULL, NULL, '2025-04-24 01:45:34'),
+(202, 3793, NULL, NULL, NULL, '2025-04-24 01:45:35'),
+(203, 3795, NULL, NULL, NULL, '2025-04-24 01:45:36'),
+(204, 3796, NULL, NULL, NULL, '2025-04-24 01:45:37'),
+(205, 3799, NULL, NULL, NULL, '2025-04-24 01:45:37'),
+(206, 3801, NULL, NULL, NULL, '2025-04-24 01:45:38'),
+(207, 3802, NULL, NULL, NULL, '2025-04-24 01:45:38'),
+(208, 3804, NULL, NULL, NULL, '2025-04-24 01:45:39'),
+(209, 3809, NULL, NULL, NULL, '2025-04-24 01:45:41'),
+(210, 3810, NULL, NULL, NULL, '2025-04-24 01:45:41'),
+(211, 3811, NULL, NULL, NULL, '2025-04-24 01:45:42'),
+(212, 3812, NULL, NULL, NULL, '2025-04-24 01:45:42'),
+(213, 3815, NULL, NULL, NULL, '2025-04-24 01:45:43'),
+(214, 3823, NULL, NULL, NULL, '2025-04-24 01:45:45'),
+(215, 3824, NULL, NULL, NULL, '2025-04-24 01:45:45'),
+(216, 3828, NULL, NULL, NULL, '2025-04-24 01:45:46'),
+(217, 3830, NULL, NULL, NULL, '2025-04-24 01:45:47'),
+(218, 3835, NULL, NULL, NULL, '2025-04-24 01:45:48'),
+(219, 3836, NULL, NULL, NULL, '2025-04-24 01:45:48'),
+(220, 3838, NULL, NULL, NULL, '2025-04-24 01:45:48'),
+(221, 3840, NULL, NULL, NULL, '2025-04-24 01:45:49'),
+(222, 3843, NULL, NULL, NULL, '2025-04-24 01:45:50'),
+(223, 3847, NULL, NULL, NULL, '2025-04-24 01:45:51'),
+(224, 3855, NULL, NULL, NULL, '2025-04-24 01:45:53'),
+(225, 3858, NULL, NULL, NULL, '2025-04-24 01:45:53'),
+(226, 3862, NULL, NULL, NULL, '2025-04-24 01:45:54'),
+(227, 3864, NULL, NULL, NULL, '2025-04-24 01:45:55'),
+(228, 3865, NULL, NULL, NULL, '2025-04-24 01:45:55'),
+(229, 3866, NULL, NULL, NULL, '2025-04-24 01:45:55'),
+(230, 3870, NULL, NULL, NULL, '2025-04-24 01:45:56'),
+(231, 3877, NULL, NULL, NULL, '2025-04-24 01:45:58'),
+(232, 3880, NULL, NULL, NULL, '2025-04-24 01:45:59'),
+(233, 3883, NULL, NULL, NULL, '2025-04-24 01:45:59'),
+(234, 3884, NULL, NULL, NULL, '2025-04-24 01:45:59'),
+(235, 3886, NULL, NULL, NULL, '2025-04-24 01:46:00'),
+(236, 3890, NULL, NULL, NULL, '2025-04-24 01:46:01'),
+(237, 3893, NULL, NULL, NULL, '2025-04-24 01:46:01'),
+(238, 3894, NULL, NULL, NULL, '2025-04-24 01:46:02'),
+(239, 3895, NULL, NULL, NULL, '2025-04-24 01:46:02'),
+(240, 3897, NULL, NULL, NULL, '2025-04-24 01:46:02'),
+(241, 3899, NULL, NULL, NULL, '2025-04-24 01:46:03'),
+(242, 3906, NULL, NULL, NULL, '2025-04-24 01:46:05'),
+(243, 3907, NULL, NULL, NULL, '2025-04-24 01:48:19'),
+(244, 3909, NULL, NULL, NULL, '2025-04-24 01:48:19'),
+(245, 3911, NULL, NULL, NULL, '2025-04-24 01:48:20'),
+(246, 3914, NULL, NULL, NULL, '2025-04-24 01:48:20'),
+(247, 3919, NULL, NULL, NULL, '2025-04-24 01:48:22'),
+(248, 3920, NULL, NULL, NULL, '2025-04-24 01:48:22'),
+(249, 3921, NULL, NULL, NULL, '2025-04-24 01:48:22'),
+(250, 3926, NULL, NULL, NULL, '2025-04-24 01:48:23'),
+(251, 3928, NULL, NULL, NULL, '2025-04-24 01:48:24'),
+(252, 3929, NULL, NULL, NULL, '2025-04-24 01:48:24'),
+(253, 3930, NULL, NULL, NULL, '2025-04-24 01:48:24'),
+(254, 3932, NULL, NULL, NULL, '2025-04-24 01:48:25'),
+(255, 3933, NULL, NULL, NULL, '2025-04-24 01:48:25'),
+(256, 3938, NULL, NULL, NULL, '2025-04-24 01:48:26'),
+(257, 3939, NULL, NULL, NULL, '2025-04-24 01:48:26'),
+(258, 3941, NULL, NULL, NULL, '2025-04-24 01:48:27'),
+(259, 3945, NULL, NULL, NULL, '2025-04-24 01:48:28'),
+(260, 3947, NULL, NULL, NULL, '2025-04-24 01:48:28'),
+(261, 3948, NULL, NULL, NULL, '2025-04-24 01:48:28'),
+(262, 3950, NULL, NULL, NULL, '2025-04-24 01:48:29'),
+(263, 3951, NULL, NULL, NULL, '2025-04-24 01:48:29'),
+(264, 3953, NULL, NULL, NULL, '2025-04-24 01:48:29'),
+(265, 3957, NULL, NULL, NULL, '2025-04-24 01:48:30'),
+(266, 3963, NULL, NULL, NULL, '2025-04-24 01:48:31'),
+(267, 3967, NULL, NULL, NULL, '2025-04-24 01:48:32'),
+(268, 3970, NULL, NULL, NULL, '2025-04-24 01:48:33'),
+(269, 3971, NULL, NULL, NULL, '2025-04-24 01:48:33'),
+(270, 3978, NULL, NULL, NULL, '2025-04-24 01:48:35'),
+(271, 3979, NULL, NULL, NULL, '2025-04-24 01:48:35'),
+(272, 3980, NULL, NULL, NULL, '2025-04-24 01:48:35'),
+(273, 3981, NULL, NULL, NULL, '2025-04-24 01:48:35'),
+(274, 3986, NULL, NULL, NULL, '2025-04-24 01:48:37'),
+(275, 3988, NULL, NULL, NULL, '2025-04-24 01:48:37'),
+(276, 3989, NULL, NULL, NULL, '2025-04-24 01:48:37'),
+(277, 3990, NULL, NULL, NULL, '2025-04-24 01:48:37'),
+(278, 3993, NULL, NULL, NULL, '2025-04-24 01:48:38'),
+(279, 3995, NULL, NULL, NULL, '2025-04-24 01:48:39'),
+(280, 4000, NULL, NULL, NULL, '2025-04-24 01:48:40'),
+(281, 4001, NULL, NULL, NULL, '2025-04-24 01:48:40'),
+(282, 4002, NULL, NULL, NULL, '2025-04-24 01:48:40'),
+(283, 4005, NULL, NULL, NULL, '2025-04-24 01:48:41'),
+(284, 4009, NULL, NULL, NULL, '2025-04-24 01:48:42'),
+(285, 4012, NULL, NULL, NULL, '2025-04-24 01:48:42'),
+(286, 4014, NULL, NULL, NULL, '2025-04-24 01:48:43'),
+(287, 4017, NULL, NULL, NULL, '2025-04-24 01:48:44'),
+(288, 4022, NULL, NULL, NULL, '2025-04-24 01:48:45'),
+(289, 4027, NULL, NULL, NULL, '2025-04-24 01:48:46'),
+(290, 4029, NULL, NULL, NULL, '2025-04-24 01:48:46'),
+(291, 4031, NULL, NULL, NULL, '2025-04-24 01:48:47'),
+(292, 4033, NULL, NULL, NULL, '2025-04-24 01:48:47'),
+(293, 4035, NULL, NULL, NULL, '2025-04-24 01:48:47'),
+(294, 4036, NULL, NULL, NULL, '2025-04-24 01:48:48'),
+(295, 4037, NULL, NULL, NULL, '2025-04-24 01:48:48'),
+(296, 4049, NULL, NULL, NULL, '2025-04-24 01:48:50'),
+(297, 4050, NULL, NULL, NULL, '2025-04-24 01:48:51'),
+(298, 4052, NULL, NULL, NULL, '2025-04-24 01:48:51'),
+(299, 4054, NULL, NULL, NULL, '2025-04-24 01:48:52'),
+(300, 4059, NULL, NULL, NULL, '2025-04-24 01:48:53'),
+(301, 4064, NULL, NULL, NULL, '2025-04-24 01:48:54'),
+(302, 4066, NULL, NULL, NULL, '2025-04-24 01:48:55'),
+(303, 4076, NULL, NULL, NULL, '2025-04-24 01:48:57'),
+(304, 4079, NULL, NULL, NULL, '2025-04-24 01:48:57'),
+(305, 4082, NULL, NULL, NULL, '2025-04-24 01:48:58'),
+(306, 4084, NULL, NULL, NULL, '2025-04-24 01:48:59'),
+(307, 4085, NULL, NULL, NULL, '2025-04-24 01:48:59'),
+(308, 4090, NULL, NULL, NULL, '2025-04-24 01:49:00'),
+(309, 4091, NULL, NULL, NULL, '2025-04-24 01:49:00'),
+(310, 4101, NULL, NULL, NULL, '2025-04-24 01:49:02'),
+(311, 4102, NULL, NULL, NULL, '2025-04-24 01:49:02'),
+(312, 4106, NULL, NULL, NULL, '2025-04-24 01:49:03'),
+(313, 4108, NULL, NULL, NULL, '2025-04-24 01:49:04'),
+(314, 4117, NULL, NULL, NULL, '2025-04-24 01:49:06'),
+(315, 4119, NULL, NULL, NULL, '2025-04-24 01:49:06'),
+(316, 4120, NULL, NULL, NULL, '2025-04-24 01:49:07'),
+(317, 4123, NULL, NULL, NULL, '2025-04-24 01:49:07'),
+(318, 4124, NULL, NULL, NULL, '2025-04-24 01:49:07'),
+(319, 4127, NULL, NULL, NULL, '2025-04-24 01:49:08'),
+(320, 4129, NULL, NULL, NULL, '2025-04-24 01:49:09'),
+(321, 4130, NULL, NULL, NULL, '2025-04-24 01:49:09'),
+(322, 4132, NULL, NULL, NULL, '2025-04-24 01:49:09'),
+(323, 4135, NULL, NULL, NULL, '2025-04-24 01:49:10'),
+(324, 4137, NULL, NULL, NULL, '2025-04-24 01:49:11'),
+(325, 4142, NULL, NULL, NULL, '2025-04-24 01:49:12'),
+(326, 4143, NULL, NULL, NULL, '2025-04-24 01:49:12'),
+(327, 4146, NULL, NULL, NULL, '2025-04-24 01:49:13'),
+(328, 4150, NULL, NULL, NULL, '2025-04-24 01:49:14'),
+(329, 4152, NULL, NULL, NULL, '2025-04-24 01:49:14'),
+(330, 4153, NULL, NULL, NULL, '2025-04-24 01:49:14'),
+(331, 4154, NULL, NULL, NULL, '2025-04-24 01:49:15'),
+(332, 4156, NULL, NULL, NULL, '2025-04-24 01:49:15'),
+(333, 4158, NULL, NULL, NULL, '2025-04-24 01:49:16'),
+(334, 4161, NULL, NULL, NULL, '2025-04-24 01:49:16'),
+(335, 4162, NULL, NULL, NULL, '2025-04-24 01:49:17'),
+(336, 4163, NULL, NULL, NULL, '2025-04-24 01:49:17'),
+(337, 4164, NULL, NULL, NULL, '2025-04-24 01:49:17'),
+(338, 4166, NULL, NULL, NULL, '2025-04-24 01:49:17'),
+(339, 4170, NULL, NULL, NULL, '2025-04-24 01:49:18'),
+(340, 4171, NULL, NULL, NULL, '2025-04-24 01:49:19'),
+(341, 4172, NULL, NULL, NULL, '2025-04-24 01:49:19'),
+(342, 4176, NULL, NULL, NULL, '2025-04-24 01:49:20'),
+(343, 4179, NULL, NULL, NULL, '2025-04-24 01:49:20'),
+(344, 4182, NULL, NULL, NULL, '2025-04-24 01:49:21'),
+(345, 4186, NULL, NULL, NULL, '2025-04-24 01:49:22'),
+(346, 4189, NULL, NULL, NULL, '2025-04-24 01:49:23'),
+(347, 4193, NULL, NULL, NULL, '2025-04-24 01:49:24'),
+(348, 4197, NULL, NULL, NULL, '2025-04-24 01:49:25'),
+(349, 4201, NULL, NULL, NULL, '2025-04-24 01:49:26'),
+(350, 4202, NULL, NULL, NULL, '2025-04-24 01:49:26'),
+(351, 4209, NULL, NULL, NULL, '2025-04-24 01:49:28'),
+(352, 4211, NULL, NULL, NULL, '2025-04-24 01:49:28'),
+(353, 4212, NULL, NULL, NULL, '2025-04-24 01:49:28'),
+(354, 4221, NULL, NULL, NULL, '2025-04-24 01:49:31'),
+(355, 4223, NULL, NULL, NULL, '2025-04-24 01:49:31'),
+(356, 4226, NULL, NULL, NULL, '2025-04-24 01:49:32'),
+(357, 4227, NULL, NULL, NULL, '2025-04-24 01:49:32'),
+(358, 4231, NULL, NULL, NULL, '2025-04-24 01:49:33'),
+(359, 4238, NULL, NULL, NULL, '2025-04-24 01:49:35'),
+(360, 4240, NULL, NULL, NULL, '2025-04-24 01:49:35'),
+(361, 4248, NULL, NULL, NULL, '2025-04-24 01:49:37'),
+(362, 4249, NULL, NULL, NULL, '2025-04-24 01:49:37'),
+(363, 4250, NULL, NULL, NULL, '2025-04-24 01:49:38'),
+(364, 4251, NULL, NULL, NULL, '2025-04-24 01:49:38'),
+(365, 4252, NULL, NULL, NULL, '2025-04-24 01:49:38'),
+(366, 4254, NULL, NULL, NULL, '2025-04-24 01:49:39'),
+(367, 4255, NULL, NULL, NULL, '2025-04-24 01:49:39'),
+(368, 4256, NULL, NULL, NULL, '2025-04-24 01:49:39'),
+(369, 4263, NULL, NULL, NULL, '2025-04-24 01:49:41'),
+(370, 4265, NULL, NULL, NULL, '2025-04-24 01:49:41'),
+(371, 4268, NULL, NULL, NULL, '2025-04-24 01:49:42'),
+(372, 4271, NULL, NULL, NULL, '2025-04-24 01:49:43'),
+(373, 4274, NULL, NULL, NULL, '2025-04-24 01:49:44'),
+(374, 4277, NULL, NULL, NULL, '2025-04-24 01:49:44'),
+(375, 4278, NULL, NULL, NULL, '2025-04-24 01:49:45'),
+(376, 4281, NULL, NULL, NULL, '2025-04-24 01:49:45'),
+(377, 4283, NULL, NULL, NULL, '2025-04-24 01:49:46'),
+(378, 4285, NULL, NULL, NULL, '2025-04-24 01:49:46'),
+(379, 4286, NULL, NULL, NULL, '2025-04-24 01:49:47'),
+(380, 4287, NULL, NULL, NULL, '2025-04-24 01:49:47'),
+(381, 4288, NULL, NULL, NULL, '2025-04-24 01:49:47'),
+(382, 4289, NULL, NULL, NULL, '2025-04-24 01:49:47'),
+(383, 4290, NULL, NULL, NULL, '2025-04-24 01:49:48'),
+(384, 4293, NULL, NULL, NULL, '2025-04-24 01:49:48'),
+(385, 4297, NULL, NULL, NULL, '2025-04-24 01:49:49'),
+(386, 4302, NULL, NULL, NULL, '2025-04-24 01:49:51'),
+(387, 4304, NULL, NULL, NULL, '2025-04-24 01:49:51'),
+(388, 4306, NULL, NULL, NULL, '2025-04-24 01:49:52'),
+(389, 4308, NULL, NULL, NULL, '2025-04-24 01:49:52'),
+(390, 4310, NULL, NULL, NULL, '2025-04-24 01:49:53'),
+(391, 4320, NULL, NULL, NULL, '2025-04-24 01:49:56'),
+(392, 4321, NULL, NULL, NULL, '2025-04-24 01:49:56'),
+(393, 4325, NULL, NULL, NULL, '2025-04-24 01:49:57'),
+(394, 4327, NULL, NULL, NULL, '2025-04-24 01:49:57'),
+(395, 4331, NULL, NULL, NULL, '2025-04-24 01:49:58'),
+(396, 4335, NULL, NULL, NULL, '2025-04-24 01:49:59'),
+(397, 4339, NULL, NULL, NULL, '2025-04-24 01:50:00'),
+(398, 4340, NULL, NULL, NULL, '2025-04-24 01:50:00'),
+(399, 4344, NULL, NULL, NULL, '2025-04-24 01:50:01'),
+(400, 4348, NULL, NULL, NULL, '2025-04-24 01:50:03'),
+(401, 4350, NULL, NULL, NULL, '2025-04-24 01:50:04'),
+(402, 4353, NULL, NULL, NULL, '2025-04-24 01:50:05'),
+(403, 4359, NULL, NULL, NULL, '2025-04-24 01:50:07'),
+(404, 4362, NULL, NULL, NULL, '2025-04-24 01:50:07'),
+(405, 4368, NULL, NULL, NULL, '2025-04-24 01:50:09'),
+(406, 4373, NULL, NULL, NULL, '2025-04-24 01:50:10'),
+(407, 4376, NULL, NULL, NULL, '2025-04-24 01:50:11'),
+(408, 4377, NULL, NULL, NULL, '2025-04-24 01:50:11'),
+(409, 4378, NULL, NULL, NULL, '2025-04-24 01:50:11'),
+(410, 4379, NULL, NULL, NULL, '2025-04-24 01:50:11'),
+(411, 4380, NULL, NULL, NULL, '2025-04-24 01:50:12'),
+(412, 4381, NULL, NULL, NULL, '2025-04-24 01:50:12'),
+(413, 4382, NULL, NULL, NULL, '2025-04-24 01:50:12'),
+(414, 4386, NULL, NULL, NULL, '2025-04-24 01:50:13'),
+(415, 4388, NULL, NULL, NULL, '2025-04-24 01:50:14'),
+(416, 4390, NULL, NULL, NULL, '2025-04-24 01:50:14'),
+(417, 4393, NULL, NULL, NULL, '2025-04-24 01:50:15'),
+(418, 4398, NULL, NULL, NULL, '2025-04-24 01:50:16'),
+(419, 4401, NULL, NULL, NULL, '2025-04-24 01:50:16'),
+(420, 4403, NULL, NULL, NULL, '2025-04-24 01:50:17'),
+(421, 4407, NULL, NULL, NULL, '2025-04-24 01:50:18'),
+(422, 4409, NULL, NULL, NULL, '2025-04-24 01:50:18'),
+(423, 4417, NULL, NULL, NULL, '2025-04-24 01:50:20'),
+(424, 4419, NULL, NULL, NULL, '2025-04-24 01:50:21'),
+(425, 4424, NULL, NULL, NULL, '2025-04-24 01:50:22'),
+(426, 4425, NULL, NULL, NULL, '2025-04-24 01:50:22'),
+(427, 4426, NULL, NULL, NULL, '2025-04-24 01:50:22'),
+(428, 4430, NULL, NULL, NULL, '2025-04-24 01:50:23'),
+(429, 4431, NULL, NULL, NULL, '2025-04-24 01:50:23'),
+(430, 4432, NULL, NULL, NULL, '2025-04-24 01:50:24'),
+(431, 4437, NULL, NULL, NULL, '2025-04-24 01:50:25'),
+(432, 4438, NULL, NULL, NULL, '2025-04-24 01:50:25'),
+(433, 4439, NULL, NULL, NULL, '2025-04-24 01:50:25'),
+(434, 4443, NULL, NULL, NULL, '2025-04-24 01:50:26'),
+(435, 4446, NULL, NULL, NULL, '2025-04-24 01:50:27'),
+(436, 4452, NULL, NULL, NULL, '2025-04-24 01:50:28');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `response_data`
+--
+
+CREATE TABLE `response_data` (
+  `id` int(11) NOT NULL,
+  `response_id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `field_id` int(11) NOT NULL,
+  `field_value` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `response_data`
+--
+
+INSERT INTO `response_data` (`id`, `response_id`, `survey_id`, `field_id`, `field_value`) VALUES
+(3, 3, 2, 1, '3'),
+(4, 3, 2, 2, 'Yes');
+
 -- --------------------------------------------------------
 
 --
@@ -362,35 +655,6 @@ INSERT INTO `roles` (`id`, `role_name`, `description`, `created_at`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `sections`
---
-
-CREATE TABLE `sections` (
-  `id` int(11) NOT NULL,
-  `class_id` int(11) NOT NULL,
-  `section_name` varchar(20) NOT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `sections`
---
-
-INSERT INTO `sections` (`id`, `class_id`, `section_name`, `created_at`) VALUES
-(1, 1, 'A', '2025-04-23 05:15:28'),
-(2, 1, 'B', '2025-04-23 05:15:28'),
-(3, 1, 'C', '2025-04-23 05:15:28'),
-(4, 2, 'A', '2025-04-23 05:15:28'),
-(5, 2, 'B', '2025-04-23 05:15:28'),
-(6, 2, 'C', '2025-04-23 05:15:28'),
-(40, 13, 'A', '2025-04-23 05:15:28'),
-(41, 13, 'B', '2025-04-23 05:15:28'),
-(42, 10, 'A', '2025-04-23 07:44:28'),
-(43, 10, 'B', '2025-04-23 07:44:55');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `students`
 --
 
@@ -412,8 +676,499 @@ CREATE TABLE `students` (
 --
 
 INSERT INTO `students` (`id`, `user_id`, `class_id`, `section_id`, `enrollment_no`, `date_of_birth`, `gender`, `address`, `status`, `created_at`) VALUES
-(3, 5, 10, 3, 'STU001', '2010-05-15', 'Male', '123 Student Street, Addis Ababa', 'active', '2025-04-23 05:23:51'),
-(4, 65, 10, 3, 'STU002', '2011-03-22', 'Male', '456 Learner Avenue, Addis Ababa', 'active', '2025-04-23 05:23:51');
+(3, 5, 12, 3, 'STU001', '2010-05-15', 'Male', '123 Student Street, Addis Ababa', 'active', '2025-04-23 05:23:51'),
+(4, 65, 11, 3, 'STU002', '2011-03-22', 'Male', '456 Learner Avenue, Addis Ababa', 'active', '2025-04-23 05:23:51'),
+(9, 72, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(10, 73, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(11, 74, 1, 42, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(12, 75, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(13, 76, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(14, 77, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(15, 78, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(16, 79, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(17, 80, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(18, 81, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(19, 82, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(20, 83, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(21, 84, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(22, 85, 5, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(23, 86, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(24, 87, 3, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(25, 88, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(26, 89, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(27, 90, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(28, 91, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(29, 92, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(30, 93, 5, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(31, 94, 3, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(32, 95, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(33, 96, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(34, 97, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(35, 98, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(36, 99, 3, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(37, 100, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(38, 101, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(39, 102, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(40, 103, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(41, 104, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(42, 105, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(43, 106, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(44, 107, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(45, 108, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(46, 109, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(47, 110, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(48, 111, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(49, 112, 5, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(50, 113, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(51, 114, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(52, 115, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(53, 116, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(54, 117, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(55, 118, 5, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(56, 119, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(57, 120, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(58, 121, 3, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(59, 122, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(60, 123, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(61, 124, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(62, 125, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(63, 126, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(64, 127, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(65, 128, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(66, 129, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(67, 130, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(68, 131, 2, 1, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(69, 132, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(70, 133, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(71, 134, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(72, 135, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(73, 136, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(74, 137, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(75, 138, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(76, 139, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(77, 140, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(78, 141, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(79, 142, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(80, 143, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(81, 144, 5, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(82, 145, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(83, 146, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(84, 147, 3, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(85, 148, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(86, 149, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(87, 150, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(88, 151, 5, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(89, 152, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(90, 153, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:35:24'),
+(93, 3201, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:39'),
+(94, 3206, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:41'),
+(95, 3207, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:41'),
+(96, 3208, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:41'),
+(97, 3209, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:41'),
+(98, 3210, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:42'),
+(99, 3211, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:42'),
+(100, 3212, 6, 65, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:42'),
+(101, 3225, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:45'),
+(102, 3228, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:46'),
+(103, 3233, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:47'),
+(104, 3234, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:47'),
+(105, 3237, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:48'),
+(106, 3239, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:49'),
+(107, 3241, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:49'),
+(108, 3244, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:50'),
+(109, 3246, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:50'),
+(110, 3247, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:50'),
+(111, 3248, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:51'),
+(112, 3252, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:52'),
+(113, 3253, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:52'),
+(114, 3256, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:53'),
+(115, 3258, 7, 82, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:53'),
+(116, 3261, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:54'),
+(117, 3264, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:54'),
+(118, 3265, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:55'),
+(119, 3267, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:55'),
+(120, 3268, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:55'),
+(121, 3269, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:56'),
+(122, 3272, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:56'),
+(123, 3277, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:57'),
+(124, 3279, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:58'),
+(125, 3280, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:58'),
+(126, 3282, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:59'),
+(127, 3283, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:59'),
+(128, 3285, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:59'),
+(129, 3288, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:00'),
+(130, 3291, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:01'),
+(131, 3296, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:02'),
+(132, 3297, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:03'),
+(133, 3299, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:03'),
+(134, 3302, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:04'),
+(135, 3305, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:04'),
+(136, 3306, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:04'),
+(137, 3313, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:06'),
+(138, 3315, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:06'),
+(139, 3319, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:07'),
+(140, 3321, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:07'),
+(141, 3323, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:08'),
+(142, 3327, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:09'),
+(143, 3336, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:11'),
+(144, 3339, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:12'),
+(145, 3347, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:13'),
+(146, 3349, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:14'),
+(147, 3351, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:14'),
+(148, 3353, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:15'),
+(149, 3355, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:50'),
+(150, 3366, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:52'),
+(151, 3367, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:52'),
+(152, 3369, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:53'),
+(153, 3376, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:54'),
+(154, 3382, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:56'),
+(155, 3384, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:56'),
+(156, 3386, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:57'),
+(157, 3390, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:58'),
+(158, 3398, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:59'),
+(159, 3399, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:00'),
+(160, 3404, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:01'),
+(161, 3407, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:01'),
+(162, 3408, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:02'),
+(163, 3410, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:02'),
+(164, 3411, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:02'),
+(165, 3423, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:05'),
+(166, 3425, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:06'),
+(167, 3433, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:08'),
+(168, 3434, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:08'),
+(169, 3436, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:08'),
+(170, 3438, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:09'),
+(171, 3441, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:09'),
+(172, 3446, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:11'),
+(173, 3451, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:12'),
+(174, 3452, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:12'),
+(175, 3453, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:12'),
+(176, 3462, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:14'),
+(177, 3468, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:16'),
+(178, 3473, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:17'),
+(179, 3474, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:17'),
+(180, 3476, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:18'),
+(181, 3477, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:18'),
+(182, 3478, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:18'),
+(183, 3486, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:20'),
+(184, 3487, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:20'),
+(185, 3497, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:23'),
+(186, 3500, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:23'),
+(187, 3506, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:25'),
+(188, 3508, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:25'),
+(189, 3509, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:26'),
+(190, 3510, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:26'),
+(191, 3512, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:26'),
+(192, 3516, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:27'),
+(193, 3521, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:28'),
+(194, 3524, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:29'),
+(195, 3525, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:29'),
+(196, 3529, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:30'),
+(197, 3530, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:31'),
+(198, 3532, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:31'),
+(199, 3534, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:31'),
+(200, 3537, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:32'),
+(201, 3538, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:33'),
+(202, 3539, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:33'),
+(203, 3542, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:33'),
+(204, 3543, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:34'),
+(205, 3545, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:34'),
+(206, 3548, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:35'),
+(207, 3551, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:36'),
+(208, 3558, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:37'),
+(209, 3559, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:38'),
+(210, 3561, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:38'),
+(211, 3571, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:41'),
+(212, 3575, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:42'),
+(213, 3576, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:42'),
+(214, 3580, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:43'),
+(215, 3589, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:45'),
+(216, 3591, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:46'),
+(217, 3592, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:46'),
+(218, 3593, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:46'),
+(219, 3594, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:46'),
+(220, 3595, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:46'),
+(221, 3597, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:47'),
+(222, 3599, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:48'),
+(223, 3600, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:48'),
+(224, 3602, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:48'),
+(225, 3603, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:49'),
+(226, 3604, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:49'),
+(227, 3605, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:49'),
+(228, 3609, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:50'),
+(229, 3610, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:50'),
+(230, 3611, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:51'),
+(231, 3616, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:52'),
+(232, 3636, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:56'),
+(233, 3642, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:58'),
+(234, 3645, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:59'),
+(235, 3648, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:59'),
+(236, 3650, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:00'),
+(237, 3653, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:01'),
+(238, 3656, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:02'),
+(239, 3657, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:02'),
+(240, 3658, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:02'),
+(241, 3659, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:03'),
+(242, 3662, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:03'),
+(243, 3664, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:04'),
+(244, 3666, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:04'),
+(245, 3667, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:05'),
+(246, 3670, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:05'),
+(247, 3671, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:06'),
+(248, 3675, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:07'),
+(249, 3676, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:07'),
+(250, 3677, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:07'),
+(251, 3678, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:07'),
+(252, 3681, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:08'),
+(253, 3683, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:08'),
+(254, 3686, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:09'),
+(255, 3689, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:10'),
+(256, 3691, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:10'),
+(257, 3693, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:11'),
+(258, 3696, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:11'),
+(259, 3701, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:12'),
+(260, 3704, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:13'),
+(261, 3709, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:14'),
+(262, 3710, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:15'),
+(263, 3715, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:16'),
+(264, 3716, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:16'),
+(265, 3717, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:16'),
+(266, 3719, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:17'),
+(267, 3720, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:17'),
+(268, 3722, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:17'),
+(269, 3723, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:18'),
+(270, 3727, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:18'),
+(271, 3729, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:19'),
+(272, 3730, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:19'),
+(273, 3731, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:19'),
+(274, 3736, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:20'),
+(275, 3737, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:21'),
+(276, 3740, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:21'),
+(277, 3742, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:22'),
+(278, 3743, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:22'),
+(279, 3744, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:22'),
+(280, 3748, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:23'),
+(281, 3754, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:25'),
+(282, 3760, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:26'),
+(283, 3762, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:27'),
+(284, 3768, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:28'),
+(285, 3770, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:29'),
+(286, 3772, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:29'),
+(287, 3774, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:29'),
+(288, 3777, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:30'),
+(289, 3781, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:31'),
+(290, 3782, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:31'),
+(291, 3786, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:33'),
+(292, 3789, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:34'),
+(293, 3792, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:35'),
+(294, 3794, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:36'),
+(295, 3798, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:37'),
+(296, 3807, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:40'),
+(297, 3813, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:42'),
+(298, 3817, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:44'),
+(299, 3818, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:44'),
+(300, 3819, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:44'),
+(301, 3820, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:44'),
+(302, 3821, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:45'),
+(303, 3825, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:46'),
+(304, 3829, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:46'),
+(305, 3832, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:47'),
+(306, 3833, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:47'),
+(307, 3849, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:51'),
+(308, 3851, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:52'),
+(309, 3852, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:52'),
+(310, 3853, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:52'),
+(311, 3859, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:54'),
+(312, 3861, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:54'),
+(313, 3867, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:56'),
+(314, 3871, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:57'),
+(315, 3874, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:57'),
+(316, 3878, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:58'),
+(317, 3879, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:58'),
+(318, 3881, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:59'),
+(319, 3882, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:59'),
+(320, 3900, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:03'),
+(321, 3901, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:03'),
+(322, 3902, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:04'),
+(323, 3903, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:04'),
+(324, 3908, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:19'),
+(325, 3913, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:20'),
+(326, 3923, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:23'),
+(327, 3931, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:24'),
+(328, 3934, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:25'),
+(329, 3937, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:26'),
+(330, 3943, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:27'),
+(331, 3946, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:28'),
+(332, 3949, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:28'),
+(333, 3952, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:29'),
+(334, 3954, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:29'),
+(335, 3955, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:30'),
+(336, 3961, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:31'),
+(337, 3962, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:31'),
+(338, 3964, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:32'),
+(339, 3966, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:32'),
+(340, 3968, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:33'),
+(341, 3972, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:33'),
+(342, 3974, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:34'),
+(343, 3975, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:34'),
+(344, 3976, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:34'),
+(345, 3977, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:35'),
+(346, 3982, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:36'),
+(347, 3983, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:36'),
+(348, 3992, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:38'),
+(349, 3997, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:39'),
+(350, 3999, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:40'),
+(351, 4004, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:41'),
+(352, 4007, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:41'),
+(353, 4011, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:42'),
+(354, 4016, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:43'),
+(355, 4018, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:44'),
+(356, 4023, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:45'),
+(357, 4025, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:45'),
+(358, 4030, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:46'),
+(359, 4032, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:47'),
+(360, 4039, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:48'),
+(361, 4041, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:49'),
+(362, 4043, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:49'),
+(363, 4045, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:50'),
+(364, 4046, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:50'),
+(365, 4047, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:50'),
+(366, 4048, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:50'),
+(367, 4053, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:51'),
+(368, 4056, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:52'),
+(369, 4058, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:53'),
+(370, 4060, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:53'),
+(371, 4062, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:53'),
+(372, 4065, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:54'),
+(373, 4068, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:55'),
+(374, 4069, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:55'),
+(375, 4071, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:56'),
+(376, 4074, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:56'),
+(377, 4075, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:57'),
+(378, 4078, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:57'),
+(379, 4081, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:58'),
+(380, 4089, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:00'),
+(381, 4092, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:00'),
+(382, 4096, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:01'),
+(383, 4097, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:01'),
+(384, 4098, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:02'),
+(385, 4099, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:02'),
+(386, 4104, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:03'),
+(387, 4105, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:03'),
+(388, 4107, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:04'),
+(389, 4110, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:04'),
+(390, 4111, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:04'),
+(391, 4113, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:05'),
+(392, 4114, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:05'),
+(393, 4116, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:06'),
+(394, 4121, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:07'),
+(395, 4122, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:07'),
+(396, 4126, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:08'),
+(397, 4138, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:11'),
+(398, 4141, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:12'),
+(399, 4144, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:12'),
+(400, 4145, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:13'),
+(401, 4157, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:15'),
+(402, 4159, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:16'),
+(403, 4165, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:17'),
+(404, 4167, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:18'),
+(405, 4173, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:19'),
+(406, 4174, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:19'),
+(407, 4184, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:21'),
+(408, 4187, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:22'),
+(409, 4188, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:22'),
+(410, 4191, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:23'),
+(411, 4192, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:24'),
+(412, 4196, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:25'),
+(413, 4199, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:25'),
+(414, 4203, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:26'),
+(415, 4204, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:26'),
+(416, 4206, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:27'),
+(417, 4207, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:27'),
+(418, 4210, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:28'),
+(419, 4213, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:29'),
+(420, 4214, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:29'),
+(421, 4215, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:29'),
+(422, 4216, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:29'),
+(423, 4217, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:29'),
+(424, 4218, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:30'),
+(425, 4222, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:31'),
+(426, 4224, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:31'),
+(427, 4229, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:32'),
+(428, 4232, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:33'),
+(429, 4233, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:33'),
+(430, 4235, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:34'),
+(431, 4237, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:34'),
+(432, 4241, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:35'),
+(433, 4242, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:36'),
+(434, 4245, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:36'),
+(435, 4247, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:37'),
+(436, 4253, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:38'),
+(437, 4262, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:40'),
+(438, 4267, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:42'),
+(439, 4270, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:43'),
+(440, 4279, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:45'),
+(441, 4282, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:46'),
+(442, 4292, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:48'),
+(443, 4296, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:49'),
+(444, 4299, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:50'),
+(445, 4301, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:50'),
+(446, 4307, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:52'),
+(447, 4309, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:53'),
+(448, 4311, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:53'),
+(449, 4312, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:53'),
+(450, 4314, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:54'),
+(451, 4315, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:54'),
+(452, 4316, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:54'),
+(453, 4318, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:55'),
+(454, 4322, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:56'),
+(455, 4323, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:56'),
+(456, 4328, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:57'),
+(457, 4329, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:58'),
+(458, 4333, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:59'),
+(459, 4337, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:00'),
+(460, 4338, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:00'),
+(461, 4341, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:01'),
+(462, 4342, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:01'),
+(463, 4345, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:02'),
+(464, 4346, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:02'),
+(465, 4349, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:04'),
+(466, 4352, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:05'),
+(467, 4354, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:05'),
+(468, 4355, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:06'),
+(469, 4360, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:07'),
+(470, 4365, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:08'),
+(471, 4369, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:09'),
+(472, 4374, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:10'),
+(473, 4375, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:10'),
+(474, 4384, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:13'),
+(475, 4392, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:14'),
+(476, 4394, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:15'),
+(477, 4404, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:17'),
+(478, 4405, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:17'),
+(479, 4408, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:18'),
+(480, 4411, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:19'),
+(481, 4412, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:19'),
+(482, 4413, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:19'),
+(483, 4414, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:19'),
+(484, 4421, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:21'),
+(485, 4422, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:21'),
+(486, 4427, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:22'),
+(487, 4429, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:23'),
+(488, 4433, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:24'),
+(489, 4434, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:24'),
+(490, 4436, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:25'),
+(491, 4440, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:25'),
+(492, 4445, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:27'),
+(493, 4450, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:28'),
+(494, 4453, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:28'),
+(495, 4454, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:29'),
+(496, 4456, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:29'),
+(497, 4458, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:30'),
+(498, 4459, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:30'),
+(499, 4460, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:30'),
+(500, 4461, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:30'),
+(504, 3195, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 05:14:55');
 
 -- --------------------------------------------------------
 
@@ -431,73 +1186,27 @@ CREATE TABLE `student_parents` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `subjects`
+-- Table structure for table `support_tickets`
 --
 
-CREATE TABLE `subjects` (
+CREATE TABLE `support_tickets` (
   `id` int(11) NOT NULL,
-  `curriculum_id` int(11) NOT NULL,
-  `subject_name` varchar(100) NOT NULL,
-  `description` text DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `user_id` int(11) NOT NULL,
+  `ticket_number` varchar(20) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `message` text NOT NULL,
+  `priority` enum('low','medium','high') DEFAULT 'medium',
+  `status` enum('open','in_progress','on_hold','resolved') DEFAULT 'open',
+  `attachment` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Dumping data for table `subjects`
+-- Dumping data for table `support_tickets`
 --
 
-INSERT INTO `subjects` (`id`, `curriculum_id`, `subject_name`, `description`, `created_at`) VALUES
-(1, 1, 'English', 'Primary English', '2025-04-23 05:16:40'),
-(2, 1, 'Mathematics', 'Primary Mathematics', '2025-04-23 05:16:40'),
-(3, 1, 'Science', 'Primary Science', '2025-04-23 05:16:40'),
-(4, 1, 'Global Perspectives', 'Primary Global Perspectives', '2025-04-23 05:16:40'),
-(5, 1, 'ICT', 'Primary Information and Communication Technology', '2025-04-23 05:16:40'),
-(6, 1, 'Art & Design', 'Primary Art and Design', '2025-04-23 05:16:40'),
-(7, 1, 'Music', 'Primary Music', '2025-04-23 05:16:40'),
-(8, 1, 'Physical Education', 'Primary PE', '2025-04-23 05:16:40'),
-(9, 1, 'English', 'Lower Secondary English', '2025-04-23 05:16:40'),
-(10, 1, 'Mathematics', 'Lower Secondary Mathematics', '2025-04-23 05:16:40'),
-(11, 1, 'Science', 'Lower Secondary Science (Biology, Chemistry, Physics)', '2025-04-23 05:16:40'),
-(12, 1, 'Global Perspectives', 'Lower Secondary Global Perspectives', '2025-04-23 05:16:40'),
-(13, 1, 'ICT', 'Lower Secondary ICT', '2025-04-23 05:16:40'),
-(14, 1, 'First Language (Amharic)', 'Lower Secondary First Language', '2025-04-23 05:16:40'),
-(15, 1, 'Foreign Language (French)', 'Lower Secondary Foreign Language', '2025-04-23 05:16:40'),
-(16, 1, 'English - First Language', 'IGCSE English First Language', '2025-04-23 05:16:40'),
-(17, 1, 'English - Second Language', 'IGCSE English Second Language', '2025-04-23 05:16:40'),
-(18, 1, 'Mathematics', 'IGCSE Mathematics', '2025-04-23 05:16:40'),
-(19, 1, 'Additional Mathematics', 'IGCSE Additional Mathematics', '2025-04-23 05:16:40'),
-(20, 1, 'Biology', 'IGCSE Biology', '2025-04-23 05:16:40'),
-(21, 1, 'Chemistry', 'IGCSE Chemistry', '2025-04-23 05:16:40'),
-(22, 1, 'Physics', 'IGCSE Physics', '2025-04-23 05:16:40'),
-(23, 1, 'Business Studies', 'IGCSE Business Studies', '2025-04-23 05:16:40'),
-(24, 1, 'Economics', 'IGCSE Economics', '2025-04-23 05:16:40'),
-(25, 1, 'Accounting', 'IGCSE Accounting', '2025-04-23 05:16:40'),
-(26, 1, 'ICT', 'IGCSE Information and Communication Technology', '2025-04-23 05:16:40'),
-(27, 1, 'Computer Science', 'IGCSE Computer Science', '2025-04-23 05:16:40'),
-(28, 1, 'Geography', 'IGCSE Geography', '2025-04-23 05:16:40'),
-(29, 1, 'History', 'IGCSE History', '2025-04-23 05:16:40'),
-(30, 1, 'Foreign Language (French)', 'IGCSE French', '2025-04-23 05:16:40'),
-(31, 1, 'Foreign Language (Spanish)', 'IGCSE Spanish', '2025-04-23 05:16:40'),
-(32, 1, 'Foreign Language (Arabic)', 'IGCSE Arabic', '2025-04-23 05:16:40'),
-(33, 1, 'Art & Design', 'IGCSE Art and Design', '2025-04-23 05:16:40'),
-(34, 1, 'Music', 'IGCSE Music', '2025-04-23 05:16:40'),
-(35, 1, 'Physical Education', 'IGCSE PE', '2025-04-23 05:16:40'),
-(36, 1, 'English - Language & Literature', 'AS/A Level English Language and Literature', '2025-04-23 05:16:40'),
-(37, 1, 'Mathematics', 'AS/A Level Mathematics', '2025-04-23 05:16:40'),
-(38, 1, 'Further Mathematics', 'AS/A Level Further Mathematics', '2025-04-23 05:16:40'),
-(39, 1, 'Biology', 'AS/A Level Biology', '2025-04-23 05:16:40'),
-(40, 1, 'Chemistry', 'AS/A Level Chemistry', '2025-04-23 05:16:40'),
-(41, 1, 'Physics', 'AS/A Level Physics', '2025-04-23 05:16:40'),
-(42, 1, 'Business', 'AS/A Level Business', '2025-04-23 05:16:40'),
-(43, 1, 'Economics', 'AS/A Level Economics', '2025-04-23 05:16:40'),
-(44, 1, 'Accounting', 'AS/A Level Accounting', '2025-04-23 05:16:40'),
-(45, 1, 'Computer Science', 'AS/A Level Computer Science', '2025-04-23 05:16:40'),
-(46, 1, 'Psychology', 'AS/A Level Psychology', '2025-04-23 05:16:40'),
-(47, 1, 'Global Perspectives', 'AS/A Level Global Perspectives', '2025-04-23 05:16:40'),
-(48, 1, 'Geography', 'AS/A Level Geography', '2025-04-23 05:16:40'),
-(49, 1, 'History', 'AS/A Level History', '2025-04-23 05:16:40'),
-(50, 1, 'Art & Design', 'AS/A Level Art and Design', '2025-04-23 05:16:40'),
-(51, 1, 'Music', 'AS/A Level Music', '2025-04-23 05:16:40');
+INSERT INTO `support_tickets` (`id`, `user_id`, `ticket_number`, `subject`, `message`, `priority`, `status`, `attachment`, `created_at`) VALUES
+(1, 65, 'TKT-67FD9BC48CF6B', 'Greetings', 'Hello', 'medium', 'open', NULL, '2025-04-14 13:35:32');
 
 -- --------------------------------------------------------
 
@@ -509,6 +1218,8 @@ CREATE TABLE `surveys` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
   `created_by` int(11) NOT NULL,
   `starts_at` datetime NOT NULL,
   `ends_at` datetime NOT NULL,
@@ -516,6 +1227,51 @@ CREATE TABLE `surveys` (
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `surveys`
+--
+
+INSERT INTO `surveys` (`id`, `title`, `description`, `category_id`, `status`, `created_by`, `starts_at`, `ends_at`, `is_anonymous`, `is_active`, `created_at`) VALUES
+(2, 'Teachers Survey', 'Teachers survey', 1, 2, 4, '2025-04-23 17:53:00', '2025-05-23 17:53:00', 1, 1, '2025-04-23 17:59:11');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_categories`
+--
+
+CREATE TABLE `survey_categories` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_categories`
+--
+
+INSERT INTO `survey_categories` (`id`, `name`, `description`, `created_at`) VALUES
+(1, 'Behaviour Survey', 'This is to know how behave our employees are.(example)', '2025-03-26 02:36:15'),
+(2, 'Survey on Teachers', 'Description', '2025-03-26 02:38:51'),
+(3, 'Students Performance Survey', 'Descritpion', '2025-03-26 02:40:18'),
+(4, 'contact survey', '', '2025-03-28 05:47:46');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_conditions`
+--
+
+CREATE TABLE `survey_conditions` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `field_id` int(11) NOT NULL,
+  `operator` enum('=','!=','>','<','>=','<=','contains') NOT NULL,
+  `compare_value` varchar(255) NOT NULL,
+  `logic_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -534,6 +1290,30 @@ CREATE TABLE `survey_fields` (
   `display_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `survey_fields`
+--
+
+INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `field_name`, `field_options`, `is_required`, `display_order`) VALUES
+(1, 2, 'radio', 'On a scale of 1-5, how satisfied are you with your current teaching workload?', '', '[\"1\",\"2\",\"3\",\"4\",\"5\"]', 1, 0),
+(2, 2, 'radio', 'Class Assessments are Crucial to measure Students Performance', '', '[\"Yes\",\"No\"]', 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_logic`
+--
+
+CREATE TABLE `survey_logic` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `source_field_id` int(11) NOT NULL,
+  `trigger_value` varchar(255) NOT NULL,
+  `target_field_id` int(11) NOT NULL,
+  `action` enum('show','hide','enable','disable') NOT NULL,
+  `condition` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -548,6 +1328,55 @@ CREATE TABLE `survey_responses` (
   `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `survey_responses`
+--
+
+INSERT INTO `survey_responses` (`id`, `survey_id`, `user_id`, `submitted_at`, `answers`) VALUES
+(3, 2, 4458, '2025-04-23 20:41:10', '{\"1\":\"3\",\"2\":\"Yes\"}');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_roles`
+--
+
+CREATE TABLE `survey_roles` (
+  `id` int(11) NOT NULL,
+  `survey_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_roles`
+--
+
+INSERT INTO `survey_roles` (`id`, `survey_id`, `role_id`) VALUES
+(1, 2, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `survey_statuses`
+--
+
+CREATE TABLE `survey_statuses` (
+  `id` int(11) NOT NULL,
+  `status` varchar(50) NOT NULL,
+  `label` varchar(100) NOT NULL,
+  `icon` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_statuses`
+--
+
+INSERT INTO `survey_statuses` (`id`, `status`, `label`, `icon`) VALUES
+(1, 'draft', 'Draft', 'fa-file'),
+(2, 'active', 'Active', 'fa-rocket'),
+(3, 'inactive', 'Inactive', 'fa-pause'),
+(4, 'archived', 'Archived', 'fa-archive');
+
 -- --------------------------------------------------------
 
 --
@@ -557,11 +1386,26 @@ CREATE TABLE `survey_responses` (
 CREATE TABLE `system_settings` (
   `id` int(11) NOT NULL,
   `setting_key` varchar(100) NOT NULL,
+  `academic_year` varchar(50) DEFAULT NULL,
+  `term` varchar(50) DEFAULT NULL,
   `setting_value` text DEFAULT NULL,
   `setting_group` varchar(50) DEFAULT 'general',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `system_settings`
+--
+
+INSERT INTO `system_settings` (`id`, `setting_key`, `academic_year`, `term`, `setting_value`, `setting_group`, `created_at`, `updated_at`) VALUES
+(1, 'site_name', NULL, NULL, 'School CRM System', 'general', '2025-04-22 23:46:38', '2025-04-22 23:46:38'),
+(2, 'site_email', NULL, NULL, 'admin@school.edu', 'general', '2025-04-22 23:46:38', '2025-04-22 23:46:38'),
+(3, 'timezone', NULL, NULL, 'Africa/Nairobi', 'general', '2025-04-22 23:46:38', '2025-04-22 23:47:40'),
+(4, 'items_per_page', NULL, NULL, '20', 'general', '2025-04-22 23:46:38', '2025-04-22 23:47:40'),
+(11, 'enable_surveys', NULL, NULL, '1', 'features', '2025-04-23 00:11:40', '2025-04-23 00:11:40'),
+(12, 'enable_notifications', NULL, NULL, '1', 'features', '2025-04-23 00:11:40', '2025-04-23 00:11:40'),
+(13, 'enable_chat', NULL, NULL, '1', 'features', '2025-04-23 00:11:40', '2025-04-23 00:11:40');
 
 -- --------------------------------------------------------
 
@@ -586,7 +1430,464 @@ CREATE TABLE `teachers` (
 --
 
 INSERT INTO `teachers` (`id`, `user_id`, `qualification`, `subject_specialization`, `date_of_birth`, `gender`, `address`, `status`, `created_at`) VALUES
-(1, 69, 'BSc Degree in Business', 'Business Studies', '1985-08-10', 'Male', '789 Educator Road, Addis Ababa', 'active', '2025-04-23 05:28:17');
+(1, 69, 'BSc Degree in Business', 'Business Studies', '1985-08-10', 'Male', '789 Educator Road, Addis Ababa', 'active', '2025-04-23 05:28:17'),
+(2, 2932, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(3, 2933, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(4, 2934, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(5, 2935, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(6, 2936, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(7, 2937, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(8, 2938, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(9, 2939, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(10, 2940, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(11, 2941, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(12, 2942, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(13, 2943, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(14, 2944, 'BSc Degree', 'Biology', '0000-00-00', 'Male', '', 'active', '2025-04-24 00:36:20'),
+(15, 2945, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(16, 2946, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(17, 2947, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(18, 2948, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(19, 2949, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(20, 2950, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(21, 2951, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(22, 2952, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(23, 2953, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(24, 2954, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(25, 2955, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(26, 2959, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(27, 3047, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 00:36:20'),
+(28, 3184, 'BSc Degree', 'Chemistry', '0000-00-00', 'Male', '', 'active', '2025-04-24 01:42:36'),
+(29, 3186, 'BSc Degree', 'Physics', '0000-00-00', 'Male', '', 'active', '2025-04-24 01:42:36'),
+(31, 3190, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:37'),
+(32, 3191, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:37'),
+(33, 3198, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:39'),
+(34, 3200, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:39'),
+(35, 3204, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:40'),
+(36, 3205, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:40'),
+(37, 3214, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:43'),
+(38, 3215, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:43'),
+(39, 3219, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:44'),
+(40, 3223, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:45'),
+(41, 3224, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:45'),
+(42, 3226, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:46'),
+(43, 3227, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:46'),
+(44, 3231, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:47'),
+(45, 3235, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:48'),
+(46, 3236, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:48'),
+(47, 3238, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:48'),
+(48, 3242, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:49'),
+(49, 3243, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:50'),
+(50, 3245, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:50'),
+(51, 3251, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:51'),
+(52, 3263, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:54'),
+(53, 3266, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:55'),
+(54, 3270, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:56'),
+(55, 3274, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:57'),
+(56, 3275, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:57'),
+(57, 3281, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:42:58'),
+(58, 3289, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:00'),
+(59, 3290, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:00'),
+(60, 3293, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:01'),
+(61, 3295, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:02'),
+(62, 3298, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:03'),
+(63, 3300, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:03'),
+(64, 3301, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:03'),
+(65, 3304, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:04'),
+(66, 3311, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:05'),
+(67, 3316, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:06'),
+(68, 3317, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:07'),
+(69, 3320, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:07'),
+(70, 3325, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:08'),
+(71, 3330, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:09'),
+(72, 3331, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:10'),
+(73, 3338, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:11'),
+(74, 3340, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:12'),
+(75, 3341, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:12'),
+(76, 3344, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:13'),
+(77, 3346, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:13'),
+(78, 3348, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:14'),
+(79, 3350, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:14'),
+(80, 3352, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:15'),
+(81, 3356, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:50'),
+(82, 3358, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:50'),
+(83, 3362, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:51'),
+(84, 3363, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:51'),
+(85, 3364, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:52'),
+(86, 3368, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:52'),
+(87, 3370, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:53'),
+(88, 3379, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:55'),
+(89, 3380, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:55'),
+(90, 3383, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:56'),
+(91, 3387, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:57'),
+(92, 3388, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:57'),
+(93, 3391, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:58'),
+(94, 3394, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:59'),
+(95, 3396, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:59'),
+(96, 3397, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:43:59'),
+(97, 3400, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:00'),
+(98, 3405, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:01'),
+(99, 3409, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:02'),
+(100, 3412, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:03'),
+(101, 3416, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:04'),
+(102, 3417, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:04'),
+(103, 3418, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:04'),
+(104, 3419, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:04'),
+(105, 3420, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:05'),
+(106, 3426, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:06'),
+(107, 3427, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:06'),
+(108, 3431, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:07'),
+(109, 3435, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:08'),
+(110, 3439, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:09'),
+(111, 3445, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:10'),
+(112, 3447, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:11'),
+(113, 3448, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:11'),
+(114, 3449, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:11'),
+(115, 3454, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:12'),
+(116, 3456, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:13'),
+(117, 3461, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:14'),
+(118, 3465, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:15'),
+(119, 3470, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:16'),
+(120, 3475, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:17'),
+(121, 3479, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:18'),
+(122, 3481, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:19'),
+(123, 3485, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:20'),
+(124, 3489, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:21'),
+(125, 3490, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:21'),
+(126, 3492, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:21'),
+(127, 3494, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:22'),
+(128, 3495, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:22'),
+(129, 3496, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:22'),
+(130, 3504, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:24'),
+(131, 3505, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:25'),
+(132, 3507, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:25'),
+(133, 3511, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:26'),
+(134, 3513, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:27'),
+(135, 3517, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:27'),
+(136, 3518, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:28'),
+(137, 3520, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:28'),
+(138, 3522, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:29'),
+(139, 3523, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:29'),
+(140, 3526, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:30'),
+(141, 3527, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:30'),
+(142, 3528, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:30'),
+(143, 3531, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:31'),
+(144, 3533, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:31'),
+(145, 3535, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:32'),
+(146, 3536, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:32'),
+(147, 3540, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:33'),
+(148, 3544, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:34'),
+(149, 3553, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:36'),
+(150, 3556, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:37'),
+(151, 3557, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:37'),
+(152, 3560, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:38'),
+(153, 3562, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:38'),
+(154, 3565, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:39'),
+(155, 3568, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:40'),
+(156, 3570, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:40'),
+(157, 3572, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:41'),
+(158, 3573, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:41'),
+(159, 3574, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:41'),
+(160, 3578, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:42'),
+(161, 3579, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:43'),
+(162, 3581, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:43'),
+(163, 3583, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:44'),
+(164, 3585, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:44'),
+(165, 3586, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:44'),
+(166, 3587, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:45'),
+(167, 3588, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:45'),
+(168, 3598, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:47'),
+(169, 3608, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:50'),
+(170, 3614, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:51'),
+(171, 3615, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:52'),
+(172, 3617, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:52'),
+(173, 3619, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:52'),
+(174, 3621, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:53'),
+(175, 3622, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:53'),
+(176, 3623, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:53'),
+(177, 3624, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:54'),
+(178, 3625, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:54'),
+(179, 3628, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:55'),
+(180, 3629, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:55'),
+(181, 3634, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:56'),
+(182, 3635, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:56'),
+(183, 3639, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:57'),
+(184, 3644, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:58'),
+(185, 3647, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:44:59'),
+(186, 3649, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:00'),
+(187, 3651, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:00'),
+(188, 3661, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:03'),
+(189, 3668, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:05'),
+(190, 3669, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:05'),
+(191, 3679, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:07'),
+(192, 3684, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:09'),
+(193, 3685, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:09'),
+(194, 3687, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:09'),
+(195, 3688, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:10'),
+(196, 3692, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:10'),
+(197, 3695, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:11'),
+(198, 3699, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:12'),
+(199, 3700, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:12'),
+(200, 3703, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:13'),
+(201, 3706, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:14'),
+(202, 3713, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:15'),
+(203, 3714, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:15'),
+(204, 3718, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:16'),
+(205, 3721, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:17'),
+(206, 3726, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:18'),
+(207, 3734, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:20'),
+(208, 3735, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:20'),
+(209, 3738, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:21'),
+(210, 3741, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:22'),
+(211, 3745, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:23'),
+(212, 3746, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:23'),
+(213, 3747, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:23'),
+(214, 3749, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:24'),
+(215, 3750, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:24'),
+(216, 3752, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:24'),
+(217, 3753, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:25'),
+(218, 3755, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:25'),
+(219, 3758, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:26'),
+(220, 3759, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:26'),
+(221, 3761, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:26'),
+(222, 3764, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:27'),
+(223, 3766, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:28'),
+(224, 3767, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:28'),
+(225, 3769, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:28'),
+(226, 3773, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:29'),
+(227, 3778, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:30'),
+(228, 3779, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:31'),
+(229, 3780, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:31'),
+(230, 3783, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:32'),
+(231, 3787, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:33'),
+(232, 3788, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:33'),
+(233, 3797, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:37'),
+(234, 3800, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:38'),
+(235, 3803, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:39'),
+(236, 3805, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:39'),
+(237, 3806, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:40'),
+(238, 3808, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:41'),
+(239, 3814, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:43'),
+(240, 3816, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:43'),
+(241, 3822, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:45'),
+(242, 3826, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:46'),
+(243, 3827, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:46'),
+(244, 3831, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:47'),
+(245, 3834, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:48'),
+(246, 3837, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:48'),
+(247, 3839, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:49'),
+(248, 3841, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:49'),
+(249, 3842, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:49'),
+(250, 3844, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:50'),
+(251, 3845, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:50'),
+(252, 3846, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:50'),
+(253, 3848, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:51'),
+(254, 3850, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:51'),
+(255, 3854, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:52'),
+(256, 3856, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:53'),
+(257, 3857, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:53'),
+(258, 3860, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:54'),
+(259, 3863, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:55'),
+(260, 3868, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:56'),
+(261, 3869, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:56'),
+(262, 3872, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:57'),
+(263, 3873, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:57'),
+(264, 3875, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:57'),
+(265, 3876, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:45:58'),
+(266, 3885, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:00'),
+(267, 3887, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:00'),
+(268, 3888, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:00'),
+(269, 3889, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:01'),
+(270, 3891, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:01'),
+(271, 3892, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:01'),
+(272, 3896, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:02'),
+(273, 3898, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:03'),
+(274, 3904, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:04'),
+(275, 3905, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:46:04'),
+(276, 3910, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:19'),
+(277, 3912, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:20'),
+(278, 3915, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:21'),
+(279, 3916, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:21'),
+(280, 3917, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:21'),
+(281, 3918, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:22'),
+(282, 3922, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:22'),
+(283, 3924, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:23'),
+(284, 3925, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:23'),
+(285, 3927, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:23'),
+(286, 3935, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:25'),
+(287, 3936, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:26'),
+(288, 3940, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:26'),
+(289, 3942, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:27'),
+(290, 3944, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:27'),
+(291, 3956, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:30'),
+(292, 3958, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:30'),
+(293, 3959, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:31'),
+(294, 3960, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:31'),
+(295, 3965, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:32'),
+(296, 3969, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:33'),
+(297, 3973, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:34'),
+(298, 3984, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:36'),
+(299, 3985, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:36'),
+(300, 3987, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:37'),
+(301, 3991, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:38'),
+(302, 3994, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:38'),
+(303, 3996, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:39'),
+(304, 3998, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:39'),
+(305, 4003, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:40'),
+(306, 4006, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:41'),
+(307, 4008, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:42'),
+(308, 4010, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:42'),
+(309, 4013, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:43'),
+(310, 4015, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:43'),
+(311, 4019, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:44'),
+(312, 4020, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:44'),
+(313, 4021, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:44'),
+(314, 4024, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:45'),
+(315, 4026, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:46'),
+(316, 4028, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:46'),
+(317, 4034, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:47'),
+(318, 4038, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:48'),
+(319, 4040, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:49'),
+(320, 4042, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:49'),
+(321, 4044, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:49'),
+(322, 4051, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:51'),
+(323, 4055, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:52'),
+(324, 4057, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:52'),
+(325, 4061, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:53'),
+(326, 4063, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:54'),
+(327, 4067, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:55'),
+(328, 4070, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:55'),
+(329, 4072, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:56'),
+(330, 4073, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:56'),
+(331, 4077, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:57'),
+(332, 4080, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:58'),
+(333, 4083, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:58'),
+(334, 4086, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:59'),
+(335, 4087, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:59'),
+(336, 4088, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:48:59'),
+(337, 4093, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:00'),
+(338, 4094, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:01'),
+(339, 4095, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:01'),
+(340, 4100, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:02'),
+(341, 4103, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:03'),
+(342, 4109, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:04'),
+(343, 4112, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:05'),
+(344, 4115, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:05'),
+(345, 4118, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:06'),
+(346, 4125, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:08'),
+(347, 4128, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:08'),
+(348, 4131, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:09'),
+(349, 4133, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:10'),
+(350, 4134, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:10'),
+(351, 4136, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:10'),
+(352, 4139, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:11'),
+(353, 4140, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:11'),
+(354, 4147, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:13'),
+(355, 4148, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:13'),
+(356, 4149, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:13'),
+(357, 4151, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:14'),
+(358, 4155, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:15'),
+(359, 4160, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:16'),
+(360, 4168, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:18'),
+(361, 4169, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:18'),
+(362, 4175, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:19'),
+(363, 4177, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:20'),
+(364, 4178, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:20'),
+(365, 4180, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:21'),
+(366, 4181, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:21'),
+(367, 4183, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:21'),
+(368, 4185, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:22'),
+(369, 4190, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:23'),
+(370, 4194, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:24'),
+(371, 4195, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:24'),
+(372, 4198, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:25'),
+(373, 4200, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:26'),
+(374, 4205, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:27'),
+(375, 4208, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:27'),
+(376, 4219, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:30'),
+(377, 4220, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:30'),
+(378, 4225, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:31'),
+(379, 4228, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:32'),
+(380, 4230, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:33'),
+(381, 4234, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:34'),
+(382, 4236, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:34'),
+(383, 4239, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:35'),
+(384, 4243, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:36'),
+(385, 4244, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:36'),
+(386, 4246, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:36'),
+(387, 4257, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:39'),
+(388, 4258, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:40'),
+(389, 4259, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:40'),
+(390, 4260, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:40'),
+(391, 4261, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:40'),
+(392, 4264, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:41'),
+(393, 4266, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:42'),
+(394, 4269, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:42'),
+(395, 4272, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:43'),
+(396, 4273, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:43'),
+(397, 4275, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:44'),
+(398, 4276, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:44'),
+(399, 4280, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:45'),
+(400, 4284, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:46'),
+(401, 4291, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:48'),
+(402, 4294, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:49'),
+(403, 4295, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:49'),
+(404, 4298, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:50'),
+(405, 4300, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:50'),
+(406, 4303, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:51'),
+(407, 4305, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:51'),
+(408, 4313, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:54'),
+(409, 4317, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:55'),
+(410, 4319, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:55'),
+(411, 4324, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:57'),
+(412, 4326, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:57'),
+(413, 4330, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:58'),
+(414, 4332, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:58'),
+(415, 4334, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:59'),
+(416, 4336, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:49:59'),
+(417, 4343, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:01'),
+(418, 4347, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:03'),
+(419, 4351, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:05'),
+(420, 4356, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:06'),
+(421, 4357, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:06'),
+(422, 4358, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:06'),
+(423, 4361, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:07'),
+(424, 4363, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:08'),
+(425, 4364, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:08'),
+(426, 4366, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:08'),
+(427, 4367, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:09'),
+(428, 4370, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:09'),
+(429, 4371, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:10'),
+(430, 4372, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:10'),
+(431, 4383, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:12'),
+(432, 4385, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:13'),
+(433, 4387, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:13'),
+(434, 4389, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:14'),
+(435, 4391, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:14'),
+(436, 4395, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:15'),
+(437, 4396, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:15'),
+(438, 4397, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:16'),
+(439, 4399, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:16'),
+(440, 4400, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:16'),
+(441, 4402, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:17'),
+(442, 4406, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:18'),
+(443, 4410, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:19'),
+(444, 4415, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:20'),
+(445, 4416, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:20'),
+(446, 4418, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:20'),
+(447, 4420, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:21'),
+(448, 4423, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:21'),
+(449, 4428, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:23'),
+(450, 4435, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:24'),
+(451, 4441, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:26'),
+(452, 4442, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:26'),
+(453, 4444, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:26'),
+(454, 4447, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:27'),
+(455, 4448, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:27'),
+(456, 4449, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:28'),
+(457, 4451, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:28'),
+(458, 4455, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:29'),
+(459, 4457, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:29');
 
 -- --------------------------------------------------------
 
@@ -600,6 +1901,30 @@ CREATE TABLE `teacher_subjects` (
   `class_subject_id` int(11) NOT NULL,
   `section_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `teacher_subjects`
+--
+
+INSERT INTO `teacher_subjects` (`id`, `teacher_id`, `class_subject_id`, `section_id`) VALUES
+(21, 1, 3, 42),
+(22, 1, 6, 42),
+(23, 1, 4, 42),
+(24, 1, 6, 43);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transcripts`
+--
+
+CREATE TABLE `transcripts` (
+  `id` int(11) NOT NULL,
+  `enrollment_id` int(11) NOT NULL,
+  `academic_year_id` int(11) NOT NULL,
+  `gpa` decimal(4,2) DEFAULT NULL,
+  `remarks` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -615,6 +1940,7 @@ CREATE TABLE `users` (
   `first_name` varchar(100) DEFAULT NULL,
   `last_name` varchar(100) DEFAULT NULL,
   `role_id` int(11) DEFAULT NULL,
+  `last_active` datetime DEFAULT NULL,
   `active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `last_login` timestamp NULL DEFAULT NULL,
@@ -625,24 +1951,1633 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `active`, `created_at`, `last_login`, `avatar`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, 1, '2025-03-25 03:50:31', '2025-04-22 21:26:14', 'admin_avatar.jpg'),
-(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'mcdc@gmail.com', 'Efream', 'Yohannes', 4, 1, '2025-03-25 11:47:11', '2025-04-21 07:40:11', 'student_avatar5.jpg'),
-(65, 'Adugna1', '$2y$10$mVnaYcK/FyHuL7meR9J5susyTa.6T4tgUt6Ci7xcLpMsREPWX6R3G', 'gizawadugna@gmail.com', 'Adugna', 'Gizaw', 4, 1, '2025-03-29 01:03:37', '2025-04-21 12:52:56', 'avatar_65_053303628160f3c6.png'),
-(66, 'gizawadugna1', '$2y$10$lc./P6NQpbQoCJ8j6PkI.ecLmF5mJ3n5ykcwXZ2DzZ8IGk/E5w/2W', 'gizawadugna1@gmail.com', 'Gizaw', 'Parent', 3, 1, '2025-04-21 07:18:47', '2025-04-21 09:07:43', 'parent_avatar66.jpg'),
-(67, 'abel', '$2y$10$bGlkJRnMYCgBgcmpmCKtR.Kej4OY9UEb8h66IAXmtxuBpDBWZZ7wu', 'efreamyohannes@gmail.com', 'Abel', 'Manager', 1, 1, '2025-04-21 08:03:05', '2025-04-21 09:16:38', 'admin_avatar67.jpg'),
-(68, 'developermustafa', '$2y$10$ztkwBLG9mvtcipjuNnhc5Otu3obOiAQKQYO.ScHvZpIFBrFu6RluK', 'mustafarahman792@gmail.com', 'Mustafa', 'Rahman', 1, 1, '2025-04-21 15:55:48', '2025-04-21 15:55:53', 'default.jpg'),
-(69, 'gizawadugna3', '$2y$10$Zhuo9Q3Efpz5Y1o8AckTpOeXCTEjK3138VIBRFiQ8bNy1joC.kx7u', 'gizawadugna3@gmail.com', 'Adugna', 'Gizaw', 2, 1, '2025-04-22 06:13:36', NULL, 'teacher_avatar69.jpg');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `active`, `created_at`, `last_login`, `avatar`) VALUES
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, NULL, 1, '2025-03-25 03:50:31', '2025-04-23 20:20:28', 'admin_avatar.jpg'),
+(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'mcdc@gmail.com', 'Efream', 'Yohannes', 4, NULL, 1, '2025-03-25 11:47:11', '2025-04-21 07:40:11', 'student_avatar5.jpg'),
+(65, 'Adugna1', '$2y$10$mVnaYcK/FyHuL7meR9J5susyTa.6T4tgUt6Ci7xcLpMsREPWX6R3G', 'gizawadugna@gmail.com', 'Adugna', 'Gizaw', 4, NULL, 1, '2025-03-29 01:03:37', '2025-04-21 12:52:56', 'avatar_65_053303628160f3c6.png'),
+(66, 'gizawadugna1', '$2y$10$lc./P6NQpbQoCJ8j6PkI.ecLmF5mJ3n5ykcwXZ2DzZ8IGk/E5w/2W', 'gizawadugna1@gmail.com', 'Gizaw', 'Parent', 3, NULL, 1, '2025-04-21 07:18:47', '2025-04-21 09:07:43', 'parent_avatar66.jpg'),
+(67, 'abel', '$2y$10$bGlkJRnMYCgBgcmpmCKtR.Kej4OY9UEb8h66IAXmtxuBpDBWZZ7wu', 'efreamyohannes@gmail.com', 'Abel', 'Manager', 3, NULL, 1, '2025-04-21 08:03:05', '2025-04-21 09:16:38', 'admin_avatar67.jpg'),
+(68, 'developermustafa', '$2y$10$ztkwBLG9mvtcipjuNnhc5Otu3obOiAQKQYO.ScHvZpIFBrFu6RluK', 'mustafarahman792@gmail.com', 'Mustafa', 'Rahman', 3, NULL, 1, '2025-04-21 15:55:48', '2025-04-21 15:55:53', 'default.jpg'),
+(69, 'gizawadugna3', '$2y$10$Zhuo9Q3Efpz5Y1o8AckTpOeXCTEjK3138VIBRFiQ8bNy1joC.kx7u', 'gizawadugna3@gmail.com', 'Adugna', 'Gizaw', 2, NULL, 1, '2025-04-22 06:13:36', NULL, 'teacher_avatar69.jpg'),
+(72, 'Tayiton', '$2y$10$C2rgv8RN7v2Vx7N1iEd/bOsXRt1DaUffasadWm5dYabu6S/WoBuRC', 'tayton@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:43', NULL, 'default.jpg'),
+(73, 'Kaleab', '$2y$10$wxOLU/rGBEcGGfCm/nMDZ.aYu1MGXTv/fjaICwPvFzxZL6kowM/7y', 'kaleab@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:43', NULL, 'default.jpg'),
+(74, 'Adil', '$2y$10$2MzEmM19FmhdNnLrqgpsMOyAkCL5WO9x0bZ3lhq3/zvHjZa1gBlAi', 'Adi@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:43', NULL, 'default.jpg'),
+(75, 'Michael', '$2y$10$Lzadw3YGW4gphmvSK4RHLeNb5jugVxPCrtWlQp6YcPHuEWxgeG.lq', 'Michael@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:44', NULL, 'default.jpg'),
+(76, 'Tamar', '$2y$10$BslPoG.YBY4W9vEUymbDmOYw53GGjGuXBteVvDBNUU5B0LmQI4fKm', 'Tamar@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:44', NULL, 'default.jpg'),
+(77, 'Lilian', '$2y$10$ot6J/9l9uk4RAcAwVKQINuQK66Tg.gJUpYPWtG07vHHaPD5Dfah.C', 'Lilian@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:44', NULL, 'default.jpg'),
+(78, 'Debi', '$2y$10$1KoBeVxyLac6fTFYhFFIhOVE3krIRcr/EeZGeB1kyNKX13QhCenaK', 'Debi@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:44', NULL, 'default.jpg'),
+(79, 'Dagmawi', '$2y$10$AztlRdhp5Jvq8xFHHcrIxuOuBdEFiocuWqKF0TSIG6.E6q1To6pYa', 'Dagmawi@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:45', NULL, 'default.jpg'),
+(80, 'Kirubel', '$2y$10$CrT3xXjjjqkKpfLKVc4wCuMuQ6bhkVzjGtcL/ta7GFdVRghtsEovK', 'Mariana@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:45', NULL, 'default.jpg'),
+(81, 'Leul', '$2y$10$wbcK1Q0gFrW9FVarj3Rmoe8sRS0STHQzVALcemoMdKrLJ1YEgi9ia', 'Joel@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:45', NULL, 'default.jpg'),
+(82, 'Biruk', '$2y$10$Zhme6i/cNIjoCcntBCBo.eoFdMFbxoGP.Dmfa7T2nmtgmTxykg7qy', 'Kirubel@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:45', NULL, 'default.jpg'),
+(83, 'Hasset', '$2y$10$bgMDGADtko/PlwlT5ERSP.4z2Kdzhr/Rpr2cL9Pp.sRqNam975Xq.', 'Biruk@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:46', NULL, 'default.jpg'),
+(84, 'Naftati', '$2y$10$Jto6v0qIeeEv5pfoTfEh7OhDfpzcDiF1NaujrdTSndn6tRCzsxqYi', 'Leul@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:46', NULL, 'default.jpg'),
+(85, 'Barok', '$2y$10$HhgfrD2rd74LS/gUyovUOO2vw/S4LgmEuCEnvixuSxRU2g8lizB9e', 'Hasset@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:46', NULL, 'default.jpg'),
+(86, 'Yared', '$2y$10$aQ/tzQuUx/RmERMYVvL9KuTOcUqAuP6WMtcEFe4HeyEQewyQ2XMPS', 'Naftati@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:46', NULL, 'default.jpg'),
+(87, 'Yeab', '$2y$10$s5lvAdGsNH6ssyGleDtiNOS/FsvszII6su7EX7gA12NDLFKx9YgK2', 'Barok@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:47', NULL, 'default.jpg'),
+(88, 'Herma', '$2y$10$8l8MIIc8DmvOMbsIl/V1S.J83moOtU8Sn.epGC3PjWp3.AzRmil/K', 'Yared@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:47', NULL, 'default.jpg'),
+(89, 'Benyas', '$2y$10$cf.k8lNmTCh06EcT7JpwMOzQGoJDzU1IchFUVVsQFzx8WVoSqnk0u', 'Yeab@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:47', NULL, 'default.jpg'),
+(90, 'Liat', '$2y$10$7DGLe16/EsecyJ/sKgeno.iLsbLPtfSWB8oh83U9iJ6G5.SXv1gJu', 'Herma@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:48', NULL, 'default.jpg'),
+(91, 'Robel', '$2y$10$vFSlOfAmR9qNEloNsY1I8ueE0BBzRUQ4HTktPbqW0pSwMR8PtcrpO', 'Benyas@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:48', NULL, 'default.jpg'),
+(92, 'Joshua', '$2y$10$jcIos9JJCycnLwJKzB2Nsec2irSe08JKHIjqnYasN39DmhYpAz8nu', 'Liat@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:48', NULL, 'default.jpg'),
+(93, 'Amen', '$2y$10$LnUr2ffL0bwS6CnYAZq9sOSje/NbDZaIoD4ECzpiF0yubDpUmrl/q', 'Robel@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:48', NULL, 'default.jpg'),
+(94, 'Yomef', '$2y$10$4DGkfk5T2MicaszZf8N83ey1P19HSd8v94JbxSJKL7N8ocfbGOVsi', 'Joshua@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:49', NULL, 'default.jpg'),
+(95, 'Eliazer', '$2y$10$5fgGFjIf0ZtXqUabdP97COfW7rnOFBRCD6NTAv1qzIbVBfUF1GycG', 'Amen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:49', NULL, 'default.jpg'),
+(96, 'Canaan', '$2y$10$Z3xWn5fR1.Mu0txA3P2CPOpFooQLfG.1mdYN97ZdUWqnwSCzMjnHS', 'Yomef@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:49', NULL, 'default.jpg'),
+(97, 'Noel', '$2y$10$.QaYMKCcsrUs6gI1MNY/PumFjaCEDuMlK9FaGHWva4d9I/GXG1HSe', 'Eliazer@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:49', NULL, 'default.jpg'),
+(98, 'Heran', '$2y$10$zogaU3YBZm5SsMOH1EwVReu8agwy/n8TDeoqjN0AqBtuLspMZsndm', 'Canaan@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:50', NULL, 'default.jpg'),
+(99, 'Yeabsira', '$2y$10$R8oQ4yCd0tEHZBT/FRGePuTs.ttSchjGNvuY21TCjVhN2aLZvWx0W', 'Noel@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:50', NULL, 'default.jpg'),
+(100, 'Hayat', '$2y$10$Hybb2LjBfEPwMlE.XegsbO.PMTJFQ.COtXjrPHZUoMQ6W.W5VcQgq', 'Heran@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:50', NULL, 'default.jpg'),
+(101, 'Nobel', '$2y$10$aEVLTKUbuGrgCW00owv98.M1eRTOxaLmhZxJibeQk40QGoNQ.k0JG', 'Yeabsira@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:50', NULL, 'default.jpg'),
+(102, 'Naol', '$2y$10$s.KO2/R9eNPJDR05aAKXcu.ycwgVW42oCuLPzkYc72s9uDpxDmy5y', 'Hayat@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:51', NULL, 'default.jpg'),
+(103, 'Elhanan', '$2y$10$EM7xBv55flDGyHU8peo51.XXJarMDfr1Frmr.twyDtPC8pqMrWUiu', 'Nobel@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:51', NULL, 'default.jpg'),
+(104, 'Orion', '$2y$10$JZx8SYIjptn3o7ekJBfhXuJwfo/01xwrUzbAAHGPFwiXu32pdgoGe', 'Naol@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:51', NULL, 'default.jpg'),
+(105, 'Eskinder', '$2y$10$DoJKXXNuhnBJh8Uxsux9MePol5nm8ntv59hmQuVuYo/RNAEFc/Woy', 'Elhanan@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:52', NULL, 'default.jpg'),
+(106, 'Benayas', '$2y$10$uXUHaDQxdw/bsfvxzkvZ1uT94xmqfOtXTqWKXcQQuR6eOxXpt0qXi', 'Orion@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:52', NULL, 'default.jpg'),
+(107, 'Wildan', '$2y$10$jXJLP5zVnVgZJmAVVOYI8ef6KFY8U9Qg4Ejo61SxNC55416.l7yHK', 'Eskinder@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:52', NULL, 'default.jpg'),
+(108, 'Nanati', '$2y$10$4oHd/2PfE0EgmoNBWwG3reLU0P47rB35/bwgJSV.goHrVbKNQZrae', 'Benayas@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:52', NULL, 'default.jpg'),
+(109, 'Emani', '$2y$10$d6aOp9EhWQDRCn1ruAvKCe.OWXpx18Lb.WaN4v8fOJSU62bJsPKzy', 'Wildan@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:53', NULL, 'default.jpg'),
+(110, 'Sem', '$2y$10$xB9RBt7IPju3K8coiKjqeOhpRHHqK7jCD348I/17EWgzCkqpwimJO', 'Nanati@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:53', NULL, 'default.jpg'),
+(111, 'Naomi', '$2y$10$eVJf4z9wViwbfUjNcBvlIOTHiY1E.XtJeXPXywoPh4Rio/SYv8mOi', 'Emani@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:53', NULL, 'default.jpg'),
+(112, 'Bana', '$2y$10$N7o2WvAgEUu6DWbsnP.TdOy0bmE93a4igG84JG0izKzargyShcx.6', 'Sem@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:53', NULL, 'default.jpg'),
+(113, 'Mariamawit', '$2y$10$6ft.M7d8YpAbfOvIZO1tduMtafFT9AlJqIrlt1kZ.V.3Keg7pOJ5a', 'Naomi@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:54', NULL, 'default.jpg'),
+(114, 'Malachi', '$2y$10$XkFBwNPh0mdsNukNPIAq/eT8TPhlwR43wxfG1S9WFFlVbtlnz1PdO', 'Bana@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:54', NULL, 'default.jpg'),
+(115, 'Gavein', '$2y$10$WU4GDw9T478zNdKS6m10ruI3FuLlxsOwzImreUn.LS0c1/e5hzoNm', 'Mariamawit@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:54', NULL, 'default.jpg'),
+(116, 'Lillian', '$2y$10$xLdCMNqv7eSv/hnaJ5jVquTXTkZJzbdCtIH5EMdTiJGLcOfc6Tc0C', 'Malachi@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:55', NULL, 'default.jpg'),
+(117, 'Noah', '$2y$10$LGPVNpIYf7iRrPGiYIzZM.OyPuUGLpzcHfx4MuLahhA7b.PiG7C3i', 'Gavein@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:55', NULL, 'default.jpg'),
+(118, 'Amir', '$2y$10$C0sXA9PGupO7CzPbhfa.iO.ay9ACq.Bd/7nQeDoLyLvN/DjqVrACW', 'Lillian@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:55', NULL, 'default.jpg'),
+(119, 'Makida', '$2y$10$CvsBF14cvg/8ykfKNHmfPu2AJG0Xcm/8LBzbXyj4.giEYkjRAsoDy', 'Noah@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:55', NULL, 'default.jpg'),
+(120, 'Dagim', '$2y$10$5mNIM1K2EzLlbo7gMd51tuUe//ls85x1vQcJes/vSpd/Ee6wz6eVe', 'Amir@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:56', NULL, 'default.jpg'),
+(121, 'Yostina', '$2y$10$A3fRyoB29mvItJ2IWKqKt.NcWR0foTPhL/bC.Q2hLr.Pz.3aYE0Vm', 'Makida@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:56', NULL, 'default.jpg'),
+(122, 'Yanet', '$2y$10$x8bsSwKQHP5wlU0PQOs.b.6bVKBUUks6HjyoBdfgsLele9k5qPdUG', 'Dagim@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:56', NULL, 'default.jpg'),
+(123, 'Kidus', '$2y$10$ZVs2ACVruZLdI5f52WvLYudY3kAZVvhrtMgWdXlsBaJbiok1c2baG', 'Yostina@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:56', NULL, 'default.jpg'),
+(124, 'Ruth', '$2y$10$YSBkVYln0DOJMtbFD5DiYuVV7ffQxbRz/35WYoNEvQ0jfF0WTMngW', 'Yanet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:57', NULL, 'default.jpg'),
+(125, 'Hiyab', '$2y$10$JebfPhT63Svk/Qc42aRcZ.D6FlRdhcBbe2/aNWyVtTvoD.RbJL0DW', 'Kidus@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:57', NULL, 'default.jpg'),
+(126, 'Nathan', '$2y$10$DrpKow9FdC92ysStKqIetOobxGV.a7Ba1n5jpW/aSwFobDcs7b5n6', 'Ruth@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:57', NULL, 'default.jpg'),
+(127, 'Shalom', '$2y$10$v3CFjzK0Z1K4RgLbFBmwGO7aJn2Qng.8FjDrKn2UkAxAzcLcUEBBe', 'Hiyab@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:57', NULL, 'default.jpg'),
+(128, 'Eleni', '$2y$10$Cuk3XtC3vBR01YQ3Hp.c8.MZtjUfG6E0BU0nY5ghb6U6nTn0Gf6SO', 'Nathan@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:58', NULL, 'default.jpg'),
+(129, 'Raye', '$2y$10$7bQDo1d/0NAN9LaaR4VnX.EaWwALXuGXuJDjOJhwFb3nqQ43t6Rfi', 'Eleni@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:58', NULL, 'default.jpg'),
+(130, 'Maya', '$2y$10$AFNvG3M1v4gN//c5Mi0VnuwaV2ZUS/vEAA0LdwWqgUSyu9sqAxYCa', 'Raye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:58', NULL, 'default.jpg'),
+(131, 'Abenezer', '$2y$10$pnaEp32Xo0GDNkhFAy6Rue3KM.2/6HDSkjGAc7RYb58ctJUSSrQhS', 'Brook@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:58', NULL, 'default.jpg'),
+(132, 'Beniyas', '$2y$10$3VAs048o.ZUp3DKlMhdKWuKKoBYVPUVzqqh9MPx1ljE2dcFtuOz56', 'Maya@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:58', NULL, 'default.jpg'),
+(133, 'Monet', '$2y$10$69gZXZDgl.DTciPcLqPvi.2qKYqmYI4AO8LZmiBjHjjAHUswYr4ly', 'Beniyas@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:59', NULL, 'default.jpg'),
+(134, 'Kalhiwot', '$2y$10$sLmOsSVKF3vtgv6iKpqKf.Np7tO/3yq/cD4Ijsrgdkis3VyPk4tE6', 'Monet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:59', NULL, 'default.jpg'),
+(135, 'Ednael', '$2y$10$sTTughsQWOLKURU.0DtXGOtqrDTVWDcRVTU11BaE5UaDh6VbK60RC', 'Vitalia@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:31:59', NULL, 'default.jpg'),
+(136, 'Hela', '$2y$10$he0fVm5CRmuyIleCZTTnEuh70M/Y09XDbKAR6gcEnGbPytFvsGWKi', 'Kalhiwot@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:00', NULL, 'default.jpg'),
+(137, 'Sagni', '$2y$10$DcQJePFaVYUtP.kqsJXkOOeeaX2wwr0IC9Yp1W5ZRN.UlHPtToZRK', 'Ednael@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:00', NULL, 'default.jpg'),
+(138, 'Eliana', '$2y$10$H1hJNzA5IqG/XgZttUxMJeiSxKlbBTJAeyEI7RDDR8l3GMk2.8n4q', 'Hela@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:00', NULL, 'default.jpg'),
+(139, 'Mati', '$2y$10$p5dgk8VYcBkAD.vnLnPxSep6xsmVggpk5PJxU1.HdKh8rAiC8SD32', 'Eliana@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:00', NULL, 'default.jpg'),
+(140, 'Bella', '$2y$10$kSFRhR9Geflxvajn4UIM/ufKwaYK5DcQaf84yWopylIK5VloCIf.K', 'Aaron@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:01', NULL, 'default.jpg'),
+(141, 'Eldana', '$2y$10$AdOiC2bl4IUheN8GWnQEf.7sXQ.hjEDA6GivQa.L7/kkahCMH7F6e', 'Bella@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:01', NULL, 'default.jpg'),
+(142, 'Maraki', '$2y$10$EJuNrbSY1n3OKU.zI8vOgOdMpTgyJyqOUGrsoP/Hnp8f2jOtDfhoa', 'Yohannes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:01', NULL, 'default.jpg'),
+(143, 'Fiker', '$2y$10$Mcy/a4IQ04EH1nZrqIX9luHzOANAUSRb9lJg0Ug26ZzmEDFE2mU2y', 'Eldana@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:01', NULL, 'default.jpg'),
+(144, 'Ariam', '$2y$10$9jvbgpgi05GBiTlM/b55.OSRfJLc/X/0Mu1zCNw0nNDcfTFB8.cT6', 'Fiker@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:02', NULL, 'default.jpg'),
+(145, 'Millen', '$2y$10$QmEmuR1xK4FSNcEma3DXxuLaWIAtxG5n5Mrx8pPo6XZJzswq2LaCm', 'Ethan@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:02', NULL, 'default.jpg'),
+(146, 'Elfaaz', '$2y$10$6e79/1vgaCfViDcUi/qEruw3DwsaVxqqeLgMzeiSnyRYK/mfSmlay', 'Millen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:02', NULL, 'default.jpg'),
+(147, 'Zoe', '$2y$10$ndRS4ZP/g4ov2tD1xwhJF./tPqHTA81i1Xn3VPzMTydki4gjtIjxS', 'Amariah@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:02', NULL, 'default.jpg'),
+(148, 'Leon', '$2y$10$FEVJFiytT9MVJwU11o9ZpupCFsU/wDqRRWqPdUvdvE83G4vHMKvj2', 'Elfaaz@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:03', NULL, 'default.jpg'),
+(149, 'Heamen', '$2y$10$TFcKi8tgrcIBUfb.lHyS0urZPxWbv7qyxDylwi5WMEWCzQdRdVOp.', 'Zoe@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:03', NULL, 'default.jpg'),
+(150, 'Kamlak', '$2y$10$PR2ey2kLuQOw79fOBhujteUBYCf8oOTtto.fBv7GLzDNt6br3WltK', 'Leon@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:03', NULL, 'default.jpg'),
+(151, 'Bahran', '$2y$10$Rn3eXiNtzRH3v6yxz4c4eO5ew1DXfIh1cpKUWY0iyGk14cDUUFGu6', 'Heamen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:03', NULL, 'default.jpg'),
+(152, 'Blen', '$2y$10$5//9Ht8MoZaDDNQbH5HDPusFPWl2X/iPHKxOLl/.o.N0GQR0o/UQO', 'Kamlak@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:04', NULL, 'default.jpg'),
+(153, 'Joel', '$2y$10$PWnDwZXoFz8Q.PA4.NkP3ej/Kl1bQacwYDKDUx9QXg3tzl6F2gjNG', 'Blen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 13:32:04', NULL, 'default.jpg'),
+(2932, 'Biniam Sisay', '$2y$10$ockbwrRzFa9IdcPq4CLHXet9fmvH7xmII/4uuyNL1OpVpNtnZJ.1a', 'biniam.sisay@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:56', NULL, 'default.jpg'),
+(2933, 'Quinton Mulder', '$2y$10$rXve01ZwYgL5FNQfnqgeQehGRG7y0dZulkk9ZK60Mn5SwZ1wDCeYK', 'qmulder@advtech.co.za', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:57', NULL, 'default.jpg'),
+(2934, 'Wollega Saba', '$2y$10$psL21OW.xLLKz7inTUBuTOY8vLXOaIvHgyAqxfqLc2ZupuIr65eme', 'wollega.saba@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:57', NULL, 'default.jpg'),
+(2935, 'Frehiwot Endale', '$2y$10$/qsOTFalm50F9LmarrhHJevu5BXGH6dbUE4yWrWeQb9swIF5yzknO', 'frehiwot.endale@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:57', NULL, 'default.jpg'),
+(2936, 'Jatti James', '$2y$10$KzOnhEUSHyh03eJ2e0Ju/.6gIPMAafL9B24SkgwgUwjTmq87pqLFy', 'jatti.james@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:57', NULL, 'default.jpg'),
+(2937, 'Yonas Adamu', '$2y$10$Ou7MIAwQSP6.Mtn/jgGbFupyOw/87UGClIXYAfCXNq0IJ3f6xwhhO', 'yonas.adamu@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:58', NULL, 'default.jpg'),
+(2938, 'Tamagn Woyesa', '$2y$10$STUsvuZl8zaAKxxtmh9yI.EzvSEJB.jOGuqI6NnZC5m.lIj0E1LVK', 'tamagn.woyesa@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:58', NULL, 'default.jpg'),
+(2939, 'Mekonnen Atali', '$2y$10$pgBGV3nfd90M21EjPQ4bAu2ugT1/ZEz7MOA2wc7htfAO0MOLPflfi', 'mekonnen.atali@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:58', NULL, 'default.jpg'),
+(2940, 'Meiraf Ketema', '$2y$10$mh2Ym6bjpJXdM9y6c6TwWugjT7W8OL2Z99cvHwTF/Zl3C7Vrb5ijO', 'meiraf.ketema@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:58', NULL, 'default.jpg'),
+(2941, 'Mebratu Gebre', '$2y$10$g0RKIvUI.oTrhBgb/b2gBe0taGNF9hxRvok99p2WWVB8vI91TJUrm', 'mebratu.gebre@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:59', NULL, 'default.jpg'),
+(2942, 'Aynishet Alemu', '$2y$10$.z6YITwTN5mPuOZFGIBRZOhQTKjenvy1LF53VmAgYFO4FOYolpxz.', 'aynishet.alemu@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:59', NULL, 'default.jpg'),
+(2943, 'Amanuel Teshome', '$2y$10$c.KWZn8b8ujH9f/Tsy75G.xPPCOvb3FrQ4zIU9ZAweK62PvLuHgjK', 'amanuel.teshome@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:59', NULL, 'default.jpg'),
+(2944, 'Adam Debissa', '$2y$10$vTyQjWz5U6pl/hag7LL1YuFmdj7sjLW92NSM6pyOU8BUIQxqTjpDu', 'adam.mezgebu@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:13:59', NULL, 'default.jpg'),
+(2945, 'Yonas Gemeda', '$2y$10$3ZQOih0fHIkT3EJkzxgfveu/E8WAWQFKONEuipa.CGj6fMqRn9xk2', 'yonas.gemeda@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:00', NULL, 'default.jpg'),
+(2946, 'Beatrice Chambwera', '$2y$10$FWJLgElozoosBik1BPQVT.BjejMSM4GuFgTddrrj6845QgEEHxM6i', 'beatricec@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:00', NULL, 'default.jpg'),
+(2947, 'Agere Tarekegn', '$2y$10$tkmUqA44b86ZRc08RThLauvMBZhXJW47.ZYXV//XTbzIYaEzltCSK', 'agere.tarekegn@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:00', NULL, 'default.jpg'),
+(2948, 'Esther Wangec', '$2y$10$IJvEI6fPZ9zNrNyCQ7fSKe2NqlQJqM8kkTkE4A8n4edNQYIk8fH0O', 'esther.wangeci@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:01', NULL, 'default.jpg'),
+(2949, 'Elsabet Shimelis', '$2y$10$i0Q/WCZgI26yHFpUVXm9ZuJ6f9SkcCeGJVT9YwNKWkk3wxpwT3lx2', 'elsabet.shimelis@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:01', NULL, 'default.jpg'),
+(2950, 'Addisu Gebrehiwot', '$2y$10$MD52LPTbfOBV6xxTQIK4ye6/poxPu1SAY4axf7ueONAZhNJ5aKVpq', 'addisu.gebrehiwot@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:01', NULL, 'default.jpg'),
+(2951, 'Helina Asrat', '$2y$10$7vF8D9f4IM2KHsO0BbNwSujeBt/IydhaaBHnjD8B5ooTLaTFSP3GK', 'helina.asrat@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:01', NULL, 'default.jpg'),
+(2952, 'Saba Amlak', '$2y$10$TkvUQ0lPQslLjt0dOCXtS.nJ8rXfbglvW18Gh6wOc3JQ5KLr2ginW', 'saba.amlak@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:02', NULL, 'default.jpg'),
+(2953, 'Bezawit Dereje', '$2y$10$FxoQ8xgEswM1JQD3HEDbIOSzr23NMCUW9/KLparcdGl2UTpGPUx9W', 'bezawit.dereje@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:02', NULL, 'default.jpg'),
+(2954, 'Betelhem Teketel', '$2y$10$pKAQgU7Y5vHZy8vXxPeNJOQvcZiKEVdo2.7WoKz.GZJ1.c9H9xYpu', 'betelhem.teketel@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:02', NULL, 'default.jpg'),
+(2955, 'Richard Carroll', '$2y$10$otBMlbfmAe95p.FOIXXzEeWtfZBxjHHGg5r0BREl183454R.3gASa', 'richard.carroll@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:02', NULL, 'default.jpg'),
+(2956, 'Samuel SAMI', '$2y$10$vTq3YVOiz1CKmnMYlX.jmubJ1pHoBTbUo83X32Tj5OUi4LXVoWUgy', 'samuelijoo@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:03', NULL, 'default.jpg'),
+(2957, 'Takele ADMASU', '$2y$10$spvwApDgHpdMasu2cIkUn.RErpYM0noU2BQcvCDHCqSkUphEVX5PS', 'takelong1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:03', NULL, 'default.jpg'),
+(2958, 'Mamaru SINSHAW', '$2y$10$MEnQBZr0uBVwjbxF/cKvPeCWPc08XSc2mZQ9ZyI9450sUTTKfEt0O', 'mamarusenshaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:03', NULL, 'default.jpg'),
+(2959, 'Haymanot Belay ZELEKE', '$2y$10$ukXPphAXvr1crdEevRT2BOlRRTF0jdIOb6CMV7o6ImI1YHHSSf/5.', 'hbelay@mtalawoffice.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:03', NULL, 'default.jpg'),
+(2960, 'Filmawit Alemayehu TEKLEMICHAEL', '$2y$10$rHfrAxpq502UdPUZ0ObuE.honiZVoubj/wprmgbBf7QST8v/HyHIm', 'fillyana38@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:04', NULL, 'default.jpg'),
+(2961, 'Tilaye DERIBE', '$2y$10$Inyph8fmfPrW/hHk9TG3ruEaWtefOsZEBuhU0l0idqWox.fcIA/5a', 'tilayede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:04', NULL, 'default.jpg'),
+(2962, 'Tizita GEBRU', '$2y$10$drXb5dCT..xnO7k9x8aAR.KGHjO0lQCrExwoBKzUEbGDO7H7/Lci.', 'rereduer@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:04', NULL, 'default.jpg'),
+(2963, 'Mena SOLOMON', '$2y$10$pXrHv1G.I8URIcy4MBwiHuM9scCEB2eiltM7AKIm1l5egcuysnu6u', 'free2menni@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:05', NULL, 'default.jpg'),
+(2964, 'Berhanu YAI', '$2y$10$VscVl.DkLyW0JugN82NoVOX6O7cCg1Puy9H7mNtvxFAccRq8CvGl6', 'berhanuhaile411@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:05', NULL, 'default.jpg'),
+(2965, 'Addis YOHANNES', '$2y$10$MXQ4KJsMAjLmyhkKabqO4.iy0ZH9CdSl9opL7US92CHbihQJSH6GO', 'yabukaaddis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:05', NULL, 'default.jpg'),
+(2966, 'Tigist ENEYEW', '$2y$10$ke1bKTF3Ir52MyhjIOiWsuftIPqbkegtA18boOyZiU5xje3dW3CKO', 'tigist.eneyew@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:05', NULL, 'default.jpg'),
+(2967, 'Dawit KASSA', '$2y$10$m7bhgYtAAuAYuUqeg67xhOCs8.7FLXqmFtPqrsS9P/uM89jrskBY2', 'davokassa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:06', NULL, 'default.jpg'),
+(2968, 'Hawi HAILU', '$2y$10$lRJGqKlYZVmEC0X2ld27uu9rPmsYz7yUNj.ON2THGb0zz5ubfCSJa', 'hawi.hailu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:06', NULL, 'default.jpg'),
+(2969, 'Eleni DEREJE', '$2y$10$bSEJcMaFs.VrDZSbk0iEPO8JsxANx7JL3VR7N8mkQ7Rp4Y.XqXrH2', 'elenidereje1993@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:06', NULL, 'default.jpg'),
+(2970, 'Minalu BEKELE', '$2y$10$Hr1W7IVPAOPR3UuggcO1EeJuEarqffmAmuUaiDDDLjczupjyBps42', 'jerry12mk12@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:06', NULL, 'default.jpg'),
+(2971, 'Helen GEBRESELASE', '$2y$10$f53yHgFL4JI/yNWGTepQLeaVavdx7uta6u3pGdbf927wtuqlOT77C', 'hela4219@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:07', NULL, 'default.jpg'),
+(2972, 'Selam GEMECHU', '$2y$10$TEdrDDBYnD4JuwptsM3o7u4.GdI7K6NpEXc0LRmg9dkqQ9Rc2g4ve', 'selamgemechu9@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:07', NULL, 'default.jpg'),
+(2973, 'Kidest TESHOME', '$2y$10$NuRpZ0lJUrmc2SYacHlPreZ5olgLtwISFQXjUMc2ZbkHzGxpoPRSa', 'kiddywow2017@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:07', NULL, 'default.jpg'),
+(2974, 'Alemtsehay DEJENE', '$2y$10$wgsjoZjLr8kMHjuVcjHb4efxuhQUl1Ips0YRiy17XfHsPUDrILuIy', 'yoseph.twolde@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:07', NULL, 'default.jpg'),
+(2975, 'Tessema WOLDEMICHAEL', '$2y$10$ey7xST08Jb8mFbOX8sD4B.PNTM5M0QdJo4IFv6bVJVEyU4A16O8cK', 'tessemaasgedom@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:08', NULL, 'default.jpg'),
+(2976, 'Getahun Aschalew WOLDEMARIAM', '$2y$10$sF8uYtOukdz0VVKAx7Zp9OMAJgPndZG/N5NrOmSrwJYPiLmDE6L4.', 'igetpower@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:08', NULL, 'default.jpg'),
+(2977, 'Eyoel SHEWANGIZAW', '$2y$10$2j5xPPwg5/OvXRWR7kHnT.YPKZP.GqHJxvzRE/7vJezmokmH5stda', 'eyoelshewa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:08', NULL, 'default.jpg'),
+(2978, 'Bezaye DENEKEW', '$2y$10$/1a7Sd9a3W8CxYQI2q9Br.fwkmFObFp99l9pAQciUoUzKIKx/EhZK', 'bezayekassaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:08', NULL, 'default.jpg'),
+(2979, 'Belete ALEMU', '$2y$10$X/tT8JoI06gLBGhflesY6uLVSs22ZF2ckChWjW7FJXXng8P9IN362', 'belete319@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:09', NULL, 'default.jpg'),
+(2980, 'Kidane ABATE', '$2y$10$ZgZ9Dfo8NthAiUkKP1FVmuUiEY3aes2bEjJyqAzeUKxrREf8BaIxe', 'reganebra09@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:09', NULL, 'default.jpg'),
+(2981, 'Ayano BURKA', '$2y$10$9/522k.ZPJMT4zfjwjMIPu4a9zcCKav75EA7bbFMggc1sHWnW0Hnm', 'ayanoburka@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:09', NULL, 'default.jpg'),
+(2982, 'Adane TEFERI', '$2y$10$jphBtY3ICb7EcHNMTb7/VOBmBK8ijLKSutuZM5eNieQvNtaZdtaHy', 'adane306@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:09', NULL, 'default.jpg'),
+(2983, 'Eyerus GEBRU', '$2y$10$MNhke8pfAf1GtW2iawZ90.ubYng3pR0Uxz/4N5w5QCaHx7BzwIk0W', 'eyerusaberham671@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:10', NULL, 'default.jpg'),
+(2984, 'Tesfaye MEGESTE', '$2y$10$NiiNjYSdm7s3docFPhkACu2YDx2lHMcMJP0.WrwqiAIvBx5UKwSHO', 'tesfayemengeste@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:10', NULL, 'default.jpg'),
+(2985, 'Mikiyas TERESSA', '$2y$10$49qKJUROg/TQbTFhLtjUP.4hdR6oPvK7QUmk8VaoyqUqxnwxM.EgO', 'mikiyas89@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:10', NULL, 'default.jpg'),
+(2986, 'Eman MOHAMMED', '$2y$10$OBOXNgs.hkeZ4u/OVxW3dOcttpi9PXdGb87HgcBtO8COY.t/imsie', 'willy246986@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:10', NULL, 'default.jpg'),
+(2987, 'Ermias TADESSE', '$2y$10$Vai60nB1AbY5wxSewkzxNe8X7JpdKyQ2cw2anLLKbVWqAAPnW3wuq', 'tsega9973@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:10', NULL, 'default.jpg'),
+(2988, 'Kirubel DESALEGN', '$2y$10$0noWShZ9NOi7DYH8aZ7MJeibpo9yYB7XuCBMAyK2MZAi1f0uFPRRq', 'kirubeld022@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:11', NULL, 'default.jpg'),
+(2989, 'Kalkidan ADDIS', '$2y$10$ipSiwqxGVVnCAGIwBYDMTefwdzBg1yCA0A.Sn28nmI5BZLR16UrSO', 'addiskal13@yahoo.co.uk', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:11', NULL, 'default.jpg'),
+(2990, 'Muluwork ADUGNA', '$2y$10$IndsWzx2LUiQ7gLQpjstsOvXvX8rGY9jqho546P9ET5uIr6BEfpdS', 'muluworkadugna85@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:11', NULL, 'default.jpg'),
+(2991, 'Senait ANISE', '$2y$10$Qaf52nVi.BUB0WtH07H4vOiTObUeuqfTCG2HqO7m.c8wpmAHMUQwC', 'anisesenait@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:11', NULL, 'default.jpg'),
+(2992, 'Yonas AMARE', '$2y$10$xSUkf6RuU4RvGZJd.M3g8.RUet1.81rdVDOPpzsLyBuuF8.mL7xc6', 'yxamar@hotmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:12', NULL, 'default.jpg'),
+(2993, 'Mesfin ABERA', '$2y$10$qnuimNXUQ3srfmdFMOuWjuA9vwJvztTvATQcseQbU8HESYm/eoBYm', 'mesfin43@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:12', NULL, 'default.jpg'),
+(2994, 'Biniam AWEL', '$2y$10$exaIxXzYuw3HSM8cMFG/n.lp/r8dMq7L1.LlgCjziJ/B8Qqv1a29S', 'biniyamawel@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:12', NULL, 'default.jpg'),
+(2995, 'Belay Meshesha BEKELE', '$2y$10$JykMiGK/Y3CzSHsV43nJGOfNAlwtDl0Agj0dCf2S0IibYPH6HT/42', 'belay602@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:12', NULL, 'default.jpg'),
+(2996, 'Zerihun NAZARETH', '$2y$10$0LLXXntYjJbqVu9alYMKOO6GtXV8D6h7NoUnGbMnJfM793ytIc/Bi', 'nazzu.shikor@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:13', NULL, 'default.jpg'),
+(2997, 'Tewodros KASSAYE', '$2y$10$lg3qMKvKRJFX6STdPCpzMeyNPxqz8Uixj3g808jpqyZ5MAj4FEsvi', 'tlkassa1000@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:13', NULL, 'default.jpg'),
+(2998, 'Robel ASSEFA', '$2y$10$8mOng5wn/62Q629m12TUWOTZr/5mmIMhtGgcVJV6wyxfkMNuzesSm', 'freweynihadis2024delete@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:13', NULL, 'default.jpg'),
+(2999, 'Esayas GETACHEW', '$2y$10$.yS87ldN/2qGJWgQwSfKHueJ6ycRtRBCQPHznT3iXTHvoi6CrJbjW', 'iprintadvert@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:13', NULL, 'default.jpg'),
+(3000, 'Yonas WOLDESENBET', '$2y$10$JK9x4EAhclBiJgv4nn0MGugjTDPgacDMnaQGjkBmORv7Xi3a9emVy', 'yonas1985@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:14', NULL, 'default.jpg'),
+(3001, 'Tesfa NEGUSSIE', '$2y$10$LGytJekTwaAVs3c2u.XDLeqh1dnExFrROrUWNj5l4bOomhLnojhY2', 'tesfa509@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:14', NULL, 'default.jpg'),
+(3002, 'Tadele DESTA', '$2y$10$lg/MHN7WkMgl/Ymk6rFyceEZOHTL4bE/dsDgdpSrJ31dehfWJGGv6', 'myefrata@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:14', NULL, 'default.jpg'),
+(3003, 'Samson KEBEDE', '$2y$10$QLBJXps/qYcf7EpJbSEP2e9l9ubnWvvBsQ4kZsXy/uwR0nvXOm0.G', 'kesanocons@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:14', NULL, 'default.jpg'),
+(3004, 'Mulugeta BALCHA', '$2y$10$3IlpQJZOBTzx2qjbo9/aP.kutlyA0vfNXDSr3XfZ7e/c40A96DwmG', 'balchaballa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:15', NULL, 'default.jpg'),
+(3005, 'Johannes YIMENE', '$2y$10$kjCsc5WfkdnF7E8Gt7ex1eVvxNaqR3i6vtdUiQ2AWzhcwtRSaOisC', 'maxiyohaness2005@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:15', NULL, 'default.jpg'),
+(3006, 'Bekele HAILU', '$2y$10$RBxxn2GRPZoG/JHWzJMn6OZ8nReep4gZbdAZebbzLfH/CP.5nE9O2', 'hailubekele@periplusbusiness.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:15', NULL, 'default.jpg'),
+(3007, 'Eyasu YEMANEBERHAN', '$2y$10$3K2MowwZ2pUg/aaXp1WzzOKh3FGCWwpxj4xKSdoouv/f/y6WYJsTG', 'joshuayemane@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:15', NULL, 'default.jpg'),
+(3008, 'Addis MIKRU', '$2y$10$eIFA4icDXR4fHNsTkTwA8uLCF2iqRVQpMH3inYve4efApOLTZzE5e', 'adadamikru2712@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:16', NULL, 'default.jpg'),
+(3009, 'Yohana STEPHANOS', '$2y$10$5F6XGL3XOrSu3q2vhCqNge6ZiE1wI397cE6o50MVaE1GzNfTZb3K6', 'yohana.stephanos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:16', NULL, 'default.jpg'),
+(3010, 'Wondewosen HAILEMARIAM', '$2y$10$YdQIfrEI5QyRdrTa6NJ/3e7ORlnntrRbMfWIGPj0BFcfIj9YwEYvu', 'wondewosenh@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:17', NULL, 'default.jpg'),
+(3011, 'Tesfa ZERIHUN', '$2y$10$oAyUa6LOTLF1feUulhflKOxOk3UZqj9sqi2KKPnnm0zqJmG01BOyS', 'tesfazlamu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:17', NULL, 'default.jpg'),
+(3012, 'Temesgen TEME', '$2y$10$vw1ViR7T2quTPYD1yuVEieh/Ph0JTOu3OeUeOgFRO1u3IPT9iVjfK', 'temeteferi@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:17', NULL, 'default.jpg'),
+(3013, 'Samuel TSEGAYE', '$2y$10$Y3N5958gVrDDJ4Q.t9AVMe6hdhbzDmKI9mpj/G6sBgYgxtQvwybsa', 'amanuelgirma517@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:18', NULL, 'default.jpg'),
+(3014, 'Michael BENYAM', '$2y$10$XnJ5NgQZGS82WpSgc5C3Sepaipu8I/n6nvsGIIypu1Ho2OfRhYYMy', 'bmichaelbenyam@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:18', NULL, 'default.jpg'),
+(3015, 'Senait KASSAYE', '$2y$10$4n89ZY3xdtdpM7xFcFnAiuzIiNyHWH/DrXnBP543ZrJbBoKOiKhDW', 'kassayesenait26@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:18', NULL, 'default.jpg'),
+(3016, 'Alehegn GEBRU', '$2y$10$MKwCJoVFXOS1NqYH1u6mVeBrBW3CqE31IWBRonSnCHPXJyqBSzZDi', 'alehegn@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:19', NULL, 'default.jpg'),
+(3017, 'Yimer AL AMIN', '$2y$10$0SUN7qIcrssaA7x15LAG2eOcDQhZN77oZ55/WHbFRUFafJZhCf252', 'alamin@uneca.org', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:19', NULL, 'default.jpg'),
+(3018, 'Yonas TESFAYE', '$2y$10$q7U1RIHIukfqt4c.VHtWPOE1nib7PbjLWMygxLrAnECOAUoRQEMne', 'yonastl@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:19', NULL, 'default.jpg'),
+(3019, 'Yohaness GASHAW', '$2y$10$Qjd8v0S9HL.2Y0DClC.ww.Qph4ILDFT.v633oZE.Up6RYFzCBaWsG', 'johngasha42@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:19', NULL, 'default.jpg'),
+(3020, 'Teklit GYOHANNES', '$2y$10$fizeAEfNcijyzuvcM6mYpufTDWYojXvymjLVoUlTG8lsR3ES7uyu6', 'teklitrozina@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:20', NULL, 'default.jpg'),
+(3021, 'Solomon BEKELE', '$2y$10$dWNLGAmO1uyVbYT3SqBTfOhe.omeyVIb25EU/MRS06qiCrkGjCAsq', 'yetikuranbesa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:20', NULL, 'default.jpg'),
+(3022, 'Esmail HEYREDIN', '$2y$10$YYFMO5KPuwlbsgp5OaihW.XtqyEW8bRIGIGIj74uaitt2TDGrAktG', 'esmhyr@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:20', NULL, 'default.jpg'),
+(3023, 'Dawit SOLOMON', '$2y$10$wnlJhBrhi/X/5ZN7nQmgXu0jV2G3j1WgjK.0PD012m267/aDrJK2i', 'dawitsol@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:20', NULL, 'default.jpg'),
+(3024, 'Dawit ENDALE', '$2y$10$GLjsXLrxo8kM8bghWPRPjuaDcbueYVoF91eJOqSqUqs9wR5gjJWf2', 'dawit.end@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:21', NULL, 'default.jpg'),
+(3025, 'Kalkidan GETACHEW', '$2y$10$GcZQKsxJGqxyG8o1Th.cuOoJP7kH3Y4.9UeqyI6k9hQxJm8QgiH4G', 'kalkidangetachew710@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:21', NULL, 'default.jpg'),
+(3026, 'Desalegn ZEWDIE', '$2y$10$zL7.TK6cY2ss.e0mrGIL.eI/ICx9YKrLLwIZ4zWVEJe6SSCL5TJ3G', 'tirudes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:21', NULL, 'default.jpg'),
+(3027, 'Aida Zeinu SEID', '$2y$10$AmKYHa07OITANFNtS9hwgeWNHSuvYRicEM38uWvhxhf7bO33op8eW', 'ali.aljecotrading@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:21', NULL, 'default.jpg'),
+(3028, 'Fasika BERILE', '$2y$10$1fHfk9BRUNH34kXdgXilZuMT4Gs/.4rwRjO7T9m/8AuUPB9JL/xpa', 'fasikaberile@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:22', NULL, 'default.jpg'),
+(3029, 'Dawit KENEA', '$2y$10$Of64GFKUiZ9/bc3Ot/cGsu0micr41xxBw3qplDbao1Ag1AvgNa5ki', 'dawit.d@synergyplc.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:22', NULL, 'default.jpg'),
+(3030, 'Nazareth ZERIHUN', '$2y$10$PHbfuCu.ixyjPOCWC2wgEOQ/P78JFPWvget.r1PeTg2XKSNxrLcea', 'yakobshanko@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:22', NULL, 'default.jpg'),
+(3031, 'Robel HAILU', '$2y$10$qtb3vPHRQgAyWPf5vAiYlelfwIcz7D5oOOvqLp9cuwRWvf8FjUcEi', 'nrobel202@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:22', NULL, 'default.jpg'),
+(3032, 'Kidist ABATE', '$2y$10$whDrz3q/MFszb34W7moV8OyxYs2Jg2VraPIX3SxmNnit.O0n7WrdC', 'kidistabate477@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:23', NULL, 'default.jpg'),
+(3033, 'Betselot KELELEGN', '$2y$10$nrrMdKQdG.xzhKNquuPB/Ohm8zdZ5SpopkkgkmqvOvARw7hVA2jYe', 'emubetsu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:23', NULL, 'default.jpg'),
+(3034, 'Tewodros TEWODROS', '$2y$10$6KtaZ2qcExnphscp2wEmFu5SGY/iry21ozu/sbYuBre3TS0ySKOiq', 'tewodrosmulu14@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:23', NULL, 'default.jpg'),
+(3035, 'Hiwot ALEMU', '$2y$10$i.5thjrpUNtTVo8MZPczQuy9DnwMpN3UNrei88YlWulg25oK6cNFy', 'samueltesfaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:23', NULL, 'default.jpg'),
+(3036, 'Samuel YIRDAW', '$2y$10$YJOBuzBq2ROppvmbKtPsKegM.5.Emdt1quHqzIqaih3U.DvpHSxHK', 'h.samuel@tsenvironment.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:24', NULL, 'default.jpg'),
+(3037, 'Akelat MERID', '$2y$10$kJi5yFhTlIeQDbDDzda5KOZXpUIYdoQ3Z4163.6jqiJmgsR8AusS.', 'akelatcarlla@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:24', NULL, 'default.jpg'),
+(3038, 'Lensa KUMA JEBESSA', '$2y$10$TXeuRLlLNjfjQxN5leLhZOBTPqgXizSxeco67K5ZKCP2Y5JR0ApN6', 'lkjebessa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:24', NULL, 'default.jpg'),
+(3039, 'Kejise SIRIKA', '$2y$10$tTI3xg8e1qBzQ/e3BggROO7Xi1rTzkfne9c4E0h7gnyICE6APFZBu', 'kejisesirika@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:25', NULL, 'default.jpg'),
+(3040, 'Metadel FENTAHUAN', '$2y$10$k94F77SyBo3EAZJMT8Q/EuKJH90gaVloTxmYHWWFqp5VfY4XQg7RS', 'metadel.fentahuan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:25', NULL, 'default.jpg'),
+(3041, 'Edom HADDIS', '$2y$10$t2V9Cx0nI2GIObyNEied1O9oef0s1t6asXc4zOtnTppamfKdyBxc6', 'edom.haddis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:25', NULL, 'default.jpg'),
+(3042, 'Zerihun TSIGE', '$2y$10$AjjFRU/MWHeOwZsZaDzbFe72X1jgVhmzGjObMEahl1e7abLXCptK.', 'fiscomm.zerihun@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:25', NULL, 'default.jpg'),
+(3043, 'Zelalem Lemi TULU', '$2y$10$jh9N/N42PUMdv1XFL5VOBuwBOPRhqZMnyoLb5sEldYve42rnqt/C.', 'yosephgirma64@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:26', NULL, 'default.jpg'),
+(3044, 'Rediet SEYOUM', '$2y$10$dSM7odsJo7joR2PlcjIWmuG6mFBs4/F2kTw5cI2wRmWLkp24G6kHS', 'rediseyoum@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:26', NULL, 'default.jpg'),
+(3045, 'Shimels TAMRE', '$2y$10$idTBvlZfejwstww0v415N.2akLxF9o1806jAcOVYifnZx9Z2fgqpS', 'anobetelhem@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:26', NULL, 'default.jpg'),
+(3046, 'GGziabher GSILASSIE TEKLU', '$2y$10$01u8AGvbz/DoQyGWAvsNauW8lFi2WOJsjdWMiA4SK9m0ajXWBnF0W', 'gere970@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:27', NULL, 'default.jpg'),
+(3047, 'Frezer BERHANU', '$2y$10$agtRK89jwXpovzStgRS/Ve4Ne7uKftutjS/SZSd1szi/GpN3bBAR.', 'yemariamf@flipperschools.com', NULL, NULL, 2, NULL, 1, '2025-04-23 14:14:27', NULL, 'default.jpg'),
+(3048, 'Fikadu FIKADU TADESSE', '$2y$10$vsG.gJAc.YMvXkUYVieFaeGro/nwuACDRyBSiUOpJhn6ZqOJF4Ptm', 'foqo98@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:27', NULL, 'default.jpg'),
+(3049, 'Tseday JEMANEH', '$2y$10$3QCfWAwsQoxLejJEuA37X.Z69TSQTqlUbv6OKxWlVL5y2nLc1ruMW', 'habashaspring1@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:27', NULL, 'default.jpg'),
+(3050, 'Samrawit BARYAGABRE', '$2y$10$/SB0/dJuRuHbYYTdELo7NuXxx1KudrrGhwHmPo3VkxN94/25GhYrS', 'adhanomsamrawit3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:27', NULL, 'default.jpg'),
+(3051, 'Selam DEMISSIE', '$2y$10$fwOD4lupHhbWe4nrO9PK0uf6Jl7E1O/y2NkGD3BgPTVFmew6z83K2', 'nanaselam28@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:28', NULL, 'default.jpg'),
+(3052, 'Abebe Mekonnen WORKU', '$2y$10$c5ceqTuxgQW5oOWfdCtJ0.h955U14Sd.my2.XLlGKsU281ujy9e2W', 'abebemekonnen@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:28', NULL, 'default.jpg'),
+(3053, 'Axumawit AMDEWORK', '$2y$10$paoUAk90wMrHh0tjfoVPB.AEDShlklHtu7EIs4X9d6uzMwmShpOrS', 'kabtsion@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:28', NULL, 'default.jpg'),
+(3054, 'Yohanes MULUKEN', '$2y$10$aiLuCZDBxrbs7k0EAYYWIuYA/P52nUrxlAok7nUoYWqb54J2Y4pgW', 'yohanesmuluken1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:29', NULL, 'default.jpg'),
+(3055, 'Desta DESTA FIKADU TAYE', '$2y$10$qrkke9lKo/8eg1FHe/2bmePeemsCD7oZlz3wG2UbgYjJRVbKyhkzu', 'destafikadu27@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:29', NULL, 'default.jpg'),
+(3056, 'Tadiwos LAEKEMARIAM', '$2y$10$s3p1Aw9RonYhXN7cj3oZTu/4iYlvtvv12btmHefOmOodVwEEcmZzy', 'tesfagtchw@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:29', NULL, 'default.jpg'),
+(3057, 'Sentayehu GIRMA', '$2y$10$eqRGhhwYYkdPbTBGA8DzruYi2GJhLJtFUCi5tLjq3XXsylxYX/rou', 'sentayehugf@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:30', NULL, 'default.jpg'),
+(3058, 'Mihret DAGMAWI', '$2y$10$2MUtdkbE28CVkx11s6pDfOskW7tEFy4x6LTgDd2vJ7APtbYEYdTMy', 'mercydagm4@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:30', NULL, 'default.jpg'),
+(3059, 'Selamawit FISSHA', '$2y$10$tks69MZL892R59wCMPHx4ez3kDfojkjlbGecFdCWxQEXwyD8S/cny', 'selawishf@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:30', NULL, 'default.jpg'),
+(3060, 'Neima KEDIR', '$2y$10$wGHhGkc6LlI5geMp1nPca.sjSr7SJrcbhGYQWcX0vK/mcIktQS0Xa', 'neimakedir339@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:30', NULL, 'default.jpg'),
+(3061, 'Markos MENGISTU', '$2y$10$gn1NTf5zB4CKAmWza3X6xudvMzMF8dDyI09SJzLWiMh/YBeQIb1u6', 'markosmengistu002@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:31', NULL, 'default.jpg'),
+(3062, 'Kalabe BERHE', '$2y$10$xSCTU18TifFXCKTwQMr4Du2dIGBgJkkyXdqrCgsNf44XnqkZP5.mi', 'kalroma16@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:31', NULL, 'default.jpg'),
+(3063, 'Girmay KIFLE', '$2y$10$rLiXJd3SnW5pY5AO1gryHumiD7w/D/ZiDBIayt.SjFr48h.WGMNB2', 'girmaykifle21@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:31', NULL, 'default.jpg'),
+(3064, 'Assegahegn NARDOS', '$2y$10$YoYzdtP9fbnz4qr3Toe2jOowbS7K36NmKTZnKk5DnFtos/aDgLcUK', 'accessnardos@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:32', NULL, 'default.jpg'),
+(3065, 'Abraham BONSSA', '$2y$10$tj3yPISAZYppJFZwdojmf.IQvfXYWJ0.TCYl.KN6QwmyeMrSsZ.tS', 'abraham_bonn@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:32', NULL, 'default.jpg'),
+(3066, 'Abel YESHITLA', '$2y$10$lkHpgkVKf1dcCAwudt79xOa1ji4v8gycPqi9fsYA7.Efs7s9ajsCm', 'abel3298@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:32', NULL, 'default.jpg'),
+(3067, 'Wogderes MITIKU', '$2y$10$L50mwvl2sBQOn9hkob2rbe1ebYPXI4XEUEgfeHbviBJW./5mjnxn.', 'wogederes85tefera@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:32', NULL, 'default.jpg'),
+(3068, 'Taddele SHITAYE', '$2y$10$KhXvt3d/y6IUiRWE0jbvv.OVt5P9X/t8gO5ZmvwsaPbiXPCFmk2Yu', 'taddeleshitaye6@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:33', NULL, 'default.jpg'),
+(3069, 'Nebeyu ASFERACHEW', '$2y$10$vsjI/IKUVDEcZA.SpF6Dj.V2CsFm02x2T.CY09RXCbw4grjUuP9Ca', 'nebeyu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:33', NULL, 'default.jpg'),
+(3070, 'Biruk DESTA', '$2y$10$1fgGxEuB/H9JHjQZ.3QdVe05n1r9l62M7S/4E3B6G1HuqN51u56o6', 'birukdesta88@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:33', NULL, 'default.jpg'),
+(3071, 'Alexander DECARLI', '$2y$10$zBQvvX0ShshmRnv75216gO6DprSbfWZtdssHvdA6enBzYizjG4Vlm', 'alexgsun@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:33', NULL, 'default.jpg'),
+(3072, 'Nigussie TAKELE', '$2y$10$hYQlHw1q3htmeAP4MFOI0uW5a9h0lAGAChRZWR.vY2JvByNxPmC5K', 'nigatabay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:34', NULL, 'default.jpg'),
+(3073, 'Nathanael ASRAT', '$2y$10$OD1A99wVmObGLt4FFiaCeeWtix.Af4SzldCgCKiwQX93sp6Yk6XOi', 'pishonmineral@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:34', NULL, 'default.jpg'),
+(3074, 'Kebede DERIBE', '$2y$10$N/VQ38Uim/eIltiOEdLJqOlMp/O8d.F2c6LMq99MI.vfoxaPh4cw.', 'kebededeka@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:34', NULL, 'default.jpg'),
+(3075, 'Girum FELEKE', '$2y$10$ei8wODbr4.KLwLTAGhdwb.Ym4aID9ju/tHKprDMdhnyck6s2SdI5O', 'kasechg2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:34', NULL, 'default.jpg'),
+(3076, 'Girum NEGEDE', '$2y$10$gTTF0nKTg1pjZbVKcm4UKO1fDUzz1U8RBCekPnurQEZO5K2FBaMeW', 'girum.nege@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:35', NULL, 'default.jpg'),
+(3077, 'Getahun GIRMA', '$2y$10$qheI6COp9GGkxYhy035x8.P0Q2GbmYPeHwTiLrA6e/vvYXg3YgONW', 'getahungirm82@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:35', NULL, 'default.jpg'),
+(3078, 'Hayat AHMED', '$2y$10$S36JpA1cfyPCtU.ToDo.ouxXgQ7DJHK..I5MEpLcTRCOGx8cbohoe', 'hayuni1885@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:35', NULL, 'default.jpg'),
+(3079, 'Yonas BERHE', '$2y$10$859b5bpFuzjBym7uiiNMhOe5H3oFc46cgs9Oc6d.RK9WOrumxvR0S', 'yonas.berhe@icsaddis.or', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:35', NULL, 'default.jpg'),
+(3080, 'Yirgalem GEDLU', '$2y$10$KIsV7P1LvWPbsOaZwZCsDukgwnhWPlYEC/1Z6BfjjP.XHVVEH3hxu', 'yirgabirh@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:36', NULL, 'default.jpg'),
+(3081, 'Manaye DAGNE', '$2y$10$2klhkLrYiNlQhEna2As2v.Evq2iPcx0w3/NeMOzthhnNipUz3G9eu', 'glim2007@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:36', NULL, 'default.jpg'),
+(3082, 'Dereje GELAN', '$2y$10$1/Vr5zh1XaazXS.Q/Ctn6.IzsMkddIaxhlK3awM0hJYRhVzWnxrTm', 'mintamer08@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:36', NULL, 'default.jpg'),
+(3083, 'Zerihun ALEMU', '$2y$10$AdaV6Ws6ZPR34.c7PtXo9OX4D62X952mVEu/JixNESeAbDDrVYGku', 'zerish70@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:36', NULL, 'default.jpg'),
+(3084, 'Yohannes NOSIBLING', '$2y$10$zkmGNw1PauICxM3y74fznuHe/jDVDQXnvNc0ZY4iza8yYtji/as.G', 'workunani@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:37', NULL, 'default.jpg'),
+(3085, 'Mikiyas TADESSE', '$2y$10$J1WsWQDNKv7qrzuMyztuHOvPJWWMykIqHdYjPSGDd0M50ziHdMNNe', 'meserettages@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:37', NULL, 'default.jpg'),
+(3086, 'Filimon WONDYFRAW', '$2y$10$fFM62k5q53QaE7nXI06A5uW8ueXQp77brdmkj8LA5DbjY1F/S1QQ6', 'filimonag@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:37', NULL, 'default.jpg'),
+(3087, 'Errol MUZAWAZI', '$2y$10$/Zew.6ZGa4Ibfn2uotgAF.LwUn7mFmgAapVDzlbkqFhbyT2Gkw3tW', 'adugna.senait@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:38', NULL, 'default.jpg'),
+(3088, 'Elias TESHOME', '$2y$10$pKOMTWK4APctxwUNKxohuuucwmhwxtF532ch3hs5ZhDuLUeigYdTm', 'eliasteshome@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:38', NULL, 'default.jpg'),
+(3089, 'Lishan LISHAN BAYU', '$2y$10$n4zwMiYHMkqF5R78HMfStOmW5ILASpGv9TiDFEQe9SukGaurwOybe', 'papaethio@icloud.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:38', NULL, 'default.jpg'),
+(3090, 'Sisay BOKA', '$2y$10$T/IgJDATqUU0wxgQiv1fe.geJp2NBTlO2Yphq6ip343S0n9Yy4HHq', 'sisaylalo@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:38', NULL, 'default.jpg'),
+(3091, 'Wondiye WONDIYE HGEBRIEL HAILE', '$2y$10$j7Pw4VqvnslQ1GfXHW7od.wXtEOnm.AMtJTaIrW.1CQ2AwqomiMUi', 'wondhg30@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:39', NULL, 'default.jpg'),
+(3092, 'Kalkidan ASSEFA', '$2y$10$dNnU4NbwxolnT42stnDugOWCo5H1tCGm5EvjyQEyBGFn07k5uwoS6', 'kaljulie123@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:39', NULL, 'default.jpg'),
+(3093, 'Fasil Andarge YITAYEW', '$2y$10$Akxrmfze3PyMd4hUmdQebus0LSKFQ1ND2LYOXvjW4OHJZz2RxUizy', 'fasil_y@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:39', NULL, 'default.jpg'),
+(3094, 'Kelemu TADESE', '$2y$10$FwsFH/jykC2ZPZ1KBlLm7.A/.1rrg2PNyyeXfUL9INZnVFAI987Ai', 'nahomkokeb22@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:39', NULL, 'default.jpg'),
+(3095, 'Alemayehu ALEMAYEHU', '$2y$10$YkqHkrkKo9nk9bPcBuzZAeQ8KfmOMJ2km1DNbCbiKHDiMlTVNpiFK', 'alemayehubahiru99@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:39', NULL, 'default.jpg'),
+(3096, 'Tsegaye HABTU', '$2y$10$qV7TR0BcH7aVNUxj08RttObmezqoWKRwDhRm9pr.g68MGuSZhGvrO', 'habtu511@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:40', NULL, 'default.jpg'),
+(3097, 'Yohannes GIRMAY', '$2y$10$G3JCR4gFXEFGKqepbNE3qeDToFS64fgBfBOnYBFzx8KnEdslVMTyG', 'hildanagirmay00@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:40', NULL, 'default.jpg'),
+(3098, 'Mekdes Alemayehu DERSEH', '$2y$10$raYgd0HFUzj22nA8LPNZwuj3Cdqn9NzeLvmpiftjX/IMXna/0fjX.', 'nolymeg@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:40', NULL, 'default.jpg'),
+(3099, 'Solomon DEBEBE', '$2y$10$TjgJXr4QZ.St/ITqHuTmT.nC.JOujJgl5SF0q2cMXZSI26bQHeAba', 'soldk@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:41', NULL, 'default.jpg'),
+(3100, 'Hana Lale SIRBELA', '$2y$10$9Q7m7HzkjSd3Vp.2gXmck.tuE7/5l9PmtUP9y/Rlz4Lz0a3onuNiq', 'hanalale111@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:41', NULL, 'default.jpg'),
+(3101, 'Fiker GEBERYES', '$2y$10$oxNiN3ms6xKXYVb2uQkWbexbqI0jgYWl9V3eJlW.A9cKrw9zFKM.W', 'geberyesmimi@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:41', NULL, 'default.jpg'),
+(3102, 'Alganesh BIRSH', '$2y$10$6o0pD7ZyOuVbG.EyfSqtOO22I3lqTvaJ9Mq80a48.gO91OUSBK5CS', 'gebreyesusmelakul@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:41', NULL, 'default.jpg'),
+(3103, 'Fasil Bekele ABSHIRO', '$2y$10$J1w1DdAU1YoLh.snGYcsA.VKFn/nY23dL6xWIYzHWQsqiEErbfSNG', 'dbmfasil2013@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:42', NULL, 'default.jpg'),
+(3104, 'Hanna Girma TNSAYE', '$2y$10$Pgirk/af6ecjtkuB5HEDTOkpbg6zMf4XZHoDh92LFkAbSJiQQwVim', 'tesfaye_simachew@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:42', NULL, 'default.jpg'),
+(3105, 'Kassahun Yimer KEBEDE', '$2y$10$IA03ntH4z7w8QlHikc2k.eXzOExoBWGJ0AzXSw4VStmREU/.sw0ly', 'ykassahun@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:42', NULL, 'default.jpg'),
+(3106, 'Habtamu AKLILU', '$2y$10$6M1/HrOK5qk2g15O7Sf/t.sdDH2FAsK1n2YOE74ims/SMBf0NVZaG', 'akiyahab2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:42', NULL, 'default.jpg'),
+(3107, 'Alula YIHDEGO', '$2y$10$ndwUmz2HL5emH3kqMrzJteMxUW7bNcypf6jUe4MxaOyXs1tvgMcZO', 'alulaberaki@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:43', NULL, 'default.jpg'),
+(3108, 'Mesfin GEBREAMANUEL', '$2y$10$m6X4Vd56cwRqy31Q1Yh10uAdEWmD92.cqqXEk2.OIpL0W3aUoTAdy', 'mesfingamanuel@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:43', NULL, 'default.jpg'),
+(3109, 'Rumana MOHAMED', '$2y$10$rQ9EKTGaMHYu2cVSJRGJme3Et2B6Gc8Ik2J0o8QtC0sLDGZ/3vSBa', 'rumana.mohamed99@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:43', NULL, 'default.jpg'),
+(3110, 'Tarekegn ABRIHA', '$2y$10$9f.jr9PLRjx2jG.VS3iLeuceTGTlsIaEpOP.audU1cSIIF1YBo5D6', 'tariegiz@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:43', NULL, 'default.jpg'),
+(3111, 'Mesfin DEBELA', '$2y$10$xa9wBMVil3LyV0ajOgxcquu1WONVHXiN8oF76Js53oaOzFKGgXgYG', 'gebrem657@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:44', NULL, 'default.jpg'),
+(3112, 'Paula Cristina LUCAS CAETANO', '$2y$10$E4c70IjdHJdhwmY0bqKhuOJ.x8BPIX.EhndRn2UJ2gjWSoQ/5Bn/G', 'pcaetanog@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:44', NULL, 'default.jpg'),
+(3113, 'Askbiw Tarekegn MOLLA', '$2y$10$gAr1VWP.5KFZpM2Uj.54O.mm5RrgWMss2B0x9GDRpGe3bGlHJq7s2', 'liyaalemayehu22@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:44', NULL, 'default.jpg'),
+(3114, 'Semira NURHUSSEN', '$2y$10$UPlkDxEyyrIx9xQ0MFr1T.C2JDyppbzAVu/AQxFgzE.YcR4qp84ii', 'semiranur@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:45', NULL, 'default.jpg'),
+(3115, 'Kennedy ARKEBE', '$2y$10$DoNzVuVp/6Svza9FR2anHuDWkNURLrjQIDuUIcZ6.3wvpxHcdd7sq', 'nebilkedir1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:45', NULL, 'default.jpg'),
+(3116, 'Biruk TESFAYE', '$2y$10$Xdo15iLKCYX.Dofp4kowReDt25f8me2D2q/cf7EHcvWZL69fswH0W', 'birukte@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:45', NULL, 'default.jpg'),
+(3117, 'Seble HAILEMARIAM', '$2y$10$NTpvaGqI9EIUop2YWgRIo.TpKyfeVnzfzRELfNX9yaIt4LTmJWBZm', 'abiyb21@hotmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:45', NULL, 'default.jpg'),
+(3118, 'Daniel LEGESSE', '$2y$10$.e/Wm6MWCEUs5WREGNInEOtuH7pDUqSkVE0W6Kntosgwdadxp6KNy', 'dannydecor1621@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:46', NULL, 'default.jpg'),
+(3119, 'Eskedar BEKELE', '$2y$10$21EgHc.XEBStaChnOkTO6.KM0Fk4K.FAITP.ye0SSnO5YZ/qO0zBy', 'eskedib@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:46', NULL, 'default.jpg'),
+(3120, 'Tilahun Amede WONDIFRAW', '$2y$10$oGf/KB1kAM3g8XkH25unI.0GgJtnVe3QFstazTT.3qmsixnpAaThW', 'hibretbelay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:46', NULL, 'default.jpg');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `active`, `created_at`, `last_login`, `avatar`) VALUES
+(3121, 'Kassahun HASSEN', '$2y$10$twwzqDuIkzazhtHaaSL.eufSoB./CfwRpL/JLyXbrAg7VeU6K7vBe', 'hassen.uneca@un.org', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:47', NULL, 'default.jpg'),
+(3122, 'Henok GEBREGIZE', '$2y$10$oo1YeMmxExbWEzif1SHgj.XwTk4GhomKa71mw0KvD4DQHC/8jatzm', 'aheimporterplc@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:47', NULL, 'default.jpg'),
+(3123, 'Demissew KASSAYE', '$2y$10$d.pQAAqrqYbsg8acXCxnme2EyKYsBOLu6ykDwK07X2lig6PFjFo0S', 'demiss@live.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:47', NULL, 'default.jpg'),
+(3124, 'Mushrika MAZIED', '$2y$10$bH70L2LpHD6bfxFp/7FVz.gm2boCofEV9nPZUbvYu/5ZQSrC6chv.', 'musherika200839@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:47', NULL, 'default.jpg'),
+(3125, 'Nejat SIRAJ', '$2y$10$uhV7xL2Kd.r78e2/PSgZau6cGGPHbFKK2MC9n0bJ1DQ4t3AJs080u', 'sabrinateib0001@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:47', NULL, 'default.jpg'),
+(3126, 'Eligo LEGESSE', '$2y$10$l3PenqF0maenMCB2T3mYw.Ith.GFNpq7POoYNo2s4QQGdVN5UIdH6', 'eligo@dclplc.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:48', NULL, 'default.jpg'),
+(3127, 'Akberet YIRKO', '$2y$10$jVO8RcATF.TMsTHOzSjmi.ynNqhBZmIbB2mVX8HHXV/byQQ/Uim7S', 'hiyabealaa@outlook.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:48', NULL, 'default.jpg'),
+(3128, 'Demelash GULILAT', '$2y$10$G2lqnabRocpWEmohpprAIOohdvpcSdYH8oAgFIYy145kmbaX0yc26', 'sbacomktg@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:48', NULL, 'default.jpg'),
+(3129, 'Lalise KUSA', '$2y$10$suewadFnRnS0P.n2gy/4juKWxpt4bMhdu3ZXsCxTkaWuXcpY7apNC', 'lalehora39@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:48', NULL, 'default.jpg'),
+(3130, 'Asnakech HMARIAM', '$2y$10$cwsAwElH0s99tW0arX1GLONq3bw8KvKFz9AC2E3Ae7EGewriespBO', 'ammanuelsisay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:49', NULL, 'default.jpg'),
+(3131, 'Welela WELELA MELAKU', '$2y$10$cvy0vciBya6EotYyr05jPO23YVDZJrD2oHo5IJ0rmapuVWs0cuLoC', 'welelamelaku73@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:49', NULL, 'default.jpg'),
+(3132, 'Mihiret WOLDEGERIMA', '$2y$10$3g4M0SmiocQXtuBe06ZCkOa642SCaKjbnmSZURThhGPVfA/9Vp/Gi', 'rimnabyom@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:49', NULL, 'default.jpg'),
+(3133, 'Selamawit TEBEBESELASSIE', '$2y$10$kGE9Wy4NeVXjHanj2VgMz.kFqKk4KWuEZeQAT4wOGVj9j7MpGXfq6', 'selamtebeb@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:49', NULL, 'default.jpg'),
+(3134, 'Fekadu BELAYNEH', '$2y$10$VWNnKYQPFrAo4D/4Al1eqO/6x9jBoGKuNNvxrxsGVbIT4SNmil5OW', 'md@fameimpextradingplc.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:50', NULL, 'default.jpg'),
+(3135, 'Tiruneh YIBREHU', '$2y$10$ADJZ6cvypYYXLjrQOYNfX.9Ykq4ih65Zm8IjZl5uMNnSPJICfOCLi', 'eyoelt@flipperschools.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:50', NULL, 'default.jpg'),
+(3136, 'Henok BEKELE', '$2y$10$wAKsUhL4uXidXe5jre6Q5O1E15nCQRnjjZBXoqMAYsJVgBraeWECa', 'henokmiti@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:50', NULL, 'default.jpg'),
+(3137, 'Teib MUSSA', '$2y$10$7mFOFZiNZp6JXn3nWGmK9exwobtPFZNoYMsxUIfo1GEFFv1f2XaBK', 'ramziteib905@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:50', NULL, 'default.jpg'),
+(3138, 'Limenew FELEKE', '$2y$10$PhSqbmOUgcs07X3ND8a7LudNMIHK4cd/vUUbawFuoOlh7utqlRtq.', 'limefeleke@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:50', NULL, 'default.jpg'),
+(3139, 'Getachew KIDANE', '$2y$10$H44tAp55jE7b6TC.yj5MrOVZYCVj7nwNY7V7DNnVgJvP0VYnJ0yTC', 'getkidted@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:51', NULL, 'default.jpg'),
+(3140, 'Manker ETENES', '$2y$10$fCJZ7BzLblxwocat.WrfoODByeelZziYjQ78xvzplowFbA4NY6VS6', 'etenesassefamanker@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:51', NULL, 'default.jpg'),
+(3141, 'Senait Berhane BERHE', '$2y$10$153slRzzbqkDpY5Idy/2J.OYYxwfv/z0czCgHt/uI/5fyPE9m5ReK', 'berhanesenait358@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:51', NULL, 'default.jpg'),
+(3142, 'Elsa ZEMENE', '$2y$10$L0Qdm1MT.dBcbHQcA56HeeC0BKIfrG0kfe0vTDDHOGF2La0jZx1jq', 'elsazemene13@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:51', NULL, 'default.jpg'),
+(3143, 'Ayenew DEMIS', '$2y$10$32a.ViVZXQrrRpoJa00dj.gg4x/lkA2OCmGXIA19mkqLB5wQ23yZm', 'eskitayi11@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:52', NULL, 'default.jpg'),
+(3144, 'Seble ALMEYAYEHU', '$2y$10$PnplZkzVx6vWUfhCM3M5eeaN1O6py7fWQ1.VzNy.CwgC46btcT1f6', 'papialex771@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:52', NULL, 'default.jpg'),
+(3145, 'Lidet Abebe TIZAZU', '$2y$10$IrTOpMAE5JJvP/LXCHSWFOzLOeaL1MGpAGl0dKL4sOo8NvZp8LiVe', 'lideta@latlegalservices.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:52', NULL, 'default.jpg'),
+(3146, 'Mekdes Muluneh MULUNEH GETAHUN', '$2y$10$PwKa/fzpb2NOPFxJW0VPoewFn1rRyGTlN.gIDcCSvp4t.XgySehjO', 'mulunehmekdes24@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:52', NULL, 'default.jpg'),
+(3147, 'Tsige KEBERE', '$2y$10$ntOHYZBVcX17u/IlpEzXsO8qTvAvp6qE6je1pM8YHH16LSlUqV9uG', 'hiaddisye@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:53', NULL, 'default.jpg'),
+(3148, 'Tsegaye AKATI', '$2y$10$EYyKCDW658nCX6sSIUgQw.7Agd28KpAJF6bIY6/97MsecnvegRTKi', 'tsegayeguteta2000@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:53', NULL, 'default.jpg'),
+(3149, 'Mekonnen HAILEMARIAM', '$2y$10$3SR4z4ocJoCjCBNvR0bodOPi0sPOiKSp6IUPHRR8J8qj8kBzOX08K', 'mekhailem@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:53', NULL, 'default.jpg'),
+(3150, 'Rayan JEMAL', '$2y$10$CRqtP7CbnZtMbzoprKwzuu9LI4ZUFIkifBjCRnhCpNOp9ooTeho6C', 'lailasima396@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:53', NULL, 'default.jpg'),
+(3151, 'Endris Adem HASSEN', '$2y$10$J/qPsbgyRS/c1uJAeIGrO.PhgJV.gRopVN22wQeCLo5xjakZ7rx6a', 'daniaendris0@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:54', NULL, 'default.jpg'),
+(3152, 'Timage ABDOSH MOHAMMED', '$2y$10$AXb4.6JzOqaXu1uxMXoqS.wuRmrN/EfjIsotDFKuGNVyUN5Ay3xOO', 'haninaelias7@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:54', NULL, 'default.jpg'),
+(3153, 'Tilahun Abza GAME', '$2y$10$aQL6fZX0JK60BgFzw392Xebt3L1nvBCCZ2wLcTHGgeVH3XZev6bIG', 'habeshatravels@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:54', NULL, 'default.jpg'),
+(3154, 'Girma KEBEDE', '$2y$10$H5lIPfUopg4GFkpwXwFqoej6t9WTPMpvyv5NrPvzV/6BiyqJvhwUO', 'gkyimer@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:55', NULL, 'default.jpg'),
+(3155, 'Fisseha HAILEMICHAEL', '$2y$10$0dbMAFvLCEv23I72RzOIGOq.UFGgikropQZyrO37UiwTVafPnyakW', 'fishhmy@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:55', NULL, 'default.jpg'),
+(3156, 'Dereje WUHIB', '$2y$10$7AwcVt3bNVQQhmN/gB/gb.RG89ZVWfoJylzhISG.EtGCBy4eBm3dO', 'cyclopsimporter2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:55', NULL, 'default.jpg'),
+(3157, 'Dagnew H.MARIAM', '$2y$10$.5l3R3OunEOo4.sbwByd/.nHW8lOMDJyMJd74s2ekPwNa1nAzDdSu', 'dagnewh@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:55', NULL, 'default.jpg'),
+(3158, 'Bereket ASMELASH', '$2y$10$ouLGl.da3XNOCrnVLwrdBOBej1Qxll63BHft0mAqdNG/GTgYQAVma', 'yamkin2@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:55', NULL, 'default.jpg'),
+(3159, 'Yonas KEBEDE', '$2y$10$Cq22Donf023bY37jQOGXpeqFJ7SDsPEO0SyVcg.YdzW5CwV8Kv/Fq', 'yonas.kebede11@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:56', NULL, 'default.jpg'),
+(3160, 'Mekonnen TADESSE', '$2y$10$QnKrzm0HluFNGscTCEfV7.SwUDActDc4wMOq78Ed7MVqzarSL6dRK', 'mekonentadd@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:56', NULL, 'default.jpg'),
+(3161, 'Roza AYALEW', '$2y$10$pwCArRyWU2JwILLJvrHwreu5XAKHMBoTzJ7d5OCu3f2LstAd5dHwu', 'roza.ayalew2014@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:56', NULL, 'default.jpg'),
+(3162, 'Geta MEKONNEN', '$2y$10$On7p/6g5O3F0ye30kDZsFeBbDKMlR2Lrybes8HgdVmnKhQpRD6naO', 'getadmekonnen@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:56', NULL, 'default.jpg'),
+(3163, 'Gashaw MELESE', '$2y$10$WYI9IQG5xFjO2pC9ITuO/.6M.RJJX0uWiWxexc2UOUbg.PoFbeiK2', 'gashawlule@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:57', NULL, 'default.jpg'),
+(3164, 'Daniel LUELSEGED', '$2y$10$nSOzU3l0ngBi4PInxqVQM.sTBdrzFgOridVCnaOObybepRuJFFeQe', 'mimiayele@hotmaol.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:57', NULL, 'default.jpg'),
+(3165, 'Abiye DEMISSIE', '$2y$10$jVVB9bK0i7rhaEh4MIW7fufjfuPBnudl4GJ7dEXymBMpnf8DjUxIO', 'haymibelet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:57', NULL, 'default.jpg'),
+(3166, 'Abebayehu MEBRATU', '$2y$10$gXOnsbgdEnC5y3G2KUU6/.9B0UD7.Kpw/vScpJdJPEom.FiUnHiIy', 'abebayehumebratu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:57', NULL, 'default.jpg'),
+(3167, 'Zemenu BELAY', '$2y$10$94ozDHdCNV74dSq5o3hB7OcDYw6vKfAFO.DV8GWSrtRtIVWk9iztO', 'zemen96@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:58', NULL, 'default.jpg'),
+(3168, 'Sofia SHIBABAW', '$2y$10$kZiyqOuTzDEh4KzcUlhmd.twhzUr0j9cVCcsT4MQFE3yPVs5TrpgO', 'roosterproperties2020@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:58', NULL, 'default.jpg'),
+(3169, 'Sultan KEDIR', '$2y$10$zCH4IXX9K8CqYJIc10Q93Ojy9tD3elnLM71Ys5uAjf3H97qZe3WH6', 'kamilasultan123@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:58', NULL, 'default.jpg'),
+(3170, 'Getabalew LEGESSE', '$2y$10$ZD6q8OsbNbnR4ZEceSjHt.tPpwh.ANOFvbsbfqyffotV0.h3za60O', 'getulegesseg@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:58', NULL, 'default.jpg'),
+(3171, 'Dr.fikremariam GUDETA', '$2y$10$Ws1BSduLJ8BIGjxZho/LXOtEvpy04/T0GgF5shs/TVjVhqgwtVcIO', 'fikreg20@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:58', NULL, 'default.jpg'),
+(3172, 'Tesfalem KIFLE', '$2y$10$4/1OHb.dxSO04cYyivWmRObF6Ii1rJPU/OS2QA5I8TmTUf8YeFmJ.', 'agimport2004@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:59', NULL, 'default.jpg'),
+(3173, 'Assefa GEBREGZIABHER', '$2y$10$CKl.gYpVyi8Mi53xnFo8oOYkm/yz.UokJB5S2JMne0LxsdqLkuLtC', 'ezraassefa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:59', NULL, 'default.jpg'),
+(3174, 'Addis AYELE', '$2y$10$VM8.atOy1q05lVeGDaoR.exKyykJ10RbDczyHlehSLvZcQXjTAPHq', 'meronbelew23@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:14:59', NULL, 'default.jpg'),
+(3175, 'Abebe Wubneh HAILESELASSIE', '$2y$10$NsflQDpieW3TA.DVVfKJV.6I7Z3K4z1episS1gsWZpFcFih8pBMF2', 'abebewubneh@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:00', NULL, 'default.jpg'),
+(3176, 'Elsabeth Gebeyehu GEBEYEHU', '$2y$10$btVNzEr2s112nIqi.y/ZxuqB2xQ8Rna6FuGolW.fySw628qHjoALK', 'elsabethgebeyehu69@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:00', NULL, 'default.jpg'),
+(3177, 'Yilikal BERHANU', '$2y$10$AwzKJFyk/wMm2T0P.Ec.yumSi.bUvXP1NELGL50q5jxnH7.F9AvxS', 'yilbet@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:00', NULL, 'default.jpg'),
+(3178, 'Solomon WERES', '$2y$10$PQb37NT5apX8hMoH3yNUb.We5B/duK8kV8kI276NnhVoM.qnD1AXy', 'mazaet@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:00', NULL, 'default.jpg'),
+(3179, 'Sebsibe KELELEGN', '$2y$10$y4r/SFBT5zy6hIxxJFtLNO2UMdxXtFt0NNdHCBbfZ.RH.r92OQvBy', 'skelelegn@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:01', NULL, 'default.jpg'),
+(3180, 'Eyob TAFESSE', '$2y$10$A1fLagf7iWsKKC6G9h/HqOXkegxw9EtKpj2DHhmMYHsgjV6JWWhMe', 'eyobtafesse@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:01', NULL, 'default.jpg'),
+(3181, 'Adebabay BIRRU', '$2y$10$LevcDsAn5btcC9dDGzdVVO2u7JkpB/z9S3k6GnSEvo/ZloOlfNRN.', 'abirru@yahoo.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:01', NULL, 'default.jpg'),
+(3182, 'Sisay GEZAHEGN', '$2y$10$IxrT8Qb33NaPgqatN.usSuWhVRv2nqKEW1noISfauBvCUuJTbs9Re', 'sisayalula7@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:01', NULL, 'default.jpg'),
+(3183, 'Sayzer ABDOSH', '$2y$10$DempDtJD8Rzl4c6GZUgzlejBMi5Fh2n3AxQyvN/0uIpKhJdF8F4T6', 'eurosaytrade@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 14:15:02', NULL, 'default.jpg'),
+(3184, 'abebe1004', '$2y$10$DMUjzCONPycnk3Qa5XOmzO0VzPJYO4XFsrCph8DcpJ0dG.52NuPwC', 'abebewudase@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:36', NULL, 'default.jpg'),
+(3185, 'abebe102', '$2y$10$HBWS7RMGQ1URJZkFw3B2reRMlv25xm9s1yg5lFKQhpskSjiRchHLK', 'abebeendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:36', NULL, 'default.jpg'),
+(3186, 'abebe1030', '$2y$10$Au1rjdhaNEvzSoipBaHQ.O.Yehp1oB4UtDSd6TiPGW0/0ZPpj71ZS', 'abebecherinet1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:36', NULL, 'default.jpg'),
+(3187, 'abebe1115', '$2y$10$VqprfUWmB2RzMRxHtbkwOuTjUIyBojaI2ZNQSgXXy3HejUI3htKUC', 'abebemamo@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:36', NULL, 'default.jpg'),
+(3190, 'abebe1300', '$2y$10$JF7RLRKUDbwmwTjRVgCFRO8ZHbF9i5fVpvaLrrvYvVzGJ0jYlwFV2', 'abebeadmasu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:37', NULL, 'default.jpg'),
+(3191, 'abebe1348', '$2y$10$Z55rF5IAwrLkq/BO7ext6ufkvBTAEGGie3.OcT1ufrJyELcns.vja', 'abebedawite2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:37', NULL, 'default.jpg'),
+(3192, 'abebe1371', '$2y$10$pgkbTDRb5fboNa.m7GvSoOL.dT4Zv2eyn3l0OwyRt34AFYT6zTY16', 'abebedagnachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:37', NULL, 'default.jpg'),
+(3193, 'abebe1377', '$2y$10$8FtekAHNx25GNN2ZrEIpGuxDaCMSAOU5o1OGnh/MUhHZ22dU/ulfu', 'abebegebremedhin1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:38', NULL, 'default.jpg'),
+(3194, 'abebe1390', '$2y$10$37X/b.0Aq3Ckz5pWHkr18.vPVgHVKUTcLRTqtwn8sONYsHxji386G', 'abebeoumer1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:38', NULL, 'default.jpg'),
+(3195, 'abebe1517', '$2y$10$Yd/Net/AnVrpbwOvYEbfGuWvQy4vmzoKoWViR1esguadd8y/bJZNG', 'abebegenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:38', NULL, 'default.jpg'),
+(3196, 'abebe1630', '$2y$10$cEETmt5q3U3P.tlm.TKO0ONgN2V4.bsxWgcJIxCEn1BN0vBGaLG1.', 'abebefikru1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:38', NULL, 'default.jpg'),
+(3197, 'abebe1647', '$2y$10$MfMLEMpzljkOLF36Ptb7RuE7dhMNJBJPEkUNK/GkTYaaJ4N/t.Gvq', 'abebezelalem2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:38', NULL, 'default.jpg'),
+(3198, 'abebe1807', '$2y$10$9QltKMGdhd9P5xS2d1s5Q.PCHv4OSoLTqaQh1OmzV5Lx5lW3DFzn2', 'abebemohammed@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:39', NULL, 'default.jpg'),
+(3199, 'abebe1851', '$2y$10$azJ5jeUTYG4LG0zkivBEAeaUZJ5ueHb/w66.oBHR579g7AZ/lzwF2', 'abebeyohannes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:39', NULL, 'default.jpg'),
+(3200, 'abebe1870', '$2y$10$kMId.PwQRQsAmPatAOBD0OROVKmyZ0WDG62AsHtgAutkMfqYWAnVa', 'abebegebremedhin@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:39', NULL, 'default.jpg'),
+(3201, 'abebe1964', '$2y$10$MIQV0rpJO66C2jvGWIM81.lWyq9Hpufg2JJSOSk5YD/7vsHSxy95.', 'abebezelalem1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:39', NULL, 'default.jpg'),
+(3202, 'abebe2016', '$2y$10$wN8CcicDjgXVaALRl7YlpuJDIK9yPAvPYLyjENut70p.dc/WQx63S', 'abebetekle1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:40', NULL, 'default.jpg'),
+(3203, 'abebe2090', '$2y$10$2p6S.rKKq8/pf06kOn9.5umzd6R7NvfhJR0MWh0eW.uYk2Ru/607u', 'abebegizaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:40', NULL, 'default.jpg'),
+(3204, 'abebe2120', '$2y$10$CEmcWimzaLYqRzZkO3oxwe9utE9/4PFwMVGiVKMYVOunB7sdMxuw.', 'abebedawite@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:40', NULL, 'default.jpg'),
+(3205, 'abebe2139', '$2y$10$BIgJ.HRpjyDNYtKqkc657OjzASntDOya/K66jHy291wlXO175bwta', 'abebetesfaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:40', NULL, 'default.jpg'),
+(3206, 'abebe2221', '$2y$10$T8KO3R2NdP9.SEffvuqdmeJE/tvv.bgz59azJu92EXMaJbZ7wsGRW', 'abebeworku@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:41', NULL, 'default.jpg'),
+(3207, 'abebe233', '$2y$10$FCtfwIzbj3LH06TpCDCj0uNkBV5tKPNh8EG.VCFszFVembP1Yi.Ne', 'abebeliya1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:41', NULL, 'default.jpg'),
+(3208, 'abebe2404', '$2y$10$WjOQjHMiDDqQbcpT5tJByuJ6Z7FA.Mvg7NDOkbqqtZE7QhHSdxR5e', 'abebebereket@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:41', NULL, 'default.jpg'),
+(3209, 'abebe2463', '$2y$10$jjmEwXQoYizCkJkILqkjY.2017EqyPQ84wPZ3HhFFuaSKElsD6vXq', 'abebeassefa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:41', NULL, 'default.jpg'),
+(3210, 'abebe2471', '$2y$10$hOyRAM6Syrti29azMO0sDOO2LljXLbbo/2z5oQmkpAvuIt8FQmO1i', 'abebealeme@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:42', NULL, 'default.jpg'),
+(3211, 'abebe2553', '$2y$10$5pntoxJRkPHXSfayFLrO8Ojc1GKgbqnSERUhCOhI7L4rLvu92dyzO', 'abebebisrat@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:42', NULL, 'default.jpg'),
+(3212, 'abebe2625', '$2y$10$eErcHqU1hPYKFoYuxPV5dOtVAYepIvrTT3QxoteeXlzoNxAYLxRiq', 'abebewolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:42', NULL, 'default.jpg'),
+(3213, 'abebe2659', '$2y$10$i3Et3TBP2xYRC5D3xrT66euse6liSUOMDASHk83lHBxMEggTUHlRS', 'abebehassan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:43', NULL, 'default.jpg'),
+(3214, 'abebe2709', '$2y$10$K6nqyVT2xbmpFLCoMq2tEeBM0mXqegXQB8g/p/iWrCa/bIs9m6dfW', 'abebekifle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:43', NULL, 'default.jpg'),
+(3215, 'abebe2773', '$2y$10$WNsP.TxDkO4qiKduvomU8uJUaRND/9OxLIV5CCKijruI69XgQ/ldu', 'abebetadesse@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:43', NULL, 'default.jpg'),
+(3216, 'abebe2868', '$2y$10$vFgwUSTYsm7HWnEjACAUoeMJRVKcB42yU7VWh0GI3QcC/pWi1cu1e', 'abebecherinet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:43', NULL, 'default.jpg'),
+(3217, 'abebe2949', '$2y$10$OGhCJmLrnfA4FUbRpo7ay.dU3/MokiS9rqfLQARBZLhLhs5Nhj.jq', 'abebegizaw1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:43', NULL, 'default.jpg'),
+(3218, 'abebe2960', '$2y$10$Rfmf663JtF0IIx09xovZHeU0ZzwBY4g0vxxsXcWoL2aYKTo9A9Z82', 'abebetekle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:44', NULL, 'default.jpg'),
+(3219, 'abebe2980', '$2y$10$emZ.T8XeHZJ7KZEFd9Khp.nVbShnLD3DnYB6kYMVLR4UiBDLbai6m', 'abebekassa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:44', NULL, 'default.jpg'),
+(3220, 'abebe314', '$2y$10$q.7MCtv4OYDUGvxYQ88CAOBe76DOIpIWOudf4Ltj.tq22w5ErHDp6', 'abebeoumer@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:44', NULL, 'default.jpg'),
+(3221, 'abebe317', '$2y$10$4o.D8.X3WIx7j0WahbgUR.EDcK4hwESfZevRWu4ohKyPMP6kA5Zby', 'abebeshimelis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:44', NULL, 'default.jpg'),
+(3222, 'abebe321', '$2y$10$.hwGSK2I4GoY3t6Wcq0p9unRfdlQM0ptEio3cR0qAOX9Tlpq0oVKe', 'abebezelalem@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:45', NULL, 'default.jpg'),
+(3223, 'abebe447', '$2y$10$9Uf1YxHofi.6EQ4pqAvaZuVpzSpbaKKr1JjotjqPBU75yWQThgCKG', 'abebemohammed1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:45', NULL, 'default.jpg'),
+(3224, 'abebe448', '$2y$10$IVXvzgvXwCHEkO.l8Wo4LuRPGu7BleY/gpz82oHUsqgUxziy8BmzO', 'abebeliya@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:45', NULL, 'default.jpg'),
+(3225, 'abebe514', '$2y$10$z52rDr/yglGX3mGyzdrAUeuN/C5GVYDU/hAhWIrbB13kGe4vH7p3y', 'abebefikru@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:45', NULL, 'default.jpg'),
+(3226, 'abebe658', '$2y$10$7R3.tLsr40025AkqyMJfeOowEaGZvlfgJPQ2Kb4rZrGB40XNxxnxe', 'abebesisay@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:46', NULL, 'default.jpg'),
+(3227, 'abebe753', '$2y$10$/CeQg.qXEtwufro.lXXMC.blx1rm9xusscY7BJI6.nHy9VwSJI8By', 'abebekebede@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:46', NULL, 'default.jpg'),
+(3228, 'abebe78', '$2y$10$/XWDlRsniAG/f8.KbydFDeIr9rJkRGVUftkuLd69uznWbvyNAnehe', 'abebedawite1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:46', NULL, 'default.jpg'),
+(3229, 'abebe84', '$2y$10$MyeWjxR2.fIXoUCsp6fqAespd3mEXCArFugBuZC7oiKFruSxOiFEe', 'abebebisrat1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:46', NULL, 'default.jpg'),
+(3230, 'abebe908', '$2y$10$j.6oDeBiUz93L8BWwq7MyuAMJg627kKl7EJiUQTNnddaqL.9Ayvrm', 'abebeali@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:46', NULL, 'default.jpg'),
+(3231, 'abebe930', '$2y$10$a7JGVJsufh.GXcDS3BavDemesZbwBa9X.Wl.FQ6ULHy1KK7/2zIWK', 'abebenigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:47', NULL, 'default.jpg'),
+(3232, 'abenet1048', '$2y$10$VqQvO1n4/ipe2Be0x0/lKePiZdIQ2WV8h9hieifi5Jf0ZT7l8vh9S', 'abenettsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:47', NULL, 'default.jpg'),
+(3233, 'abenet1050', '$2y$10$2N8ghJYKA843k4nbLLvamOMLGboFt2nWnLkhROWZWg2sY9sZmCRui', 'abenetadmasu1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:47', NULL, 'default.jpg'),
+(3234, 'abenet1105', '$2y$10$RQnzUuOOg8ERo5Vvi0OoZ.wUmLhss7uO0RUFstNj9NShG.1g1GTpa', 'abenetbekele@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:47', NULL, 'default.jpg'),
+(3235, 'abenet1200', '$2y$10$l774ktglmRN.6rwK.vVmlOdDrNXpW5JOy2uKbQEakla4upssiAxVC', 'abenetfisseha1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:48', NULL, 'default.jpg'),
+(3236, 'abenet1201', '$2y$10$.ykjffdf5kF9qSzAX2ZXvOeeOXEIQ7czy.ieKjuG/3sth/G6eBapC', 'abenetnigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:48', NULL, 'default.jpg'),
+(3237, 'abenet1249', '$2y$10$2CRH5VS9e.wUfxbRGE5KL.lVqdje9wxLzZk7/jEeoIoONClB6g58W', 'abenetzerihun@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:48', NULL, 'default.jpg'),
+(3238, 'abenet1272', '$2y$10$kxY8ois2yG6.e.voaZ5/ZeyLABsS7RwK.CttB4n0CU7MPIF7yXz/C', 'abenetibrahim1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:48', NULL, 'default.jpg'),
+(3239, 'abenet1400', '$2y$10$Q9kx3nZXqZVo4URcYzBaG.2yOR0SGRg.ujqrZOSTHkNSGGSJLN5Dq', 'abenetliya1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:49', NULL, 'default.jpg'),
+(3240, 'abenet1489', '$2y$10$K64LXLgwVatuiRzi/97Eh.3/ZFhU7MPA3Ebkpty3ixEaJsEWWdjCO', 'abenetabebe1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:49', NULL, 'default.jpg'),
+(3241, 'abenet1629', '$2y$10$ymgW0MtL0F/61qIjTC3xOe4nmPPbEXzSlsDLvTo9vOdYbGso2cfGO', 'abenetmohammed@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:49', NULL, 'default.jpg'),
+(3242, 'abenet1662', '$2y$10$1Z39uwR/G9U87D7T1E4y/OI4fK6VHh96lmjqXUgr3UrbuixsuuO4S', 'abenetassefa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:49', NULL, 'default.jpg'),
+(3243, 'abenet1694', '$2y$10$stIWkYmgIXaUZ6UFhnhQTOfXRmChd3W2eAkvGuqF8xcPXVEAQT.d6', 'abenetabebe2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:50', NULL, 'default.jpg'),
+(3244, 'abenet1773', '$2y$10$zcu814hJkGvZ6wfUwbyyK.mQ0PA9JnKqJejIeLKQGTqf/XAb5u0a2', 'abenetyohannes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:50', NULL, 'default.jpg'),
+(3245, 'abenet1865', '$2y$10$H66Aya45nHYVxNE9Ko7p7.B6hvoQPfZS0NIOcmmwA9zFBJx.WVguW', 'abenethagos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:50', NULL, 'default.jpg'),
+(3246, 'abenet2105', '$2y$10$.mIo1DLFpSHbjDycc3Xqd.wfE18Zl8I3xik43KBy9AIl9YgIWa6vu', 'abenettesfaye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:50', NULL, 'default.jpg'),
+(3247, 'abenet2353', '$2y$10$NAq0.3OcNyt3zjj9W0d2yemfpuIb4SeuJOGTC38ogMlZ.J1MfII5G', 'abenetbisrat@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:50', NULL, 'default.jpg'),
+(3248, 'abenet2372', '$2y$10$a8E.zUMWC4wso3dY2wNoqOB0Lw6N/pgWD3Wloy9naAXR4vLpgGzWK', 'abenetqes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:51', NULL, 'default.jpg'),
+(3249, 'abenet2412', '$2y$10$EaOfH9ASufWccTuhSr5BFunnN53RrxTAXQ/iYDED60Q2BcITxTVru', 'abenetkebede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:51', NULL, 'default.jpg'),
+(3250, 'abenet2438', '$2y$10$I4g9nn4IncQdOLPskCWDvuf7jQMOvRKIo.fEHbhTMWMX30c2F3ii2', 'abenethailu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:51', NULL, 'default.jpg'),
+(3251, 'abenet2562', '$2y$10$orK86zIvRd3P/WwRgLf1p.m9ByIhnrK9JnPToTan6BbC/jBvuyUqu', 'abenetoumer@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:51', NULL, 'default.jpg'),
+(3252, 'abenet2588', '$2y$10$5lFpqf.MqkOBVB31NEA.jOGvGpTHtAP8DMV4.mIyy3d/G/TrOsPAy', 'abenetgenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:52', NULL, 'default.jpg'),
+(3253, 'abenet259', '$2y$10$esmTk1tDWDiog63oajFQWuAiEul3OX5CxopWG0d7qdl7/LoFi1KZu', 'abenetpetros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:52', NULL, 'default.jpg'),
+(3254, 'abenet2640', '$2y$10$qjffU0JQuM/J6avycdqJSOOHnSz.BgAmasxFTmTGRsdqsqavY/vNW', 'abenetsisay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:52', NULL, 'default.jpg'),
+(3255, 'abenet2702', '$2y$10$cysSqpLRI7ONN2LKweCSX.t.bz3o.hJAvBCtm7i6yXfvR8LaoCqHC', 'abenetnigussie1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:52', NULL, 'default.jpg'),
+(3256, 'abenet2703', '$2y$10$LGsLBIFG6JudCX36N6rSseqwsSfX1bxeQNkeEbTgpKm6i9/aj9Sx6', 'abenetwolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:53', NULL, 'default.jpg'),
+(3257, 'abenet2708', '$2y$10$cNdArKDERvOBr9MvOkM2hum6fBhrCsQBNsrsrjng/7lXVVODPnYTO', 'abenetredda1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:53', NULL, 'default.jpg'),
+(3258, 'abenet2763', '$2y$10$b4v7YovkpaDnkPkGdRvVVuftc3vQxuMMbBX5PtP0G6jmyqoXNM3si', 'abenetselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:53', NULL, 'default.jpg'),
+(3259, 'abenet28', '$2y$10$z.DdsxFdi0y.U9F2E6vcP.cXvo.9hI1usAeDgr5OoIcOe.aEUwOFC', 'abenetliya@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:53', NULL, 'default.jpg'),
+(3260, 'abenet2812', '$2y$10$swVL0S2xHtZukOoUAXdNu.0yiJom5kAJP/xQnSi4VV8691rpNUS8K', 'abenethaben@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:54', NULL, 'default.jpg'),
+(3261, 'abenet2855', '$2y$10$iyCkC5vEZ1Xa9GQwFYjeBescO4iJsROz.PiZlGwg/HFGxpYeMFtHa', 'abenetaleme@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:54', NULL, 'default.jpg'),
+(3262, 'abenet2917', '$2y$10$SEUaw.0fNcySM/lQqhBjPOho3gSQBfnc..8JFkE.CaH3RaouW5nxG', 'abenetdemissie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:54', NULL, 'default.jpg'),
+(3263, 'abenet311', '$2y$10$4hVBkSRA44MwHpGo5vJ6yeXt0lR1A5F.EekJY8Gui6/8JnovCVRrS', 'abenetmulugeta@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:54', NULL, 'default.jpg'),
+(3264, 'abenet363', '$2y$10$TXr2k1untGkzidAZ7TiEjOeV8cgL1QAimXLr0WCOmHZoO1ZlaHe9q', 'abenetnardos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:54', NULL, 'default.jpg'),
+(3265, 'abenet402', '$2y$10$YzsDUcbGApv.If5Jfb4bDOe6C2HYzbLGyyWCA63iRLLvpq6RAZSKi', 'abenetnegash@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:55', NULL, 'default.jpg'),
+(3266, 'abenet414', '$2y$10$r5MRKNzFWXYwyb9U0iAmEer0s0FdM6fzMKxfFDVBsivxVjhHRxxBi', 'abenetredda@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:55', NULL, 'default.jpg'),
+(3267, 'abenet421', '$2y$10$5xj2W6hUGgdJqDzuhRMXJ.T/lyRBNkMkWg9vM1HhS4Lg9qTCUcPuy', 'abenetshimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:55', NULL, 'default.jpg'),
+(3268, 'abenet448', '$2y$10$Uwpm43SnvaokrOKk812yt.nhQUdHNYiDz8.7NnQ86GpOZrx9Pa.TG', 'abenetyohannes1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:55', NULL, 'default.jpg'),
+(3269, 'abenet461', '$2y$10$opLJmJ7M0uGGXKTG6FvMY.1zJLFeSR4hr8muDiXbfCvbT3RNxU8ua', 'abenetadmasu2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:56', NULL, 'default.jpg'),
+(3270, 'abenet558', '$2y$10$hOVfkYq84IeF29M0RHUCruLWmxh4IHhbCrqd4.riA5DQH.icn2C9G', 'abenetadmasu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:56', NULL, 'default.jpg'),
+(3271, 'abenet566', '$2y$10$an/yIdSGFXOeF5Up9ijujOKNOG5cSLVW5fTwOW0Ni5alKR8k1kooW', 'abenetwudase@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:56', NULL, 'default.jpg'),
+(3272, 'abenet593', '$2y$10$qAdoo/r4F3/YaoGO658QbuZkqvRQukdPaIb6kPstlx4mQHbzgABhu', 'abenetabebe@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:56', NULL, 'default.jpg'),
+(3273, 'abenet629', '$2y$10$/UXfo5wlrBdV9hcIWDnUwOJl93eqjPMP1JeVhFGrOSR2RBWLVK.sG', 'abenetfisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:56', NULL, 'default.jpg'),
+(3274, 'abenet666', '$2y$10$vnwWBJe8STYLLbZTjuKxcexR0gOsigJm62RgyA2IphuGh19ifM.li', 'abenetredda2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:57', NULL, 'default.jpg'),
+(3275, 'abenet68', '$2y$10$w1kMiY1k/QV7YZc5xh6cMugkIB23o1uqxs985F7zsfsldLQy9xgZy', 'abenetwudase1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:57', NULL, 'default.jpg'),
+(3276, 'abenet744', '$2y$10$E.fSPOiT8hBOxHliMKVD9.aqyFJ7gHSC3O9a5OLBgcfNfeuPPSCM2', 'abenethaben1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:57', NULL, 'default.jpg'),
+(3277, 'abenet825', '$2y$10$/Wj.m3.0j3CPXHtnH7ix9ONUKn9/rviUie4qhaonJuBCD37QQobda', 'abenethailu1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:57', NULL, 'default.jpg'),
+(3278, 'abenet888', '$2y$10$s91IQ4FvokSwlh3.hOdmVO.NFen5zYRT3FnSjnsZF5hBmo.nx/K5q', 'abenetnegash1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:58', NULL, 'default.jpg'),
+(3279, 'abenet900', '$2y$10$zP3BFVkN.Ym2.OOWR/Pf.uLyfFr.czbZ7rv6cPQGieDhK.NNLVtem', 'abenetibrahim@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:58', NULL, 'default.jpg'),
+(3280, 'abenet930', '$2y$10$mO4DbIvmGKogTtEJFh2rr.F3R448KaffBN48rTDTwKyr32GwUpiki', 'abenetfisseha2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:58', NULL, 'default.jpg'),
+(3281, 'alemayehu1113', '$2y$10$Fpe2tJQ8KxE9hVqboD1YsOvB81M/alkPfKldHfpOOGZ4rKLM1oWXS', 'alemayehushimelis@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:42:58', NULL, 'default.jpg'),
+(3282, 'alemayehu1119', '$2y$10$nhWrkuAryYDvPa8LtRZrU.o9mrvf3j1h8kTTZ.e4P6CshDfnMJUNa', 'alemayehuhaben@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:59', NULL, 'default.jpg'),
+(3283, 'alemayehu116', '$2y$10$eBKQuKV5AFP90C3gOWzzDePynE/WbcLf126AxDnFjCs0FsnuTVxSu', 'alemayehuendale@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:59', NULL, 'default.jpg'),
+(3284, 'alemayehu1216', '$2y$10$qyZxtPRvQyeZQaOhyVRlpOUb7HG5cJRCCq7LWGQFBB5NcFA7uEfES', 'alemayehufikru@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:42:59', NULL, 'default.jpg'),
+(3285, 'alemayehu1219', '$2y$10$vPqH6VvraLP/ER5MIOxpjuLDi7cTANNQOfwDrO9xGoJCffzVGva.C', 'alemayehuibrahim@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:42:59', NULL, 'default.jpg'),
+(3286, 'alemayehu1361', '$2y$10$pZXK4ij21Y2P15sPi8HuPe8nXg38oEfNqKRhBiW2TiZZbvLEKk5rG', 'alemayehuoumer1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:00', NULL, 'default.jpg'),
+(3287, 'alemayehu1381', '$2y$10$FEaoW6UngY7qK4SOKQFHiOdSIGimze0YqGoPUufrs3CO6wnzvNnqq', 'alemayehuabebe@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:00', NULL, 'default.jpg'),
+(3288, 'alemayehu1465', '$2y$10$sO7YOfeFx1mplW1LCKZdzOOvsoJBWSAycFdZkLEjuBq2NXnkBirFC', 'alemayehuhailu1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:00', NULL, 'default.jpg'),
+(3289, 'alemayehu1487', '$2y$10$n2wnJIwcYSN//1rBH3dvIOpTy6x6Rl4jyi5gIUDWj.Oc0B9Ck2YYS', 'alemayehuzelalem1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:00', NULL, 'default.jpg'),
+(3290, 'alemayehu156', '$2y$10$XPnP7/EWgSX6sncEMlbd7uR3s/TXr3xmIS8bq3E3tw799/o6CCLBW', 'alemayehugetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:00', NULL, 'default.jpg'),
+(3291, 'alemayehu1568', '$2y$10$70o/zKvmK5qbZlgCpUw0i.vlmgttx1th.ltYqCAYr9HhqUm2rDSMm', 'alemayehuselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:01', NULL, 'default.jpg'),
+(3292, 'alemayehu1653', '$2y$10$WIoVfU5CfxqHCnWfnml7MOLt1SOs7lDS.iNP.eoKEtL.A2nAl/jme', 'alemayehunigussie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:01', NULL, 'default.jpg'),
+(3293, 'alemayehu1733', '$2y$10$OBJ8Djv3LZVRSq.933321e3qG9hMkuMPs2QRQh8GIPaEgdDAXBE2u', 'alemayehuwolde@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:01', NULL, 'default.jpg'),
+(3294, 'alemayehu1902', '$2y$10$Qql.wiU9QqpVNv3E0V5MT.yhqYwxfRw6EWz3UbjfhlzMPKmU8KPMK', 'alemayehuoumer@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:02', NULL, 'default.jpg'),
+(3295, 'alemayehu1926', '$2y$10$0nJIKrL1WfHp8oVTFHMNpOJKkYHyWSyVDkmN43LLkOTPVQgYPmFnO', 'alemayehuhassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:02', NULL, 'default.jpg'),
+(3296, 'alemayehu1951', '$2y$10$.BJBaphJywDUgam9GnM/EeQXxaugqH5ztpwts7KRzbBnH.H53LCw.', 'alemayehuendale1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:02', NULL, 'default.jpg'),
+(3297, 'alemayehu2052', '$2y$10$D8mHMdXOVGI/B7OLokvsB.eDrLepgTYLUtkNePw0vSas061SVV2L6', 'alemayehuhailu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:03', NULL, 'default.jpg'),
+(3298, 'alemayehu214', '$2y$10$vgIunMYqQx4qMDk5D/QaE.FT6WCx7SmZ6UnIUUwaufjO4dN0UzUwW', 'alemayehumamo@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:03', NULL, 'default.jpg'),
+(3299, 'alemayehu2295', '$2y$10$spTphi5L/FKvMSV5MTDJ9OFVBfeOiGTI6tA0gV6k7RyTN/qTGFmwq', 'alemayehuselam1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:03', NULL, 'default.jpg'),
+(3300, 'alemayehu2317', '$2y$10$dgcp66jUBSjgiKWSBjb3LOaiHh8syQP0deu5Vx3OtFcbxFHA8dtyW', 'alemayehuwudase@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:03', NULL, 'default.jpg'),
+(3301, 'alemayehu2362', '$2y$10$rvtcaYkdRnBuTnapIDsGUezYhEZ011jnmPzk.nkMQ5/WLc3eqiB96', 'alemayehuyohannes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:03', NULL, 'default.jpg'),
+(3302, 'alemayehu2374', '$2y$10$qPqge/gROwwC0yewTcboBuRIdAe.uX8.K/u6nb/lU2rGQ7bGwdJXq', 'alemayehumekonnen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:04', NULL, 'default.jpg'),
+(3303, 'alemayehu2376', '$2y$10$il/FdBfpVngUmZ6uMYQbHOa/8/5ixo77a7vbMiF/MUi.LweJbgO1.', 'alemayehuassefa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:04', NULL, 'default.jpg'),
+(3304, 'alemayehu2403', '$2y$10$1uljEeLPNAb/.Jeg2ouowu1gd8.8RAhZfe7CfYjjYpqvzC9UsexXi', 'alemayehudemissie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:04', NULL, 'default.jpg'),
+(3305, 'alemayehu2437', '$2y$10$R0b2/xCJfXW/zyK5u6W92erT6YnHxcitrSEvOl80KgFXWUqZY09A6', 'alemayehugizaw2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:04', NULL, 'default.jpg'),
+(3306, 'alemayehu2497', '$2y$10$/r7dwUGI68n2P48FvBBHR.U8rlx3YFGhpZKRKSRmNni1GLcQMdmA2', 'alemayehugirma@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:04', NULL, 'default.jpg'),
+(3307, 'alemayehu2506', '$2y$10$rNWeQ6bRm95zb2c0/GOwAug8MJiyMmUehbuQbIv.xPNewyqPrTEcm', 'alemayehuhaben1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:05', NULL, 'default.jpg'),
+(3308, 'alemayehu2559', '$2y$10$cYWWxm0rKDDPA3Yf/9lDsu7fnFMfcdccZnmLA50K/FOUXaifyuAzG', 'alemayehugetachew1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:05', NULL, 'default.jpg'),
+(3309, 'alemayehu2577', '$2y$10$bEiknm4yXZp9sahYO5daFe6OuKctv6ipVfTS2ikXP5ARh7fd1CElG', 'alemayehugizaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:05', NULL, 'default.jpg'),
+(3310, 'alemayehu2599', '$2y$10$7cTHrggyg0/0dB1BOgIrw.oDzPW6ZMLDgEy68frZ/GLaP05vlCLIe', 'alemayehusisay1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:05', NULL, 'default.jpg'),
+(3311, 'alemayehu2629', '$2y$10$uKR9zxmCrq0z2v3gmcOhnOKuTY9vLE.qSNVYyJOqEE4Ih0dLjw9CK', 'alemayehuyohannes2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:05', NULL, 'default.jpg'),
+(3312, 'alemayehu2644', '$2y$10$BWNdELxQPWrIyy3imkr3q./FVJd8E5cIjfz2UlH2dqz/ZXw9gu/em', 'alemayehuyohannes1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:06', NULL, 'default.jpg'),
+(3313, 'alemayehu2660', '$2y$10$QO5RazSFRPYJePr5hzE9KuzvPKDZy5DhalgsKU/GGHznuW4JYpffu', 'alemayehuali@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:06', NULL, 'default.jpg'),
+(3314, 'alemayehu2664', '$2y$10$4s2t9fij2kUKfqwaOApY9uyjqXqOGbtLSVcygfrLxkQYZtVbZyGxW', 'alemayehutsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:06', NULL, 'default.jpg'),
+(3315, 'alemayehu2699', '$2y$10$WU/BgiP3lpLMhIO2LuGsPOmGruRDlqm02Gjk8QVNbw6CHrO.Jkp6C', 'alemayehuadmasu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:06', NULL, 'default.jpg'),
+(3316, 'alemayehu2790', '$2y$10$4nvNQGU3s7tOQRs.szYgJ.B2OUusjXh34rTNG9Z8eZOQ0qleo8grq', 'alemayehuhagos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:06', NULL, 'default.jpg'),
+(3317, 'alemayehu2811', '$2y$10$XDIANcaHGhi1BDFIV3u7juE155U3fzAlEzbIUV8KX03SGfjgA0Ema', 'alemayehupetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:07', NULL, 'default.jpg'),
+(3318, 'alemayehu2829', '$2y$10$.Fe3I9HrAzG6Cp/56nIcNOCB.cJ5qmnnjzWBSb21/Ddx9JO8NzQ5q', 'alemayehudagnachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:07', NULL, 'default.jpg'),
+(3319, 'alemayehu2854', '$2y$10$/IjIEX6m9p/LDHPsWMCq7e0hJN6xLNt4lfiGvaAwY8U2itxV5fDrS', 'alemayehuwudase1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:07', NULL, 'default.jpg'),
+(3320, 'alemayehu2884', '$2y$10$OHW.lwV53RaF2auPh5ZgFuj01hsqCWRno12ak6xIIOgZeuc6sX8HC', 'alemayehusisay2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:07', NULL, 'default.jpg'),
+(3321, 'alemayehu2908', '$2y$10$VcsRSDZghxahHjbWTMr36ejkAixMHRGTwFc4q6vVUrv6N0c2ozuhW', 'alemayehuhagos1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:07', NULL, 'default.jpg'),
+(3322, 'alemayehu2911', '$2y$10$0FY9GUtq5arWkHCU8UqoyudHEYZPLSUGz6Vp5GgGZeP3T85GLY.xu', 'alemayehubereket@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:08', NULL, 'default.jpg'),
+(3323, 'alemayehu296', '$2y$10$SM5kOQLFbfBnHNJXYvwxNuIujgF0jh87mwKjuLTOagwf7wXEbtjBu', 'alemayehusisay@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:08', NULL, 'default.jpg'),
+(3324, 'alemayehu316', '$2y$10$ZcWPwsJgjqwF6EVHsbk4ped3MoZxoUdGlWlPAqKBuwYlZwkcpozU2', 'alemayehuzelalem2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:08', NULL, 'default.jpg'),
+(3325, 'alemayehu336', '$2y$10$Di2Op4Uuz8D2G4LyChgDPesF9VikITxkrnSrKoPokpD57RBuLMwdS', 'alemayehuassefa1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:08', NULL, 'default.jpg'),
+(3326, 'alemayehu459', '$2y$10$u71TEWS5ev84S4I.mefJuOp5RiYcQJOMuRpkiUqPEFYn8ekLKvAZS', 'alemayehugizaw1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:09', NULL, 'default.jpg'),
+(3327, 'alemayehu481', '$2y$10$/daOAIODkO1wTHwxc/00peNqzudZNTEjp9ghWS5MHpj0Lp0ru/WW2', 'alemayehuhagos2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:09', NULL, 'default.jpg'),
+(3328, 'alemayehu536', '$2y$10$3n/faPg0md9wSN2mpSstgehGluwexGdvBbeBwTAfR0O/rHXJFsMV2', 'alemayehuhaben2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:09', NULL, 'default.jpg'),
+(3329, 'alemayehu695', '$2y$10$e/3Pnrv0gKnjhvpOT/GrCeotP/Qx2sAobfqPWeZKlkZfb/q.c8wHa', 'alemayehugetachew2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:09', NULL, 'default.jpg'),
+(3330, 'alemayehu699', '$2y$10$RpM1pFacJ3spFic3e6YhZudKWdGZkU8On2.S3lxMzcyBTsvtcxdQa', 'alemayehuzelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:09', NULL, 'default.jpg'),
+(3331, 'alemayehu919', '$2y$10$CUUbHdrv730e4tjXe9JerOi2IP3WjKodZFUEb8MKqTSBY6pXpa3fq', 'alemayehukiros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:10', NULL, 'default.jpg'),
+(3332, 'alemu1048', '$2y$10$rBHssy3wLm1xsPMsj730KO//3hbuAHA.E38YebiX8spA2keT3WUCC', 'alemunigussie1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:10', NULL, 'default.jpg'),
+(3333, 'alemu1090', '$2y$10$1FZl1YjXT7UBkkIjmu5Dvu/g8W3nCAKZLBYSJlL6RfcU7GLljgFiW', 'alemuwudase@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:10', NULL, 'default.jpg'),
+(3334, 'alemu1157', '$2y$10$LKERt4PWMAFPr9loUbvidOMtg0nSBFu/LVZWERkW6xipBysU1Yj5y', 'alemutesfaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:10', NULL, 'default.jpg'),
+(3335, 'alemu1186', '$2y$10$AdEpF9TvIG.quBviOrJuDeuhr2IjHt.gFpXi7Gacul1NRAHLFrgNm', 'alemukiros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:10', NULL, 'default.jpg'),
+(3336, 'alemu1220', '$2y$10$lkU2Bdb0hLYgy9LxOT7dAeqHkwA1psBUhMAOrpojXAMrUu6ucJA9.', 'alemunegash3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:11', NULL, 'default.jpg'),
+(3337, 'alemu1254', '$2y$10$2kS.lLqdTCAO1bH44zKJ5.MABDUxJCgaLSkRfXJgiTiN7j7lYhhoC', 'alemuworku@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:11', NULL, 'default.jpg'),
+(3338, 'alemu1392', '$2y$10$fmhkipoc3jGah9VZjJf1JO36pQHLWSe4nwcvFPWyo4BQXnWrKcGLe', 'alemugirma@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:11', NULL, 'default.jpg'),
+(3339, 'alemu1407', '$2y$10$u4ndI7C4cttnhsUoBZH6bOgfdGDcT4tuk.jMKFc5C9lQF.tvo9w62', 'alemuoumer@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:12', NULL, 'default.jpg'),
+(3340, 'alemu1432', '$2y$10$kBhCzMXZOkI2mrYzDNRoVeWcCwIL3XDyIEoY.OOImiwUMFjhfgoRO', 'alemugetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:12', NULL, 'default.jpg'),
+(3341, 'alemu144', '$2y$10$ow11BjwrI5Nlx6OinflkQeemAd1ciVAUi0L4Tw7llhF07uPqlrQaC', 'alemunigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:12', NULL, 'default.jpg'),
+(3342, 'alemu1463', '$2y$10$hvAhfNIJha/jHvKS5s7hsuDTiBEO.Hnaxjm0z0bDqxcrEveJCY7z.', 'alemueyerus@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:12', NULL, 'default.jpg'),
+(3343, 'alemu1467', '$2y$10$uUrp3gfFty5W1cZSJS/99eKsZ/MNsIAbltN0nmoC7KL1Yz3F.zpPq', 'alemuibrahim@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:12', NULL, 'default.jpg'),
+(3344, 'alemu152', '$2y$10$vUXpjUdEBvhV9KcHmCyy6ex8Iu3bM3cvXSlaayuO3hvvgh7y71uHW', 'alemuyohannes1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:13', NULL, 'default.jpg'),
+(3345, 'alemu1532', '$2y$10$wfOPcVC.TBtJzyvtF.foJehH0PQCff.JJad8KG7i801eDHVQ6eAry', 'alemutsegaye1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:13', NULL, 'default.jpg'),
+(3346, 'alemu1591', '$2y$10$8BfFvw0L/6fs2NxdJgomQutvPytk55pF4JoMoGWmzAcflZlXJaicq', 'alemutsegaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:13', NULL, 'default.jpg'),
+(3347, 'alemu1597', '$2y$10$QXuqhsYzg2rfEcfjM.GhMuA61UtQzMtpZjfjt/MkY6SStTn8MalT6', 'alemumamo@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:13', NULL, 'default.jpg'),
+(3348, 'alemu1641', '$2y$10$FSFhjaujCdJTJbwAaXi1fuTHGgrhs4vLcuJUFxNFH/5UxihBHVKfa', 'alemutekle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:14', NULL, 'default.jpg'),
+(3349, 'alemu1666', '$2y$10$X7JE4xLFnI1RCafAu6a65uJsY4D96xfzmyH2k7PEGl6dHvW1o75BG', 'alemuendale1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:14', NULL, 'default.jpg'),
+(3350, 'alemu1717', '$2y$10$.tI1xUi0cv33vnV3ThtVmuc3oX3FBDuii.f/Aax6z6b84Ab4vMNcS', 'alemuzelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:14', NULL, 'default.jpg'),
+(3351, 'alemu1751', '$2y$10$tAbvg.NGsKFyLlZGu7UGiuwUZ2yMBL7Elrxx.pP0Lfx7mvBwdvjBC', 'alemuselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:14', NULL, 'default.jpg'),
+(3352, 'alemu1849', '$2y$10$ESP3PKnK370JmK4npRaP3OTgnO4odf0p4IlYCpdW9kMPm07Q.QT1i', 'alemudemissie2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:15', NULL, 'default.jpg'),
+(3353, 'alemu1895', '$2y$10$PEpSv9ZH.70uLgzIWLkiHOU6C18p/7tRTnYHHxKa32LoH7X4mM3fa', 'alemunegash@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:15', NULL, 'default.jpg'),
+(3354, 'alemu1944', '$2y$10$qrmUX6Cy7F681UfOrPPTk.9mpy0b6UUhkXb9Geq.rAOvpQC6tl5iS', 'alemuibrahim1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:49', NULL, 'default.jpg'),
+(3355, 'alemu2', '$2y$10$IbNKGZuFpa.Crxa4nAYZ..jivbKcvU/1EQauoc8Lf9K.awMwg2PXu', 'alemuhailu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:50', NULL, 'default.jpg'),
+(3356, 'alemu2037', '$2y$10$gO7P4ILdJM/I5Mg7sWXkguIX3XhBtiKPZfd/6Jw6Ly3XblQ7HnfJ.', 'alemuadmasu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:50', NULL, 'default.jpg'),
+(3357, 'alemu2103', '$2y$10$AUSaD1SxVQlAH4dqJN9kteeqheiMSJ7fakRjqfsd4Q2.7lg.43kC.', 'alemunegash2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:50', NULL, 'default.jpg'),
+(3358, 'alemu2195', '$2y$10$Zb8K5DHI7NAgOM3FQ/1nI.yvraN05YmICCGX7EPG9s4GaSo8fOxc.', 'alemuzewdie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:50', NULL, 'default.jpg'),
+(3359, 'alemu2265', '$2y$10$3p/KjIOlY5UEse/2V.ekAe88HAfZTaeQxy49ntswZ203sLrnpY12W', 'alemuqes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:50', NULL, 'default.jpg'),
+(3360, 'alemu2330', '$2y$10$D4929bgKHY.qIRNRGyAMN.D9dzhY0byyb58yZwP3/iEwjbEkQayRO', 'alemuendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:51', NULL, 'default.jpg'),
+(3361, 'alemu2438', '$2y$10$jc/5W8WwWWPLYk7Gfk9FEudbZOrxclgDxD/fhHTgjZdSCSfJYMZ4a', 'alemuhagos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:51', NULL, 'default.jpg'),
+(3362, 'alemu2448', '$2y$10$2lw.oxbHFhHGFCn7Eiigk.oLtLRaHBCmQ3d3wofyGAPb6vmGbefoS', 'alemutsegaye3@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:51', NULL, 'default.jpg'),
+(3363, 'alemu2483', '$2y$10$Y3LydQWbmgKurQCCkUIzFefOe0Oaxzz.z9cry80LOdMg7jAtAooTO', 'alemutsegaye2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:51', NULL, 'default.jpg'),
+(3364, 'alemu2492', '$2y$10$CVOLI0uNQncUzpIDuDjqJeM.wt/12w0uZ83TZe4tI6V60wW1dL25W', 'alemumohammed2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:52', NULL, 'default.jpg'),
+(3365, 'alemu2533', '$2y$10$nEl9.8bTVttgFwpY3u/rcejA/rS5oahdqk5CqV4wfjL2GpOv.mZa2', 'alemukebede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:52', NULL, 'default.jpg'),
+(3366, 'alemu2557', '$2y$10$q8CxS.p3stB9aI.262BJd..lwDynsqf5BF72fMSZdxBOtCMOrt4PW', 'alemuadmasu1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:52', NULL, 'default.jpg'),
+(3367, 'alemu2573', '$2y$10$JupzFQce70JBXCNojxrEnergH.hNTORKEx4QaAZi5u.ikzzgFlLTC', 'alemugetachew2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:52', NULL, 'default.jpg'),
+(3368, 'alemu2636', '$2y$10$rDPnHInAsroCHZQ/1FGR3.az6wQTtbqaiAaQqFwWA7DeAgNZk7Si.', 'alemumekonnen@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:52', NULL, 'default.jpg'),
+(3369, 'alemu2673', '$2y$10$KkfkJqgPk4sQjwpUO097Oe1gCGRPGGJU3G3amSUdCC1z5Bc2Meto.', 'alemudemissie1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:53', NULL, 'default.jpg'),
+(3370, 'alemu2723', '$2y$10$1uU3e2bHWyKebgUmYm23Pu0QfAmR41lqRbbGs4VOSZ5To0UMsKy1y', 'alemuzelalem2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:53', NULL, 'default.jpg'),
+(3371, 'alemu2757', '$2y$10$cbIDBfLjjwyhNmBh1quAU.K0dsYgFHUo9QMGlcwvZC.0MDGoE3yBC', 'alemusisay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:53', NULL, 'default.jpg'),
+(3372, 'alemu2761', '$2y$10$pcA2rZnIsDNhMXEr3okuQuwRA2sf4bZYD.3h33jlUz6todNOaRqzq', 'alemugetachew1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:53', NULL, 'default.jpg'),
+(3373, 'alemu2785', '$2y$10$u.7LaAiRnHFQISC2jCsEeuXxsR38AbA6bUOVDcYXFwa4JNW5XO3qi', 'alemubekele@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:54', NULL, 'default.jpg'),
+(3374, 'alemu2798', '$2y$10$t82Dx1NrEOiUtDB8JqNrZO8CZc0cd8c5YPYnA.mGuy4I/178n1enG', 'alemuyohannes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:54', NULL, 'default.jpg'),
+(3375, 'alemu2834', '$2y$10$nnzGESRqFCFKZlNdDNZ0nORvLMWFSof039hozhczch5WPJLUPXcwW', 'alemubekele1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:54', NULL, 'default.jpg'),
+(3376, 'alemu2836', '$2y$10$wbQuDR0QmVwoSi7zUYQx/ev.kd2r0DTawONRnE8Z3dcbw6qbY0YL6', 'alemukiros1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:54', NULL, 'default.jpg'),
+(3377, 'alemu2863', '$2y$10$sFzaNemUMf92CzUU2KlS7e.1XNvnAqA/xGDHg3ZDl4y.tiZ84Sgeu', 'alemugetachew4@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:55', NULL, 'default.jpg'),
+(3378, 'alemu2966', '$2y$10$wEBs5mgOW53.Iyu40CK7z.2W1WSJhGYKluyMeWCNCAawpKFftzN3.', 'alemuliya@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:55', NULL, 'default.jpg'),
+(3379, 'alemu370', '$2y$10$vxJNeSAZpQDLRsQit0Nfy.3oy7tTfn2bOkmgpx7ex5xIvU.H4UO2y', 'alemugetachew3@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:55', NULL, 'default.jpg'),
+(3380, 'alemu412', '$2y$10$aur6nBCTEnvTpvZb74A8KefFZEfIHo5xc60rDflcksuHKMJ1AFy7O', 'alemudemissie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:55', NULL, 'default.jpg'),
+(3381, 'alemu422', '$2y$10$4DfLlSwP6TOgZmiK0csblOS7676CuDp.xO9J2HeRMr85Iv0lz1Gli', 'alemumohammed@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:56', NULL, 'default.jpg'),
+(3382, 'alemu460', '$2y$10$jPE5QKYJrXN1LuMXDU0HJOKYsFX1Ef2Af4OklijRbxbgTPTh//1Pa', 'alemuworku1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:56', NULL, 'default.jpg'),
+(3383, 'alemu69', '$2y$10$f4pZ2u3l9voNs3t9OMIV3OcEYYIsAEIiPkEUYFUg45iiKd3AuorOy', 'alemuqes1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:56', NULL, 'default.jpg'),
+(3384, 'alemu792', '$2y$10$l/StJXXtuUWlvfGgUrpXb.BQ9ThjKYO1VHRGvgsd8XSEqugRawLpq', 'alemunegash1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:56', NULL, 'default.jpg'),
+(3385, 'alemu82', '$2y$10$hRQu06Jz5osV2FqS1XCggeLs1sItfU1y0b5WqgjpvH4Dqz0VhCmJm', 'alemuzelalem1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:56', NULL, 'default.jpg'),
+(3386, 'alemu827', '$2y$10$WLZW9TTu4n/NHtomVI0Lg.tJJCjYzMc7WYzrmFI64mOb2huuZPtg2', 'alemuali@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:57', NULL, 'default.jpg'),
+(3387, 'alemu901', '$2y$10$1777wRPEhY28KakhVHLrbeQfCqr2XTyncdkD/Ac3BfI0Nod.9xATW', 'alemumohammed1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:57', NULL, 'default.jpg'),
+(3388, 'alemu915', '$2y$10$PIgqb1ndiSP3u2JEhyLXD.ZMBbYti2qO8SBXpLl1Nb6/8LoCR6qGy', 'alemugetachew5@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:57', NULL, 'default.jpg'),
+(3389, 'ali1043', '$2y$10$T3.BQNF7Y2qGR7usxhOyp.GCX2nD2GZri1S9zhCwKVd91GoNk3aSC', 'aligirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:57', NULL, 'default.jpg'),
+(3390, 'ali1051', '$2y$10$V5xQaPCFIdnFmWGpiarLge43tX0RjqrLJP6sUsx60HamtZGWAbZJO', 'alimekonnen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:58', NULL, 'default.jpg'),
+(3391, 'ali1078', '$2y$10$ru10IvfpZNnQiOXFdn5k5usIg1Rx94Lwmf0o9b.uFOrdq5oklmw2K', 'alikebede@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:58', NULL, 'default.jpg'),
+(3392, 'ali1091', '$2y$10$CVDNNoQlaMiIqzwMBOJKXOwX7Gp/rRQymlo/o5E/sZ1w.nObwtxRa', 'aliyohannes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:58', NULL, 'default.jpg'),
+(3393, 'ali1114', '$2y$10$WMy63CNVeKfNFt/Vk3DNzOT9Ug/TigK.Mo3NuPahSgumgIePAsp5u', 'alicherinet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:58', NULL, 'default.jpg'),
+(3394, 'ali1121', '$2y$10$XT5VBZQ5NWnrIzg6Lk2U4ux4fZCSsK2mXQLE0XgTzuM9mBi0OTB7K', 'alifikru@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:59', NULL, 'default.jpg'),
+(3395, 'ali1247', '$2y$10$sggJnt3crbqT9i0YOoBXSeYBTzAIeHJNN2MrSXVhmjqc4Tuca/Vae', 'aliyohannes1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:43:59', NULL, 'default.jpg'),
+(3396, 'ali1390', '$2y$10$yPseXkXY1LtcN.s9y6RxDeih.0PoqfXF4sOOkaXdnDnzqRkhYGL8G', 'alibereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:59', NULL, 'default.jpg'),
+(3397, 'ali1407', '$2y$10$Gu0TAi7ND48T8zBLJJ6Qvu248vnGpQixgfiCeTdOFu6IJq9cx//l.', 'alikassa2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:43:59', NULL, 'default.jpg'),
+(3398, 'ali1471', '$2y$10$Ftde9ZThIwgBF4hBL70xqeCaEdF92ZvR07m7SRSeTfeQufTNuYjXS', 'alialeme1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:43:59', NULL, 'default.jpg'),
+(3399, 'ali1750', '$2y$10$1H2nNewmWFvkO7jwOY9j3uoAHTO1cP5mVc7CbXPJM5yNAHzf4GDcG', 'alikebede1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:00', NULL, 'default.jpg');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `active`, `created_at`, `last_login`, `avatar`) VALUES
+(3400, 'ali1770', '$2y$10$hZcfHV0vMVfK6UfNb.nrU.bJzSMqabU9PtkMeT5nd9QoYTKfxD4wm', 'aliliya@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:00', NULL, 'default.jpg'),
+(3401, 'ali1810', '$2y$10$6nVAxoOFo46QG65oB.KLE.Gx.5XJUpmvOv5bVeSKt9n1ylkHDxvIy', 'alihassan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:00', NULL, 'default.jpg'),
+(3402, 'ali1821', '$2y$10$R/L2tzHD3LF.mQccwhmwbeS3zlD0nTgrveRfuzWiU4k/EOcHXLbzy', 'alicherinet2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:00', NULL, 'default.jpg'),
+(3403, 'ali1890', '$2y$10$huPHGjq4gVYTqzyBj6AStenGan/Fk7MxVAI9JUHWTiDnIH2FjPI3K', 'aliredda@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:00', NULL, 'default.jpg'),
+(3404, 'ali2017', '$2y$10$.96rZCZFc8p5GMSEJRuuyu2tPEsh92JlEdXnujvw18b23kRxMAmP6', 'alicherinet3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:01', NULL, 'default.jpg'),
+(3405, 'ali203', '$2y$10$hP3h9nEetUE/LEUzZIrTcuzBxGryGIOuItRuXVAVbdUtJdk/kKl9y', 'aliendale@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:01', NULL, 'default.jpg'),
+(3406, 'ali2134', '$2y$10$oN5jRhOK/2vfUrdYHRnbZuEotUSMDmnHyxH3OORDzh8Cs/QsgwRMm', 'aligebremedhin1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:01', NULL, 'default.jpg'),
+(3407, 'ali2161', '$2y$10$1ixZAZuHG2CEXlfWzwkSjeL96NE1szW73Bj5XFXkWc01xZeVN3rEC', 'aliibrahim@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:01', NULL, 'default.jpg'),
+(3408, 'ali2169', '$2y$10$VHwMk3FTyWHv0.WGHOyEW.4URuzXD.DD4F/dW8gygTVl4jkw1hATi', 'alikifle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:02', NULL, 'default.jpg'),
+(3409, 'ali2203', '$2y$10$EU7P4QhOmXT9iPwblR52l.u9zLJyU7zT0Q0.G5mtBzuvCAMTRaUPa', 'alihaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:02', NULL, 'default.jpg'),
+(3410, 'ali2314', '$2y$10$RXYda57bj.2ZCmDbHd1.VeB2Qr4rQNtccGrxh9ybrPbpdSe2h.aZm', 'alishimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:02', NULL, 'default.jpg'),
+(3411, 'ali2336', '$2y$10$aN/0iDT92CfXs/yr9cGkiOby8PskrmEiCatQNRsQTzMbQGIAxPF8e', 'aliworku@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:02', NULL, 'default.jpg'),
+(3412, 'ali2369', '$2y$10$6DVOGpmmFHRxFnzFZy/BLeVfpxddIhrBcjS8n.KJNhZNRS0W168m.', 'alikassa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:03', NULL, 'default.jpg'),
+(3413, 'ali2372', '$2y$10$FSvvl.dqeyffcxkic6JsiejIzbLJNran8NbL/q.p8pF42yy0Arcam', 'alinardos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:03', NULL, 'default.jpg'),
+(3414, 'ali2373', '$2y$10$t3p4lLHG9XxzQI.FE5WOLeOSjYvNMbkKm5lVZhqAvgGFILNk16Keu', 'aliwudase@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:03', NULL, 'default.jpg'),
+(3415, 'ali2384', '$2y$10$tTxgtJkaO6gxId/aHtM49eGh1X1BE99wB61uRoG/WZeEzZxf8L1Fa', 'alitsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:03', NULL, 'default.jpg'),
+(3416, 'ali2525', '$2y$10$2hNXUXon0nN9MD6dDCEbTuot8fKV42iAsR9fbuBmBu5KLS8f5vgii', 'alitekle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:04', NULL, 'default.jpg'),
+(3417, 'ali2632', '$2y$10$eCNlp4xqslHsD9vSPnSJ.uC7/irjbVL8ZpoZtBq1lLyKY2HHsfqU6', 'alitesfaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:04', NULL, 'default.jpg'),
+(3418, 'ali2639', '$2y$10$d7R8oNrw2lw6MX9InA8ECO2571/XHFK4sMInXTKr/6hPJNbARR2/u', 'alizewdie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:04', NULL, 'default.jpg'),
+(3419, 'ali2818', '$2y$10$bXv9aOhHBpnyIga/2WZzEOHpCGhPfnLU.POqpe6C0PEFIForMMCau', 'alinegash@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:04', NULL, 'default.jpg'),
+(3420, 'ali2840', '$2y$10$f/1qE3ffsNtePa0GJuHg/erkrB.rLGSiglKilyqiaceUY3NknneaW', 'alicherinet1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:05', NULL, 'default.jpg'),
+(3421, 'ali2849', '$2y$10$qBexqHBTMrDubz6Mukanc.2urUKcUavA8anyRyrLexXmrIA5WAKBa', 'alikassa1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:05', NULL, 'default.jpg'),
+(3422, 'ali309', '$2y$10$K00uH5bdnaFdiUtgAy8THeeJeDXAchS/e1Mt8ZeYO5O1tPnvVKpUi', 'alipetros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:05', NULL, 'default.jpg'),
+(3423, 'ali348', '$2y$10$9hd0kX0ILoBDJNGh1/.AJuxSojlw1Dbk7erTyIYCnEfZ43oynmzLe', 'alimulugeta@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:05', NULL, 'default.jpg'),
+(3424, 'ali35', '$2y$10$.SsW2W1O63wuaRB//01tGuYRIswAryJJi4a2NwaxAFzh4sjb/vuq6', 'alizewdie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:06', NULL, 'default.jpg'),
+(3425, 'ali350', '$2y$10$uSZXqWXnZ0j2cSa1pLACQuTvg6F6j15DAawd4AQjQ2z50YvPex0Y2', 'alifisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:06', NULL, 'default.jpg'),
+(3426, 'ali467', '$2y$10$ybK/LC.MwGks4BE9I2p0p.yoWTANbtycdW8JCvW9T9FemL5AT9h7G', 'alimamo1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:06', NULL, 'default.jpg'),
+(3427, 'ali536', '$2y$10$RLiIVySgeiSVyxxMwGZGnOIykVwbh30Xr6buBma27KihXFhiKFEKW', 'aligebremedhin@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:06', NULL, 'default.jpg'),
+(3428, 'ali630', '$2y$10$Z/bVAGNDpW3343Nxe3fuoOVkFnM6yueVNetWQhRV96NvOFBPyxLYG', 'alialeme@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:07', NULL, 'default.jpg'),
+(3429, 'ali663', '$2y$10$iynUlYigG2E/DchEm15vze/TKNm.ihcMRJUiEtZoNBaToY8733y96', 'alitsegaye1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:07', NULL, 'default.jpg'),
+(3430, 'ali711', '$2y$10$pHoOzfOUVaTY3XMhggeigeNkJbNcBc1ts5QXV6KZFM4zGxj9aHq.m', 'alibereket1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:07', NULL, 'default.jpg'),
+(3431, 'ali753', '$2y$10$CurLq7hbNUPk..qTGykptO/1JFzOwbzEu18KFg9618wx5AuATxysq', 'alisisay@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:07', NULL, 'default.jpg'),
+(3432, 'ali761', '$2y$10$HQ4TlBfsvHuhXq0E1dZbVujmulM14URKnkNa0RzgRIazX0Pl8YQ12', 'alimohammed@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:07', NULL, 'default.jpg'),
+(3433, 'ali790', '$2y$10$E2FNrhU6LHB9eCW14nVaT.OTxPQjdzIxJH/O0m3Ma2F8QFJ6Wgq6e', 'alimulugeta1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:08', NULL, 'default.jpg'),
+(3434, 'ali857', '$2y$10$7B1tuVlzSDdTqlaY2P81d.BHs0dBJMM2vAno8UVTemlkM9bZ3l.Fi', 'alihagos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:08', NULL, 'default.jpg'),
+(3435, 'ali956', '$2y$10$Cni04CLwEPXSEnGxkxbrxeHec2sJuumy94nuUBjb6sEqAQQVq7S.u', 'aliassefa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:08', NULL, 'default.jpg'),
+(3436, 'ali988', '$2y$10$jvLS0c.CaSvuEUgHkOdc9OUTw29JCCoJInF5QD8UUE8uwtpRMrZtq', 'alihaben1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:08', NULL, 'default.jpg'),
+(3437, 'bekele1002', '$2y$10$2YyDMITI2wtWw8kI6LhlnO5deqVZHw44AMX1Ku3sY1Ty6Spju2vl6', 'bekelecherinet1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:08', NULL, 'default.jpg'),
+(3438, 'bekele1267', '$2y$10$/z0ff9qBQygT0uKOvtUiN.IVmWqG1fuW3k3PJjM6YbB8VxkB6yTUq', 'bekelegenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:09', NULL, 'default.jpg'),
+(3439, 'bekele1332', '$2y$10$4Rww16jNlgoZvng2I.1QKO3L7/Rqj4.WReTgsKpFrBVTjhXSMhtIq', 'bekelezerihun1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:09', NULL, 'default.jpg'),
+(3440, 'bekele135', '$2y$10$Jc04JE.7e9qRDzNQfPkSI.U0XynXGm1Dk.uDASjQntvTp/UPnXVna', 'bekeleredda@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:09', NULL, 'default.jpg'),
+(3441, 'bekele1399', '$2y$10$I0GTjZaDnKfhYI4xikMWyef.RBAybQFi2SMvV/tPEnZZHgnXUUbei', 'bekeleliya@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:09', NULL, 'default.jpg'),
+(3442, 'bekele1462', '$2y$10$OCflndBQlJXtRmqBanAWSeleDbgV3Rsf8KQHAOSG8iX5OGTIfuWmW', 'bekeletsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:10', NULL, 'default.jpg'),
+(3443, 'bekele1466', '$2y$10$l8rwUKBy2.rlSeQ28/OAG.61tp3ylF1OayHbv.g3ro06Spp2Xi5sW', 'bekeleeyerus@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:10', NULL, 'default.jpg'),
+(3444, 'bekele1505', '$2y$10$37yp9NSfgLS.HLp9y/FsveRtvm70Ksb2xj9kWLo77fXku.iRDENQ2', 'bekelenardos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:10', NULL, 'default.jpg'),
+(3445, 'bekele1594', '$2y$10$p0T9BT2i8v9yRVVSvL5N2.Q1hQQVph2HIJtJl4emX.CS/rxtw9ns.', 'bekelehassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:10', NULL, 'default.jpg'),
+(3446, 'bekele164', '$2y$10$4wq5uews1lBDPYvygwofPuko8gPNx3WMfYDhtkyNBYWSyBPiMxzvO', 'bekeleeyerus1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:11', NULL, 'default.jpg'),
+(3447, 'bekele1644', '$2y$10$Y963TobtRJ5hJnwG/i8lweOyg/Mh.JXIw.7z/nxknl6Pn9Dk1qTMi', 'bekelenigussie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:11', NULL, 'default.jpg'),
+(3448, 'bekele1677', '$2y$10$MJOcHjiUPKIn4SsOVBRtZONdNQJZzhA5woCYDQD92bh5I83QQ9hU.', 'bekelehaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:11', NULL, 'default.jpg'),
+(3449, 'bekele17', '$2y$10$vQyEUP3ucQnu41uaB164C.oEkUICAAMHuT48KAU9cNNfMCnYPhUOC', 'bekeletsegaye1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:11', NULL, 'default.jpg'),
+(3450, 'bekele177', '$2y$10$1Mhgo30O.rLfQ8cn62djUunuZXrAuAyZqRqd.ouRReFRE0XNMKflO', 'bekelegirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:11', NULL, 'default.jpg'),
+(3451, 'bekele2134', '$2y$10$kyNG0SQ3DN2mQ4ZXdXYe/.dSeJVy4gtXxueFjmxhvj5/EHVfQ52ku', 'bekelehagos1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:12', NULL, 'default.jpg'),
+(3452, 'bekele2153', '$2y$10$QUwB/JNEZZnGSb2i4lXveer/36rOfgEwTlsRDd3nEyDm80lPjxcRy', 'bekelealeme@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:12', NULL, 'default.jpg'),
+(3453, 'bekele2184', '$2y$10$5lc2hEfV5gu9v6vGgzCdSOzCcqO8mOhcfYibat2V9eauQlUZ8zJwS', 'bekelefisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:12', NULL, 'default.jpg'),
+(3454, 'bekele2220', '$2y$10$ENEC/VcvPUNpBUCw9nILkulrMZTdTa9rydkcH8ftgoPPk/dzOeBBe', 'bekelenegash@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:12', NULL, 'default.jpg'),
+(3455, 'bekele2300', '$2y$10$gtQXXr2whRYZke7.D31U7.qPlucpvHb23vgp44OvorPd5GgKJAzYK', 'bekelezerihun@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:13', NULL, 'default.jpg'),
+(3456, 'bekele2403', '$2y$10$kHgfr9Pf0KQl0LMCY9jSGel04XSAnoysUozL1ga3lzhMgEtYAv9q2', 'bekelemulugeta@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:13', NULL, 'default.jpg'),
+(3457, 'bekele2412', '$2y$10$1B2b8oeXOE7ofRwtsSNm8.8nXHRFQ9VTw/kXVJyW2PkUDyz4pBR4e', 'bekeletesfaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:13', NULL, 'default.jpg'),
+(3458, 'bekele2439', '$2y$10$MlL7xD1FEpP4y.XVQYlybO9OIuApxbVUKiUq16xrweImygc8MDMHu', 'bekelebekele@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:13', NULL, 'default.jpg'),
+(3459, 'bekele2448', '$2y$10$v62tv74EfqOyp/njFPZ53O1.7xCOrT3lcQ7FoCcsJFlDtlG.fvPUy', 'bekelezewdie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:14', NULL, 'default.jpg'),
+(3460, 'bekele2538', '$2y$10$7YtPqzFAAMkQh9HJBqByJeb/DKHpj3xGkIRQJIdXZsDTvpVPmtFsC', 'bekeleadmasu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:14', NULL, 'default.jpg'),
+(3461, 'bekele2547', '$2y$10$KB62idh5XmkVsKDHR/YHCu2hwIu2p.kqPsN7AWWEkxN7f5oDNCvse', 'bekeleassefa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:14', NULL, 'default.jpg'),
+(3462, 'bekele2607', '$2y$10$pgHow7PdENCKMimGgYFe7.xTk1a8JpGIl9VzishyOABsKosdEwBxq', 'bekeleshimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:14', NULL, 'default.jpg'),
+(3463, 'bekele2611', '$2y$10$jwH2IKd4/PmsNrniFRI4bOUC/rFGgBA6EmBQO7a6zNPK/SdmtP0Ku', 'bekelecherinet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:15', NULL, 'default.jpg'),
+(3464, 'bekele2655', '$2y$10$ruNUIksBzr3f8qqSrYhT7OJgLfVf2PKWoryGx41xrbc3Tu.shbDJ.', 'bekelezelalem@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:15', NULL, 'default.jpg'),
+(3465, 'bekele2689', '$2y$10$VMIxdcb96/4btH.Sy58FEOKPQDJe7qR1..k2Jv41JIQjnlumiZP5i', 'bekelehagos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:15', NULL, 'default.jpg'),
+(3466, 'bekele2777', '$2y$10$aSslbkF5x4xtay6MhfxbO.HigHFnJSkojbrTLRYmnmZoLtypgqKwW', 'bekeleali@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:15', NULL, 'default.jpg'),
+(3467, 'bekele2789', '$2y$10$qB2ompz1a6ojFTbBsh9fDecxoi4/3ww13F4XleJfI8AOg8aBam2b6', 'bekelekebede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:15', NULL, 'default.jpg'),
+(3468, 'bekele2825', '$2y$10$SdDVkysbzUFPQvEcJh4J1uHk9QfkfwCPPmTCyARL0666z5ulB6inm', 'bekeleqes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:16', NULL, 'default.jpg'),
+(3469, 'bekele2892', '$2y$10$6Z7DL7Yn/lkp9y7aD8xPde6wiJGlTzMLnOZuOvNVsUyA05JQCU7K6', 'bekelemamo@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:16', NULL, 'default.jpg'),
+(3470, 'bekele2972', '$2y$10$nUiItPVOZl8CBZNlwcIOhOg4s6dw8vy/2YSdxMRcDg6xZDleQWGX6', 'bekelenigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:16', NULL, 'default.jpg'),
+(3471, 'bekele368', '$2y$10$5JChon1A6M06at/GSUz0/epPVRC2LzCpDDuheiyClALzNuTo4Kzge', 'bekelepetros1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:16', NULL, 'default.jpg'),
+(3472, 'bekele371', '$2y$10$.r8o/EupDWA/PYbkMD7.jeRivTnXaQrpEzHj8SAh6h2/WAW/PuJTm', 'bekelebereket1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:17', NULL, 'default.jpg'),
+(3473, 'bekele397', '$2y$10$ZWuOc5VyU7m.vTFk7KezcOx5ONFNRkXsL9gYK9ELBwQkZuc/0Cxnu', 'bekeleworku1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:17', NULL, 'default.jpg'),
+(3474, 'bekele450', '$2y$10$.vAqO8D.30yvjfDjVeR/Qe6WU3PZPkyqjf5YiZRNU4.qKMQ.Rdmfe', 'bekelemamo1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:17', NULL, 'default.jpg'),
+(3475, 'bekele523', '$2y$10$Y3Low1PD/3zgc4/gcxon0OWEt9sBAtF1ZIieE//KZTRiOMqfGaIxe', 'bekelegebremedhin@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:17', NULL, 'default.jpg'),
+(3476, 'bekele551', '$2y$10$LVjqNNfhzS5ayYfjuupex.sGq3Ed9SkthQygL0dHYdrOafS.2ruUq', 'bekelewolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:18', NULL, 'default.jpg'),
+(3477, 'bekele698', '$2y$10$8miT92PZ9DyybIPJGbisIO/sq70N/1/TBB5R4/D7u3/uAG6BZC1NC', 'bekelemekonnen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:18', NULL, 'default.jpg'),
+(3478, 'bekele772', '$2y$10$AzPu8uE6X13ceEF8EC3jMeH.Afx2OHGZmMq6ENz/BQiWHV/352zsC', 'bekelepetros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:18', NULL, 'default.jpg'),
+(3479, 'bekele857', '$2y$10$PUvqluTDVAHfd9HYaejV1e259TwIu2Mih8lPkhcVWN4wGDvU19AKe', 'bekeleworku@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:18', NULL, 'default.jpg'),
+(3480, 'bekele917', '$2y$10$DAkjHeFUuaB.WxaF64b6KuAGNgkNZ6YbytsArW8fQxxbaxMzipduW', 'bekelebereket@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:19', NULL, 'default.jpg'),
+(3481, 'bereket1000', '$2y$10$LGUpLkAIEgJsE2NiPRZez.U0kE8BDCvJhicAfZPzxf9L/fojJMicS', 'bereketzewdie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:19', NULL, 'default.jpg'),
+(3482, 'bereket1121', '$2y$10$/bCS1ofDX24wTRKu97oyVuL8/YQXa8bhbBvAWsvte5w/WF6FLIH9e', 'berekettesfaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:19', NULL, 'default.jpg'),
+(3483, 'bereket1142', '$2y$10$gY8/1fD0Q8BRrHRu/csBWeXT/doQv83uxLtYyp9ESYugIW..1yRX.', 'bereketdagnachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:19', NULL, 'default.jpg'),
+(3484, 'bereket1225', '$2y$10$AV47bFhxcNPBOnCuSLjBxOwW6P577wFHcP/EuR3S7jFpjX9ZC27zS', 'bereketgizaw1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:20', NULL, 'default.jpg'),
+(3485, 'bereket1296', '$2y$10$Nj23Wfw2jMExRq.GMIo8Jeo/sld5o9teYEa6OKb1ipZJNdVDRwk52', 'bereketbereket1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:20', NULL, 'default.jpg'),
+(3486, 'bereket1478', '$2y$10$0HIBoWRS48e4PvoJBOcexON2TZzLvahH5/48KKm8FvhVTDQGRbGOm', 'bereketbereket2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:20', NULL, 'default.jpg'),
+(3487, 'bereket1488', '$2y$10$E9AsnNBv1.qbaa7RFusU/uX.AWii.mGvs72sr3ARVeTDu2fGz8xu.', 'bereketabebe@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:20', NULL, 'default.jpg'),
+(3488, 'bereket1517', '$2y$10$1tdBRr9WLrUSg6/NHe/hR.RW.XRJirtlScpg.Siz.kcnpOtYfXQN2', 'berekettekle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:20', NULL, 'default.jpg'),
+(3489, 'bereket1570', '$2y$10$g7TMmE8IYiKVOL/61P47v.3.BB3AtGhXHZt6/jFt2geXpTlIk5ZKO', 'bereketeyerus@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:21', NULL, 'default.jpg'),
+(3490, 'bereket1671', '$2y$10$oc8zxpuw22cgYH7nsMzhMulYt5J2OJMQQAcmhHLXVr2PcO8c0Pb0q', 'bereketnigussie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:21', NULL, 'default.jpg'),
+(3491, 'bereket1707', '$2y$10$h7kTqsjG.XArgDwKtlAOk.Ay5weZntJ3XzMa3UWg76TYUtbWN4SaO', 'bereketredda@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:21', NULL, 'default.jpg'),
+(3492, 'bereket1739', '$2y$10$F9meX/gtpaGRJIYyh9S8oOPrGJJu4yZgETnxu0cAgsoGTx1sSwIsK', 'bereketassefa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:21', NULL, 'default.jpg'),
+(3493, 'bereket1764', '$2y$10$znrspD9r/RpHAOlkergbEeowa217dXsqFZc0W6y2zs1RbILaCZcJ2', 'berekethagos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:22', NULL, 'default.jpg'),
+(3494, 'bereket1809', '$2y$10$w8uyKhwZFDkVUSzZx8IU3uCD49oQEHZsypxDXRigr9fmil8y84ct.', 'bereketbereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:22', NULL, 'default.jpg'),
+(3495, 'bereket1838', '$2y$10$zlPHvmI/j0x.JZCY2bVnBe8zV/Fy3wEQaclaeYT..f4vYUYcraOgi', 'bereketgetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:22', NULL, 'default.jpg'),
+(3496, 'bereket1973', '$2y$10$xgRqfr/E78/axaOCx5bHCub3T/z/aIxY/7b52tAqEcetZfKUdYRWK', 'berekethaben1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:22', NULL, 'default.jpg'),
+(3497, 'bereket2098', '$2y$10$fFUcTk.neNGPSVL5jHCaheFXYSVzDfsAv.EdWPZNREnAE9WRK/l02', 'bereketgebremedhin@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:23', NULL, 'default.jpg'),
+(3498, 'bereket2138', '$2y$10$N.F6wAoA7AasYHpQGYnhseml0KdtxQgRRD0evv7JYNw/rUAH2Cuwm', 'bereketadmasu1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:23', NULL, 'default.jpg'),
+(3499, 'bereket214', '$2y$10$oF7x2QI2.saZxNJXxPeIteSAgeeeT8suE00Bsf6PJQvmplcUR0Qvi', 'bereketgizaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:23', NULL, 'default.jpg'),
+(3500, 'bereket2269', '$2y$10$qk0eJR8RNkF7fOIVbxDyvOHk5vLPcT.jhahHaPT2qTATLOAIjfDqG', 'bereketali@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:23', NULL, 'default.jpg'),
+(3501, 'bereket2330', '$2y$10$OXar8nlptuzEv9aD3WgMTOt../Ji5ExJbMkDr0UXxQrmQUBR1ulte', 'bereketredda1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:24', NULL, 'default.jpg'),
+(3502, 'bereket2385', '$2y$10$6j4UvpFifGe83vIL4Yd1euRaKLhr85TZ8hp..5u../fwk4M22sAbC', 'bereketpetros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:24', NULL, 'default.jpg'),
+(3503, 'bereket2410', '$2y$10$vR5hnpRALaX9Dj8kGck7.egh68A.ywlOBoG.8AxGU4kad8Y43BAly', 'bereketliya@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:24', NULL, 'default.jpg'),
+(3504, 'bereket2483', '$2y$10$hc9k93Kq2/1srgzI9BnP4uu6uj4pqPVvmSAPhlqX.NRb9iODRYJQy', 'bereketgebremedhin2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:24', NULL, 'default.jpg'),
+(3505, 'bereket2538', '$2y$10$J5HeaUFxqNFC2ov/QxaUd.IntxXT4OQcSGo5CMl4PKkKp67RD6OFO', 'bereketshimelis@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:25', NULL, 'default.jpg'),
+(3506, 'bereket2550', '$2y$10$JgidKV5fsq0jhEzQpISY9uVQpXf0.nSVuuAlsp5qBUqAXzxQnx7Aa', 'bereketgebremedhin3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:25', NULL, 'default.jpg'),
+(3507, 'bereket2570', '$2y$10$1gHNwFux8xGtNFIf5zb98ObHYJAJ3IGqBxN0nZDNJ8dzcomBxlIPm', 'bereketnigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:25', NULL, 'default.jpg'),
+(3508, 'bereket2605', '$2y$10$R7dvZCJIgzAWRjgMjaNlmeD.boCZbukPO/qivlA6i0w3tjSS6IK2m', 'bereketcherinet1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:25', NULL, 'default.jpg'),
+(3509, 'bereket2666', '$2y$10$74ZOqPjKiJZ/9eLeuSdMWe0fjiNkYX.0dum3dDYVJ.x77KqVVwPeS', 'bereketkiros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:26', NULL, 'default.jpg'),
+(3510, 'bereket2668', '$2y$10$2hRoGF0zPGn/aC7HQr4ooeAfqfRNNigt1VE7XOQeJXKBnApf0ksfW', 'bereketfisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:26', NULL, 'default.jpg'),
+(3511, 'bereket2683', '$2y$10$HB.rX4Zex5puankWsoH5z.exbmNwjZTkVHOOfM5FKrEKg11Zsb2Zy', 'bereketgebremedhin1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:26', NULL, 'default.jpg'),
+(3512, 'bereket2823', '$2y$10$IFUVtE6v.3YHT7UUQA8IiuY1s0GhLC0LhTjUeLmPlaNDOLY44FPHi', 'bereketkassa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:26', NULL, 'default.jpg'),
+(3513, 'bereket2897', '$2y$10$cRBwAj/yL9GUDbmgP5w6guK.XH96yKpr8ZPKwZZEPknXygO64067C', 'bereketfisseha1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:27', NULL, 'default.jpg'),
+(3514, 'bereket2898', '$2y$10$kUoGiXsifBBQCJ.wCEPARuhzCb.aJ3woMzdbYRwV1ge8USXYVBlza', 'bereketkiros1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:27', NULL, 'default.jpg'),
+(3515, 'bereket2909', '$2y$10$xMMmZoOlqdRiEW4zTaetfO4Ev2jUPLvpEcsAm2Xzp6cykE8i/8xry', 'berekethaben@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:27', NULL, 'default.jpg'),
+(3516, 'bereket325', '$2y$10$8dqwed5ORZMAcEGanBv.HuMX8oa2cm5r/b.oGWIBKTEe5SvLxg7ZK', 'bereketfikru@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:27', NULL, 'default.jpg'),
+(3517, 'bereket365', '$2y$10$EZw9/z0khnGBO1KFxkT6lenM0rHSPnrmLjXXKH6G0n8QuSCdAE.DC', 'bereketzerihun@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:27', NULL, 'default.jpg'),
+(3518, 'bereket455', '$2y$10$MQkojlcr68t7W6UOrhilKezk7DMN.Z/COpAmhdTroBgiHBZtJORxy', 'berekettsegaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:28', NULL, 'default.jpg'),
+(3519, 'bereket59', '$2y$10$ASXxXpvWfLIaFsywMOFy1.HZUh.jBqf.Ja8v.YeDW4qZBhacO9cpm', 'bereketmekonnen@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:28', NULL, 'default.jpg'),
+(3520, 'bereket722', '$2y$10$Hk5ND/FndGQOxIEwNw12oelA50o75XFUkA47okUjNWq9YQcb/lpl2', 'bereketselam@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:28', NULL, 'default.jpg'),
+(3521, 'bereket733', '$2y$10$9euG.aaQXASYgt3yyJod8.5ZI5k9Og06MpOe2IfVBBUPDaCNE53Pu', 'bereketadmasu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:28', NULL, 'default.jpg'),
+(3522, 'bereket792', '$2y$10$/gPEOH5IZJwObRV5aGtWm.54onVeBoH0ey.yvSWUUUvbeyHI5a3Km', 'bereketqes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:29', NULL, 'default.jpg'),
+(3523, 'bereket82', '$2y$10$38lcfvZGoS4/MjnvuwB9gud6gizx8ThgojNQCmV5ZD6mbrOUc1TRC', 'bereketgirma@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:29', NULL, 'default.jpg'),
+(3524, 'bereket827', '$2y$10$3V5Ju3ods6I66N3bPD3o3eNFyM9Gi36k6uzQvt80AHc0B8Nfq9b7W', 'berekettadesse@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:29', NULL, 'default.jpg'),
+(3525, 'bereket835', '$2y$10$d2SPZvTxtD3YQGf6mimNlOawbiI7y.twW6jle2sSBLqs7JIGNjcE.', 'bereketnigussie2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:29', NULL, 'default.jpg'),
+(3526, 'bereket901', '$2y$10$WaYo8F1tcxPg9.XB7do5DeY.sVPAfcsABvkel57AqHUlE3lafb/0C', 'bereketdagnachew1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:30', NULL, 'default.jpg'),
+(3527, 'bereket903', '$2y$10$iy/joNJH3b1L4Oa5H579V.nBB.XnjxRegrYs605zWWDGMQCQ6SsgC', 'bereketcherinet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:30', NULL, 'default.jpg'),
+(3528, 'bereket911', '$2y$10$QCZFv0WfjvHqdX7Ye/3.G.VWOmPhHVnK098ceO8Wz28HmnDhmEUfa', 'bereketoumer@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:30', NULL, 'default.jpg'),
+(3529, 'bereket937', '$2y$10$/0uCIUt2FxqcajGqhZV/oOfjXlKn/9ny3EpJ8PRX2pNHsrXTothDu', 'bereketzelalem@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:30', NULL, 'default.jpg'),
+(3530, 'bereket939', '$2y$10$aoQA1t1XJEyZD.4RzyRAU.8Ls6DIh2Hz2DtbCE4FJqcmeG81rRp3W', 'bereketkifle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:31', NULL, 'default.jpg'),
+(3531, 'bereket999', '$2y$10$uJlWkTs1f7fkUZsVnTammOOc0OnB4qrEnftirMMKx7QoSkVyVHAvu', 'bereketgizaw2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:31', NULL, 'default.jpg'),
+(3532, 'birtukan1044', '$2y$10$o//EJ7FCR.U.tZ6mmrerzOTrNr9dNzpBL.jUuXf4IOreAjbVqWbLW', 'birtukanfisseha1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:31', NULL, 'default.jpg'),
+(3533, 'birtukan1045', '$2y$10$PvDNZ/NTL9KHB1BRZ.onGuEG.tjWS9/WVt0Is9JWEFH0wBZT0qMxm', 'birtukanaleme@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:31', NULL, 'default.jpg'),
+(3534, 'birtukan109', '$2y$10$TFV6qd7s/FbJ.jZuxYdzUuclPO0jgqyD6bBbK8RKhIFJE3L8Cauc2', 'birtukanaleme2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:31', NULL, 'default.jpg'),
+(3535, 'birtukan1136', '$2y$10$Yb3ITevdHvUlhoeAIxZzne/QM6CZ8MTLgtvD9k4wUIhXUiIw3cp6q', 'birtukanpetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:32', NULL, 'default.jpg'),
+(3536, 'birtukan121', '$2y$10$XWtEGegOHgS/pgmP0pgIEer91p6zeofxdMQ4mgHNkWyqOWcv3aGSS', 'birtukanhassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:32', NULL, 'default.jpg'),
+(3537, 'birtukan1261', '$2y$10$SaeTyYpPIr26IJB.RDfejeAnjllz7twVl/dn3Kkg3yFgeALHUWR26', 'birtukanzelalem@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:32', NULL, 'default.jpg'),
+(3538, 'birtukan1276', '$2y$10$sWy.x.pXDOrk06eNjE9gxOjGYgCRCLsxC904oa3QfQWw4UIKsjczS', 'birtukanzerihun@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:33', NULL, 'default.jpg'),
+(3539, 'birtukan1328', '$2y$10$8pzmiXWSASHXQMf3uEpDkeposEX8JmF1oYhVg3qA/vQlzIt4CjbGe', 'birtukandagnachew2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:33', NULL, 'default.jpg'),
+(3540, 'birtukan1336', '$2y$10$iH8ljAwaG6JRYj2lUFK8huclYv1YQ/h3//xTS/nSrkaPR/tmcCsgW', 'birtukankassa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:33', NULL, 'default.jpg'),
+(3541, 'birtukan1344', '$2y$10$.qkiFI0cCxYy6icMrTj48OclPLeePzhpsZjKN2yqq5C6ZRXm3ayNK', 'birtukanredda@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:33', NULL, 'default.jpg'),
+(3542, 'birtukan1362', '$2y$10$PdVqIdM.jyEN49kT/LLnouPoxvi1bQtAIUlOw3vMXRbfkoXgHs0na', 'birtukanhagos1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:33', NULL, 'default.jpg'),
+(3543, 'birtukan1388', '$2y$10$5gt.0WrOIdMGPHeR2htsMu7K0zq4IWIn5ORHt2SsNNCmf1l1tAbC2', 'birtukanhagos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:34', NULL, 'default.jpg'),
+(3544, 'birtukan1418', '$2y$10$B9LDXDRvjJezd/R6aHx73es4N/SZ2dQSyJQdZ6eDu9iTDdN5wBVBK', 'birtukantesfaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:34', NULL, 'default.jpg'),
+(3545, 'birtukan1427', '$2y$10$FUlGTuv9fOJ7dbSsLwO6KOcRP00S6coAcW.FnKav8pDr90OI2RBdO', 'birtukanfisseha2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:34', NULL, 'default.jpg'),
+(3546, 'birtukan1434', '$2y$10$8r2PwpALR9hwsh53cNl6.OYj8As9t2saJYXHji2WToOp3fuYbeYGy', 'birtukanzerihun1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:35', NULL, 'default.jpg'),
+(3547, 'birtukan1441', '$2y$10$DR/ewc4ZhgSMLJfXQIcr0eCNfma21jWiu0.9aitVG4ih7URY9dqKa', 'birtukankassa2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:35', NULL, 'default.jpg'),
+(3548, 'birtukan1449', '$2y$10$cgR5.V/KYVYqCD1EeyrUAuvWkonSW8rEVScBfWLpHMGaxqbfiL6I2', 'birtukanworku@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:35', NULL, 'default.jpg'),
+(3549, 'birtukan1465', '$2y$10$gEK.GhgfOSny7N37EK0xp.gP37c2PADoUUkuKHeDF5JEgXZ6pzFDK', 'birtukangebremedhin2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:35', NULL, 'default.jpg'),
+(3550, 'birtukan1617', '$2y$10$TzUbkPm7Dd2xJr20ssFN0.YHz/eDWCVLh9.ol1cyEEcWq3DgaOPkm', 'birtukanaleme1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:36', NULL, 'default.jpg'),
+(3551, 'birtukan1688', '$2y$10$UrzU6ry653mf7SXpcYgDG.SfhATIUR9o5aUrgIITPvptplraVRp8a', 'birtukannardos1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:36', NULL, 'default.jpg'),
+(3552, 'birtukan1695', '$2y$10$Ifq6NQ1hKdH7qE8ZbEH2e.RDH.4iZETXEF53UVyzC6nzzWhqyuON.', 'birtukanwolde@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:36', NULL, 'default.jpg'),
+(3553, 'birtukan1748', '$2y$10$o9oYubZLQ2DJjfvnVv8MAexd1QMzF8ddIYqU7jdUWAZFVUCMgW7eC', 'birtukanfisseha3@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:36', NULL, 'default.jpg'),
+(3554, 'birtukan1825', '$2y$10$FRyQdiS2vUye3X44jT9PYOkuTvP.YniZ1QWUqqZocPkQMBaQv7tIW', 'birtukanali1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:36', NULL, 'default.jpg'),
+(3555, 'birtukan1848', '$2y$10$TZ7SEhCGPypB/Y3vBJM9IOtDylwTo3/.k9.Yy7YuaMODt5YMpgvcK', 'birtukankifle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:37', NULL, 'default.jpg'),
+(3556, 'birtukan1849', '$2y$10$CjifcddRQeR54oHpyY5wOuWaBgzVxgV1.D4Lw445LSKejtS/rlLoe', 'birtukangebremedhin@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:37', NULL, 'default.jpg'),
+(3557, 'birtukan1887', '$2y$10$d5Ob9kxYAqCMYeJAo23NCeiqEgjmRkQLHlQTJtSOeaS4RhjkXqgMC', 'birtukankebede@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:37', NULL, 'default.jpg'),
+(3558, 'birtukan1910', '$2y$10$lEvcYesOhRiEvDpnV.wZqOa3IrHxMjbOmdNINrqhloMZeUnKpQHFO', 'birtukanzewdie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:37', NULL, 'default.jpg'),
+(3559, 'birtukan1922', '$2y$10$PPVwANgZw7VNEbB9jKaOv.U9ZqNI7bux3u2pqz1zwAigRbGBN2.12', 'birtukanfisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:38', NULL, 'default.jpg'),
+(3560, 'birtukan202', '$2y$10$dWCdDJJ6GESTWdmkQtCcRO/LsRtZbx545T2Nj2LaHFSEAYYRAt1D2', 'birtukanbisrat@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:38', NULL, 'default.jpg'),
+(3561, 'birtukan2063', '$2y$10$wex8kZ.efYwTUY42jLbVSetjyt15lLwOwgq/.okzPOXg/Ki.EGIRS', 'birtukantadesse@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:38', NULL, 'default.jpg'),
+(3562, 'birtukan2087', '$2y$10$xOxQshN5EB6NeEjY0MzOO.2iCDUH2MIe.uk822x8E6Xon9xPW7ZiW', 'birtukanzewdie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:38', NULL, 'default.jpg'),
+(3563, 'birtukan2101', '$2y$10$KW1GbVeB9rNvIG5ld5H9wu6ypBwXJvZkr.sP877p5.7apsA1JBU4G', 'birtukankassa1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:39', NULL, 'default.jpg'),
+(3564, 'birtukan2123', '$2y$10$j/98ZJvZAPyMzGeutC.eAux9bbHcrDc1KzaKGlI1qVIqpL0AEjPUO', 'birtukandagnachew1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:39', NULL, 'default.jpg'),
+(3565, 'birtukan2125', '$2y$10$stLor4EyLESqpleBs00Pq.l8XRByM1Yjx3gsgcfXmK/rB/zamyN5O', 'birtukantesfaye2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:39', NULL, 'default.jpg'),
+(3566, 'birtukan2156', '$2y$10$vmXMf1T3xe0sdvqIYQqR1enpId25eg9pUbYfsSK8b435kHyw4BgMe', 'birtukanshimelis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:39', NULL, 'default.jpg'),
+(3567, 'birtukan2169', '$2y$10$LYamDvZlN4gc2841YumqluSvFc24nISfArp6vbMB2DLL34nriQazS', 'birtukangizaw1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:40', NULL, 'default.jpg'),
+(3568, 'birtukan23', '$2y$10$X4ZdkH/LnpZyuzAhmHTFOuMYnjbV2rH2EAykn2Bg1Y8Ih8grxsCw2', 'birtukanfikru@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:40', NULL, 'default.jpg'),
+(3569, 'birtukan2314', '$2y$10$J5j5638nEqic2Qnam0wqluVzTD44I0ZtV2wpSEg/w/3eCYHPzh.G2', 'birtukanendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:40', NULL, 'default.jpg'),
+(3570, 'birtukan2516', '$2y$10$y1F92OQylML/VGmIZlWOhubEP/CefGQlzZIsXBUPds5xUxJi5BEkq', 'birtukanfikru1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:40', NULL, 'default.jpg'),
+(3571, 'birtukan2556', '$2y$10$4jF0ObVv5.H7VuXOEo49aOug919TQMJYUTgv/u.wzc4yEvcPMmdPO', 'birtukanbereket@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:41', NULL, 'default.jpg'),
+(3572, 'birtukan2879', '$2y$10$JxGZsJ8EG8i1aRdCMkAAQ.x3PBRb44wdOWVggc3nfGjBnRMQ30RWe', 'birtukancherinet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:41', NULL, 'default.jpg'),
+(3573, 'birtukan291', '$2y$10$kVxXibVEN54f.JeUt5542eOkAMToN39E.YTRYxrPHqrzGavQfu9HW', 'birtukanqes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:41', NULL, 'default.jpg'),
+(3574, 'birtukan2918', '$2y$10$Svg5yCNt5no3AIRM9LwT7uzpo8DZt5eYQ7Qtqo5Y1LMtt39e147Qi', 'birtukandemissie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:41', NULL, 'default.jpg'),
+(3575, 'birtukan352', '$2y$10$6RNb/dRpCE7EozqmUign3OqPVrGXiuuATttl.LVH2mXtYeIdFROam', 'birtukanmulugeta@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:42', NULL, 'default.jpg'),
+(3576, 'birtukan366', '$2y$10$LRZowUY9tKkOEDCZbAIv7O4Zp04fAZCserSI0pVbtZN.ZkQLgyHtC', 'birtukanbekele@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:42', NULL, 'default.jpg'),
+(3577, 'birtukan373', '$2y$10$GPp5tkPvDmHfaJxn4f/YQez835729.63SSLerMbn8SC8C0UziKaAu', 'birtukannardos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:42', NULL, 'default.jpg'),
+(3578, 'birtukan376', '$2y$10$c5sY.1s34L7QT.22NuMa..Olt8T1SHr2I/SBu2UEv9.4gEhMRS6T.', 'birtukanabebe@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:42', NULL, 'default.jpg'),
+(3579, 'birtukan419', '$2y$10$y9VICcKzXJ.x7J/Qjdn9SOAwJiGj6gb0QlaVcsiRPJuSsfiodleL.', 'birtukandagnachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:43', NULL, 'default.jpg'),
+(3580, 'birtukan420', '$2y$10$iy1xKoyuxDTj19yfYrsBs.vyIm8mCOuAdRmPVWeRn4qQ3XsjZLmLy', 'birtukangizaw2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:43', NULL, 'default.jpg'),
+(3581, 'birtukan456', '$2y$10$5bbala.9mAukHF0.l/WK.u9mLWgiiSnm65TueYxlGwqvXwn.q3Q.C', 'birtukangizaw@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:43', NULL, 'default.jpg'),
+(3582, 'birtukan485', '$2y$10$m49yvM8ZN7.Ne8lL8uHebO2QdXoAdaqecePVLAeD.Eb2yfMWNjhZy', 'birtukankiros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:43', NULL, 'default.jpg'),
+(3583, 'birtukan600', '$2y$10$uOC8J8/hZuGdyuoKnUwbnOhNGuIqvzAOwZPiRQ/nMd76v/G14puu6', 'birtukanhailu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:44', NULL, 'default.jpg'),
+(3584, 'birtukan77', '$2y$10$DN1N4SWIYcdrAfgBZsPZCOe4krBDicLciKWF15eHFNBgMQUnS4Z9q', 'birtukantsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:44', NULL, 'default.jpg'),
+(3585, 'birtukan800', '$2y$10$qQ9DMutWQ6Yu7WvQEonNLu3kSW45HBtqgvc9sRqafO7N5tHREYbza', 'birtukanali@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:44', NULL, 'default.jpg'),
+(3586, 'birtukan833', '$2y$10$zCv66f.W4lweGjxKPqAdRuE1Fw1dQ.WcDXOsZmlNq6Pmb5SEyfqTS', 'birtukantesfaye1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:44', NULL, 'default.jpg'),
+(3587, 'birtukan863', '$2y$10$jG8ln5rcG0Rb7SwnYHEexu812F8Ps6wLXSwSY5mMrkxVt.yQV5jSe', 'birtukanadmasu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:45', NULL, 'default.jpg'),
+(3588, 'birtukan879', '$2y$10$POB1sVt.7pgCmmb9942IeONFEVFBICJxsdnCjFqJY4r/2FH0rEVn2', 'birtukangebremedhin1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:45', NULL, 'default.jpg'),
+(3589, 'bruk1084', '$2y$10$IJb57YC1WPZyiuc/suz9C.E5gz5USqoAmprYRN6jTAsBgVrG6gpSi', 'brukbereket@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:45', NULL, 'default.jpg'),
+(3590, 'bruk117', '$2y$10$LlCYEqYT.pupJBs9l9.8xORJyzxKQudiNS1XI24fKrMfGGrZNd0rm', 'brukkifle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:45', NULL, 'default.jpg'),
+(3591, 'bruk1183', '$2y$10$NEcbJ5oxaDsX.zi73nC6u.OIER/C44xiVv/LRTy7pob4zpbsRRNhO', 'brukmekonnen1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:46', NULL, 'default.jpg'),
+(3592, 'bruk1235', '$2y$10$GGXypxUQ0pb4d/SIgbIJn.H/P59.oLZPrm83bhT4nW0FINSw28lOG', 'brukabebe@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:46', NULL, 'default.jpg'),
+(3593, 'bruk1251', '$2y$10$ln9/3ELpcBOTTj3S4MMtAemFM/pREKbQN5saJDj7tEk/3jq8.gDf2', 'brukassefa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:46', NULL, 'default.jpg'),
+(3594, 'bruk1279', '$2y$10$qzm28QQJmyNjjtYacJk1wOnu0ngJbuIhPiW8aMggVtE.APBzLMV/a', 'bruknegash@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:46', NULL, 'default.jpg'),
+(3595, 'bruk1286', '$2y$10$j1kGGtg65kclzNNKsy5S2eilcoJlCGR84INVpPXTlVPb8t5JwQ.pu', 'brukzerihun1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:46', NULL, 'default.jpg'),
+(3596, 'bruk130', '$2y$10$q1.xvabX8y2NHl9IlVG/eeyEGRWOytsOMGAtVlwrZWeIJYmwhfnVK', 'brukhassan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:47', NULL, 'default.jpg'),
+(3597, 'bruk1416', '$2y$10$Bd8yhe4LN4TwKXNabULbZONM9S6.Y4f9l5hl0RumtQW.J89OzjV1O', 'brukqes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:47', NULL, 'default.jpg'),
+(3598, 'bruk143', '$2y$10$qhLgwmfcbJcckHES2zPFDuiuOA5F4Xkcz9z4Z3C/vOUHy6VyzjKUa', 'brukzerihun2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:47', NULL, 'default.jpg'),
+(3599, 'bruk144', '$2y$10$MPdG0VZk.QGE5NTAeGcmmuSQU6xnDkRF1NDTVubjFiSKEBiW7FSk2', 'brukhailu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:48', NULL, 'default.jpg'),
+(3600, 'bruk1457', '$2y$10$HZ.uUc4PgPH.ESCnhmJ.6O01wjV2wjYBev79FI7OGhR4q7LapKNGW', 'brukbisrat@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:48', NULL, 'default.jpg'),
+(3601, 'bruk1483', '$2y$10$VH24O0uH.bO65x2JoBNlgOBo25P7yTrhRdRVfgDtXVY3VuUcrPj0y', 'bruknegash1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:48', NULL, 'default.jpg'),
+(3602, 'bruk149', '$2y$10$GG.RpAqJ.asrMxEQICrAyeRjIwAzp2pdbQky1ka2GvHG3.1maI8y6', 'brukmohammed@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:48', NULL, 'default.jpg'),
+(3603, 'bruk1532', '$2y$10$gP5m82HyHjRdXIP0kYNNDOjGL7kj/VmlqU.IDvWUebbvCa3lRqjdm', 'brukkiros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:49', NULL, 'default.jpg'),
+(3604, 'bruk1537', '$2y$10$y.OSMwKdX/aOrmWGHUK.rOUZiOGh0uK.7ihyiZZ9hg7Q8LJ96CjqG', 'bruknigussie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:49', NULL, 'default.jpg'),
+(3605, 'bruk1569', '$2y$10$cBWjL5kcHZDVdzBR5TYFJ.i0nkd9DlKrGZk3mr4fwwN4e6AIWkj62', 'brukwolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:49', NULL, 'default.jpg'),
+(3606, 'bruk160', '$2y$10$SxGPvw7GGg5Sd4RBNS8BHetr/hOKECN9NZJd/cPLkhy0giKMrWsG.', 'brukhaben@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:49', NULL, 'default.jpg'),
+(3607, 'bruk1692', '$2y$10$sroRdTs3ItqOjUr6V1ZNQ.vhmnl6skcrXO9stjksbyDQoZ3rmdtYm', 'brukfisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:50', NULL, 'default.jpg'),
+(3608, 'bruk1712', '$2y$10$w6Kq9MrF0G1DG/zg29lupebGJyY66R2spHhTJb0qXua2C.iV6FA2G', 'brukshimelis@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:50', NULL, 'default.jpg'),
+(3609, 'bruk1742', '$2y$10$FLbNvuQzVgc1YhTms3bE2OZa29CjZuEEHRxMyRvZKuttF8P0E8qSu', 'brukkebede@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:50', NULL, 'default.jpg'),
+(3610, 'bruk1786', '$2y$10$4e//5g8btaOvuQWcNnV10utRznSy3S7Dwdfxzg0OiruEqLlF/JBIS', 'brukkebede2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:50', NULL, 'default.jpg'),
+(3611, 'bruk1829', '$2y$10$Xk4OFeGMdvVogrhqkW779uJHNr61WBY2hyk8Bl..X41JK.r.HWuGe', 'brukpetros1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:51', NULL, 'default.jpg'),
+(3612, 'bruk1875', '$2y$10$z4Hz0y5Mi3CJkYjC/aCOS.4uYw846cIqeHY9dWuDt0DYplcMJCccG', 'brukzelalem@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:51', NULL, 'default.jpg'),
+(3613, 'bruk1876', '$2y$10$y4WFYgGk0VNGXw1neDta7OAhKsWqTAyBdvNYBZZGCK9p4nEjyvFXG', 'brukoumer@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:51', NULL, 'default.jpg'),
+(3614, 'bruk1948', '$2y$10$DfclwKwSFdWCENIHAM428.KXtliSSllz0E0idrrTxJ2Y5lZYE225O', 'brukkebede1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:51', NULL, 'default.jpg'),
+(3615, 'bruk2056', '$2y$10$4.E.3c5MkpfAYdaVtO2R0Ot0iSbcpqkyvKt0iLj6RuY7oNPln9Un6', 'brukliya@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:52', NULL, 'default.jpg'),
+(3616, 'bruk2096', '$2y$10$jHXRi7TdkW142p3z40DRKOUwL2qDy6kEyp6TCEIcP8ngty6VxEmTS', 'brukpetros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:52', NULL, 'default.jpg'),
+(3617, 'bruk2252', '$2y$10$ZqCdYv5MCAqk4/Dah3t0/u/Nr9Lo.GrVGpev5ihjlivTMaD1tb0.y', 'bruknigussie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:52', NULL, 'default.jpg'),
+(3618, 'bruk2284', '$2y$10$qLONaE7PMDiZLvJDGaih8.Bq/mFQTQ1RQtyM6cZiuPltTaowwrmiq', 'bruknardos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:52', NULL, 'default.jpg'),
+(3619, 'bruk230', '$2y$10$DVHki6go2jPTYXl06aGjqena9oTfamH7CvYbGmqzmqQMftVd3Hwv.', 'bruknegash2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:52', NULL, 'default.jpg'),
+(3620, 'bruk2425', '$2y$10$PAxxvFxaCHK0o6zz/nt5kOP9G3fzphWL5nfGuHd9jmWtueCVs6nCi', 'brukworku@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:53', NULL, 'default.jpg'),
+(3621, 'bruk2454', '$2y$10$rUGsfCXGGxoppoDYBLVuFOEd.WyoW/L7ZPCNn19jX3BHd4YSNeW0K', 'bruktadesse@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:53', NULL, 'default.jpg'),
+(3622, 'bruk2692', '$2y$10$quyMTgINtWsYPu7iH3u/q.LEoXD/XqMZLFa4SGFeU6iSIcR8Y3g/.', 'brukhagos1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:53', NULL, 'default.jpg'),
+(3623, 'bruk280', '$2y$10$cBGmpkdMEI/6pOktmXWqte.8uUsRT2RqfD/9rRH2r2/oBKwp9E/KG', 'brukdawite@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:53', NULL, 'default.jpg'),
+(3624, 'bruk2813', '$2y$10$.s3MjDbTjL1OeBVUHgJGRe0cSmY..ykyvU3byaDdipKG9T7aaIow2', 'brukhagos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:54', NULL, 'default.jpg'),
+(3625, 'bruk2815', '$2y$10$C13.ZG0aWMPyXbczxe876OPQaPIGDDe3rfPx4QccoY8JTqDqjdYTW', 'brukzerihun@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:54', NULL, 'default.jpg'),
+(3626, 'bruk2844', '$2y$10$6smjojdMbPirM1eU4zsT.uO./DQxs93sxiu6temxNMY2p6ZFoHa2y', 'brukdemissie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:54', NULL, 'default.jpg'),
+(3627, 'bruk2855', '$2y$10$jBUalNWX04Q0v8z1NLYOFeSaEbbuAbQQr62PeE4BLbv6my/kEjrTC', 'brukwolde1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:54', NULL, 'default.jpg'),
+(3628, 'bruk2870', '$2y$10$QxJcUhAlCVIwImZE4h//zuEwGVFSDIqcYhEpby83P.dytgX3Zgx/G', 'brukwolde2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:55', NULL, 'default.jpg'),
+(3629, 'bruk2914', '$2y$10$yGl25HVj975w/uWRLdevTeQRBNFEw7fbC5QfC.YhtN5RBrSpnD1nC', 'brukcherinet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:55', NULL, 'default.jpg'),
+(3630, 'bruk2970', '$2y$10$LV9HJ5ztdiEJ/2R9GGn.pOLAoFyxEsLeGyHPx8DaXIfpld/0evyFO', 'brukgirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:55', NULL, 'default.jpg'),
+(3631, 'bruk32', '$2y$10$KjvzLtFuJmjxhZ1Pzd4ZRe8UcAJiWq71vGIZ65fl4CKim.H/jI7bS', 'brukselam1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:55', NULL, 'default.jpg'),
+(3632, 'bruk543', '$2y$10$FaNXkt4ghs8RuzTkVDHG9un/qhpssdnhgKZxFRWIkgqWfMHg/33.C', 'bruktadesse1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:56', NULL, 'default.jpg'),
+(3633, 'bruk547', '$2y$10$RPNFFfQmkgZyOGpaoJSkHucMoi4IwtV5PI6UYrXHfo2mrf97Q7YPG', 'brukmekonnen@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:56', NULL, 'default.jpg'),
+(3634, 'bruk626', '$2y$10$aUJXGBUUdvPc.ZzeR06r8.o7Wj/c.AP9uo/0YU1f6HLSipRItdHi6', 'brukselam@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:56', NULL, 'default.jpg'),
+(3635, 'bruk865', '$2y$10$6UhbbNr8cXIHxE.HYI72t.wKEDPs5PBe6CpbgN9p3l3N2P6nldHE.', 'brukgebremedhin@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:56', NULL, 'default.jpg'),
+(3636, 'bruk935', '$2y$10$uC01hfKeCsRYJcN/h/4foOKGoqugZyuCscftEDXOncBL2ji.XNN3.', 'brukadmasu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:56', NULL, 'default.jpg'),
+(3637, 'bruk960', '$2y$10$AQfeWhlz6DrI5v0nMUR/3eBa7pq3Ae3CE3xlZ6Fmf9zCcZw.ja.GW', 'brukredda@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:57', NULL, 'default.jpg'),
+(3638, 'dawit1038', '$2y$10$lek3fNrLFQL5V6A91Caq0O6I2Wfv53yOYCTT3xn2AJUyBK./3npne', 'dawitcherinet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:57', NULL, 'default.jpg'),
+(3639, 'dawit1120', '$2y$10$LFsyd3eftux4INQIykiBVewJPB1enM8p2hBUvys1WhHflDgQoxvDi', 'dawitoumer2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:57', NULL, 'default.jpg'),
+(3640, 'dawit1279', '$2y$10$L8hqlyGv8He3rejZvTAkNuSo0d4fAxy.UJC17B/Dtn1XRYrO2BNku', 'dawitzerihun@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:57', NULL, 'default.jpg'),
+(3641, 'dawit138', '$2y$10$zUxNlSbe1lVlnsH0hypH6eST4lyvTv2N41LVZHgcvnf5/ebi5vkSK', 'dawitmamo@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:58', NULL, 'default.jpg'),
+(3642, 'dawit1498', '$2y$10$X5nmj9HqHNtPUaA29Lq10eg5IIQevI3SLXlezt9.vxX329fRoqXnK', 'dawitnigussie1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:58', NULL, 'default.jpg'),
+(3643, 'dawit1546', '$2y$10$Cbz0JnZSD3tFaDyqjPoeC.O0zxi5vPfbY8jeKBsbR6DR4BdvWgdQ.', 'dawithassan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:58', NULL, 'default.jpg'),
+(3644, 'dawit1565', '$2y$10$uNYVcMFTtLHcxTD/PRqLzenft2CK25N3Wn5Munub57u18TP96/lea', 'dawithailu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:58', NULL, 'default.jpg'),
+(3645, 'dawit1566', '$2y$10$buOA7v/4WdVjqVN7bJKbXO7nQ2UlVo7s0T1acxQn4YM0E.HnUUT7C', 'dawittadesse1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:59', NULL, 'default.jpg'),
+(3646, 'dawit1711', '$2y$10$vYDvpmiN4yWktYV6ezh7fuxSrWnR41sMUpAoVd5mJ2mw.1YlE.jSO', 'dawitaleme2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:44:59', NULL, 'default.jpg'),
+(3647, 'dawit1716', '$2y$10$mqn8wJSAP1H5CEpydvYQjOUUDx53pV/jQHdTwNH2dtsv.uzMCcm2e', 'dawitnigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:44:59', NULL, 'default.jpg'),
+(3648, 'dawit1722', '$2y$10$8uUwyOJHykXxFTuUzARTY.X81gHIbXXQPtYILx101kQ8Yj1b5K6su', 'dawitaleme@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:44:59', NULL, 'default.jpg'),
+(3649, 'dawit1730', '$2y$10$1O9TFsecQgfF9LYu7fQpHOLgzFHlLnsuZchv2sEDpgRWrUGLCAEde', 'dawitdagnachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:00', NULL, 'default.jpg'),
+(3650, 'dawit1762', '$2y$10$9E8Po7L8/sWSmveyUXv7nubNhp5Z1ZCAupkSgSHsMhu1qM3EeP2Wy', 'dawittsegaye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:00', NULL, 'default.jpg'),
+(3651, 'dawit1771', '$2y$10$1W1QtrWDn9u34pS9.1KLZ.jcOIW7fPn9j34dDVil5Xv4ldMRBqpXm', 'dawitnardos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:00', NULL, 'default.jpg'),
+(3652, 'dawit1774', '$2y$10$YiUDGBbOFCkcJUhqb/y7EOc/Rzh36rUwO.zGADVPqCQwItOlaNzkq', 'dawitendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:00', NULL, 'default.jpg'),
+(3653, 'dawit1795', '$2y$10$C5nllGdyLc67aieBZNoR6ehpBwbRo6nJGT64Z4I6OpZc.JoZJBmee', 'dawitgetachew2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:01', NULL, 'default.jpg'),
+(3654, 'dawit1821', '$2y$10$9fqGy.mLMOXPTG5Mjy6fiuoVJflu58PP35PGfSfr1KQTWn1kXyloS', 'dawitbereket@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:01', NULL, 'default.jpg'),
+(3655, 'dawit1822', '$2y$10$2yWJ0s0RL8q.iXVn1JLqpOSsTLJ9L2jIxv4UHgukvjFILIgdewmpi', 'dawitcherinet1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:01', NULL, 'default.jpg'),
+(3656, 'dawit1838', '$2y$10$v8D0Iiqz29YyVJcqzKxPw.DwHD/.cW5jiMzDZHvO6/6941soZlFhi', 'dawitgetachew@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:02', NULL, 'default.jpg'),
+(3657, 'dawit1873', '$2y$10$pQNPqnPSPLTv/ZdAYc97O.5HV.3LhukkQS/TVKOrW74J94G4gqU6q', 'dawitqes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:02', NULL, 'default.jpg'),
+(3658, 'dawit1917', '$2y$10$Jj1F8qAtcDknrD14kZeqtu/.rWXADgKqnscEiOl8jIMMSniHKg.O2', 'dawitshimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:02', NULL, 'default.jpg'),
+(3659, 'dawit1968', '$2y$10$OfGqNhkMjJwQ/T/xdc56weSqQVbMqkq6aKAfhQwVBJgirl2avp0Zu', 'dawitkassa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:03', NULL, 'default.jpg'),
+(3660, 'dawit1999', '$2y$10$QXEGUIYsRhTiF1Uu6yDgI.jmcWrmhVaBsF1as9SgjdDkbDyJm9iiO', 'dawitfisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:03', NULL, 'default.jpg'),
+(3661, 'dawit2065', '$2y$10$iAtoMU8QIQQbLs1zcxyi7.j.j6aQ.1jc47GPccLUxbEFp7yfJ8QQW', 'dawitnegash@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:03', NULL, 'default.jpg'),
+(3662, 'dawit2083', '$2y$10$PSG1crV0sULehwHP.5qmZ.kaeQYsaqKV9Jlcietvcf3HA2nIq78y2', 'dawitqes1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:03', NULL, 'default.jpg'),
+(3663, 'dawit2152', '$2y$10$5hq5viqcekaGs6DH7um8xu70VRxCKz9ap0RhC1cLc0T9y8tyC1CtS', 'dawithailu1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:04', NULL, 'default.jpg'),
+(3664, 'dawit2191', '$2y$10$jBtA5jVakQXwPuPL6pGw9ObpF0sHGTSaQr8xrevK2vbFcm4lILs5m', 'dawitzewdie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:04', NULL, 'default.jpg'),
+(3665, 'dawit2193', '$2y$10$fuge0by3/caH4fF2PFAPpuzcBvwMtwxnNr0KmmBoCSvawg/NPTKY.', 'dawitgirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:04', NULL, 'default.jpg'),
+(3666, 'dawit2225', '$2y$10$9NF1X8lIUFHqNTFSawd6R.2l2gFr7Mjv4xQjW7S7Brx43q/T46hH6', 'dawittadesse@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:04', NULL, 'default.jpg'),
+(3667, 'dawit2259', '$2y$10$KPsQiNxFg9MUtkYRJxs0mupHbFKK0Inc0X26PvKJwgFujbnjMRBZq', 'dawitfikru@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:05', NULL, 'default.jpg'),
+(3668, 'dawit2267', '$2y$10$3AlIHxD8NYSRcOhYZZYiau86w5WiPq8O0K4OopRISN6zu07/KMV8a', 'dawitadmasu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:05', NULL, 'default.jpg'),
+(3669, 'dawit2307', '$2y$10$znwDEQF1dShuB4pRd/3fRu9AkOMVUN8BTsX/e1WolIpLQMeQVXtcq', 'dawitali@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:05', NULL, 'default.jpg'),
+(3670, 'dawit2356', '$2y$10$YmX1jsu7o3QxIUMiWUmiO.RwbAm3gYk.F7kU3r5JgcPnONAexhg.m', 'dawitfikru2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:05', NULL, 'default.jpg'),
+(3671, 'dawit2445', '$2y$10$QzA7FFxBZl1YXIK81Y73d.N6TU3Pt6UL6Hs3Woavtjl4fcAWmEspS', 'dawitaleme1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:06', NULL, 'default.jpg'),
+(3672, 'dawit2493', '$2y$10$7flBUZ.UBWfL4w8x6QzTGe1KAAk2InWlZAcuvKGK9GpMNH.2qbicq', 'dawitdawite@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:06', NULL, 'default.jpg'),
+(3673, 'dawit2520', '$2y$10$XZIwRQ2zyWuOiULLHmCVXOvpZ2Cxo0XSiL.AtCryiKLGA9jVsLJCG', 'dawitredda1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:06', NULL, 'default.jpg'),
+(3674, 'dawit2557', '$2y$10$AxFt8iNmlcV6XH7J7hrta.6gaQU4hRnJHOo0OPm2jFClWkCKYdIgW', 'dawittsegaye1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:06', NULL, 'default.jpg'),
+(3675, 'dawit2579', '$2y$10$tG05wZ0r0zBKf3aGXWqAvedXyUhCy5JOh67lBtTtwswcH2kNG0umi', 'dawitoumer1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:07', NULL, 'default.jpg'),
+(3676, 'dawit2685', '$2y$10$zKid12Lx/Z3KXTaa6HN2k.zlrucXs3NtcxverKGmzjviEHyv9gF2u', 'dawitfisseha1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:07', NULL, 'default.jpg'),
+(3677, 'dawit2719', '$2y$10$XdNBNa4LvL8QQPI9ZLFfMegOfjZgKmQg6hFxAg.odJYPktsaeciUa', 'dawiteyerus@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:07', NULL, 'default.jpg'),
+(3678, 'dawit2757', '$2y$10$2EiZJ3F8hu6SIEpEaIJyOel5wgqTQDVLKqMF.6qKrcnJJtgsCEqiC', 'dawitoumer@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:07', NULL, 'default.jpg'),
+(3679, 'dawit277', '$2y$10$Jfz7lxSDF32rPNAqQ/HVAeag9r.KEOJqSvTanTbqYKJv7oo/yX8y2', 'dawitsisay@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:07', NULL, 'default.jpg');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `active`, `created_at`, `last_login`, `avatar`) VALUES
+(3680, 'dawit2807', '$2y$10$h5KapxTO6KWsT98FXc1fvepyPQvZ2AqYPYMXMUduJuORGY8iyd8Qy', 'dawitgenet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:08', NULL, 'default.jpg'),
+(3681, 'dawit2912', '$2y$10$AjVZiJNB34jfYbTx.8ioxeiR1mEOupy9NZhdCgarqcICMkuS7eKhK', 'dawitdagnachew1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:08', NULL, 'default.jpg'),
+(3682, 'dawit337', '$2y$10$Yx/gue.7VUVnSLc78FrRkuRmNeIBfNWaAeef10SAQdtK4AiON5vQ.', 'dawitmekonnen@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:08', NULL, 'default.jpg'),
+(3683, 'dawit386', '$2y$10$aPG.mDgSdAwVf0TfIMtjA.X8XlCgavAIvl3HEW0PRXzP/hmSgJ8V2', 'dawitselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:08', NULL, 'default.jpg'),
+(3684, 'dawit409', '$2y$10$y72NF0ZDOp02dJ.Hp1JXR.1BLcC4l4tqJc9/GtUwZCpP.qolVZFti', 'dawitredda@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:09', NULL, 'default.jpg'),
+(3685, 'dawit413', '$2y$10$wwVCJRD6kj5rEKn34k4QPuJyRdlZ0zKobl7ZP5FfCb9q/gOKXBF.O', 'dawittadesse2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:09', NULL, 'default.jpg'),
+(3686, 'dawit461', '$2y$10$ysER8nl2DXm6ol3YUokLLuS1JlG7IP3iYuzb3WiPgZlzhMcvsCCSu', 'dawitqes2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:09', NULL, 'default.jpg'),
+(3687, 'dawit477', '$2y$10$cW23aEkVMkk4FewJ6xXZ/uJ/HDRA1YYN3WMpIc7sXZNa.rHZFMURi', 'dawitali1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:09', NULL, 'default.jpg'),
+(3688, 'dawit532', '$2y$10$yPj0.yZi54bZxtmu1HfG2umTxpjGNV4HraLqtWGV7anaofVfX/G3a', 'dawitzerihun1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:10', NULL, 'default.jpg'),
+(3689, 'dawit762', '$2y$10$NreDCBqOqGST5zsIIktKqOVywIgVi8hnHp69hpvrlmQe6bvLFz032', 'dawittadesse3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:10', NULL, 'default.jpg'),
+(3690, 'dawit769', '$2y$10$/yqPJA2B4uGD0zw/eXGSj.n2fPsfavTzhmriwpZAK4QdJwdQyf90G', 'dawitkifle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:10', NULL, 'default.jpg'),
+(3691, 'dawit876', '$2y$10$hNa7X.HWLRmuoGPd5jn.I.HrwJiMd5DSPT1d.hEE5Ko0ydMu3DSQq', 'dawitfikru1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:10', NULL, 'default.jpg'),
+(3692, 'dawit879', '$2y$10$TUCViE75J2dnNEWfYYSS7eHaKUZCVR69kjXNj5MqyRWXbkscoBHIm', 'dawitgetachew1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:10', NULL, 'default.jpg'),
+(3693, 'dawit895', '$2y$10$9fxHoC/luzqoV23MwQyEruW8CkaIoa61mb9f4wFAatdTsoUfigks2', 'dawitgirma1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:11', NULL, 'default.jpg'),
+(3694, 'desta1021', '$2y$10$tJo3YdVZ8QtQp2Mj7baWFuT5jyY1cVRBXnsbrC0zSFQmRFeqSkcYS', 'destaqes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:11', NULL, 'default.jpg'),
+(3695, 'desta1081', '$2y$10$M4MaksGJKqd1Np2qkMWNu.9ttJTBUd2hT3Q5UC/DV8bc2oNtmL5nu', 'destazelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:11', NULL, 'default.jpg'),
+(3696, 'desta1103', '$2y$10$B3dMgozby8cdtgCw0FOG7Od0MweJ5aO5bFHuocH3y1zvqtlpgLauq', 'destagebremedhin@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:11', NULL, 'default.jpg'),
+(3697, 'desta1137', '$2y$10$DDrVhbL4bFFzHXyxt0In8epvHvYKoe4REswACJy/a.VXV41JOvgEC', 'destawudase2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:12', NULL, 'default.jpg'),
+(3698, 'desta1172', '$2y$10$nDRS3g.Tw8.a3oFgMUWry.zICA8pimHBwSHvn23ybtUnd6C85Cfa.', 'destakiros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:12', NULL, 'default.jpg'),
+(3699, 'desta1197', '$2y$10$rGPUJ.v268zusoXWeSa.Fuho9Pegc3PvaFm.EAMUpBWlqKl5747Oe', 'destagetachew3@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:12', NULL, 'default.jpg'),
+(3700, 'desta120', '$2y$10$xTcNoorI9cnreBz8uzMiTOFe4lLUmS826Q3iCovYlYPM/jde9sNJO', 'destawudase@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:12', NULL, 'default.jpg'),
+(3701, 'desta1237', '$2y$10$HFmj9DS4DZ9B54u3xFZ2m.sBSIlqDLwl9Vo2nE/FAOy6bz5w.5avO', 'destanardos1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:12', NULL, 'default.jpg'),
+(3702, 'desta1242', '$2y$10$UayR/vLKRAV/cBfFeaJhTus4ZlP6z9aV9X7qTizQcKP0bvR9OcfyK', 'destaeyerus@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:13', NULL, 'default.jpg'),
+(3703, 'desta127', '$2y$10$l6X99o1F9f3FoBYI8mVKU.H.Pe7weKPJzr8m5q6VR.rUy9BYTK5Re', 'destadagnachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:13', NULL, 'default.jpg'),
+(3704, 'desta1402', '$2y$10$whd0s53WuXlyszweIBNOXOkY78mqZR1dP3x.7uGRaDuNFCM9xDVZC', 'destasisay@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:13', NULL, 'default.jpg'),
+(3705, 'desta142', '$2y$10$I8uNWbp3Byj5A0WWMUwfmegJTAF5zJUJIqzntT5TPvtEFnBRASP3C', 'destaabebe@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:13', NULL, 'default.jpg'),
+(3706, 'desta1437', '$2y$10$WdeVb8r6vFfeICS78wvm8.4MTit8Cs0wmhRPzc6UOUy/63pzUazdW', 'destanegash2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:14', NULL, 'default.jpg'),
+(3707, 'desta1461', '$2y$10$Vvhe1azfvrPdoT9IQdy5WOcQqZsxegGOHbetUJsjJh/q5T/dbrq.i', 'destapetros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:14', NULL, 'default.jpg'),
+(3708, 'desta1472', '$2y$10$qKZZ3a.lVvo04aOfTJ2CZOFWQuqjXur5wqrZx0LJKpSvVzDI7TgLq', 'destabereket@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:14', NULL, 'default.jpg'),
+(3709, 'desta1478', '$2y$10$2IGqae41vMTEHqfLdNJK7.VtJBQNwMJJ6c05Wwx2KuTWrNb4pvppq', 'destagenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:14', NULL, 'default.jpg'),
+(3710, 'desta1510', '$2y$10$C2sQz8/MGo71Qba0Bp4b0uzUOAfBYPr4WvmaHLNOlZlwBPDCH1wva', 'destabisrat@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:15', NULL, 'default.jpg'),
+(3711, 'desta1546', '$2y$10$jSgY7EB4lvz2Jhl3z/gvwO00huPRrPZUoP.BVQyKdk/YfQhwzeP9e', 'destaassefa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:15', NULL, 'default.jpg'),
+(3712, 'desta1569', '$2y$10$e7PM8X.HH67RskIXtiEjeutErWGUIaup3l9BhJpHmOg7JCUoEdyjO', 'destakebede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:15', NULL, 'default.jpg'),
+(3713, 'desta158', '$2y$10$ft8h0AzmrhQJh84SbVvMjeYUg.xPZyQcmvllSYX/3.fnUnhiqNn/W', 'destacherinet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:15', NULL, 'default.jpg'),
+(3714, 'desta1648', '$2y$10$AqJpVkwLXsftuZ0oV7aFaufUQ454zPBx3zNDb.jt0Q/ay0rk4gbXC', 'destanegash1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:15', NULL, 'default.jpg'),
+(3715, 'desta1803', '$2y$10$2VmTuN1eOpeDNhORqhA9YOTrJK7JwF9oepSUmNLp09JdvhrN0chie', 'destakassa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:16', NULL, 'default.jpg'),
+(3716, 'desta1841', '$2y$10$JS/HqjWXzUnIvtFijSaY6OsJ5rNMybiiP9gsSMqZKZmrHVUgqgAb2', 'destatadesse@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:16', NULL, 'default.jpg'),
+(3717, 'desta1846', '$2y$10$2FQrOsKFjiLQkbiWUP8sEeW7ko.bj3c8z4AFTbnBJ9yEglvBDuw7i', 'destasisay1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:16', NULL, 'default.jpg'),
+(3718, 'desta1910', '$2y$10$1Y2SAiuFgb0pGV0SNtErCeT7vsBM0ptqwtqHqaaw51qpXZWM/f/ry', 'destanigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:16', NULL, 'default.jpg'),
+(3719, 'desta1937', '$2y$10$rOuh7vgngesyKlLeTKLWp.JaI5q9CJMeU5qFqzAoSxwYKkTQymnb.', 'destaali@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:17', NULL, 'default.jpg'),
+(3720, 'desta1962', '$2y$10$mrkQS7I1hx356x9GpWMhSepgUJHH14gtrWFUwXUkS4Uti6xCTdOkm', 'destawolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:17', NULL, 'default.jpg'),
+(3721, 'desta198', '$2y$10$yzMY99gTr43IIg8PCT0.puxJVhm48MzQ4YyhEoy0xZyS0C11Z8Iwe', 'destahaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:17', NULL, 'default.jpg'),
+(3722, 'desta2111', '$2y$10$P1YDMFDl6WQfbXlX0LcgRu8jQu3LDtNVz3oojRdw64KQzbba1R0rS', 'destamekonnen1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:17', NULL, 'default.jpg'),
+(3723, 'desta212', '$2y$10$dxlDymM05NFcov1F1fZdMeAflLx8fGqnaTQWPWJ.oZjOyI2QDgpbu', 'destagetachew1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:18', NULL, 'default.jpg'),
+(3724, 'desta2120', '$2y$10$hnLLjYsUdnRANUseJNdHvemPuaHi5Hi2q.7OSCU333oOPJ13Cd.si', 'destafisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:18', NULL, 'default.jpg'),
+(3725, 'desta2153', '$2y$10$V0cD/BC3u8/6lUGOT8E3B.mx/2AE9vesO2byAGMW08LAaQTNYxcxq', 'destagetachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:18', NULL, 'default.jpg'),
+(3726, 'desta2292', '$2y$10$81gexe1RMKuuKlg6ekvhpeydSTkD1EUR6f91ntKsTJDb5qFBZYTRi', 'destazerihun2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:18', NULL, 'default.jpg'),
+(3727, 'desta2294', '$2y$10$eQDSll0aAfxxtsfnVyNQ1eL2DQPKqOYAhwAGsX3Bass0fRpoLoNgO', 'destanigussie1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:18', NULL, 'default.jpg'),
+(3728, 'desta2336', '$2y$10$MuQXipzc/Wyu4LDbhaM3dOzizgvcuiJ2Pt/XtdXFbzP98KXI5wTUm', 'destawolde1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:19', NULL, 'default.jpg'),
+(3729, 'desta2353', '$2y$10$V5A6o8Q9Z5ooJgt/M9fmuOZhwQ7eYV.KxauYt31B505HTxgsOSk5G', 'destaali1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:19', NULL, 'default.jpg'),
+(3730, 'desta244', '$2y$10$ozM6V9VdgIY1BGxyL7bB7.AoUaSWCXh5bCqRuWMuSTAU9lDYRAd6K', 'destazerihun@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:19', NULL, 'default.jpg'),
+(3731, 'desta2447', '$2y$10$6mzeYmp/Ti0f6/pR2vynx.GvnEmIcpfUg9PEvysiYLf3MkYv4mWGG', 'destamohammed@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:19', NULL, 'default.jpg'),
+(3732, 'desta253', '$2y$10$Qxm6sFTbyYVR2RuvUvrYY.QoS2CSR.Kl57sDw/c9bwk6EZaXQLYde', 'destaselam1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:20', NULL, 'default.jpg'),
+(3733, 'desta2545', '$2y$10$VQno.zom2PJ5pQ6CKfgtBuyD5BMrTEPQU5i6/4Yv0dTn1e0xMdhlS', 'destagizaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:20', NULL, 'default.jpg'),
+(3734, 'desta2585', '$2y$10$5cPbZI.gQpnQMS/hIUX5MurPHOLk43AP/l7q.puEu6ZsHnH6eQ0tW', 'destawudase3@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:20', NULL, 'default.jpg'),
+(3735, 'desta2588', '$2y$10$/.pqLU2nsOKBtWTUus7/xuKMPLYUym2hLL9f5tehjb.o4gX/mfhju', 'destaqes2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:20', NULL, 'default.jpg'),
+(3736, 'desta2652', '$2y$10$FS0jmWL6kVr4J5uFac8m5O3exHbMMyaF5foRLvszXMV7SHnr7/mFy', 'destanegash@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:20', NULL, 'default.jpg'),
+(3737, 'desta2705', '$2y$10$XnFBYaMqh4NRi0xhSvoX.e9OWgtmE5Q9UARaZ9lycHS02aoGPksDW', 'destamulugeta1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:21', NULL, 'default.jpg'),
+(3738, 'desta271', '$2y$10$DG1SsW8.LkJL2VOBPifzXu9Koc5XL9VtDWKUIM/Go6MHEEmvnaLOu', 'destahailu1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:21', NULL, 'default.jpg'),
+(3739, 'desta2735', '$2y$10$Jqs4WrGXgV4aXXJeB.6L8e2pRVioMCWAVTolOrbk9JqJxptju4EWi', 'destanardos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:21', NULL, 'default.jpg'),
+(3740, 'desta2751', '$2y$10$9QRRFj8L413VWVPssAh4dOIaBAMx1lkjrE0FIuMCgp82WCpSy/fAa', 'destahailu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:21', NULL, 'default.jpg'),
+(3741, 'desta2758', '$2y$10$yRGOsijpLCg.vW.sZ75xWO0PTp2PeqDctnAMb0MVO1eWopQdcXayK', 'destaaleme@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:22', NULL, 'default.jpg'),
+(3742, 'desta2832', '$2y$10$2DrIEBYhXWwnBvVhhp1cqeuh9RFDCKq6GVYvwv2vmUx8V4FMmJWAG', 'destamamo@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:22', NULL, 'default.jpg'),
+(3743, 'desta2852', '$2y$10$Y1I6Bxx4yxopfXeq/7vPXOEUKzo30jcrkjwNiPYxAa3RNcgN3vwke', 'destaselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:22', NULL, 'default.jpg'),
+(3744, 'desta287', '$2y$10$/TG7EqL8T2SS7NZ7wo/VQO26Rdi2TISnyO2Yuv5Smwf5XSPHI8dIm', 'destayohannes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:22', NULL, 'default.jpg'),
+(3745, 'desta2885', '$2y$10$tbv2UApB7mYcGDPlKy9BGuHspg1L4ot5Y2dq.nZwXhyuRnA.7tSRy', 'destakifle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:23', NULL, 'default.jpg'),
+(3746, 'desta2921', '$2y$10$.97xCiz1GfHKsk20bqqPgOqGfr1Lyuj3s6sJIJfJOgDCrgHYQDQPS', 'destabekele@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:23', NULL, 'default.jpg'),
+(3747, 'desta2959', '$2y$10$m0kEZCCNmsR6VAES8U4KtOh4h9jhgvaLQJiXxPOy7ONbOig5gXL/2', 'destatekle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:23', NULL, 'default.jpg'),
+(3748, 'desta2971', '$2y$10$ARXZdi7vtCl3AczgVoY9BuyCdpDc0vIMp2mYXXQYtac.mtg5qIYKK', 'destahagos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:23', NULL, 'default.jpg'),
+(3749, 'desta31', '$2y$10$gOenP0rC7Tn51uAZx55GWeNRd8yn5T.WSOSMbOuPLYks2BSBafBpu', 'destamulugeta@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:24', NULL, 'default.jpg'),
+(3750, 'desta351', '$2y$10$laj.4XN/IWpUPVL59o7J8edxK9NL/rkIUDB/zlqaUmhTS5hcOUmCW', 'destazerihun1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:24', NULL, 'default.jpg'),
+(3751, 'desta550', '$2y$10$BJi4Fo.TyGEBGNi3Dm1FZuw3gt5iiD.82Wuf60H09rdnFdKjnB9G.', 'destazewdie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:24', NULL, 'default.jpg'),
+(3752, 'desta606', '$2y$10$kzSaaoWnyQAcB9AYmVOhR.KhCNIvxg9GsOpWxqXnS8PiFLvb6dB.C', 'destaibrahim@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:24', NULL, 'default.jpg'),
+(3753, 'desta672', '$2y$10$tSjLgwPrut2qeoeaZj9/y.Tejp3.QBjIDhu05q/SEjv3T/LLHhrBG', 'destamekonnen@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:25', NULL, 'default.jpg'),
+(3754, 'desta681', '$2y$10$uPoNenlyE6ONr0vVB6CyxeA4Eg4lX/IVKyu125PLz/ohQOkcICLcS', 'destagetachew2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:25', NULL, 'default.jpg'),
+(3755, 'desta855', '$2y$10$T/AvtpsYEWTBcrw1Pca5aOE.XIaVde9n1FDYv/pgBTMoPIugWjfFO', 'destawudase1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:25', NULL, 'default.jpg'),
+(3756, 'desta964', '$2y$10$yplFBn7mAtqN2AyIIFQLguz2GozCrMYJ62mlkDZWGelYqlbUIQl26', 'destaqes1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:25', NULL, 'default.jpg'),
+(3757, 'efrata106', '$2y$10$0iM8RD2CJGICz.3kFTHH5.l7mGxNJfB8gw0s9AQscG/sjKitXitoq', 'efratatekle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:25', NULL, 'default.jpg'),
+(3758, 'efrata1104', '$2y$10$Xt8lFXfLRdpZ4N/AYztHh.9hW9mChLmoou8wq0HZvEb1hCKDWdpmy', 'efratawudase1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:26', NULL, 'default.jpg'),
+(3759, 'efrata1121', '$2y$10$sRfLOgU.t57VFJYJ.HoryegMbnO0IusWWGSubIqdLvXatQ0DSMwHi', 'efratatadesse@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:26', NULL, 'default.jpg'),
+(3760, 'efrata1126', '$2y$10$pRjBYPNKWK7jydvVnlo26.0cJz6nzPrnxZB3TaMJWxmELGcifC4PO', 'efrataeyerus1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:26', NULL, 'default.jpg'),
+(3761, 'efrata1171', '$2y$10$o3R.EVoERa5OCT5Z5cNQXuJ3n01H57DrJVd15Jm3aGYm0blXylSfG', 'efrataadmasu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:26', NULL, 'default.jpg'),
+(3762, 'efrata1172', '$2y$10$Xu.FhUrLkpRqiUM2o6J5cOrgalr8B2EYgTnKEQDM0KKOUC2aClh.u', 'efratakassa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:27', NULL, 'default.jpg'),
+(3763, 'efrata1176', '$2y$10$GB6OiFnzLgVeJmrT9HGRvuUQa9XDCow8i2JER0V7oY4tg4hZSA7IG', 'efratawudase@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:27', NULL, 'default.jpg'),
+(3764, 'efrata1279', '$2y$10$L3XTilJ0P6DaLjsW5Miqc.9vaDmMFvFa8Iv7RVzYswGRWF6dOEcIy', 'efratapetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:27', NULL, 'default.jpg'),
+(3765, 'efrata1415', '$2y$10$habScPieq3tByPnOPemacu3KJ28bf6EgEziCqH1awzy/KhcioJW7y', 'efratakifle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:27', NULL, 'default.jpg'),
+(3766, 'efrata1485', '$2y$10$662t4N9WVUopE2PsUWniCekHbNPyeDjglyiQVrF2usv3N1mbHJ.ZS', 'efratazerihun1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:28', NULL, 'default.jpg'),
+(3767, 'efrata1599', '$2y$10$4BY0AEy.PdNVrhah89TfVeJml.mDQs.oPujVmMVK71O8mcZKkk31C', 'efrataworku@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:28', NULL, 'default.jpg'),
+(3768, 'efrata166', '$2y$10$rrMyb5g6M6L1Yx2Y5XE/teNdn2YxyX/7lf6gEWRc1bSgTHGGaRwyy', 'efratanegash2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:28', NULL, 'default.jpg'),
+(3769, 'efrata1669', '$2y$10$sApaoAko2o/Dcwur9fhKVuFcx9I0QsvI7gAD6jQoXHKUGKfcZ5/ei', 'efratagirma2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:28', NULL, 'default.jpg'),
+(3770, 'efrata1753', '$2y$10$dQXSf1lDPvzZUZyMEIagH.0/KZ/EU5ti/nRG8jT8Y1230PooWnbIW', 'efrataibrahim1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:29', NULL, 'default.jpg'),
+(3771, 'efrata1764', '$2y$10$RhQKOzGF0XyJj3Ww3i5A6evrHx9xqhZLgmKSBa6beEbM8T.HkwRJ.', 'efrataworku1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:29', NULL, 'default.jpg'),
+(3772, 'efrata1782', '$2y$10$v7t1aoTiCZjc1CX7tpcTzuQCY.IaDhO9mdJ5UU6vpodo8NaXAiXeC', 'efratanegash3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:29', NULL, 'default.jpg'),
+(3773, 'efrata1931', '$2y$10$ns4N2twNwpGc4qo3uv/BWuOPh3JPv4i8XEA8kqIMwk5katKhKw1ua', 'efratamamo@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:29', NULL, 'default.jpg'),
+(3774, 'efrata2020', '$2y$10$4s066F1IxV10yPjhH9TE4.LM/k5cy9RC3ss94ovoHy8/Mx/Iw5ib.', 'efratazerihun3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:29', NULL, 'default.jpg'),
+(3775, 'efrata2288', '$2y$10$AgoeEvYoo8Ddwi915hrF4.dZ6uahhikcJTCOdv6QN63lOaFYh4spu', 'efratabisrat@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:30', NULL, 'default.jpg'),
+(3776, 'efrata2295', '$2y$10$a8Tm6D4pouW76Bfcc32rr.FTYUX7eGbDaOp4XNZa1LJ/IHaI3yXM2', 'efratagizaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:30', NULL, 'default.jpg'),
+(3777, 'efrata2329', '$2y$10$sAQur6IzxTxlRWArS7Zp0OnL.2i1k136TmgrELNnHKkAKfMPqQGmm', 'efratahagos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:30', NULL, 'default.jpg'),
+(3778, 'efrata234', '$2y$10$j3i2aPjGbTuw38LZhTitaObMgSwVAcQSEC0EmwCzrfpufe1jEwgrC', 'efratahaben2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:30', NULL, 'default.jpg'),
+(3779, 'efrata2397', '$2y$10$oBnVBYFiY4yJm/xATCH4TehNn4rwtfKdK3Citdygbs3ht8M19se.a', 'efratamulugeta2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:31', NULL, 'default.jpg'),
+(3780, 'efrata2459', '$2y$10$NH1mbEt3Ts03qTVv/kqzwuVx7YnfumkwzChlOKC7W4kt.vkD1X3SC', 'efratahaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:31', NULL, 'default.jpg'),
+(3781, 'efrata2478', '$2y$10$puWgiQxOayLt5NZGaElbDuX9oR7BxhEx2b/ASJ5cZcAUa/2AvqdJq', 'efrataoumer@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:31', NULL, 'default.jpg'),
+(3782, 'efrata2494', '$2y$10$lONxCJo6loXN0RppCYEks.sfusuYt5fnWz1p2AKTJdjSE7.crewPm', 'efratademissie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:31', NULL, 'default.jpg'),
+(3783, 'efrata2559', '$2y$10$KpjKmWV4cDMQYh7MkhXOqOd16ESwhR2SovABamlnP3j8Aicgb4gja', 'efratagirma1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:32', NULL, 'default.jpg'),
+(3784, 'efrata2635', '$2y$10$QVXA6pqpAbMz6Vcy8jibFORCtlfwS2LubAuorq5LnZ5ctWC6ne7BK', 'efrataendale1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:32', NULL, 'default.jpg'),
+(3785, 'efrata2640', '$2y$10$FQECZ.AJK045b5V40YjWFe/fRPQBayNQXp0pfwvvC9oJ0omcY8V/a', 'efratafisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:32', NULL, 'default.jpg'),
+(3786, 'efrata2650', '$2y$10$Qh.nRQfSW1le1qR1pkdjW.Jqzom0ZkEU3uO4GNovj8A3ksSBK/JlG', 'efrataselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:33', NULL, 'default.jpg'),
+(3787, 'efrata2652', '$2y$10$Vpa/a3hRpRL9rZVpHmGGa.Yd4T9nWdTk2Zbv3fkDO7S6QF.X9gpGK', 'efrataibrahim@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:33', NULL, 'default.jpg'),
+(3788, 'efrata2663', '$2y$10$b8HbTOw08sVc.DI5wVACc.Db1yTC1AqvSldoRKrBvSBopWQllxbqS', 'efratabisrat1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:33', NULL, 'default.jpg'),
+(3789, 'efrata2689', '$2y$10$uHOdt3krtNBjqoR9oza88OI2oNwQlMRJA1sqoufbdoFXDglEcmLQi', 'efratagebremedhin@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:34', NULL, 'default.jpg'),
+(3790, 'efrata2693', '$2y$10$ofMXesw0G1gNAZ6kmsIhPePX5oEq1mu/Obqna/2Pi6wBY6FcbEl2q', 'efratamulugeta@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:34', NULL, 'default.jpg'),
+(3791, 'efrata2696', '$2y$10$W8BNfT.PcEQchjzNs0STI.jQ0hkZnqGtsAKWiyQqct/WH82m2GE.C', 'efratakifle1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:34', NULL, 'default.jpg'),
+(3792, 'efrata2796', '$2y$10$CsTdgLJ/vT/B42Bg8WB21uRNrRJ07AiYVPu1Pfc1iPMmM1qxQv.QO', 'efratawudase2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:35', NULL, 'default.jpg'),
+(3793, 'efrata2824', '$2y$10$nrsLnlviO6TXJYVbyRHJHupiGdqGA4hvvhO73zAEBQ4OTo66ECOi.', 'efrataeyerus@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:35', NULL, 'default.jpg'),
+(3794, 'efrata286', '$2y$10$Fi9udZP.txyz7ItIWpR8JOVsu641QX9vpwYBHWnNI17xOqezMWru2', 'efratahaben1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:36', NULL, 'default.jpg'),
+(3795, 'efrata2864', '$2y$10$5OQ0eGxkWaYO3Q0FgZmvFeQ1tgtvsaKfMLyFO/UmEBR7WjVeWJVdS', 'efratashimelis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:36', NULL, 'default.jpg'),
+(3796, 'efrata2912', '$2y$10$NUhHrgokafOShHx.T502YOX17JWZkEdz9di73E826KhdDFw5kNQJm', 'efrataendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:37', NULL, 'default.jpg'),
+(3797, 'efrata2929', '$2y$10$XprF5DJWq5PvOsYKIxKViOIyQqswefuxOxB.HpwN5xg/Vei.jwYee', 'efratazewdie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:37', NULL, 'default.jpg'),
+(3798, 'efrata2952', '$2y$10$qZgwNLlM/xcsUY0Ap494A.W3odk8UVAw21R2SLMGqafSsvvY/1Hym', 'efratamamo1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:37', NULL, 'default.jpg'),
+(3799, 'efrata2972', '$2y$10$eK6N1wCp/lx6tItPgKlSH.eVLgMZkD7n4cHaJYsRl4NAWoq9nk8mO', 'efratagirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:37', NULL, 'default.jpg'),
+(3800, 'efrata2984', '$2y$10$W.x4EAXWoX6ruHeGtJZKi.hJLBqN2u2kjQQPopfRy0I2aXRWLEYI.', 'efratamohammed1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:38', NULL, 'default.jpg'),
+(3801, 'efrata304', '$2y$10$Bl0Xs8EPdGHF869iMLzrxO2rULbv31fW/vnkDa2l.oqZwcE1KTb.W', 'efratakassa1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:38', NULL, 'default.jpg'),
+(3802, 'efrata32', '$2y$10$VcXREaTls1JqoIHrZVF9V.y0joki9o8mkJiMvvRLUA1FqL/3aU.m2', 'efratahassan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:38', NULL, 'default.jpg'),
+(3803, 'efrata392', '$2y$10$OfTM5cTNB2R1CQJIO3H8pu3CXBn/GEVE4ZqBWPrqP3vq..xAb46HC', 'efratapetros1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:39', NULL, 'default.jpg'),
+(3804, 'efrata453', '$2y$10$GIarJyTwV8JgI6s93HEV3OHrRkSZ3Tk.lhmdnd2AJy/7lLsKuGbna', 'efratadagnachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:39', NULL, 'default.jpg'),
+(3805, 'efrata490', '$2y$10$xdeg3rCJe8KE.Ii/emLF7eRrDawzQ/sJPxug0FABHedOf5FUCrQOK', 'efratazerihun2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:39', NULL, 'default.jpg'),
+(3806, 'efrata517', '$2y$10$EGMefJcnrs4bvMoUUDEEz.Vf3I1v2Gop/MiT38q9ZjKwuDvwbUgjW', 'efratacherinet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:40', NULL, 'default.jpg'),
+(3807, 'efrata662', '$2y$10$rj3TfV7IT8FuQjxzj763SOLryiyHEZY4Q/nywHEHhXYnDpE9cnAge', 'efratakassa2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:40', NULL, 'default.jpg'),
+(3808, 'efrata689', '$2y$10$V/f4u/Uw9uDBP9aRvmJhEuOA9K49YD0ZrcotItrZ1H3Xq5SipWtES', 'efratagetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:41', NULL, 'default.jpg'),
+(3809, 'efrata728', '$2y$10$d9bP9Csq7vrFNUy2t6qWjuR8Uv2Zn51eFCswn6AmHeCkq5BK.n7iu', 'efratazerihun@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:41', NULL, 'default.jpg'),
+(3810, 'efrata729', '$2y$10$odKF6qIrwHjXI0D.MYmtCe/1ESX5gyK4cNls2FOzuePv3NPTFIGh.', 'efratamohammed@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:41', NULL, 'default.jpg'),
+(3811, 'efrata780', '$2y$10$i6iqoV6dWsDiP2gFhWyw7.EBGlFYXzmeHNeD46cZOB77IaDserUFC', 'efratanardos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:42', NULL, 'default.jpg'),
+(3812, 'efrata786', '$2y$10$KuauiQdcypRopAxe.1yySOLPuk4Jv/aO9PxIzTiJYhYp0W57nlFK2', 'efratayohannes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:42', NULL, 'default.jpg'),
+(3813, 'efrata800', '$2y$10$P5iIna686ZES/gakLxqJg.Q9OiEzsjed2Ly39ZFI.8UKeWiBSIxL2', 'efrataliya@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:42', NULL, 'default.jpg'),
+(3814, 'efrata831', '$2y$10$bTQi/JkrJdQCsxOhwr2g6uNqO5CLedjSinIZJoHUoEeO.ai5QmItu', 'efratamulugeta1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:43', NULL, 'default.jpg'),
+(3815, 'efrata865', '$2y$10$Ol7XNKxiLVt6nshwHyGECOpVnPzd/N6yETbvenKpC7mT6aMbWTGna', 'efratanegash@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:43', NULL, 'default.jpg'),
+(3816, 'efrata888', '$2y$10$CRlYP4nZ7knHyUAzy2uwdeiWZBNQBzUFc5C6zf.WWbV8ofdMwmO7W', 'efrataredda@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:43', NULL, 'default.jpg'),
+(3817, 'efrata898', '$2y$10$7eNmANUTfJD4/rxMMnzd/up4aqNMBojuDI6KDWIsZqxJDrW6JVUfK', 'efratatesfaye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:44', NULL, 'default.jpg'),
+(3818, 'efrata906', '$2y$10$V.y6iekeQYXkUZ/I4N9bGeca5Qy7uiqy6CtjpvINaMlNwYLaB.ZRS', 'efratanegash1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:44', NULL, 'default.jpg'),
+(3819, 'elshadai1030', '$2y$10$G5mydKc78Tx7TmxhcWD5TuhFys2cVZrfrX0c8BykslupOV8jeB2H6', 'elshadaihaben1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:44', NULL, 'default.jpg'),
+(3820, 'elshadai1031', '$2y$10$.4JmEhgdECkLW61IXTC76uaHsTdmeh.5h2lGIqFiMrftEPDwHjYAm', 'elshadaitesfaye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:44', NULL, 'default.jpg'),
+(3821, 'elshadai1035', '$2y$10$i4NL55RnsF0mdzjdrWP6k.oAHpsSafShw6qoCvQMpqguB8O6eOg5a', 'elshadaikifle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:45', NULL, 'default.jpg'),
+(3822, 'elshadai1064', '$2y$10$pnjO9OjT0HT.wg0iq.RSH.8UHnRSxXxE2Wm6vHBN2TgpNvHH6dNia', 'elshadaiyohannes1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:45', NULL, 'default.jpg'),
+(3823, 'elshadai1138', '$2y$10$09CAQm2AyWcWebg46ge8oeBUuxNTaJ/6SG26ewdkOPnLlRTDe3C7W', 'elshadaigebremedhin@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:45', NULL, 'default.jpg'),
+(3824, 'elshadai1196', '$2y$10$fBjWdDbollsYSjVYozvnvOBdIC.QFQwCmMJzx5xXDp15BA8thVlsi', 'elshadaiyohannes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:45', NULL, 'default.jpg'),
+(3825, 'elshadai1226', '$2y$10$9mU3Owvv6Mt6kRYXIhSede66AzVIUfFZ/8Cgb60Q1qAUBDoCpeEES', 'elshadaimulugeta@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:46', NULL, 'default.jpg'),
+(3826, 'elshadai1235', '$2y$10$th1tyqxoZUsSvoMKXJfGKOkQ/DFBimqgazbgN47AZy9ZyHLmEkNPS', 'elshadaizerihun2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:46', NULL, 'default.jpg'),
+(3827, 'elshadai1237', '$2y$10$jbgBf2XvNOzPzX10r7x6re1uNcE1EvCLNaTmrWIbAdBFbCK0jL/Q.', 'elshadaigirma@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:46', NULL, 'default.jpg'),
+(3828, 'elshadai1243', '$2y$10$u/b1gFG2HIl/WpTTqP4KUuABDqsdp1GhNN7PGjaaeVV4fYZMFbTRy', 'elshadainegash@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:46', NULL, 'default.jpg'),
+(3829, 'elshadai1287', '$2y$10$/Q2ZppSsBi.Qwg2hXghEce/R0IuBVe7Ru5iVkHOZah6ZKlyFVByCe', 'elshadaicherinet1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:46', NULL, 'default.jpg'),
+(3830, 'elshadai1361', '$2y$10$TThLcTItI.DMMzaJNwFJueyYR5oEhpbVUjKEznM6wbeM5hAc2XQCy', 'elshadaiibrahim1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:47', NULL, 'default.jpg'),
+(3831, 'elshadai1381', '$2y$10$kIwW1RuaH7Awgdg8J9feTOcD5oQUx3WW9CcJnzGPPlKkvKvUp7TwS', 'elshadaikifle1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:47', NULL, 'default.jpg'),
+(3832, 'elshadai139', '$2y$10$McJjZbvCPBkaJqFrb3hvh.SkStayYfH4IIMl2qfTn1tdMPJwz1umC', 'elshadaitekle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:47', NULL, 'default.jpg'),
+(3833, 'elshadai1416', '$2y$10$1/63XSO8tJoKFdkj5TkP1uahcoBQfFHAsO4RO7.30pfNVeK.h7JCO', 'elshadainegash1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:47', NULL, 'default.jpg'),
+(3834, 'elshadai152', '$2y$10$X1naabKAG3Dyjy9NBSzSdum9hYQUNuHS8SvM.JW5IzsVxdrrHusIK', 'elshadaihaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:48', NULL, 'default.jpg'),
+(3835, 'elshadai1554', '$2y$10$evp6XqkZUlf5N54lXew3/ujMzJsAKfrD4aE9fmeMI2xJRIrbINOnC', 'elshadaiali@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:48', NULL, 'default.jpg'),
+(3836, 'elshadai1585', '$2y$10$Ro4KkJxnFnmszO5WMpKwWe33Hd2zepqMS9dITcnKPfonwjuvniGkm', 'elshadaikassa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:48', NULL, 'default.jpg'),
+(3837, 'elshadai1736', '$2y$10$UqmFcEgRyV.r3eJDw5nVduv4h4RmnSc7ONc/e3JJYD3pFcCjlCOO.', 'elshadaigebremedhin1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:48', NULL, 'default.jpg'),
+(3838, 'elshadai1757', '$2y$10$6PSwUySba3FB3hrpsuLcmuB1Q56LeNr44Qtk7yW7EVzKxK0pufdXq', 'elshadaiwudase1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:48', NULL, 'default.jpg'),
+(3839, 'elshadai1763', '$2y$10$pI4sDbAbTq2NseRo51z7ROF.8WtVg24qxYCxOh57JBqmXlyxJXwSq', 'elshadaizelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:49', NULL, 'default.jpg'),
+(3840, 'elshadai1856', '$2y$10$CPCPsyz7/7qjRDWWyMPQi.ZWS4ndsGDUhbf2eRVsX8MNkL7lMIGMS', 'elshadaifikru@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:49', NULL, 'default.jpg'),
+(3841, 'elshadai1864', '$2y$10$RYJke164ZuhxHiO3V3KRA..ZMGz1vU4vKdMVTcToWiCWEZhp2XSG6', 'elshadaizerihun@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:49', NULL, 'default.jpg'),
+(3842, 'elshadai1880', '$2y$10$OwW70dmrWafosfO2YE/26Ol2lUhxCCXiTtq6GnoF94MLTiDxAcdmS', 'elshadaiyohannes2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:49', NULL, 'default.jpg'),
+(3843, 'elshadai1935', '$2y$10$dDXVUNtaIw/cyjp1kdvkxuChPZ1OR1fFMCnGw4t3xqrdKobh1uZ.K', 'elshadaishimelis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:50', NULL, 'default.jpg'),
+(3844, 'elshadai1984', '$2y$10$SxPBfcpSUYdp8d4wwpcxKeucfIPbClJPfzn1FO2lASZxER9B53cDG', 'elshadaioumer1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:50', NULL, 'default.jpg'),
+(3845, 'elshadai2093', '$2y$10$ED.626MSTzYSTN/X/F26nOSKTr93Z/a61Ggukb3f1Toy8Hk4XoON6', 'elshadaialeme1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:50', NULL, 'default.jpg'),
+(3846, 'elshadai2136', '$2y$10$UKQHhO.DgnhN60cMQFlICenV6Qzn1nxUhhgZ8Vjfd/cwnnRl7G5ZK', 'elshadaizewdie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:50', NULL, 'default.jpg'),
+(3847, 'elshadai2144', '$2y$10$Qg7lGdjn0XxvkShwYPiPrOyPYyDjligbqVcndsbWKZBvK4HvHs22.', 'elshadaikifle2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:51', NULL, 'default.jpg'),
+(3848, 'elshadai2167', '$2y$10$LYvOEC8pw5Zm.17Rwh5JreZo4Tt1owuxiTM035QHjUIq6ORGtuFqq', 'elshadainardos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:51', NULL, 'default.jpg'),
+(3849, 'elshadai2210', '$2y$10$XABR6ADyhoYSlKcgriUKgO/kKXpZGLq3z1R.bO2cSNLWuSrczelGO', 'elshadaikiros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:51', NULL, 'default.jpg'),
+(3850, 'elshadai2214', '$2y$10$3rGenhA1SNVcEaZw.lk9fORBs/oBHJEFbCxkQ6A0RJy6NqWs63tGO', 'elshadaizelalem1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:51', NULL, 'default.jpg'),
+(3851, 'elshadai2328', '$2y$10$UhHZdsN74gfEf7JUIzjQr.6EBpEo3cEaycqwygUNPmV1tWY7ZVomu', 'elshadaiwudase@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:52', NULL, 'default.jpg'),
+(3852, 'elshadai233', '$2y$10$zPvYlOtTgcX3aggx1SoW5exlss6qSdk1rHmxIqwDzJkXqpRk7Fff6', 'elshadaitadesse1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:52', NULL, 'default.jpg'),
+(3853, 'elshadai2331', '$2y$10$XMYNgr/26OXr.QdFycbdBuYlgxeDTAKRd/ZYosEm5fLRVUReJfmcm', 'elshadaikebede@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:52', NULL, 'default.jpg'),
+(3854, 'elshadai2346', '$2y$10$EHR./p3CysQrARoBq.OOluJWQwPxbEfjap2l2noAxT377IVRvYhbe', 'elshadaigetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:52', NULL, 'default.jpg'),
+(3855, 'elshadai2403', '$2y$10$xnv64zLWeMHyFNmcZcfVYe1VZaicaQ3ZkFoYN5jGUMAQegi5QxVS2', 'elshadainardos2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:53', NULL, 'default.jpg'),
+(3856, 'elshadai2472', '$2y$10$FJ0an1UrKofw6jdtoxYx1uy049NYbGcaXTJK263q0QRt..8MQdg6m', 'elshadaioumer@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:53', NULL, 'default.jpg'),
+(3857, 'elshadai2526', '$2y$10$o5V1geURhg5W7Kc1bdEZWOxzRWFroDHN6/qSJLEpjf8Exsfo3ffN.', 'elshadaieyerus1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:53', NULL, 'default.jpg'),
+(3858, 'elshadai2561', '$2y$10$E8TlUrrplQzyO9VliX.c1eWJaMHkrOE6qqlIieeh50HCSPB19I5zK', 'elshadaiendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:53', NULL, 'default.jpg'),
+(3859, 'elshadai2623', '$2y$10$3QtFy9rrd3naqorfk/WMlOTwh6zy6jvJROxhBPodpAMDyu.d4JmOK', 'elshadaifisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:54', NULL, 'default.jpg'),
+(3860, 'elshadai263', '$2y$10$niHF7Dd/3kckRUhZs8qUx.v4AwBo6ytuXsqkHxJ49Ffl91j.0teiS', 'elshadaiadmasu1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:54', NULL, 'default.jpg'),
+(3861, 'elshadai2667', '$2y$10$p3Jf0OqKKfYiHH4FHQB4h.LJENAC62RvjKbl2aXsIsSziXsuNwNWy', 'elshadailiya@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:54', NULL, 'default.jpg'),
+(3862, 'elshadai2729', '$2y$10$OU/rgKqYP2HNYp6hzMBm.eCP2PVLDHBYm.DfBQG84rkg9bUTJxYYe', 'elshadaihassan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:54', NULL, 'default.jpg'),
+(3863, 'elshadai2752', '$2y$10$yu34b2yfDary7ZWm9kx.LOjpu5m6A9uRIgj.r6ZbyjamAXTsONJh6', 'elshadairedda1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:55', NULL, 'default.jpg'),
+(3864, 'elshadai2763', '$2y$10$r/ebgCafYAZ.fgiSH/I/reCcB0t2ZU7UStQXbVzt9s3BmOpAc6FKe', 'elshadaigenet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:55', NULL, 'default.jpg'),
+(3865, 'elshadai2817', '$2y$10$4/j6ldTBgbHTH7EZkmA1vudkmhe0NmOy2e3LGAJ1njEgLznONdJoG', 'elshadaiadmasu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:55', NULL, 'default.jpg'),
+(3866, 'elshadai2819', '$2y$10$gnzHllDtxb6xGE5ZEP9qVeWPFjhmf56tYgWD4F1cDfCEs7Wy7eVEa', 'elshadaicherinet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:55', NULL, 'default.jpg'),
+(3867, 'elshadai2823', '$2y$10$n/lRFxMTZvO8RueJMPufOO0bF30aTT8R9DYrAdgejUXCjABELWhpK', 'elshadaishimelis1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:56', NULL, 'default.jpg'),
+(3868, 'elshadai2857', '$2y$10$lC972T/qDZRd5ZKzuyrfmO7sNAogoCcHC3/cJiPJdSjP9opKPFCem', 'elshadaieyerus2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:56', NULL, 'default.jpg'),
+(3869, 'elshadai2876', '$2y$10$twBbMTRX8CXLmUf5QJqFdO/fxXszNIS0BLUsHAIE/3Qk.bfal.RAO', 'elshadaimohammed@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:56', NULL, 'default.jpg'),
+(3870, 'elshadai2922', '$2y$10$43vf1mBdQf6iithdJXtCZ..62mWAgOC8iQdGNjYi.JJJOn4o3oI0e', 'elshadaialeme@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:56', NULL, 'default.jpg'),
+(3871, 'elshadai2931', '$2y$10$m94nyHXn/fxHte8rLN8UKutEmwgVwgXffaZLMIneN24MrttWzFK9C', 'elshadaibereket@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:57', NULL, 'default.jpg'),
+(3872, 'elshadai2972', '$2y$10$rAqRlVs4vSeT.cpO7/ZPMu/2as/gAlnI3G3sTEUQbXHBEu4L0C32W', 'elshadaizerihun1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:57', NULL, 'default.jpg'),
+(3873, 'elshadai396', '$2y$10$qp1m6pGGrz7l7K/dCVLcTORiAdEcgglORmFjGuhHcfezcqdJN6gvC', 'elshadaigirma1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:57', NULL, 'default.jpg'),
+(3874, 'elshadai512', '$2y$10$d4e4KAhyeuaHAo0X/Mjl0.jbSAfmnJSRhqKE7ws0.qhlpQkTx2Jfe', 'elshadaihailu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:57', NULL, 'default.jpg'),
+(3875, 'elshadai517', '$2y$10$6NEJmpnaQi6rSIGKgxD/5ejpBVIgJDzHFqqzOinKqyMrlotpAKmui', 'elshadaipetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:57', NULL, 'default.jpg'),
+(3876, 'elshadai594', '$2y$10$Zx.9hkPVO8KkndwAyv/XR.B1dyq1zAOH2S3iCpPmLo6WhM/jDQf92', 'elshadaieyerus@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:45:58', NULL, 'default.jpg'),
+(3877, 'elshadai632', '$2y$10$1ixsabVlncFzGIGVf00mFOYPZKzmWTlBcltfjKectMjLJzXVStKse', 'elshadaitadesse@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:58', NULL, 'default.jpg'),
+(3878, 'elshadai915', '$2y$10$aVTlfJHzRwTuxZ7i1y.V..hk2X4KXR/bDTxOK7MvSXl8bj.fkQZ5W', 'elshadairedda@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:58', NULL, 'default.jpg'),
+(3879, 'elshadai930', '$2y$10$NBdCpnMVwJQFlpGgfL2JjuD9eRZIRz/Y51NMTcQM4N031LT3T8KZi', 'elshadaiibrahim@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:58', NULL, 'default.jpg'),
+(3880, 'elshadai981', '$2y$10$VXoqkCGq3IZZTRLVdHdohuiTfnvcOBW0GbtdclKAh8ewQHheIcj.a', 'elshadainardos1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:59', NULL, 'default.jpg'),
+(3881, 'eyerus1151', '$2y$10$hqpQrGK0tFMPoqQjlI4yL.VpTlxT5FM20YKabvzfN6lPFALw7gv5O', 'eyerustekle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:59', NULL, 'default.jpg'),
+(3882, 'eyerus1199', '$2y$10$ySpnzZMbIZRkhLYaIYqFSOA3MA.eRtYKMoxtTdSfl1Q/G6D0rlZxK', 'eyerusgetachew1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:45:59', NULL, 'default.jpg'),
+(3883, 'eyerus1374', '$2y$10$ruh0xWs2IZ/YwBKcgMfuWuCTJzmP2aE2sGf3CWyIL1YCkkxsQvdC6', 'eyerusgebremedhin@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:59', NULL, 'default.jpg'),
+(3884, 'eyerus1421', '$2y$10$UrecTZaIYKHL7mu5TRedgONytz.hnFx5/X2KQdr1JXU74xqF6Nfq.', 'eyerusfisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:45:59', NULL, 'default.jpg'),
+(3885, 'eyerus1422', '$2y$10$MC6cO3w8XNwhkW/NYZGK4eubcWUCESI2aTp.9RO1b9U59t8NORce6', 'eyerussisay@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:00', NULL, 'default.jpg'),
+(3886, 'eyerus1556', '$2y$10$5AEDeC53OwhCgSIeK07PmuoQ0jsBDT5mFyFrQzvdtJW.TrA.WmZBW', 'eyerusdawite1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:00', NULL, 'default.jpg'),
+(3887, 'eyerus1749', '$2y$10$WxAwg1zSGBITnXQne9vXEuqXdEJCIk2xXFKnZ5pmE286rd.QBXF9C', 'eyerusgizaw@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:00', NULL, 'default.jpg'),
+(3888, 'eyerus1855', '$2y$10$I8FsdatSe5W2MBNK86k4X.VIM9RHOd.4YU5sMaSurA6BtXerBUfiW', 'eyerusmohammed@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:00', NULL, 'default.jpg'),
+(3889, 'eyerus1884', '$2y$10$3VFKCqCxvlmAguDxPueYzuN6XJT06GGUOB21ZAp6fh7mtgFm4Gsae', 'eyerusbereket2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:01', NULL, 'default.jpg'),
+(3890, 'eyerus1888', '$2y$10$pVaM7YXMPRSCxOsjMhsxlezcTI5bgr.MKA4z3H8WURLRDmJmdGCVq', 'eyerusshimelis3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:01', NULL, 'default.jpg'),
+(3891, 'eyerus1897', '$2y$10$Xit.loLnjBRFUAJW6/07s.rVYHMsLAVHFh3upZyMUyhMt.TFkitVK', 'eyerustsegaye1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:01', NULL, 'default.jpg'),
+(3892, 'eyerus193', '$2y$10$FQXLn1.b3VrGsfBO9PI/eO.JADVI/G5yzzcWx1USQl6lX6j6Z97Lq', 'eyerusnegash@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:01', NULL, 'default.jpg'),
+(3893, 'eyerus1938', '$2y$10$4tsMlfC3UpW5uaaiS2WBB.fEGBGShfo/3cSA/aTXWvwk.XJWCuDUe', 'eyerusabebe@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:01', NULL, 'default.jpg'),
+(3894, 'eyerus2154', '$2y$10$TcWP6iu7hNlLVaJPGAH9WeCvrbh3Q/gDx0UBhuFNu0m4IzV1y..Lq', 'eyerusfikru@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:02', NULL, 'default.jpg'),
+(3895, 'eyerus2240', '$2y$10$cM1twwa/lDp7UmwdBY6Kmut3MVK6xa7sx9YSbBcnrBm4FdIfAL7Li', 'eyerusibrahim@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:02', NULL, 'default.jpg'),
+(3896, 'eyerus2270', '$2y$10$pn1jlyaO/aHTC0NZYUTiTuWGY81v2uIiyJs4PpNwr1D6bPsurvsR2', 'eyerusgebremedhin1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:02', NULL, 'default.jpg'),
+(3897, 'eyerus2339', '$2y$10$GQHt4v4K6VpEM4j3uOoo0OBIW6EQP/KdYLwcdwQXSS/zSPDY6fkoG', 'eyerusmamo@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:02', NULL, 'default.jpg'),
+(3898, 'eyerus2377', '$2y$10$xCXEMm7F.U6pu6smOeVIO.CviC55Ju/G0GOg7ZWWauYfn4vCrutKq', 'eyerusbisrat@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:03', NULL, 'default.jpg'),
+(3899, 'eyerus2407', '$2y$10$EmfaGJCaON8HPcm1SNL7eOWrwiAs74iZP6AAG0yOWsB5CF6ExN3vq', 'eyerustsegaye2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:03', NULL, 'default.jpg'),
+(3900, 'eyerus2449', '$2y$10$6Vq5pZ/V7KXDopz8Sjd2a.3oujCUhbRihCGqDfp/o0gYE3tJEhiGi', 'eyeruscherinet1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:46:03', NULL, 'default.jpg'),
+(3901, 'eyerus2484', '$2y$10$sK/Z0OWSMkJsA3rWfpaf2.CHc1g9N5xe6bg2sEhoR7hpTOL5L7bWa', 'eyerusnegash3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:46:03', NULL, 'default.jpg'),
+(3902, 'eyerus249', '$2y$10$xQ.dxit9pt8/Q74IndZq8e91.EU3OYKW1j5JDH52oHHPGsucw9fP.', 'eyerusfisseha1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:46:04', NULL, 'default.jpg'),
+(3903, 'eyerus2502', '$2y$10$.vEEUoT9LfvKkVjwpsol2.uPwYtmyLId5.NoZdbfrkzP3L4k8kX2a', 'eyerustsegaye3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:46:04', NULL, 'default.jpg'),
+(3904, 'eyerus2530', '$2y$10$yh3FxDXBDauyAQHFkNs6x.b9xSPU2k/9ctxPyjFNSsn7UuqqPvFPS', 'eyerusgirma@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:04', NULL, 'default.jpg'),
+(3905, 'eyerus2590', '$2y$10$cO7nTH/OxqMXq1FdUxBw4e7IxIuVl/sg9iJn3Y/W8wHLEeztg8Nbi', 'eyerusshimelis4@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:46:04', NULL, 'default.jpg'),
+(3906, 'eyerus260', '$2y$10$wmS1IuV8Vd7QVZFhNKSEzuWLP16YQzd3IpobKugx2lPLv0iGl8nAe', 'eyerusgenet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:46:05', NULL, 'default.jpg'),
+(3907, 'eyerus2694', '$2y$10$L4AucWp6U9XTJhmcfziX2uV3sS9UCLw2JevQQMrtXWruS.QmB9A7e', 'eyerusselam@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:19', NULL, 'default.jpg'),
+(3908, 'eyerus2729', '$2y$10$pC8RbIpZRCmWAkpf2kXPz.V.cQupahBEn0eDVoS1wjup1yjQUYt/i', 'eyerusnegash1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:19', NULL, 'default.jpg'),
+(3909, 'eyerus2744', '$2y$10$8Xc5Z2O8.IOowQ57NuboDOX09p5.zLToeNVYVZcreUotU5PVCjA0O', 'eyerustadesse@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:19', NULL, 'default.jpg'),
+(3910, 'eyerus2771', '$2y$10$RuEsMO09Ry5kgRDWJMWhIuDC7Mb6oN6XBdMcsah9UlXN6NLi6ckFO', 'eyerusliya@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:19', NULL, 'default.jpg'),
+(3911, 'eyerus2778', '$2y$10$tX1vF3ba4S2PEOhj2SV4KOKo1Bn2Q2ZhOhTYgegjNoNBkYEMutowa', 'eyerusnegash2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:20', NULL, 'default.jpg'),
+(3912, 'eyerus2780', '$2y$10$tnWlqLdeXCJI07Q6ya6Pe.iiIGA4RFfeCqmPJbFeBdg9XKgExS3Fa', 'eyerustsegaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:20', NULL, 'default.jpg'),
+(3913, 'eyerus2802', '$2y$10$5l/owKXATNCyF/J970gBLO1692YONKcTX6n5e9aHkfv54KXVquvEy', 'eyerusgirma1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:20', NULL, 'default.jpg'),
+(3914, 'eyerus2813', '$2y$10$SfJTQl5hHScXjE54AfoxfeBBUdAjVzXx4aq1T/4Z88mskx66kzOcS', 'eyerusbekele@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:20', NULL, 'default.jpg'),
+(3915, 'eyerus2920', '$2y$10$gHd2kafATrnWZ2T6mm/uHuXHocsOzaMOrulJPjRIz.LbE9VmQqnJ.', 'eyerusyohannes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:21', NULL, 'default.jpg'),
+(3916, 'eyerus295', '$2y$10$jI2aAXBz3Akfh83VKAT6a.dcuWCE8jynpkCFuuCKNkhU8YwrYef12', 'eyeruspetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:21', NULL, 'default.jpg'),
+(3917, 'eyerus2981', '$2y$10$jczG0ymKTieSL/VZzXU3hOVfA61YfdjIGtHfBm70xKS6TTBwSeUJu', 'eyerusselam1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:21', NULL, 'default.jpg'),
+(3918, 'eyerus340', '$2y$10$WsM2OdMpW/JrM5doyMr7dOMULU.yf/Zfcv0KpX4lnrp4mSCHliRci', 'eyeruskiros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:22', NULL, 'default.jpg'),
+(3919, 'eyerus35', '$2y$10$CBdbyHtaq/tLn4Mlwpn9KeHZ98ES16XTJuDtgAunUb9vNoe29smyS', 'eyerusworku@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:22', NULL, 'default.jpg'),
+(3920, 'eyerus383', '$2y$10$rOnFLFqdsui.J6mFAiTi8eJQzYker5ShBRgeI6gf/vK/AVvHHe37q', 'eyerusshimelis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:22', NULL, 'default.jpg'),
+(3921, 'eyerus398', '$2y$10$NwhWJElIGP0LJ5nLmgYzIe0UTUOzDy2AvHRnthPEVsY4x0s.vFTHa', 'eyerusdemissie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:22', NULL, 'default.jpg'),
+(3922, 'eyerus408', '$2y$10$EYyMb7ncx/6n9RVI5g0DR.wGiuCRqRMjolJosKdXV5iKeY0wu9pj.', 'eyerusshimelis1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:22', NULL, 'default.jpg'),
+(3923, 'eyerus417', '$2y$10$UYLc6lo5Ki7xa02byy3S3.49itKLbsohDmh3Z1h00L9Jy.BSdipIW', 'eyeruscherinet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:23', NULL, 'default.jpg'),
+(3924, 'eyerus537', '$2y$10$ZRIVWDmDK.KX/E/xMLEj0ecYFr/o4JEpVyuzwe2BT0dcJI2veJ6V2', 'eyerushassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:23', NULL, 'default.jpg'),
+(3925, 'eyerus617', '$2y$10$z/udY9FH2ikXaa/jbUR2N.fTvyFBzfqc9hXccLahyK644hNuuUbpK', 'eyeruszelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:23', NULL, 'default.jpg'),
+(3926, 'eyerus626', '$2y$10$spRnCmrOfwhLKzFTrM/eP.SCOi5CBXg2BY9vEM.1fAF1Q/a8YMXLO', 'eyerussisay1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:23', NULL, 'default.jpg'),
+(3927, 'eyerus646', '$2y$10$NLVLHR43inRI7RkwFiINZuMv6D3j.EuVQ8mKGs1r1DB6rONIicq86', 'eyerusbereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:23', NULL, 'default.jpg'),
+(3928, 'eyerus716', '$2y$10$/uB5WMnGBD0wuiN.SUEg6.FPCge11lZJjeEH6WFsDbwjFm4dwOVN6', 'eyerusbereket1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:24', NULL, 'default.jpg'),
+(3929, 'eyerus833', '$2y$10$GLl0WCqrQL6Tir54NURy7.e2zvhwo/IrrOBJaFkxgfL2m/dq.o0iu', 'eyerusdawite@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:24', NULL, 'default.jpg'),
+(3930, 'eyerus860', '$2y$10$iX6NKS3yoxKUlLaZInFtAO4eYjv.P23lAVKsUu5zDafF8GWITWRw.', 'eyerusshimelis2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:24', NULL, 'default.jpg'),
+(3931, 'eyerus861', '$2y$10$.yObfkD5qHs59YX46b3sn.tjORyF7pBFwz3bwlg2Lsn/ktrbQoOCG', 'eyerustesfaye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:24', NULL, 'default.jpg'),
+(3932, 'eyerus886', '$2y$10$buVbeeBMA85vf7hRZCtpOe/C1nV8D9FEr.q.wEQ7ta0zWj6ei.LQO', 'eyerusgetachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:25', NULL, 'default.jpg'),
+(3933, 'eyerus898', '$2y$10$7TDEwsroAwAjas.lnH932OrUgTXmm46Gy7PZN.3mDNG7psx0VYI5S', 'eyerusyohannes1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:25', NULL, 'default.jpg'),
+(3934, 'fasika1010', '$2y$10$es1yDqNT5QQIG33bTYKS7e4PweT9OkTSwFre7.tOqdA5N82Qzclwm', 'fasikanigussie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:25', NULL, 'default.jpg'),
+(3935, 'fasika1072', '$2y$10$QqWReNRjRIC.RSAKuB6RHOoKobEOcYljqczm9awMNOoH9SLlpPO0W', 'fasikakiros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:25', NULL, 'default.jpg'),
+(3936, 'fasika1105', '$2y$10$/4KHXNwZiaCp1dSznVRgoe4.kSC/XJdEZvi61k3IV2cmsPUHqf4Q6', 'fasikademissie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:26', NULL, 'default.jpg'),
+(3937, 'fasika1131', '$2y$10$EiKWVuXViBS47gakNLIO0ezpWLFtJjTGROSHWboGgfhNZLo9nT8D.', 'fasikadagnachew1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:26', NULL, 'default.jpg'),
+(3938, 'fasika1170', '$2y$10$lv1oib6sDroy/qvmMu5dW.urgr.9A8DcOL3isQwHAuidgk.yWd3ka', 'fasikashimelis1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:26', NULL, 'default.jpg'),
+(3939, 'fasika1190', '$2y$10$GIh2A17n1N8YxVvAw/bB6e/JyArli/nzln.3axa.hU73IDTKJBfY2', 'fasikagirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:26', NULL, 'default.jpg'),
+(3940, 'fasika1250', '$2y$10$abXr3Wls8b9tGoyzCIey3edUn1GHk.ZeJSn0qt.j1lTA.hg3qwwk2', 'fasikabereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:26', NULL, 'default.jpg'),
+(3941, 'fasika1289', '$2y$10$mb8I.fSpAEALu7275CarvOUMhhCcv3/a1x9dQbBlKwN7r.0hY9JB6', 'fasikakebede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:27', NULL, 'default.jpg'),
+(3942, 'fasika1300', '$2y$10$/4DP7zlyXt6AYJUFzLk1huirAVJGurePFdrnEoI9XDgSkS6kGcUOK', 'fasikafisseha1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:27', NULL, 'default.jpg'),
+(3943, 'fasika1320', '$2y$10$wXD53eSUmBWK/veCIxgyPOwxrkIoppupX6nT6zaPJvkLvi4TRtkJq', 'fasikasisay1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:27', NULL, 'default.jpg'),
+(3944, 'fasika1352', '$2y$10$VNycpos/opVIRfPQAdCPxOFdzOcyjILSC.Ht2g60zGIAm/FkMmMMm', 'fasikakassa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:27', NULL, 'default.jpg'),
+(3945, 'fasika1435', '$2y$10$Bs1mRhaDM/6R15dzX85qBOEBw2GWeV/dKVviOsywsWtpxqymTQUU6', 'fasikaibrahim@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:28', NULL, 'default.jpg'),
+(3946, 'fasika1452', '$2y$10$DSShb91rkWvCVv/4c9R6c.eYz.8w1kgu1oCxuo/wIeC7hp15V8rTm', 'fasikagenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:28', NULL, 'default.jpg'),
+(3947, 'fasika1458', '$2y$10$DOTsmGgOHfxvB6jQBW2Zv.xhCa4BFqsc10h5xcfT/vj43F1OmBs42', 'fasikahaben@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:28', NULL, 'default.jpg'),
+(3948, 'fasika1496', '$2y$10$TfwJ8FloiPOAy4gBkGwZnOkqUQK1zc9YF91jZv.wBwGS0nrJc5E1i', 'fasikazelalem@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:28', NULL, 'default.jpg'),
+(3949, 'fasika1512', '$2y$10$qv0qN.wJt0YD9ZZi9TAQVe.DmcxzNxK8EfZ.vNfnvp2yhAgDvyCAC', 'fasikafisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:28', NULL, 'default.jpg'),
+(3950, 'fasika1528', '$2y$10$3nMmxrnLnOCCs/ywr3ZUVepjKARcnzFUcYL4ZBXbNSVeWWY2fMRbe', 'fasikagetachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:29', NULL, 'default.jpg'),
+(3951, 'fasika1593', '$2y$10$kmTC1x5Mg7hnaTZ/TCMQf.V3K0LwllIJDztxNfpgMT3poqy4hOstG', 'fasikatsegaye1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:29', NULL, 'default.jpg'),
+(3952, 'fasika1619', '$2y$10$LVpZ68TtCB1Muc30kz2nQuHX5zYD3di9a2kuH7wBBFlhalNAmoFmi', 'fasikawudase2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:29', NULL, 'default.jpg'),
+(3953, 'fasika1721', '$2y$10$zorKrtpQamgRxX.XGr/jWOK/U7z2a./86FFhZIiYabwd6sGOJg386', 'fasikatekle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:29', NULL, 'default.jpg'),
+(3954, 'fasika1732', '$2y$10$nZK1UJHBnQxzV/BSxZjane8Cry93kpBkSIv2OoCZcGqMRRwEA.tle', 'fasikabekele@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:29', NULL, 'default.jpg'),
+(3955, 'fasika1736', '$2y$10$KbU5XPd7gW9updiVqpHfFuUTS4YSNofOtE.5S8GLEqTzIk94IrjPe', 'fasikawudase1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:30', NULL, 'default.jpg'),
+(3956, 'fasika1742', '$2y$10$4VJXSH3aDTRdEHXrANOILe0ZZu/n1MwaBK4SAofTRFybq83VXLwHm', 'fasikahailu2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:30', NULL, 'default.jpg'),
+(3957, 'fasika1758', '$2y$10$nsVhifcAjJ36Zxb1UCrVeurkcRlzoCMV.y7QS4kVpfgQTigaS.MZ.', 'fasikahailu1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:30', NULL, 'default.jpg');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `active`, `created_at`, `last_login`, `avatar`) VALUES
+(3958, 'fasika1889', '$2y$10$AcPCyQVLNyesYzCgJ7Mb2eOYjqSjSZbZDsSgadrPIcA3w/QPxzzQG', 'fasikaendale@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:30', NULL, 'default.jpg'),
+(3959, 'fasika1923', '$2y$10$R7UtKuYxuuEznMswVgSrsukviBH6Z5r5fQCG9KO7WJM3mM8PVrwmC', 'fasikagebremedhin@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:31', NULL, 'default.jpg'),
+(3960, 'fasika1989', '$2y$10$pg29sl6iZJhf5XfWHeZojegR3T5yf4SBu13NjvzP4TcCRvftf2cT2', 'fasikaredda@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:31', NULL, 'default.jpg'),
+(3961, 'fasika2024', '$2y$10$6Qw3vWNmlmSoLpgupel8SuzfOz8G3n59Vlh/FAD1UBmbvxg.c7Sg.', 'fasikaadmasu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:31', NULL, 'default.jpg'),
+(3962, 'fasika2033', '$2y$10$gORaGgxMMiK3umq.tl211OUkLzhYEDFFj7402zo2shYl1KXt6A91.', 'fasikawolde1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:31', NULL, 'default.jpg'),
+(3963, 'fasika2125', '$2y$10$p7nU1L6uhDkTg9yp0sP8Muay3pJpiaCnqIF/WxbxOUt/z8ijjdaiW', 'fasikahaben1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:31', NULL, 'default.jpg'),
+(3964, 'fasika2136', '$2y$10$N2XQkCgG3TsJUrHgUithb.suNipSZJ.EPm9PYNruTcN7MGkGokfzK', 'fasikabisrat@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:32', NULL, 'default.jpg'),
+(3965, 'fasika2155', '$2y$10$CH9pLVRWQ6N9fLdY4D7jTuWQfhtXT3FbVH1LW42Ta1JH9qH7AxwJy', 'fasikatsegaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:32', NULL, 'default.jpg'),
+(3966, 'fasika2175', '$2y$10$5t3O5wCvkX3xjb1gfexNKuvXjh4ei8FAH.IlGdPzwiu5HHreShsAy', 'fasikamulugeta@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:32', NULL, 'default.jpg'),
+(3967, 'fasika2192', '$2y$10$x1ugBOa1kXwi6SxPsDt2r.NP1ysvo2mC7bD8yCYb6vJgHXaYsPgEm', 'fasikatesfaye3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:32', NULL, 'default.jpg'),
+(3968, 'fasika2195', '$2y$10$KuXpNz3dV143V818aK.w2.El8Kx1P8CaDLmeu92tY0E3simmuP56C', 'fasikamamo@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:33', NULL, 'default.jpg'),
+(3969, 'fasika2199', '$2y$10$U3MKOhOXlgBWH2FGcb58ruqwwqOxUe9msxYzuUoRISFVCI1IPvLrC', 'fasikahassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:33', NULL, 'default.jpg'),
+(3970, 'fasika2223', '$2y$10$sKCrYtcJHgVyky4XikQd..BeMWPxnpe4Wd4YXdFdm8doeEK2vWMgi', 'fasikamekonnen@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:33', NULL, 'default.jpg'),
+(3971, 'fasika223', '$2y$10$vXvOf2X/jQHjvj/FmdoIYe3MUBY/mJ40pMkZ/WYD1yI1MgC9UgH7a', 'fasikatesfaye1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:33', NULL, 'default.jpg'),
+(3972, 'fasika2257', '$2y$10$pQKQJpy0RhvIDA5SJs3X1.bB/udD4zqqadJYQP1w6uA5JhPKSJUN.', 'fasikanigussie1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:33', NULL, 'default.jpg'),
+(3973, 'fasika2262', '$2y$10$N6CY0CAxxEJG9eJvp3P4u.4t/UYB1PCxkD0jhuhi12Vs09W0wysBS', 'fasikakifle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:34', NULL, 'default.jpg'),
+(3974, 'fasika2280', '$2y$10$1XPmdmaExRihrqDwsZOaEOySibsV0edizXN4cguEqazEFJDGM5tmq', 'fasikaassefa1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:34', NULL, 'default.jpg'),
+(3975, 'fasika2374', '$2y$10$AICUfLVJ.y1Xy7E1vSxQKezN9pRcAf1I.lfcq74J5Y5mM98WrCvTa', 'fasikawolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:34', NULL, 'default.jpg'),
+(3976, 'fasika2386', '$2y$10$/eLOnsRfE5/6BwuvT0MiO.557/D4HMCZIoNT/fDgoaLi04aF7HhgW', 'fasikadawite@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:34', NULL, 'default.jpg'),
+(3977, 'fasika2395', '$2y$10$e8Ds9gXeefyKZedudPX.EeMx9qcZh1VKHfBUi8MWCCtfd2lDEj52e', 'fasikagizaw@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:35', NULL, 'default.jpg'),
+(3978, 'fasika2542', '$2y$10$d.30WTtbzDTkR1ENN3uY8eMz54lxz8c10ZK5zkO2k.OJ.10xW/t2q', 'fasikatesfaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:35', NULL, 'default.jpg'),
+(3979, 'fasika2576', '$2y$10$QbLIsSe8Ima.UCRtNdvLQ.dETpGPSHUgzZiIgoLfpAWogjrHxiFSa', 'fasikashimelis2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:35', NULL, 'default.jpg'),
+(3980, 'fasika2601', '$2y$10$FeWM7V9xS9WidsIBmahgiem93mcVIFksouoryf/KS6Kd7DH8R81fu', 'fasikaibrahim1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:35', NULL, 'default.jpg'),
+(3981, 'fasika2756', '$2y$10$cdgz90POZwAjyfkrkgd4L.2bRwC6ssaOnEP0FO6s58.LAZK7N0S3O', 'fasikaibrahim2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:35', NULL, 'default.jpg'),
+(3982, 'fasika30', '$2y$10$fIdbsksVrc21FWS1k3jQNO5jn743bDfpVCOQ50Y1m7gu1kEqbJ5S2', 'fasikaqes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:36', NULL, 'default.jpg'),
+(3983, 'fasika337', '$2y$10$SdL3ev9DWpXZ7i.5ATXt6.jR1kpB9dU9mbLQsiM3xHAcDtTu8jhSq', 'fasikadagnachew@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:36', NULL, 'default.jpg'),
+(3984, 'fasika342', '$2y$10$8e8eyUGYnVzlmsSvz8B.quMWsL/fhQjKDI37weEQUoFHNL9JHlWMS', 'fasikahailu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:36', NULL, 'default.jpg'),
+(3985, 'fasika418', '$2y$10$zvU9fLO.6VMqWo9rmz8QSu//ezOiyHbWZjqPuo1crM6gB/KIYn7c6', 'fasikazerihun@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:36', NULL, 'default.jpg'),
+(3986, 'fasika425', '$2y$10$t6r0yA7MFFXb98GRvQHK7OhAGhLs1XGH1DisKAQTc5OMm7d4nO8Nm', 'fasikawolde2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:37', NULL, 'default.jpg'),
+(3987, 'fasika44', '$2y$10$hJ1GY45EPTdsmYmXGYQfLueqaHkvA.j3t0PuIqGpBLJcNzoU/i6y2', 'fasikagebremedhin1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:37', NULL, 'default.jpg'),
+(3988, 'fasika468', '$2y$10$bN0xc.kVzWPS98HKNwmEzOMPtMN7KCv4jZ3wrSOloURFy8.6VXF9e', 'fasikatesfaye2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:37', NULL, 'default.jpg'),
+(3989, 'fasika47', '$2y$10$fPTDVfNdshl5FwYVFo5X8eK95H.ThVFd81E5Itk.wCPfGOXEe/JNu', 'fasikanigussie2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:37', NULL, 'default.jpg'),
+(3990, 'fasika589', '$2y$10$yOT7CZlEG2WpcQ9z4ZinI.C.4WpTLyVCjhuhPQVDOrxRmJlw2I3he', 'fasikakassa1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:37', NULL, 'default.jpg'),
+(3991, 'fasika647', '$2y$10$RR6wrQgisxPTQ9tcQ.9fE.YssLECPHIhmVc8IBXj.VgDD/240V15u', 'fasikadagnachew2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:38', NULL, 'default.jpg'),
+(3992, 'fasika669', '$2y$10$3mKOnK0Ze1RBg3HwxpJxb.bOUgo7oJVOdMkrZfPAbI5GUu/2OtQsi', 'fasikademissie1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:38', NULL, 'default.jpg'),
+(3993, 'fasika68', '$2y$10$TREkU4V/NrEeJLX02ohXlu3XmX12sijR5HfFsvcPtaQqTmy.vU8pC', 'fasikahaben2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:38', NULL, 'default.jpg'),
+(3994, 'fasika723', '$2y$10$Cm4k3eIktVNzzHhmoavW3.00RGOeirek8nRrGYG0Ewoe6qPpagoIi', 'fasikagirma1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:38', NULL, 'default.jpg'),
+(3995, 'fasika760', '$2y$10$svzMXqD3ZwRLbkfZyIrqreJGungXhMSwjruCZLt3I9o3IpMDnqW0G', 'fasikanegash@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:39', NULL, 'default.jpg'),
+(3996, 'fasika787', '$2y$10$FbUGTMUzMdKmntDcpKXZyOsfTz09WPXntd/CLU1AGlBu24V7qxY4S', 'fasikazewdie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:39', NULL, 'default.jpg'),
+(3997, 'fasika886', '$2y$10$Sjm8Fj0puu89zgzHHkPjHOZrZnis.1jUg.qCz6fv5OcCNckJPTWyS', 'fasikashimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:39', NULL, 'default.jpg'),
+(3998, 'fasika929', '$2y$10$EzLnnZHkA9IWxVmqVsAQMuUmOzP1XiWDjChQb.QwxmtaYj2tad4jK', 'fasikawudase@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:39', NULL, 'default.jpg'),
+(3999, 'fasika93', '$2y$10$G5wq8CwoXWbeFMiVh745Ue3eLUm63td1kjCUtqfEUo.gfPwdp2FFi', 'fasikaassefa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:40', NULL, 'default.jpg'),
+(4000, 'fasika937', '$2y$10$uG4kwWe31U1N0SlwHVLRxeqSf/z2Nf1llcC6Nc3VWIhdWmfCS4QB2', 'fasikasisay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:40', NULL, 'default.jpg'),
+(4001, 'fikre1052', '$2y$10$wB2FFmb52glxt.Tw9EN49eVCDzTwFmxwBfiAzmBeSR49tpb8guu9K', 'fikrehaben1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:40', NULL, 'default.jpg'),
+(4002, 'fikre1103', '$2y$10$YJ.TYUWVp0.NxnBG5jPL0.Ve7PhVXeBI3pva9g0JL7jVmqfHqukbO', 'fikreendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:40', NULL, 'default.jpg'),
+(4003, 'fikre1143', '$2y$10$7ME05VdADCi85BLdT7g9m.k6e8uPDbprAKzNz7934aWalkhxccU0y', 'fikrehaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:40', NULL, 'default.jpg'),
+(4004, 'fikre1171', '$2y$10$eRUGc5GYAyLqQtcxFLVaY.sOddnHKpcllVOs/vohrqASFT8VnfWiW', 'fikreredda@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:41', NULL, 'default.jpg'),
+(4005, 'fikre1179', '$2y$10$mPfntDdMgEnbvMBCdNovb.e67sFf6ILe1/mlYpxgOynSvyQGH10y6', 'fikreqes1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:41', NULL, 'default.jpg'),
+(4006, 'fikre1194', '$2y$10$kcRr6WsNvsQh1vGCMOL8X.BqoTWWbjY9OTb5Uyg4EkpvwBAW6FXrK', 'fikrekiros2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:41', NULL, 'default.jpg'),
+(4007, 'fikre1206', '$2y$10$/X/53YFexyoy6oyvZtSJ7uxwaXxUy3vvAaK3vyFIrm8aOPqpSFprW', 'fikretekle1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:41', NULL, 'default.jpg'),
+(4008, 'fikre123', '$2y$10$IaiOHoPWEFol2RBYIOogTux1kWU7nG7fJkQeIy1K3/Ef/YmtRFhPa', 'fikrewolde@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:42', NULL, 'default.jpg'),
+(4009, 'fikre1255', '$2y$10$k1..mHO0iFCUZKs1CQXxAu5oZFUMyrF0a0pSExy0756sv3uui.zwu', 'fikrezelalem2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:42', NULL, 'default.jpg'),
+(4010, 'fikre1289', '$2y$10$FLXtIUP5pfnB2ymaKOA66.X7xbCtMofmK/DuechvSzYCS1MO1q5/6', 'fikrebereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:42', NULL, 'default.jpg'),
+(4011, 'fikre1320', '$2y$10$Gh0/kKxUEubRxs3PxPxW7uQWUmakMRWGSzyrZLuIOhGA0J0shPBma', 'fikretekle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:42', NULL, 'default.jpg'),
+(4012, 'fikre1342', '$2y$10$Qn6n8ZyFOaOoEY3LrH5yHudZsUUM9EKNy9.DNFCmPWadPwRk/F9mu', 'fikrealeme3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:42', NULL, 'default.jpg'),
+(4013, 'fikre1374', '$2y$10$CBx45jPM2eNfQmuWxra/euymUecVHbPrzjhmAjfbGrV6Sp/A8sEYG', 'fikregizaw@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:43', NULL, 'default.jpg'),
+(4014, 'fikre1490', '$2y$10$ZK8jErkd280qn5VU8.X0c.LnnGBJSqF.D98AW9Zsh/TUZrgOSnHPy', 'fikremekonnen1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:43', NULL, 'default.jpg'),
+(4015, 'fikre1514', '$2y$10$.KbnrwdhXVgoR2dRJbkFduDu91a9mi5Lm7tRuSt0F1GeV6dcJpzwW', 'fikreibrahim1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:43', NULL, 'default.jpg'),
+(4016, 'fikre1519', '$2y$10$DH5N/I9duvMoqcRpf5hiYuYouxtzQr438YjnXivIidG0y7FMBFTjy', 'fikrezelalem1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:43', NULL, 'default.jpg'),
+(4017, 'fikre1693', '$2y$10$0UgfNJXiIN/DRS71Tu.d7elopCuaIQKqwbyVThNaAgYva0p8xYp7y', 'fikrehailu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:44', NULL, 'default.jpg'),
+(4018, 'fikre1753', '$2y$10$7k/iBamnadQ1ib21LxK3A.K2t.PLXD03eVCMw8pi3Kak2Afh7YI5a', 'fikrekiros1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:44', NULL, 'default.jpg'),
+(4019, 'fikre1823', '$2y$10$8/U4fIChYkljcgN7bG.9RuE7MwxYw51GUABnkm6p0CPhJx4HHxLgy', 'fikrehaben2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:44', NULL, 'default.jpg'),
+(4020, 'fikre1988', '$2y$10$R3RBF3y9k1fq6YPsgNFWkuDB/icfEAIjzRi453ijpD6CDciPL95H2', 'fikrepetros1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:44', NULL, 'default.jpg'),
+(4021, 'fikre2075', '$2y$10$b5Z7dDprhMRVyj//H.i8q.Q/qaW8HgYvQVpw/chK02z9408Av6oOG', 'fikresisay@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:44', NULL, 'default.jpg'),
+(4022, 'fikre2136', '$2y$10$.ChTlLHsgD6t/Fm.TevhjeVK//Q98REXU9OVyHM8t6XA048iQWoBW', 'fikrekiros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:45', NULL, 'default.jpg'),
+(4023, 'fikre2180', '$2y$10$VizW0YCwpgud7DBffW4ubuYQq9lSJZanPbiHQ1Ci31wt5lv3YotQ.', 'fikreworku@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:45', NULL, 'default.jpg'),
+(4024, 'fikre2276', '$2y$10$yym2Fp73P9O62pN/.8H47O6ZUpnRcZpEXYxBJ4av0AKAKK0N.Bagq', 'fikredemissie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:45', NULL, 'default.jpg'),
+(4025, 'fikre2419', '$2y$10$hS.9aFrLEPQ698NomhEEF.MijX.nKiWY.QMl3kUhGo5kq3KthN2Gm', 'fikremohammed@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:45', NULL, 'default.jpg'),
+(4026, 'fikre2528', '$2y$10$.C2Hgp89.yRPotYpY0ulZ.g9sXGcHTmiGhaaJjhIW6IF5Z9YoGA7.', 'fikreshimelis@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:46', NULL, 'default.jpg'),
+(4027, 'fikre2710', '$2y$10$mIdnw37vL/9nJcDrUEMln.5zI6WEdYH7W2D2E3imxrLEFDfsYmdkO', 'fikrenigussie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:46', NULL, 'default.jpg'),
+(4028, 'fikre273', '$2y$10$hc3Zrax3isrS1..byJQq1eFmaR1m9sNjOm7wimjcRtmFFlVQ/09xG', 'fikrehagos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:46', NULL, 'default.jpg'),
+(4029, 'fikre2738', '$2y$10$W.BvotVYLV0o7qRxC00cj.eXaZBJEjUvaivWh.V6mEYtV0TQaUfwG', 'fikredawite@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:46', NULL, 'default.jpg'),
+(4030, 'fikre2810', '$2y$10$a8LrFy9YZ8qnvvjMLgAWYOieIRp5Kp2pwns9mYmLPUZv2CpoCD8IC', 'fikreoumer@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:46', NULL, 'default.jpg'),
+(4031, 'fikre2814', '$2y$10$luDbVUkK0WjzXIc0aGMVLOlshzGEpwEScBG6Ns9mEUgXvQleawBpG', 'fikrekebede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:47', NULL, 'default.jpg'),
+(4032, 'fikre2817', '$2y$10$3gyx.1mbMbPeHyqeHy2Yj.vjMERQFQKztT1mpxa2CaZOz2tCb0zJm', 'fikredawite1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:47', NULL, 'default.jpg'),
+(4033, 'fikre2847', '$2y$10$RrWkz9joq4MRA5s5LDiE1OUvEW939jq9tnnlmDireFlLLh/LYQ4N6', 'fikrealeme1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:47', NULL, 'default.jpg'),
+(4034, 'fikre2874', '$2y$10$rsUi5A8//bs7YGiklvSuwO0N0tYm0uyeZzXJtfHUF28rITvOp1n.S', 'fikregirma@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:47', NULL, 'default.jpg'),
+(4035, 'fikre2908', '$2y$10$9v.AOOVZFbcoXj5cqjFK9.374XU.BR8U9MKt6MQ3iIj3p2EF0Asne', 'fikrealeme@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:47', NULL, 'default.jpg'),
+(4036, 'fikre2914', '$2y$10$FohfaGgNMtZsplGgng16AuyPVKndgInA.4oXG6F76.iHWwAAFXz22', 'fikreyohannes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:48', NULL, 'default.jpg'),
+(4037, 'fikre2972', '$2y$10$klTgiGwz7r7KaX8S5jOCcu21W6xkc4R/W9XwYt/U16m9PDs98FNIK', 'fikrekassa1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:48', NULL, 'default.jpg'),
+(4038, 'fikre2995', '$2y$10$cAy3jlzvhOBsJnKnrTnwGOgidgpeq8ZHIRn/UXHiBZcgWVf4kDwj6', 'fikrezewdie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:48', NULL, 'default.jpg'),
+(4039, 'fikre410', '$2y$10$XlLV0pNomUlJKhBUBGGb8.D6Vdi5nGdqzOAegfMYjollAz.Z/isHS', 'fikrekassa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:48', NULL, 'default.jpg'),
+(4040, 'fikre432', '$2y$10$1wNEYHV2OQ9ZjF61J7p8nud3u77CS7HGFg1dGF8caGKBtx8IntcGm', 'fikreibrahim@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:49', NULL, 'default.jpg'),
+(4041, 'fikre463', '$2y$10$2EK.Joo8eilHYsEfbuwXuuVdC/4UWvnx7H5v8nXB/tGerPbuA0PEC', 'fikretesfaye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:49', NULL, 'default.jpg'),
+(4042, 'fikre513', '$2y$10$w.9u8CQhTlLnrBophO9K4.pe4HW4UYfgBi/t7gVoDy295Jodqt2vC', 'fikreeyerus@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:49', NULL, 'default.jpg'),
+(4043, 'fikre535', '$2y$10$08AAMmevluRs2Y/0yT4N7./psSomK9K4HK4.4YnIoGmvajsp/t.F2', 'fikreselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:49', NULL, 'default.jpg'),
+(4044, 'fikre653', '$2y$10$mSBveNsVH04kt5o5P6Y1p.BP8AdFWV9abFZjDbGleQaUX9sJnreUG', 'fikremekonnen2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:49', NULL, 'default.jpg'),
+(4045, 'fikre709', '$2y$10$roP54kK.imL/.TPuFRVxUOn.9tOBkZ7IN/GzzaqgaBpGEHbLDYIFa', 'fikremamo@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:50', NULL, 'default.jpg'),
+(4046, 'fikre715', '$2y$10$UiiP2a2U4ZcRkJ3O5v4lze.WQOz.jhC.U/rmLtJ6ynp/Sq4E2TZFq', 'fikremekonnen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:50', NULL, 'default.jpg'),
+(4047, 'fikre758', '$2y$10$R99ZZRW/L20LQkHN5ZP3feO82taala8/SUn.jWU4EJJqrBTuSxuP2', 'fikrezelalem@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:50', NULL, 'default.jpg'),
+(4048, 'fikre826', '$2y$10$jWMMrnQX7eJ6AO2q.F8.Fu3kg.91G1bS8R4Gf9MoK6bhmw6BXk17W', 'fikrenardos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:50', NULL, 'default.jpg'),
+(4049, 'fikre872', '$2y$10$reyaKXV2I.VI7hDznSnNtOI6Y2ifJxW6/QSYd9WiFFE/q7edYg1BS', 'fikreassefa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:50', NULL, 'default.jpg'),
+(4050, 'fikre895', '$2y$10$ldUfSuqCjQzPPU3v8lKVVe/.tbj/YOx.oVTQSnNEgHzx6lkx1Etvy', 'fikrekiros3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:51', NULL, 'default.jpg'),
+(4051, 'fikre901', '$2y$10$LiyolZFEdXC4U7bflSd/ReDsygz/nZezhjYv0uZwoBZSYeAHCYpO.', 'fikreqes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:51', NULL, 'default.jpg'),
+(4052, 'fikre934', '$2y$10$cVJT6vjDJ6fo0G9NpUGrqud1YZZgABQp5rRyj/jMBmuJu2mi7M.4C', 'fikrealeme2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:51', NULL, 'default.jpg'),
+(4053, 'fikre942', '$2y$10$LpQLmWUJmJI7KekEJbxiw.Et4oAeo9cF61/Ax0Hhk8iI88pF1Uus2', 'fikrepetros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:51', NULL, 'default.jpg'),
+(4054, 'fikru1031', '$2y$10$/g.bh3yN6RHKuBp5UX66HO9uVVXqZxkvhbYl44bE0JJc46kYVZJT6', 'fikrugenet2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:52', NULL, 'default.jpg'),
+(4055, 'fikru1048', '$2y$10$FHdsbme67ZYM1UeK.r46nuShnNRAGX/RkabSRSyhg5gZhUY/3xJ.m', 'fikrufisseha1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:52', NULL, 'default.jpg'),
+(4056, 'fikru1055', '$2y$10$K/qwb7CQnJtr1aJSF3wDT.Cp7OfcatUhUViOU/u2.ckwhSbsgyqsO', 'fikrunardos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:52', NULL, 'default.jpg'),
+(4057, 'fikru1151', '$2y$10$t0ywpM0vBqxZZFohF4AIwuRSGH0vBBY4ynG0mTvhNvlydORxJOF1S', 'fikrukassa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:52', NULL, 'default.jpg'),
+(4058, 'fikru1158', '$2y$10$xf411.fSd3mS8R3YjyrDDu/8xhVUJpG1OiXkIMWO6ChMJN3lfZeo.', 'fikruhailu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:53', NULL, 'default.jpg'),
+(4059, 'fikru1204', '$2y$10$Dy5BntkCa2rb8KpGPwXMNu7HLwkdUx2wZHRViNz/mDXSDrVxGk..2', 'fikrupetros1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:53', NULL, 'default.jpg'),
+(4060, 'fikru1247', '$2y$10$BUFGt/MPRj.u81wVDr8xceG25JJ8nYYw0FvIWCgFoRya5UuzGljpS', 'fikruendale1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:53', NULL, 'default.jpg'),
+(4061, 'fikru1353', '$2y$10$rUOhROmuJ.1HNGCXcBBkV.Vqw20vi.7wbwnE3oaj1WpUY7/hqflIK', 'fikrudemissie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:53', NULL, 'default.jpg'),
+(4062, 'fikru1380', '$2y$10$ej6kfjnR9YiNkt7hyrpDeeQOOQB5VxBxO23lB8RaxIaxvFy28UcVC', 'fikrusisay@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:53', NULL, 'default.jpg'),
+(4063, 'fikru152', '$2y$10$YByFpc5YPMPfHIi3yYZof.uuMlFHT2xXWl7Xtq1wnlVxunRJTlk/O', 'fikruendale@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:54', NULL, 'default.jpg'),
+(4064, 'fikru1543', '$2y$10$7diIQsb8lOMEyr4DHTmNTud10UaPEH9Yqr7VQUR8op/IfTMMn7OcG', 'fikruliya@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:54', NULL, 'default.jpg'),
+(4065, 'fikru1595', '$2y$10$BC/fofUmR9ein6.ib4uX8.jTSlmxPbDhXCxXcWlZP0pmiejiq7lqu', 'fikruibrahim1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:54', NULL, 'default.jpg'),
+(4066, 'fikru1634', '$2y$10$/g1g2LizA/erHPOo6zxr8OrCnAQsCa/15cwB2cTuCgQIilRcc3NYi', 'fikrufisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:55', NULL, 'default.jpg'),
+(4067, 'fikru1702', '$2y$10$Oc7sFoDTHxMQBUIx.g0Acuhn4E8EQMCCF7wqW8dhlCotak/IOxzMa', 'fikrubereket1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:55', NULL, 'default.jpg'),
+(4068, 'fikru1792', '$2y$10$Ws1lKSI5V.9FyvF.tfcFt.8yfXVpTIbqoeqwy4RuhWItQwP3QZz7m', 'fikruabebe1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:55', NULL, 'default.jpg'),
+(4069, 'fikru1835', '$2y$10$JX09cW4ktOhhpK1gNckXx.1EfeFk9zfOqBFGoQ8ILa81QTCOUdnca', 'fikruzewdie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:55', NULL, 'default.jpg'),
+(4070, 'fikru184', '$2y$10$gd52fOHSGjpzzwuIn54Rdur8dp2bDamH9twdujQPOavOkgdzHC1pq', 'fikrugenet3@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:55', NULL, 'default.jpg'),
+(4071, 'fikru1892', '$2y$10$rxH9vw7FahCIP3npwUhHuuau7Fu0f3aotR/tsH.xgB95jjxC7KF/W', 'fikruhagos1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:56', NULL, 'default.jpg'),
+(4072, 'fikru1917', '$2y$10$NTdg1D6/xCPGbFrZbLPRSelbovwX87rw80s35k4yUjRrfkajUKVNu', 'fikrukifle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:56', NULL, 'default.jpg'),
+(4073, 'fikru196', '$2y$10$WmLf./qI9LEcL1lbb9HBY.xg.fqT1MMydkmQfhlPPjWf/bbl.qgWC', 'fikrumamo@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:56', NULL, 'default.jpg'),
+(4074, 'fikru1987', '$2y$10$E3sbsz1t7l8KyTw9LKHafelwwnSagiC3OUOaMvtbINaGq0UtaOdA6', 'fikrukiros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:56', NULL, 'default.jpg'),
+(4075, 'fikru1999', '$2y$10$DBO66k0TPN5.4x5HwE1TsOa0.V.KbqTssJ1V/Ywl4vnJD0BzcXiU6', 'fikrutesfaye1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:57', NULL, 'default.jpg'),
+(4076, 'fikru2090', '$2y$10$OSivVg3d6lM3wa9oM1x51efKX75CSqooILtXal/KA9aYynieJvZuy', 'fikrupetros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:57', NULL, 'default.jpg'),
+(4077, 'fikru2138', '$2y$10$pMiuY0u5.KIOl4Di/85uru5Y.7rREw4/R7rqgQbcli4L7Z/PFo1gW', 'fikrugetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:57', NULL, 'default.jpg'),
+(4078, 'fikru2160', '$2y$10$hRMqx4xFYMW6YVK2Jf1RAeeHeJW5w4kv6LG7bULRUtnikj68g15za', 'fikruzelalem@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:57', NULL, 'default.jpg'),
+(4079, 'fikru2257', '$2y$10$p8bJ54OWW7YP4JPWC9YAputMbjvi7rSmb16wxBc4utTX9nYVkemVS', 'fikruali@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:57', NULL, 'default.jpg'),
+(4080, 'fikru2352', '$2y$10$jgFIHzBvvPNRl3W38Obkq.C5mjXXXM5GLfU2.ojugEXlfF5SHWyo.', 'fikrukassa1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:58', NULL, 'default.jpg'),
+(4081, 'fikru239', '$2y$10$oynJ91wFesQ5THpU9BP2.eHnx0/TpkeQTc5NCMRsRsR3KqhvVvz2i', 'fikrubekele@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:48:58', NULL, 'default.jpg'),
+(4082, 'fikru2401', '$2y$10$qjR8/k8jtpqqBcvAH.yJ7O5XpfLJV/z02UP57lx136lfLLI8HuQ1G', 'fikrutadesse@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:58', NULL, 'default.jpg'),
+(4083, 'fikru2445', '$2y$10$gAx4RdjvjcDj8TAV6oTDEutO6IpoSP8FRuAeHve7S2wuY6WWcOlb2', 'fikruhaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:58', NULL, 'default.jpg'),
+(4084, 'fikru2470', '$2y$10$3RKesVGSJbdd1W8ARc5RI.fUVzWnHRVlr2OS.VDWVE11WfJKl1tJu', 'fikrugenet1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:59', NULL, 'default.jpg'),
+(4085, 'fikru251', '$2y$10$KFgja9J.9nypEMPZb67y8e24UEn6g7Pii5T6rQvRLoTRNLM9j/xbS', 'fikrudemissie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:48:59', NULL, 'default.jpg'),
+(4086, 'fikru2537', '$2y$10$3QHhpTrQiCeEtYhf8pK1iOhVbkSDJ8KKnxOPxy1BC2W7lOEKXK3Ka', 'fikrupetros2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:59', NULL, 'default.jpg'),
+(4087, 'fikru2739', '$2y$10$lWxado0q4lYG9cRFlYQzp.KceBljzN6WcoHRnuQ7WYdtZ6T5Q.Mm.', 'fikruassefa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:59', NULL, 'default.jpg'),
+(4088, 'fikru2768', '$2y$10$F1ggh5sDV/b4mFf4hGy6m.n4zOvwhoaBW3KeyzfaUfQKcIFeS8Gr2', 'fikruabebe@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:48:59', NULL, 'default.jpg'),
+(4089, 'fikru2773', '$2y$10$Yzu0vQOrrJKpS5v2YKH7DOWVLENck8PYrmB9VPJMFW8AzAveBKenu', 'fikrufikru@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:00', NULL, 'default.jpg'),
+(4090, 'fikru279', '$2y$10$cXnUYJdnnfztVyrG0kXtGuZfGI82RezCP1rzRwmXugROx1ByBsOO2', 'fikrukifle1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:00', NULL, 'default.jpg'),
+(4091, 'fikru2831', '$2y$10$n8CqRn.t8x6hJL8bZCCaKuQi/e6mocozbgNPvbIeMc1B9UwIgiNt6', 'fikrugebremedhin@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:00', NULL, 'default.jpg'),
+(4092, 'fikru2853', '$2y$10$VYqE0jVjWnTAb1u01HBmHuhLcqduKCQrSF7gu5wmO0eMBc1OcGS6u', 'fikrumulugeta@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:00', NULL, 'default.jpg'),
+(4093, 'fikru2911', '$2y$10$6dC5zmM4zVFRlxeKHMwmxOiv/kjAxfYQtfZfRDv76DkKk2jfz2IHy', 'fikrukebede@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:00', NULL, 'default.jpg'),
+(4094, 'fikru2913', '$2y$10$j5wSl8yKuQFf7hu19L9C7OTL4bgSc09.DyVtbWFDRfBbnlwzM6iye', 'fikruibrahim@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:01', NULL, 'default.jpg'),
+(4095, 'fikru2954', '$2y$10$WCE6GzSzP6xMDLrXCsrZPuLBWG92lQsd.R72WUcI.QA7KEgtoTgXC', 'fikrukassa2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:01', NULL, 'default.jpg'),
+(4096, 'fikru2987', '$2y$10$byCGjOqSvdId3v6kyItsPOFghGQu6A5jafPPClnY.IRXRrL45cpbK', 'fikrugenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:01', NULL, 'default.jpg'),
+(4097, 'fikru352', '$2y$10$2.Y6eUFdie.ncNiXPZX15edESmt4u5nVUMUN0D.dy3vR2qbX0yI0S', 'fikrubereket@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:01', NULL, 'default.jpg'),
+(4098, 'fikru359', '$2y$10$pWTirh2jOkztaoAshRxk5eJ6SuGNn9zJmTme2CK/IFuchbIXpNGvm', 'fikrupetros3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:02', NULL, 'default.jpg'),
+(4099, 'fikru387', '$2y$10$6sArSk5RuzIgaI5MmAhJt.f/K364HDMO1eZ1Scoyhc.TqOP9SeOd.', 'fikrutesfaye@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:02', NULL, 'default.jpg'),
+(4100, 'fikru389', '$2y$10$Wm.KlEA2fi4VoHsfnnwfw.7jL8CXedripRcw65E5D1Z69K0.k2wtK', 'fikruoumer@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:02', NULL, 'default.jpg'),
+(4101, 'fikru399', '$2y$10$M/F739Ppg7G8RNUMixV1LOavsYZjO3mEqS.hr6oX96eMhu9edTUkC', 'fikrumulugeta1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:02', NULL, 'default.jpg'),
+(4102, 'fikru491', '$2y$10$Fg9Y5j1xRarAvEHMW.pi1OWWh8MLbCE0BtC2OudyfHKV6PYJq8hRW', 'fikruworku@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:02', NULL, 'default.jpg'),
+(4103, 'fikru494', '$2y$10$a7FkZJJbYfDvcas9lvdeAuR8WPsZsZRk.grgH0t4LNFiCZaD34H/G', 'fikruzewdie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:03', NULL, 'default.jpg'),
+(4104, 'fikru630', '$2y$10$Zebb.Hjz0vc3OyfNrcf6a.HaXJpZm8qOcgi76VIll5MF06uP4ZDQm', 'fikruwolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:03', NULL, 'default.jpg'),
+(4105, 'fikru788', '$2y$10$hKtSqPQ9LN4MVpeB4k4BBO3wrT3iQAwTLATa0/gcPvoSkR7kfUlDG', 'fikruhagos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:03', NULL, 'default.jpg'),
+(4106, 'fikru8', '$2y$10$WSmwS5vPW.W/7bqDD6HFtei/iME73qoh7.C7oPmL/MNzEIYpNlP/S', 'fikruendale2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:03', NULL, 'default.jpg'),
+(4107, 'fikru832', '$2y$10$iOtZ6Xcj6HEalJ5sllUMNOqAJdih7sB8jDBPuS/9gImTbf/A0FlPy', 'fikrudemissie2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:04', NULL, 'default.jpg'),
+(4108, 'fikru902', '$2y$10$EN1845hRQv8lMAPu7Jm7MOT6iUADDyw5raPZFa9SwifE2sBYj8pPG', 'fikrumulugeta2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:04', NULL, 'default.jpg'),
+(4109, 'fikru959', '$2y$10$zNqQJczobjJ3Q1AklibJV.A6Vnh8SznVzZXPZSSVU7kPlHtW8aXqW', 'fikrunegash@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:04', NULL, 'default.jpg'),
+(4110, 'gadisa1003', '$2y$10$w9QrG9uhiuyF3FjySkqhcOpv.BYlrVoqiw8Hiq2CdRHUnegejSfUi', 'gadisasisay2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:04', NULL, 'default.jpg'),
+(4111, 'gadisa1030', '$2y$10$.6UZAxeebkjcmK9msorlTeHj6P6mj247wu1.RMNwl7gzsOd.lRxL2', 'gadisafisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:04', NULL, 'default.jpg'),
+(4112, 'gadisa1069', '$2y$10$l49u1QWiQst/OxlpO5YGD.YJbFoLfS8z6t30FIRYONQQG.IYTngtm', 'gadisahagos3@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:05', NULL, 'default.jpg'),
+(4113, 'gadisa1134', '$2y$10$wLpXzqMPuhf3c479A/eO5ev372HhkFdryhiTQOHGK.Vy8ht7p1asC', 'gadisahaben@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:05', NULL, 'default.jpg'),
+(4114, 'gadisa1139', '$2y$10$.xRGXAaUFl/d/aHj4rNUrO7PRxaFhJkUpBh.6DKBxP.GyrowYwaSK', 'gadisakebede1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:05', NULL, 'default.jpg'),
+(4115, 'gadisa1214', '$2y$10$OWjHGoO7CyxYxVOdn3vYYOu5FO/jvF.vfhllhAg8cdooMmK4hiw4C', 'gadisahagos1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:05', NULL, 'default.jpg'),
+(4116, 'gadisa1224', '$2y$10$8hA32eUhlKB5nH9xiqwSZu8Fdqjc0iJ9rUDQu7OAb5ZgTgNkcV8FC', 'gadisabekele1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:06', NULL, 'default.jpg'),
+(4117, 'gadisa1278', '$2y$10$.sl9lmFXrfcLi2elbMHosOwlIc3WkYLYMCcpIzjdMTNNxa/xzWQ26', 'gadisanigussie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:06', NULL, 'default.jpg'),
+(4118, 'gadisa1294', '$2y$10$mdEzEm9DRGwM5D8Jj0gTEOdAVAxTjWA.97PmeZI.3vR7ckkIJJOMO', 'gadisafikru@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:06', NULL, 'default.jpg'),
+(4119, 'gadisa1329', '$2y$10$cske33aWFrIHrOdiDe2gx.cWMA8mxJnhSuXu70m0cA8d54zDWAbgq', 'gadisaliya@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:06', NULL, 'default.jpg'),
+(4120, 'gadisa1370', '$2y$10$9aJ9xo2D4TNSOORZB227keNvuW5ZObrfxM6bOontNQK7kh.pod4Py', 'gadisatesfaye1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:07', NULL, 'default.jpg'),
+(4121, 'gadisa1417', '$2y$10$vGtUYG6H1Otub5ygoMh91u3yX6.0ihT9.9HGTljaLEDivV6yUU3uy', 'gadisatekle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:07', NULL, 'default.jpg'),
+(4122, 'gadisa1472', '$2y$10$C5kmDDNe4YE1vpd5QXi2Oe1MZnUF5BaSvOqL5fuWfaNCJfXYTSbd.', 'gadisadawite@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:07', NULL, 'default.jpg'),
+(4123, 'gadisa1483', '$2y$10$mcMDvWErKIXXo78spxHHJutdz5cFt0HZX8VtHzulnAHpheMLteLX6', 'gadisayohannes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:07', NULL, 'default.jpg'),
+(4124, 'gadisa1486', '$2y$10$nAwZSL4Eip.KVsvKSZBxF.SW5FF4i05Z5VPeoSt7EQL.yPnd0TE2m', 'gadisagetachew2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:07', NULL, 'default.jpg'),
+(4125, 'gadisa1506', '$2y$10$FiiCmlrFUY5wsXhPQjmXC.wIAXHmQpy7aVp17mwWIqh7itljw6Uci', 'gadisagizaw@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:08', NULL, 'default.jpg'),
+(4126, 'gadisa151', '$2y$10$ZOC8q8nLpsfjGiwnZupl5.LC7NqePAot/erIaNnKk4HBPZuDVdcvy', 'gadisanigussie1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:08', NULL, 'default.jpg'),
+(4127, 'gadisa1523', '$2y$10$p.aPKyxUjBpND7ooccOqYepHFAJdMbOs55/bYEvY0bMUF99g17zGq', 'gadisazewdie1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:08', NULL, 'default.jpg'),
+(4128, 'gadisa158', '$2y$10$mPfFUVBRWz3IAF1MHUhNKu4Wq/HFf4LKTcLN/zAAk1Xv2FvLP2zT6', 'gadisagetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:08', NULL, 'default.jpg'),
+(4129, 'gadisa1580', '$2y$10$JH7AXCE1OK/s3D./pCld1OKjB295E1PAlsiUb9VSTK92JjhNy.9LS', 'gadisakebede@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:09', NULL, 'default.jpg'),
+(4130, 'gadisa1589', '$2y$10$acIZVl0WC8mK31fFpthQUO0LYTV7.BVzN4a56MMQWWA.U0qz5/nPS', 'gadisabekele2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:09', NULL, 'default.jpg'),
+(4131, 'gadisa1597', '$2y$10$1Ig9MqLFNoJvruFT.AOD7OD6zu6B4/QXWDRUwZZrPKZiqMo/XFayS', 'gadisaabebe@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:09', NULL, 'default.jpg'),
+(4132, 'gadisa160', '$2y$10$rLpaVVTResXAP/z5XbuTCeldbTX/o5p4pj1T41qx3uQ9KEYz5gesK', 'gadisadagnachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:09', NULL, 'default.jpg'),
+(4133, 'gadisa1684', '$2y$10$Vwwhq0C4.VCHdxaSEKgZ1uplIjlk9M3EIP0UH8Nvirzk49goJ1pKe', 'gadisabisrat@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:10', NULL, 'default.jpg'),
+(4134, 'gadisa1769', '$2y$10$yg5a5ZkD1Vx9v.qMSm6nP.HLO/tO.oZm40crqaJe2Ulq46tUDwdFC', 'gadisagenet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:10', NULL, 'default.jpg'),
+(4135, 'gadisa18', '$2y$10$Pfb2MXhOWDIBDsTwrtJjIus.WdNhkBtD.9MKwGGiAGbDDYBRnmWM.', 'gadisabekele@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:10', NULL, 'default.jpg'),
+(4136, 'gadisa1870', '$2y$10$uvz.mAUhJALbOsOj9Y6./ech5j9KuGQI579Ct7/5atN0Arpno8.jy', 'gadisamekonnen@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:10', NULL, 'default.jpg'),
+(4137, 'gadisa1876', '$2y$10$mSNwPFlyFo8tdubqXG/02ex8GohSSItrUDlYnhFtgh0Hlo1Zm6YVm', 'gadisatadesse1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:11', NULL, 'default.jpg'),
+(4138, 'gadisa1910', '$2y$10$aPXDaekf0of/7gCJrFgbP.t.Kfisx5ttHxZw1XGdYL0Qrr5U09qUC', 'gadisagetachew1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:11', NULL, 'default.jpg'),
+(4139, 'gadisa1971', '$2y$10$TaoHXvKuSRXvez8gN6u5n.YMBRH7sMOAg37EsxrC.th1xr0lsW.Z2', 'gadisaqes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:11', NULL, 'default.jpg'),
+(4140, 'gadisa199', '$2y$10$aAEikgLEhD/Myzun2vC.zOeBc4vQ1wBJLyTp2VMQTBAzbpnNUUE3C', 'gadisaliya1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:11', NULL, 'default.jpg'),
+(4141, 'gadisa2147', '$2y$10$nUB4ayC38INOPTNcUZJ.vO1236Qam/vyelYZQQHR56x4Vwv//CBAe', 'gadisamohammed@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:12', NULL, 'default.jpg'),
+(4142, 'gadisa2148', '$2y$10$Xyy5d6NTHTD2bWLBFtMVFeTg0XJdj9z1ZA4SbxS0.CUDzcHL95YtK', 'gadisapetros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:12', NULL, 'default.jpg'),
+(4143, 'gadisa2252', '$2y$10$dBxtCXY9IZdBC6TUxiyfyetN/3o8UTItIgydD5wUwTvtBbrFUG.T6', 'gadisahagos2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:12', NULL, 'default.jpg'),
+(4144, 'gadisa2298', '$2y$10$dGRgRyZXVUykHcZJmuwUPue7by9BnLm5werV9IuZZhljK2Um1G/Xi', 'gadisatadesse@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:12', NULL, 'default.jpg'),
+(4145, 'gadisa2306', '$2y$10$owpItSRO39qErC7UcMsOKOF4Ol1OFHp0rOZib9G88M/GlT.4UXrk2', 'gadisagenet1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:13', NULL, 'default.jpg'),
+(4146, 'gadisa244', '$2y$10$vSxOv9Eoj/A8eNFXXZMpROxIWu9kypGgOpVWz6IV503E4RQ506UXO', 'gadisaassefa1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:13', NULL, 'default.jpg'),
+(4147, 'gadisa2481', '$2y$10$GwX6ZS1vkfoT.9l1vQdHU.k5rutD4prhmm5YnST8WltsoKQZx0KBS', 'gadisasisay1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:13', NULL, 'default.jpg'),
+(4148, 'gadisa2499', '$2y$10$Ujg7iRVhGWCQ9fcs8watn.DMfCUtSFYmgi6QlQctqDQ6djqVpqUVK', 'gadisakassa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:13', NULL, 'default.jpg'),
+(4149, 'gadisa2533', '$2y$10$HkX0r/cRHDcHPen/44x/veV7EPQWLVPfMQsJ4heQU/n2aVeExs/Tm', 'gadisatesfaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:13', NULL, 'default.jpg'),
+(4150, 'gadisa2604', '$2y$10$Twew4ITOGg7WFG61TJw7jOZY54mXvaReaE036Xq1wIu2YdQvlQbuS', 'gadisawolde@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:14', NULL, 'default.jpg'),
+(4151, 'gadisa2674', '$2y$10$.Mev4mp21cvFVQj3r7qOreouexbMg978flCNgP/H2u9Z8ZaIOcj/.', 'gadisamohammed1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:14', NULL, 'default.jpg'),
+(4152, 'gadisa2678', '$2y$10$vnA/y9JOcqgj/eqQHjF2m.pZ4YEuHZiKJXtlIntJhI628Z5ZkQj86', 'gadisakiros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:14', NULL, 'default.jpg'),
+(4153, 'gadisa2693', '$2y$10$0DHDZVxANbfV5ikxjiwx9evRWcVNsSDHABYG2qNbQ63e70Vyd8U6a', 'gadisazelalem@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:14', NULL, 'default.jpg'),
+(4154, 'gadisa271', '$2y$10$ooMnX2oqQlnjsUtx43uLWOJ8BNFJSI7nuhOD.ON.6ge15p0yYoM9.', 'gadisasisay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:15', NULL, 'default.jpg'),
+(4155, 'gadisa2739', '$2y$10$AI0ZgpmHL4NV7HIgpcVZEOqP23SgafsxDsDduQ6j/KRYNBMoj4or.', 'gadisahagos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:15', NULL, 'default.jpg'),
+(4156, 'gadisa2783', '$2y$10$lhrD9ASr3RNFeLemt2J8/.lKnTia.Vf70SgaBBX2sTk0z6QGuqSv.', 'gadisagebremedhin@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:15', NULL, 'default.jpg'),
+(4157, 'gadisa2860', '$2y$10$o3uzrwavr3jkqRGxK6piXOkJlGFYbztp36d0lKuPH7Qen1QveV3PO', 'gadisaeyerus@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:15', NULL, 'default.jpg'),
+(4158, 'gadisa2909', '$2y$10$riWRgogG0buVaB7Up/fesufVUyRjuJxTZEItlHqNyEHbuqgdZXDHy', 'gadisakiros1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:16', NULL, 'default.jpg'),
+(4159, 'gadisa2972', '$2y$10$xT/7mH9HSBp06eWfhlPVr.gGCviphl.V8HYNBCgbxilzxaf3gAz2m', 'gadisashimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:16', NULL, 'default.jpg'),
+(4160, 'gadisa343', '$2y$10$v8LQMjS5wmV2dDXIybOr0.Cyvn469.doewux013M5D7LgrZNao1tm', 'gadisaqes1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:16', NULL, 'default.jpg'),
+(4161, 'gadisa391', '$2y$10$J608xtjV/kM0On/J22NG4e/4RnwDrPGQ5IY75HjB/ow2iWRKdnih6', 'gadisaworku@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:16', NULL, 'default.jpg'),
+(4162, 'gadisa392', '$2y$10$OVV1OeYKYT2i3b0qfEMthecuaRcvA87Z70D6T/0Wy/a1Mea3j2P4m', 'gadisakassa1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:17', NULL, 'default.jpg'),
+(4163, 'gadisa393', '$2y$10$NIoXa3BE94jKHydoCxYnBem8MG/sSsC8zAH9MKpr.v.lkfxJjgyO2', 'gadisatsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:17', NULL, 'default.jpg'),
+(4164, 'gadisa529', '$2y$10$D4dQ.6pqDPx/7hNwhFzlc.wEWuXTApzDXL0Odt0KE5c8FERtqI5BS', 'gadisagirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:17', NULL, 'default.jpg'),
+(4165, 'gadisa530', '$2y$10$Smittaub4L.OUYaR3tcqNeR1RPmMAXf.VRTGv9K7NLzr7qt6VRpiu', 'gadisademissie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:17', NULL, 'default.jpg'),
+(4166, 'gadisa577', '$2y$10$Ou.KBWWEav28sSwqEmgCeeu5PvehmczSflh.LAOXq2MBjKlKyrVi6', 'gadisayohannes1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:17', NULL, 'default.jpg'),
+(4167, 'gadisa670', '$2y$10$eQP4O.ObZ51zwJ3faw38uO.hQLmj06K1CNiA7U.9iGXD6OPs4xNVW', 'gadisaassefa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:18', NULL, 'default.jpg'),
+(4168, 'gadisa835', '$2y$10$QRNaqVK/.ka6f.mN0hQJsuQficpJAL81TDziue0Pl074qmPa/rjBm', 'gadisazewdie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:18', NULL, 'default.jpg'),
+(4169, 'gadisa860', '$2y$10$mdxGFyaLcf44opLfwh2oTOfcbHnBvNwuWYTFum8ZhURPWXtBG/r5O', 'gadisafisseha1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:18', NULL, 'default.jpg'),
+(4170, 'gadisa903', '$2y$10$2ZwAnKHcfBpPIWIml58preK321tS5YRkM5BAAQX.2NpxFhpH2sAQa', 'gadisahassan@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:18', NULL, 'default.jpg'),
+(4171, 'genet1054', '$2y$10$LQN9Kptwk3yK.Y4B0IKq7.0.EE4C1S80KmSrNdBukEMGDaOmqQ/Vm', 'genettesfaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:19', NULL, 'default.jpg'),
+(4172, 'genet1070', '$2y$10$kKWmw/NZAXb9S2TTTzUmE.cbXSgGS9jUNM7aQL6hyNB63m1qjRB9W', 'genetzewdie1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:19', NULL, 'default.jpg'),
+(4173, 'genet1078', '$2y$10$NMV9EC7mLQZqjzORRXjedOuKfP7CJP9/up1sL07lDvM7vIewIaIJO', 'genetgizaw@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:19', NULL, 'default.jpg'),
+(4174, 'genet1131', '$2y$10$0QNbvsCswNfMH3CjtYQ4yuvWvCV667hl1d14bwdb.OH4F8A4JZsBu', 'genetkifle1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:19', NULL, 'default.jpg'),
+(4175, 'genet1134', '$2y$10$wT.Nit1Os8ThU3cum3GEWOvJtVPOLpcD268qqyl2zin57mTaBVOCy', 'genetredda@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:19', NULL, 'default.jpg'),
+(4176, 'genet124', '$2y$10$6VMkz6/DxReWAzsbN2gcgON0.aORbTydQg2I8nXN2GblkiMkzCAae', 'genetbisrat@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:20', NULL, 'default.jpg'),
+(4177, 'genet1291', '$2y$10$nJVXWl.Xx7pxZfw45BmjU.EDabfYouCkPprVuk1oTjDfOiTeSc1zm', 'genetdemissie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:20', NULL, 'default.jpg'),
+(4178, 'genet1340', '$2y$10$FPbYNqQvVdERE1k3YSbQueCNdyBsxClMA4eir50LMorekcbVGxDPa', 'genetmamo1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:20', NULL, 'default.jpg'),
+(4179, 'genet1471', '$2y$10$11PKVE4fa3l2hnFMndsKPOEyoOEEP8ku9tgUAKVT2AOKW6XQnn2dK', 'genetsisay1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:20', NULL, 'default.jpg'),
+(4180, 'genet1519', '$2y$10$AYqI.xQDTD7Kcx5MKAQksOMZ.miVWn8zmxpZ1jHB23NwgH9LcF0J.', 'genetoumer@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:21', NULL, 'default.jpg'),
+(4181, 'genet1526', '$2y$10$8FTq3v/j4046j1NWwcyrE.nLZm7gQKGYP3ZMrUTlQ5XI68vYtYPQ6', 'genetgenet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:21', NULL, 'default.jpg'),
+(4182, 'genet1569', '$2y$10$Xq12jkyF3z0dC10XzNGCr.0kX5X1gWEAD1O52bVHfejYOURvyt.Vu', 'genetgizaw1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:21', NULL, 'default.jpg'),
+(4183, 'genet159', '$2y$10$57sF8j2oXOIP.D0sbtC3he7vP9FqmYkV9ku0Bphi9uSl4Q9JPofky', 'genetendale@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:21', NULL, 'default.jpg'),
+(4184, 'genet1618', '$2y$10$nzBql0oYYz0gR4jnVcHYWe5GCCVdVW5hU22WlowebEjvDlu8xplne', 'genetaleme@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:21', NULL, 'default.jpg'),
+(4185, 'genet163', '$2y$10$7ICAGWL9Ch7n1JwVtIzYT.2DvZgbSWuzK16Jx8WLHfNpvOCEL.Bnm', 'genetabebe1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:22', NULL, 'default.jpg'),
+(4186, 'genet1682', '$2y$10$wDXnjb8llxSo4Lh.3iGjUOB1a4eErNLmSE5rbI7D./6pu3Res9uMC', 'genetmohammed2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:22', NULL, 'default.jpg'),
+(4187, 'genet1706', '$2y$10$l/yY3rI56DiPlxi.aLraEuj9ekiTa45zssVP/bkh4eH9/1d9AoDLG', 'genetmohammed1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:22', NULL, 'default.jpg'),
+(4188, 'genet1722', '$2y$10$eJHj2rJriZr2aMu29v25MORBpwN7wI00dY240vpq/9EVeyMwANyTW', 'geneteyerus@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:22', NULL, 'default.jpg'),
+(4189, 'genet1772', '$2y$10$6D2lRTwq1maZT2s7w7A1CO3oJwIMzQxutXY.s5begOwSZahHtrLAi', 'genetbekele@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:23', NULL, 'default.jpg'),
+(4190, 'genet1881', '$2y$10$uWP20u60oMM1aOEuZeq2OOixXEdfc4v8/8maVIcAgaGNfB60mxxP.', 'genetzerihun@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:23', NULL, 'default.jpg'),
+(4191, 'genet1941', '$2y$10$m6SMIaubqiG7ldSYo0yrC.H21E.RbQ2/2hyDC3BpdyI2/O34BJRkC', 'genetbereket@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:23', NULL, 'default.jpg'),
+(4192, 'genet2014', '$2y$10$UnWNMZvE39FzRtgV6G1zgeFJaD1jiyH9G87XVShLQIGWOLuPlEUM.', 'genethailu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:24', NULL, 'default.jpg'),
+(4193, 'genet2030', '$2y$10$5YHdrycz.Ur7SZI3z6cYLuvn17AMKrGgLt24G/alBRnu2bgknuRIy', 'genetabebe@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:24', NULL, 'default.jpg'),
+(4194, 'genet2037', '$2y$10$o..qlwQ1h13iK9VlgXhQMuM1gp5MnrvEATxOptt.NY5Zac7apLHNS', 'genetgirma@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:24', NULL, 'default.jpg'),
+(4195, 'genet2051', '$2y$10$8yirNEFu3z/ffe.6z.m35ej/EMnOz5A7XFXFOhZfmFcY8qki.h.0i', 'genetnardos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:24', NULL, 'default.jpg'),
+(4196, 'genet2053', '$2y$10$EZOeNyeYql2p40lBwVzK6OEc4BgRIZInFljdCzn57kmtNkRQfjbrW', 'genethassan@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:25', NULL, 'default.jpg'),
+(4197, 'genet2119', '$2y$10$1kvVM4ORJcZ7rO6ufWMogOHWMQ3eoRZkM5w43aHEYVhhNA8HLQaKO', 'genetshimelis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:25', NULL, 'default.jpg'),
+(4198, 'genet2137', '$2y$10$4uc6Gni9umWbHhMMYCrlZu4k1zU6qZ6A38lybKjp43r.8sfMbvXkK', 'genetnigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:25', NULL, 'default.jpg'),
+(4199, 'genet226', '$2y$10$NDf4uFnjxKXcs12BwYEDRuhc1F.XbluCfM5er1s18Wp/dEwY0EcSK', 'genetyohannes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:25', NULL, 'default.jpg'),
+(4200, 'genet2297', '$2y$10$LP02KlWg0pteWqtWMox9U.CSt8BZivJgGKXHqtajCHi.pHn42EGWW', 'genetworku@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:26', NULL, 'default.jpg'),
+(4201, 'genet2450', '$2y$10$5T6PmBIV4ASZeK/8HcXheO0n0H.EkOShl.M.U4/ZM1hLy5dbIwBrO', 'genetzerihun1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:26', NULL, 'default.jpg'),
+(4202, 'genet2482', '$2y$10$OhOoNAObOyaHGV7cdA6NGejMIvE9imScZbPf05mJJ4OWcWmyJDG2.', 'genetkiros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:26', NULL, 'default.jpg'),
+(4203, 'genet2520', '$2y$10$DhHCyUIFtF77c/jp6JP8suatw/zowO3Qa/t7LtKxQ0w3AgoYkbAo6', 'genetworku1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:26', NULL, 'default.jpg'),
+(4204, 'genet2630', '$2y$10$zi63RsIZeLvSDkrxOKpUL.5huk1mFoJ9l2bVnoslJR1PXaoBCRsp6', 'genetzelalem1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:26', NULL, 'default.jpg'),
+(4205, 'genet2653', '$2y$10$1Pofrwgif03BbiM7Mb3cNO4JPEo2CTE2hJWJdJI2W1VE38ir.nRGG', 'genetzelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:27', NULL, 'default.jpg'),
+(4206, 'genet2717', '$2y$10$bMwMcDVCmOFpOmZ9lLxUYeahaNrHXkssXEuBkDJcVBMmHuI81HWly', 'genetwudase1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:27', NULL, 'default.jpg'),
+(4207, 'genet2720', '$2y$10$v25xjmNn2zTHVfwHrqyenuhbFvkfnOXGcGNW//Um4XgEIDAuFy8d2', 'genetcherinet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:27', NULL, 'default.jpg'),
+(4208, 'genet276', '$2y$10$s5PhW.LDUXg8HipmkvstC.xWoltrmlBuSiScYE2l8QKqsdUd4KKp6', 'genetbisrat1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:27', NULL, 'default.jpg'),
+(4209, 'genet2805', '$2y$10$tcm2hwAMhN9wOkEuxVCmlOQ4FLDn/ZRn2nYrJ/GDtW34tao/ZVoUC', 'genetkifle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:28', NULL, 'default.jpg'),
+(4210, 'genet2858', '$2y$10$i9TXl3gL2COEU.TTDMWx/OR1M7naMHvhIpnlxlTPB1J5LoscBIVgG', 'genetshimelis1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:28', NULL, 'default.jpg'),
+(4211, 'genet2906', '$2y$10$jyU1U9jUbsxJrDeUmwb.Ne9zoPywC4I9ctT1bpWwxjQBi/sk6SYbK', 'genetmohammed@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:28', NULL, 'default.jpg'),
+(4212, 'genet2989', '$2y$10$Jm9t5GlB54dRmzC132fTK.dEmKKwJaK.aQAejY09x84XXFlfW3wYO', 'genetfisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:28', NULL, 'default.jpg'),
+(4213, 'genet36', '$2y$10$kkCR0OV8/tmtZFO5/9qfBO9GLda0ko2ZYVcV2.OmoY05SKeCFyMta', 'genetwudase2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:29', NULL, 'default.jpg'),
+(4214, 'genet409', '$2y$10$DFBuTebxgUGQKpy6RKMieeL6jbZxNRVYv8JSi2jLJjDJMfYHWrwTi', 'genetgebremedhin@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:29', NULL, 'default.jpg'),
+(4215, 'genet471', '$2y$10$oAZfP9lqYmpUZVNyKRZ0uOvWBSaMMKCRmnIDgJClUp7EtLjuQyuOu', 'genetgenet1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:29', NULL, 'default.jpg'),
+(4216, 'genet51', '$2y$10$fjWRPdpJ.wOPasqpdAHD6eZPKzu4nPxmY1nZrCC2FikGu3qonC3s2', 'genetmamo@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:29', NULL, 'default.jpg'),
+(4217, 'genet538', '$2y$10$/aJPnyJ42Yl0JXQ5LcfwM.UlWY5TIR/Jkhrx6pnIwxKixqCCs7xca', 'genetoumer1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:29', NULL, 'default.jpg'),
+(4218, 'genet589', '$2y$10$W4cDfJoTq6/px1UAdYD9mO6Duz/spIygctn6sCS6djcQ89K7BprkK', 'genetoumer2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:30', NULL, 'default.jpg'),
+(4219, 'genet664', '$2y$10$P.xWOxtCB2QkCPmBzyhgN.en4nCfZu7BBFUE5MZb236CjOfPLjXru', 'genetwudase@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:30', NULL, 'default.jpg'),
+(4220, 'genet670', '$2y$10$BV3UcjVI4UXTkcdbEUweDeXcu5B.0AgSSK6QBqPpOJiAo9gC.MGF.', 'genettsegaye@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:30', NULL, 'default.jpg'),
+(4221, 'genet708', '$2y$10$yckFge7B6YhboxiHmW2EdOif3Da.vD0jE.gkXuy1KVo4DQB0UT.v6', 'genetnigussie1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:31', NULL, 'default.jpg'),
+(4222, 'genet736', '$2y$10$Yjn1yP22nIfamUfsZJPTd.VfAPZa.myhDn4ekbmVHVzNt3JMc2dqq', 'genetsisay@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:31', NULL, 'default.jpg'),
+(4223, 'genet76', '$2y$10$6LYlgKysnknTNNJflRyfnul8F.Rz3mgob/Ee6DaAMAn9rDU98nQoa', 'genetkebede1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:31', NULL, 'default.jpg'),
+(4224, 'genet763', '$2y$10$RtjbIpxZVX4aOla2OgVq9eVQSqRRwBl2.IlBGuJOS2PhyTgKDUsey', 'genethaben@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:31', NULL, 'default.jpg'),
+(4225, 'genet783', '$2y$10$NUnUj49ZEu/tJzjNvnFxLuB9Uxz.Qf3jcKWoC.c6NKT.14Vy3aldG', 'genetkebede@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:31', NULL, 'default.jpg'),
+(4226, 'genet920', '$2y$10$cXCmc9lBlxZQRz1omnQcXu6/RVlOpDkeBT.LuiPZkSR5NwRp39rDC', 'genetpetros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:32', NULL, 'default.jpg'),
+(4227, 'genet932', '$2y$10$cWjHM8N3kRZGZ3dKbfBACuFTx1mbb7AzbTWSyPEOzAFDLeJ9lYs7.', 'genetzewdie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:32', NULL, 'default.jpg'),
+(4228, 'girma1202', '$2y$10$FufhQ8VCyIgNb7YljQRu0OJMiJzYaXd4JUHcRiz1T/vFOprX813Lq', 'girmabisrat@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:32', NULL, 'default.jpg'),
+(4229, 'girma1325', '$2y$10$cr9/0LPmGGZDysKgQFPRRuEecfBuCtGg6cfIh6O2aU2KypaXEZ6.G', 'girmahaben@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:32', NULL, 'default.jpg'),
+(4230, 'girma1408', '$2y$10$jGC/V3eTamESaW/97yB01uAz/eCO9iYkgBxSzigAaprZ0K9jNLXXW', 'girmaselam@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:33', NULL, 'default.jpg'),
+(4231, 'girma1495', '$2y$10$hQuLzetsAdMJzTVxpJZb/uB5lgKIHTuHEEnOnvfA3CE.tE6x1eNY.', 'girmadagnachew1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:33', NULL, 'default.jpg'),
+(4232, 'girma1564', '$2y$10$pokPmw9mCy0k0GFPFI1jveiBT2d2SOX/wxuMJUycXgQgunEvTKBt.', 'girmagenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:33', NULL, 'default.jpg'),
+(4233, 'girma1568', '$2y$10$YtzVUiFTb18aT81tv/X.z.F9dk3vF97aQPQ4cXsqNbaqBeG/1zdDS', 'girmaoumer@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:33', NULL, 'default.jpg'),
+(4234, 'girma1636', '$2y$10$inLlpMjQc3LyW8E7YpCIZuyPJTtZr42jfoANj8oT2T2mk5uEZkLze', 'girmanigussie@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:34', NULL, 'default.jpg'),
+(4235, 'girma1661', '$2y$10$P8eD8HSslwxMftHYKA9rjuxiQaoNxIoEwSCAT8bXRYeJuT8gz8NfS', 'girmakifle1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:34', NULL, 'default.jpg'),
+(4236, 'girma1869', '$2y$10$J.M2vY5jIya5V/Myo1hQDusKKxYMBlIEahfUlIuDHjtxoQJPTs3vS', 'girmaeyerus1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:34', NULL, 'default.jpg'),
+(4237, 'girma194', '$2y$10$eIQQl71KvRahdXwBneikQOShejTE6UBdgLC.qVRjopShdmlvvVyh.', 'girmafikru@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:34', NULL, 'default.jpg'),
+(4238, 'girma1950', '$2y$10$UUzEHVm24htTDS4yV/.bp.M868/dvOZ9xiAErQRkPtqQulc5bl8su', 'girmabereket@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:35', NULL, 'default.jpg');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `active`, `created_at`, `last_login`, `avatar`) VALUES
+(4239, 'girma1978', '$2y$10$zfsOj83vkTBl/LmnlDkMH.s8JwZ5CdJfwmEJxZD6r8FOgnxfjxoIq', 'girmaendale@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:35', NULL, 'default.jpg'),
+(4240, 'girma2083', '$2y$10$8/PnW9UCsXT.YqfpgQYH4uPdpf56zoMiFUP073AodJd148JCrkJEW', 'girmashimelis1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:35', NULL, 'default.jpg'),
+(4241, 'girma209', '$2y$10$r3d8UDGLDDip4lj7WilE1uYzP78WN9L12/ueOriZAM62udMj0mDja', 'girmagebremedhin1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:35', NULL, 'default.jpg'),
+(4242, 'girma2115', '$2y$10$gOzS2hQKRru2HFrNj7FiYO.icauNNVOgcDtrZERpc5by/AHDl/Z9G', 'girmaadmasu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:36', NULL, 'default.jpg'),
+(4243, 'girma2125', '$2y$10$0UrsmfEVoqAaSutxFPvCwO5RirBUJv3WNxRNL7bgheUqMl4/XGQOe', 'girmaqes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:36', NULL, 'default.jpg'),
+(4244, 'girma2152', '$2y$10$VyoJ9LpSeyG1mBSMJls9OuKg/5GFecTPb8mB6pBqK4xNGYqEoXw0q', 'girmahassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:36', NULL, 'default.jpg'),
+(4245, 'girma2195', '$2y$10$DpYDnm4t/zy.buIcwa8gbO7mgefkTPjN6WnaPZRwKJUq4bXfOGcaS', 'girmafikru1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:36', NULL, 'default.jpg'),
+(4246, 'girma2237', '$2y$10$bxYsehWlYUof70xmCDRf2OQcvR4EB6YJFpY4UJxeaADwv6/jETWm2', 'girmayohannes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:36', NULL, 'default.jpg'),
+(4247, 'girma2260', '$2y$10$fS4oJq/64jw.X/VgDcfAuef.iSHKZOW.yPmmWo7NUjm.Zuhcu1Tw2', 'girmaredda@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:37', NULL, 'default.jpg'),
+(4248, 'girma2331', '$2y$10$WEZtteWTNdOkXqiMeR2en.iA50XcqhAOYIgRBPpU2pqv0qoGX8VZC', 'girmaendale1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:37', NULL, 'default.jpg'),
+(4249, 'girma239', '$2y$10$RqBp82PEm0f4hdbu3jV7cem4.R8o/QIZK9kUiJRp9UGGDtw6/oA1m', 'girmaworku@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:37', NULL, 'default.jpg'),
+(4250, 'girma2412', '$2y$10$DA1zreKSkCJppVL22uVWy.c6hnKdVw1X.4r9BH6cMzVDZy4Hq2YXi', 'girmaabebe@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:38', NULL, 'default.jpg'),
+(4251, 'girma2491', '$2y$10$GV6J8ddT4BC9tmTpfqU3UOsezw1/MkWqp77keS6CgQTtNSYtC4XT2', 'girmagenet1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:38', NULL, 'default.jpg'),
+(4252, 'girma2622', '$2y$10$92DBb3MZWpTheC3TXBUpouElKDeUH6snCo3uJSYpVp.N42Krp3dmO', 'girmademissie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:38', NULL, 'default.jpg'),
+(4253, 'girma2627', '$2y$10$Z7luynDzYz7ePGsEONG/Iul.SufXmxey2E1e5l2xYINUs5Q6aJrVO', 'girmacherinet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:38', NULL, 'default.jpg'),
+(4254, 'girma2644', '$2y$10$V5UWCIpEN7AHmqCQ3UuVWe.qgHHCaKQD.97/8YjIZAB2nqwglFawO', 'girmahagos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:39', NULL, 'default.jpg'),
+(4255, 'girma2670', '$2y$10$ngBXcUl72JYD9.frnyRWs.IO3XN1qilxdjK4fb4uZ37DHzTkznXmm', 'girmatekle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:39', NULL, 'default.jpg'),
+(4256, 'girma2705', '$2y$10$C9qljMUK88aU1X1XiYj/lOUwa/WuyxEucKZSqSGUlBnop6Z3zqDuC', 'girmazewdie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:39', NULL, 'default.jpg'),
+(4257, 'girma2708', '$2y$10$nMSaqjb2RKNmk1k9zH9HVe968C10f5izGWqIZRf0Y/2b4nNSESyQ6', 'girmaaleme@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:39', NULL, 'default.jpg'),
+(4258, 'girma2757', '$2y$10$UbeCYunCJlT0Qcx7P0mwvOpwRj2AS0UIqFmAKC4Of8C7.rX/zANx.', 'girmaaleme1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:40', NULL, 'default.jpg'),
+(4259, 'girma2761', '$2y$10$8MDujcZtL5Egk5a3Vli0sOatxKsNf7LLPWrsuROqGz8nAeqF9QV4y', 'girmaabebe1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:40', NULL, 'default.jpg'),
+(4260, 'girma348', '$2y$10$AfBEM40k/flTfJsSYoBt6eE53A1i1XKaXcYvVOFfwzMhnNmYuMKDi', 'girmadagnachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:40', NULL, 'default.jpg'),
+(4261, 'girma41', '$2y$10$qkcSb0ukGCZlOF5Ra4r0/uQkKMLySHwBpnP6srMPkBcdOGMfzSZKm', 'girmademissie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:40', NULL, 'default.jpg'),
+(4262, 'girma490', '$2y$10$WlvWxlzUDIHwCtQGNtwZYONJFvaRyXcTicMKSaANuPMbeIZU9gft2', 'girmashimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:40', NULL, 'default.jpg'),
+(4263, 'girma495', '$2y$10$8x.JeTxNZV9nR2EDPhKXz.6JbqzqGKkEsT3BwGpvIgX.rbkRXVaZi', 'girmatadesse@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:41', NULL, 'default.jpg'),
+(4264, 'girma583', '$2y$10$vOGZJJuQSDSmcA.mrIT6Eu/gaAwrSZKO1TaqQv8ChSUX.VBx7HKYG', 'girmaworku1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:41', NULL, 'default.jpg'),
+(4265, 'girma606', '$2y$10$Caxm813RXMIamTX0.5ftJuQJNAvXB8ehcS19RHHZoThqwhfaBfcTm', 'girmademissie2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:41', NULL, 'default.jpg'),
+(4266, 'girma673', '$2y$10$uNWEUwZBjWkhG5rJo02S9.ALQe.hEWs/JFzpQjMN/Hb7YqA5fBGXS', 'girmagebremedhin@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:42', NULL, 'default.jpg'),
+(4267, 'girma687', '$2y$10$IyAT.mPGD709xUps/nMkpu2fm1BZi5lr/DjpZq6nWBa46k0FBUQES', 'girmaeyerus@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:42', NULL, 'default.jpg'),
+(4268, 'girma775', '$2y$10$0lfxbHms3EISgo0qqboL9O/QOq.MrOw/DHF26zGPBKgdDR.xFCXNi', 'girmamohammed@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:42', NULL, 'default.jpg'),
+(4269, 'girma837', '$2y$10$I.EEQLUzT.V7ezOzI9FNQu1xiOB2B.Xg3toNo5AwSgD6YGOtMdD16', 'girmawudase@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:42', NULL, 'default.jpg'),
+(4270, 'girma85', '$2y$10$tGA9HNQryVgIXALHUROsiOgzTky09zj20bayffOBM8KhTUr4sCqc6', 'girmabekele@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:43', NULL, 'default.jpg'),
+(4271, 'girma866', '$2y$10$doNkiA2P5EHWGT0cGkxpye30lYMPkWhK4DZ87koqtheXpaH78y9jq', 'girmaali@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:43', NULL, 'default.jpg'),
+(4272, 'girma873', '$2y$10$K/ACVz7eiFQzrcnxf874NuRsSaqMYpOZlJXU5feJwB0RsftRuapXa', 'girmahassan1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:43', NULL, 'default.jpg'),
+(4273, 'girma882', '$2y$10$z8dzH.WG/vnRjbJDfJbiwOPH.avtJCvSzbqpeel7qAPLSfr242xIy', 'girmamekonnen@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:43', NULL, 'default.jpg'),
+(4274, 'girma945', '$2y$10$gmzE8JqQ3UBjFcgkjNVt1OGe1f5E6DkKXdLvKVfCmTgAAO2Ui/.1e', 'girmakifle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:44', NULL, 'default.jpg'),
+(4275, 'girma96', '$2y$10$wUbOAGHoH6h/XoWDuIEZB.upf7tK3Qo9ba4aZQouzdBWQa4QRMc6q', 'girmaassefa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:44', NULL, 'default.jpg'),
+(4276, 'girma973', '$2y$10$rT712WBYAjJqFfENb.oupezEo5hrMV270Q8GA.RtCIllf8Qg5if.i', 'girmagetachew@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:44', NULL, 'default.jpg'),
+(4277, 'haben1027', '$2y$10$9.IxufgVFeXylZjfwJ5lL.tmyfy/g1hYY9aEfGU937eFecgeU4.DK', 'habenkassa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:44', NULL, 'default.jpg'),
+(4278, 'haben1037', '$2y$10$pz7p/9LQ3086P.sg.oiZu.tH4e67Gq9ahBSnOgOVE4emJKWZSVNUO', 'habenendale@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:45', NULL, 'default.jpg'),
+(4279, 'haben1044', '$2y$10$CWNfT2H9VebYinrYly6WpuPYHMiyi2DkSqgw4ihMSOU0PGsHC.kHS', 'habengebremedhin@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:45', NULL, 'default.jpg'),
+(4280, 'haben1060', '$2y$10$JnpHHx2m1M/lIy1PZCnjgOuMiZ3q1T21oHbppykzqt0smH1kE69o6', 'habenaleme@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:45', NULL, 'default.jpg'),
+(4281, 'haben1091', '$2y$10$ZClpGyiC/pam2oCAAwVc2.U5xps5nPhRhXvk.snK/J2hYdEV8UXUS', 'habengirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:45', NULL, 'default.jpg'),
+(4282, 'haben1096', '$2y$10$amcEkbYt1VZJaVO4TJvy/Obfu9gIuQuhIDFuirp1OfdwxIFbXNt/a', 'habennardos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:46', NULL, 'default.jpg'),
+(4283, 'haben1141', '$2y$10$Um0q.vjgeHQyqHGndrKl4uuQl.wQ.hqvNCyzpNMuSoDVWFn9jSNeq', 'habengizaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:46', NULL, 'default.jpg'),
+(4284, 'haben1163', '$2y$10$SC8mDC0YlmJWUkW4Y7un5eC1L8PGa3qukiW6bt6etQBJHzFZNyrZ6', 'habenmohammed@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:46', NULL, 'default.jpg'),
+(4285, 'haben1353', '$2y$10$OHhXgK1D.eOCwoglLJHnfeGo8HD0EWUx5QdgRPbtmW.nlt9zJ65IO', 'habenmamo1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:46', NULL, 'default.jpg'),
+(4286, 'haben1423', '$2y$10$rKz4xcerjfDZjX/BPJgDpuHQQt5n0eWuQ5EHaRqaBQWwS9ahuGAMG', 'habenaleme1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:47', NULL, 'default.jpg'),
+(4287, 'haben1521', '$2y$10$kONh4La24AXCy9IRY4MzUO34/Jw44axbzD7fV2fWKg3m3Mk6YRDE2', 'habenendale1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:47', NULL, 'default.jpg'),
+(4288, 'haben1580', '$2y$10$U9B6fx8DfO59ZvPuV2RTv.jj2yeRB2G/OugnWIIrXq2spgnU02yjy', 'habeneyerus@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:47', NULL, 'default.jpg'),
+(4289, 'haben1585', '$2y$10$YF7tE.cpuoFXtJncdaWuSeIw2suqPaM.MRVCkDG2JSSvB3FnoTvuO', 'habenfisseha@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:47', NULL, 'default.jpg'),
+(4290, 'haben1652', '$2y$10$Wy1lQhFAY1GXe4bifC4LJeAXgdPcTHkCRZyCXhQ0LZZR3Jsn7jbbS', 'habengenet1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:48', NULL, 'default.jpg'),
+(4291, 'haben1714', '$2y$10$c9gTmbuGEpG1V9qF5UDwluXP0wQTJBbs8K8Qh.nRLzIaQbFoK1AJO', 'habennegash@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:48', NULL, 'default.jpg'),
+(4292, 'haben1718', '$2y$10$4Hgiv0kwjWrwyq/ilbKZmuf4AH2/hYtEvbn7Zg1xPbD4W58w/0A3.', 'habentekle1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:48', NULL, 'default.jpg'),
+(4293, 'haben1733', '$2y$10$x6kiAJESxzMcls88IxCGb./.TLqCzVhcgENrpmz2/j6GTQn.jVlle', 'habendagnachew1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:48', NULL, 'default.jpg'),
+(4294, 'haben1913', '$2y$10$NpE1YnopSgtKaeEX4gpVxOa3nkZdUPicWLNmz/1qgetm.GfXitrQ6', 'habenpetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:49', NULL, 'default.jpg'),
+(4295, 'haben2005', '$2y$10$Sqx9wXMoIBx4RxSxzgRmqe16yqKOED66rnWLdj/ay.M1N.tKU7Cfe', 'habenqes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:49', NULL, 'default.jpg'),
+(4296, 'haben2024', '$2y$10$VyCWSJmPykxAonJO.EkVMu1J9rzHVjLANT6GdMOsu8MiEjdF87NKq', 'habeneyerus2@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:49', NULL, 'default.jpg'),
+(4297, 'haben203', '$2y$10$RO1c8zRN4fnmcJp7sYClw..Gbj27hiTcK9GS7OGnfHcjZqC5xEXTS', 'habenoumer@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:49', NULL, 'default.jpg'),
+(4298, 'haben2073', '$2y$10$HKvrCCtIPsC2K4m.kdUnueL.OaX8V8Ex3hPbz1x3rjoNHdo5pX62S', 'habenmekonnen@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:50', NULL, 'default.jpg'),
+(4299, 'haben209', '$2y$10$FUl6N91HlZzH8pHJ9CcIcu.wnpHOQGYpJw6rZzkUiTrHFcS3AlYue', 'habenabebe@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:50', NULL, 'default.jpg'),
+(4300, 'haben2103', '$2y$10$nSWUNU/wfM6mToWbDuo.Tuk0w9Yagm5OwSAJkKnoQh6SOpOwEGOWu', 'habenredda@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:50', NULL, 'default.jpg'),
+(4301, 'haben2176', '$2y$10$j2X3B0sHjJeM4cKhgD5Txe2qj2sca9J7AbvLJBUY1QmEoUgZ/WBBC', 'habenbereket1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:50', NULL, 'default.jpg'),
+(4302, 'haben2224', '$2y$10$qVM8v5.G6V9qStFpJSuWie.QU.AtG7bR4aXz.huywYSVP1FhfwK2W', 'habenselam@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:51', NULL, 'default.jpg'),
+(4303, 'haben2246', '$2y$10$oKRQCYFEC6wq4PeW01sKheiQOMWcl4suJvqjzexzi.bC8poxJjaNi', 'habenbereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:51', NULL, 'default.jpg'),
+(4304, 'haben2301', '$2y$10$bJOESTfnaus/bd4YiD4Y/.B9bj/K.qz7JZaeYXuK7f9CHFBWmTZCO', 'habenmulugeta@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:51', NULL, 'default.jpg'),
+(4305, 'haben2345', '$2y$10$GpDg/49uO3vP2r7/BxpLkOygpUanzyUlqgpRfReGsvlbTFCrPVrBG', 'habenshimelis2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:51', NULL, 'default.jpg'),
+(4306, 'haben2538', '$2y$10$Ni8GMucxFKz0VvK0a8Ctde1duBCnM3jJuSB/2Li24qQXqYnZ/GbRa', 'habenhaben@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:52', NULL, 'default.jpg'),
+(4307, 'haben2606', '$2y$10$bsHXnlnV8N0xX1escgOsAeAYfL1Tud9P/NTE1z94BaiyBN37V6jii', 'habenassefa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:52', NULL, 'default.jpg'),
+(4308, 'haben2626', '$2y$10$55GRKdNJBUAFcebpAZEJmOJMqdgX7mdfC9nLkysUe0n6U3BQWMzhu', 'habengenet2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:52', NULL, 'default.jpg'),
+(4309, 'haben2662', '$2y$10$01Hfns/TqtWumhuJvYN0CuViKtMC674oo14k1FHoOH.TOqYBtkj4W', 'habenshimelis1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:53', NULL, 'default.jpg'),
+(4310, 'haben2766', '$2y$10$BNW2aW8TJMZOzGWUs6GDz.W7vlp5M3q0gPhjCYjsiwLGFKD5QhKHK', 'habendagnachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:53', NULL, 'default.jpg'),
+(4311, 'haben2807', '$2y$10$bCLu7n1InkRKiteHMLSPzOLFToKEiSGHnipuZ/XCgquONAHPs2ngC', 'habenshimelis3@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:53', NULL, 'default.jpg'),
+(4312, 'haben2817', '$2y$10$xkgZmTq7MNQPE7h1IpDBmOD70aAllOmtfyVa8viPjvKbHDgFU.6Me', 'habenkifle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:53', NULL, 'default.jpg'),
+(4313, 'haben2858', '$2y$10$YUs6K7uXVfurj.7eXZQnzuh/UjBE5bP6hHnHtvWZ8bzmIiw4n3HMO', 'habenaleme2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:54', NULL, 'default.jpg'),
+(4314, 'haben2937', '$2y$10$EO3HOFzcgWBWF0MulpavCOltNnPcF/J5LJf4P1AfREQgHOYHfpeAy', 'habengenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:54', NULL, 'default.jpg'),
+(4315, 'haben357', '$2y$10$KtNGMvgZiozUdO08KJCdJ.mbmNvnwJt05vR4ptTHGJ/qwgIf5iaE6', 'habensisay@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:54', NULL, 'default.jpg'),
+(4316, 'haben472', '$2y$10$DUKd9l9KsLBFpX6xb0zEMOJcxs1BKZQAEgyTsO.wNuwJumalRbI3.', 'habenshimelis@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:54', NULL, 'default.jpg'),
+(4317, 'haben50', '$2y$10$347Yx3zKCu97ot/3N2oOte9z2fusY2jL1MnOMsiT377pgJ2hbY4TC', 'habenkebede@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:55', NULL, 'default.jpg'),
+(4318, 'haben505', '$2y$10$hZLITVVGisZiTUAc1sZG1.7GgCXo/5CgcRa3unEcBw//NTZQ8hZMm', 'habenwolde@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:55', NULL, 'default.jpg'),
+(4319, 'haben507', '$2y$10$efrjgywAAh.hBt.kFjt/6eNRe.PrS7Lrsgpd6vRweTrP3iZudokIm', 'habeneyerus1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:55', NULL, 'default.jpg'),
+(4320, 'haben627', '$2y$10$2Jx3SLb7feHk62V/xwB7ROKr/0hNAd6kbYJvO17v6149QeiGkbKCq', 'habenali@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:56', NULL, 'default.jpg'),
+(4321, 'haben716', '$2y$10$BGmUFMyKRzKY9SPH124iM.Xo5zg2oZbmm0qvyM6Hz5eX7UpiH1JQC', 'habenbekele@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:56', NULL, 'default.jpg'),
+(4322, 'haben814', '$2y$10$/LSo3GCBDJEu7zsq3107KO9TIFZ4sx4BPvF.uRbOBuHfUMZ3iytfy', 'habenmamo@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:56', NULL, 'default.jpg'),
+(4323, 'haben904', '$2y$10$RbN7JYMevtelUN18oMNt9OjiWAG.E6SRUsFny9oapMp2HS2EhKw5W', 'habenfikru@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:56', NULL, 'default.jpg'),
+(4324, 'haben907', '$2y$10$1vsq0xkSt6ZXGv0hk1tdFux7VIwAaJZpZ8E5BI13EUyPIp6YVtjGO', 'habentekle@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:57', NULL, 'default.jpg'),
+(4325, 'haben911', '$2y$10$CmAPSZAx.Eul8W6o.beaxut.fMax18tK/tr5.PBVl8ehOLs7ZVbdK', 'habenibrahim@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:57', NULL, 'default.jpg'),
+(4326, 'haben987', '$2y$10$rjO2Juxdo3xH7CzJvISwyeuMP4cLxsc0EEqwuObHd4E4MU9HOzFda', 'habenworku@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:57', NULL, 'default.jpg'),
+(4327, 'hailu1013', '$2y$10$EQRjYJO4LV2F.62UD1xB0.8Ieo3uIL5Cucoh3/XOeToWIN4.SIKPO', 'hailuzerihun@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:57', NULL, 'default.jpg'),
+(4328, 'hailu1015', '$2y$10$hxLeRiqpmeq7T9tt485X7ejzX9Xh5zhP/s/XwckyEUZSOuTI4I8re', 'hailueyerus1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:57', NULL, 'default.jpg'),
+(4329, 'hailu1050', '$2y$10$okH2q/3DVz2c3llU4.d5DuNh3JR/IdZXQl4PeffzCCNUMJJVfne3u', 'hailunardos@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:58', NULL, 'default.jpg'),
+(4330, 'hailu1121', '$2y$10$7m1kvujoFG8UfaUGrblRtuFqaR.r8KBqh4p1siNrmtP/LWB/WzBwu', 'hailudawite1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:58', NULL, 'default.jpg'),
+(4331, 'hailu1144', '$2y$10$oYfB.M2idaVa3sWpAbxGnulgChwZlnGIS9.O7dTPjigH6B2fhgymi', 'hailutekle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:58', NULL, 'default.jpg'),
+(4332, 'hailu1251', '$2y$10$BMbjrowI8stifmUHtcA2Uu6IhzwoajD1nWQjL0ykwXQjeilIFJ3ai', 'hailuali@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:58', NULL, 'default.jpg'),
+(4333, 'hailu1284', '$2y$10$c7.Fw6KSZ50qDGVpz01pFuwPHW0N/3TLt4UDW0bMhDROLX8lzpHgG', 'hailumamo1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:49:59', NULL, 'default.jpg'),
+(4334, 'hailu1368', '$2y$10$aMnbkpk1sH/QWZduAOqqfO4vLZET9XAv8DXD1/1slRn5kM.XT2RT2', 'hailunigussie1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:59', NULL, 'default.jpg'),
+(4335, 'hailu1480', '$2y$10$SZL3WK3/GtTlnbKkswbBleXdpqn2wuEq2ZmBLkVyO6fH69AsFZeCG', 'hailutesfaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:49:59', NULL, 'default.jpg'),
+(4336, 'hailu1569', '$2y$10$vjDPaxUnBkP/7Ad20n6Pme0X2kdrahuJzelj3JtrPM.5ywfBhh2c2', 'hailubereket1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:49:59', NULL, 'default.jpg'),
+(4337, 'hailu1648', '$2y$10$KUO0MNQ/ItqtVLGbbENtyeb5gwZA2PfchUpmoNtc96xisWTJ5Ak72', 'hailufisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:00', NULL, 'default.jpg'),
+(4338, 'hailu1656', '$2y$10$Y23lrnA98UAKEc5pxvV5SOdJiYIYdMC.WNp6o30sbr.pOWiGEhBwC', 'hailuhassan1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:00', NULL, 'default.jpg'),
+(4339, 'hailu1681', '$2y$10$8WWhJrTHhZnJP5HXIQwFq.Ec/ZcTHOHVefE7IBrul/f5OYwKMEm1u', 'hailunardos1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:00', NULL, 'default.jpg'),
+(4340, 'hailu1763', '$2y$10$kYzcdyoSmpyoD43/B4SgROc9mAXvZ1gLk4uUmxCooOTAvFrEkOk1e', 'hailugirma@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:00', NULL, 'default.jpg'),
+(4341, 'hailu192', '$2y$10$1764rHmwam6sBUEZFCgKE.F5n1inkuM.9CTG8hxf9uUBdx.qiqLZm', 'hailumulugeta1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:01', NULL, 'default.jpg'),
+(4342, 'hailu1921', '$2y$10$JHN/Nw0QZMH6HD6lgheHAusQ4Mmea0.Zt66e3JpEr6bJd8Mig8tPC', 'hailugizaw1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:01', NULL, 'default.jpg'),
+(4343, 'hailu1935', '$2y$10$wm2PSRYJ8OY2lB4Qi9EpveAT91mjHvYL7qiXeA7E4YWfU60D9P6Ci', 'hailuzerihun2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:01', NULL, 'default.jpg'),
+(4344, 'hailu1960', '$2y$10$1Jq5XVZcrgjY7NabBJ3SlONj7zr7vB5SzRdp8jVf9scSw6FqiTj6y', 'hailuliya@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:01', NULL, 'default.jpg'),
+(4345, 'hailu1994', '$2y$10$QzUHKJXTHL8szbopjyrP/.rNbSIr0l.r0AEwZKxV0X35wdhVlCr6y', 'hailugenet@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:02', NULL, 'default.jpg'),
+(4346, 'hailu2093', '$2y$10$gsNRLcSCMBhf99qo4ta/SOK/hWDXBDVFRuSdMi3OYMAH3UQuIvDia', 'hailukassa@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:02', NULL, 'default.jpg'),
+(4347, 'hailu2185', '$2y$10$vQ.BjroBV.u2M.mtcPbcPOOtS0ckes6ZY7ZH1.uVn25S9EYBvaOxm', 'hailuwudase1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:03', NULL, 'default.jpg'),
+(4348, 'hailu2247', '$2y$10$/Vo4vJ0pChY3FJIROR2IgO1/4S5unlkBbDkuLl3tdHBMg4lUr3usm', 'hailuselam2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:03', NULL, 'default.jpg'),
+(4349, 'hailu2255', '$2y$10$FdXWjwFi1Cv5QsvZ9OTfcOgajKOPEydkK/KZHAHKGDkkAbOsdywq2', 'hailumekonnen1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:04', NULL, 'default.jpg'),
+(4350, 'hailu2258', '$2y$10$Szp0rIlz4hlMjdl/WAtKo.2A9canuFGrJ3kZfZWLtXPnn/9DWvs/m', 'hailunigussie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:04', NULL, 'default.jpg'),
+(4351, 'hailu2417', '$2y$10$5vqWugO8nTClT3pIpbF3cuE1q2CRaHn3UOrIazkdccZxRTemIM18S', 'hailuoumer1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:05', NULL, 'default.jpg'),
+(4352, 'hailu244', '$2y$10$JXC7cCVneE2fImX/eyP.i.dADWQfBhASmmCXHSq5wqnkEZ14mHO22', 'hailuqes1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:05', NULL, 'default.jpg'),
+(4353, 'hailu2601', '$2y$10$YmNEjDv0lreHj7hsKBs.yez0.glDTcDh8Fwn4y.ABXoE42sIslEYe', 'hailuredda@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:05', NULL, 'default.jpg'),
+(4354, 'hailu2628', '$2y$10$hk2yxiOOYCtBS6SXDNYfIO6Y7FghRzR63n/AvkHjEt6jHIvEgcV6K', 'hailukebede@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:05', NULL, 'default.jpg'),
+(4355, 'hailu2640', '$2y$10$uxeCgORSadtpjRj0pQebze1eJZA7ZPqGcUSQejktXrvqLOYgLENaO', 'hailuselam@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:06', NULL, 'default.jpg'),
+(4356, 'hailu2672', '$2y$10$wFmDDaKu2sY1Ql/smjuc/uxokIgF5DJLzhwV2DPUoBMR2Jkkmb6nm', 'hailuabebe@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:06', NULL, 'default.jpg'),
+(4357, 'hailu2689', '$2y$10$z1tYvrgpznmAkqgPaMwj.ep2F.U/gqObUv2YDbtfXKNNvWe2CSPka', 'hailuadmasu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:06', NULL, 'default.jpg'),
+(4358, 'hailu2717', '$2y$10$7ngioo/AZiPMeYn2/bx.b.QnRKpR2xpaasfV.GeDIPplW0KCzID/K', 'hailugizaw2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:06', NULL, 'default.jpg'),
+(4359, 'hailu2770', '$2y$10$UdWdLr5BomtfsWfTLBU30O.PNibn8hPQE4HT7S9ypfB8T4Hdi81OC', 'hailuselam1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:07', NULL, 'default.jpg'),
+(4360, 'hailu286', '$2y$10$aKXYxTSa6NXvgYQlN3fTrO/K0tSIxAY0GmOuuTAGqfDZcxbxBmLDS', 'hailudagnachew@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:07', NULL, 'default.jpg'),
+(4361, 'hailu2931', '$2y$10$QmUCZg4KMNyXtrV4Pw7i..AQ3Oy7bZtuMln6HC82z7clKg5bpnf.G', 'hailuhagos@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:07', NULL, 'default.jpg'),
+(4362, 'hailu2955', '$2y$10$wi46YBDTekDWpZlmQHqTBORpWTotsyGIsYP1REoK5q0lH22yuXx3W', 'hailuqes@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:07', NULL, 'default.jpg'),
+(4363, 'hailu2983', '$2y$10$P0XVxmHTbTCr2pHpCCUpJ.AQWnExV8sWuUZmXgTcPbfdAuCC8.cO.', 'hailugizaw@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:08', NULL, 'default.jpg'),
+(4364, 'hailu2985', '$2y$10$k8Tto8H94biDepCp0ACOuuxmq4oD0sE5rnIAueRjiMuPDtVRnGNvq', 'hailubereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:08', NULL, 'default.jpg'),
+(4365, 'hailu452', '$2y$10$9wdZzyKO0YDQ9vN32tkKk.9sPsdY1sDthizqr2Egf1fXZre6Z6Bzq', 'hailudawite@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:08', NULL, 'default.jpg'),
+(4366, 'hailu525', '$2y$10$zSaIWqbDJ8VtxLK0Jg99b..V6s40iH5YpcTUrmFtimz4md.mEajQG', 'hailumamo@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:08', NULL, 'default.jpg'),
+(4367, 'hailu526', '$2y$10$XdRoQBmYOe.QCAprtuqiNOXNIpHAHYBaCFlliEIep0Qa5vlQNgBvK', 'hailucherinet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:09', NULL, 'default.jpg'),
+(4368, 'hailu56', '$2y$10$aO3Ylr31ERWqKJ/WcYy3vernUST3KgBvUEGm/KK1CB.8FCsz/5hzC', 'hailukiros@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:09', NULL, 'default.jpg'),
+(4369, 'hailu570', '$2y$10$oTk8RFmvOhNi4h7HQ5xOjOO1p0niIe2r9Oq3ImkCwh3BriFEa4Yg6', 'hailumekonnen@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:09', NULL, 'default.jpg'),
+(4370, 'hailu593', '$2y$10$cWGkgJiwNzlvFUpLUCSQf.cqIzLJvi7ieAOU1dU.Di6mjRHRzk23m', 'hailuyohannes@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:09', NULL, 'default.jpg'),
+(4371, 'hailu598', '$2y$10$aMII4Pi2cEtW7fbnKJtA7ejORIUFXoqNMazvlmRtZxqghyKT3EUBK', 'hailuoumer@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:10', NULL, 'default.jpg'),
+(4372, 'hailu611', '$2y$10$wlC2rbbqK85NXLNbaJ5KIOIH.lUSVEco9ZgF/kdUMLc0en3n88Rb6', 'hailuhassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:10', NULL, 'default.jpg'),
+(4373, 'hailu650', '$2y$10$ci2ksld/UoqXA3.0.omD..ynESFb1lerCNss/DBvp8ekJ1O9Q1osi', 'hailueyerus@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:10', NULL, 'default.jpg'),
+(4374, 'hailu714', '$2y$10$lWIOZJ25f0lFY8Q3nbNJluXubuEYwULiukWao6NRlEoaVOd592YPW', 'hailuwudase@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:10', NULL, 'default.jpg'),
+(4375, 'hailu804', '$2y$10$wAYKPL2cZJwMGDPl92NpfeHrRcmyoA5I2aKMr9GG1fLrGhjpvfHqW', 'hailumulugeta@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:10', NULL, 'default.jpg'),
+(4376, 'hailu839', '$2y$10$m1LLumPS6ZxfZpk2ty/aNOAUUwMHEtizdJDehBtN3gp2DwrBOnnkq', 'hailuzerihun1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:11', NULL, 'default.jpg'),
+(4377, 'hailu879', '$2y$10$mytpwEJ94HXN8KcgSl9BReT5Cg9wTXmWoRaSI2ilNmJnb0/9mkogm', 'hailugizaw3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:11', NULL, 'default.jpg'),
+(4378, 'hailu893', '$2y$10$CjhLl89r6N834J1ijvIsuuE63ciZ/YZhEmulSa.15y.M6HEfbPqV.', 'hailualeme@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:11', NULL, 'default.jpg'),
+(4379, 'hailu946', '$2y$10$FL3Vb2cJf5C4wnO4I2iGm.j37ykXhrCmfrO9wGmrjnfPSIEafTlbG', 'hailushimelis@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:11', NULL, 'default.jpg'),
+(4380, 'hassan1044', '$2y$10$7Q3F7LEr/fBAaHLmI6btiumAsksGvDb25PS9t4ygmI2Shwyz97TOO', 'hassansisay@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:12', NULL, 'default.jpg'),
+(4381, 'hassan1049', '$2y$10$B1LfpjQNwDFhA6Z9o65f1eld896tyktmBuH6FhsbTMm5kuM0pRL3y', 'hassanbekele@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:12', NULL, 'default.jpg'),
+(4382, 'hassan1055', '$2y$10$MV4yUtc3aLMhdUKOIGlleOIVwrWoSEY9135LKUbX.GNCjrl9Rxg82', 'hassanadmasu1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:12', NULL, 'default.jpg'),
+(4383, 'hassan1150', '$2y$10$JpQjf3uq2a9mM7WHawlZ1.EkSwA4t3RO6EOnJeki9.XNj96UCebJe', 'hassanbereket1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:12', NULL, 'default.jpg'),
+(4384, 'hassan1177', '$2y$10$pARFTzCuCLN2rfJZNbjVXOQWDF8Sln7T30vol.Oci.41gMcOAM8vO', 'hassanadmasu@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:13', NULL, 'default.jpg'),
+(4385, 'hassan1212', '$2y$10$/jdiVHnoqwWkS.RNwnnk3OEl37201KNM27P89XHFN/nOqJjaepJlC', 'hassanhaben@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:13', NULL, 'default.jpg'),
+(4386, 'hassan1287', '$2y$10$Ihf1quuxiMEPLcehldCQYuG/BKW6PiqjI.x9WtxS./tEP.DoYOwAy', 'hassanbekele2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:13', NULL, 'default.jpg'),
+(4387, 'hassan1344', '$2y$10$FaSqgbxRvUjBpxSkfA49MOQttwQacdbKqllrX8R.OIk4qjfm8.l7m', 'hassanzelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:13', NULL, 'default.jpg'),
+(4388, 'hassan1424', '$2y$10$y6VSM5r2XbEAnbjDT1I98O/ax4Ic1VsKz7HSUvohRhKjLMjU0yp7K', 'hassanassefa@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:14', NULL, 'default.jpg'),
+(4389, 'hassan147', '$2y$10$dF8K4VM6vFuSREEeqHrEIueVATz93IXYS7MjtVMHSNkxXev.BluH.', 'hassangizaw1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:14', NULL, 'default.jpg'),
+(4390, 'hassan1520', '$2y$10$B37RIJDywCmOj.oZZMLUfuPdXMkF.Jgk8teKW1162X9s6DGG4Q/l.', 'hassandemissie@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:14', NULL, 'default.jpg'),
+(4391, 'hassan1547', '$2y$10$ktBgRUdbVgrx1QXEije47OwMoXUfeZtBE1PHIaLuHQs6zPja4RFO.', 'hassanpetros1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:14', NULL, 'default.jpg'),
+(4392, 'hassan1570', '$2y$10$dO3Qt76TgoreqMrJMNXBreaunfS3xRpNDtrNW1/IBoVq.BBBQ8NJ6', 'hassanliya@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:14', NULL, 'default.jpg'),
+(4393, 'hassan1582', '$2y$10$3zOAVnaTKruauhtpurCbcO0i0JYpUJhALlD2C5fPbfgKPlhSb8d9e', 'hassankiros3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:15', NULL, 'default.jpg'),
+(4394, 'hassan159', '$2y$10$pI4U0677VZjZpFqnKfOZUe42zlCafGelJRJvaNvpNnD3jd2iioyPq', 'hassangebremedhin@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:15', NULL, 'default.jpg'),
+(4395, 'hassan1605', '$2y$10$7.fmtVb/hcKLkY9HaQ62wODKwJiUVPzUieGNbXe93KjAdbTY4ki82', 'hassangenet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:15', NULL, 'default.jpg'),
+(4396, 'hassan1616', '$2y$10$hiS.cFTQuknlESWZGIhNC.u8dwSLe5qtPdrPuLC7SxZNuiGRsVmze', 'hassanmohammed@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:15', NULL, 'default.jpg'),
+(4397, 'hassan1628', '$2y$10$Bf4W6lXCbddxJDDbgQnP1O7Nbe3UJYj0UHfUZ.EUw7kI4UVwpSzBm', 'hassanwolde1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:16', NULL, 'default.jpg'),
+(4398, 'hassan172', '$2y$10$9A8LOCuoDVAd/QANYxxA1uLY6nq7TmtahKAXWYmm07t4j6oyZR6jm', 'hassanbekele1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:16', NULL, 'default.jpg'),
+(4399, 'hassan1763', '$2y$10$RAFyqKc5NgvPAWw5X0k7b.2vCdsaYuoqd2WYCrd77hb.QhzO2IH0i', 'hassanbisrat1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:16', NULL, 'default.jpg'),
+(4400, 'hassan1784', '$2y$10$URmfdSeYMgL1bxNf4j9UbeustWMr2FqCpiUpITguv4sngf1g46ziy', 'hassanwolde2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:16', NULL, 'default.jpg'),
+(4401, 'hassan1883', '$2y$10$.OwXaaDDKHl22erZSiCxSewEMAl.tjf0qoF.q2qX7NVg9wihWq65e', 'hassanhagos@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:16', NULL, 'default.jpg'),
+(4402, 'hassan1910', '$2y$10$/49SCDTCb4.jXnX1AA2Xge7pfWhxd7hJCgnqq5wyVm9GPS7tlKMg6', 'hassansisay2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:17', NULL, 'default.jpg'),
+(4403, 'hassan1938', '$2y$10$Y66HZwpqhDjOGCqw21e.4usEvr3ALg6YQFfoh9FCf5FQ9eb1wIHLS', 'hassanworku@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:17', NULL, 'default.jpg'),
+(4404, 'hassan1964', '$2y$10$Aj0KC3ymirq7/7m2Jp5b3e1GpuqhMqGKwTOwsPAKWOX4Cj3xLJwBS', 'hassanyohannes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:17', NULL, 'default.jpg'),
+(4405, 'hassan2049', '$2y$10$hP9M9FRY8.NYjkEfHVFHaemuUZFhwI1VoIi7el3J8ZTjZrx/1eVwK', 'hassanworku1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:17', NULL, 'default.jpg'),
+(4406, 'hassan2091', '$2y$10$QOUzYCwyUrmfAoyWoRCO4eY1wKBDQ0wnnJO6GB.fQrAmA7VfKQSsS', 'hassankassa@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:18', NULL, 'default.jpg'),
+(4407, 'hassan2104', '$2y$10$ZNhr.zYYu6jLqb7Ju/5G2usFSRIxSLCigSsVPfiVFVo41dBkuDMtO', 'hassangizaw@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:18', NULL, 'default.jpg'),
+(4408, 'hassan2110', '$2y$10$z/aUvTjYSRJSN2QB6BTc..ofyInKy8FJE4xTcr8wI7Pev/hvaBLI2', 'hassanmulugeta@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:18', NULL, 'default.jpg'),
+(4409, 'hassan2193', '$2y$10$8g71.iY3y7y6kXCpwrA/0ui2vC0KpTE2BKPNS3zQ5dXXYw2GJvwze', 'hassansisay1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:18', NULL, 'default.jpg'),
+(4410, 'hassan227', '$2y$10$4EQ2gG26Z3wJP/lkeOalxu4rUqe8qIVCzSOlD8tWtMj9QDMO.FB.e', 'hassanhassan@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:19', NULL, 'default.jpg'),
+(4411, 'hassan2286', '$2y$10$eUD61uhduqOajYCR8bvHmenq/KDpOwbElNMQEhEEyOgIl8whJMwCS', 'hassandemissie1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:19', NULL, 'default.jpg'),
+(4412, 'hassan2343', '$2y$10$Skanqei8P9PsRZSclA0m5.Gmynxg03H8EVN0wvVcl1BsqJaaPB6Q2', 'hassanqes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:19', NULL, 'default.jpg'),
+(4413, 'hassan2484', '$2y$10$s/0y5wwqymVW.0zUAAKU/.gfRtMtfB798qFtrVv6Z35RA6j0ZXp76', 'hassaneyerus@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:19', NULL, 'default.jpg'),
+(4414, 'hassan2522', '$2y$10$LxO14eHvY53HoZb7HpB5E.T5muLBXOfUoXxq64mPZoHl/AXHn1dO.', 'hassanfisseha1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:19', NULL, 'default.jpg'),
+(4415, 'hassan2530', '$2y$10$P4MY/Sz4OV8I06CBdDOCDekLkyKz4WDbGgJ4cBeI0uTJjqS3D2XES', 'hassaneyerus1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:20', NULL, 'default.jpg'),
+(4416, 'hassan2540', '$2y$10$ywX153ErOVFwQv5FQ5gufeategOIQrv6QBwEoP.Ab87qgN1SkjJUe', 'hassanbereket@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:20', NULL, 'default.jpg'),
+(4417, 'hassan2583', '$2y$10$3dgrl.IaVYcf//VwPElKSecfiP3Ghfg9MXVZj6LMs5/FckybtGoOW', 'hassanzelalem1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:20', NULL, 'default.jpg'),
+(4418, 'hassan2601', '$2y$10$6hA9sxI8WDGaQOoAP1JU3.9aLn7MgOejX/A52AjQsigFJY/myk8Vy', 'hassanpetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:20', NULL, 'default.jpg'),
+(4419, 'hassan2668', '$2y$10$kDxaACUpidRyaDG6MU.1uueJBIi3mlRhDskOwA2iuxfCDo8rTxHge', 'hassanbisrat@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:21', NULL, 'default.jpg'),
+(4420, 'hassan2770', '$2y$10$O.vbMBMeAdQDWVRMkeMgMuLXcyi3vUAqdvdQL4z.qZKFo4eaXsbxu', 'hassanhailu@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:21', NULL, 'default.jpg'),
+(4421, 'hassan2834', '$2y$10$1InyQ0Z.yjI1Kdrs6m6PBOL7TR6K9uoV4aomFbm149DpSNy4ZKqa6', 'hassanfisseha@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:21', NULL, 'default.jpg'),
+(4422, 'hassan2881', '$2y$10$qQH6s2yn/w9qqVPAgUP5vO10orOioE0CuuPpal3ypnQ3C41S/ywSS', 'hassandagnachew@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:21', NULL, 'default.jpg'),
+(4423, 'hassan2964', '$2y$10$Wykasn/wsPRULnObPtsHPeGGfmFdnDRpddZSL.nNEhAA.tvDfsAq.', 'hassanaleme@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:21', NULL, 'default.jpg'),
+(4424, 'hassan297', '$2y$10$ONtLkbpNoOyfCPPrKTkomOBnk4TAruBGJ1pE/Rbr9DVFJcm9Ix74u', 'hassantsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:22', NULL, 'default.jpg'),
+(4425, 'hassan2981', '$2y$10$EFpvELN13FwAvpUz5ZnAVuL0neB8Z3PRUX/fi9VAoSsJSjUUQ35XO', 'hassanbekele3@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:22', NULL, 'default.jpg'),
+(4426, 'hassan313', '$2y$10$P3LSjY2ZZEhljOaDyWdAauxL2ltfRaR.7TeVHXGc2hOMzowWByeXi', 'hassanmohammed1@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:22', NULL, 'default.jpg'),
+(4427, 'hassan321', '$2y$10$QRsC6a7XPmtpZh0Wqoq.E.3piPAmA7G6nhP27YQA0kbNAIgBI2EeK', 'hassantsegaye1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:22', NULL, 'default.jpg'),
+(4428, 'hassan383', '$2y$10$rY.A6hTHfuwm9nIWBMQ8dul8BbWGJxco.2v0zxWcvd2928mncFJvS', 'hassankiros1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:23', NULL, 'default.jpg'),
+(4429, 'hassan445', '$2y$10$tbYbonNyivXSzmESwZpjIeQUcVa6eZiAoUNkv0S/THwyFb9WD.ILi', 'hassankebede@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:23', NULL, 'default.jpg'),
+(4430, 'hassan642', '$2y$10$fcgCK7T4y5k6B1.t9V3jceisKpTL4CxQdZK2Wh/aMAB.1x0bIQVcS', 'hassantekle@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:23', NULL, 'default.jpg'),
+(4431, 'hassan682', '$2y$10$TdFLYuy1wFTKQ6q0502oEOU38jfT.6YPSf3kQMjHgfQbzjwOgpTTu', 'hassankiros2@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:23', NULL, 'default.jpg'),
+(4432, 'hassan866', '$2y$10$FPuA8nRAOfFqFOwO3x0wmexdCpE2x5lpBWLykDFUx2F.LjvRp1yK2', 'hassanoumer@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:24', NULL, 'default.jpg'),
+(4433, 'hassan915', '$2y$10$0R/egjPVp.z2GACDOL2/EuvofR1i81ayVRR7QP19PUK/BsdUqbGAO', 'hassanfikru@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:24', NULL, 'default.jpg'),
+(4434, 'hassan981', '$2y$10$MmFTQeB0ld6qnS.QsI5zJucnZQ4KYku4Tuu8Mn2o38D2X/goCSIA2', 'hassankiros@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:24', NULL, 'default.jpg'),
+(4435, 'ibrahim1000', '$2y$10$781HpE6h/eIHFixPdnHOVeiiADSQ0CDsQ92eGGKBCLhgr5Gpfn7MO', 'ibrahimpetros@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:24', NULL, 'default.jpg'),
+(4436, 'ibrahim1042', '$2y$10$KX5cOTJO6Bcr.lCVyvMd/Oy0Y0UztMOJWPwDeLvS5bwJuUATI/xR.', 'ibrahimkifle@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:25', NULL, 'default.jpg'),
+(4437, 'ibrahim1069', '$2y$10$nIrhXyQSrQRJBRFl.TTtgu4KWl9lFh3W6KB0ca4HcP81rf6Aza5cC', 'ibrahimredda@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:25', NULL, 'default.jpg'),
+(4438, 'ibrahim1084', '$2y$10$EfxMqpEzwkLxgzIaGhtz5OpH5zS6i7OwRAuqudu1RTK6/sRYNfR0C', 'ibrahimcherinet@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:25', NULL, 'default.jpg'),
+(4439, 'ibrahim1174', '$2y$10$EsN867yrYDHTTEO6pXW8i.lXRBd/u/imW2UY.LMb2NXANJBC.Yviq', 'ibrahimgetachew@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:25', NULL, 'default.jpg'),
+(4440, 'ibrahim1239', '$2y$10$mTL731aoe76RS5tTrwVhKOZG9YjC84ifupyjMIJ87yePxapEvjQ4.', 'ibrahimtekle1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:25', NULL, 'default.jpg'),
+(4441, 'ibrahim1241', '$2y$10$.o/2jlvtFPZWmlB8nS/9leR.zv60MtS45sfttC1otR.8onA4cnGnC', 'ibrahimdawite@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:26', NULL, 'default.jpg'),
+(4442, 'ibrahim1274', '$2y$10$2ckN5ThavfxVblWwlbdCN.6GNbvUpfM42R9C1mNY/DHlYmqbqAnIK', 'ibrahimzelalem@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:26', NULL, 'default.jpg'),
+(4443, 'ibrahim1332', '$2y$10$uL6bulZOgtISp.oCeTkSQOASvHx5tZ.9ubv/cRorBAPzyrvYy5jf6', 'ibrahimtsegaye@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:26', NULL, 'default.jpg'),
+(4444, 'ibrahim1346', '$2y$10$cW93uTl0nRZJsR2.QlzYXeeWNTdNHoz70FarcR6JRcagXY918AmPi', 'ibrahimkifle1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:26', NULL, 'default.jpg'),
+(4445, 'ibrahim1389', '$2y$10$Q46bXxokwBj1LTl9oUWN/e2PO68jiDel5K7UWoQQM.kLpdUk8Refu', 'ibrahimqes@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:27', NULL, 'default.jpg'),
+(4446, 'ibrahim1396', '$2y$10$Z/C4XIeI7.ZLd5kIFa1ih.ArjOgqmx7b2evNrqox6I1JCno1KU1eO', 'ibrahimhailu@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:27', NULL, 'default.jpg'),
+(4447, 'ibrahim143', '$2y$10$kmP8mLZa7JPCqizguuIyW.A6ZcIFBAYfjxyr.tt0Z2d8bM9h.U7S.', 'ibrahimkebede1@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:27', NULL, 'default.jpg'),
+(4448, 'ibrahim1440', '$2y$10$UNnKrUpDGs3diYq8ocObcuK2q5/zSEKEIByDeXpATAeSn4.AFz2Wy', 'ibrahimoumer@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:27', NULL, 'default.jpg'),
+(4449, 'ibrahim1457', '$2y$10$3EwODFZx0wlD0VqHDJ/6LOlbyHpDsXGQmfwOV8la2vvbDTDGNgGua', 'ibrahimtesfaye2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:28', NULL, 'default.jpg'),
+(4450, 'ibrahim1545', '$2y$10$jGKzsYRovsbs/CIfJsq5puUOVUmlnwaBECz3t8cucBGoTsOjc7/s.', 'ibrahimnigussie@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:28', NULL, 'default.jpg'),
+(4451, 'ibrahim1692', '$2y$10$AS53AOVvzivlh6WEcfGv1OhhDdazzGp/GuBMws5NlhdlIKbDHIB0i', 'ibrahimgenet@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:28', NULL, 'default.jpg'),
+(4452, 'ibrahim1696', '$2y$10$kzKwpEcfWXooZKMKgGtyLOhGLWxNg6IDi0M3hFhc7bztbhIkPguxO', 'ibrahimbisrat@gmail.com', NULL, NULL, 3, NULL, 1, '2025-04-23 15:50:28', NULL, 'default.jpg'),
+(4453, 'ibrahim1715', '$2y$10$54qc4LLFjPr9veegEzdkt.FrbzuMhcJt7pcnMfewgmjyijdGHVWHG', 'ibrahimwudase@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:28', NULL, 'default.jpg'),
+(4454, 'ibrahim1728', '$2y$10$odneLiuHlwCYH9ubFULyNuz/A04BDXw5Udwq7Q2xaRORHbHHCRnTm', 'ibrahimyohannes1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:29', NULL, 'default.jpg'),
+(4455, 'ibrahim1768', '$2y$10$Ttg9jNZ2rZAXyc6s.SvQC.gpBtvEAZIU/bW/z.IQ9kpTGxhH9vYjm', 'ibrahimmohammed@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:29', NULL, 'default.jpg'),
+(4456, 'ibrahim1776', '$2y$10$N3U6fN6V/MOX6oe0ZIOUdOCun7BDM.XLwfJl9Kr4qnW6qDvKpRzmi', 'ibrahimworku@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:29', NULL, 'default.jpg'),
+(4457, 'ibrahim1830', '$2y$10$IGMkaIABHpRgOQRDSzgRaOfm2wqrqWbacQj30H6nzF/T0jnHw7NVS', 'ibrahimtekle2@gmail.com', NULL, NULL, 2, NULL, 1, '2025-04-23 15:50:29', NULL, 'default.jpg'),
+(4458, 'ibrahim', '$2y$10$Djik3HGaTGfUIie2ZE4xq.FXCjQZs85AnoDnLRUc9z1FfNDRCNJle', 'ibrahimkebede@gmail.com', NULL, NULL, 2, '2025-04-24 07:01:39', 1, '2025-04-23 15:50:30', '2025-04-23 20:57:16', 'default.jpg'),
+(4459, 'ibrahim1888', '$2y$10$UKBF0AKXKUojqmLpi7mLq.6eyeljT3C8iSXIQperiVvePgGNttlCW', 'ibrahimbereket1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:30', NULL, 'default.jpg'),
+(4460, 'ibrahim2110', '$2y$10$cRj1QIEVSjtSoNKxSkxNn.MNdwqunpPrS5QvLYoKibUMFI06nmuu2', 'ibrahimqes1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:30', NULL, 'default.jpg'),
+(4461, 'ibrahim212', '$2y$10$lg9SSBqUXU9qasKjaIXqze.A3uAWi7EwFpF7eo8MrTTHcWxlLxfpm', 'ibrahimhailu1@gmail.com', NULL, NULL, 4, NULL, 1, '2025-04-23 15:50:30', NULL, 'default.jpg');
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `academic_terms`
---
-ALTER TABLE `academic_terms`
-  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `announcements`
@@ -652,13 +3587,6 @@ ALTER TABLE `announcements`
   ADD KEY `created_by` (`created_by`);
 
 --
--- Indexes for table `attendance`
---
-ALTER TABLE `attendance`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `student_id` (`student_id`);
-
---
 -- Indexes for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
@@ -666,51 +3594,11 @@ ALTER TABLE `audit_logs`
   ADD KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `classes`
+-- Indexes for table `feedback_subjects`
 --
-ALTER TABLE `classes`
+ALTER TABLE `feedback_subjects`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `class_level_id` (`class_level_id`),
-  ADD KEY `curriculum_id` (`curriculum_id`);
-
---
--- Indexes for table `class_levels`
---
-ALTER TABLE `class_levels`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `curriculum_id` (`curriculum_id`);
-
---
--- Indexes for table `class_subjects`
---
-ALTER TABLE `class_subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `class_subject_unique` (`class_id`,`subject_id`),
-  ADD KEY `subject_id` (`subject_id`);
-
---
--- Indexes for table `curriculums`
---
-ALTER TABLE `curriculums`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`);
-
---
--- Indexes for table `grades`
---
-ALTER TABLE `grades`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `student_id` (`student_id`),
-  ADD KEY `subject_id` (`subject_id`),
-  ADD KEY `grading_scale_id` (`grading_scale_id`),
-  ADD KEY `fk_grades_class_subjects` (`class_subject_id`);
-
---
--- Indexes for table `grading_scales`
---
-ALTER TABLE `grading_scales`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `curriculum_id` (`curriculum_id`);
+  ADD UNIQUE KEY `subject_unique` (`subject`);
 
 --
 -- Indexes for table `messages`
@@ -728,18 +3616,20 @@ ALTER TABLE `parents`
   ADD UNIQUE KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `response_data`
+--
+ALTER TABLE `response_data`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `response_id` (`response_id`),
+  ADD KEY `survey_id` (`survey_id`),
+  ADD KEY `field_id` (`field_id`);
+
+--
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `role_name` (`role_name`);
-
---
--- Indexes for table `sections`
---
-ALTER TABLE `sections`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `class_id` (`class_id`);
 
 --
 -- Indexes for table `students`
@@ -759,19 +3649,18 @@ ALTER TABLE `student_parents`
   ADD KEY `parent_id` (`parent_id`);
 
 --
--- Indexes for table `subjects`
---
-ALTER TABLE `subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `curriculum_id` (`curriculum_id`),
-  ADD KEY `subject_name` (`subject_name`) USING BTREE;
-
---
 -- Indexes for table `surveys`
 --
 ALTER TABLE `surveys`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `created_by` (`created_by`);
+  ADD KEY `created_by` (`created_by`),
+  ADD KEY `category_id` (`category_id`);
+
+--
+-- Indexes for table `survey_categories`
+--
+ALTER TABLE `survey_categories`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `survey_fields`
@@ -787,6 +3676,14 @@ ALTER TABLE `survey_responses`
   ADD PRIMARY KEY (`id`),
   ADD KEY `survey_id` (`survey_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `survey_roles`
+--
+ALTER TABLE `survey_roles`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `survey_id` (`survey_id`),
+  ADD KEY `role_id` (`role_id`);
 
 --
 -- Indexes for table `system_settings`
@@ -812,6 +3709,14 @@ ALTER TABLE `teacher_subjects`
   ADD KEY `section_id` (`section_id`);
 
 --
+-- Indexes for table `transcripts`
+--
+ALTER TABLE `transcripts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `enrollment_id` (`enrollment_id`),
+  ADD KEY `academic_year_id` (`academic_year_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -825,64 +3730,22 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `academic_terms`
---
-ALTER TABLE `academic_terms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `attendance`
---
-ALTER TABLE `attendance`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
--- AUTO_INCREMENT for table `classes`
+-- AUTO_INCREMENT for table `feedback_subjects`
 --
-ALTER TABLE `classes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT for table `class_levels`
---
-ALTER TABLE `class_levels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `class_subjects`
---
-ALTER TABLE `class_subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
---
--- AUTO_INCREMENT for table `curriculums`
---
-ALTER TABLE `curriculums`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `grades`
---
-ALTER TABLE `grades`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `grading_scales`
---
-ALTER TABLE `grading_scales`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+ALTER TABLE `feedback_subjects`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `messages`
@@ -894,7 +3757,13 @@ ALTER TABLE `messages`
 -- AUTO_INCREMENT for table `parents`
 --
 ALTER TABLE `parents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=437;
+
+--
+-- AUTO_INCREMENT for table `response_data`
+--
+ALTER TABLE `response_data`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -903,16 +3772,10 @@ ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `sections`
---
-ALTER TABLE `sections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
-
---
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=505;
 
 --
 -- AUTO_INCREMENT for table `student_parents`
@@ -921,52 +3784,64 @@ ALTER TABLE `student_parents`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `subjects`
---
-ALTER TABLE `subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
-
---
 -- AUTO_INCREMENT for table `surveys`
 --
 ALTER TABLE `surveys`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `survey_categories`
+--
+ALTER TABLE `survey_categories`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `survey_fields`
 --
 ALTER TABLE `survey_fields`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `survey_roles`
+--
+ALTER TABLE `survey_roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `system_settings`
 --
 ALTER TABLE `system_settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `teachers`
 --
 ALTER TABLE `teachers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=460;
 
 --
 -- AUTO_INCREMENT for table `teacher_subjects`
 --
 ALTER TABLE `teacher_subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `transcripts`
+--
+ALTER TABLE `transcripts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4462;
 
 --
 -- Constraints for dumped tables
@@ -979,53 +3854,10 @@ ALTER TABLE `announcements`
   ADD CONSTRAINT `announcements_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `attendance`
---
-ALTER TABLE `attendance`
-  ADD CONSTRAINT `attendance_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE;
-
---
 -- Constraints for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
   ADD CONSTRAINT `audit_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `classes`
---
-ALTER TABLE `classes`
-  ADD CONSTRAINT `classes_ibfk_1` FOREIGN KEY (`class_level_id`) REFERENCES `class_levels` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `classes_ibfk_2` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `class_levels`
---
-ALTER TABLE `class_levels`
-  ADD CONSTRAINT `class_levels_ibfk_1` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `class_subjects`
---
-ALTER TABLE `class_subjects`
-  ADD CONSTRAINT `class_subjects_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `class_subjects_ibfk_2` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_class_subjects_class` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_class_subjects_subject` FOREIGN KEY (`subject_id`) REFERENCES `subjects` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `grades`
---
-ALTER TABLE `grades`
-  ADD CONSTRAINT `fk_grades_class_subjects` FOREIGN KEY (`class_subject_id`) REFERENCES `class_subjects` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `grades_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `students` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `grades_ibfk_3` FOREIGN KEY (`grading_scale_id`) REFERENCES `grading_scales` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `fk_grades_section` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL;
-
---
--- Constraints for table `grading_scales`
---
-ALTER TABLE `grading_scales`
-  ADD CONSTRAINT `grading_scales_ibfk_1` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `messages`
@@ -1041,10 +3873,12 @@ ALTER TABLE `parents`
   ADD CONSTRAINT `parents_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `sections`
+-- Constraints for table `response_data`
 --
-ALTER TABLE `sections`
-  ADD CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE;
+ALTER TABLE `response_data`
+  ADD CONSTRAINT `fk_response_data_field` FOREIGN KEY (`field_id`) REFERENCES `survey_fields` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_response_data_response` FOREIGN KEY (`response_id`) REFERENCES `survey_responses` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_response_data_survey` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `students`
@@ -1062,19 +3896,11 @@ ALTER TABLE `student_parents`
   ADD CONSTRAINT `student_parents_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `parents` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `subjects`
---
-ALTER TABLE `subjects`
-  ADD CONSTRAINT `subjects_ibfk_1` FOREIGN KEY (`curriculum_id`) REFERENCES `curriculums` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE subjects
-    ADD COLUMN class_level_id INT NULL AFTER curriculum_id;
-
---
 -- Constraints for table `surveys`
 --
 ALTER TABLE `surveys`
-  ADD CONSTRAINT `surveys_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `surveys_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `surveys_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `survey_categories` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `survey_fields`
@@ -1088,6 +3914,13 @@ ALTER TABLE `survey_fields`
 ALTER TABLE `survey_responses`
   ADD CONSTRAINT `survey_responses_ibfk_1` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `survey_responses_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `survey_roles`
+--
+ALTER TABLE `survey_roles`
+  ADD CONSTRAINT `fk_survey_roles_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_survey_roles_survey` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `teachers`
@@ -1104,6 +3937,13 @@ ALTER TABLE `teacher_subjects`
   ADD CONSTRAINT `fk_teacher_subjects_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `transcripts`
+--
+ALTER TABLE `transcripts`
+  ADD CONSTRAINT `transcripts_ibfk_1` FOREIGN KEY (`enrollment_id`) REFERENCES `enrollments` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `transcripts_ibfk_2` FOREIGN KEY (`academic_year_id`) REFERENCES `academic_years` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `users`
 --
 ALTER TABLE `users`
@@ -1113,22 +3953,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
--- Example: Set class_level_id for Cambridge Primary subjects
-UPDATE subjects SET class_level_id = 1 WHERE id IN (1,2,3,4,5,6,7,8);
-
--- Set class_level_id for Cambridge Lower Secondary subjects
-UPDATE subjects SET class_level_id = 2 WHERE id IN (9,10,11,12,13,14,15);
-
--- Set class_level_id for Cambridge IGCSE subjects
-UPDATE subjects SET class_level_id = 3 WHERE id IN (16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35);
-
--- Set class_level_id for Cambridge AS/A Level subjects
-UPDATE subjects SET class_level_id = 4 WHERE id IN (36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51);
-
--- If you have more fine-grained levels (e.g., "Year 1", "Year 2", ...), adjust the queries accordingly.
--- Example for a specific subject:
--- UPDATE subjects SET class_level_id = (SELECT id FROM class_levels WHERE level_name = 'Year 7' AND curriculum_id = 1 LIMIT 1) WHERE id = 9;
-
--- Repeat for other curriculums and levels as needed.
--- Link Primary subjects

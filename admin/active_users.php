@@ -22,7 +22,7 @@ $roleSql = $roleFilter ? "AND r.role_name = :role" : "";
 $searchSql = $search ? "AND (u.username LIKE :search OR u.email LIKE :search)" : "";
 
 try {
-    // Get active users (status = active, last_active or last_login in last 15 minutes)
+    // --- Fix: Use last_active (not last_activity) and status column as in db.sql ---
     $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
 
     $sql = "
@@ -46,7 +46,7 @@ try {
     if ($roleFilter) $stmt->bindValue(':role', $roleFilter);
     if ($search) $stmt->bindValue(':search', '%' . $search . '%');
     $stmt->execute();
-    $activeUsers = $stmt->fetchAll();
+    $activeUsers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Format last activity time
     foreach ($activeUsers as &$user) {
