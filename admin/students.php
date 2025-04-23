@@ -5,15 +5,18 @@ require_once '../includes/config.php';
 
 $pageTitle = "Students";
 
-// Fetch students with class and section info
+// Fetch students with class and section info (only users with 'student' role)
 $stmt = $pdo->query("
     SELECT s.*, u.username, u.email, c.class_name, sec.section_name
     FROM students s
     LEFT JOIN users u ON s.user_id = u.id
+    LEFT JOIN user_roles ur ON ur.user_id = u.id
+    LEFT JOIN roles r ON ur.role_id = r.id
     LEFT JOIN classes c ON s.class_id = c.id
     LEFT JOIN enrollments e ON s.id = e.student_id
     LEFT JOIN batches b ON e.batch_id = b.id
     LEFT JOIN sections sec ON b.section_id = sec.id
+    WHERE r.role_name = 'student'
     ORDER BY u.username
 ");
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
