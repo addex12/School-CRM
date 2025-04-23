@@ -1,14 +1,12 @@
 <?php
 ob_start();
-session_start();
-
 // Error reporting (remove in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // Include required files
-require '../includes/db.php';
-require '../includes/config.php';
-require '../includes/auth.php';
+require_once '../includes/auth.php';
+requireAdmin();
+require_once '../includes/config.php';
 
 // Verify admin access
 requireAdmin();
