@@ -222,6 +222,29 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
             row.addEventListener('mouseenter', function() { row.style.background = '#e2efda'; });
             row.addEventListener('mouseleave', function() { row.style.background = ''; });
         });
+
+        // ERPNext-style search/filter
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Search surveys...';
+            searchInput.style = 'margin-bottom:1.2rem;padding:8px 14px;width:100%;border:1px solid #e5e7eb;border-radius:4px;font-size:1rem;';
+            const table = document.querySelector('.surveys-table');
+            const container = table.parentElement;
+            container.insertBefore(searchInput, table);
+
+            searchInput.addEventListener('input', function() {
+                const val = this.value.toLowerCase();
+                document.querySelectorAll('.surveys-table tbody tr').forEach(function(row) {
+                    row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+                });
+            });
+        });
+
+        // ERPNext-style action dropdown (for future extensibility)
+        document.querySelectorAll('.survey-actions').forEach(function(cell) {
+            // Could add dropdown here if needed
+        });
     </script>
 </body>
 </html>
