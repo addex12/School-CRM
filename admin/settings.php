@@ -455,7 +455,7 @@ $terms = $pdo->query("
                             <div class="settings-group">
                                 <h3>Academic Years</h3>
                                 <form method="post" style="margin-bottom:1em;">
-                                    <input type="text" name="name" placeholder="Year Name (e.g. 2024/25)" required>
+                                    <input type="text" name="year_name" placeholder="Year Name (e.g. 2024/25)" required>
                                     <input type="date" name="year_start" required>
                                     <input type="date" name="year_end" required>
                                     <button type="submit" name="add_academic_year" class="btn">Add Year</button>
@@ -475,7 +475,7 @@ $terms = $pdo->query("
                                                 <form method="post">
                                                     <td>
                                                         <!-- Changed 'name' to 'year_name' -->
-                                                        <input type="text" name="name" value="<?= htmlspecialchars($year['year_name']) ?>" required>
+                                                        <input type="text" name="year_name" value="<?= htmlspecialchars($year['year_name']) ?>" required>
                                                         <input type="hidden" name="year_id" value="<?= $year['id'] ?>">
                                                     </td>
                                                     <td><input type="date" name="year_start" value="<?= $year['start_date'] ?>" required></td>

@@ -195,7 +195,7 @@ if (isset($_GET['export'])) {
                             </select>
                         </label>
                         <label>Class:
-                            <select name="class_id" required>
+                            <select name="class_id" id="class_id_select" required>
                                 <option value="">Select Class</option>
                                 <?php foreach ($classes as $c): ?>
                                     <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['class_name']) ?></option>
@@ -203,10 +203,10 @@ if (isset($_GET['export'])) {
                             </select>
                         </label>
                         <label>Section (optional):
-                            <select name="section_id">
+                            <select name="section_id" id="section_id_select">
                                 <option value="">Select Section</option>
                                 <?php foreach ($sections as $sec): ?>
-                                    <option value="<?= $sec['id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
+                                    <option value="<?= $sec['id'] ?>" data-class="<?= $sec['class_id'] ?>"><?= htmlspecialchars($sec['section_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </label>
@@ -241,6 +241,29 @@ if (isset($_GET['export'])) {
             </div>
         </div>
     </div>
+    <script>
+        // Filter sections based on selected class
+        document.addEventListener('DOMContentLoaded', function() {
+            const classSelect = document.getElementById('class_id_select');
+            const sectionSelect = document.getElementById('section_id_select');
+            const allOptions = Array.from(sectionSelect.options);
+
+            function filterSections() {
+                const classId = classSelect.value;
+                // Always keep the first option (Select Section)
+                sectionSelect.innerHTML = '';
+                sectionSelect.appendChild(allOptions[0].cloneNode(true));
+                allOptions.slice(1).forEach(opt => {
+                    if (!classId || opt.getAttribute('data-class') === classId) {
+                        sectionSelect.appendChild(opt.cloneNode(true));
+                    }
+                });
+            }
+
+            classSelect.addEventListener('change', filterSections);
+            filterSections(); // Initial filter
+        });
+    </script>
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
