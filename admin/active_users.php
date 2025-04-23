@@ -26,14 +26,14 @@ try {
     $activeThreshold = date('Y-m-d H:i:s', strtotime('-15 minutes'));
 
     $sql = "
-        SELECT u.id, u.username, u.email, u.last_activity, 
+        SELECT u.id, u.username, u.email, u.last_login, 
                COALESCE(r.role_name, 'No Role') as role_name 
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.last_activity >= :threshold
+        WHERE u.last_login >= :threshold
         $roleSql
         $searchSql
-        ORDER BY u.last_activity DESC
+        ORDER BY u.last_login DESC
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(':threshold', $activeThreshold);
@@ -44,7 +44,7 @@ try {
 
     // Format last activity time
     foreach ($activeUsers as &$user) {
-        $user['last_active'] = date('M j, Y g:i A', strtotime($user['last_activity']));
+        $user['last_login'] = date('M j, Y g:i A', strtotime($user['last_login']));
     }
     unset($user);
 
