@@ -315,6 +315,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php endforeach; ?>
                             </select>
                         </div>
+                        <div id="student_info" style="margin-bottom:1rem;color:#2980b9;"></div>
                         <div style="margin-bottom:1rem;">
                             <label for="subject_id">Subject</label>
                             <select name="subject_id" id="subject_id" required>
@@ -464,19 +465,35 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     var gradingScalesByLevel = <?= json_encode($gradingScalesByLevel) ?>;
     var sectionsByClass = <?= json_encode($sectionsByClass) ?>;
     var students = <?= json_encode($students) ?>;
+    // Fetch current term and academic year from the server (PHP)
+    var currentTerm = <?= json_encode($pdo->query("SELECT name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn() ?: '') ?>;
+    var currentAcademicYear = <?= json_encode($pdo->query("SELECT year_name FROM academic_years WHERE end_date >= CURDATE() ORDER BY start_date DESC LIMIT 1")->fetchColumn() ?: '') ?>;
 
     function updateSubjects() {
         var studentId = document.getElementById('student_id').value;
         var subjectSelect = document.getElementById('subject_id');
         var sectionSelect = document.getElementById('section_id');
+        var infoDiv = document.getElementById('student_info');
+        var termInput = document.getElementById('term');
+        var yearInput = document.getElementById('academic_year');
         subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
         sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
 
-        // Detect student's class and section, and show as info (optional)
+        // Detect student's class and section, and show as info
         var student = students.find(function(s) { return s.id == studentId; });
         if (student) {
-            // Optionally, display class/section info somewhere
-            // Example: document.getElementById('student_class_info').textContent = 'Class: ' + (student.class_id || '-') + ', Section: ' + (student.section_id || '-');
+            var classText = student.class_id ? 'Class ID: ' + student.class_id : 'Class: -';
+            // Find section name if available
+            var sectionName = '-';
+            if (student.class_id && sectionsByClass[student.class_id]) {
+                var secList = sectionsByClass[student.class_id];
+                if (secList.length === 1) {
+                    sectionName = secList[0].section_name;
+                }
+            }
+            infoDiv.textContent = classText + (sectionName !== '-' ? ', Section: ' + sectionName : '');
+        } else {
+            infoDiv.textContent = '';
         }
 
         // Populate subjects based on student's class_level_id
@@ -498,6 +515,10 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 sectionSelect.appendChild(opt);
             });
         }
+
+        // Autofill current term and academic year
+        if (termInput) termInput.value = currentTerm;
+        if (yearInput) yearInput.value = currentAcademicYear;
     }
 
     function autoFillGradeLetter() {
@@ -525,13 +546,13 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Initialize subject and section dropdowns on page load if editing
     document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('student_id').addEventListener('change', function() {
+            updateSubjects();
+            autoFillGradeLetter();
+        });
+        document.getElementById('score').addEventListener('input', autoFillGradeLetter);
         updateSubjects();
     });
-    document.getElementById('student_id').addEventListener('change', function() {
-        updateSubjects();
-        autoFillGradeLetter();
-    });
-    document.getElementById('score').addEventListener('input', autoFillGradeLetter);
     </script>
 </body>
 </html>
