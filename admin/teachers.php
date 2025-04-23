@@ -259,6 +259,12 @@ function sort_link($col, $label, $current_sort, $current_order) {
                             <a href="add_users.php?role=teacher" class="erpnext-btn btn-sm btn-success"><i class="fas fa-plus"></i> Add Teacher</a>
                         </div>
                     </div>
+                    <!-- Search bar -->
+                    <div style="margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;">
+                        <input type="text" id="teacherSearch" placeholder="Search teachers..." style="flex:1;padding:10px 16px;border:1px solid #e5e7eb;border-radius:6px;font-size:1rem;background:#f9fafb;">
+                        <button class="erpnext-btn btn-primary" id="searchBtn" style="padding:10px 18px;"><i class="fas fa-search"></i> Search</button>
+                        <button class="erpnext-btn btn-secondary" id="clearSearch" style="padding:10px 18px;">Clear</button>
+                    </div>
                     <!-- Bulk selection bar -->
                     <form method="post" id="bulkAssignTeachersForm">
                         <div class="bulk-select-bar">
@@ -358,7 +364,6 @@ function sort_link($col, $label, $current_sort, $current_order) {
                 </div>
             </div>
         </div>
-        </div>d
         <script>
             // Bulk select all checkboxes for teachers
             document.addEventListener('DOMContentLoaded', function() {
@@ -371,10 +376,34 @@ function sort_link($col, $label, $current_sort, $current_order) {
                 if (selectAll) selectAll.addEventListener('change', e => toggleAll(e.target.checked));
                 if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
             });
-        </script>
-        <?php include './includes/footer.php'; ?><?php ob_end_flush(); ?>
+
+            // Search/filter functionality
 
 
 
 
-</html></body>   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</html></body>    </div>        <?php include './includes/footer.php'; ?>        </script>            });                });                    filterRows();                    searchInput.value = '';                    e.preventDefault();                clearBtn.addEventListener('click', function(e) {                });                    filterRows();                    e.preventDefault();                searchBtn.addEventListener('click', function(e) {                searchInput.addEventListener('input', filterRows);                }                    });                        row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';                    rows.forEach(function(row) {                    const val = searchInput.value.toLowerCase();                function filterRows() {                const rows = document.querySelectorAll('.excel-table tbody tr');                const clearBtn = document.getElementById('clearSearch');                const searchBtn = document.getElementById('searchBtn');                const searchInput = document.getElementById('teacherSearch');            document.addEventListener('DOMContentLoaded', function() {
