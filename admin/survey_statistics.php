@@ -235,7 +235,7 @@ $chart_json = json_encode($chart_data);
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><i class="fas fa-chart-pie"></i> Page Statistics</h1>
+                <h1><i class="fas fa-chart-pie"></i> {{ pageTitle }}</h1>
             </header>
             <div class="content">
                 <div class="filter-section">
