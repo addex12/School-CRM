@@ -14,23 +14,35 @@ $pageTitle = "Active Users";
 // Filtering logic
 $search = trim($_GET['search'] ?? '');
 $roleFilter = $_GET['role'] ?? '';
-$searchSql = $search ? "AND (username LIKE :search)" : "";
-$roleSql = $roleFilter ? "AND role = :role" : "";
+$conditions = ["status = 'active'"];
+$params = [];
+
+if ($roleFilter) {
+    $conditions[] = "role = :role";
+    $params[':role'] = $roleFilter;
+}
+if ($search) {
+    $conditions[] = "username LIKE :search";
+    $params[':search'] = '%' . $search . '%';
+}
+$whereSql = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
 
 try {
     // Online users only (must also be active)
-    $onlineSql = "SELECT id, username, last_active FROM users WHERE online = 1 AND status = 'active' $roleSql $searchSql ORDER BY username";
+    $onlineSql = "SELECT id, username, last_active FROM users $whereSql AND online = 1 ORDER BY username";
     $stmtOnline = $pdo->prepare($onlineSql);
-    if ($roleFilter) $stmtOnline->bindValue(':role', $roleFilter);
-    if ($search) $stmtOnline->bindValue(':search', '%' . $search . '%');
+    foreach ($params as $key => $val) {
+        $stmtOnline->bindValue($key, $val);
+    }
     $stmtOnline->execute();
     $onlineUsers = $stmtOnline->fetchAll(PDO::FETCH_ASSOC);
 
     // All active users (regardless of online)
-    $allSql = "SELECT id, username, last_active, online FROM users WHERE status = 'active' $roleSql $searchSql ORDER BY online DESC, username";
+    $allSql = "SELECT id, username, last_active, online FROM users $whereSql ORDER BY online DESC, username";
     $stmtAll = $pdo->prepare($allSql);
-    if ($roleFilter) $stmtAll->bindValue(':role', $roleFilter);
-    if ($search) $stmtAll->bindValue(':search', '%' . $search . '%');
+    foreach ($params as $key => $val) {
+        $stmtAll->bindValue($key, $val);
+    }
     $stmtAll->execute();
     $allUsers = $stmtAll->fetchAll(PDO::FETCH_ASSOC);
 
