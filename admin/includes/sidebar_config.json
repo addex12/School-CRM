@@ -20,7 +20,6 @@
       "icon": "user-graduate",
       "items": [
         { "title": "Student List", "icon": "user-graduate", "link": "students.php" },
-        { "title": "Add Student", "icon": "user-plus", "link": "add_student.php" }
       ],
       "id": "students-menu"
     },
