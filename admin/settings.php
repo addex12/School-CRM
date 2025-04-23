@@ -169,7 +169,14 @@ $logs = $pdo->query("SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 10"
 
 // Fetch Academic Years and Terms
 $years = $pdo->query("SELECT * FROM academic_years ORDER BY start_date DESC")->fetchAll(PDO::FETCH_ASSOC);
-$terms = $pdo->query("SELECT t.*, y.name AS year_name FROM academic_terms t LEFT JOIN academic_years y ON t.academic_year_id = y.id ORDER BY t.start_date DESC")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch Academic Terms with Academic Year info
+$terms = $pdo->query("
+    SELECT t.*, y.name AS year_name
+    FROM academic_terms t
+    LEFT JOIN academic_years y ON t.academic_year_id = y.id
+    ORDER BY t.start_date DESC
+")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -504,7 +511,7 @@ $terms = $pdo->query("SELECT t.*, y.name AS year_name FROM academic_terms t LEFT
                                             <tr>
                                                 <form method="post">
                                                     <td>
-                                                        <input type="text" name="term_name" value="<?= htmlspecialchars($term['name']) ?>" required>
+                                                        <input type="text" name="term_name" value="<?= htmlspecialchars($term['name'] ?? '') ?>" required>
                                                         <input type="hidden" name="term_id" value="<?= $term['id'] ?>">
                                                     </td>
                                                     <td>
