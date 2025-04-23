@@ -13,21 +13,29 @@ $pageTitle = "Active Users";
 
 // Filtering logic
 $search = trim($_GET['search'] ?? '');
-$searchSql = $search ? "AND (username LIKE :search OR email LIKE :search)" : "";
 $roleFilter = $_GET['role'] ?? '';
-$roleSql = $roleFilter ? "AND role = :role" : "";
 
 // Fetch all users with status active, online users first
 try {
+    // Use correct SQL syntax for equality and filter logic
+    $params = [];
+    $where = "WHERE status = 'active'";
+    if ($search) {
+        $where .= " AND (username LIKE :search OR email LIKE :search)";
+        $params[':search'] = '%' . $search . '%';
+    }
+    if ($roleFilter) {
+        $where .= " AND role = :role";
+        $params[':role'] = $roleFilter;
+    }
     $sql = "SELECT id, username, email, last_active, role, status, online 
             FROM users 
-            WHERE status = 'active' 
-            $roleSql
-            $searchSql
+            $where
             ORDER BY online DESC, username ASC";
     $stmt = $pdo->prepare($sql);
-    if ($roleFilter) $stmt->bindValue(':role', $roleFilter);
-    if ($search) $stmt->bindValue(':search', '%' . $search . '%');
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
+    }
     $stmt->execute();
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
