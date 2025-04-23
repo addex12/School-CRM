@@ -435,7 +435,13 @@ function sort_link($col, $label, $current_sort, $current_order) {
                         <a href="download_template.php?type=students_assign" class="erpnext-btn btn-sm btn-secondary">Download CSV Template</a>
                     </div>
                     <div class="table-responsive">
-                        <table class="excel-table">
+                        <!-- Search bar -->
+                        <div style="margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;">
+                            <input type="text" id="studentSearch" placeholder="Search students..." style="flex:1;padding:10px 16px;border:1px solid #e5e7eb;border-radius:6px;font-size:1rem;background:#f9fafb;">
+                            <button class="erpnext-btn btn-primary" id="searchBtn" style="padding:10px 18px;"><i class="fas fa-search"></i> Search</button>
+                            <button class="erpnext-btn btn-secondary" id="clearSearch" style="padding:10px 18px;">Clear</button>
+                        </div>
+                        <table class="excel-table" id="studentsTable">
                             <thead>
                                 <tr>
                                     <th>User ID</th>
@@ -446,7 +452,7 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="studentsTbody">
                                 <?php if (!empty($students)): ?>
                                     <?php foreach ($students as $s): ?>
                                         <tr>
@@ -473,8 +479,77 @@ function sort_link($col, $label, $current_sort, $current_order) {
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
+    <script>
+        // Real-time search/filter functionality using JSON data
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('studentSearch');
+            const searchBtn = document.getElementById('searchBtn');
+            const clearBtn = document.getElementById('clearSearch');
+            const tbody = document.getElementById('studentsTbody');
 
+            // Prepare students data as JSON for client-side filtering
+            const studentsData = <?=
+                json_encode(array_map(function($s) {
+                    return [
+                        'student_id' => $s['student_id'],
+                        'user_id' => $s['user_id'],
+                        'username' => $s['username'],
+                        'email' => $s['email'],
+                        'status' => $s['status'],
+                        'created_at' => $s['created_at']
+                    ];
+                }, $students));
+            ?>;
+
+            function renderRows(filtered) {
+                if (!filtered.length) {
+                    tbody.innerHTML = '<tr><td colspan="6">No students found.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = filtered.map(function(s) {
+                    return `<tr>
+                        <td>${s.user_id || ''}</td>
+                        <td>${s.username || ''}</td>
+                        <td>${s.email || ''}</td>
+                        <td>${s.status || '-'}</td>
+                        <td>${s.created_at || '-'}</td>
+                        <td>
+                            <a href="edit_user.php?id=${s.user_id}" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                            <a href="students.php?delete_student=${s.student_id}" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student and user?')">Delete</a>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
+
+            function filterRows() {
+                const val = searchInput.value.toLowerCase();
+                const filtered = studentsData.filter(function(s) {
+                    return Object.values(s).join(' ').toLowerCase().includes(val);
+                });
+                renderRows(filtered);
+            }
+
+            // Real-time filtering as you type
+            searchInput.addEventListener('input', filterRows);
+
+            // On search button click, show only filtered results (same as real-time)
+            searchBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterRows();
+            });
+
+            // Clear search
+            clearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                searchInput.value = '';
+                renderRows(studentsData);
+            });
+
+            // Initial render
+            renderRows(studentsData);
+        });
+    </script>
 </body>
 </html>
 <?php ob_end_flush(); ?>
