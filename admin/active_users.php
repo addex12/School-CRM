@@ -31,9 +31,10 @@ try {
         WHERE u.last_activity >= :threshold
     ";
     
-    // Add search conditions if search term exists
+    // Initialize parameters array
     $params = [':threshold' => $activeThreshold];
     
+    // Add search condition if search term exists
     if (!empty($searchTerm)) {
         $sql .= " AND (u.username LIKE :search OR u.email LIKE :search)";
         $params[':search'] = '%' . $searchTerm . '%';
@@ -45,8 +46,8 @@ try {
     $stmt = $pdo->prepare($sql);
     
     // Bind parameters
-    foreach ($params as $key => &$val) {
-        $stmt->bindParam($key, $val);
+    foreach ($params as $key => $val) {
+        $stmt->bindValue($key, $val);
     }
     
     $stmt->execute();
@@ -62,6 +63,8 @@ try {
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
+    // For debugging, you can temporarily show the actual error:
+    // $error = "Database Error: " . $e->getMessage();
 } catch (Exception $e) {
     error_log("Application Error: " . $e->getMessage());
     $error = "An error occurred: " . $e->getMessage();
@@ -77,64 +80,7 @@ try {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .active-users-container {
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .active-users-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .active-count {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #555;
-        }
-        .active-count i {
-            color: #4CAF50;
-        }
-        .refresh-btn {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .refresh-btn:hover {
-            background: #2980b9;
-        }
-        .users-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .users-table th {
-            background: #f8f9fa;
-            padding: 12px;
-            text-align: left;
-            border-bottom: 2px solid #dee2e6;
-        }
-        .users-table td {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-        .users-table tr:hover {
-            background-color: #f5f5f5;
-        }
-        .status-active {
-            color: #4CAF50;
-            font-weight: 500;
-        }
+        /* ... (keep all your existing styles) ... */
         .search-container {
             margin-bottom: 20px;
         }
@@ -157,8 +103,7 @@ try {
 </head>
 <body>
     <div class="admin-dashboard">
-       
-    <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
 
         <div class="admin-main">
             <div class="active-users-container">
@@ -175,10 +120,12 @@ try {
                     </div>
                 </div>
 
-                <!-- Add search form -->
+                <!-- Search Form -->
                 <div class="search-container">
                     <form method="GET" action="">
-                        <input type="text" name="all_search" class="search-input" placeholder="Search by username or email..." value="<?= htmlspecialchars($searchTerm) ?>">
+                        <input type="text" name="all_search" class="search-input" 
+                               placeholder="Search by username or email..." 
+                               value="<?= htmlspecialchars($searchTerm) ?>">
                         <button type="submit" class="search-btn">Search</button>
                         <?php if (!empty($searchTerm)): ?>
                             <a href="?" class="search-btn">Clear</a>
@@ -214,7 +161,9 @@ try {
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="text-center">No active users found</td>
+                                    <td colspan="6" class="text-center">
+                                        No active users found<?= !empty($searchTerm) ? ' matching your search' : '' ?>
+                                    </td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
