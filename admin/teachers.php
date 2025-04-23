@@ -257,7 +257,6 @@ function sort_link($col, $label, $current_sort, $current_order) {
                         <h2>Teacher List</h2>
                         <div>
                             <a href="add_users.php?role=teacher" class="erpnext-btn btn-sm btn-success"><i class="fas fa-plus"></i> Add Teacher</a>
-                            <a href="view_teacher.php" class="erpnext-btn btn-sm btn-secondary"><i class="fas fa-eye"></i> View All</a>
                         </div>
                     </div>
                     <!-- Bulk selection bar -->
