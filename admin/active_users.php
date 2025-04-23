@@ -4,9 +4,10 @@ ob_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // Include required files
+require_once '../includes/config.php';
+require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireAdmin();
-require_once '../includes/config.php';
 
 
 $pageTitle = "Active Users";
@@ -46,7 +47,7 @@ try {
     unset($user);
 
     // Fetch all roles for filter dropdown
-    $roles = $pdo->query("SELECT DISTINCT role_name FROM roles WHERE role_name IS NOT NULL ORDER BY role_name")->fetchAll(PDO::FETCH_COLUMN);
+    $roles = $pdo->query("SELECT DISTINCT role_name FROM roles WHERE role_name IS NOT NULL AND role_name != '' ORDER BY role_name")->fetchAll(PDO::FETCH_COLUMN);
 
     // Ensure $error is not set if query is successful
     unset($error);
