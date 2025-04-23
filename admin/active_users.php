@@ -10,19 +10,6 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
-// Add this before the try-catch for the query, near the top after $pageTitle
-$allSearch = isset($_GET['all_search']) ? trim($_GET['all_search']) : '';
-
-// Add this block to define $allWhereSql and $allParams
-$allConditions = ["status = 'active'"];
-$allParams = [];
-if ($allSearch) {
-    $allConditions[] = "(username LIKE :search_username OR name LIKE :search_name OR email LIKE :search_email)";
-    $allParams[':search_username'] = '%' . $allSearch . '%';
-    $allParams[':search_name'] = '%' . $allSearch . '%';
-    $allParams[':search_email'] = '%' . $allSearch . '%';
-}
-$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 // Fetch all roles for filter dropdown (do this first, always)
 try {
@@ -47,6 +34,16 @@ try {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
     $allUsers = [];
+}
+
+// Simple query to list all active users
+try {
+    $users = $pdo->query("SELECT id, username, last_active FROM users WHERE status = 'active' ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+    unset($error);
+} catch (PDOException $e) {
+    error_log("Database Error: " . $e->getMessage());
+    $error = "A database error occurred. Please try again later.";
+    $users = [];
 }
 ?>
 <!DOCTYPE html>
@@ -172,8 +169,8 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (isset($allUsers) && is_array($allUsers) && count($allUsers) > 0): ?>
-                            <?php foreach ($allUsers as $user): ?>
+                        <?php if (isset($users) && is_array($users) && count($users) > 0): ?>
+                            <?php foreach ($users as $user): ?>
                             <tr>
                                 <td><?= htmlspecialchars($user['id']) ?></td>
                                 <td><?= htmlspecialchars($user['username']) ?></td>
