@@ -426,7 +426,6 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         
                         <form method="POST" enctype="multipart/form-data" class="mt-4" id="bulkImportForm">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            
                             <div class="form-group">
                                 <label>Upload CSV File</label>
                                 <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
@@ -460,22 +459,39 @@ document.addEventListener('DOMContentLoaded', function() {
             progressBar.textContent = '0%';
             importBtn.disabled = true;
 
-            // Simulate progress (since PHP can't update progress in real time)
-            var fakeProgress = 0;
-            var interval = setInterval(function() {
-                fakeProgress += Math.floor(Math.random() * 15) + 10;
-                if (fakeProgress > 95) fakeProgress = 95;
-                progressBar.style.width = fakeProgress + '%';
-                progressBar.textContent = fakeProgress + '%';
-            }, 200);
+            // Use AJAX for real upload and progress
+            var file = csvInput.files[0];
+            var formData = new FormData();
+            formData.append('csv_file', file);
+            formData.append('csrf_token', '<?= $_SESSION['csrf_token'] ?>');
+            formData.append('bulk_import', '1');
 
-            // Let the form submit after a short delay to show progress
-            setTimeout(function() {
-                clearInterval(interval);
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'add_users.php', true);
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    var percent = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = percent + '%';
+                    progressBar.textContent = percent + '%';
+                }
+            };
+
+            xhr.onload = function() {
                 progressBar.style.width = '100%';
-                progressBar.textContent = 'Uploading...';
-                form.submit();
-            }, 1200);
+                progressBar.textContent = 'Processing...';
+                setTimeout(function() {
+                    window.location.reload();
+                }, 800);
+            };
+
+            xhr.onerror = function() {
+                progressBar.style.background = '#e74c3c';
+                progressBar.textContent = 'Upload failed';
+                importBtn.disabled = false;
+            };
+
+            xhr.send(formData);
             e.preventDefault();
         });
     }
