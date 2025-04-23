@@ -23,7 +23,7 @@ if (!isset($pdo) || !$pdo) {
     error_log("Database connection established successfully.");
 }
 
-// Add more widgets for dashboard revamp
+// School CRM Dashboard widgets (revamped)
 $widgets = [
     [
         "title" => "Total Users",
@@ -32,23 +32,23 @@ $widgets = [
         "query" => "SELECT COUNT(*) FROM users"
     ],
     [
-        "title" => "Total Students",
+        "title" => "Students",
         "icon" => "fa-user-graduate",
         "color" => "purple",
         "query" => "SELECT COUNT(*) FROM students"
     ],
     [
-        "title" => "Total Teachers",
+        "title" => "Teachers",
         "icon" => "fa-chalkboard-teacher",
         "color" => "teal",
         "query" => "SELECT COUNT(*) FROM teachers"
     ],
-    /**[
-        "title" => "Total Classes",
-        "icon" => "fa-school",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM classes"
-    ],**/
+    [
+        "title" => "Parents",
+        "icon" => "fa-user-friends",
+        "color" => "yellow",
+        "query" => "SELECT COUNT(*) FROM parents"
+    ],
     [
         "title" => "Active Surveys",
         "icon" => "fa-poll",
@@ -56,9 +56,9 @@ $widgets = [
         "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
     ],
     [
-        "title" => "Feedback Received",
+        "title" => "Feedback",
         "icon" => "fa-comments",
-        "color" => "yellow",
+        "color" => "orange",
         "query" => "SELECT COUNT(*) FROM feedback"
     ],
     [
@@ -67,33 +67,12 @@ $widgets = [
         "color" => "red",
         "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
     ],
-    /**[
-        "title" => "Number of Classes",
-        "icon" => "fa-school",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM classes"
-    ],**/
-    /**[
-        "title" => "Number of Sections",
-        "icon" => "fa-th-large",
-        "color" => "teal",
-        "query" => "SELECT COUNT(*) FROM sections"
-    ],
-    // Add widget for total curriculums
     [
-        "title" => "Total Curriculums",
-        "icon" => "fa-list",
+        "title" => "Messages",
+        "icon" => "fa-envelope",
         "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM curriculums"
-    ]**/
-    
-    // Add widget for curriculum-grade/class mappings
-    /**[
-      /**  "title" => "Curriculum-Grade/Class Mappings",
-        "icon" => "fa-layer-group",
-        "color" => "purple",
-        "query" => "SELECT COUNT(*) FROM curriculum_grades"
-    ]**/
+        "query" => "SELECT COUNT(*) FROM messages"
+    ]
 ];
 
 foreach ($widgets as &$widget) {
@@ -196,6 +175,44 @@ try {
     }
 } catch (Exception $e) {
     $gradeByLevel = [];
+}
+
+// Fetch survey participation stats for chart
+$surveyStats = [];
+try {
+    $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
+        FROM surveys s
+        LEFT JOIN survey_responses sr ON s.id = sr.survey_id
+        GROUP BY s.id
+        ORDER BY responses DESC
+        LIMIT 7");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $surveyStats[$row['title']] = $row['responses'];
+    }
+} catch (Exception $e) {
+    $surveyStats = [];
+}
+
+// Fetch feedback rating distribution for chart
+$feedbackRatings = [];
+try {
+    $stmt = $pdo->query("SELECT rating, COUNT(*) as count FROM feedback GROUP BY rating ORDER BY rating");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $feedbackRatings[$row['rating']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $feedbackRatings = [];
+}
+
+// Fetch support ticket status distribution for chart
+$ticketStatus = [];
+try {
+    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM support_tickets GROUP BY status");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $ticketStatus[$row['status']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $ticketStatus = [];
 }
 ?>
 
@@ -418,30 +435,24 @@ try {
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Grade Scale Chart -->
-               <!-- <div class="dashboard-section">
-                    <h2>Grade Scale Distribution (All Students)</h2>
-                    <canvas id="gradeScaleChart" height="80"></canvas>
-                </div> -->
+                <!-- Survey Participation Chart -->
+                <div class="dashboard-section">
+                    <h2>Survey Participation</h2>
+                    <canvas id="surveyParticipationChart" height="80"></canvas>
+                </div>
 
-                 <!--Grade Distribution by Class -->
-                <!--<div class="dashboard-section">
-                    <h2>Grade Distribution by Class</h2>
-                    <canvas id="gradeByClassChart" height="100"></canvas>
-                </div> -->
+                <!-- Feedback Ratings Chart -->
+                <div class="dashboard-section">
+                    <h2>Feedback Ratings</h2>
+                    <canvas id="feedbackRatingsChart" height="80"></canvas>
+                </div>
 
-                <!-- Grade Distribution by Section -->
-                <!--<div class="dashboard-section">
-                    <h2>Grade Distribution by Section</h2>
-                    <canvas id="gradeBySectionChart" height="100"></canvas>
-                </div> -->
+                <!-- Support Ticket Status Chart -->
+                <div class="dashboard-section">
+                    <h2>Support Ticket Status</h2>
+                    <canvas id="ticketStatusChart" height="80"></canvas>
+                </div>
 
-                <!-- Grade Distribution by Level/Grade -->
-               <!-- <div class="dashboard-section">
-                    <h2>Grade Distribution by Level/Grade</h2>
-                    <canvas id="gradeByLevelChart" height="100"></canvas>
-                </div> -->
-                    
                 <!-- System Stats Section -->
                 <div class="dashboard-section">
                     <h2>System Stats</h2>
@@ -636,6 +647,48 @@ try {
             type: 'bar',
             data: { labels: levelLabels, datasets: datasetsByLevel },
             options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
+        });
+
+        // Survey Participation Chart
+        new Chart(document.getElementById('surveyParticipationChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode(array_keys($surveyStats)) ?>,
+                datasets: [{
+                    label: 'Responses',
+                    data: <?= json_encode(array_values($surveyStats)) ?>,
+                    backgroundColor: '#3b82f6'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+
+        // Feedback Ratings Chart
+        new Chart(document.getElementById('feedbackRatingsChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
+                datasets: [{
+                    label: 'Feedback Ratings',
+                    data: <?= json_encode(array_values($feedbackRatings)) ?>,
+                    backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // Support Ticket Status Chart
+        new Chart(document.getElementById('ticketStatusChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: <?= json_encode(array_keys($ticketStatus)) ?>,
+                datasets: [{
+                    label: 'Tickets',
+                    data: <?= json_encode(array_values($ticketStatus)) ?>,
+                    backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
+                }]
+            },
+            options: { responsive: true }
         });
     </script>
 </body>
