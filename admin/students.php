@@ -108,12 +108,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_selected'])) {
     $selected_students = $_POST['selected_students'] ?? [];
     $class_id = intval($_POST['bulk_class_id'] ?? 0);
-    $section_id = intval($_POST['bulk_section_id'] ?? 0);
+    $section_id = $_POST['bulk_section_id'] !== "" ? intval($_POST['bulk_section_id']) : null;
     $assigned = 0; $errors = [];
     foreach ($selected_students as $student_id) {
         $student_id = intval($student_id);
         if (!$student_id || !$class_id) continue;
-        $pdo->prepare("UPDATE students SET class_id=? WHERE id=?")->execute([$class_id, $student_id]);
+        // Assign both class and section at once
+        $pdo->prepare("UPDATE students SET class_id=?, section_id=? WHERE id=?")->execute([$class_id, $section_id, $student_id]);
         if ($section_id) {
             // Remove from all batches
             $pdo->prepare("DELETE FROM enrollments WHERE student_id=?")->execute([$student_id]);
