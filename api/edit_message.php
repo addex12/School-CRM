@@ -27,7 +27,7 @@ if (!$message) {
     exit;
 }
 
-$stmt = $pdo->prepare("UPDATE messages SET message = ?, updated_at = NOW() WHERE id = ?");
+$stmt = $pdo->prepare("UPDATE messages SET content = ?, updated_at = NOW() WHERE id = ?");
 if ($stmt->execute([$newMessage, $messageId])) {
     echo json_encode(['success' => true]);
 } else {
