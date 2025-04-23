@@ -9,6 +9,7 @@ require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
+$users = $pdo->query("SELECT id, username, last_active FROM users WHERE online == 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
 $pageTitle = "Active Users";
 
