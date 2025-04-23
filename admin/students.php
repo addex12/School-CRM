@@ -36,16 +36,6 @@ $stmt = $pdo->query("
 ");
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// --- Classes and sections may not exist, so check before querying ---
-$classes = [];
-$sections = [];
-try {
-    $classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
-    $sections = $pdo->query("SELECT id, section_name, class_id FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    // If classes/sections tables do not exist, leave arrays empty
-}
-
 // Handle bulk assign (CSV import)
 $bulk_error = $bulk_success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
@@ -326,12 +316,8 @@ function sort_link($col, $label, $current_sort, $current_order) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: #f5f7fa;
-        }
-        .admin-main {
-            margin-left: 250px;
-        }
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
         .dashboard-section {
             background: #fff;
             border-radius: 8px;
@@ -419,32 +405,13 @@ function sort_link($col, $label, $current_sort, $current_order) {
             margin-bottom: 10px;
             width: 100%;
         }
-        .table-responsive {
-            overflow-x: auto;
-        }
+        .table-responsive { overflow-x: auto; }
         @media (max-width: 900px) {
             .dashboard-section { padding: 1rem; }
             .students-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
         }
         @media (max-width: 600px) {
             .excel-table th, .excel-table td { padding: 8px 6px; }
-        }
-        .bulk-select-bar {
-            background: #e2efda;
-            border-radius: 6px;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-        .bulk-select-bar label {
-            margin: 0 0.5rem 0 0;
-            font-weight: 500;
-            color: #215967;
-        }
-        .bulk-select-bar select {
-            min-width: 120px;
         }
     </style>
 </head>
@@ -462,254 +429,46 @@ function sort_link($col, $label, $current_sort, $current_order) {
                         <a href="students.php?export=1" class="erpnext-btn btn-sm btn-secondary">Export Students</a>
                         <a href="download_template.php?type=students_assign" class="erpnext-btn btn-sm btn-secondary">Download CSV Template</a>
                     </div>
-                    <p style="color:#888;">CSV columns: username, class_id, section_id (section_id optional)</p>
-                </div>
-                <div class="dashboard-section">
-                    <h2 style="color:#215967;">Assign Student to Class/Section</h2>
-                    <form method="post" style="display:flex; flex-wrap:wrap; gap:1.5rem;">
-                        <div style="flex:1 1 200px;">
-                            <label class="form-label">Student:</label>
-                            <select name="student_id" required>
-                                <option value="">Select Student</option>
-                                <?php foreach ($students as $s): ?>
-                                    <option value="<?= esc($s['student_id']) ?>"><?= esc($s['username']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div style="flex:1 1 200px;">
-                            <label class="form-label">Class:</label>
-                            <select name="class_id" id="class_id_select" required>
-                                <option value="">Select Class</option>
-                                <?php foreach ($classes as $c): ?>
-                                    <option value="<?= esc($c['id']) ?>"><?= esc($c['class_name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div style="flex:1 1 200px;">
-                            <label class="form-label">Section (optional):</label>
-                            <select name="section_id" id="section_id_select">
-                                <option value="">Select Section</option>
-                                <?php foreach ($sections as $sec): ?>
-                                    <option value="<?= esc($sec['id']) ?>" data-class="<?= esc($sec['class_id']) ?>"><?= esc($sec['section_name']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div style="align-self:flex-end;">
-                            <button type="submit" name="assign_single" class="erpnext-btn btn-sm btn-success">Assign</button>
-                        </div>
-                    </form>
-                </div>
-                <div class="dashboard-section">
-                    <div class="students-header">
-                        <h2>Student List</h2>
-                    </div>
-                    <!-- Bulk selection bar -->
-                    <form method="post" id="bulkAssignForm">
-                        <div class="bulk-select-bar">
-                            <label><input type="checkbox" id="select_all_students"> Select All</label>
-                            <label>Class:
-                                <select name="bulk_class_id" required>
-                                    <option value="">Select Class</option>
-                                    <?php foreach ($classes as $c): ?>
-                                        <option value="<?= esc($c['id']) ?>"><?= esc($c['class_name']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </label>
-                            <label>Section (optional):
-                                <select name="bulk_section_id">
-                                    <option value="">Select Section</option>
-                                    <?php foreach ($sections as $sec): ?>
-                                        <option value="<?= esc($sec['id']) ?>" data-class="<?= esc($sec['class_id']) ?>"><?= esc($sec['section_name']) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </label>
-                            <button type="submit" name="bulk_assign_selected" class="erpnext-btn btn-sm btn-success">Assign Selected</button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="excel-table">
-                                <thead>
-                                    <tr>
-                                        <th><input type="checkbox" id="select_all_students_head"></th>
-                                        <th><?= sort_link('user_id', 'User ID', $sort, $order) ?></th>
-                                        <th><?= sort_link('username', 'Username', $sort, $order) ?></th>
-                                        <th><?= sort_link('email', 'Email', $sort, $order) ?></th>
-                                        <th><?= sort_link('class_name', 'Class', $sort, $order) ?></th>
-                                        <th><?= sort_link('section_name', 'Section', $sort, $order) ?></th>
-                                        <th><?= sort_link('status', 'Status', $sort, $order) ?></th>
-                                        <th><?= sort_link('created_at', 'Created At', $sort, $order) ?></th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="students-tbody">
-                                    <?php if (!empty($students)): ?>
-                                        <?php foreach ($students as $s): ?>
-                                            <tr data-student-id="<?= esc($s['student_id']) ?>">
-                                                <td><input type="checkbox" name="selected_students[]" value="<?= esc($s['student_id']) ?>" class="student-checkbox"></td>
-                                                <td><?= esc($s['user_id']) ?></td>
-                                                <td><?= esc($s['username']) ?></td>
-                                                <td><?= esc($s['email']) ?></td>
-                                                <td><?= esc($s['class_name'] ?? '-') ?></td>
-                                                <td><?= esc($s['section_name'] ?? '-') ?></td>
-                                                <td><?= esc($s['status'] ?? '-') ?></td>
-                                                <td><?= esc($s['created_at'] ?? '-') ?></td>
-                                                <td>
-                                                    <button type="button" class="erpnext-btn btn-sm btn-secondary edit-student-btn" data-student-id="<?= esc($s['student_id']) ?>">Edit</button>
-                                                    <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
-                                                </td>
-                                            </tr>
-                                            <tr class="edit-row" id="edit-row-<?= esc($s['student_id']) ?>" style="display:none;">
-                                                <td colspan="9">
-                                                    <form class="edit-student-form" data-student-id="<?= esc($s['student_id']) ?>" style="display:flex;gap:1rem;align-items:center;">
-                                                        <input type="hidden" name="student_id" value="<?= esc($s['student_id']) ?>">
-                                                        <label>Class:
-                                                            <select name="class_id" required>
-                                                                <?php foreach ($classes as $c): ?>
-                                                                    <option value="<?= esc($c['id']) ?>" <?= ($s['class_id'] == $c['id']) ? 'selected' : '' ?>><?= esc($c['class_name']) ?></option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                        </label>
-                                                        <label>Section:
-                                                            <select name="section_id">
-                                                                <option value="">Select Section</option>
-                                                                <?php foreach ($sections as $sec): ?>
-                                                                    <option value="<?= esc($sec['id']) ?>" <?= ($s['section_id'] == $sec['id']) ? 'selected' : '' ?>><?= esc($sec['section_name']) ?></option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                        </label>
-                                                        <label>Status:
-                                                            <input type="text" name="status" value="<?= esc($s['status']) ?>">
-                                                        </label>
-                                                        <button type="submit" class="erpnext-btn btn-sm btn-success">Save</button>
-                                                        <button type="button" class="erpnext-btn btn-sm btn-secondary cancel-edit-btn">Cancel</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="excel-table">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($students)): ?>
+                                    <?php foreach ($students as $s): ?>
                                         <tr>
-                                            <td colspan="9">No students found.</td>
+                                            <td><?= esc($s['user_id']) ?></td>
+                                            <td><?= esc($s['username']) ?></td>
+                                            <td><?= esc($s['email']) ?></td>
+                                            <td><?= esc($s['status'] ?? '-') ?></td>
+                                            <td><?= esc($s['created_at'] ?? '-') ?></td>
+                                            <td>
+                                                <a href="students.php?edit_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
+                                            </td>
                                         </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </form>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="6">No students found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-    <script>
-        // Bulk select all checkboxes
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAll = document.getElementById('select_all_students');
-            const selectAllHead = document.getElementById('select_all_students_head');
-            const checkboxes = document.querySelectorAll('.student-checkbox');
-            function toggleAll(checked) {
-                checkboxes.forEach(cb => cb.checked = checked);
-            }
-            if (selectAll) selectAll.addEventListener('change', e => toggleAll(e.target.checked));
-            if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
-        });
-
-        // Filter sections based on selected class (for bulk assign bar)
-        document.addEventListener('DOMContentLoaded', function() {
-            const classSelect = document.querySelector('select[name="bulk_class_id"]');
-            const sectionSelect = document.querySelector('select[name="bulk_section_id"]');
-            if (classSelect && sectionSelect) {
-                const allOptions = Array.from(sectionSelect.options);
-                function filterSections() {
-                    const classId = classSelect.value;
-                    sectionSelect.innerHTML = '';
-                    allOptions.forEach(opt => {
-                        if (!opt.value || !classId || opt.getAttribute('data-class') === classId) {
-                            sectionSelect.appendChild(opt.cloneNode(true));
-                        }
-                    });
-                }
-                classSelect.addEventListener('change', filterSections);
-                filterSections();
-            }
-        });
-
-        // Filter sections based on selected class
-        document.addEventListener('DOMContentLoaded', function() {
-            const classSelect = document.getElementById('class_id_select');
-            const sectionSelect = document.getElementById('section_id_select');
-            const allOptions = Array.from(sectionSelect.options);
-
-            function filterSections() {
-                const classId = classSelect.value;
-                sectionSelect.innerHTML = '';
-                allOptions.forEach(opt => {
-                    if (!opt.value || !classId || opt.getAttribute('data-class') === classId) {
-                        sectionSelect.appendChild(opt.cloneNode(true));
-                    }
-                });
-            }
-
-            classSelect.addEventListener('change', filterSections);
-            filterSections();
-        });
-
-        // Edit student row show/hide and AJAX save
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show edit row
-            document.querySelectorAll('.edit-student-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    var id = btn.getAttribute('data-student-id');
-                    document.querySelectorAll('.edit-row').forEach(function(row) { row.style.display = 'none'; });
-                    var editRow = document.getElementById('edit-row-' + id);
-                    if (editRow) editRow.style.display = '';
-                });
-            });
-            // Cancel edit
-            document.querySelectorAll('.cancel-edit-btn').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    btn.closest('.edit-row').style.display = 'none';
-                });
-            });
-            // AJAX save
-            document.querySelectorAll('.edit-student-form').forEach(function(form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    var fd = new FormData(form);
-                    fd.append('ajax_edit_student', '1');
-                    fetch('students.php', {
-                        method: 'POST',
-                        body: fd
-                    }).then(res => res.json()).then(data => {
-                        if (data.success) {
-                            window.location.reload();
-                        }
-                    });
-                });
-            });
-        });
-
-        // AJAX bulk assign selected students
-        document.addEventListener('DOMContentLoaded', function() {
-            var bulkForm = document.getElementById('bulkAssignForm');
-            if (bulkForm) {
-                bulkForm.addEventListener('submit', function(e) {
-                    if (bulkForm.querySelector('button[name="bulk_assign_selected"]')) {
-                        e.preventDefault();
-                        var fd = new FormData(bulkForm);
-                        fd.append('ajax_bulk_assign_selected', '1');
-                        fetch('students.php', {
-                            method: 'POST',
-                            body: fd
-                        }).then(res => res.json()).then(data => {
-                            if (data.success) {
-                                window.location.reload();
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    </script>
-    <script src="bulk_import_progress.js"></script>
-    <?php require_once '../includes/footer.php';?>
 </body>
 </html>
-<?php ob_end_flush(); // Output buffer end ?>
+<?php ob_end_flush(); ?>    
