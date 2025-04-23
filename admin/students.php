@@ -15,6 +15,20 @@ foreach ($studentUsers as $user_id) {
     }
 }
 
+// Sorting logic
+$sortable_columns = [
+    'user_id' => 'u.id',
+    'username' => 'u.username',
+    'email' => 'u.email',
+    'class_name' => 'c.class_name',
+    'section_name' => 'sec.section_name',
+    'status' => 's.status',
+    'created_at' => 's.created_at'
+];
+$sort = $_GET['sort'] ?? 'username';
+$order = strtolower($_GET['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+$sort_sql = $sortable_columns[$sort] ?? 'u.username';
+
 // Fetch all users with student role (role_id = 4 or role_name = 'student')
 $stmt = $pdo->query("
     SELECT 
@@ -26,7 +40,7 @@ $stmt = $pdo->query("
     LEFT JOIN sections sec ON s.section_id = sec.id
     LEFT JOIN roles r ON u.role_id = r.id
     WHERE r.role_name = 'student'
-    ORDER BY u.username
+    ORDER BY $sort_sql $order
 ");
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -222,6 +236,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_student'])) {
 }
 
 function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
+function sort_link($col, $label, $current_sort, $current_order) {
+    $next_order = ($current_sort === $col && $current_order === 'asc') ? 'desc' : 'asc';
+    $arrow = '';
+    if ($current_sort === $col) {
+        $arrow = $current_order === 'asc' ? ' ▲' : ' ▼';
+    }
+    $params = $_GET;
+    $params['sort'] = $col;
+    $params['order'] = $next_order;
+    $url = strtok($_SERVER["REQUEST_URI"], '?') . '?' . http_build_query($params);
+    return '<a href="' . esc($url) . '" style="color:inherit;text-decoration:none;">' . esc($label) . $arrow . '</a>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -364,16 +390,10 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
             <div class="content">
                 <div class="dashboard-section">
                     <div class="students-header">
-                        <h2>Bulk Assign Students to Classes/Sections</h2>
-                    </div>
-                    <?php if ($bulk_error): ?><div class="error"><?= esc($bulk_error) ?></div><?php endif; ?>
-                    <?php if ($bulk_success): ?><div class="success"><?= esc($bulk_success) ?></div><?php endif; ?>
-                    <form method="post" enctype="multipart/form-data" style="margin-bottom:1.5rem;">
-                        <input type="file" name="csv_file" accept=".csv" required>
-                        <button type="submit" name="bulk_assign" class="erpnext-btn btn-sm btn-success">Bulk Assign</button>
+                        <h2>Student List</h2>
                         <a href="students.php?export=1" class="erpnext-btn btn-sm btn-secondary">Export Students</a>
                         <a href="download_template.php?type=students_assign" class="erpnext-btn btn-sm btn-secondary">Download CSV Template</a>
-                    </form>
+                    </div>
                     <p style="color:#888;">CSV columns: username, class_id, section_id (section_id optional)</p>
                 </div>
                 <div class="dashboard-section">
@@ -442,13 +462,13 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                 <thead>
                                     <tr>
                                         <th><input type="checkbox" id="select_all_students_head"></th>
-                                        <th>User ID</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Class</th>
-                                        <th>Section</th>
-                                        <th>Status</th>
-                                        <th>Created At</th>
+                                        <th><?= sort_link('user_id', 'User ID', $sort, $order) ?></th>
+                                        <th><?= sort_link('username', 'Username', $sort, $order) ?></th>
+                                        <th><?= sort_link('email', 'Email', $sort, $order) ?></th>
+                                        <th><?= sort_link('class_name', 'Class', $sort, $order) ?></th>
+                                        <th><?= sort_link('section_name', 'Section', $sort, $order) ?></th>
+                                        <th><?= sort_link('status', 'Status', $sort, $order) ?></th>
+                                        <th><?= sort_link('created_at', 'Created At', $sort, $order) ?></th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>

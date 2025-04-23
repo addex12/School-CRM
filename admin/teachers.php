@@ -22,6 +22,23 @@ foreach ($teacherUsers as $user_id) {
     }
 }
 
+// Sorting logic
+$sortable_columns = [
+    'user_id' => 'u.id',
+    'username' => 'u.username',
+    'email' => 'u.email',
+    'qualification' => 't.qualification',
+    'subject_specialization' => 't.subject_specialization',
+    'date_of_birth' => 't.date_of_birth',
+    'gender' => 't.gender',
+    'address' => 't.address',
+    'status' => 't.status',
+    'created_at' => 't.created_at'
+];
+$sort = $_GET['sort'] ?? 'username';
+$order = strtolower($_GET['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+$sort_sql = $sortable_columns[$sort] ?? 'u.username';
+
 // Fetch all users with teacher role (role_id = 2 or role_name = 'teacher')
 $stmt = $pdo->query("
     SELECT 
@@ -31,7 +48,7 @@ $stmt = $pdo->query("
     LEFT JOIN teachers t ON t.user_id = u.id
     LEFT JOIN roles r ON u.role_id = r.id
     WHERE r.role_name = 'teacher'
-    ORDER BY u.username
+    ORDER BY $sort_sql $order
 ");
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -94,6 +111,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign_selected_
 
 // Helper
 function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
+function sort_link($col, $label, $current_sort, $current_order) {
+    $next_order = ($current_sort === $col && $current_order === 'asc') ? 'desc' : 'asc';
+    $arrow = '';
+    if ($current_sort === $col) {
+        $arrow = $current_order === 'asc' ? ' ▲' : ' ▼';
+    }
+    $params = $_GET;
+    $params['sort'] = $col;
+    $params['order'] = $next_order;
+    $url = strtok($_SERVER["REQUEST_URI"], '?') . '?' . http_build_query($params);
+    return '<a href="' . esc($url) . '" style="color:inherit;text-decoration:none;">' . esc($label) . $arrow . '</a>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -250,17 +279,17 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                             <table class="excel-table">
                                 <thead>
                                     <tr>
-                                        <th><input type="checkbox" id="select_all_teachers_head"></th>
-                                        <th>User ID</th>
-                                        <th>Username</th>
-                                        <th>Email</th>
-                                        <th>Qualification</th>
-                                        <th>Subject Specialization</th>
-                                        <th>Date of Birth</th>
-                                        <th>Gender</th>
-                                        <th>Address</th>
-                                        <th>Status</th>
-                                        <th>Created At</th>
+                                        <th></th>
+                                        <th><?= sort_link('user_id', 'User ID', $sort, $order) ?></th>
+                                        <th><?= sort_link('username', 'Username', $sort, $order) ?></th>
+                                        <th><?= sort_link('email', 'Email', $sort, $order) ?></th>
+                                        <th><?= sort_link('qualification', 'Qualification', $sort, $order) ?></th>
+                                        <th><?= sort_link('subject_specialization', 'Subject Specialization', $sort, $order) ?></th>
+                                        <th><?= sort_link('date_of_birth', 'Date of Birth', $sort, $order) ?></th>
+                                        <th><?= sort_link('gender', 'Gender', $sort, $order) ?></th>
+                                        <th><?= sort_link('address', 'Address', $sort, $order) ?></th>
+                                        <th><?= sort_link('status', 'Status', $sort, $order) ?></th>
+                                        <th><?= sort_link('created_at', 'Created At', $sort, $order) ?></th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
