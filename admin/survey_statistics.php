@@ -94,7 +94,7 @@ $chart_json = json_encode($chart_data);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Survey Statistics - Admin Panel</title>
+    <title><?= esc($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -235,7 +235,7 @@ $chart_json = json_encode($chart_data);
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><i class="fas fa-chart-pie"></i> {{ pageTitle }}</h1>
+                <h1><i class="fas fa-chart-pie"></i> {{ $pageTitle }}</h1>
             </header>
             <div class="content">
                 <div class="filter-section">
