@@ -11,6 +11,8 @@ requireAdmin();
 $pageTitle = "Active Users";
 
 // Place this block here, after DB connection is established
+
+$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 $allSearch = isset($_GET['all_search']) ? trim($_GET['all_search']) : '';
 $allConditions = ["status = 'active'"];
 $allParams = [];
@@ -20,8 +22,6 @@ if ($allSearch) {
     $allParams[':search_name'] = '%' . $allSearch . '%';
     $allParams[':search_email'] = '%' . $allSearch . '%';
 }
-$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
-
 // Fetch all roles for filter dropdown (do this first, always)
 try {
     $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
