@@ -12,7 +12,7 @@ $pageTitle = "Active Users";
 
 // Only fetch id, username, last_active for active users, ordered by username
 try {
-    $users = $pdo->query("SELECT id, username, last_active FROM users WHERE status = 'active' ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+    $users = $pdo->query("SELECT id, username, last_active FROM users WHERE active = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
     unset($error);
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
