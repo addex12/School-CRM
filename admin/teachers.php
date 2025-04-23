@@ -25,6 +25,30 @@ $stmt = $pdo->query("
 ");
 $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Handle CRUD actions for teachers
+if (isset($_GET['delete_teacher']) && is_numeric($_GET['delete_teacher'])) {
+    $teacher_id = intval($_GET['delete_teacher']);
+    $pdo->prepare("DELETE FROM teachers WHERE id=?")->execute([$teacher_id]);
+    // Optionally, delete user as well (uncomment if needed)
+    // $pdo->prepare("DELETE FROM users WHERE id=(SELECT user_id FROM teachers WHERE id=?)")->execute([$teacher_id]);
+    header("Location: teachers.php?msg=Teacher+deleted");
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_teacher'])) {
+    $teacher_id = intval($_POST['teacher_id']);
+    $qualification = trim($_POST['qualification']);
+    $subject_specialization = trim($_POST['subject_specialization']);
+    $date_of_birth = trim($_POST['date_of_birth']);
+    $gender = trim($_POST['gender']);
+    $address = trim($_POST['address']);
+    $status = trim($_POST['status']);
+    $pdo->prepare("UPDATE teachers SET qualification=?, subject_specialization=?, date_of_birth=?, gender=?, address=?, status=? WHERE id=?")
+        ->execute([$qualification, $subject_specialization, $date_of_birth, $gender, $address, $status, $teacher_id]);
+    header("Location: teachers.php?msg=Teacher+updated");
+    exit;
+}
+
 // Helper
 function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
 ?>
@@ -175,10 +199,39 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                             <td><?= esc($teacher['status'] ?? '-') ?></td>
                                             <td><?= esc($teacher['created_at'] ?? '-') ?></td>
                                             <td>
-                                                <a href="edit_teacher.php?id=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-secondary" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <a href="view_teacher.php" class="erpnext-btn btn-sm btn-secondary" title="View All"><i class="fas fa-eye"></i></a>
+                                                <a href="teachers.php?edit_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                <a href="teachers.php?delete_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher?')">Delete</a>
                                             </td>
                                         </tr>
+                                        <?php if (isset($_GET['edit_teacher']) && $_GET['edit_teacher'] == $teacher['teacher_id']): ?>
+                                        <tr>
+                                            <td colspan="11">
+                                                <form method="post" style="display:flex;gap:1rem;align-items:center;">
+                                                    <input type="hidden" name="teacher_id" value="<?= esc($teacher['teacher_id']) ?>">
+                                                    <label>Qualification:
+                                                        <input type="text" name="qualification" value="<?= esc($teacher['qualification']) ?>">
+                                                    </label>
+                                                    <label>Subject Specialization:
+                                                        <input type="text" name="subject_specialization" value="<?= esc($teacher['subject_specialization']) ?>">
+                                                    </label>
+                                                    <label>Date of Birth:
+                                                        <input type="date" name="date_of_birth" value="<?= esc($teacher['date_of_birth']) ?>">
+                                                    </label>
+                                                    <label>Gender:
+                                                        <input type="text" name="gender" value="<?= esc($teacher['gender']) ?>">
+                                                    </label>
+                                                    <label>Address:
+                                                        <input type="text" name="address" value="<?= esc($teacher['address']) ?>">
+                                                    </label>
+                                                    <label>Status:
+                                                        <input type="text" name="status" value="<?= esc($teacher['status']) ?>">
+                                                    </label>
+                                                    <button type="submit" name="edit_teacher" class="erpnext-btn btn-sm btn-success">Save</button>
+                                                    <a href="teachers.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>

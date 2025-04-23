@@ -152,6 +152,28 @@ if (isset($_GET['export'])) {
     exit;
 }
 
+// Handle CRUD actions for students
+if (isset($_GET['delete_student']) && is_numeric($_GET['delete_student'])) {
+    $student_id = intval($_GET['delete_student']);
+    // Delete from students table
+    $pdo->prepare("DELETE FROM students WHERE id=?")->execute([$student_id]);
+    // Optionally, delete user as well (uncomment if needed)
+    // $pdo->prepare("DELETE FROM users WHERE id=(SELECT user_id FROM students WHERE id=?)")->execute([$student_id]);
+    header("Location: students.php?msg=Student+deleted");
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_student'])) {
+    $student_id = intval($_POST['student_id']);
+    $class_id = intval($_POST['class_id']);
+    $section_id = intval($_POST['section_id']);
+    $status = trim($_POST['status']);
+    $pdo->prepare("UPDATE students SET class_id=?, section_id=?, status=? WHERE id=?")
+        ->execute([$class_id, $section_id ?: null, $status, $student_id]);
+    header("Location: students.php?msg=Student+updated");
+    exit;
+}
+
 function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-8'); }
 ?>
 <!DOCTYPE html>
@@ -340,6 +362,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <th>Section</th>
                                     <th>Status</th>
                                     <th>Created At</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -353,11 +376,44 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                             <td><?= esc($s['section_name'] ?? '-') ?></td>
                                             <td><?= esc($s['status'] ?? '-') ?></td>
                                             <td><?= esc($s['created_at'] ?? '-') ?></td>
+                                            <td>
+                                                <a href="students.php?edit_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
+                                            </td>
                                         </tr>
+                                        <?php if (isset($_GET['edit_student']) && $_GET['edit_student'] == $s['student_id']): ?>
+                                        <tr>
+                                            <td colspan="8">
+                                                <form method="post" style="display:flex;gap:1rem;align-items:center;">
+                                                    <input type="hidden" name="student_id" value="<?= esc($s['student_id']) ?>">
+                                                    <label>Class:
+                                                        <select name="class_id" required>
+                                                            <?php foreach ($classes as $c): ?>
+                                                                <option value="<?= esc($c['id']) ?>" <?= ($s['class_id'] == $c['id']) ? 'selected' : '' ?>><?= esc($c['class_name']) ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </label>
+                                                    <label>Section:
+                                                        <select name="section_id">
+                                                            <option value="">Select Section</option>
+                                                            <?php foreach ($sections as $sec): ?>
+                                                                <option value="<?= esc($sec['id']) ?>" <?= ($s['section_id'] == $sec['id']) ? 'selected' : '' ?>><?= esc($sec['section_name']) ?></option>
+                                                            <?php endforeach; ?>
+                                                        </select>
+                                                    </label>
+                                                    <label>Status:
+                                                        <input type="text" name="status" value="<?= esc($s['status']) ?>">
+                                                    </label>
+                                                    <button type="submit" name="edit_student" class="erpnext-btn btn-sm btn-success">Save</button>
+                                                    <a href="students.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <?php endif; ?>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="7">No students found.</td>
+                                        <td colspan="8">No students found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
