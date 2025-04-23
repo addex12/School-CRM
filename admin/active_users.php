@@ -194,7 +194,7 @@ try {
                                     <td><?= htmlspecialchars($user['username']) ?></td>
                                     <td><?= htmlspecialchars($user['email']) ?></td>
                                     <td><?= htmlspecialchars($user['role_name']) ?></td>
-                                    <td><?= htmlspecialchars($user['last_active']) ?></td>
+                                    <td><?= htmlspecialchars($user['last_login) ?></td>
                                     <td class="status-active">Active</td>
                                 </tr>
                                 <?php endforeach; ?>
