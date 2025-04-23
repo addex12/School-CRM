@@ -368,7 +368,7 @@ function sort_link($col, $label, $current_sort, $current_order) {
                 if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
             });
         </script>
-        <?php include 'includes/footer.php'; ?>
+        <?php include './includes/footer.php'; ?>
     </div>
 </body>
 </html>
