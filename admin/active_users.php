@@ -598,6 +598,11 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
 
     // Initial delegate
     delegateCrud();
+
+    // Ensure delegateCrud is called after every AJAX update
+    // Add MutationObserver to handle dynamic table updates
+    const observer = new MutationObserver(delegateCrud);
+    observer.observe(usersTableBody, { childList: true });
     </script>
 </body>
 </html>
