@@ -127,7 +127,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 }
 
 // Fetch roles for filter dropdown
-$roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN());
+$roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
 
 ?>
 <!DOCTYPE html>
