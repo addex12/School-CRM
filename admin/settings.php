@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $start = $_POST['year_start'];
         $end = $_POST['year_end'];
         if ($id && $name && $start && $end) {
+            // Use correct column names: name, start_date, end_date
             $stmt = $pdo->prepare("UPDATE academic_years SET name=?, start_date=?, end_date=? WHERE id=?");
             $stmt->execute([$name, $start, $end, $id]);
             $success = "Academic Year updated!";
