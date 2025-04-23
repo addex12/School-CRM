@@ -175,8 +175,8 @@ if ($scaleCount == 0) {
 }
 
 // Fetch all academic terms and years for dropdowns
-$terms = $pdo->query("SELECT name FROM academic_terms ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
-$currentTerm = $pdo->query("SELECT name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn();
+$terms = $pdo->query("SELECT term_name FROM academic_terms ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
+$currentTerm = $pdo->query("SELECT term_name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn();
 $years = $pdo->query("SELECT year_name FROM academic_years ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
 $currentAcademicYear = $pdo->query("SELECT year_name FROM academic_years WHERE end_date >= CURDATE() ORDER BY start_date DESC LIMIT 1")->fetchColumn();
 
@@ -552,7 +552,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     var sectionsByClass = <?= json_encode($sectionsByClass) ?>;
     var students = <?= json_encode($students) ?>;
     // Fetch current term and academic year from the server (PHP)
-    var currentTerm = <?= json_encode($pdo->query("SELECT name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn() ?: '') ?>;
+    var currentTerm = <?= json_encode($pdo->query("SELECT term_name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn() ?: '') ?>;
     var currentAcademicYear = <?= json_encode($pdo->query("SELECT year_name FROM academic_years WHERE end_date >= CURDATE() ORDER BY start_date DESC LIMIT 1")->fetchColumn() ?: '') ?>;
 
     function updateSubjects() {
