@@ -153,7 +153,9 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="surveys-container">
                     <div class="surveys-header">
                         <h2>Survey List</h2>
-                        <a href="survey_builder.php" class="btn btn-primary"><i class="fas fa-plus"></i> New Survey</a>
+                        <a href="survey_builder.php" class="erpnext-btn btn-sm btn-success" style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;">
+                            <i class="fas fa-plus"></i> New Survey
+                        </a>
                     </div>
                     <div class="table-responsive">
                         <table class="surveys-table">
