@@ -64,95 +64,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Edit User - Admin Panel</title>
+    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .form-group {
-            margin-bottom: 15px;
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2.2rem 2rem 2.5rem 2rem;
         }
-        .form-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .form-group input, .form-group select {
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #215967; }
+        input[type="text"], input[type="email"], select {
             width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 1rem;
         }
         .form-actions {
-            margin-top: 20px;
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
         }
-        .form-actions .btn {
-            padding: 10px 15px;
-            font-size: 16px;
-            border: none;
+        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
+            display: inline-block;
+            padding: 10px 22px;
+            font-size: 15px;
             border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #215967;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
             cursor: pointer;
+            text-decoration: none;
         }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
+        .btn-primary, .erpnext-btn.btn-primary {
+            background: #3b82f6;
+            color: #fff;
         }
-        .btn-secondary {
-            background-color: #6c757d;
-            color: white;
+        .btn-primary:hover, .erpnext-btn.btn-primary:hover {
+            background: #2563eb;
         }
-        .btn:hover {
-            opacity: 0.9;
+        .btn-secondary, .erpnext-btn.btn-secondary {
+            background: #eaeaea;
+            color: #666;
+        }
+        .btn-secondary:hover, .erpnext-btn.btn-secondary:hover {
+            background: #e2efda;
+            color: #215967;
         }
         .error-message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            background-color: #f8d7da;
-            color: #721c24;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #fca5a5;
+        }
+        @media (max-width: 900px) {
+            .form-container, .admin-main { padding: 1rem; }
+        }
+        @media (max-width: 600px) {
+            .form-container, .admin-main { padding: 4px; }
+            .erpnext-btn, .btn, .btn-primary { padding: 6px 10px; font-size: 0.95em; }
         }
     </style>
+    <script src="../assets/js/edit_user_validation.js"></script>
 </head>
-<script src="../assets/js/edit_user_validation.js"></script>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1>Edit User</h1>
+                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-user-edit"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
-            <div class="content">
+            <div class="form-container">
                 <?php if (isset($_SESSION['error'])): ?>
                     <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
                 <?php endif; ?>
-
                 <form method="POST">
                     <input type="hidden" name="update_user">
-                    
                     <div class="form-group">
                         <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+                        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username']); ?>" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']); ?>" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="role">Role:</label>
                         <select id="role" name="role_id" required>
                             <?php foreach ($roles as $role): ?>
-                                <option value="<?php echo $role['id']; ?>" <?php echo $role['id'] == $user['role_id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($role['role_name']); ?>
+                                <option value="<?= $role['id']; ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : ''; ?>>
+                                    <?= htmlspecialchars($role['role_name']); ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    
                     <div class="form-actions">
-                        <a href="users.php" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-primary">Update User</button>
+                        <a href="users.php" class="erpnext-btn btn-secondary">Cancel</a>
+                        <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-save"></i> Update User</button>
                     </div>
                 </form>
             </div>
@@ -161,3 +183,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
+<?php ob_end_flush(); ?>
