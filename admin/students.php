@@ -58,9 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
                 $batch->execute([$class_id, $section_id]);
                 $batch_id = $batch->fetchColumn();
                 if (!$batch_id) {
-                    // Set program_id to 0 (or a valid default) instead of NULL
-                    $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (0,?,?,?)")
-                        ->execute([$class_id, $section_id, "Class $class_id - Section $section_id"]);
+                    // Fetch a valid program_id (first available) or fallback to a safe value
+                    $program_id = $pdo->query("SELECT id FROM programs LIMIT 1")->fetchColumn();
+                    if (!$program_id) {
+                        // If no program exists, create one or handle error as needed
+                        $pdo->prepare("INSERT INTO programs (name) VALUES ('Default Program')")->execute();
+                        $program_id = $pdo->lastInsertId();
+                    }
+                    $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (?, ?, ?, ?)")
+                        ->execute([$program_id, $class_id, $section_id, "Class $class_id - Section $section_id"]);
                     $batch_id = $pdo->lastInsertId();
                 }
                 // Enroll student in batch
@@ -94,9 +100,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_single'])) {
             $batch->execute([$class_id, $section_id]);
             $batch_id = $batch->fetchColumn();
             if (!$batch_id) {
-                // Set program_id to 0 (or a valid default) instead of NULL
-                $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (0,?,?,?)")
-                    ->execute([$class_id, $section_id, "Class $class_id - Section $section_id"]);
+                // Fetch a valid program_id (first available) or fallback to a safe value
+                $program_id = $pdo->query("SELECT id FROM programs LIMIT 1")->fetchColumn();
+                if (!$program_id) {
+                    // If no program exists, create one or handle error as needed
+                    $pdo->prepare("INSERT INTO programs (name) VALUES ('Default Program')")->execute();
+                    $program_id = $pdo->lastInsertId();
+                }
+                $pdo->prepare("INSERT INTO batches (program_id, class_id, section_id, name) VALUES (?, ?, ?, ?)")
+                    ->execute([$program_id, $class_id, $section_id, "Class $class_id - Section $section_id"]);
                 $batch_id = $pdo->lastInsertId();
             }
             // Enroll student in batch if not already enrolled
