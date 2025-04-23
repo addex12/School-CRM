@@ -5,7 +5,7 @@
  * LinkedIn: https://www.linkedin.com/in/eleganceict
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
- */
+ */ob_start();
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -248,3 +248,4 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>
 </body>
 </html>
+<?php ob_end_flush(); ?>
