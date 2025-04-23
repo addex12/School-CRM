@@ -6,7 +6,8 @@ requireAdmin();
 $pageTitle = "Add User";
 
 // Reconnect to MySQL if "server has gone away"
-function ensurePdoConnection($pdo) {
+function ensurePdoConnection($pdo)
+{
     try {
         $pdo->query('SELECT 1');
     } catch (PDOException $e) {
@@ -27,6 +28,18 @@ $pdo = ensurePdoConnection($pdo);
 // Get roles with IDs (fix: fetch as associative array)
 $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll(PDO::FETCH_ASSOC);
 
+// For AJAX polling progress
+if (isset($_GET['bulk_progress'])) {
+    $progressFile = sys_get_temp_dir() . '../assets/js/bulk_import_progress.json';
+    if (file_exists($progressFile)) {
+        header('Content-Type: application/json');
+        echo file_get_contents($progressFile);
+    } else {
+        echo json_encode(['percent' => 0, 'status' => 'Starting...']);
+    }
+    exit;
+}
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
@@ -39,25 +52,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
                 throw new Exception("Failed to upload file");
             }
-        
+
+            $progressFile = sys_get_temp_dir() . '../assets/js/bulk_import_progress.json';
+            $totalRows = 0;
             $file = $_FILES['csv_file']['tmp_name'];
             $handle = fopen($file, 'r');
             if (!$handle) {
                 throw new Exception("Failed to open uploaded file");
             }
-
-            // Remove transaction for bulk import to avoid "server has gone away" on large files
-            // $pdo->beginTransaction();
+            // Count total rows for progress
+            while (fgetcsv($handle)) $totalRows++;
+            rewind($handle);
 
             // Skip header
             fgetcsv($handle);
-
-            $rowNumber = 1; // Start counting from header row
+            $rowNumber = 1;
             $errors = [];
             $imported = 0;
+            $currentRow = 0;
+
+            // Write initial progress
+            file_put_contents($progressFile, json_encode(['percent' => 0, 'status' => 'Starting...']));
 
             while (($data = fgetcsv($handle)) !== false) {
                 $rowNumber++;
+                $currentRow++;
                 $username = trim($data[0] ?? '');
                 $email = trim($data[1] ?? '');
                 $roleName = trim($data[2] ?? ''); // Now using role name
@@ -78,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("SELECT id FROM roles WHERE LOWER(role_name) = LOWER(?)");
                 $stmt->execute([$roleName]);
                 $role = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
                 if (!$role) {
                     $errors[] = "Row $rowNumber: Role '$roleName' does not exist";
                     continue;
@@ -110,16 +129,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = "Dear School CRM Family! As per your request, following are your temporary credentials.\nUsername: $username\nTemporary Password: $temp_password";
                 $headers = "From: adugna.gizaw@flipperschools.com";
                 @mail($to, $subject, $message, $headers);
+
+                // Update progress
+                $percent = $totalRows > 0 ? intval(($currentRow / $totalRows) * 100) : 100;
+                file_put_contents($progressFile, json_encode([
+                    'percent' => $percent,
+                    'status' => "Imported $currentRow of $totalRows"
+                ]));
             }
 
             fclose($handle);
 
-            // $pdo->commit();
+            // Final progress
+            file_put_contents($progressFile, json_encode([
+                'percent' => 100,
+                'status' => "Done. Imported $imported users." . (empty($errors) ? "" : " Some rows had errors.")
+            ]));
 
             if (!empty($errors)) {
                 $_SESSION['bulk_import_errors'] = $errors;
             }
             $_SESSION['success'] = "Bulk import completed. $imported users imported." . (empty($errors) ? "" : " Some rows had errors.");
+
+            // Remove progress file after a short delay (let JS poll one last time)
+            register_shutdown_function(function () use ($progressFile) {
+                sleep(3);
+                @unlink($progressFile);
+            });
 
             header("Location: add_users.php");
             exit();
@@ -185,6 +221,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -196,29 +233,35 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
-            overflow: hidden; /* Prevent content overflow */
+            overflow: hidden;
+            /* Prevent content overflow */
         }
 
         .form-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr; /* Ensure two equal columns */
+            grid-template-columns: 1fr 1fr;
+            /* Ensure two equal columns */
             gap: 2rem;
             margin-top: 2rem;
-            align-items: start; /* Align items at the start for consistent alignment */
+            align-items: start;
+            /* Align items at the start for consistent alignment */
         }
 
         .admin-main {
-            margin-left: 250px; /* Adjust to ensure it doesn't overlap the sidebar */
+            margin-left: 250px;
+            /* Adjust to ensure it doesn't overlap the sidebar */
         }
 
         .card {
             background: white;
             border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 2rem;
             display: flex;
-            flex-direction: column; /* Ensure content stacks properly */
-            justify-content: space-between; /* Space out content evenly */
+            flex-direction: column;
+            /* Ensure content stacks properly */
+            justify-content: space-between;
+            /* Space out content evenly */
         }
 
         .form-group {
@@ -232,7 +275,8 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             color: #374151;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid #e5e7eb;
@@ -264,22 +308,23 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             color: white;
             border: none;
         }
-        .success-message {
-    background: #dcfce7;
-    color: #16a34a;
-    padding: 1rem;
-    border-radius: 0.375rem;
-    margin-bottom: 1.5rem;
-}
 
-.admin-header h1 {
-    font-size: 2rem;
-    font-weight: 600;
-    color: #1f2937;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e5e7eb;
-}
+        .success-message {
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
 
         .error-message {
             background: #fee2e2;
@@ -297,7 +342,10 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             background: #f8fafc;
         }
 
-        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
+        .erpnext-btn,
+        .btn,
+        .btn-primary,
+        .btn-secondary {
             display: inline-block;
             padding: 10px 22px;
             font-size: 15px;
@@ -307,25 +355,33 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             color: #222d32;
             font-weight: 600;
             transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            box-shadow: 0 1px 2px rgba(44, 62, 80, 0.04);
             cursor: pointer;
             margin-right: 4px;
         }
-        .erpnext-btn:hover, .btn:hover, .btn-primary:hover, .btn-secondary:hover {
+
+        .erpnext-btn:hover,
+        .btn:hover,
+        .btn-primary:hover,
+        .btn-secondary:hover {
             background: #e2efda;
             color: #215967;
         }
+
         .btn-primary {
             background: #3b82f6;
             color: white;
         }
+
         .btn-primary:hover {
             background: #2563eb;
         }
+
         .btn-secondary {
             background: #eaeaea;
             color: #666;
         }
+
         .progress-bar-container {
             width: 100%;
             background: #f3f4f6;
@@ -333,8 +389,9 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             margin: 1rem 0;
             height: 28px;
             overflow: hidden;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            box-shadow: 0 1px 2px rgba(44, 62, 80, 0.04);
         }
+
         .progress-bar {
             height: 100%;
             background: #3b82f6;
@@ -347,10 +404,11 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
     </style>
 </head>
+
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        
+
         <div class="admin-main">
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1> <!-- Ensure consistent styling -->
@@ -359,7 +417,8 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             <div class="admin-content">
                 <?php if (isset($_SESSION['error'])): ?>
                     <div class="error-message">
-                        <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
+                        <?= htmlspecialchars($_SESSION['error']);
+                        unset($_SESSION['error']); ?>
                     </div>
                 <?php endif; ?>
 
@@ -375,16 +434,18 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                     </div>
                 <?php endif; ?>
                 <?php if (isset($_SESSION['error'])): ?>
-    <div class="error-message">
-        <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
-    </div>
-<?php endif; ?>
+                    <div class="error-message">
+                        <?= htmlspecialchars($_SESSION['error']);
+                        unset($_SESSION['error']); ?>
+                    </div>
+                <?php endif; ?>
 
-<?php if (isset($_SESSION['success'])): ?>
-    <div class="success-message">
-        <?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
-    </div>
-<?php endif; ?>
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="success-message">
+                        <?= htmlspecialchars($_SESSION['success']);
+                        unset($_SESSION['success']); ?>
+                    </div>
+                <?php endif; ?>
 
                 <div class="form-grid">
                     <!-- Single User Form -->
@@ -392,17 +453,17 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         <h2>Create Single User</h2>
                         <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            
+
                             <div class="form-group">
                                 <label>Username</label>
                                 <input type="text" name="username" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label>Email Address</label>
                                 <input type="email" name="email" required>
                             </div>
-                            
+
                             <div class="form-group">
                                 <label>User Role</label>
                                 <select name="role_id" required>
@@ -414,16 +475,18 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                                 </select>
                             </div>
                             <?php if (isset($_SESSION['error'])): ?>
-    <div class="error-message">
-        <?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
-    </div>
-<?php endif; ?>
+                                <div class="error-message">
+                                    <?= htmlspecialchars($_SESSION['error']);
+                                    unset($_SESSION['error']); ?>
+                                </div>
+                            <?php endif; ?>
 
-<?php if (isset($_SESSION['success'])): ?>
-    <div class="success-message">
-        <?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
-    </div>
-<?php endif; ?>
+                            <?php if (isset($_SESSION['success'])): ?>
+                                <div class="success-message">
+                                    <?= htmlspecialchars($_SESSION['success']);
+                                    unset($_SESSION['success']); ?>
+                                </div>
+                            <?php endif; ?>
 
                             <button type="submit" name="create_user" class="btn btn-primary">
                                 Create User
@@ -440,7 +503,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                                 Download Template
                             </a>
                         </div>
-                        
+
                         <form method="POST" enctype="multipart/form-data" class="mt-4" id="bulkImportForm">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             <div class="form-group">
@@ -459,79 +522,81 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             </div>
         </div>
     </div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var form = document.getElementById('bulkImportForm');
-    var progressContainer = document.getElementById('progressContainer');
-    var progressBar = document.getElementById('progressBar');
-    var importBtn = document.getElementById('importBtn');
-    var csvInput = document.getElementById('csv_file');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementById('bulkImportForm');
+            var progressContainer = document.getElementById('progressContainer');
+            var progressBar = document.getElementById('progressBar');
+            var importBtn = document.getElementById('importBtn');
+            var csvInput = document.getElementById('csv_file');
 
-    if (form && progressContainer && progressBar && importBtn && csvInput) {
-        form.addEventListener('submit', function(e) {
-            if (!csvInput.files.length) return;
-            progressContainer.style.display = 'block';
-            progressBar.style.width = '0%';
-            progressBar.textContent = '0%';
-            importBtn.disabled = true;
+            if (form && progressContainer && progressBar && importBtn && csvInput) {
+                form.addEventListener('submit', function(e) {
+                    if (!csvInput.files.length) return;
+                    progressContainer.style.display = 'block';
+                    progressBar.style.width = '0%';
+                    progressBar.textContent = '0%';
+                    importBtn.disabled = true;
 
-            var file = csvInput.files[0];
-            var formData = new FormData();
-            formData.append('csv_file', file);
-            formData.append('csrf_token', '<?= $_SESSION['csrf_token'] ?>');
-            formData.append('bulk_import', '1');
+                    var file = csvInput.files[0];
+                    var formData = new FormData();
+                    formData.append('csv_file', file);
+                    formData.append('csrf_token', '<?= $_SESSION['csrf_token'] ?>');
+                    formData.append('bulk_import', '1');
 
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'add_users.php', true);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'add_users.php', true);
 
-            xhr.upload.onprogress = function(e) {
-                if (e.lengthComputable) {
-                    var percent = Math.round((e.loaded / e.total) * 100);
-                    progressBar.style.width = percent + '%';
-                    progressBar.textContent = percent + '%';
-                }
-            };
-
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    progressBar.style.width = '100%';
-                    if (xhr.status === 200) {
-                        // Try to parse response for errors/success
-                        var parser = new DOMParser();
-                        var doc = parser.parseFromString(xhr.responseText, 'text/html');
-                        var errorMsg = doc.querySelector('.error-message');
-                        var successMsg = doc.querySelector('.success-message');
-                        if (errorMsg) {
-                            progressBar.style.background = '#e74c3c';
-                            progressBar.textContent = errorMsg.textContent.trim();
-                        } else if (successMsg) {
-                            progressBar.style.background = '#27ae60';
-                            progressBar.textContent = successMsg.textContent.trim();
-                        } else {
-                            progressBar.textContent = 'Done';
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            var percent = Math.round((e.loaded / e.total) * 100);
+                            progressBar.style.width = percent + '%';
+                            progressBar.textContent = percent + '%';
                         }
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 1800);
-                    } else {
+                    };
+
+                    xhr.onreadystatechange = function() {
+                        if (xhr.readyState === 4) {
+                            progressBar.style.width = '100%';
+                            if (xhr.status === 200) {
+                                // Try to parse response for errors/success
+                                var parser = new DOMParser();
+                                var doc = parser.parseFromString(xhr.responseText, 'text/html');
+                                var errorMsg = doc.querySelector('.error-message');
+                                var successMsg = doc.querySelector('.success-message');
+                                if (errorMsg) {
+                                    progressBar.style.background = '#e74c3c';
+                                    progressBar.textContent = errorMsg.textContent.trim();
+                                } else if (successMsg) {
+                                    progressBar.style.background = '#27ae60';
+                                    progressBar.textContent = successMsg.textContent.trim();
+                                } else {
+                                    progressBar.textContent = 'Done';
+                                }
+                                setTimeout(function() {
+                                    window.location.reload();
+                                }, 1800);
+                            } else {
+                                progressBar.style.background = '#e74c3c';
+                                progressBar.textContent = 'Upload failed';
+                                importBtn.disabled = false;
+                            }
+                        }
+                    };
+
+                    xhr.onerror = function() {
                         progressBar.style.background = '#e74c3c';
                         progressBar.textContent = 'Upload failed';
                         importBtn.disabled = false;
-                    }
-                }
-            };
+                    };
 
-            xhr.onerror = function() {
-                progressBar.style.background = '#e74c3c';
-                progressBar.textContent = 'Upload failed';
-                importBtn.disabled = false;
-            };
-
-            xhr.send(formData);
-            e.preventDefault();
+                    xhr.send(formData);
+                    e.preventDefault();
+                });
+            }
         });
-    }
-});
-</script>
+    </script>
+    <script src="../assets/js/bulk_import_progress.js"></script>
 </body>
+
 </html>
