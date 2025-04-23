@@ -37,3 +37,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 echo json_encode(['status' => 'invalid']);
 exit;
+<?php ob_clean(); ?>

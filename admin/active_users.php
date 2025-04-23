@@ -601,17 +601,17 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
         setTimeout(delegateCrud, 350);
     };
 
-    // Initial delegate
-    delegateCrud();
-
-    // Ensure delegateCrud is called after every AJAX update
-    const observer = new MutationObserver(delegateCrud);
-    observer.observe(usersTableBody, { childList: true });
-
     // On page load, fetch all users by default (no filter)
     document.addEventListener('DOMContentLoaded', function() {
         fetchUsers();
     });
+
+    // Always re-delegate after table changes
+    const observer = new MutationObserver(delegateCrud);
+    observer.observe(usersTableBody, { childList: true, subtree: true });
+
+    // Ensure delegateCrud is called after every AJAX update and on page load
+    delegateCrud();
     </script>
 </body>
 </html>
