@@ -529,19 +529,19 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
             const username = usernameTd.querySelector('input').value.trim();
             const role_id = roleTd.querySelector('select').value;
             const online = onlineTd.querySelector('input[type="checkbox"]').checked ? 1 : 0;
-            fetch('../api/user_crud.php', {
+            fetch('active_users.php', { // <-- changed from ../api/user_crud.php
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: new URLSearchParams({
-                    action: 'update',
+                    ajax: 'update_user', // <-- changed from action: 'update'
                     id: id,
                     username: username,
                     role_id: role_id,
                     online: online,
                     active: 1
                 })
-            }).then(res => res.json()).then(resp => {
-                if (resp.status === 'success') {
+            }).then(res => res.text()).then(resp => {
+                if (resp.trim() === 'success') {
                     fetchUsers();
                 } else {
                     alert('Update failed');
@@ -558,15 +558,15 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
     function deleteRow(tr) {
         const id = tr.getAttribute('data-id');
         if (!confirm('Are you sure you want to delete this user?')) return;
-        fetch('../api/user_crud.php', {
+        fetch('active_users.php', { // <-- changed from ../api/user_crud.php
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({
-                action: 'delete',
+                ajax: 'delete_user', // <-- changed from action: 'delete'
                 id: id
             })
-        }).then(res => res.json()).then(resp => {
-            if (resp.status === 'success') {
+        }).then(res => res.text()).then(resp => {
+            if (resp.trim() === 'success') {
                 fetchUsers();
             } else {
                 alert('Delete failed');
