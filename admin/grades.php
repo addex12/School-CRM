@@ -459,9 +459,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="admin-main">
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>style="padding: 20px;">
+            </header>
             <div class="content">
-                <div class="dashboard-section" >
+                <div class="dashboard-section" style="padding: 20px;" >
                     <h2><?= $editGrade ? 'Edit Grade' : 'Add Grade' ?></h2>
                     <?php if ($error): ?>
                         <div style="color:#e74c3c;"><?= htmlspecialchars($error) ?></div>
@@ -571,9 +571,9 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($grade['academic_year']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($grade['created_at'])) ?></td>
                                             <td>
-                                                <a href="grades.php?edit_grade=<?= $grade['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
-                                                <a href="grades.php?delete_grade=<?= $grade['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this grade?')">Delete</a>
-                                                <a href="grades.php?export_word=<?= $grade['id'] ?>" class="btn btn-success btn-sm">Export Word</a>
+                                                <a href="grades.php?edit_grade=<?= $grade['id'] ?>" class="btn">Edit</a>
+                                                <a href="grades.php?delete_grade=<?= $grade['id'] ?>" class="btn"return confirm('Delete this grade?')">Delete</a>
+                                                <a href="grades.php?export_word=<?= $grade['id'] ?>" class="btn">Export Word</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
