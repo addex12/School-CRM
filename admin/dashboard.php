@@ -43,12 +43,12 @@ $widgets = [
         "color" => "teal",
         "query" => "SELECT COUNT(*) FROM teachers"
     ],
-    [
+    /**[
         "title" => "Total Classes",
         "icon" => "fa-school",
         "color" => "orange",
         "query" => "SELECT COUNT(*) FROM classes"
-    ],
+    ],**/
     [
         "title" => "Active Surveys",
         "icon" => "fa-poll",
@@ -67,13 +67,13 @@ $widgets = [
         "color" => "red",
         "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
     ],
-    [
+    /**[
         "title" => "Number of Classes",
         "icon" => "fa-school",
         "color" => "orange",
         "query" => "SELECT COUNT(*) FROM classes"
-    ],
-    [
+    ],**/
+    /**[
         "title" => "Number of Sections",
         "icon" => "fa-th-large",
         "color" => "teal",
@@ -85,7 +85,7 @@ $widgets = [
         "icon" => "fa-list",
         "color" => "blue",
         "query" => "SELECT COUNT(*) FROM curriculums"
-    ]
+    ]**/
     
     // Add widget for curriculum-grade/class mappings
     /**[
