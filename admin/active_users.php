@@ -23,10 +23,6 @@ $allRoleFilter = $_GET['all_role'] ?? '';
 $allConditions = ["status = 'active'"];
 $allParams = [];
 
-if ($allRoleFilter) {
-    $allConditions[] = "role = :all_role";
-    $allParams[':all_role'] = $allRoleFilter;
-}
 if ($allSearch) {
     $allConditions[] = "(username LIKE :search_username OR name LIKE :search_name OR email LIKE :search_email)";
     $allParams[':search_username'] = '%' . $allSearch . '%';
