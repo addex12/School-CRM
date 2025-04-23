@@ -93,41 +93,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../assets/js/feedback.js" defer></script>
     <style>
-        /* ...existing styles... */
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
+        .dashboard-section, .form-section, .table-section {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            margin-bottom: 2rem;
+            padding: 2rem 2.5rem;
+        }
+        .form-section h2, .table-section h2 {
+            color: #215967;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #215967;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        .star-rating {
+            direction: rtl;
+            unicode-bidi: bidi-override;
+            display: inline-block;
+        }
+        .star-rating input[type="radio"] { display: none; }
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+            font-size: 2em;
+        }
+        .star-rating input[type="radio"]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: orange;
+        }
+        .erpnext-btn, .btn, .btn-primary, .btn-secondary, .btn-danger, .btn-info {
+            display: inline-block;
+            padding: 10px 22px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #215967;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-primary, .erpnext-btn.btn-primary { background: #3b82f6; color: #fff; }
+        .btn-primary:hover, .erpnext-btn.btn-primary:hover { background: #2563eb; }
+        .btn-secondary, .erpnext-btn.btn-secondary { background: #eaeaea; color: #666; }
+        .btn-secondary:hover, .erpnext-btn.btn-secondary:hover { background: #e2efda; color: #215967; }
+        .btn-danger { background: #e74c3c; color: #fff; }
+        .btn-info { background: #38bdf8; color: #fff; }
+        .btn-sm { padding: 6px 14px; font-size: 13px; }
+        .alert { background: #e2efda; color: #215967; border-radius: 8px; padding: 1rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #b7e4c7; font-size: 1.05rem; }
+        .alert-danger { background: #fee2e2; color: #e74c3c; border: 1px solid #fca5a5; }
+        .alert-success { background: #dcfce7; color: #27ae60; border: 1px solid #b7e4c7; }
+        .table-section .form-control, .form-section .form-control { margin-bottom: 0.7rem; }
+        .table-section input[type="text"] { min-width: 120px; }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+        .table th, .table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            text-align: left;
+        }
+        .table th {
+            background: #e2efda;
+            font-weight: 700;
+            color: #215967;
+        }
+        .table tr:hover { background: #f4f8fb; }
+        .feedback-rating span { font-size: 1.2em; }
+        .admin-reply { background: #f5f7fa; border-radius: 5px; padding: 5px 10px; margin-bottom: 5px; color: #215967; }
+        #feedback-search { margin-bottom: 1.2rem; padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 5px; background: #f9fafb; font-size: 1rem; width: 100%; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
+        .modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 8px; }
+        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .close:hover, .close:focus { color: black; text-decoration: none; cursor: pointer; }
         @media (max-width: 900px) {
-            .form-section, .table-section {
-                padding: 12px !important;
-                margin: 10px 0 !important;
-            }
+            .form-section, .table-section { padding: 12px !important; margin: 10px 0 !important; }
         }
         @media (max-width: 600px) {
-            .form-section, .table-section {
-                padding: 8px !important;
-                margin: 6px 0 !important;
-            }
-            .form-actions {
-                flex-direction: column !important;
-                gap: 10px !important;
-            }
-            .admin-header {
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 8px !important;
-            }
-            .page-title, h1, h2 {
-                font-size: 1.2rem !important;
-            }
-            .table-responsive, .table {
-                display: block;
-                width: 100%;
-                overflow-x: auto;
-            }
-            th, td {
-                white-space: nowrap;
-                font-size: 0.95em;
-            }
+            .form-section, .table-section { padding: 8px !important; margin: 6px 0 !important; }
+            .form-actions { flex-direction: column !important; gap: 10px !important; }
+            .admin-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+            .page-title, h1, h2 { font-size: 1.2rem !important; }
+            .table-responsive, .table { display: block; width: 100%; overflow-x: auto; }
+            th, td { white-space: nowrap; font-size: 0.95em; }
+            .modal-content { width: 95%; }
         }
     </style>
 </head>
@@ -155,101 +229,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
                 <?php include 'includes/alerts.php'; ?>
 
                 <!-- Add Feedback Section -->
                 <section class="form-section">
-    <!-- Status Message for Feedback Section Only -->
-    <?php if (!empty($_SESSION['success'])): ?>
-        <div id="statusMsg" class="alert alert-success text-center" style="margin-bottom:10px;padding:8px 20px;max-width:400px;margin-left:auto;margin-right:auto;">
-            <?= htmlspecialchars($_SESSION['success']) ?>
-        </div>
-        <?php unset($_SESSION['success']); ?>
-    <?php elseif (!empty($_SESSION['error'])): ?>
-        <div id="statusMsg" class="alert alert-danger text-center" style="margin-bottom:10px;padding:8px 20px;max-width:400px;margin-left:auto;margin-right:auto;">
-            <?= htmlspecialchars($_SESSION['error']) ?>
-        </div>
-        <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
-    <script>
-    // Auto-hide status message after 3 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        var msg = document.getElementById('statusMsg');
-        if (msg) setTimeout(function() { msg.style.display = 'none'; }, 3000);
-    });
-    </script>
-    <h2>Add Feedback</h2>
+                    <h2>Add Feedback</h2>
                     <form method="POST">
                         <div class="form-group">
-    <label for="user_id">User</label>
-    <select name="user_id" id="user_id" class="form-control" required>
-        <option value="">Select user...</option>
-        <?php foreach ($users as $user): ?>
-            <option value="<?= $user['id'] ?>">ID <?= $user['id'] ?> - <?= htmlspecialchars($user['username']) ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                            <label for="user_id">User</label>
+                            <select name="user_id" id="user_id" class="form-control" required>
+                                <option value="">Select user...</option>
+                                <?php foreach ($users as $user): ?>
+                                    <option value="<?= $user['id'] ?>">ID <?= $user['id'] ?> - <?= htmlspecialchars($user['username']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="form-group">
-    <label for="subject">Subject</label>
-    <select name="subject" id="subject" class="form-control" required>
-        <option value="">Select subject...</option>
-        <?php foreach ($subjects as $subject): ?>
-            <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
+                            <label for="subject">Subject</label>
+                            <select name="subject" id="subject" class="form-control" required>
+                                <option value="">Select subject...</option>
+                                <?php foreach ($subjects as $subject): ?>
+                                    <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="message">Message</label>
                             <textarea name="message" id="message" rows="4" required></textarea>
                         </div>
                         <div class="form-group">
-    <label for="rating">Rating</label>
-    <div class="star-rating" style="font-size:2em; color:gold;">
-        <?php for ($i = 5; $i >= 1; $i--): ?>
-            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;">
-            <label for="star<?= $i ?>" style="cursor:pointer;">&#9733;</label>
-        <?php endfor; ?>
-    </div>
-</div>
-<style>
-.star-rating {
-    direction: rtl;
-    unicode-bidi: bidi-override;
-    display: inline-block;
-}
-.star-rating input[type="radio"] {
-    display: none;
-}
-.star-rating label {
-    color: #ccc;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-.star-rating input[type="radio"]:checked ~ label,
-.star-rating label:hover,
-.star-rating label:hover ~ label {
-    color: orange;
-}
-.star-rating input[type="radio"]:checked ~ label {
-    color: orange;
-}
-</style>
-                        <button type="submit" name="add_feedback" class="btn btn-primary">Add Feedback</button>
+                            <label for="rating">Rating</label>
+                            <div class="star-rating">
+                                <?php for ($i = 5; $i >= 1; $i--): ?>
+                                    <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required>
+                                    <label for="star<?= $i ?>">&#9733;</label>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+                        <button type="submit" name="add_feedback" class="erpnext-btn btn-primary"><i class="fas fa-plus"></i> Add Feedback</button>
                     </form>
                 </section>
 
                 <!-- Feedback List Section -->
                 <section class="table-section">
-    <h2>Feedback List</h2>
-    <div style="max-width:500px;margin-bottom:24px;">
-        <canvas id="feedbackChart" height="180"></canvas>
-    </div>
-    <input type="text" id="feedback-search" placeholder="Search feedback..." class="form-control">
+                    <h2>Feedback List</h2>
+                    <div style="max-width:500px;margin-bottom:24px;">
+                        <canvas id="feedbackChart" height="180"></canvas>
+                    </div>
+                    <input type="text" id="feedback-search" placeholder="Search feedback..." class="form-control">
                     <?php if (count($feedbackList) > 0): ?>
-                        <table class="table">
+                        <table class="table" id="feedbackTable">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -257,45 +289,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <th>Subject</th>
                                     <th>Message</th>
                                     <th>Rating</th>
-<th>Admin Reply</th>
+                                    <th>Admin Reply</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="feedbackTbody">
                                 <?php foreach ($feedbackList as $feedback): ?>
-    <tr>
-        <td><?= htmlspecialchars($feedback['id']) ?></td>
-        <td><?= htmlspecialchars($feedback['username'] ?? 'Anonymous') ?></td>
-        <td><?= htmlspecialchars($feedback['subject']) ?></td>
-        <td><?= htmlspecialchars($feedback['message']) ?></td>
-        <td class="feedback-rating">
-            <?php
-            $full = intval($feedback['rating']);
-            $empty = 5 - $full;
-            for ($i=0; $i<$full; $i++) echo '<span style="color:gold;font-size:1.2em">&#9733;</span>';
-            for ($i=0; $i<$empty; $i++) echo '<span style="color:#ccc;font-size:1.2em">&#9733;</span>';
-            ?>
-        </td>
-        <td>
-            <?php if (!empty($feedback['admin_reply'])): ?>
-                <div class="admin-reply"><strong>Admin:</strong> <?= htmlspecialchars($feedback['admin_reply']) ?></div>
-            <?php endif; ?>
-            <form method="POST" style="margin-top:5px;">
-                <input type="hidden" name="feedback_id" value="<?= $feedback['id'] ?>">
-                <input type="text" name="reply" placeholder="Add reply..." class="form-control" required>
-                <button type="submit" name="admin_reply" class="btn btn-sm btn-info" style="margin-top:2px;">Reply</button>
-            </form>
-        </td>
-        <td><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
-        <td>
-                                            <!-- Edit Button -->
-                                            <?php /**<button class="btn btn-secondary" onclick="editFeedback(<?= $feedback['id'] ?>, '<?= htmlspecialchars($feedback['subject']) ?>', '<?= htmlspecialchars($feedback['message']) ?>', <?= $feedback['rating'] ?>)">Edit</button> **/?>
-                                            
-                                            <!-- Delete Button -->
+                                    <tr>
+                                        <td><?= htmlspecialchars($feedback['id']) ?></td>
+                                        <td><?= htmlspecialchars($feedback['username'] ?? 'Anonymous') ?></td>
+                                        <td><?= htmlspecialchars($feedback['subject']) ?></td>
+                                        <td><?= htmlspecialchars($feedback['message']) ?></td>
+                                        <td class="feedback-rating">
+                                            <?php
+                                            $full = intval($feedback['rating']);
+                                            $empty = 5 - $full;
+                                            for ($i=0; $i<$full; $i++) echo '<span style="color:gold;font-size:1.2em">&#9733;</span>';
+                                            for ($i=0; $i<$empty; $i++) echo '<span style="color:#ccc;font-size:1.2em">&#9733;</span>';
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <?php if (!empty($feedback['admin_reply'])): ?>
+                                                <div class="admin-reply"><strong>Admin:</strong> <?= htmlspecialchars($feedback['admin_reply']) ?></div>
+                                            <?php endif; ?>
+                                            <form method="POST" style="margin-top:5px;">
+                                                <input type="hidden" name="feedback_id" value="<?= $feedback['id'] ?>">
+                                                <input type="text" name="reply" placeholder="Add reply..." class="form-control" required>
+                                                <button type="submit" name="admin_reply" class="erpnext-btn btn-sm btn-info" style="margin-top:2px;">Reply</button>
+                                            </form>
+                                        </td>
+                                        <td><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
+                                        <td>
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="feedback_id" value="<?= $feedback['id'] ?>">
-                                                <button type="submit" name="delete_feedback" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this feedback?')">Delete</button>
+                                                <button type="submit" name="delete_feedback" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this feedback?')">Delete</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -329,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="editRating">Rating</label>
                     <input type="number" name="rating" id="editRating" min="1" max="5" required>
                 </div>
-                <button type="submit" name="edit_feedback" class="btn btn-primary">Save Changes</button>
+                <button type="submit" name="edit_feedback" class="erpnext-btn btn-primary">Save Changes</button>
             </form>
         </div>
     </div>
@@ -363,6 +391,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
 
+        // Feedback search (real-time)
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('feedback-search');
+            const tbody = document.getElementById('feedbackTbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            searchInput.addEventListener('input', function() {
+                const val = searchInput.value.toLowerCase();
+                rows.forEach(function(row) {
+                    row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+                });
+            });
+        });
+
         function editFeedback(id, subject, message, rating) {
             document.getElementById('editFeedbackId').value = id;
             document.getElementById('editSubject').value = subject;
@@ -375,43 +416,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             document.getElementById('editModal').style.display = 'none';
         }
     </script>
-
-    <style>
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-            border-radius: 8px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
+<?php ob_end_flush(); ?>
