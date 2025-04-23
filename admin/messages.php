@@ -262,10 +262,10 @@ foreach ($users as $u) {
                 <div class="messaging-container">
                     <aside class="contact-list">
                         <div class="contact-list-header">Users</div>
-                        <div class="search-bar">
-                            <input type="text" id="userSearch" placeholder="Search users...">
-                            <button class="erpnext-btn btn-primary" id="searchUserBtn"><i class="fas fa-search"></i></button>
-                            <button class="erpnext-btn btn-secondary" id="clearUserSearch">Clear</button>
+                        <div class="search-bar" style="margin-bottom:0.5rem; padding-bottom:0;">
+                            <input type="text" id="userSearch" placeholder="Search users..." style="flex:1;min-width:0;">
+                            <button class="erpnext-btn btn-primary" id="searchUserBtn" style="margin-left:0;"><i class="fas fa-search"></i></button>
+                            <button class="erpnext-btn btn-secondary" id="clearUserSearch" style="margin-left:0;">Clear</button>
                         </div>
                         <div class="online-users">
                             <i class="fas fa-circle" style="color:#27ae60;font-size:0.9em;"></i>
