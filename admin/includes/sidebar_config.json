@@ -37,7 +37,7 @@
       "icon": "user-friends",
       "items": [
         { "title": "Parent List", "icon": "user-friends", "link": "parents.php" },
-        { "title": "Add Parent", "icon": "user-plus", "link": "add_parent.php" }
+        { "title": "Add Parent", "icon": "user-plus", "link": "add_users.php" }
       ],
       "id": "parents-menu"
     },
