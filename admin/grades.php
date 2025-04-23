@@ -174,6 +174,12 @@ if ($scaleCount == 0) {
     }
 }
 
+// Fetch all academic terms and years for dropdowns
+$terms = $pdo->query("SELECT name FROM academic_terms ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
+$currentTerm = $pdo->query("SELECT name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn();
+$years = $pdo->query("SELECT year_name FROM academic_years ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
+$currentAcademicYear = $pdo->query("SELECT year_name FROM academic_years WHERE end_date >= CURDATE() ORDER BY start_date DESC LIMIT 1")->fetchColumn();
+
 // Handle add grade
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_grade'])) {
@@ -215,6 +221,56 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Grade Reports - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <style>
+        /* Excel-like table style */
+        .excel-table {
+            border-collapse: collapse;
+            width: 100%;
+            background: #fff;
+        }
+        .excel-table th, .excel-table td {
+            border: 1px solid #bdbdbd;
+            padding: 8px 10px;
+            text-align: left;
+            font-size: 1em;
+        }
+        .excel-table th {
+            background: #e2efda;
+            color: #215967;
+            font-weight: bold;
+        }
+        .excel-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .excel-table tr:hover {
+            background: #f4f8fb;
+        }
+        .excel-form-row {
+            display: flex;
+            gap: 0;
+        }
+        .excel-form-row > div {
+            flex: 1 1 0;
+            margin: 0;
+            padding: 0 2px;
+        }
+        .excel-form-row label {
+            display: block;
+            font-size: 0.95em;
+            color: #215967;
+            margin-bottom: 2px;
+        }
+        .excel-form-row input, .excel-form-row select {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid #bdbdbd;
+            border-radius: 2px;
+            font-size: 1em;
+        }
+        @media (max-width: 900px) {
+            .excel-form-row { flex-direction: column; }
+        }
+    </style>
     <script>
     // Dynamically update subject dropdown based on selected student
     var subjectsByLevel = <?= json_encode($subjectsByLevel) ?>;
@@ -222,19 +278,34 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
     var gradingScalesByLevel = <?= json_encode($gradingScalesByLevel) ?>;
     var sectionsByClass = <?= json_encode($sectionsByClass) ?>;
     var students = <?= json_encode($students) ?>;
+    var currentTerm = <?= json_encode($currentTerm ?: '') ?>;
+    var currentAcademicYear = <?= json_encode($currentAcademicYear ?: '') ?>;
 
     function updateSubjects() {
         var studentId = document.getElementById('student_id').value;
         var subjectSelect = document.getElementById('subject_id');
         var sectionSelect = document.getElementById('section_id');
+        var infoDiv = document.getElementById('student_info');
+        var termSelect = document.getElementById('term');
+        var yearSelect = document.getElementById('academic_year');
         subjectSelect.innerHTML = '<option value="">-- Select Subject --</option>';
         sectionSelect.innerHTML = '<option value="">-- Any Section --</option>';
 
-        // Detect student's class and section, and show as info (optional)
+        // Detect student's class and section, and show as info
         var student = students.find(function(s) { return s.id == studentId; });
         if (student) {
-            // Optionally, display class/section info somewhere
-            // Example: document.getElementById('student_class_info').textContent = 'Class: ' + (student.class_id || '-') + ', Section: ' + (student.section_id || '-');
+            var classText = student.class_id ? 'Class ID: ' + student.class_id : 'Class: -';
+            // Find section name if available
+            var sectionName = '-';
+            if (student.class_id && sectionsByClass[student.class_id]) {
+                var secList = sectionsByClass[student.class_id];
+                if (secList.length === 1) {
+                    sectionName = secList[0].section_name;
+                }
+            }
+            infoDiv.textContent = classText + (sectionName !== '-' ? ', Section: ' + sectionName : '');
+        } else {
+            infoDiv.textContent = '';
         }
 
         // Populate subjects based on student's class_level_id
@@ -256,6 +327,10 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 sectionSelect.appendChild(opt);
             });
         }
+
+        // Set dropdown to current term/year if student changes (if not already selected)
+        if (termSelect && currentTerm) termSelect.value = currentTerm;
+        if (yearSelect && currentAcademicYear) yearSelect.value = currentAcademicYear;
     }
 
     function autoFillGradeLetter() {
@@ -283,13 +358,13 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Initialize subject and section dropdowns on page load if editing
     document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('student_id').addEventListener('change', function() {
+            updateSubjects();
+            autoFillGradeLetter();
+        });
+        document.getElementById('score').addEventListener('input', autoFillGradeLetter);
         updateSubjects();
     });
-    document.getElementById('student_id').addEventListener('change', function() {
-        updateSubjects();
-        autoFillGradeLetter();
-    });
-    document.getElementById('score').addEventListener('input', autoFillGradeLetter);
     </script>
 </head>
 <body>
@@ -300,85 +375,78 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <div class="dashboard-section" style="max-width:900px;">
+                <div class="dashboard-section" style="max-width:1000px;">
                     <h2>Add Grade</h2>
                     <?php if ($error): ?>
                         <div style="color:#e74c3c;"><?= htmlspecialchars($error) ?></div>
                     <?php endif; ?>
                     <form method="post" style="margin-bottom:2rem;">
-                        <div style="margin-bottom:1rem;">
-                            <label for="student_id">Student</label>
-                            <select name="student_id" id="student_id" required onchange="updateSubjects();autoFillGradeLetter();">
-                                <option value="">-- Select Student --</option>
-                                <?php foreach ($students as $s): ?>
-                                    <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['username']) ?></option>
-                                <?php endforeach; ?>
-                            </select>
+                        <div class="excel-form-row">
+                            <div>
+                                <label for="student_id">Student</label>
+                                <select name="student_id" id="student_id" required>
+                                    <option value="">-- Select Student --</option>
+                                    <?php foreach ($students as $s): ?>
+                                        <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['username']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="subject_id">Subject</label>
+                                <select name="subject_id" id="subject_id" required>
+                                    <option value="">-- Select Student First --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="section_id">Section (optional)</label>
+                                <select name="section_id" id="section_id">
+                                    <option value="">-- Any Section --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="grading_scale_id">Grading Scale (optional)</label>
+                                <select name="grading_scale_id" id="grading_scale_id">
+                                    <option value="">-- Any Scale --</option>
+                                    <?php foreach ($grading_scales as $gs): ?>
+                                        <option value="<?= $gs['id'] ?>">
+                                            <?= htmlspecialchars($gs['scale_name']) ?>
+                                            (<?= htmlspecialchars($gs['curriculum'] ?? '-') ?>)
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <div id="student_info" style="margin-bottom:1rem;color:#2980b9;"></div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="subject_id">Subject</label>
-                            <select name="subject_id" id="subject_id" required>
-                                <option value="">-- Select Student First --</option>
-                            </select>
+                        <div class="excel-form-row" style="margin-top:8px;">
+                            <div>
+                                <label for="score">Score</label>
+                                <input type="number" step="0.01" name="score" id="score" required oninput="autoFillGradeLetter()">
+                            </div>
+                            <div>
+                                <label for="grade_letter">Grade Letter</label>
+                                <input type="text" name="grade_letter" id="grade_letter" required readonly>
+                            </div>
+                            <div>
+                                <label for="term">Term</label>
+                                <select name="term" id="term" required>
+                                    <?php foreach ($terms as $t): ?>
+                                        <option value="<?= htmlspecialchars($t) ?>" <?= ($t == $currentTerm) ? 'selected' : '' ?>><?= htmlspecialchars($t) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="academic_year">Academic Year</label>
+                                <select name="academic_year" id="academic_year" required>
+                                    <?php foreach ($years as $y): ?>
+                                        <option value="<?= htmlspecialchars($y) ?>" <?= ($y == $currentAcademicYear) ? 'selected' : '' ?>><?= htmlspecialchars($y) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="section_id">Section (optional)</label>
-                            <select name="section_id" id="section_id">
-                                <option value="">-- Any Section --</option>
-                            </select>
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="grading_scale_id">Grading Scale (optional)</label>
-                            <select name="grading_scale_id" id="grading_scale_id">
-                                <option value="">-- Any Scale --</option>
-                                <?php foreach ($grading_scales as $gs): ?>
-                                    <option value="<?= $gs['id'] ?>">
-                                        <?= htmlspecialchars($gs['scale_name']) ?>
-                                        (<?= htmlspecialchars($gs['curriculum'] ?? '-') ?>)
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="score">Score</label>
-                            <input type="number" step="0.01" name="score" id="score" required oninput="autoFillGradeLetter()">
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="grade_letter">Grade Letter</label>
-                            <input type="text" name="grade_letter" id="grade_letter" required readonly>
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="term">Term</label>
-                            <select name="term" id="term" required>
-                                <?php
-                                // Fetch all academic terms for dropdown
-                                $terms = $pdo->query("SELECT name FROM academic_terms ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
-                                $currentTerm = $pdo->query("SELECT name FROM academic_terms WHERE is_current=1 ORDER BY start_date DESC LIMIT 1")->fetchColumn();
-                                foreach ($terms as $t):
-                                ?>
-                                    <option value="<?= htmlspecialchars($t) ?>" <?= ($t == $currentTerm) ? 'selected' : '' ?>><?= htmlspecialchars($t) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="academic_year">Academic Year</label>
-                            <select name="academic_year" id="academic_year" required>
-                                <?php
-                                // Fetch all academic years for dropdown
-                                $years = $pdo->query("SELECT year_name FROM academic_years ORDER BY start_date DESC")->fetchAll(PDO::FETCH_COLUMN);
-                                $currentAcademicYear = $pdo->query("SELECT year_name FROM academic_years WHERE end_date >= CURDATE() ORDER BY start_date DESC LIMIT 1")->fetchColumn();
-                                foreach ($years as $y):
-                                ?>
-                                    <option value="<?= htmlspecialchars($y) ?>" <?= ($y == $currentAcademicYear) ? 'selected' : '' ?>><?= htmlspecialchars($y) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <button type="submit" name="add_grade" class="btn" style="background:#3498db;color:#fff;">Add Grade</button>
+                        <button type="submit" name="add_grade" class="btn" style="background:#3498db;color:#fff;margin-top:10px;">Add Grade</button>
                     </form>
                     <h2>Grade Reports</h2>
                     <div class="table-responsive">
-                        <table class="classes-table">
+                        <table class="excel-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -474,7 +542,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
     // Dynamically update subject dropdown based on selected student
