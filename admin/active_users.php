@@ -17,22 +17,6 @@ try {
     $roles = [];
 }
 
-// Online Users filter
-$onlineSearch = trim($_GET['online_search'] ?? '');
-$onlineRoleFilter = $_GET['online_role'] ?? '';
-$onlineConditions = ["status = 'active'", "online = 1"];
-$onlineParams = [];
-
-if ($onlineRoleFilter) {
-    $onlineConditions[] = "role = :online_role";
-    $onlineParams[':online_role'] = $onlineRoleFilter;
-}
-if ($onlineSearch) {
-    $onlineConditions[] = "username LIKE :online_search";
-    $onlineParams[':online_search'] = '%' . $onlineSearch . '%';
-}
-$onlineWhereSql = 'WHERE ' . implode(' AND ', $onlineConditions);
-
 // All Active Users filter
 $allSearch = trim($_GET['all_search'] ?? '');
 $allRoleFilter = $_GET['all_role'] ?? '';
@@ -50,15 +34,6 @@ if ($allSearch) {
 $allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 try {
-    // Online users only (must also be active)
-    $onlineSql = "SELECT id, username, last_active FROM users $onlineWhereSql ORDER BY username";
-    $stmtOnline = $pdo->prepare($onlineSql);
-    foreach ($onlineParams as $key => $val) {
-        $stmtOnline->bindValue($key, $val);
-    }
-    $stmtOnline->execute();
-    $onlineUsers = $stmtOnline->fetchAll(PDO::FETCH_ASSOC);
-
     // All active users (regardless of online)
     $allSql = "SELECT id, username, last_active, online FROM users $allWhereSql ORDER BY online DESC, username";
     $stmtAll = $pdo->prepare($allSql);
@@ -72,7 +47,6 @@ try {
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
     $error = "A database error occurred. Please try again later.";
-    $onlineUsers = [];
     $allUsers = [];
 }
 ?>
@@ -176,7 +150,6 @@ try {
                         </button>
                         <span class="active-count">
                             <i class="fas fa-circle"></i>
-                            <?= count($onlineUsers ?? []) ?> online /
                             <?= count($allUsers ?? []) ?> active
                         </span>
                     </div>
@@ -185,44 +158,6 @@ try {
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
-                <h3 style="margin-top:2rem;">Online Users</h3>
-                <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.5rem;">
-                    <input type="text" name="online_search" id="onlineUserSearch" placeholder="Search by username..." value="<?= htmlspecialchars($onlineSearch) ?>">
-                    <select name="online_role" id="onlineRoleFilter">
-                        <option value="">All Roles</option>
-                        <?php foreach ($roles as $role): ?>
-                            <option value="<?= htmlspecialchars($role) ?>" <?= $role === $onlineRoleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
-                    <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
-                </form>
-                <table class="users-table" id="onlineUsersTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Last Active</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (isset($onlineUsers) && is_array($onlineUsers) && count($onlineUsers) > 0): ?>
-                            <?php foreach ($onlineUsers as $user): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($user['id']) ?></td>
-                                <td><span class="online-dot"></span><?= htmlspecialchars($user['username']) ?></td>
-                                <td><?= htmlspecialchars($user['last_active']) ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="3" class="text-center">No online users found</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-
-                <h3 style="margin-top:2.5rem;">All Active Users</h3>
                 <form method="get" class="search-bar" id="allUserSearchForm" style="margin-bottom:1.5rem;">
                     <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username..." value="<?= htmlspecialchars($allSearch) ?>">
                     <select name="all_role" id="allRoleFilter">
