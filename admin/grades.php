@@ -201,6 +201,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_grade'])) {
     }
 }
 
+// Handle delete grade
+if (isset($_GET['delete_grade']) && is_numeric($_GET['delete_grade'])) {
+    $grade_id = intval($_GET['delete_grade']);
+    $pdo->prepare("DELETE FROM grades WHERE id=?")->execute([$grade_id]);
+    header("Location: grades.php?msg=Grade+deleted");
+    exit;
+}
+
+// Handle edit grade (fetch for form)
+$editGrade = null;
+if (isset($_GET['edit_grade']) && is_numeric($_GET['edit_grade'])) {
+    $edit_id = intval($_GET['edit_grade']);
+    $editGrade = $pdo->prepare("SELECT * FROM grades WHERE id=?");
+    $editGrade->execute([$edit_id]);
+    $editGrade = $editGrade->fetch(PDO::FETCH_ASSOC);
+}
+
+// Handle update grade
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_grade'])) {
+    $grade_id = intval($_POST['grade_id']);
+    $student_id = $_POST['student_id'] ?? '';
+    $subject_id = $_POST['subject_id'] ?? '';
+    $section_id = $_POST['section_id'] ?? null;
+    $grading_scale_id = $_POST['grading_scale_id'] ?? null;
+    $score = $_POST['score'] ?? '';
+    $grade_letter = trim($_POST['grade_letter'] ?? '');
+    $term = trim($_POST['term'] ?? '');
+    $academic_year = trim($_POST['academic_year'] ?? '');
+    if ($grade_id && $student_id && $subject_id && $score !== '' && $grade_letter && $term && $academic_year) {
+        $stmt = $pdo->prepare("UPDATE grades SET student_id=?, subject_id=?, section_id=?, grading_scale_id=?, score=?, grade_letter=?, term=?, academic_year=? WHERE id=?");
+        $stmt->execute([$student_id, $subject_id, $section_id ?: null, $grading_scale_id ?: null, $score, $grade_letter, $term, $academic_year, $grade_id]);
+        header("Location: grades.php?msg=Grade+updated");
+        exit;
+    } else {
+        $error = "All fields except section and grading scale are required.";
+    }
+}
+
+// Export report card as Word (docx) using placeholders
+if (isset($_GET['export_word']) && is_numeric($_GET['export_word'])) {
+    $grade_id = intval($_GET['export_word']);
+    $grade = $pdo->prepare("
+        SELECT g.*, u.username AS student, s.subject_name, sec.section_name, gs.scale_name, g.term, g.academic_year
+        FROM grades g
+        LEFT JOIN students st ON g.student_id = st.id
+        LEFT JOIN users u ON st.user_id = u.id
+        LEFT JOIN subjects s ON g.subject_id = s.id
+        LEFT JOIN sections sec ON g.section_id = sec.id
+        LEFT JOIN grading_scales gs ON g.grading_scale_id = gs.id
+        WHERE g.id=?
+    ");
+    $grade->execute([$grade_id]);
+    $grade = $grade->fetch(PDO::FETCH_ASSOC);
+
+    // Load a Word template and replace placeholders
+    require_once '../vendor/autoload.php'; // Ensure Composer autoloader is included
+    if (!class_exists('\PhpOffice\PhpWord\TemplateProcessor')) {
+        die('PhpOffice\PhpWord\TemplateProcessor class not found. Ensure phpoffice/phpword is installed.');
+    }
+    $templatePath = '../templates/report_card_template.docx';
+    $phpWord = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
+
+    // Set placeholders (example: {{student}}, {{subject}}, etc.)
+    $phpWord->setValue('student', htmlspecialchars($grade['student'] ?? ''));
+    $phpWord->setValue('subject', htmlspecialchars($grade['subject_name'] ?? ''));
+    $phpWord->setValue('section', htmlspecialchars($grade['section_name'] ?? ''));
+    $phpWord->setValue('score', htmlspecialchars($grade['score'] ?? ''));
+    $phpWord->setValue('grade_letter', htmlspecialchars($grade['grade_letter'] ?? ''));
+    $phpWord->setValue('term', htmlspecialchars($grade['term'] ?? ''));
+    $phpWord->setValue('academic_year', htmlspecialchars($grade['academic_year'] ?? ''));
+    $phpWord->setValue('scale_name', htmlspecialchars($grade['scale_name'] ?? ''));
+
+    // Download the file
+    header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    header('Content-Disposition: attachment; filename="report_card_' . $grade_id . '.docx"');
+    $phpWord->saveAs('php://output');
+    exit;
+}
+
 // Fetch all grades with student, subject, section, and grading scale info
 $stmt = $pdo->query("
     SELECT g.id, u.username AS student, s.subject_name, sec.section_name, gs.scale_name, g.score, g.grade_letter, g.term, g.academic_year, g.created_at
@@ -376,18 +455,21 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </header>
             <div class="content">
                 <div class="dashboard-section" style="max-width:1000px;">
-                    <h2>Add Grade</h2>
+                    <h2><?= $editGrade ? 'Edit Grade' : 'Add Grade' ?></h2>
                     <?php if ($error): ?>
                         <div style="color:#e74c3c;"><?= htmlspecialchars($error) ?></div>
                     <?php endif; ?>
                     <form method="post" style="margin-bottom:2rem;">
+                        <?php if ($editGrade): ?>
+                            <input type="hidden" name="grade_id" value="<?= $editGrade['id'] ?>">
+                        <?php endif; ?>
                         <div class="excel-form-row">
                             <div>
                                 <label for="student_id">Student</label>
                                 <select name="student_id" id="student_id" required>
                                     <option value="">-- Select Student --</option>
                                     <?php foreach ($students as $s): ?>
-                                        <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['username']) ?></option>
+                                        <option value="<?= $s['id'] ?>" <?= ($editGrade && $editGrade['student_id'] == $s['id']) ? 'selected' : '' ?>><?= htmlspecialchars($s['username']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -408,7 +490,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <select name="grading_scale_id" id="grading_scale_id">
                                     <option value="">-- Any Scale --</option>
                                     <?php foreach ($grading_scales as $gs): ?>
-                                        <option value="<?= $gs['id'] ?>">
+                                        <option value="<?= $gs['id'] ?>" <?= ($editGrade && $editGrade['grading_scale_id'] == $gs['id']) ? 'selected' : '' ?>>
                                             <?= htmlspecialchars($gs['scale_name']) ?>
                                             (<?= htmlspecialchars($gs['curriculum'] ?? '-') ?>)
                                         </option>
@@ -419,17 +501,17 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="excel-form-row" style="margin-top:8px;">
                             <div>
                                 <label for="score">Score</label>
-                                <input type="number" step="0.01" name="score" id="score" required oninput="autoFillGradeLetter()">
+                                <input type="number" step="0.01" name="score" id="score" required oninput="autoFillGradeLetter()" value="<?= $editGrade ? htmlspecialchars($editGrade['score']) : '' ?>">
                             </div>
                             <div>
                                 <label for="grade_letter">Grade Letter</label>
-                                <input type="text" name="grade_letter" id="grade_letter" required readonly>
+                                <input type="text" name="grade_letter" id="grade_letter" required readonly value="<?= $editGrade ? htmlspecialchars($editGrade['grade_letter']) : '' ?>">
                             </div>
                             <div>
                                 <label for="term">Term</label>
                                 <select name="term" id="term" required>
                                     <?php foreach ($terms as $t): ?>
-                                        <option value="<?= htmlspecialchars($t) ?>" <?= ($t == $currentTerm) ? 'selected' : '' ?>><?= htmlspecialchars($t) ?></option>
+                                        <option value="<?= htmlspecialchars($t) ?>" <?= (($editGrade && $editGrade['term'] == $t) || (!$editGrade && $t == $currentTerm)) ? 'selected' : '' ?>><?= htmlspecialchars($t) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -437,12 +519,17 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <label for="academic_year">Academic Year</label>
                                 <select name="academic_year" id="academic_year" required>
                                     <?php foreach ($years as $y): ?>
-                                        <option value="<?= htmlspecialchars($y) ?>" <?= ($y == $currentAcademicYear) ? 'selected' : '' ?>><?= htmlspecialchars($y) ?></option>
+                                        <option value="<?= htmlspecialchars($y) ?>" <?= (($editGrade && $editGrade['academic_year'] == $y) || (!$editGrade && $y == $currentAcademicYear)) ? 'selected' : '' ?>><?= htmlspecialchars($y) ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" name="add_grade" class="btn" style="background:#3498db;color:#fff;margin-top:10px;">Add Grade</button>
+                        <button type="submit" name="<?= $editGrade ? 'update_grade' : 'add_grade' ?>" class="btn" style="background:#3498db;color:#fff;margin-top:10px;">
+                            <?= $editGrade ? 'Update Grade' : 'Add Grade' ?>
+                        </button>
+                        <?php if ($editGrade): ?>
+                            <a href="grades.php" class="btn btn-secondary" style="margin-left:10px;">Cancel</a>
+                        <?php endif; ?>
                     </form>
                     <h2>Grade Reports</h2>
                     <div class="table-responsive">
@@ -459,6 +546,7 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <th>Term</th>
                                     <th>Academic Year</th>
                                     <th>Created At</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -475,11 +563,16 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <td><?= htmlspecialchars($grade['term']) ?></td>
                                             <td><?= htmlspecialchars($grade['academic_year']) ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($grade['created_at'])) ?></td>
+                                            <td>
+                                                <a href="grades.php?edit_grade=<?= $grade['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
+                                                <a href="grades.php?delete_grade=<?= $grade['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this grade?')">Delete</a>
+                                                <a href="grades.php?export_word=<?= $grade['id'] ?>" class="btn btn-success btn-sm">Export Word</a>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="10">No grades found.</td>
+                                        <td colspan="11">No grades found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -638,8 +731,15 @@ $grades = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
         document.getElementById('score').addEventListener('input', autoFillGradeLetter);
         updateSubjects();
+        <?php if ($editGrade): ?>
+        setTimeout(function() {
+            document.getElementById('student_id').value = "<?= $editGrade['student_id'] ?>";
+            updateSubjects();
+            document.getElementById('subject_id').value = "<?= $editGrade['subject_id'] ?>";
+            document.getElementById('section_id').value = "<?= $editGrade['section_id'] ?>";
+        }, 100);
+        <?php endif; ?>
     });
     </script>
-</body>cript>
-</html>
+</body>
 </html>
