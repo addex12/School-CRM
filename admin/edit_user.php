@@ -58,6 +58,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
         exit();
     }
 }
+
+// Handle password reset (random)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_random_password'])) {
+    $new_password = bin2hex(random_bytes(4)) . rand(100,999); // 8+ chars
+    $hashed = password_hash($new_password, PASSWORD_DEFAULT);
+    $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+    $stmt->execute([$hashed, $id]);
+    // Send email
+    $to = $user['email'];
+    $subject = "Your password has been reset";
+    $body = "Hello " . $user['username'] . ",\n\nYour new password is: $new_password\n\nPlease login and change it.";
+    @mail($to, $subject, $body);
+    $_SESSION['success'] = "Password reset and sent to user's email.";
+    header("Location: edit_user.php?id=" . urlencode($id));
+    exit();
+}
+
+// Handle password reset (manual)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_manual_password'])) {
+    $manual_password = $_POST['manual_password'] ?? '';
+    if (strlen($manual_password) < 6) {
+        $_SESSION['error'] = "Password must be at least 6 characters.";
+    } else {
+        $hashed = password_hash($manual_password, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $stmt->execute([$hashed, $id]);
+        $_SESSION['success'] = "Password reset successfully.";
+        header("Location: edit_user.php?id=" . urlencode($id));
+        exit();
+    }
+}
+
+// Handle delete user
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
+    $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+    $stmt->execute([$id]);
+    $_SESSION['success'] = "User deleted successfully.";
+    header("Location: users.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -152,6 +192,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
                 <?php if (isset($_SESSION['error'])): ?>
                     <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
                 <?php endif; ?>
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="alert alert-success" style="background:#dcfce7;color:#27ae60;padding:1rem;margin-bottom:1rem;border-radius:6px;">
+                        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                    </div>
+                <?php endif; ?>
                 <form method="POST">
                     <input type="hidden" name="update_user">
                     <div class="form-group">
@@ -176,6 +221,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
                         <a href="users.php" class="erpnext-btn btn-secondary">Cancel</a>
                         <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-save"></i> Update User</button>
                     </div>
+                </form>
+                <hr style="margin:2rem 0;">
+                <h3 style="color:#215967;">Password Management</h3>
+                <form method="POST" style="margin-bottom:1.2rem;">
+                    <button type="submit" name="reset_random_password" class="erpnext-btn btn-info" onclick="return confirm('Reset password and send to user email?')">
+                        <i class="fas fa-random"></i> Reset Random Password & Email
+                    </button>
+                </form>
+                <form method="POST" style="display:flex;gap:1rem;align-items:center;">
+                    <input type="password" name="manual_password" placeholder="Enter new password" required style="flex:1;min-width:180px;">
+                    <button type="submit" name="reset_manual_password" class="erpnext-btn btn-primary">
+                        <i class="fas fa-key"></i> Set Password Manually
+                    </button>
+                </form>
+                <hr style="margin:2rem 0;">
+                <h3 style="color:#e74c3c;">Danger Zone</h3>
+                <form method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This cannot be undone!');">
+                    <button type="submit" name="delete_user" class="erpnext-btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete User
+                    </button>
                 </form>
             </div>
         </div>
