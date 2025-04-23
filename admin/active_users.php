@@ -1,8 +1,6 @@
 <?php
 ob_start();
 // Error reporting (remove in production)
-error_log($allSql);
-error_log(print_r($allParams, true));
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // Include required files
@@ -34,6 +32,9 @@ try {
 try {
     // Only select id, username, last_active, correct WHERE syntax
     $allSql = "SELECT id, username, last_active FROM users $allWhereSql ORDER BY username";
+    // Debug: log the SQL and params before preparing/executing
+    error_log("SQL: " . $allSql);
+    error_log("PARAMS: " . print_r($allParams, true));
     $stmtAll = $pdo->prepare($allSql);
     // Fix: Only bind if $allParams is not empty
     if (!empty($allParams)) {
