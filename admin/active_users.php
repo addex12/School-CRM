@@ -10,35 +10,9 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
-
-// Fetch all roles for filter dropdown (do this first, always)
+// Remove all search/filter logic, just fetch active users
 try {
-    $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
-} catch (PDOException $e) {
-    $roles = [];
-}
-
-
-try {
-    // Only select id, username, last_active, correct WHERE syntax
-    $allSql = "SELECT id, username, last_active FROM users $allWhereSql ORDER BY username";
-    $stmtAll = $pdo->prepare($allSql);
-    foreach ($allParams as $key => $val) {
-        $stmtAll->bindValue($key, $val);
-    }
-    $stmtAll->execute();
-    $allUsers = $stmtAll->fetchAll(PDO::FETCH_ASSOC);
-
-    unset($error);
-} catch (PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
-    $error = "A database error occurred. Please try again later.";
-    $allUsers = [];
-}
-
-// Simple query to list all active users
-try {
-    $users = $pdo->query("SELECT id, username, last_active FROM users WHERE status = 'active' ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+    $users = $pdo->query("SELECT id, username, last_active, online FROM users WHERE status = 'active' ORDER BY online DESC, username")->fetchAll(PDO::FETCH_ASSOC);
     unset($error);
 } catch (PDOException $e) {
     error_log("Database Error: " . $e->getMessage());
@@ -146,7 +120,7 @@ try {
                         </button>
                         <span class="active-count">
                             <i class="fas fa-circle"></i>
-                            <?= count($allUsers ?? []) ?> active
+                            <?= count($users ?? []) ?> active
                         </span>
                     </div>
                 </div>
@@ -154,18 +128,15 @@ try {
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
-                <form method="get" class="search-bar" id="allUserSearchForm" style="margin-bottom:1.5rem;">
-                    <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username, name, or email..." value="<?= htmlspecialchars($allSearch ?? '') ?>">
-                    <!-- Remove role filter dropdown -->
-                    <!-- <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button> -->
-                    <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
-                </form>
+                <!-- Remove search form entirely -->
+
                 <table class="users-table" id="allUsersTable">
                     <thead>
                         <tr>
                             <th>ID</th>
                             <th>Username</th>
                             <th>Last Active</th>
+                            <th>Online</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,11 +146,18 @@ try {
                                 <td><?= htmlspecialchars($user['id']) ?></td>
                                 <td><?= htmlspecialchars($user['username']) ?></td>
                                 <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
+                                <td>
+                                    <?php if (!empty($user['online'])): ?>
+                                        <span class="online-dot"></span> Online
+                                    <?php else: ?>
+                                        Offline
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="3" class="text-center">No active users found</td>
+                                <td colspan="4" class="text-center">No active users found</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -188,30 +166,6 @@ try {
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-    <script>
-        // Real-time search/filter (client-side for current page)
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('activeUserSearch');
-            const roleFilter = document.getElementById('roleFilter');
-            function filterTables() {
-                const val = searchInput.value.toLowerCase();
-                const role = roleFilter.value;
-                ['onlineUsersTable', 'allUsersTable'].forEach(function(tableId) {
-                    const tbody = document.getElementById(tableId).querySelector('tbody');
-                    const rows = Array.from(tbody.querySelectorAll('tr'));
-                    rows.forEach(function(row) {
-                        const cells = row.querySelectorAll('td');
-                        if (!cells.length) return;
-                        const username = cells[1].textContent.toLowerCase();
-                        const match = (!val || username.includes(val));
-                        row.style.display = match ? '' : 'none';
-                    });
-                });
-            }
-            searchInput.addEventListener('input', filterTables);
-            roleFilter.addEventListener('change', filterTables);
-        });
-    </script>
 </body>
 </html>
 <?php ob_end_flush(); ?>
