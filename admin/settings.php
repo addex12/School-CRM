@@ -52,7 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $end = $_POST['term_end'];
         $year_id = intval($_POST['term_year_id']);
         if ($name && $start && $end && $year_id) {
-            $stmt = $pdo->prepare("INSERT INTO academic_terms (academic_year_id, name, start_date, end_date) VALUES (?, ?, ?, ?)");
+            // Changed 'name' to 'term_name'
+            $stmt = $pdo->prepare("INSERT INTO academic_terms (academic_year_id, term_name, start_date, end_date) VALUES (?, ?, ?, ?)");
             $stmt->execute([$year_id, $name, $start, $end]);
             $success = "Academic Term added!";
         }
@@ -65,7 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $end = $_POST['term_end'];
         $year_id = intval($_POST['term_year_id']);
         if ($id && $name && $start && $end && $year_id) {
-            $stmt = $pdo->prepare("UPDATE academic_terms SET academic_year_id=?, name=?, start_date=?, end_date=? WHERE id=?");
+            // Changed 'name' to 'term_name'
+            $stmt = $pdo->prepare("UPDATE academic_terms SET academic_year_id=?, term_name=?, start_date=?, end_date=? WHERE id=?");
             $stmt->execute([$year_id, $name, $start, $end, $id]);
             $success = "Academic Term updated!";
         }
@@ -516,7 +518,8 @@ $terms = $pdo->query("
                                             <tr>
                                                 <form method="post">
                                                     <td>
-                                                        <input type="text" name="term_name" value="<?= htmlspecialchars($term['name'] ?? '') ?>" required>
+                                                        <!-- Changed 'name' to 'term_name' -->
+                                                        <input type="text" name="term_name" value="<?= htmlspecialchars($term['term_name'] ?? '') ?>" required>
                                                         <input type="hidden" name="term_id" value="<?= $term['id'] ?>">
                                                     </td>
                                                     <td>
