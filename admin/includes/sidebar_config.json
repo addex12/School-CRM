@@ -10,8 +10,8 @@
       "icon": "poll",
       "items": [
         { "title": "All Surveys", "icon": "poll", "link": "surveys.php" },
-        { "title": "Create Survey", "icon": "plus-circle", "link": "add_survey.php" },
-        { "title": "Survey Results", "icon": "chart-bar", "link": "survey_results.php" }
+        { "title": "Create Survey", "icon": "plus-circle", "link": "survey_builder.php" },
+        { "title": "Survey Results", "icon": "chart-bar", "link": "results.php" }
       ],
       "id": "surveys-menu"
     },
