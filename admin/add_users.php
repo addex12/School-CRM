@@ -462,7 +462,6 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         </div>
     </div>
 <script>
-// Progress bar for bulk import (client-side simulation)
 document.addEventListener('DOMContentLoaded', function() {
     var form = document.getElementById('bulkImportForm');
     var progressContainer = document.getElementById('progressContainer');
@@ -478,7 +477,6 @@ document.addEventListener('DOMContentLoaded', function() {
             progressBar.textContent = '0%';
             importBtn.disabled = true;
 
-            // Use AJAX for real upload and progress
             var file = csvInput.files[0];
             var formData = new FormData();
             formData.append('csv_file', file);
@@ -496,12 +494,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
 
-            xhr.onload = function() {
-                progressBar.style.width = '100%';
-                progressBar.textContent = 'Processing...';
-                setTimeout(function() {
-                    window.location.reload();
-                }, 800);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    progressBar.style.width = '100%';
+                    if (xhr.status === 200) {
+                        // Try to parse response for errors/success
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(xhr.responseText, 'text/html');
+                        var errorMsg = doc.querySelector('.error-message');
+                        var successMsg = doc.querySelector('.success-message');
+                        if (errorMsg) {
+                            progressBar.style.background = '#e74c3c';
+                            progressBar.textContent = errorMsg.textContent.trim();
+                        } else if (successMsg) {
+                            progressBar.style.background = '#27ae60';
+                            progressBar.textContent = successMsg.textContent.trim();
+                        } else {
+                            progressBar.textContent = 'Done';
+                        }
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1800);
+                    } else {
+                        progressBar.style.background = '#e74c3c';
+                        progressBar.textContent = 'Upload failed';
+                        importBtn.disabled = false;
+                    }
+                }
             };
 
             xhr.onerror = function() {
