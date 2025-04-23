@@ -13,27 +13,31 @@ $pageTitle = "Active Users";
 // Handle search/filter
 $search = trim($_GET['search'] ?? '');
 $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
-$role = trim($_GET['role'] ?? '');
+$role_id = trim($_GET['role'] ?? '');
 
-$where = ["active = 1"];
+$where = ["u.active = 1"];
 $params = [];
 
 if ($search !== '') {
-    $where[] = "username LIKE :search";
+    $where[] = "u.username LIKE :search";
     $params[':search'] = "%$search%";
 }
 if ($filter_online) {
-    $where[] = "online = 1";
+    $where[] = "u.online = 1";
 }
-if ($role !== '') {
-    $where[] = "role = :role";
-    $params[':role'] = $role;
+if ($role_id !== '') {
+    $where[] = "u.role_id = :role_id";
+    $params[':role_id'] = $role_id;
 }
 
 $where_sql = implode(' AND ', $where);
 
 try {
-    $stmt = $pdo->prepare("SELECT id, username, last_active, online, role FROM users WHERE $where_sql ORDER BY username");
+    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, r.name AS role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE $where_sql
+        ORDER BY u.username");
     $stmt->execute($params);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -66,26 +70,30 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     require_once '../includes/config.php';
     $search = trim($_GET['search'] ?? '');
     $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
-    $role = trim($_GET['role'] ?? '');
+    $role_id = trim($_GET['role'] ?? '');
 
-    $where = ["active = 1"];
+    $where = ["u.active = 1"];
     $params = [];
 
     if ($search !== '') {
-        $where[] = "username LIKE :search";
+        $where[] = "u.username LIKE :search";
         $params[':search'] = "%$search%";
     }
     if ($filter_online) {
-        $where[] = "online = 1";
+        $where[] = "u.online = 1";
     }
-    if ($role !== '') {
-        $where[] = "role = :role";
-        $params[':role'] = $role;
+    if ($role_id !== '') {
+        $where[] = "u.role_id = :role_id";
+        $params[':role_id'] = $role_id;
     }
 
     $where_sql = implode(' AND ', $where);
 
-    $stmt = $pdo->prepare("SELECT id, username, last_active, online, role FROM users WHERE $where_sql ORDER BY username");
+    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, r.name AS role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE $where_sql
+        ORDER BY u.username");
     $stmt->execute($params);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -102,7 +110,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
     ob_clean();
     if (count($online_users) + count($offline_users) === 0) {
-        echo '<tr><td colspan="5" class="text-center">No active users found</td></tr>';
+        echo '<tr><td colspan="6" class="text-center">No active users found</td></tr>';
     } else {
         foreach ($online_users as $user) {
             echo '<tr>
@@ -110,7 +118,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 <td>' . htmlspecialchars($user['username']) . '</td>
                 <td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>
                 <td><span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span></td>
-                <td>' . htmlspecialchars($user['role']) . '</td>
+                <td>' . htmlspecialchars($user['role_name']) . '</td>
+                <td>
+                    <button class="crud-btn edit">Edit</button>
+                    <button class="crud-btn delete">Delete</button>
+                </td>
             </tr>';
         }
         foreach ($offline_users as $user) {
@@ -119,7 +131,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 <td>' . htmlspecialchars($user['username']) . '</td>
                 <td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>
                 <td><span style="color:#aaa;">Offline</span></td>
-                <td>' . htmlspecialchars($user['role']) . '</td>
+                <td>' . htmlspecialchars($user['role_name']) . '</td>
+                <td>
+                    <button class="crud-btn edit">Edit</button>
+                    <button class="crud-btn delete">Delete</button>
+                </td>
             </tr>';
         }
     }
@@ -131,14 +147,14 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'update_user') {
     require_once '../includes/config.php';
     $id = intval($_POST['id']);
     $username = trim($_POST['username']);
-    $role = trim($_POST['role']);
+    $role_id = trim($_POST['role_id']);
     $active = isset($_POST['active']) ? 1 : 0;
     $online = isset($_POST['online']) ? 1 : 0;
 
-    $stmt = $pdo->prepare("UPDATE users SET username = :username, role = :role, active = :active, online = :online WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, active = :active, online = :online WHERE id = :id");
     $ok = $stmt->execute([
         ':username' => $username,
-        ':role' => $role,
+        ':role_id' => $role_id,
         ':active' => $active,
         ':online' => $online,
         ':id' => $id
@@ -157,8 +173,8 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'delete_user') {
     exit;
 }
 
-// Fetch roles for filter dropdown
-$roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN());
+// Fetch roles for filter dropdown (id => name)
+$roles = $pdo->query("SELECT id, name FROM roles ORDER BY name")->fetchAll(PDO::FETCH_KEY_PAIR);
 
 ?>
 <!DOCTYPE html>
@@ -372,9 +388,9 @@ $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND
                     </label>
                     <select name="role" id="roleInput">
                         <option value="">All Roles</option>
-                        <?php foreach ($roles as $r): ?>
-                            <option value="<?= htmlspecialchars($r) ?>" <?= (isset($_GET['role']) && $_GET['role'] === $r) ? 'selected' : '' ?>>
-                                <?= htmlspecialchars(ucfirst($r)) ?>
+                        <?php foreach ($roles as $id => $name): ?>
+                            <option value="<?= htmlspecialchars($id) ?>" <?= (isset($_GET['role']) && $_GET['role'] == $id) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars($name) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -406,7 +422,7 @@ $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND
                                 <td class="online">
                                     <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
                                 </td>
-                                <td class="role"><?= htmlspecialchars($user['role']) ?></td>
+                                <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
                                 <td>
                                     <button class="crud-btn edit">Edit</button>
                                     <button class="crud-btn delete">Delete</button>
@@ -422,7 +438,7 @@ $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND
                                 <td class="online">
                                     <span style="color:#aaa;">Offline</span>
                                 </td>
-                                <td class="role"><?= htmlspecialchars($user['role']) ?></td>
+                                <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
                                 <td>
                                     <button class="crud-btn edit">Edit</button>
                                     <button class="crud-btn delete">Delete</button>
@@ -487,7 +503,7 @@ $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND
         // Save original values
         const orig = {
             username: usernameTd.textContent.trim(),
-            role: roleTd.textContent.trim(),
+            role_id: roleTd.getAttribute('data-role-id'),
             online: /Online/i.test(onlineTd.textContent),
         };
 
@@ -495,8 +511,8 @@ $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND
         usernameTd.innerHTML = `<input class="crud-editable" name="username" value="${orig.username}">`;
         // Role select
         let roleOptions = `<option value="">Select</option>`;
-        <?php foreach ($roles as $r): ?>
-            roleOptions += `<option value="<?= htmlspecialchars($r) ?>" ${orig.role === "<?= htmlspecialchars($r) ?>" ? 'selected' : ''}><?= htmlspecialchars(ucfirst($r)) ?></option>`;
+        <?php foreach ($roles as $id => $name): ?>
+            roleOptions += `<option value="<?= htmlspecialchars($id) ?>" ${orig.role_id == "<?= htmlspecialchars($id) ?>" ? 'selected' : ''}><?= htmlspecialchars($name) ?></option>`;
         <?php endforeach; ?>
         roleTd.innerHTML = `<select class="crud-editable" name="role">${roleOptions}</select>`;
         // Online checkbox
@@ -510,7 +526,7 @@ $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND
         // Save handler
         actionsTd.querySelector('.save').onclick = function() {
             const username = usernameTd.querySelector('input').value.trim();
-            const role = roleTd.querySelector('select').value;
+            const role_id = roleTd.querySelector('select').value;
             const online = onlineTd.querySelector('input[type="checkbox"]').checked ? 1 : 0;
             fetch('active_users.php', {
                 method: 'POST',
@@ -519,7 +535,7 @@ $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND
                     ajax: 'update_user',
                     id: id,
                     username: username,
-                    role: role,
+                    role_id: role_id,
                     online: online,
                     active: 1
                 })
