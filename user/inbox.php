@@ -6,10 +6,44 @@ requireLogin();
 
 $userId = $_SESSION['user_id'];
 
-// Replace direct last_active updates with the helper function
+// Update last active
 updateLastActive($userId);
 
-// Add error handling for the message-fetching query
+// Sorting/filtering logic for online users
+$roleFilter = $_GET['role'] ?? '';
+$search = trim($_GET['search'] ?? '');
+$roleSql = $roleFilter ? "AND r.role_name = :role" : "";
+$searchSql = $search ? "AND (u.username LIKE :search OR u.email LIKE :search)" : "";
+
+// Fetch online users (active in last 5 minutes)
+$onlineThreshold = date('Y-m-d H:i:s', strtotime('-5 minutes'));
+$onlineUsers = [];
+$roles = [];
+try {
+    $sql = "
+        SELECT u.id, u.username, u.email, u.role_id, u.last_activity, COALESCE(r.role_name, 'No Role') as role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE u.last_activity > :threshold AND u.id != :self
+        $roleSql
+        $searchSql
+        ORDER BY u.last_activity DESC
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindValue(':threshold', $onlineThreshold);
+    $stmt->bindValue(':self', $userId);
+    if ($roleFilter) $stmt->bindValue(':role', $roleFilter);
+    if ($search) $stmt->bindValue(':search', '%' . $search . '%');
+    $stmt->execute();
+    $onlineUsers = $stmt->fetchAll();
+
+    // Fetch all roles for filter dropdown
+    $roles = $pdo->query("SELECT DISTINCT role_name FROM roles WHERE role_name IS NOT NULL ORDER BY role_name")->fetchAll(PDO::FETCH_COLUMN);
+} catch (PDOException $e) {
+    error_log("Error fetching online users: " . $e->getMessage());
+}
+
+// Fetch messages
 try {
     $stmt = $pdo->prepare("
         SELECT m.id, m.subject, m.content, m.sender_id, m.receiver_id, m.sent_at, m.is_read, u.username AS sender_name 
@@ -23,22 +57,6 @@ try {
 } catch (PDOException $e) {
     error_log("Error fetching messages: " . $e->getMessage());
     $messages = [];
-}
-
-// Fetch online users (active in last 5 minutes)
-$onlineThreshold = date('Y-m-d H:i:s', strtotime('-5 minutes'));
-$onlineUsers = [];
-try {
-    $stmt = $pdo->prepare("
-        SELECT id, username, email, role_id, last_activity 
-        FROM users 
-        WHERE last_activity > ? AND id != ?
-        ORDER BY username
-    ");
-    $stmt->execute([$onlineThreshold, $userId]);
-    $onlineUsers = $stmt->fetchAll();
-} catch (PDOException $e) {
-    error_log("Error fetching online users: " . $e->getMessage());
 }
 
 function getUserRoleName($roleId) {
@@ -57,16 +75,24 @@ function getUserRoleName($roleId) {
         <div class="inbox-layout">
             <div class="inbox-sidebar">
                 <h3>Online Users</h3>
-
+                <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.5rem;">
+                    <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" style="flex:1;">
+                    <select name="role" id="roleFilter">
+                        <option value="">All Roles</option>
+                        <?php foreach ($roles as $role): ?>
+                            <option value="<?= htmlspecialchars($role) ?>" <?= $role === $roleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i></button>
+                    <a href="inbox.php" class="erpnext-btn btn-secondary">Clear</a>
+                </form>
                 <div class="online-users-list">
                     <?php if (count($onlineUsers) > 0): ?>
                         <?php foreach ($onlineUsers as $user): ?>
                             <div class="online-user">
                                 <span class="user-status"></span>
                                 <span class="username"><?= htmlspecialchars($user['username']) ?></span>
-                                <?php if ($user['role_id']): ?>
-                                    <span class="user-role">(<?= getUserRoleName($user['role_id']) ?>)</span>
-                                <?php endif; ?>
+                                <span class="user-role">(<?= htmlspecialchars($user['role_name'] ?? getUserRoleName($user['role_id'])) ?>)</span>
                                 <button class="btn btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
                             </div>
                         <?php endforeach; ?>
@@ -75,19 +101,16 @@ function getUserRoleName($roleId) {
                     <?php endif; ?>
                 </div>
             </div>
-
             <div class="inbox-main">
                 <h1>Your Inbox</h1>
-
-                <div class="inbox-controls">
-                    <input type="text" id="search" placeholder="Search messages..." class="search-bar">
+                <div class="inbox-controls" style="display:flex;gap:1rem;margin-bottom:20px;">
+                    <input type="text" id="search" placeholder="Search messages..." class="search-bar" style="flex:1;">
                     <select id="filter" class="filter-dropdown">
                         <option value="all">All Messages</option>
                         <option value="unread">Unread</option>
                         <option value="read">Read</option>
                     </select>
                 </div>
-
                 <div class="message-list">
                     <?php if (count($messages) > 0): ?>
                         <?php foreach ($messages as $message): ?>
@@ -116,13 +139,12 @@ function getUserRoleName($roleId) {
         </div>
     </div>
 </div>
-<script
+<script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Search/filter for messages
     const searchInput = document.getElementById('search');
     const filterDropdown = document.getElementById('filter');
     const messages = document.querySelectorAll('.message-item');
-
-    // Search functionality
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.toLowerCase();
         messages.forEach(message => {
@@ -136,8 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-    // Filter functionality
     filterDropdown.addEventListener('change', () => {
         const filter = filterDropdown.value;
         messages.forEach(message => {
@@ -146,6 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (filter === 'unread' && message.dataset.status === 'unread') {
                 message.style.display = '';
             } else if (filter === 'read' && message.dataset.status === 'read') {
+                message.style.display = '';
+            } else {
                 message.style.display = 'none';
             }
         });
@@ -156,16 +178,12 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', async () => {
             const messageId = button.dataset.id;
             const messageItem = button.closest('.message-item');
-            
             try {
-                const response = await fetch(`/api/mark-read.php`, {
+                const response = await fetch('/api/mark-read.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ messageId })
                 });
-                
                 if (response.ok) {
                     messageItem.dataset.status = 'read';
                     button.textContent = 'Read';
@@ -183,78 +201,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.view-message').forEach(button => {
         button.addEventListener('click', () => {
             const messageId = button.dataset.id;
-            // Change from /view-message.php to user/view_message.php
             window.location.href = 'view_message.php?id=' + messageId;
         });
     });
 
-    // Redirect chat button to messages.php with selected user id
+    // Chat button redirects to messages.php with selected user id
     document.querySelectorAll('.btn-chat').forEach(button => {
         button.addEventListener('click', () => {
             const userId = button.dataset.userId;
-            window.location.href = 'messages.php?user_id=' + encodeURIComponent(userId);
+            window.location.href = '../admin/messages.php?user_id=' + encodeURIComponent(userId);
         });
     });
-
-    const chatModal = document.getElementById('chatModal');
-    const chatUserName = document.getElementById('chatUserName');
-    const chatUserId = document.getElementById('chatUserId');
-    const chatMessages = document.getElementById('chatMessages');
-    const chatForm = document.getElementById('chatForm');
-    const chatInput = document.getElementById('chatInput');
-
-    // Open chat modal
-    document.querySelectorAll('.btn-chat').forEach(button => {
-        button.addEventListener('click', () => {
-            const userId = button.dataset.userId;
-            const username = button.previousElementSibling.textContent;
-
-            chatUserName.textContent = username;
-            chatUserId.value = userId;
-            chatMessages.innerHTML = ''; // Clear previous messages
-            chatModal.style.display = 'block';
-
-            // Fetch chat history
-            fetch(`/api/chat_history.php?user_id=${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    data.forEach(message => {
-                        const messageElement = document.createElement('div');
-                        messageElement.textContent = message.content;
-                        chatMessages.appendChild(messageElement);
-                    });
-                });
-        });
-    });
-
-    // Close chat modal
-    document.querySelector('.close-chat').addEventListener('click', () => {
-        chatModal.style.display = 'none';
-    });
-
-    // Send chat message
-    chatForm.addEventListener('submit', event => {
-        event.preventDefault();
-
-        const message = chatInput.value;
-        const userId = chatUserId.value;
-
-        fetch('/api/send_message.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: userId, content: message })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const messageElement = document.createElement('div');
-                messageElement.textContent = message;
-                chatMessages.appendChild(messageElement);
-                chatInput.value = '';
-            }
-        });
-    });
-};
+});
 </script>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
 <style>
