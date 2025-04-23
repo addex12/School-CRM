@@ -20,7 +20,8 @@ $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch all classes and sections for dropdowns
 $classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
-$sections = $pdo->query("SELECT id, section_name FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
+// Fetch sections with class_id for filtering
+$sections = $pdo->query("SELECT id, section_name, class_id FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
 
 // Handle bulk assign (CSV import)
 $bulk_error = $bulk_success = '';
@@ -252,9 +253,8 @@ if (isset($_GET['export'])) {
                 const classId = classSelect.value;
                 // Always keep the first option (Select Section)
                 sectionSelect.innerHTML = '';
-                sectionSelect.appendChild(allOptions[0].cloneNode(true));
-                allOptions.slice(1).forEach(opt => {
-                    if (!classId || opt.getAttribute('data-class') === classId) {
+                allOptions.forEach(opt => {
+                    if (!opt.value || !classId || opt.getAttribute('data-class') === classId) {
                         sectionSelect.appendChild(opt.cloneNode(true));
                     }
                 });
