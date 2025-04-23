@@ -364,3 +364,4 @@ foreach ($survey_data as $row) {
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </body>
 </html>
+<?php ob_end_flush(); ?>
