@@ -257,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
 };
 </script>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
-<?php ob_end_flush(); ?>
 <style>
 .inbox-container {
     max-width: 1200px;
@@ -505,3 +504,4 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 </style>
 
+<?php ob_end_flush(); ?>
