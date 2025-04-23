@@ -206,7 +206,12 @@ if (isset($_GET['export'])) {
 // Handle CRUD actions for students
 if (isset($_GET['delete_student']) && is_numeric($_GET['delete_student'])) {
     $student_id = intval($_GET['delete_student']);
-    $pdo->prepare("DELETE FROM students WHERE id=?")->execute([$student_id]);
+    // Get user_id before deleting
+    $user_id = $pdo->query("SELECT user_id FROM students WHERE id=" . $student_id)->fetchColumn();
+    if ($user_id) {
+        $pdo->prepare("DELETE FROM students WHERE id=?")->execute([$student_id]);
+        $pdo->prepare("DELETE FROM users WHERE id=?")->execute([$user_id]);
+    }
     header("Location: students.php?msg=Student+deleted");
     exit;
 }
@@ -451,8 +456,8 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                             <td><?= esc($s['status'] ?? '-') ?></td>
                                             <td><?= esc($s['created_at'] ?? '-') ?></td>
                                             <td>
-                                                <a href="students.php?edit_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
-                                                <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student?')">Delete</a>
+                                                <a href="edit_user.php?id=<?= esc($s['user_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
+                                                <a href="students.php?delete_student=<?= esc($s['student_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this student and user?')">Delete</a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
@@ -467,8 +472,9 @@ function sort_link($col, $label, $current_sort, $current_order) {
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
+            <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
-<?php ob_end_flush(); ?>    
+<?php ob_end_flush(); ?>
