@@ -14,22 +14,20 @@ $pageTitle = "Active Users";
 // Filtering logic
 $search = trim($_GET['search'] ?? '');
 $roleFilter = $_GET['role'] ?? '';
-
-// Prepare search/role SQL for both queries
-$searchSql = $search ? "AND (username LIKE :search OR email LIKE :search)" : "";
+$searchSql = $search ? "AND (username LIKE :search)" : "";
 $roleSql = $roleFilter ? "AND role = :role" : "";
 
 try {
-    // Online active users
-    $onlineSql = "SELECT id, username, last_active FROM users WHERE online = 1 AND status = 'active' $roleSql $searchSql ORDER BY username";
+    // Online users only
+    $onlineSql = "SELECT id, username, last_active FROM users WHERE online = 1 $roleSql $searchSql ORDER BY username";
     $stmtOnline = $pdo->prepare($onlineSql);
     if ($roleFilter) $stmtOnline->bindValue(':role', $roleFilter);
     if ($search) $stmtOnline->bindValue(':search', '%' . $search . '%');
     $stmtOnline->execute();
     $onlineUsers = $stmtOnline->fetchAll(PDO::FETCH_ASSOC);
 
-    // All active users
-    $allSql = "SELECT id, username, last_active FROM users WHERE status = 'active' $roleSql $searchSql ORDER BY username";
+    // All active users, online users will be sorted first
+    $allSql = "SELECT id, username, last_active, online FROM users WHERE status = 'active' $roleSql $searchSql ORDER BY online DESC, username";
     $stmtAll = $pdo->prepare($allSql);
     if ($roleFilter) $stmtAll->bindValue(':role', $roleFilter);
     if ($search) $stmtAll->bindValue(':search', '%' . $search . '%');
@@ -154,7 +152,7 @@ try {
                     </div>
                 </div>
                 <form method="get" class="search-bar" id="activeUserSearchForm" style="margin-bottom:1.5rem;">
-                    <input type="text" name="search" id="activeUserSearch" placeholder="Search by username or email..." value="<?= htmlspecialchars($search) ?>">
+                    <input type="text" name="search" id="activeUserSearch" placeholder="Search by username..." value="<?= htmlspecialchars($search) ?>">
                     <select name="role" id="roleFilter">
                         <option value="">All Roles</option>
                         <?php foreach ($roles as $role): ?>
@@ -164,65 +162,61 @@ try {
                     <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
                     <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
                 </form>
-                <?php if (isset($error)): ?>
-                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-                <?php else: ?>
-                    <h3 style="margin-top:2rem;">Online Active Users</h3>
-                    <table class="users-table" id="onlineUsersTable">
-                        <thead>
+                <h3 style="margin-top:2rem;">Online Users</h3>
+                <table class="users-table" id="onlineUsersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Last Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($onlineUsers)): ?>
+                            <?php foreach ($onlineUsers as $user): ?>
                             <tr>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Last Active</th>
+                                <td><?= htmlspecialchars($user['id']) ?></td>
+                                <td><span class="online-dot"></span><?= htmlspecialchars($user['username']) ?></td>
+                                <td><?= htmlspecialchars($user['last_active']) ?></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (!empty($onlineUsers)): ?>
-                                <?php foreach ($onlineUsers as $user): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($user['id']) ?></td>
-                                    <td><span class="online-dot"></span><?= htmlspecialchars($user['username']) ?></td>
-                                    <td><?= htmlspecialchars($user['last_active']) ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="3" class="text-center">No online active users found</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                    <h3 style="margin-top:2.5rem;">All Active Users</h3>
-                    <table class="users-table" id="allUsersTable">
-                        <thead>
+                            <?php endforeach; ?>
+                        <?php else: ?>
                             <tr>
-                                <th>ID</th>
-                                <th>Username</th>
-                                <th>Last Active</th>
+                                <td colspan="3" class="text-center">No online users found</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (!empty($allUsers)): ?>
-                                <?php foreach ($allUsers as $user): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($user['id']) ?></td>
-                                    <td>
-                                        <?php if ($user['online'] ?? 0): ?>
-                                            <span class="online-dot"></span>
-                                        <?php endif; ?>
-                                        <?= htmlspecialchars($user['username']) ?>
-                                    </td>
-                                    <td><?= htmlspecialchars($user['last_active']) ?></td>
-                                </tr>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <tr>
-                                    <td colspan="3" class="text-center">No active users found</td>
-                                </tr>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                <?php endif; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+                <h3 style="margin-top:2.5rem;">All Active Users</h3>
+                <table class="users-table" id="allUsersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Last Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($allUsers)): ?>
+                            <?php foreach ($allUsers as $user): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($user['id']) ?></td>
+                                <td>
+                                    <?php if (!empty($user['online'])): ?>
+                                        <span class="online-dot"></span>
+                                    <?php endif; ?>
+                                    <?= htmlspecialchars($user['username']) ?>
+                                </td>
+                                <td><?= htmlspecialchars($user['last_active']) ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="3" class="text-center">No active users found</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
@@ -235,7 +229,6 @@ try {
             function filterTables() {
                 const val = searchInput.value.toLowerCase();
                 const role = roleFilter.value;
-                // Filter both tables
                 ['onlineUsersTable', 'allUsersTable'].forEach(function(tableId) {
                     const tbody = document.getElementById(tableId).querySelector('tbody');
                     const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -244,7 +237,6 @@ try {
                         if (!cells.length) return;
                         const username = cells[1].textContent.toLowerCase();
                         const match = (!val || username.includes(val));
-                        // No role column in these tables, so only filter by search
                         row.style.display = match ? '' : 'none';
                     });
                 });
