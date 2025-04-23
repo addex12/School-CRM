@@ -1,142 +1,74 @@
 {
-    "menu": [
-        {
-            "title": "Dashboard",
-            "link": "dashboard.php",
-            "icon": "home",
-            "id": "dashboard"
-        },
-        {
-            "title": "User Management",
-            "icon": "users",
-            "id": "userManagement",
-            "items": [
-                {
-                    "title": "Manage Users",
-                    "link": "users.php",
-                    "icon": "list"
-                },
-                {
-                    "title": "Add Users",
-                    "link": "add_users.php",
-                    "icon": "user-edit"
-                },
-                {
-                    "title": "User Roles",
-                    "link": "user_roles.php",
-                    "icon": "user-tag"
-                },
-                {
-                    "title": "Active Users",
-                    "link": "active_users.php",
-                    "icon": "user-check"
-                }
-            ]
-        },
-        {
-            "title": "Survey Management",
-            "icon": "poll",
-            "id": "surveyManagement",
-            "items": [
-                {
-                    "title": "Surveys",
-                    "link": "surveys.php",
-                    "icon": "poll"
-                },
-                {
-                    "title": "Survey Builder",
-                    "link": "survey_builder.php",
-                    "icon": "wrench"
-                },
-                {
-                    "title": "Results",
-                    "link": "all_responses.php",   
-                    "icon": "chart-bar"
-                },
-                {
-                    "title": "Survey Statistics",
-                    "link": "survey_statistics.php",
-                    "icon": "chart-line"
-                },
-                {
-                    "title": "Survey Categories",
-                    "link": "categories.php",
-                    "icon": "folder"
-                }
-            ]
-        },
-        {
-            "title": "Content",
-            "icon": "folder-open",
-            "id": "contentManagement",
-            "items": [
-                {
-                    "title": "Templates",
-                    "link": "templates.php",
-                    "icon": "file-alt"
-                }
-            ]
-        },
-        {
-            "title": "Communication",
-            "icon": "comment",
-            "id": "communication",
-            "items": [
-                {
-                    "title": "Bulk Email",
-                    "link": "bulk_email.php",
-                    "icon": "envelope"
-                },
-                {
-                    "title": "Feedback Management",
-                    "link": "feedback_mgmt.php",
-                    "icon": "comment-dots"
-                },
-                {
-                    "title": "Messages",
-                    "link": "messages.php",
-                    "icon": "comments"
-                }  
-            ]
-        },
-        {
-            "title": "System",
-            "icon": "cogs",
-            "id": "system",
-            "items": [
-                {
-                    "title": "Settings",
-                    "link": "settings.php",
-                    "icon": "cog"
-                },
-                {
-                    "title": "Audit Log",
-                    "link": "audit_log.php",
-                    "icon": "history"
-                },
-                {
-                    "title": "Backup",
-                    "link": "backup.php",
-                    "icon": "database"
-                }
-            ]
-        },
-        {
-            "title": "Reports",
-            "icon": "file-chart-line",
-            "id": "reports",
-            "items": [
-                {
-                    "title": "Generate Reports",
-                    "link": "generate_reports.php",
-                    "icon": "file-pdf"
-                },
-                {
-                    "title": "View Reports",
-                    "link": "view_reports.php",
-                    "icon": "eye"
-                }
-            ]
-        }
-    ]
+  "menu": [
+    {
+      "title": "Dashboard",
+      "icon": "tachometer-alt",
+      "link": "dashboard.php"
+    },
+    {
+      "title": "Users",
+      "icon": "users",
+      "items": [
+        { "title": "All Users", "icon": "users", "link": "users.php" },
+        { "title": "Add User", "icon": "user-plus", "link": "add_users.php" }
+      ],
+      "id": "users-menu"
+    },
+    {
+      "title": "Students",
+      "icon": "user-graduate",
+      "items": [
+        { "title": "Student List", "icon": "user-graduate", "link": "students.php" },
+        { "title": "Add Student", "icon": "user-plus", "link": "add_student.php" }
+      ],
+      "id": "students-menu"
+    },
+    {
+      "title": "Teachers",
+      "icon": "chalkboard-teacher",
+      "items": [
+        { "title": "Teacher List", "icon": "chalkboard-teacher", "link": "teachers.php" },
+        { "title": "Add Teacher", "icon": "user-plus", "link": "add_teacher.php" }
+      ],
+      "id": "teachers-menu"
+    },
+    {
+      "title": "Classes",
+      "icon": "school",
+      "items": [
+        { "title": "Class List", "icon": "school", "link": "classes.php" },
+        { "title": "Sections", "icon": "th-large", "link": "sections.php" }
+      ],
+      "id": "classes-menu"
+    },
+    {
+      "title": "Academics",
+      "icon": "book",
+      "items": [
+        { "title": "Subjects", "icon": "book", "link": "subjects.php" },
+        { "title": "Curriculums", "icon": "list", "link": "curriculums.php" },
+        { "title": "Grading Scales", "icon": "chart-line", "link": "grading_scales.php" },
+        { "title": "Grades", "icon": "file-alt", "link": "grades.php" }
+      ],
+      "id": "academics-menu"
+    },
+    {
+      "title": "Surveys",
+      "icon": "poll",
+      "link": "surveys.php"
+    },
+    {
+      "title": "Feedback",
+      "icon": "comments",
+      "link": "feedback.php"
+    },
+    {
+      "title": "Support",
+      "icon": "ticket-alt",
+      "items": [
+        { "title": "Tickets", "icon": "ticket-alt", "link": "support_tickets.php" }
+      ],
+      "id": "support-menu"
+    }
+  ]
 }

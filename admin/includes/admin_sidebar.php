@@ -17,50 +17,111 @@ if (file_exists($configPath)) {
 $current = basename($_SERVER['PHP_SELF']);
 ?>
 <style>
+/* ERPNext/Frappe inspired sidebar styles */
 .admin-sidebar {
-    background: linear-gradient(180deg, #222d32 0%, #34495e 100%);
-    color: #fff;
-    width: 250px;
+    background: #f5f7fa;
+    color: #222d32;
+    width: 260px;
     min-height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 200;
-    padding-top: 30px;
+    padding-top: 0;
     box-shadow: 2px 0 8px rgba(44,62,80,0.07);
-    transition: width 0.2s, left 0.2s;
     display: flex;
     flex-direction: column;
+    border-right: 1px solid #e5e7eb;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+.sidebar-header {
+    padding: 1.5rem 2rem 1rem 2rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #215967;
+    letter-spacing: 1px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
 }
 .admin-sidebar ul { list-style: none; padding: 0; margin: 0; }
-.admin-sidebar li { margin-bottom: 12px; }
+.admin-sidebar li { margin-bottom: 0; }
 .admin-sidebar a {
-    color: #b8c7ce;
+    color: #215967;
     text-decoration: none;
     display: flex;
     align-items: center;
-    padding: 10px 22px;
-    border-radius: 6px;
-    font-size: 15px;
+    padding: 0.85rem 2rem;
+    border-radius: 0;
+    font-size: 1rem;
     font-weight: 500;
     transition: background 0.18s, color 0.18s;
+    gap: 12px;
+    border-left: 3px solid transparent;
+    letter-spacing: 0.01em;
+}
+.admin-sidebar li.active > a,
+.admin-sidebar a:hover,
+.admin-sidebar .submenu-item.active > a {
+    background: #e2efda;
+    color: #215967;
+    border-left: 3px solid #3b82f6;
+}
+.admin-sidebar .menu-category > .category-header {
+    padding: 0.85rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #215967;
+    cursor: pointer;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
     gap: 10px;
+    user-select: none;
 }
-.admin-sidebar li.active a, .admin-sidebar a:hover {
-    background: #1a2226;
-    color: #f1c40f;
+.admin-sidebar .category-header .collapse-icon {
+    margin-left: auto;
+    font-size: 1em;
+    transition: transform 0.2s;
 }
-.admin-sidebar i { margin-right: 10px; font-size: 1.2em; }
+.admin-sidebar .category-header.open .collapse-icon {
+    transform: rotate(180deg);
+}
+.admin-sidebar .submenu {
+    background: #f8fafc;
+    padding-left: 0;
+    border-left: 2px solid #e5e7eb;
+    display: none;
+}
+.admin-sidebar .submenu.open { display: block; }
+.admin-sidebar .submenu-item a {
+    padding: 0.7rem 2.5rem;
+    font-size: 0.97rem;
+    color: #215967;
+    border-left: 3px solid transparent;
+}
+.admin-sidebar .submenu-item.active > a,
+.admin-sidebar .submenu-item a:hover {
+    background: #e2efda;
+    color: #2563eb;
+    border-left: 3px solid #3b82f6;
+}
+.admin-sidebar i {
+    font-size: 1.15em;
+    min-width: 20px;
+    text-align: center;
+}
 .sidebar-toggle {
     display: none;
 }
 @media (max-width: 900px) {
     .admin-sidebar {
         width: 60px;
-        padding-top: 10px;
+        padding-top: 0;
     }
-    .admin-sidebar a {
-        padding: 10px 10px;
+    .sidebar-header { display: none; }
+    .admin-sidebar a, .admin-sidebar .category-header {
+        padding: 0.85rem 0.7rem;
         font-size: 0;
     }
     .admin-sidebar a .menu-text, .admin-sidebar a .category-text {
@@ -75,18 +136,19 @@ $current = basename($_SERVER['PHP_SELF']);
         position: fixed;
         top: 12px;
         left: 12px;
-        background: #1a2226;
-        color: #fff;
+        background: #fff;
+        color: #215967;
         padding: 10px;
         border-radius: 6px;
         cursor: pointer;
         z-index: 300;
-        border: none;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.07);
     }
 }
 @media (max-width: 600px) {
     .admin-sidebar {
-        left: -250px;
+        left: -260px;
         width: 220px;
         transition: left 0.2s;
     }
@@ -99,17 +161,19 @@ $current = basename($_SERVER['PHP_SELF']);
     <i class="fas fa-bars"></i>
 </button>
 <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-graduation-cap"></i> School CRM
+    </div>
     <ul class="sidebar-menu">
         <?php foreach ($sidebarItems as $item): ?>
             <?php if (isset($item['items'])): // Category with subitems ?>
                 <li class="menu-category">
-                    <div class="category-header" data-toggle="collapse" data-target="#<?= $item['id'] ?>">
+                    <div class="category-header<?= (isset($item['open']) && $item['open']) ? ' open' : '' ?>" data-toggle="collapse" data-target="#<?= $item['id'] ?>">
                         <i class="fas fa-<?= $item['icon'] ?> category-icon"></i>
                         <span class="category-text"><?= $item['title'] ?></span>
                         <i class="fas fa-chevron-down collapse-icon"></i>
                     </div>
                     <ul class="submenu" id="<?= $item['id'] ?>"<?php
-                        // If any subitem is active, open this submenu
                         $active = false;
                         foreach ($item['items'] as $subitem) {
                             if (basename($_SERVER['PHP_SELF']) == $subitem['link']) {
@@ -138,16 +202,10 @@ $current = basename($_SERVER['PHP_SELF']);
                 </li>
             <?php endif; ?>
         <?php endforeach; ?>
-       <!-- <li>
-            <a href="grade_report.php">
-                <i class="fa fa-chart-bar"></i>
-                <span>Grade Reports & Analytics</span>
-            </a>
-        </li> -->
     </ul>
 </aside>
-
 <script>
+// ERPNext/Frappe inspired sidebar JS
 (function() {
     // Submenu toggle
     var headers = document.querySelectorAll('.category-header');
