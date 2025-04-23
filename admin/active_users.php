@@ -8,8 +8,6 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-// Verify admin access
-requireAdmin();
 
 $pageTitle = "Active Users";
 
