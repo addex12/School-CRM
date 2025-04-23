@@ -10,6 +10,17 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
+// Place this block here, after DB connection is established
+$allSearch = isset($_GET['all_search']) ? trim($_GET['all_search']) : '';
+$allConditions = ["status = 'active'"];
+$allParams = [];
+if ($allSearch) {
+    $allConditions[] = "(username LIKE :search_username OR name LIKE :search_name OR email LIKE :search_email)";
+    $allParams[':search_username'] = '%' . $allSearch . '%';
+    $allParams[':search_name'] = '%' . $allSearch . '%';
+    $allParams[':search_email'] = '%' . $allSearch . '%';
+}
+$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 // Fetch all roles for filter dropdown (do this first, always)
 try {
@@ -17,7 +28,6 @@ try {
 } catch (PDOException $e) {
     $roles = [];
 }
-
 
 try {
     // Only select id, username, last_active, correct WHERE syntax
@@ -35,19 +45,6 @@ try {
     $error = "A database error occurred. Please try again later.";
     $allUsers = [];
 }
-// Add this before the try-catch for the query, near the top after $pageTitle
-$allSearch = isset($_GET['all_search']) ? trim($_GET['all_search']) : '';
-
-// Add this block to define $allWhereSql and $allParams
-$allConditions = ["status = 'active'"];
-$allParams = [];
-if ($allSearch) {
-    $allConditions[] = "(username LIKE :search_username OR name LIKE :search_name OR email LIKE :search_email)";
-    $allParams[':search_username'] = '%' . $allSearch . '%';
-    $allParams[':search_name'] = '%' . $allSearch . '%';
-    $allParams[':search_email'] = '%' . $allSearch . '%';
-}
-$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 ?>
 <!DOCTYPE html>
