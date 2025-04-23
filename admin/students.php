@@ -163,6 +163,19 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body {
+            background: #f5f7fa;
+        }
+        .admin-main {
+            margin-left: 250px;
+        }
+        .dashboard-section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            margin-bottom: 2rem;
+            padding: 2rem 2.5rem;
+        }
         .students-header {
             display: flex;
             justify-content: space-between;
@@ -172,91 +185,38 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         .students-header h2 {
             margin: 0;
             font-size: 1.5rem;
-            color: #34495e;
-        }
-        .students-header .btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-        }
-        .students-header .btn:hover {
-            background: #217dbb;
-        }
-        .students-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .students-table th, .students-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
-        }
-        .students-table th {
-            background: #f8f9fa;
+            color: #215967;
             font-weight: 600;
-            color: #34495e;
         }
-        .students-table tr:hover {
-            background: #f4f8fb;
-        }
-        .student-actions a {
-            margin-right: 8px;
-            color: #3498db;
-            text-decoration: none;
-            font-size: 1.1em;
-        }
-        .student-actions a:last-child {
-            margin-right: 0;
-        }
-        @media (max-width: 900px) {
-            .students-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-        }
-        @media (max-width: 600px) {
-            .students-table th, .students-table td {
-                padding: 8px 6px;
-            }
-        }
-        .erpnext-btn, .btn, .btn-secondary {
+        .erpnext-btn, .btn, .btn-secondary, .btn-success {
             display: inline-block;
-            padding: 6px 18px;
+            padding: 8px 22px;
             font-size: 15px;
             border-radius: 4px;
             border: none;
             background: #f5f7fa;
-            color: #222d32;
+            color: #215967;
             font-weight: 600;
             transition: background 0.18s, color 0.18s, box-shadow 0.18s;
             box-shadow: 0 1px 2px rgba(44,62,80,0.04);
             cursor: pointer;
-            margin-right: 4px;
+            margin-right: 8px;
+            text-decoration: none;
         }
-        .erpnext-btn:hover, .btn:hover, .btn-secondary:hover {
+        .erpnext-btn:hover, .btn:hover, .btn-secondary:hover, .btn-success:hover {
             background: #e2efda;
             color: #215967;
-        }
-        .btn-secondary {
-            background: #eaeaea;
-            color: #666;
-        }
-        .btn-danger {
-            background: #e74c3c;
-            color: #fff;
         }
         .btn-success {
             background: #27ae60;
             color: #fff;
         }
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
         .btn-sm, .erpnext-btn.btn-sm {
-            padding: 4px 12px;
+            padding: 4px 14px;
             font-size: 13px;
         }
         .excel-table {
@@ -266,7 +226,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         }
         .excel-table th, .excel-table td {
             border: 1px solid #bdbdbd;
-            padding: 8px 10px;
+            padding: 10px 12px;
             text-align: left;
             font-size: 1em;
         }
@@ -281,6 +241,31 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         .excel-table tr:hover {
             background: #f4f8fb;
         }
+        .form-label {
+            font-weight: 500;
+            color: #215967;
+            margin-bottom: 4px;
+            display: block;
+        }
+        select, input[type="file"], input[type="text"], input[type="number"], input[type="email"] {
+            border: 1px solid #bdbdbd;
+            border-radius: 4px;
+            padding: 7px 10px;
+            font-size: 1em;
+            background: #f9fafb;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        @media (max-width: 900px) {
+            .dashboard-section { padding: 1rem; }
+            .students-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+        }
+        @media (max-width: 600px) {
+            .excel-table th, .excel-table td { padding: 8px 6px; }
+        }
     </style>
 </head>
 <body>
@@ -288,53 +273,62 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= esc($pageTitle) ?></h1>
+                <h1 style="color:#215967; font-weight:700;"><?= esc($pageTitle) ?></h1>
             </header>
             <div class="content">
                 <div class="dashboard-section">
-                    <h2>Bulk Assign Students to Classes/Sections</h2>
+                    <div class="students-header">
+                        <h2>Bulk Assign Students to Classes/Sections</h2>
+                    </div>
                     <?php if ($bulk_error): ?><div class="error"><?= esc($bulk_error) ?></div><?php endif; ?>
                     <?php if ($bulk_success): ?><div class="success"><?= esc($bulk_success) ?></div><?php endif; ?>
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" style="margin-bottom:1.5rem;">
                         <input type="file" name="csv_file" accept=".csv" required>
                         <button type="submit" name="bulk_assign" class="erpnext-btn btn-sm btn-success">Bulk Assign</button>
                         <a href="students.php?export=1" class="erpnext-btn btn-sm btn-secondary">Export Students</a>
                         <a href="download_template.php?type=students_assign" class="erpnext-btn btn-sm btn-secondary">Download CSV Template</a>
                     </form>
-                    <p>CSV columns: username, class_id, section_id (section_id optional)</p>
+                    <p style="color:#888;">CSV columns: username, class_id, section_id (section_id optional)</p>
                 </div>
                 <div class="dashboard-section">
-                    <h2>Assign Student to Class/Section</h2>
-                    <form method="post">
-                        <label>Student:
+                    <h2 style="color:#215967;">Assign Student to Class/Section</h2>
+                    <form method="post" style="display:flex; flex-wrap:wrap; gap:1.5rem;">
+                        <div style="flex:1 1 200px;">
+                            <label class="form-label">Student:</label>
                             <select name="student_id" required>
                                 <option value="">Select Student</option>
                                 <?php foreach ($students as $s): ?>
-                                    <option value="<?= $s['id'] ?>"><?= esc($s['username']) ?></option>
+                                    <option value="<?= esc($s['student_id']) ?>"><?= esc($s['username']) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                        </label>
-                        <label>Class:
+                        </div>
+                        <div style="flex:1 1 200px;">
+                            <label class="form-label">Class:</label>
                             <select name="class_id" id="class_id_select" required>
                                 <option value="">Select Class</option>
                                 <?php foreach ($classes as $c): ?>
-                                    <option value="<?= $c['id'] ?>"><?= esc($c['class_name']) ?></option>
+                                    <option value="<?= esc($c['id']) ?>"><?= esc($c['class_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                        </label>
-                        <label>Section (optional):
+                        </div>
+                        <div style="flex:1 1 200px;">
+                            <label class="form-label">Section (optional):</label>
                             <select name="section_id" id="section_id_select">
                                 <option value="">Select Section</option>
                                 <?php foreach ($sections as $sec): ?>
-                                    <option value="<?= $sec['id'] ?>" data-class="<?= $sec['class_id'] ?>"><?= esc($sec['section_name']) ?></option>
+                                    <option value="<?= esc($sec['id']) ?>" data-class="<?= esc($sec['class_id']) ?>"><?= esc($sec['section_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                        </label>
-                        <button type="submit" name="assign_single" class="erpnext-btn btn-sm btn-success">Assign</button>
+                        </div>
+                        <div style="align-self:flex-end;">
+                            <button type="submit" name="assign_single" class="erpnext-btn btn-sm btn-success">Assign</button>
+                        </div>
                     </form>
                 </div>
                 <div class="dashboard-section">
-                    <h2>Student List</h2>
+                    <div class="students-header">
+                        <h2>Student List</h2>
+                    </div>
                     <div class="table-responsive">
                         <table class="excel-table">
                             <thead>
@@ -346,7 +340,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                     <th>Section</th>
                                     <th>Status</th>
                                     <th>Created At</th>
-                                    <!-- ...other columns... -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -360,7 +353,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                             <td><?= esc($s['section_name'] ?? '-') ?></td>
                                             <td><?= esc($s['status'] ?? '-') ?></td>
                                             <td><?= esc($s['created_at'] ?? '-') ?></td>
-                                            <!-- ...other columns... -->
                                         </tr>
                                     <?php endforeach; ?>
                                 <?php else: ?>
@@ -384,7 +376,6 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
 
             function filterSections() {
                 const classId = classSelect.value;
-                // Always keep the first option (Select Section)
                 sectionSelect.innerHTML = '';
                 allOptions.forEach(opt => {
                     if (!opt.value || !classId || opt.getAttribute('data-class') === classId) {
@@ -394,7 +385,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
             }
 
             classSelect.addEventListener('change', filterSections);
-            filterSections(); // Initial filter
+            filterSections();
         });
     </script>
     <?php include 'includes/footer.php'; ?>

@@ -37,6 +37,19 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body {
+            background: #f5f7fa;
+        }
+        .admin-main {
+            margin-left: 250px;
+        }
+        .dashboard-section {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            margin-bottom: 2rem;
+            padding: 2rem 2.5rem;
+        }
         .teachers-header {
             display: flex;
             justify-content: space-between;
@@ -46,58 +59,39 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         .teachers-header h2 {
             margin: 0;
             font-size: 1.5rem;
-            color: #34495e;
-        }
-        .teachers-header .btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-        }
-        .teachers-header .btn:hover {
-            background: #217dbb;
-        }
-        .teachers-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .teachers-table th, .teachers-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
-        }
-        .teachers-table th {
-            background: #f8f9fa;
+            color: #215967;
             font-weight: 600;
-            color: #34495e;
         }
-        .teachers-table tr:hover {
-            background: #f4f8fb;
-        }
-        .teacher-actions a {
+        .erpnext-btn, .btn, .btn-secondary, .btn-success {
+            display: inline-block;
+            padding: 8px 22px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #215967;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            cursor: pointer;
             margin-right: 8px;
-            color: #3498db;
             text-decoration: none;
-            font-size: 1.1em;
         }
-        .teacher-actions a:last-child {
-            margin-right: 0;
+        .erpnext-btn:hover, .btn:hover, .btn-secondary:hover, .btn-success:hover {
+            background: #e2efda;
+            color: #215967;
         }
-        @media (max-width: 900px) {
-            .teachers-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
+        .btn-success {
+            background: #27ae60;
+            color: #fff;
         }
-        @media (max-width: 600px) {
-            .teachers-table th, .teachers-table td {
-                padding: 8px 6px;
-            }
+        .btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .btn-sm, .erpnext-btn.btn-sm {
+            padding: 4px 14px;
+            font-size: 13px;
         }
         .excel-table {
             border-collapse: collapse;
@@ -106,7 +100,7 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         }
         .excel-table th, .excel-table td {
             border: 1px solid #bdbdbd;
-            padding: 8px 10px;
+            padding: 10px 12px;
             text-align: left;
             font-size: 1em;
         }
@@ -121,6 +115,16 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         .excel-table tr:hover {
             background: #f4f8fb;
         }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        @media (max-width: 900px) {
+            .dashboard-section { padding: 1rem; }
+            .teachers-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+        }
+        @media (max-width: 600px) {
+            .excel-table th, .excel-table td { padding: 8px 6px; }
+        }
     </style>
 </head>
 <body>
@@ -128,15 +132,15 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= esc($pageTitle) ?></h1>
+                <h1 style="color:#215967; font-weight:700;"><?= esc($pageTitle) ?></h1>
             </header>
             <div class="content">
                 <div class="dashboard-section">
                     <div class="teachers-header">
                         <h2>Teacher List</h2>
                         <div>
-                            <a href="add_teacher.php" class="btn"><i class="fas fa-plus"></i> Add Teacher</a>
-                            <a href="view_teacher.php" class="btn" style="background:#16a085;"><i class="fas fa-eye"></i> View All</a>
+                            <a href="add_teacher.php" class="erpnext-btn btn-sm btn-success"><i class="fas fa-plus"></i> Add Teacher</a>
+                            <a href="view_teacher.php" class="erpnext-btn btn-sm btn-secondary"><i class="fas fa-eye"></i> View All</a>
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -170,9 +174,9 @@ function esc($v) { return htmlspecialchars((string)($v ?? ''), ENT_QUOTES, 'UTF-
                                             <td><?= esc($teacher['address'] ?? '-') ?></td>
                                             <td><?= esc($teacher['status'] ?? '-') ?></td>
                                             <td><?= esc($teacher['created_at'] ?? '-') ?></td>
-                                            <td class="teacher-actions">
-                                                <a href="edit_teacher.php?id=<?= esc($teacher['teacher_id']) ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <a href="view_teacher.php" title="View All"><i class="fas fa-eye"></i></a>
+                                            <td>
+                                                <a href="edit_teacher.php?id=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-secondary" title="Edit"><i class="fas fa-edit"></i></a>
+                                                <a href="view_teacher.php" class="erpnext-btn btn-sm btn-secondary" title="View All"><i class="fas fa-eye"></i></a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
