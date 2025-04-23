@@ -174,7 +174,7 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'delete_user') {
 }
 
 // Fetch roles for filter dropdown (id => name)
-$roles = $pdo->query("SELECT id, name FROM roles ORDER BY name")->fetchAll(PDO::FETCH_KEY_PAIR);
+$roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll(PDO::FETCH_KEY_PAIR);
 
 ?>
 <!DOCTYPE html>
