@@ -15,39 +15,28 @@ foreach ($studentUsers as $user_id) {
     }
 }
 
-// Sorting logic
-$sortable_columns = [
-    'user_id' => 'u.id',
-    'username' => 'u.username',
-    'email' => 'u.email',
-    'class_name' => 'c.class_name',
-    'section_name' => 'sec.section_name',
-    'status' => 's.status',
-    'created_at' => 's.created_at'
-];
-$sort = $_GET['sort'] ?? 'username';
-$order = strtolower($_GET['order'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
-$sort_sql = $sortable_columns[$sort] ?? 'u.username';
-
-// Fetch all users with student role (role_id = 4 or role_name = 'student')
+// --- List all users with student role, even if not assigned to a class/section ---
 $stmt = $pdo->query("
     SELECT 
         u.id AS user_id, u.username, u.email, 
-        s.id AS student_id, s.class_id, s.section_id, c.class_name, sec.section_name, s.status, s.created_at
+        s.id AS student_id, s.class_id, s.section_id, s.status, s.created_at
     FROM users u
     LEFT JOIN students s ON s.user_id = u.id
-    LEFT JOIN classes c ON s.class_id = c.id
-    LEFT JOIN sections sec ON s.section_id = sec.id
     LEFT JOIN roles r ON u.role_id = r.id
     WHERE r.role_name = 'student'
-    ORDER BY $sort_sql $order
+    ORDER BY u.username
 ");
 $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Fetch all classes and sections for dropdowns
-$classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
-// Fetch sections with class_id for filtering
-$sections = $pdo->query("SELECT id, section_name, class_id FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
+// --- Classes and sections may not exist, so check before querying ---
+$classes = [];
+$sections = [];
+try {
+    $classes = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name")->fetchAll(PDO::FETCH_ASSOC);
+    $sections = $pdo->query("SELECT id, section_name, class_id FROM sections ORDER BY section_name")->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // If classes/sections tables do not exist, leave arrays empty
+}
 
 // Handle bulk assign (CSV import)
 $bulk_error = $bulk_success = '';
@@ -715,3 +704,4 @@ function sort_link($col, $label, $current_sort, $current_order) {
     <?php require_once '../includes/footer.php';?>
 </body>
 </html>
+<?php ob_end_flush(); // Output buffer end ?>

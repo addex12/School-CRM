@@ -94,7 +94,7 @@ $chart_json = json_encode($chart_data);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ pageTitle }} - Admin Panel</title>
+    <title>{{ $pageTitle }} - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
