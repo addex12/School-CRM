@@ -6,13 +6,14 @@
       "link": "dashboard.php"
     },
     {
-      "title": "Users",
-      "icon": "users",
+      "title": "Surveys",
+      "icon": "poll",
       "items": [
-        { "title": "All Users", "icon": "users", "link": "users.php" },
-        { "title": "Add User", "icon": "user-plus", "link": "add_users.php" }
+        { "title": "All Surveys", "icon": "poll", "link": "surveys.php" },
+        { "title": "Create Survey", "icon": "plus-circle", "link": "add_survey.php" },
+        { "title": "Survey Results", "icon": "chart-bar", "link": "survey_results.php" }
       ],
-      "id": "users-menu"
+      "id": "surveys-menu"
     },
     {
       "title": "Students",
@@ -33,42 +34,37 @@
       "id": "teachers-menu"
     },
     {
-      "title": "Classes",
-      "icon": "school",
+      "title": "Parents",
+      "icon": "user-friends",
       "items": [
-        { "title": "Class List", "icon": "school", "link": "classes.php" },
-        { "title": "Sections", "icon": "th-large", "link": "sections.php" }
+        { "title": "Parent List", "icon": "user-friends", "link": "parents.php" },
+        { "title": "Add Parent", "icon": "user-plus", "link": "add_parent.php" }
       ],
-      "id": "classes-menu"
+      "id": "parents-menu"
     },
     {
-      "title": "Academics",
-      "icon": "book",
+      "title": "Communications",
+      "icon": "envelope",
       "items": [
-        { "title": "Subjects", "icon": "book", "link": "subjects.php" },
-        { "title": "Curriculums", "icon": "list", "link": "curriculums.php" },
-        { "title": "Grading Scales", "icon": "chart-line", "link": "grading_scales.php" },
-        { "title": "Grades", "icon": "file-alt", "link": "grades.php" }
+        { "title": "Messages", "icon": "envelope", "link": "messages.php" },
+        { "title": "Chat", "icon": "comments", "link": "chat.php" },
+        { "title": "Announcements", "icon": "bullhorn", "link": "announcements.php" }
       ],
-      "id": "academics-menu"
+      "id": "communications-menu"
     },
     {
-      "title": "Surveys",
-      "icon": "poll",
-      "link": "surveys.php"
+      "title": "Support",
+      "icon": "life-ring",
+      "items": [
+        { "title": "Tickets", "icon": "ticket-alt", "link": "support_tickets.php" },
+        { "title": "Knowledge Base", "icon": "book", "link": "knowledge_base.php" }
+      ],
+      "id": "support-menu"
     },
     {
       "title": "Feedback",
       "icon": "comments",
       "link": "feedback.php"
-    },
-    {
-      "title": "Support",
-      "icon": "ticket-alt",
-      "items": [
-        { "title": "Tickets", "icon": "ticket-alt", "link": "support_tickets.php" }
-      ],
-      "id": "support-menu"
     }
   ]
 }

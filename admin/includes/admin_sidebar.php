@@ -162,7 +162,7 @@ $current = basename($_SERVER['PHP_SELF']);
 </button>
 <aside class="admin-sidebar" id="adminSidebar">
     <div class="sidebar-header">
-        <i class="fas fa-graduation-cap"></i> School CRM
+        <i class="fas fa-comments"></i> School CRM
     </div>
     <ul class="sidebar-menu">
         <?php foreach ($sidebarItems as $item): ?>
