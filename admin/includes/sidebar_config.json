@@ -12,7 +12,7 @@
             { "title": "User List", "icon": "users", "link": "users.php" },
             { "title": "Add User", "icon": "user-plus", "link": "add_users.php" },
             { "title": "Active Users", "icon": "user-tag", "link": "active_users.php" },
-            { "title": "Inactive Users", "icon": "user-slash", "link": "edit_user.php" }
+            { "title": "Edit Users", "icon": "edit", "link": "edit_user.php" }
 
         ],
         "id": "users-menu"
