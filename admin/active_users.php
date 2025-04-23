@@ -19,7 +19,7 @@ try {
 
 // All Active Users filter
 $allSearch = trim($_GET['all_search'] ?? '');
-$allRoleFilter = $_GET['all_role'] ?? '';
+// Remove role filter logic, only show active users
 $allConditions = ["status = 'active'"];
 $allParams = [];
 
@@ -32,7 +32,7 @@ if ($allSearch) {
 $allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 try {
-    // All active users (regardless of online)
+    // All active users
     $allSql = "SELECT id, username, name, email, last_active, online FROM users $allWhereSql ORDER BY online DESC, username";
     $stmtAll = $pdo->prepare($allSql);
     foreach ($allParams as $key => $val) {
@@ -158,12 +158,7 @@ try {
 
                 <form method="get" class="search-bar" id="allUserSearchForm" style="margin-bottom:1.5rem;">
                     <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username, name, or email..." value="<?= htmlspecialchars($allSearch) ?>">
-                    <select name="all_role" id="allRoleFilter">
-                        <option value="">All Roles</option>
-                        <?php foreach ($roles as $role): ?>
-                            <option value="<?= htmlspecialchars($role) ?>" <?= $role === $allRoleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <!-- Remove role filter dropdown -->
                     <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
                     <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
                 </form>
