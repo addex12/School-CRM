@@ -17,7 +17,7 @@
         ],
         "id": "users-menu"
     },
-    
+    {
       "title": "Surveys",
       "icon": "poll",
       "items": [
