@@ -5,7 +5,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 // Include required files
 require_once '../includes/config.php';
-require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
