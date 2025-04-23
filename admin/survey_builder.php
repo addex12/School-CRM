@@ -198,42 +198,87 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2.2rem 2rem 2.5rem 2rem;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: #215967; }
+        input[type="text"], textarea, select, input[type="datetime-local"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 1rem;
+        }
+        textarea { min-height: 100px; }
+        .alert { background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1.5rem; border: 1px solid #fca5a5; }
+        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
+            display: inline-block;
+            padding: 10px 22px;
+            font-size: 15px;
+            border-radius: 4px;
+            border: none;
+            background: #f5f7fa;
+            color: #215967;
+            font-weight: 600;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            cursor: pointer;
+            margin-right: 8px;
+            text-decoration: none;
+        }
+        .btn-primary { background: #3b82f6; color: #fff; }
+        .btn-primary:hover { background: #2563eb; }
+        .btn-secondary { background: #eaeaea; color: #666; }
+        .btn-secondary:hover { background: #e2efda; color: #215967; }
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
         .question-box {
-            border: 1px solid #ddd;
+            border: 1px solid #e5e7eb;
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 5px;
+            border-radius: 6px;
             background: #f9f9f9;
         }
         .question-header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
-            font-weight: bold;
+            font-weight: 600;
+            color: #215967;
         }
         .question-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
-        .form-group {
-            margin-bottom: 15px;
+        .add-question { margin-bottom: 20px; }
+        .help-text { font-size: 0.9em; color: #666; margin-top: 5px; }
+        @media (max-width: 900px) {
+            .form-container, .admin-main { padding: 1rem; }
+            .question-content { grid-template-columns: 1fr; gap: 10px; }
         }
-        .roles-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-        }
-        .add-question {
-            margin-bottom: 20px;
+        @media (max-width: 600px) {
+            .form-container, .admin-main { padding: 4px; }
+            .question-header { flex-direction: column; gap: 6px; align-items: flex-start; }
+            .question-content { grid-template-columns: 1fr; gap: 8px; }
+            .erpnext-btn, .btn, .btn-primary { padding: 6px 10px; font-size: 0.95em; }
         }
     </style>
 </head>
@@ -242,30 +287,23 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-poll"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
-
             <div class="form-container">
-                <h2><?= $survey ? "Edit Survey" : "Create New Survey" ?></h2>
-                
+                <h2 style="color:#215967;font-weight:600;"><?= $survey ? "Edit Survey" : "Create New Survey" ?></h2>
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="alert alert-danger"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                    <div class="alert"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
                 <?php endif; ?>
-                
                 <form method="POST" class="survey-form">
                     <input type="hidden" name="id" value="<?= $survey_id ?? '' ?>">
-                    
                     <div class="form-group">
                         <label for="title">Survey Title *</label>
-                        <input type="text" id="title" name="title" 
-                               value="<?= htmlspecialchars($survey['title'] ?? '') ?>" required>
+                        <input type="text" id="title" name="title" value="<?= htmlspecialchars($survey['title'] ?? '') ?>" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="description">Description</label>
                         <textarea id="description" name="description" rows="3"><?= htmlspecialchars($survey['description'] ?? '') ?></textarea>
                     </div>
-                    
                     <div class="form-group">
                         <label>Target Roles *</label>
                         <div class="roles-grid">
@@ -280,7 +318,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    
                     <div class="form-group">
                         <label for="category_id">Category *</label>
                         <select id="category_id" name="category_id" required>
@@ -293,7 +330,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label for="status">Status *</label>
                         <select id="status" name="status" required>
@@ -305,19 +341,16 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label for="starts_at">Start Date *</label>
                         <input type="datetime-local" id="starts_at" name="starts_at"
                                value="<?= date('Y-m-d\TH:i', strtotime($survey['starts_at'] ?? '+1 day')) ?>" required>
                     </div>
-                    
                     <div class="form-group">
                         <label for="ends_at">End Date *</label>
                         <input type="datetime-local" id="ends_at" name="ends_at"
                                value="<?= date('Y-m-d\TH:i', strtotime($survey['ends_at'] ?? '+1 month')) ?>" required>
                     </div>
-                    
                     <div class="form-group">
                         <label>
                             <input type="checkbox" name="is_anonymous"
@@ -325,7 +358,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             Make survey anonymous
                         </label>
                     </div>
-                    
                     <div class="form-group">
                         <label>
                             <input type="checkbox" name="is_active"
@@ -333,23 +365,20 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             Activate survey
                         </label>
                     </div>
-                    
-                    <h3>Survey Questions</h3>
+                    <h3 style="color:#215967;">Survey Questions</h3>
                     <div id="questions-container">
                         <?php if (isset($survey['questions'])): ?>
                             <?php foreach ($survey['questions'] as $index => $question): ?>
                                 <div class="question-box" data-index="<?= $index ?>">
                                     <div class="question-header">
                                         <span>Question <?= $index + 1 ?></span>
-                                        <button type="button" class="remove-question">Remove</button>
+                                        <button type="button" class="erpnext-btn btn-secondary remove-question">Remove</button>
                                     </div>
                                     <div class="question-content">
                                         <div class="form-group">
                                             <label>Question Text *</label>
-                                            <input type="text" name="questions[]" 
-                                                   value="<?= htmlspecialchars($question['field_label']) ?>" required>
+                                            <input type="text" name="questions[]" value="<?= htmlspecialchars($question['field_label']) ?>" required>
                                         </div>
-                                        
                                         <div class="form-group">
                                             <label>Field Type *</label>
                                             <select name="field_types[]" required>
@@ -364,15 +393,12 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                                                 <option value="file" <?= $question['field_type'] == 'file' ? 'selected' : '' ?>>File</option>
                                             </select>
                                         </div>
-                                        
                                         <div class="form-group">
                                             <label>
-                                                <input type="checkbox" name="required[]" 
-                                                    <?= $question['is_required'] ? 'checked' : '' ?>>
+                                                <input type="checkbox" name="required[]" <?= $question['is_required'] ? 'checked' : '' ?>>
                                                 Required
                                             </label>
                                         </div>
-                                        
                                         <div class="form-group">
                                             <label>Options (for radio, checkbox, select)</label>
                                             <textarea name="options[]" rows="3"><?= 
@@ -387,14 +413,13 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
-                    
-                    <button type="button" class="add-question btn-secondary">Add Question</button>
-                    <button type="submit" class="btn-primary">Save Survey</button>
+                    <button type="button" class="erpnext-btn btn-secondary add-question"><i class="fas fa-plus"></i> Add Question</button>
+                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-save"></i> Save Survey</button>
                 </form>
             </div>
         </div>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
     $(document).ready(function() {
         // Add new question
@@ -404,14 +429,13 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                 <div class="question-box" data-index="${index}">
                     <div class="question-header">
                         <span>Question ${index + 1}</span>
-                        <button type="button" class="remove-question">Remove</button>
+                        <button type="button" class="erpnext-btn btn-secondary remove-question">Remove</button>
                     </div>
                     <div class="question-content">
                         <div class="form-group">
                             <label>Question Text *</label>
                             <input type="text" name="questions[]" required>
                         </div>
-                        
                         <div class="form-group">
                             <label>Field Type *</label>
                             <select name="field_types[]" required>
@@ -426,14 +450,12 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                                 <option value="file">File</option>
                             </select>
                         </div>
-                        
                         <div class="form-group">
                             <label>
                                 <input type="checkbox" name="required[]">
                                 Required
                             </label>
                         </div>
-                        
                         <div class="form-group">
                             <label>Options (for radio, checkbox, select)</label>
                             <textarea name="options[]" rows="3"></textarea>
@@ -444,7 +466,6 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
             `;
             $('#questions-container').append(questionBox);
         });
-
         // Remove question
         $(document).on('click', '.remove-question', function() {
             $(this).closest('.question-box').remove();
@@ -456,5 +477,7 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
         });
     });
     </script>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
+<?php ob_end_flush();?>
