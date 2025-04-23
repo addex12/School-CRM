@@ -10,6 +10,9 @@ requireAdmin();
 
 $pageTitle = "Active Users";
 
+// Add this before the try-catch for the query, near the top after $pageTitle
+$allSearch = isset($_GET['all_search']) ? trim($_GET['all_search']) : '';
+
 // Fetch all roles for filter dropdown (do this first, always)
 try {
     $roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN);
@@ -144,7 +147,7 @@ try {
                 <?php endif; ?>
 
                 <form method="get" class="search-bar" id="allUserSearchForm" style="margin-bottom:1.5rem;">
-                    <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username, name, or email..." value="<?= htmlspecialchars($allSearch) ?>">
+                    <input type="text" name="all_search" id="allUserSearch" placeholder="Search by username, name, or email..." value="<?= htmlspecialchars($allSearch ?? '') ?>">
                     <!-- Remove role filter dropdown -->
                     <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i> Search</button>
                     <a href="active_users.php" class="erpnext-btn btn-secondary">Clear</a>
