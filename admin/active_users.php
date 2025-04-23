@@ -17,19 +17,6 @@ try {
     $roles = [];
 }
 
-// All Active Users filter
-$allSearch = trim($_GET['all_search'] ?? '');
-// Only show active users, correct SQL syntax
-$allConditions = ["status = 'active'"];
-$allParams = [];
-
-if ($allSearch) {
-    $allConditions[] = "(username LIKE :search_username OR name LIKE :search_name OR email LIKE :search_email)";
-    $allParams[':search_username'] = '%' . $allSearch . '%';
-    $allParams[':search_name'] = '%' . $allSearch . '%';
-    $allParams[':search_email'] = '%' . $allSearch . '%';
-}
-$allWhereSql = 'WHERE ' . implode(' AND ', $allConditions);
 
 try {
     // Only select id, username, last_active, correct WHERE syntax
