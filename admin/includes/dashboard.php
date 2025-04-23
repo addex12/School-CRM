@@ -43,12 +43,12 @@ $widgets = [
         "color" => "teal",
         "query" => "SELECT COUNT(*) FROM teachers"
     ],
-    [
+    /**[
         "title" => "Total Classes",
         "icon" => "fa-school",
         "color" => "orange",
         "query" => "SELECT COUNT(*) FROM classes"
-    ],
+    ],**/
     [
         "title" => "Active Surveys",
         "icon" => "fa-poll",
@@ -67,13 +67,13 @@ $widgets = [
         "color" => "red",
         "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
     ],
-    [
+    /**[
         "title" => "Number of Classes",
         "icon" => "fa-school",
         "color" => "orange",
         "query" => "SELECT COUNT(*) FROM classes"
-    ],
-    [
+    ],**/
+    /**[
         "title" => "Number of Sections",
         "icon" => "fa-th-large",
         "color" => "teal",
@@ -85,11 +85,11 @@ $widgets = [
         "icon" => "fa-list",
         "color" => "blue",
         "query" => "SELECT COUNT(*) FROM curriculums"
-    ]
+    ]**/
     
     // Add widget for curriculum-grade/class mappings
     /**[
-        "title" => "Curriculum-Grade/Class Mappings",
+      /**  "title" => "Curriculum-Grade/Class Mappings",
         "icon" => "fa-layer-group",
         "color" => "purple",
         "query" => "SELECT COUNT(*) FROM curriculum_grades"
@@ -394,14 +394,14 @@ try {
                 <!-- Quick Links Section -->
                 <div class="quick-links">
                     <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                    <a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+                    <!--<a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
                     <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
                     <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
                     <a href="curriculums.php" class="quick-link"><i class="fas fa-list"></i><span>Curriculums</span></a>
                     <a href="sections.php" class="quick-link"><i class="fas fa-th-large"></i><span>Sections</span></a>
                     <a href="subjects.php" class="quick-link"><i class="fas fa-book"></i><span>Subjects</span></a>
                     <a href="grading_scales.php" class="quick-link"><i class="fas fa-chart-line"></i><span>Grading Scales</span></a>
-                    <a href="grades.php" class="quick-link"><i class="fas fa-file-alt"></i><span>Grades</span></a>
+                    <a href="grades.php" class="quick-link"><i class="fas fa-file-alt"></i><span>Grades</span></a> -->
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
@@ -419,29 +419,29 @@ try {
                 </div>
 
                 <!-- Grade Scale Chart -->
-                <div class="dashboard-section">
+               <!-- <div class="dashboard-section">
                     <h2>Grade Scale Distribution (All Students)</h2>
                     <canvas id="gradeScaleChart" height="80"></canvas>
-                </div>
+                </div> -->
 
-                <!-- Grade Distribution by Class -->
-                <div class="dashboard-section">
+                 <!--Grade Distribution by Class -->
+                <!--<div class="dashboard-section">
                     <h2>Grade Distribution by Class</h2>
                     <canvas id="gradeByClassChart" height="100"></canvas>
-                </div>
+                </div> -->
 
                 <!-- Grade Distribution by Section -->
-                <div class="dashboard-section">
+                <!--<div class="dashboard-section">
                     <h2>Grade Distribution by Section</h2>
                     <canvas id="gradeBySectionChart" height="100"></canvas>
-                </div>
+                </div> -->
 
                 <!-- Grade Distribution by Level/Grade -->
-                <div class="dashboard-section">
+               <!-- <div class="dashboard-section">
                     <h2>Grade Distribution by Level/Grade</h2>
                     <canvas id="gradeByLevelChart" height="100"></canvas>
-                </div>
-
+                </div> -->
+                    
                 <!-- System Stats Section -->
                 <div class="dashboard-section">
                     <h2>System Stats</h2>
