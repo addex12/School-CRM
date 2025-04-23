@@ -53,6 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_assign'])) {
             }
             $pdo->prepare("UPDATE students SET class_id=? WHERE id=?")->execute([$class_id, $student_id]);
             if ($section_id) {
+                // Remove student from any other batches (sections) for this class
+                $remove = $pdo->prepare("
+                    DELETE FROM enrollments 
+                    WHERE student_id=? AND batch_id IN (
+                        SELECT id FROM batches WHERE class_id=? AND section_id!=?
+                    )
+                ");
+                $remove->execute([$student_id, $class_id, $section_id]);
+
                 // Find or create batch for this class/section
                 $batch = $pdo->prepare("SELECT id FROM batches WHERE class_id=? AND section_id=?");
                 $batch->execute([$class_id, $section_id]);
@@ -95,6 +104,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['assign_single'])) {
         // Update student's class
         $pdo->prepare("UPDATE students SET class_id=? WHERE id=?")->execute([$class_id, $student_id]);
         if ($section_id) {
+            // Remove student from any other batches (sections) for this class
+            $remove = $pdo->prepare("
+                DELETE FROM enrollments 
+                WHERE student_id=? AND batch_id IN (
+                    SELECT id FROM batches WHERE class_id=? AND section_id!=?
+                )
+            ");
+            $remove->execute([$student_id, $class_id, $section_id]);
+
             // Find or create batch for this class/section
             $batch = $pdo->prepare("SELECT id FROM batches WHERE class_id=? AND section_id=?");
             $batch->execute([$class_id, $section_id]);
