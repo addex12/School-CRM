@@ -13,6 +13,7 @@ $pageTitle = "Active Users";
 // Handle search/filter
 $search = trim($_GET['search'] ?? '');
 $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
+$role = trim($_GET['role'] ?? '');
 
 $where = ["active = 1"];
 $params = [];
@@ -24,11 +25,15 @@ if ($search !== '') {
 if ($filter_online) {
     $where[] = "online = 1";
 }
+if ($role !== '') {
+    $where[] = "role = :role";
+    $params[':role'] = $role;
+}
 
 $where_sql = implode(' AND ', $where);
 
 try {
-    $stmt = $pdo->prepare("SELECT id, username, last_active, online FROM users WHERE $where_sql ORDER BY username");
+    $stmt = $pdo->prepare("SELECT id, username, last_active, online, role FROM users WHERE $where_sql ORDER BY username");
     $stmt->execute($params);
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -55,6 +60,75 @@ try {
     $total_active = 0;
     $total_online = 0;
 }
+
+// Handle AJAX request for real-time search/filter
+if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
+    require_once '../includes/config.php';
+    $search = trim($_GET['search'] ?? '');
+    $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
+    $role = trim($_GET['role'] ?? '');
+
+    $where = ["active = 1"];
+    $params = [];
+
+    if ($search !== '') {
+        $where[] = "username LIKE :search";
+        $params[':search'] = "%$search%";
+    }
+    if ($filter_online) {
+        $where[] = "online = 1";
+    }
+    if ($role !== '') {
+        $where[] = "role = :role";
+        $params[':role'] = $role;
+    }
+
+    $where_sql = implode(' AND ', $where);
+
+    $stmt = $pdo->prepare("SELECT id, username, last_active, online, role FROM users WHERE $where_sql ORDER BY username");
+    $stmt->execute($params);
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Split users into online and offline
+    $online_users = [];
+    $offline_users = [];
+    foreach ($users as $user) {
+        if (!empty($user['online'])) {
+            $online_users[] = $user;
+        } else {
+            $offline_users[] = $user;
+        }
+    }
+
+    ob_clean();
+    if (count($online_users) + count($offline_users) === 0) {
+        echo '<tr><td colspan="5" class="text-center">No active users found</td></tr>';
+    } else {
+        foreach ($online_users as $user) {
+            echo '<tr>
+                <td>' . htmlspecialchars($user['id']) . '</td>
+                <td>' . htmlspecialchars($user['username']) . '</td>
+                <td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>
+                <td><span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span></td>
+                <td>' . htmlspecialchars($user['role']) . '</td>
+            </tr>';
+        }
+        foreach ($offline_users as $user) {
+            echo '<tr>
+                <td>' . htmlspecialchars($user['id']) . '</td>
+                <td>' . htmlspecialchars($user['username']) . '</td>
+                <td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>
+                <td><span style="color:#aaa;">Offline</span></td>
+                <td>' . htmlspecialchars($user['role']) . '</td>
+            </tr>';
+        }
+    }
+    exit;
+}
+
+// Fetch roles for filter dropdown
+$roles = $pdo->query("SELECT DISTINCT role FROM users WHERE role IS NOT NULL AND role != '' ORDER BY role")->fetchAll(PDO::FETCH_COLUMN());
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -171,6 +245,19 @@ try {
             width: 16px;
             height: 16px;
         }
+        .erpnext-search-form select {
+            padding: 7px 12px;
+            border: 1px solid #cfd8dc;
+            border-radius: 5px;
+            font-size: 1em;
+            outline: none;
+            transition: border 0.2s;
+            background: #fff;
+            color: #1976d2;
+        }
+        .erpnext-search-form select:focus {
+            border: 1.5px solid #1976d2;
+        }
         @media (max-width: 700px) {
             .active-users-container { padding: 10px; }
             .users-table th, .users-table td { padding: 7px 4px; }
@@ -200,12 +287,20 @@ try {
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
-                <form class="erpnext-search-form" method="get" action="">
-                    <input type="text" name="search" placeholder="Search username..." value="<?= htmlspecialchars($search) ?>">
+                <form class="erpnext-search-form" id="userSearchForm" method="get" action="">
+                    <input type="text" name="search" id="searchInput" placeholder="Search username..." value="<?= htmlspecialchars($search) ?>">
                     <label>
-                        <input type="checkbox" name="online" value="1" <?= $filter_online ? 'checked' : '' ?>>
+                        <input type="checkbox" name="online" id="onlineInput" value="1" <?= $filter_online ? 'checked' : '' ?>>
                         Online only
                     </label>
+                    <select name="role" id="roleInput">
+                        <option value="">All Roles</option>
+                        <?php foreach ($roles as $r): ?>
+                            <option value="<?= htmlspecialchars($r) ?>" <?= (isset($_GET['role']) && $_GET['role'] === $r) ? 'selected' : '' ?>>
+                                <?= htmlspecialchars(ucfirst($r)) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                     <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search</button>
                 </form>
 
@@ -216,9 +311,10 @@ try {
                             <th>Username</th>
                             <th>Last Active</th>
                             <th>Online</th>
+                            <th>Role</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="usersTableBody">
                         <?php
                         $has_users = (isset($online_users) && count($online_users) > 0) || (isset($offline_users) && count($offline_users) > 0);
                         if ($has_users):
@@ -232,6 +328,7 @@ try {
                                 <td>
                                     <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
                                 </td>
+                                <td><?= htmlspecialchars($user['role']) ?></td>
                             </tr>
                             <?php endforeach; ?>
                             <!-- Offline users next -->
@@ -243,11 +340,12 @@ try {
                                 <td>
                                     <span style="color:#aaa;">Offline</span>
                                 </td>
+                                <td><?= htmlspecialchars($user['role']) ?></td>
                             </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="4" class="text-center">No active users found</td>
+                                <td colspan="5" class="text-center">No active users found</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -256,6 +354,42 @@ try {
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
+    <script>
+    // Real-time AJAX search/filter
+    const searchInput = document.getElementById('searchInput');
+    const onlineInput = document.getElementById('onlineInput');
+    const roleInput = document.getElementById('roleInput');
+    const usersTableBody = document.getElementById('usersTableBody');
+    const form = document.getElementById('userSearchForm');
+    let searchTimeout = null;
+
+    function fetchUsers() {
+        const params = new URLSearchParams();
+        params.append('ajax', '1');
+        params.append('search', searchInput.value);
+        if (onlineInput.checked) params.append('online', '1');
+        if (roleInput.value) params.append('role', roleInput.value);
+
+        fetch('active_users.php?' + params.toString())
+            .then(res => res.text())
+            .then(html => {
+                usersTableBody.innerHTML = html;
+            });
+    }
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(fetchUsers, 250);
+    });
+    onlineInput.addEventListener('change', fetchUsers);
+    roleInput.addEventListener('change', fetchUsers);
+
+    // Also fetch on form submit (search button)
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetchUsers();
+    });
+    </script>
 </body>
 </html>
 <?php ob_end_flush(); ?>
