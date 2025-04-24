@@ -107,7 +107,7 @@ function getUserRoleName($roleId) {
                 <div class="active-users-header">
                     <h2 style="font-size:1.45em; color:#1976d2; font-weight:600;">Active Users</h2>
                     <div>
-                        <button class="refresh-btn" onclick="window.location.reload()">
+                        <button class="refresh-btn" type="button">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
                         <span class="active-count">
@@ -325,8 +325,8 @@ else:
         }
 
         document.querySelector('.refresh-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            fetchUsersTable();
+            e.preventDefault(); // Prevent default button action
+            fetchUsersTable();  // Reload table via AJAX
         });
 
         document.getElementById('userSearchForm').addEventListener('submit', function(e) {
