@@ -630,6 +630,19 @@ INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_
 (4470, 'adugna', '$2y$10$GGW1sY104GqRiQCPV/EyYOFnFu3DT6653waaSd81mXq4pHA.cJtXm', 'gizawadugna@gmail.com', NULL, NULL, NULL, '2025-04-24 21:38:41', 1, 0, '2025-04-24 11:31:57', '2025-04-24 11:38:24', 'default.jpg');
 
 --
+-- Table structure for table `activity_logs`
+--
+
+CREATE TABLE IF NOT EXISTS activity_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) DEFAULT NULL,
+    role VARCHAR(50) DEFAULT NULL,
+    action TEXT NOT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+--
 -- Indexes for dumped tables
 --
 

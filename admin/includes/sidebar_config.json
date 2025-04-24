@@ -12,9 +12,7 @@
             { "title": "User List", "icon": "users", "link": "users.php" },
             { "title": "Add User", "icon": "user-plus", "link": "add_users.php" },
             { "title": "Active Users", "icon": "user-tag", "link": "active_users.php" },
-            { "title": "Edit Users", "icon": "edit", "link": "edit_user.php" },
-            { "title": "User Roles", "icon": "user-lock", "link": "user_roles.php" }
-
+            { "title": "Edit Users", "icon": "edit", "link": "edit_user.php" }
         ],
         "id": "users-menu"
     },
@@ -25,7 +23,7 @@
         { "title": "All Surveys", "icon": "poll", "link": "surveys.php" },
         { "title": "Create Survey", "icon": "plus-circle", "link": "survey_builder.php" },
         { "title": "Survey Results", "icon": "chart-bar", "link": "survey_statistics.php" },
-        { "title": "Survey Categories", "icon": "file-alt", "link": "Categories.php" }
+        { "title": "Survey Categories", "icon": "file-alt", "link": "categories.php" }
       ],
       "id": "surveys-menu"
     },
@@ -92,7 +90,7 @@
         { "title": "General Settings", "icon": "cogs", "link": "settings.php" },
         { "title": "User Roles", "icon": "user-tag", "link": "user_roles.php" },
         { "title": "Permissions", "icon": "shield-alt", "link": "permissions.php" },
-        { "title": "Backup & Restore", "icon": "database", "link": "backup_restore.php" },
+        { "title": "Backup & Restore", "icon": "database", "link": "restore.php" },
         { "title": "System Logs", "icon": "file-alt", "link": "system_logs.php" },
         { "title": "Audit Trail", "icon": "history", "link": "audit_trail.php" }    
       ],

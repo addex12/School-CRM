@@ -36,7 +36,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $where[] = "u.active = 1";
     }
 
-    $where_sql = implode(' AND ', $where);
+    // Always have a valid WHERE clause
+    if (count($where) === 0) {
+        $where_sql = '1';
+    } else {
+        $where_sql = implode(' AND ', $where);
+    }
 
     $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.active, r.role_name AS role_name
         FROM users u
