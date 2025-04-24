@@ -59,7 +59,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $user['active'] = (int)$user['active'];
     }
 
-    ob_clean();
+    
     $has_users = (count($online_users) > 0) || (count($offline_users) > 0);
     if ($has_users) {
         $all_users = array_merge($online_users, $offline_users);
