@@ -29,8 +29,8 @@ if (isset($_POST['user_reply_submit'], $_POST['feedback_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['user_reply_submit'])) {
-    $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING);
-    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $rating = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 1, 'max_range' => 5]
     ]);
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['user_reply_submit'])
         $stmt->execute([$_SESSION['user_id'], $subject, $message, $rating]);
         
         // Send confirmation email
-        $user_email = $_SESSION['email'];
+        $user_email = $_SESSION['email'] ?? '';
         sendEmail($user_email, "Feedback Received", "Thank you for your feedback!\n\nWe appreciate your input.");
         
         // Notify admins
