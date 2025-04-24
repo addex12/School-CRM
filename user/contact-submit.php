@@ -1,137 +1,163 @@
 <?php
-// Enable error reporting for debugging
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-// Log errors to a file
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/../logs/error.log');
-
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
-require_once __DIR__ . '/../PHPMailer/SMTP.php';
-require_once __DIR__ . '/../PHPMailer/Exception.php';
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
-// Validate input
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: contact.php?error=Invalid request method");
-    exit();
-}
-
-$required_fields = ['email', 'subject', 'priority', 'message'];
-foreach ($required_fields as $field) {
-    if (empty($_POST[$field])) {
-        header("Location: contact.php?error=Missing required field: $field");
-        exit();
-    }
-}
-
-// Process form data
-$user_id = $_POST['user_id'] ?? null;
-$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-$subject = htmlspecialchars($_POST['subject']);
-$priority = htmlspecialchars($_POST['priority']);
-$message = htmlspecialchars($_POST['message']);
-$ticket_number = 'TKT-' . strtoupper(uniqid());
-
-// Handle file upload
-$attachment_path = null;
-if (!empty($_FILES['attachment']['name'])) {
-    $allowed_types = ['application/pdf', 'image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    $max_size = 5 * 1024 * 1024; // 5MB
-    
-    if (!in_array($_FILES['attachment']['type'], $allowed_types)) {
-        header("Location: contact.php?error=Invalid file type");
-        exit();
-    }
-    
-    if ($_FILES['attachment']['size'] > $max_size) {
-        header("Location: contact.php?error=File too large. Max 5MB allowed");
-        exit();
-    }
-    
-    $upload_dir = __DIR__ . '/../uploads/support/';
-    if (!is_dir($upload_dir)) {
-        mkdir($upload_dir, 0755, true);
-    }
-    
-    $file_ext = pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION);
-    $filename = 'ticket_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $file_ext;
-    $attachment_path = 'uploads/support/' . $filename;
-    
-    if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $upload_dir . $filename)) {
-        header("Location: contact.php?error=Failed to upload attachment");
-        exit();
-    }
-}
-
-try {
-    // Save to database
-    $stmt = $pdo->prepare("INSERT INTO support_tickets 
-                          (user_id, ticket_number, subject, message, priority, status, attachment, created_at) 
-                          VALUES (?, ?, ?, ?, ?, 'open', ?, NOW())");
-    $stmt->execute([$user_id, $ticket_number, $subject, $message, $priority, $attachment_path]);
-} catch (PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
-    header("Location: contact.php?error=Database error occurred. Please try again later.");
-    exit();
-}
-
-try {
-    // Send email to admin
-    $mail = new PHPMailer(true);
-    
+// Ensure $pdo is initialized
+if (!isset($pdo)) {
     try {
-        // Server settings
-        $mail->isSMTP();
-        $mail->Host = 'smtp.yourschool.edu'; // Change this
-        $mail->SMTPAuth = true;
-        $mail->Username = 'support@yourschool.edu';
-        $mail->Password = 'yourpassword';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-        
-        // Recipients
-        $mail->setFrom('support@yourschool.edu', 'School Support System');
-        $mail->addAddress('admin@yourschool.edu', 'Admin');
-        $mail->addReplyTo($email);
-        
-        // Content
-        $mail->isHTML(true);
-        $mail->Subject = "New Support Ticket: $ticket_number";
-        $mail->Body = "
-            <h2>New Support Ticket</h2>
-            <p><strong>Ticket Number:</strong> $ticket_number</p>
-            <p><strong>From:</strong> $email</p>
-            <p><strong>Priority:</strong> " . ucfirst($priority) . "</p>
-            <p><strong>Subject:</strong> $subject</p>
-            <p><strong>Message:</strong></p>
-            <div>$message</div>
-        ";
-        
-        if ($attachment_path) {
-            $mail->addAttachment(__DIR__ . '/../' . $attachment_path);
-        }
-        
-        $mail->send();
-    } catch (Exception $e) {
-        error_log("Mailer Error: " . $mail->ErrorInfo);
-        // Redirect with a warning if email fails
-        header("Location: contact.php?success=1&ticket=" . urlencode($ticket_number) . "&warning=Email not sent");
-        exit();
+        $pdo = new PDO('mysql:host=your_host;dbname=your_database', 'your_username', 'your_password');
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        die('Database connection failed: ' . $e->getMessage());
     }
-    
-    // Redirect to success page
-    header("Location: contact.php?success=1&ticket=" . urlencode($ticket_number));
-    exit();
-    
-} catch (PDOException $e) {
-    error_log("Database Error: " . $e->getMessage());
-    header("Location: contact.php?error=Failed to submit ticket. Please try again.");
-    exit();
 }
+
+// Get user information
+$user_id = $_SESSION['user_id'] ?? null;
+$user_email = $_SESSION['email'] ?? '';
+?>
+
+<style>
+.contact-main-container {
+    max-width: 600px;
+    margin: 40px auto 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    padding: 32px 24px 32px 24px;
+}
+.contact-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+.contact-header h2 {
+    color: #007bff;
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+.contact-header i {
+    margin-right: 8px;
+}
+.contact-form .form-group {
+    margin-bottom: 18px;
+}
+body, input, textarea, select, button {
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+}
+.erpnext-btn {
+    background: #f5f7fa;
+    color: #36414c;
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 18px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+}
+.erpnext-btn.btn-primary {
+    background: #007bfc;
+    color: #fff;
+    border-color: #007bfc;
+}
+.erpnext-btn.btn-primary:hover {
+    background: #0056b3;
+    color: #fff;
+}
+.erpnext-input, .erpnext-textarea {
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 15px;
+    background: #f5f7fa;
+    color: #36414c;
+}
+.erpnext-input:focus, .erpnext-textarea:focus {
+    outline: none;
+    border-color: #007bfc;
+    background: #fff;
+}
+.erpnext-label {
+    font-weight: 500;
+    color: #36414c;
+    margin-bottom: 4px;
+    display: block;
+}
+@media (max-width: 700px) {
+    .contact-main-container {
+        padding: 12px 2vw;
+    }
+}
+.main-content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px 0 20px;
+}
+</style>
+
+<?php include_once __DIR__ . '/includes/header.php'; ?>
+<div class="main-content-container">
+    <div class="contact-main-container">
+        <div class="contact-header">
+            <h2>
+                <i class="fas fa-headset"></i> Contact Support
+            </h2>
+        </div>
+        <?php if (isset($_GET['success'])): ?>
+            <div class="alert alert-success">
+                Your support ticket has been submitted successfully. Ticket #<?= htmlspecialchars($_GET['ticket']) ?>
+            </div>
+        <?php elseif (isset($_GET['error'])): ?>
+            <div class="alert alert-danger">
+                Error submitting your request: <?= htmlspecialchars($_GET['error']) ?>
+            </div>
+        <?php endif; ?>
+
+        <form id="contact-form" class="contact-form" action="contact-submit.php" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="user_id" value="<?= $user_id ?>">
+            
+            <div class="form-group">
+                <label class="erpnext-label" for="email">Your Email</label>
+                <input type="email" id="email" name="email" class="erpnext-input" value="<?= htmlspecialchars($user_email) ?>" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="erpnext-label" for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" class="erpnext-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="erpnext-label" for="priority">Priority</label>
+                <select id="priority" name="priority" class="erpnext-input" required>
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                    <option value="critical">Critical</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="erpnext-label" for="message">Message</label>
+                <textarea id="message" name="message" class="erpnext-textarea" rows="5" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="erpnext-label" for="attachment">Attachment (if any)</label>
+                <input type="file" id="attachment" name="attachment" class="erpnext-input">
+                <small class="text-muted">Max 5MB (PDF, JPG, PNG, DOCX allowed)</small>
+            </div>
+            
+            <button type="submit" class="erpnext-btn btn-primary">Submit Ticket</button>
+        </form>
+    </div>
+</div>
+<?php include_once __DIR__ . '/includes/footer.php'; ?>
+</div>
+<script src="../includes/activity-tracker.js"></script>
