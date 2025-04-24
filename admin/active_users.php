@@ -952,7 +952,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'bulk_export') {
         $params[] = '%' . $_GET['search'] . '%';
     }
     $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-    $stmt = $pdo->prepare("SELECT id, username, last_active, online, role_id, active FROM users $where_sql ORDER BY username");
+    // Fix: select role_name using join for export
+    $sql = "SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.active, r.role_name
+            FROM users u
+            LEFT JOIN roles r ON u.role_id = r.id
+            $where_sql
+            ORDER BY u.username";
+    $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         fputcsv($out, [
@@ -960,7 +966,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'bulk_export') {
             $row['username'],
             $row['last_active'],
             $row['online'] ? 'Online' : 'Offline',
-            $row['role_id'],
+            $row['role_name'],
             $row['active'] ? 'Active' : 'Inactive'
         ]);
     }
