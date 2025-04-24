@@ -120,7 +120,7 @@ if (file_exists($configPath)) {
         transition: left 0.2s, width 0.2s;
     }
     .admin-sidebar.collapsed {
-        width: 80px;
+        width: 90px;
     }
     .admin-main {
         margin-left: 200px;
