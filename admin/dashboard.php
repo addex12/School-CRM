@@ -414,7 +414,7 @@ try {
     <script src="../assets/js/dashboard.js" defer></script>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="admin-dashboard"></div>
                 <!-- Widgets Section -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
