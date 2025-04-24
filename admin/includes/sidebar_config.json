@@ -28,33 +28,7 @@
       ],
       "id": "surveys-menu"
     },
-    {
-      "title": "Students",
-      "icon": "user-graduate",
-      "items": [
-        { "title": "Student List", "icon": "user-graduate", "link": "students.php" },
-        { "title": "Add Student", "icon": "user-plus", "link": "add_users.php" }
-      ],
-      "id": "students-menu"
-    },
-    {
-      "title": "Teachers",
-      "icon": "chalkboard-teacher",
-      "items": [
-        { "title": "Teacher List", "icon": "chalkboard-teacher", "link": "teachers.php" },
-        { "title": "Add Teacher", "icon": "user-plus", "link": "add_users.php" }
-      ],
-      "id": "teachers-menu"
-    },
-    {
-      "title": "Parents",
-      "icon": "user-friends",
-      "items": [
-        { "title": "Parent List", "icon": "user-friends", "link": "parents.php" },
-        { "title": "Add Parent", "icon": "user-plus", "link": "add_users.php" }
-      ],
-      "id": "parents-menu"
-    },
+    
     {
       "title": "Academics",
       "icon": "school",
