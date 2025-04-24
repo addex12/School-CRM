@@ -210,12 +210,14 @@ else:
 <tr>
     <td colspan="8" class="text-center">No active users found</td>
 </tr>
-<?php endif; ?>t src="../assets/js/active_users.js"></script>
-</tbody>
+<?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
-<?php ob_end_flush(); ?>
+        <?php include __DIR__ . '/includes/footer.php'; ?>
+    </div>
+    <!-- Link the correct JS and ensure AJAX endpoints are correct -->
+   </body>
 </html>
-</table> <?php include __DIR__ . '/includes/footer.php'; ?>
-
-</body>    
+<?php ob_end_flush(); ?>
