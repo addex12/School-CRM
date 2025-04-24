@@ -30,7 +30,7 @@ if (file_exists($configPath)) {
     flex-direction: column;
 }
 .admin-sidebar.collapsed {
-    width: 50px;
+    width: 56px;
 }
 .admin-sidebar .sidebar-header {
     padding: 1.2rem 1.5rem;
@@ -111,20 +111,50 @@ if (file_exists($configPath)) {
 }
 @media (max-width: 900px) {
     .admin-sidebar {
-        position: absolute;
+        position: fixed;
+        left: 0;
+        top: 0;
+        min-height: 100vh;
+        width: 200px;
         z-index: 200;
-        min-height: 100%;
+        transition: left 0.2s, width 0.2s;
+    }
+    .admin-sidebar.collapsed {
+        width: 56px;
+    }
+    .admin-main {
+        margin-left: 200px;
+    }
+    .admin-sidebar.collapsed ~ .admin-main,
+    body .admin-sidebar.collapsed + .admin-main {
+        margin-left: 56px;
+    }
+}
+@media (max-width: 600px) {
+    .admin-sidebar {
+        width: 100vw;
+        left: -100vw;
+        transition: left 0.2s;
+    }
+    .admin-sidebar.open {
+        left: 0;
+    }
+    .admin-sidebar.collapsed {
+        width: 56px;
+        left: 0;
     }
     .admin-main {
         margin-left: 0 !important;
+        padding-left: 0 !important;
     }
 }
 .admin-main {
     margin-left: 240px;
     transition: margin-left 0.2s;
 }
-.admin-sidebar.collapsed ~ .admin-main {
-    margin-left: 50px;
+.admin-sidebar.collapsed ~ .admin-main,
+body .admin-sidebar.collapsed + .admin-main {
+    margin-left: 56px;
 }
 </style>
 <div class="admin-sidebar" id="adminSidebar">
@@ -182,31 +212,47 @@ document.addEventListener('DOMContentLoaded', function() {
     function setSidebarCollapsed(collapsed) {
         if (collapsed) {
             sidebar.classList.add('collapsed');
-            if (main) main.style.marginLeft = '50px';
+            sidebar.classList.remove('open');
+            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '56px' : '56px';
             localStorage.setItem('sidebar-collapsed', '1');
         } else {
             sidebar.classList.remove('collapsed');
-            if (main) main.style.marginLeft = '240px';
+            sidebar.classList.remove('open');
+            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
             localStorage.setItem('sidebar-collapsed', '0');
         }
     }
     // Initial state
     setSidebarCollapsed(localStorage.getItem('sidebar-collapsed') === '1');
 
-    // Always toggle collapsed state on button click
     toggle.addEventListener('click', function(e) {
         e.stopPropagation();
         var isCollapsed = sidebar.classList.contains('collapsed');
-        setSidebarCollapsed(!isCollapsed);
+        // On mobile, toggle open/close instead of collapse
+        if (window.innerWidth <= 600) {
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            } else {
+                sidebar.classList.add('open');
+            }
+        } else {
+            setSidebarCollapsed(!isCollapsed);
+        }
     });
 
-    // Also allow expanding sidebar by clicking anywhere on the collapsed sidebar (optional UX)
-    sidebar.addEventListener('click', function(e) {
-        if (
-            sidebar.classList.contains('collapsed') &&
-            (e.target === sidebar || e.target === sidebar.querySelector('.sidebar-header') || e.target === sidebar.querySelector('.sidebar-header span'))
-        ) {
+    // Allow expanding sidebar by clicking the sidebar header when collapsed (desktop only)
+    sidebar.querySelector('.sidebar-header').addEventListener('click', function(e) {
+        if (window.innerWidth > 600 && sidebar.classList.contains('collapsed')) {
             setSidebarCollapsed(false);
+        }
+    });
+
+    // Hide sidebar on mobile when clicking outside
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 600 && sidebar.classList.contains('open')) {
+            if (!sidebar.contains(e.target) && e.target !== toggle) {
+                sidebar.classList.remove('open');
+            }
         }
     });
 
@@ -219,6 +265,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
             }
         });
+    });
+
+    // Responsive: adjust margin on resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 600) {
+            if (main) main.style.marginLeft = '0';
+        } else if (sidebar.classList.contains('collapsed')) {
+            if (main) main.style.marginLeft = '56px';
+        } else {
+            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
+        }
     });
 });
 </script>
