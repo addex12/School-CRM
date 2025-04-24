@@ -234,4 +234,3 @@ if ($action === 'edit' && $id) {
 
 </body>
 </html>
-<?php ob_end_flush(); ?>
