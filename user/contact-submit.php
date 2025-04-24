@@ -12,6 +12,9 @@ require_once __DIR__ . '/../includes/db.php'; // Ensure this file initializes $p
 // Get user information
 $user_id = $_SESSION['user_id'] ?? null;
 $user_email = $_SESSION['email'] ?? '';
+
+// Ensure $pdo is accessible
+global $pdo;
 ?>
 
 <style>
