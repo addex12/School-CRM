@@ -186,10 +186,11 @@ try {
 // Fetch survey participation stats for chart
 $surveyStats = [];
 try {
+    // Ensure surveys and survey_responses tables exist and columns are correct
     $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
         FROM surveys s
         LEFT JOIN survey_responses sr ON s.id = sr.survey_id
-        GROUP BY s.id
+        GROUP BY s.id, s.title
         ORDER BY responses DESC
         LIMIT 7");
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -202,6 +203,7 @@ try {
 // Fetch feedback rating distribution for chart
 $feedbackRatings = [];
 try {
+    // Ensure feedback table and rating column exist
     $stmt = $pdo->query("SELECT rating, COUNT(*) as count FROM feedback GROUP BY rating ORDER BY rating");
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $feedbackRatings[$row['rating']] = $row['count'];
@@ -213,12 +215,33 @@ try {
 // Fetch support ticket status distribution for chart
 $ticketStatus = [];
 try {
+    // Ensure support_tickets table and status column exist
     $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM support_tickets GROUP BY status");
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
         $ticketStatus[$row['status']] = $row['count'];
     }
 } catch (Exception $e) {
     $ticketStatus = [];
+}
+
+// Error log viewer: read last 20 lines of error.log
+$errorLogLines = [];
+$errorLogPath = realpath(__DIR__ . '/../error.log');
+if ($errorLogPath && is_readable($errorLogPath)) {
+    $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $errorLogLines = array_slice($lines, -20);
+} else {
+    $errorLogLines = [];
+}
+
+// Fetch recent activity log
+$activityLog = [];
+try {
+    // Ensure activity_log table and columns exist
+    $stmt = $pdo->query("SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10");
+    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $activityLog = [];
 }
 ?>
 
@@ -391,7 +414,7 @@ try {
     <script src="../assets/js/dashboard.js" defer></script>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="admin-dashboard"></div>
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
