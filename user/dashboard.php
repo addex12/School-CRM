@@ -319,10 +319,15 @@ try {
                 </div>
             <?php else: ?>
                 <div class="survey-cards">
-                    <?php foreach ($visibleAnnouncements as $a): ?>
-                        <div class="survey-card" style="border-left:4px solid #f1c40f;">
+                    <?php foreach ($visibleAnnouncements as $idx => $a): ?>
+                        <div class="survey-card" style="border-left:4px solid #f1c40f; position:relative;">
                             <h3 style="color:#215967;"><i class="fas fa-bullhorn"></i> <?= htmlspecialchars($a['title']) ?></h3>
-                            <div class="survey-description"><?= nl2br(htmlspecialchars($a['content'])) ?></div>
+                            <div class="survey-description" id="ann-content-<?= $idx ?>">
+                                <?= nl2br(htmlspecialchars(mb_strimwidth($a['content'], 0, 250, '...'))) ?>
+                                <?php if (mb_strlen($a['content']) > 250): ?>
+                                    <a href="javascript:void(0);" class="btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleAnnContent(<?= $idx ?>, <?= json_encode($a['content']) ?>)">Read more</a>
+                                <?php endif; ?>
+                            </div>
                             <div class="survey-meta">
                                 <strong>From:</strong> <?= date('M j, Y', strtotime($a['start_date'])) ?>
                                 <strong>To:</strong> <?= date('M j, Y', strtotime($a['end_date'])) ?>
@@ -343,10 +348,15 @@ try {
                 </div>
             <?php else: ?>
                 <div class="survey-cards">
-                    <?php foreach ($kb as $article): ?>
-                        <div class="survey-card" style="border-left:4px solid #007bfc;">
+                    <?php foreach ($kb as $kidx => $article): ?>
+                        <div class="survey-card" style="border-left:4px solid #007bfc; position:relative;">
                             <h3 style="color:#215967;"><i class="fas fa-book"></i> <?= htmlspecialchars($article['title']) ?></h3>
-                            <div class="survey-description"><?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 250, '...'))) ?></div>
+                            <div class="survey-description" id="kb-content-<?= $kidx ?>">
+                                <?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 250, '...'))) ?>
+                                <?php if (mb_strlen($article['content']) > 250): ?>
+                                    <a href="javascript:void(0);" class="btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleKbContent(<?= $kidx ?>, <?= json_encode($article['content']) ?>)">Read more</a>
+                                <?php endif; ?>
+                            </div>
                             <div class="survey-meta">
                                 <strong>Last updated:</strong> <?= date('M j, Y', strtotime($article['updated_at'])) ?>
                             </div>
@@ -358,5 +368,47 @@ try {
     </div>
     <?php include 'includes/footer.php'; ?>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+    function toggleAnnContent(idx, content) {
+        var el = document.getElementById('ann-content-' + idx);
+        if (el.dataset.expanded === "1") {
+            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
+            el.dataset.expanded = "0";
+        } else {
+            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
+            el.dataset.expanded = "1";
+        }
+    }
+    function toggleKbContent(idx, content) {
+        var el = document.getElementById('kb-content-' + idx);
+        if (el.dataset.expanded === "1") {
+            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
+            el.dataset.expanded = "0";
+        } else {
+            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
+            el.dataset.expanded = "1";
+        }
+    }
+    // Utility functions for HTML escaping and nl2br
+    function htmlspecialchars(str) {
+        return str.replace(/&/g, '&amp;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#039;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;');
+    }
+    function nl2br(str) {
+        return str.replace(/\n/g, "<br>");
+    }
+    // Set initial data-expanded attribute
+    document.addEventListener('DOMContentLoaded', function() {
+        <?php foreach ($visibleAnnouncements as $idx => $a): ?>
+        document.getElementById('ann-content-<?= $idx ?>').dataset.expanded = "0";
+        <?php endforeach; ?>
+        <?php foreach ($kb as $kidx => $article): ?>
+        document.getElementById('kb-content-<?= $kidx ?>').dataset.expanded = "0";
+        <?php endforeach; ?>
+    });
+    </script>
 </body>
 </html>
