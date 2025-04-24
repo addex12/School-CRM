@@ -65,8 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, active) VALUES (?, ?, ?, ?, ?)");
         
         if ($stmt->execute([$username, $email, $hashed_password, $role_id, $active])) {
-            $_SESSION['success'] = "Registration successful! Please wait for admin approval before logging in.";
-            header("Location: login.php");
+            $_SESSION['register_success'] = true;
+            header("Location: register.php");
             exit();
         } else {
             $errors['general'] = "Registration failed. Please try again.";
@@ -188,8 +188,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="register-title">Create Account</div>
         <?php if (!empty($errors['general'])): ?>
             <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
-        <?php elseif (!empty($success)): ?>
-            <div class="success-message"><?= $success ?></div>
+        <?php elseif (!empty($_SESSION['register_success'])): ?>
+            <div class="success-message">
+                Registration successful!<br>
+                <strong>Next steps:</strong><br>
+                Your account has been created but is not yet active.<br>
+                An administrator will review and activate your account.<br>
+                You will not be able to log in until your account is approved.<br>
+                Please check your email for updates or contact support if you have questions.
+            </div>
+            <?php unset($_SESSION['register_success']); ?>
         <?php endif; ?>
         <form method="POST" autocomplete="off">
             <div class="form-group">
