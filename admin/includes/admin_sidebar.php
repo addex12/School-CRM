@@ -120,14 +120,14 @@ if (file_exists($configPath)) {
         transition: left 0.2s, width 0.2s;
     }
     .admin-sidebar.collapsed {
-        width: 56px;
+        width: 60px;
     }
     .admin-main {
         margin-left: 200px;
     }
     .admin-sidebar.collapsed ~ .admin-main,
     body .admin-sidebar.collapsed + .admin-main {
-        margin-left: 56px;
+        margin-left: 60px;
     }
 }
 @media (max-width: 600px) {
@@ -140,7 +140,7 @@ if (file_exists($configPath)) {
         left: 0;
     }
     .admin-sidebar.collapsed {
-        width: 56px;
+        width: 60px;
         left: 0;
     }
     .admin-main {
