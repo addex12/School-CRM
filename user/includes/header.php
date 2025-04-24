@@ -48,6 +48,7 @@ if (isset($_SESSION['user_id'])) {
             padding: 0.7em 2.2em 0.7em 1.2em;
             max-width: 1400px;
             margin: 0 auto;
+            flex-wrap: wrap;
         }
         .logo {
             font-size: 1.45em;
@@ -55,11 +56,13 @@ if (isset($_SESSION['user_id'])) {
             color: #fff;
             letter-spacing: 0.5px;
             margin: 0;
+            white-space: nowrap;
         }
         .main-nav {
             display: flex;
             align-items: center;
             gap: 0.5em;
+            flex-wrap: wrap;
         }
         .main-nav a {
             color: #fff;
@@ -75,6 +78,7 @@ if (isset($_SESSION['user_id'])) {
             display: flex;
             align-items: center;
             gap: 0.5em;
+            white-space: nowrap;
         }
         .main-nav a.active, .main-nav a:hover, .main-nav a:focus {
             background: #e2efda;
@@ -104,16 +108,43 @@ if (isset($_SESSION['user_id'])) {
             background: #fff;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
-        @media (max-width: 900px) {
-            .header-content { flex-direction: column; align-items: flex-start; gap: 0.7em; padding: 0.7em 1em; }
-            .main-nav { flex-wrap: wrap; gap: 0.3em; }
-            .header-avatar-container { margin-left: 0; }
+        @media (max-width: 1100px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.7em;
+                padding: 0.7em 1em;
+            }
+            .main-nav {
+                gap: 0.3em;
+                flex-wrap: wrap;
+            }
+            .header-avatar-container {
+                margin-left: 0;
+                margin-top: 0.5em;
+            }
         }
-        @media (max-width: 600px) {
-            .header-content { padding: 0.5em 0.5em; }
-            .logo { font-size: 1.1em; }
-            .main-nav a { font-size: 0.97em; padding: 7px 10px; }
-            .header-avatar-img { width: 36px; height: 36px; }
+        @media (max-width: 700px) {
+            .header-content {
+                padding: 0.5em 0.5em;
+            }
+            .logo {
+                font-size: 1.1em;
+            }
+            .main-nav a {
+                font-size: 0.97em;
+                padding: 7px 10px;
+            }
+            .header-avatar-img {
+                width: 36px;
+                height: 36px;
+            }
+            .main-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+                gap: 0.2em;
+            }
         }
         .erpnext-btn {
             background: #007bfc;
@@ -139,9 +170,14 @@ if (isset($_SESSION['user_id'])) {
             font-weight: 600;
             text-align: center;
             letter-spacing: 0.2px;
+            word-break: break-word;
         }
         .announcement-bar i {
             margin-right: 7px;
+        }
+        @media (max-width: 500px) {
+            .announcement-bar { font-size: 0.95em; padding: 6px 0.3em; }
+            .header-content { padding: 0.3em 0.2em; }
         }
     </style>
 </head>
