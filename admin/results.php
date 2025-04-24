@@ -177,6 +177,7 @@ $chart_json = json_encode($chart_data);
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="../assets/css/add_users.css">
     <style>
         /* Modern, clean styling */
         .stat-card {
@@ -199,6 +200,54 @@ $chart_json = json_encode($chart_data);
         .stat-label {
             color: #6c757d;
             font-size: 0.9rem;
+        }
+        /* ERPNext card and button styling */
+        .erpnext-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            margin: 2rem 0;
+        }
+        .erpnext-btn {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.18s;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .erpnext-btn-primary {
+            background: #3498db;
+        }
+        .erpnext-btn-primary:hover {
+            background: #217dbb;
+        }
+        .erpnext-btn-secondary {
+            background: #eaeaea;
+            color: #666;
+        }
+        .erpnext-btn-secondary:hover {
+            background: #e2efda;
+            color: #215967;
+        }
+        .erpnext-btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .erpnext-btn-danger:hover {
+            background: #c0392b;
+        }
+        .erpnext-btn-info {
+            background: #00bcd4;
+            color: #fff;
+        }
+        .erpnext-btn-info:hover {
+            background: #0097a7;
         }
         .chart-container {
             background: white;
@@ -277,14 +326,14 @@ $chart_json = json_encode($chart_data);
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include '../includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">
             <header class="admin-header">
                 <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
                 <div class="header-actions">
                     <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
+                        <button class="erpnext-btn erpnext-btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
                             <i class="fas fa-download"></i> Export
                         </button>
                         <ul class="dropdown-menu">
@@ -293,14 +342,14 @@ $chart_json = json_encode($chart_data);
                             <li><a class="dropdown-item" href="export_json.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-code"></i> JSON</a></li>
                         </ul>
                     </div>
-                    <a href="surveys.php" class="btn btn-secondary">
+                    <a href="surveys.php" class="erpnext-btn erpnext-btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Surveys
                     </a>
                 </div>
             </header>
 
             <!-- Survey Stats Cards -->
-            <div class="survey-stats mb-4">
+            <div class="survey-stats mb-4 erpnext-card">
                 <div class="stat-card">
                     <div class="stat-value"><?= number_format($total_responses) ?></div>
                     <div class="stat-label">Total Responses</div>
@@ -321,7 +370,7 @@ $chart_json = json_encode($chart_data);
 
             <!-- Filter Section -->
             <div class="filter-section">
-                <form method="GET" class="filter-form">
+                <form method="GET" class="filter-form erpnext-card">
                     <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
                     <div class="row">
                         <div class="col-md-5">
@@ -352,7 +401,7 @@ $chart_json = json_encode($chart_data);
             <div class="chart-section mb-5">
                 <div class="row">
                     <div class="col-12">
-                        <div class="chart-container">
+                        <div class="chart-container erpnext-card">
                             <h3 class="chart-title">Response Summary</h3>
                             <canvas id="summaryChart" height="100"></canvas>
                         </div>
@@ -362,7 +411,7 @@ $chart_json = json_encode($chart_data);
                 <?php foreach ($fields as $field): ?>
                     <div class="row">
                         <div class="col-12">
-                            <div class="chart-container">
+                            <div class="chart-container erpnext-card">
                                 <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
                                 <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
                             </div>
@@ -372,7 +421,7 @@ $chart_json = json_encode($chart_data);
             </div>
 
             <!-- Responses Table -->
-            <div class="response-table-section">
+            <div class="response-table-section erpnext-card">
                 <h3 class="mb-3">Individual Responses</h3>
                 
                 <?php if ($total_responses > 0): ?>
@@ -589,55 +638,6 @@ $chart_json = json_encode($chart_data);
                                 options: {
                                     responsive: true,
                                     cutout: '60%',
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: field.field_label,
-                                            font: { size: 14 }
-                                        },
-                                        legend: {
-                                            position: 'right',
-                                            labels: {
-                                                padding: 20,
-                                                usePointStyle: true,
-                                                pointStyle: 'circle'
-                                            }
-                                        },
-                                        datalabels: {
-                                            formatter: (value, ctx) => {
-                                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                                return `${Math.round(value / total * 100)}%`;
-                                            },
-                                            color: '#fff',
-                                            font: { weight: 'bold' }
-                                        }
-                                    }
-                                },
-                                plugins: [ChartDataLabels]
-                            });
-                            break;
-                            
-                        case 'checkbox':
-                            // Horizontal bar chart for multi-select questions
-                            new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: fieldAnalytics.map(item => item.field_value),
-                                    datasets: [{
-                                        label: 'Selections',
-                                        data: fieldAnalytics.map(item => item.count),
-                                        backgroundColor: '#4361ee',
-                                        borderWidth: 0,
-                                        borderRadius: 4
-                                    }]
-                                },
-                                options: {
-                                    indexAxis: 'y',
-                                    responsive: true,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: field.field_label,
                                             font: { size: 14 }
                                         },
                                         legend: { display: false },

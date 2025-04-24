@@ -239,11 +239,13 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
             width: 100%;
         }
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include '../includes/admin_sidebar.php'; ?>
+        <?php include 'includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">
             <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
