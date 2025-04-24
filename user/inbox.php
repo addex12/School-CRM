@@ -49,7 +49,7 @@ try {
         SELECT u.id, u.username, u.email, u.role_id, u.last_activity, COALESCE(r.role_name, 'No Role') as role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.online = 1 AND r.role_name = 'admin' AND u.id != :self
+        WHERE u.online = 1 AND (r.role_name = 'admin' OR r.role_name = 'Admin') AND u.id != :self
         ORDER BY u.username ASC
     ");
     $adminStmt->bindValue(':self', $userId);
@@ -298,16 +298,29 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const msg = document.getElementById('telegramMessage').value.trim();
         if (!msg) return;
-        // Send to first online admin if any, else first online user, else alert
+        // Dynamically get receiverId from PHP array (to avoid JS/PHP mismatch)
         let receiverId = null;
-        <?php if (!empty($onlineAdmins)): ?>
-            receiverId = <?= (int)$onlineAdmins[0]['id'] ?>;
-        <?php elseif (!empty($onlineUsers)): ?>
-            receiverId = <?= (int)$onlineUsers[0]['id'] ?>;
-        <?php else: ?>
+        <?php
+        // Output a JS array of online admin IDs
+        $adminIds = [];
+        foreach ($onlineAdmins as $admin) {
+            $adminIds[] = (int)$admin['id'];
+        }
+        $userIds = [];
+        foreach ($onlineUsers as $user) {
+            $userIds[] = (int)$user['id'];
+        }
+        ?>
+        const onlineAdmins = <?= json_encode($adminIds) ?>;
+        const onlineUsers = <?= json_encode($userIds) ?>;
+        if (onlineAdmins.length > 0) {
+            receiverId = onlineAdmins[0];
+        } else if (onlineUsers.length > 0) {
+            receiverId = onlineUsers[0];
+        } else {
             alert('No one is online to receive your message.');
             return;
-        <?php endif; ?>
+        }
         const formData = new FormData();
         formData.append('receiver_id', receiverId);
         formData.append('message', msg);
