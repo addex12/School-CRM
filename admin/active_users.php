@@ -177,41 +177,6 @@ function getUserRoleName($roleId) {
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
-<?php
-$has_users = (isset($online_users) && count($online_users) > 0) || (isset($offline_users) && count($offline_users) > 0);
-if ($has_users):
-    $all_users = array_merge($online_users, $offline_users);
-    foreach ($all_users as $user):
-?>
-<tr data-id="<?= htmlspecialchars($user['id']) ?>">
-    <td class="select-col"><input type="checkbox" class="row-select"></td>
-    <td><?= htmlspecialchars($user['id']) ?></td>
-    <td class="username"><?= htmlspecialchars($user['username']) ?></td>
-    <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
-    <td class="online">
-        <?php if (!empty($user['online'])): ?>
-            <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
-        <?php else: ?>
-            <span style="color:#aaa;">Offline</span>
-        <?php endif; ?>
-    </td>
-    <td class="role" data-role-id="<?= htmlspecialchars($user['role_id'] ?? '') ?>"><?= htmlspecialchars($user['role_name'] ?? getUserRoleName($user['role_id'])) ?></td>
-    <td class="status" data-status="<?= (int)$user['active'] ?>">
-        <?= ((int)$user['active'] === 1 ? 'Active' : 'Inactive') ?>
-    </td>
-    <td>
-        <button class="crud-btn edit">Edit</button>
-        <button class="crud-btn delete">Delete</button>
-    </td>
-</tr>
-<?php
-    endforeach;
-else:
-?>
-<tr>
-    <td colspan="8" class="text-center">No active users found</td>
-</tr>
-<?php endif; ?>
                     </tbody>
                 </table>
             </div>
