@@ -63,7 +63,6 @@
       "items": [
         { "title": "General Settings", "icon": "cogs", "link": "settings.php" },
         { "title": "User Roles", "icon": "user-tag", "link": "user_roles.php" },
-        { "title": "Permissions", "icon": "shield-alt", "link": "permissions.php" },
         { "title": "Backup & Restore", "icon": "database", "link": "restore.php" },
         { "title": "System Logs", "icon": "file-alt", "link": "system_logs.php" },
         { "title": "Audit Trail", "icon": "history", "link": "audit_trail.php" }
