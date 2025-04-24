@@ -39,8 +39,8 @@ try {
     } else {
         // Ensure both parameters are set and not null
         $params = [
-            ':current_user' => $current_user_id,
-            ':contact_id' => $contact_id
+            'current_user' => $current_user_id,
+            'contact_id' => $contact_id
         ];
         $stmt = $pdo->prepare("
             SELECT m.*, 
