@@ -85,97 +85,144 @@ try {
     <title><?= htmlspecialchars($pageTitle) ?> - School Survey System</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        .dashboard-container {
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+        .main-content-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px 0 20px;
+        }
+        .dashboard-container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            gap: 1em;
+            margin-bottom: 1.5em;
+        }
+        .dashboard-header h1 {
+            color: #007bfc;
+            font-size: 2.1em;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 0.5px;
         }
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 22px;
+            margin-bottom: 32px;
         }
         .stat-card {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 28px 18px 22px 18px;
             text-align: center;
+            transition: box-shadow 0.18s;
+            border-left: 5px solid #007bfc;
         }
+        .stat-card.completed { border-left: 5px solid #28a745; }
+        .stat-card.pending { border-left: 5px solid #ffc107; }
         .stat-card h3 {
             margin-top: 0;
-            color: #555;
-            font-size: 1.1em;
+            color: #215967;
+            font-size: 1.13em;
+            font-weight: 600;
         }
         .stat-value {
             font-size: 2.5em;
             font-weight: bold;
             margin: 10px 0;
-            color: #3498db;
+            color: #007bfc;
         }
-        .stat-card.completed .stat-value {
-            color: #28a745;
-        }
-        .stat-card.pending .stat-value {
-            color: #ffc107;
-        }
+        .stat-card.completed .stat-value { color: #28a745; }
+        .stat-card.pending .stat-value { color: #ffc107; }
+        .stat-card p { color: #888; margin: 0; }
         .quick-actions {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin-bottom: 30px;
+            flex-wrap: wrap;
         }
-        .quick-action {
-            padding: 12px 20px;
-            background: #3498db;
-            color: white;
+        .erpnext-btn, .quick-action, .btn {
+            background: #007bfc;
+            color: #fff;
+            border: 1px solid #007bfc;
+            border-radius: 4px;
+            padding: 10px 22px;
+            font-weight: 500;
+            font-size: 1em;
+            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+            cursor: pointer;
             text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
+            display: inline-block;
+            margin: 0 2px;
         }
-        .quick-action:hover {
-            background: #2980b9;
+        .erpnext-btn:hover, .quick-action:hover, .btn:hover {
+            background: #215967;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.12);
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.97em;
+            border-radius: 4px;
         }
         .section-title {
             margin-top: 30px;
-            color: #333;
+            color: #215967;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
+            font-size: 1.25em;
+            font-weight: 600;
+            letter-spacing: 0.2px;
         }
         .survey-cards {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 22px;
         }
         .survey-card {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 22px 18px 18px 18px;
             position: relative;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            transition: box-shadow 0.18s;
         }
-        .survey-card.completed {
-            border-left: 4px solid #28a745;
-        }
+        .survey-card.completed { border-left: 5px solid #28a745; }
+        .survey-card[style*="border-left:4px solid #f1c40f;"] { border-left: 5px solid #f1c40f !important; }
+        .survey-card[style*="border-left:4px solid #007bfc;"] { border-left: 5px solid #007bfc !important; }
         .survey-card h3 {
             margin-top: 0;
-            color: #333;
+            color: #215967;
+            font-size: 1.13em;
+            font-weight: 600;
         }
         .survey-description {
-            color: #666;
-            margin: 10px 0;
+            color: #36414c;
+            margin: 10px 0 8px 0;
+            font-size: 1em;
         }
         .survey-meta {
-            font-size: 0.9em;
-            color: #777;
+            font-size: 0.97em;
+            color: #888;
+            margin-top: auto;
         }
         .survey-status {
             position: absolute;
             top: 15px;
             right: 15px;
-            font-size: 0.8em;
-            padding: 3px 8px;
+            font-size: 0.9em;
+            padding: 3px 10px;
             border-radius: 4px;
         }
         .status-completed {
@@ -186,26 +233,19 @@ try {
             background: #fff3cd;
             color: #856404;
         }
-        .btn {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-        .btn:hover {
-            background: #2980b9;
-        }
         .time-left {
             font-weight: bold;
             color: #dc3545;
         }
-        .main-content-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px 0 20px;
+        @media (max-width: 1000px) {
+            .main-content-container { padding: 18px 4vw 0 4vw; }
+            .dashboard-header h1 { font-size: 1.4em; }
+        }
+        @media (max-width: 700px) {
+            .main-content-container { padding: 8px 2vw 0 2vw; }
+            .dashboard-header { flex-direction: column; gap: 0.5em; }
+            .survey-cards { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -213,10 +253,11 @@ try {
     <?php include 'includes/header.php'; ?>
     <div class="main-content-container">
         <div class="dashboard-container">
-            <h1 style="color:#007bff;">
-                <i class="fas fa-tachometer-alt"></i> <?= htmlspecialchars($pageTitle) ?>
-            </h1>
-            
+            <div class="dashboard-header">
+                <h1>
+                    <i class="fas fa-tachometer-alt"></i> <?= htmlspecialchars($pageTitle) ?>
+                </h1>
+            </div>
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3>Available Surveys</h3>
@@ -234,22 +275,20 @@ try {
                     <p>Surveys awaiting your response</p>
                 </div>
             </div>
-            
             <div class="quick-actions">
-                <a href="survey.php" class="quick-action">
+                <a href="survey.php" class="erpnext-btn quick-action">
                     <i class="fas fa-poll"></i> View All Surveys
                 </a>
-                <a href="feedback.php" class="quick-action">
+                <a href="feedback.php" class="erpnext-btn quick-action">
                     <i class="fas fa-comment-alt"></i> Submit Feedback
                 </a>
-                <a href="messages.php" class="quick-action">
+                <a href="messages.php" class="erpnext-btn quick-action">
                     <i class="fas fa-comments"></i> Start Chat
                 </a>
             </div>
-            
-            <h2 class="section-title">Recent Surveys</h2>
+            <h2 class="section-title"><i class="fas fa-list"></i> Recent Surveys</h2>
             <?php if (empty($recentSurveys)): ?>
-                <p>No recent surveys available.</p>
+                <div class="survey-card" style="color:#888;">No recent surveys available.</div>
             <?php else: ?>
                 <div class="survey-cards">
                     <?php foreach ($recentSurveys as $survey): 
@@ -261,12 +300,10 @@ try {
                         <div class="survey-card <?= $survey['completed'] ? 'completed' : '' ?>">
                             <h3><?= htmlspecialchars($survey['title']) ?></h3>
                             <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
-                            
                             <div class="survey-meta">
                                 <p><strong>Deadline:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
                                 <p><strong>Time Left:</strong> <span class="time-left"><?= $daysLeft ?> days</span></p>
                             </div>
-                            
                             <?php if ($survey['completed']): ?>
                                 <div class="survey-status status-completed">
                                     <i class="fas fa-check-circle"></i> Completed
@@ -275,7 +312,7 @@ try {
                                 <div class="survey-status status-pending">
                                     <i class="fas fa-exclamation-circle"></i> Pending
                                 </div>
-                                <a href="survey_response.php?id=<?= $survey['id'] ?>" class="btn">
+                                <a href="survey_response.php?id=<?= $survey['id'] ?>" class="erpnext-btn btn">
                                     Take Survey
                                 </a>
                             <?php endif; ?>
@@ -314,18 +351,16 @@ try {
             }
             ?>
             <?php if (empty($visibleAnnouncements)): ?>
-                <div style="background:#fff3cd;color:#856404;padding:18px 20px;border-radius:8px;margin-bottom:18px;">
-                    No announcements at this time.
-                </div>
+                <div class="survey-card" style="background:#fff3cd;color:#856404;">No announcements at this time.</div>
             <?php else: ?>
                 <div class="survey-cards">
                     <?php foreach ($visibleAnnouncements as $idx => $a): ?>
-                        <div class="survey-card" style="border-left:4px solid #f1c40f; position:relative;">
-                            <h3 style="color:#215967;"><i class="fas fa-bullhorn"></i> <?= htmlspecialchars($a['title']) ?></h3>
+                        <div class="survey-card" style="border-left:5px solid #f1c40f; position:relative;">
+                            <h3><i class="fas fa-bullhorn"></i> <?= htmlspecialchars($a['title']) ?></h3>
                             <div class="survey-description" id="ann-content-<?= $idx ?>">
                                 <?= nl2br(htmlspecialchars(mb_strimwidth($a['content'], 0, 250, '...'))) ?>
                                 <?php if (mb_strlen($a['content']) > 250): ?>
-                                    <a href="javascript:void(0);" class="btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleAnnContent(<?= $idx ?>, <?= json_encode($a['content']) ?>)">Read more</a>
+                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(<?= $idx ?>, <?= json_encode($a['content']) ?>)">Read more</a>
                                 <?php endif; ?>
                             </div>
                             <div class="survey-meta">
@@ -343,18 +378,16 @@ try {
             $kb = $pdo->query("SELECT title, content, updated_at FROM knowledge_base ORDER BY updated_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
             ?>
             <?php if (empty($kb)): ?>
-                <div style="background:#f8f9fa;color:#888;padding:18px 20px;border-radius:8px;">
-                    No knowledge base articles yet.
-                </div>
+                <div class="survey-card" style="background:#f8f9fa;color:#888;">No knowledge base articles yet.</div>
             <?php else: ?>
                 <div class="survey-cards">
                     <?php foreach ($kb as $kidx => $article): ?>
-                        <div class="survey-card" style="border-left:4px solid #007bfc; position:relative;">
-                            <h3 style="color:#215967;"><i class="fas fa-book"></i> <?= htmlspecialchars($article['title']) ?></h3>
+                        <div class="survey-card" style="border-left:5px solid #007bfc; position:relative;">
+                            <h3><i class="fas fa-book"></i> <?= htmlspecialchars($article['title']) ?></h3>
                             <div class="survey-description" id="kb-content-<?= $kidx ?>">
                                 <?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 250, '...'))) ?>
                                 <?php if (mb_strlen($article['content']) > 250): ?>
-                                    <a href="javascript:void(0);" class="btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleKbContent(<?= $kidx ?>, <?= json_encode($article['content']) ?>)">Read more</a>
+                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(<?= $kidx ?>, <?= json_encode($article['content']) ?>)">Read more</a>
                                 <?php endif; ?>
                             </div>
                             <div class="survey-meta">
@@ -372,20 +405,20 @@ try {
     function toggleAnnContent(idx, content) {
         var el = document.getElementById('ann-content-' + idx);
         if (el.dataset.expanded === "1") {
-            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
             el.dataset.expanded = "0";
         } else {
-            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
             el.dataset.expanded = "1";
         }
     }
     function toggleKbContent(idx, content) {
         var el = document.getElementById('kb-content-' + idx);
         if (el.dataset.expanded === "1") {
-            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
             el.dataset.expanded = "0";
         } else {
-            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;font-size:0.97em;padding:4px 10px;border-radius:4px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
             el.dataset.expanded = "1";
         }
     }

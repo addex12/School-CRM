@@ -124,8 +124,8 @@
             <h4>Quick Links</h4>
             <ul>
                 <li><a href="dashboard.php" class="footer-link">Dashboard</a></li>
-                <li><a href="faq.php" class="footer-link">FAQ</a></li>
-                <li><a href="terms.php" class="footer-link">Terms of Service</a></li>
+                <li><a href="faq.php" class="footer-link" onclick="if(!window.faqExists){alert('FAQ page coming soon!');return false;}">FAQ</a></li>
+                <li><a href="terms.php" class="footer-link" onclick="if(!window.termsExists){alert('Terms of Service page coming soon!');return false;}">Terms of Service</a></li>
             </ul>
         </div>
         <div class="footer-section contact-info">
