@@ -36,8 +36,8 @@ if ($message['sender_id'] != $userId && !$isAdmin) {
     exit;
 }
 
-// Update message
-$stmt = $pdo->prepare("UPDATE messages SET message = ?, edited_at = NOW() WHERE id = ?");
+// Update message (use 'content' column)
+$stmt = $pdo->prepare("UPDATE messages SET content = ?, edited_at = NOW() WHERE id = ?");
 $success = $stmt->execute([$newMessage, $messageId]);
 
 if ($success) {
