@@ -14,7 +14,7 @@ try {
     $input = json_decode(file_get_contents('php://input'), true);
     $contact_id = $input['contact_id'] ?? ($_GET['user_id'] ?? null);
 
-    if (!$contact_id) {
+    if ($contact_id === null || $contact_id === '') {
         throw new Exception('Contact ID required');
     }
 
@@ -37,7 +37,11 @@ try {
             $msg['sent_at'] = $msg['created_at'];
         }
     } else {
-        // Fetch both sent and received messages, respecting soft delete
+        // Ensure both parameters are set and not null
+        $params = [
+            ':current_user' => $current_user_id,
+            ':contact_id' => $contact_id
+        ];
         $stmt = $pdo->prepare("
             SELECT m.*, 
                    us.username AS sender_username, 
@@ -52,10 +56,7 @@ try {
             )
             ORDER BY m.created_at ASC
         ");
-        $stmt->execute([
-            'current_user' => $current_user_id,
-            'contact_id' => $contact_id
-        ]);
+        $stmt->execute($params);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Mark as read
@@ -63,10 +64,7 @@ try {
             UPDATE messages SET is_read = 1
             WHERE receiver_id = :current_user AND sender_id = :contact_id
         ");
-        $update->execute([
-            'current_user' => $current_user_id,
-            'contact_id' => $contact_id
-        ]);
+        $update->execute($params);
 
         foreach ($messages as &$msg) {
             $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
