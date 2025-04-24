@@ -31,13 +31,69 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .header-avatar-container {
-            position: absolute;
-            top: 18px;
-            right: 32px;
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+        .main-header {
+            background: linear-gradient(90deg, #2563eb 0%, #215967 100%);
+            color: #fff;
+            padding: 0;
+            margin: 0;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            position: relative;
+            z-index: 100;
+        }
+        .header-content {
             display: flex;
             align-items: center;
-            z-index: 10;
+            justify-content: space-between;
+            padding: 0.7em 2.2em 0.7em 1.2em;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 1.45em;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .main-nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 5px;
+            margin: 0 2px;
+            font-size: 1em;
+            transition: background 0.18s, color 0.18s;
+            background: transparent;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .main-nav a.active, .main-nav a:hover, .main-nav a:focus {
+            background: #e2efda;
+            color: #215967;
+            font-weight: 600;
+        }
+        .main-nav a.logout {
+            background: #e74c3c;
+            color: #fff;
+            font-weight: 600;
+        }
+        .main-nav a.logout:hover {
+            background: #c0392b;
+            color: #fff;
+        }
+        .header-avatar-container {
+            display: flex;
+            align-items: center;
+            margin-left: 1.5em;
         }
         .header-avatar-img {
             width: 44px;
@@ -48,18 +104,44 @@ if (isset($_SESSION['user_id'])) {
             background: #fff;
             box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
-        @media (max-width: 600px) {
-            .header-avatar-container {
-                top: 10px;
-                right: 10px;
-            }
-            .header-avatar-img {
-                width: 36px;
-                height: 36px;
-            }
+        @media (max-width: 900px) {
+            .header-content { flex-direction: column; align-items: flex-start; gap: 0.7em; padding: 0.7em 1em; }
+            .main-nav { flex-wrap: wrap; gap: 0.3em; }
+            .header-avatar-container { margin-left: 0; }
         }
-        .main-header {
-            position: relative;
+        @media (max-width: 600px) {
+            .header-content { padding: 0.5em 0.5em; }
+            .logo { font-size: 1.1em; }
+            .main-nav a { font-size: 0.97em; padding: 7px 10px; }
+            .header-avatar-img { width: 36px; height: 36px; }
+        }
+        .erpnext-btn {
+            background: #007bfc;
+            color: #fff;
+            border: 1px solid #007bfc;
+            border-radius: 4px;
+            padding: 7px 16px;
+            font-weight: 500;
+            font-size: 1em;
+            transition: background 0.18s, color 0.18s;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .erpnext-btn:hover, .erpnext-btn:focus {
+            background: #215967;
+            color: #fff;
+        }
+        .announcement-bar {
+            background: #f1c40f;
+            color: #215967;
+            padding: 7px 1.5em;
+            font-size: 1em;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 0.2px;
+        }
+        .announcement-bar i {
+            margin-right: 7px;
         }
     </style>
 </head>
@@ -79,10 +161,16 @@ if (isset($_SESSION['user_id'])) {
                 </a>
                 <a href="messages.php" class="<?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Messages
-                </a>    
+                </a>
                 <a href="inbox.php" class="<?= basename($_SERVER['PHP_SELF']) === 'inbox.php' ? 'active' : '' ?>">
                     <i class="fas fa-inbox"></i> Inbox
-                </a>                               
+                </a>
+                <a href="knowledgebase.php" class="<?= basename($_SERVER['PHP_SELF']) === 'knowledgebase.php' ? 'active' : '' ?>">
+                    <i class="fas fa-book"></i> Knowledgebase
+                </a>
+                <a href="announcements.php" class="<?= basename($_SERVER['PHP_SELF']) === 'announcements.php' ? 'active' : '' ?>">
+                    <i class="fas fa-bullhorn"></i> Announcements
+                </a>
                 <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>">
                     <i class="fas fa-user"></i> Account
                 </a>
@@ -96,5 +184,17 @@ if (isset($_SESSION['user_id'])) {
                 </a>
             </div>
         </div>
+        <?php
+        // Show latest announcement bar if available
+        require_once '../includes/config.php';
+        $announcement = $pdo->query("SELECT title, content FROM announcements WHERE NOW() BETWEEN start_date AND end_date ORDER BY start_date DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+        if ($announcement):
+        ?>
+        <div class="announcement-bar">
+            <i class="fas fa-bullhorn"></i>
+            <strong><?= htmlspecialchars($announcement['title']) ?>:</strong>
+            <?= htmlspecialchars($announcement['content']) ?>
+        </div>
+        <?php endif; ?>
     </header>
-    <main class="content-wrapper"></main>
+    <main class="content-wrapper">
