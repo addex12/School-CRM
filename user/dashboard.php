@@ -283,6 +283,53 @@ try {
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+
+            <!-- Announcements Section -->
+            <h2 class="section-title"><i class="fas fa-bullhorn"></i> Announcements</h2>
+            <?php
+            $announcements = $pdo->query("SELECT title, content, start_date, end_date FROM announcements WHERE NOW() BETWEEN start_date AND end_date ORDER BY start_date DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+            <?php if (empty($announcements)): ?>
+                <div style="background:#fff3cd;color:#856404;padding:18px 20px;border-radius:8px;margin-bottom:18px;">
+                    No announcements at this time.
+                </div>
+            <?php else: ?>
+                <div class="survey-cards">
+                    <?php foreach ($announcements as $a): ?>
+                        <div class="survey-card" style="border-left:4px solid #f1c40f;">
+                            <h3 style="color:#215967;"><i class="fas fa-bullhorn"></i> <?= htmlspecialchars($a['title']) ?></h3>
+                            <div class="survey-description"><?= nl2br(htmlspecialchars($a['content'])) ?></div>
+                            <div class="survey-meta">
+                                <strong>From:</strong> <?= date('M j, Y', strtotime($a['start_date'])) ?>
+                                <strong>To:</strong> <?= date('M j, Y', strtotime($a['end_date'])) ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Knowledge Base Section -->
+            <h2 class="section-title"><i class="fas fa-book"></i> Knowledge Base</h2>
+            <?php
+            $kb = $pdo->query("SELECT title, content, updated_at FROM knowledge_base ORDER BY updated_at DESC LIMIT 3")->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+            <?php if (empty($kb)): ?>
+                <div style="background:#f8f9fa;color:#888;padding:18px 20px;border-radius:8px;">
+                    No knowledge base articles yet.
+                </div>
+            <?php else: ?>
+                <div class="survey-cards">
+                    <?php foreach ($kb as $article): ?>
+                        <div class="survey-card" style="border-left:4px solid #007bfc;">
+                            <h3 style="color:#215967;"><i class="fas fa-book"></i> <?= htmlspecialchars($article['title']) ?></h3>
+                            <div class="survey-description"><?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 250, '...'))) ?></div>
+                            <div class="survey-meta">
+                                <strong>Last updated:</strong> <?= date('M j, Y', strtotime($article['updated_at'])) ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
