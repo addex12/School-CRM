@@ -18,69 +18,47 @@ try {
         throw new Exception('Contact ID required');
     }
 
-    if ($contact_id === 'broadcast') {
-        if (!isset($_SESSION['role_id']) || $_SESSION['role_id'] != 1) {
-            throw new Exception('Permission denied');
-        }
-        $stmt = $pdo->prepare("
-            SELECT m.*, u.username AS sender_username
-            FROM messages m
-            JOIN users u ON m.sender_id = u.id
-            WHERE m.receiver_id IS NULL
-            ORDER BY m.sent_at ASC
-        ");
-        $stmt->execute();
-        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // Do NOT run the update query for broadcast
-        foreach ($messages as &$msg) {
-            $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
-            $msg['sender'] = $msg['sender_username'];
-            $msg['sent_at'] = $msg['sent_at'];
-            $msg['message'] = $msg['content'];
-        }
-    } else {
-        if (empty($current_user_id) || empty($contact_id)) {
-            throw new Exception('User ID or Contact ID missing');
-        }
-        $params = [
-            'current_user' => $current_user_id,
-            'contact_id' => $contact_id
-        ];
-        $stmt = $pdo->prepare("
-            SELECT m.*,
-                   us.username AS sender_username,
-                   ur.username AS receiver_username
-            FROM messages m
-            JOIN users us ON m.sender_id = us.id
-            JOIN users ur ON m.receiver_id = ur.id
-            WHERE (
-                (m.sender_id = :current_user AND m.receiver_id = :contact_id AND m.deleted_by_sender = 0)
-                OR
-                (m.sender_id = :contact_id AND m.receiver_id = :current_user AND m.deleted_by_receiver = 0)
-            )
-            ORDER BY m.sent_at ASC
-        ");
-        $stmt->execute($params);
-        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Only support user-to-user messages (no broadcast with receiver_id=NULL)
+    if (!is_numeric($contact_id)) {
+        throw new Exception('Invalid contact ID');
+    }
 
-        // Only run this update for non-broadcast messages and only if contact_id is numeric
-        if (is_numeric($contact_id)) {
-            $update = $pdo->prepare("
-                UPDATE messages SET is_read = 1
-                WHERE receiver_id = :current_user AND sender_id = :contact_id
-            ");
-            $update->execute([
-                'current_user' => $current_user_id,
-                'contact_id' => $contact_id
-            ]);
-        }
+    $params = [
+        ':current_user' => $current_user_id,
+        ':contact_id' => $contact_id
+    ];
 
-        foreach ($messages as &$msg) {
-            $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
-            $msg['sender'] = $msg['sender_username'];
-            $msg['sent_at'] = $msg['sent_at'];
-            $msg['message'] = $msg['content'];
-        }
+    // Fetch messages between current user and contact
+    $stmt = $pdo->prepare("
+        SELECT m.id, m.sender_id, m.receiver_id, m.subject, m.content, m.sent_at, m.is_read, 
+               m.deleted_by_sender, m.deleted_by_receiver, m.created_at,
+               us.username AS sender_username,
+               ur.username AS receiver_username
+        FROM messages m
+        JOIN users us ON m.sender_id = us.id
+        JOIN users ur ON m.receiver_id = ur.id
+        WHERE (
+            (m.sender_id = :current_user AND m.receiver_id = :contact_id AND m.deleted_by_sender = 0)
+            OR
+            (m.sender_id = :contact_id AND m.receiver_id = :current_user AND m.deleted_by_receiver = 0)
+        )
+        ORDER BY m.sent_at ASC
+    ");
+    $stmt->execute($params);
+    $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Mark messages as read (only those received by current user from contact)
+    $update = $pdo->prepare("
+        UPDATE messages SET is_read = 1
+        WHERE receiver_id = :current_user AND sender_id = :contact_id
+    ");
+    $update->execute($params);
+
+    foreach ($messages as &$msg) {
+        $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
+        $msg['sender'] = $msg['sender_username'];
+        $msg['sent_at'] = $msg['sent_at'];
+        $msg['message'] = $msg['content'];
     }
 
     echo json_encode(['success' => true, 'messages' => $messages]);
