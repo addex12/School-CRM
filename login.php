@@ -471,7 +471,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="forgot_password.php" class="forgot-password">Forgot password?</a>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="login-btn">
                     <span>Sign In</span>
                     <i class="fas fa-arrow-right"></i>
                 </button>
@@ -563,6 +563,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             }
             // --- End Activity Tracking ---
+
+            // --- Activity Tracking on Login Button ---
+            document.getElementById('login-btn')?.addEventListener('click', function(e) {
+                // Track login attempt
+                fetch('track_activity.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        action: 'login_attempt',
+                        page: window.location.pathname,
+                        timestamp: new Date().toISOString(),
+                        username: document.getElementById('username')?.value || ''
+                    })
+                });
+            });
+            // --- End Activity Tracking on Login Button ---
         });
     </script>
 </body>
