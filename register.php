@@ -54,12 +54,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $role_id = 6; 
+    // Get role_id from roles table
+    $role_id = null;
+    $roleStmt = $pdo->prepare("SELECT id FROM roles WHERE role_name = ?");
+    $roleStmt->execute([$role]);
+    $role_id = $roleStmt->fetchColumn();
+    if (!$role_id) {
+        $errors['general'] = "Registration failed: Role not found. Please contact admin.";
+    }
 
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)");
-
+        
         if ($stmt->execute([$username, $email, $hashed_password, $role_id])) {
             $_SESSION['success'] = "Registration successful! Please login.";
             header("Location: login.php");
