@@ -14,11 +14,11 @@ requireLogin();
 
 $pageTitle = "Messaging";
 
-// Get all online admins (role_id = 0 and online = 1)
+// Get all online admins (role_id = 0 and online = 1), exclude current user
 $currentUserId = $_SESSION['user_id'];
-$users = $pdo->prepare("SELECT id, username FROM users WHERE role_id = 0 AND online = 1 ORDER BY username");
-$users->execute();
-$users = $users->fetchAll(PDO::FETCH_ASSOC);
+$usersStmt = $pdo->prepare("SELECT id, username FROM users WHERE role_id = 0 AND online = 1 AND id != ? ORDER BY username");
+$usersStmt->execute([$currentUserId]);
+$users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get unread counts for each admin
 $unreadCounts = [];
@@ -92,11 +92,60 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             margin-bottom: 4px;
             display: block;
         }
-        .user-list li.selected {
-            background-color: #eaf3fb;
+        .user-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .user-list li.contact-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 18px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f2f5;
+            transition: background 0.15s;
+            position: relative;
+        }
+        .user-list li.contact-item.selected,
+        .user-list li.contact-item:hover {
+            background: #eaf3fb;
+        }
+        .user-list .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e3eafc;
+            color: #007bfc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-right: 12px;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #44d600;
+            display: inline-block;
+            margin-right: 7px;
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 2px #eaf3fb;
+        }
+        .unread-badge {
+            background: #ff5252;
+            color: #fff;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            padding: 2px 8px;
+            margin-left: auto;
             font-weight: 600;
         }
-        /* ...keep .online-dot, .unread-badge, etc. from messages.css... */
     </style>
 </head>
 <body>
@@ -114,8 +163,12 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                         <i class="fas fa-users"></i> Online Admins
                     </h2>
                     <ul id="user-list" class="user-list">
-                        <?php foreach ($users as $user): ?>
-                            <li data-user-id="<?= $user['id'] ?>" class="contact-item">
+                        <?php foreach ($users as $user): 
+                            $initials = strtoupper(substr($user['username'], 0, 2));
+                            $isSelected = ($selectedUserId && $selectedUserId == $user['id']);
+                        ?>
+                            <li data-user-id="<?= $user['id'] ?>" class="contact-item<?= $isSelected ? ' selected' : '' ?>">
+                                <span class="avatar"><?= htmlspecialchars($initials) ?></span>
                                 <span>
                                     <span class="online-dot"></span>
                                     <?= htmlspecialchars($user['username']) ?>
@@ -156,6 +209,21 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             selectedUserId: <?= $selectedUserId ? json_encode($selectedUserId) : 'null' ?>,
             currentUser: <?= $_SESSION['user_id'] ?? 0 ?>
         };
+
+        // Telegram-style: highlight selected admin in the list
+        document.addEventListener('DOMContentLoaded', function() {
+            const userList = document.getElementById('user-list');
+            if (userList) {
+                userList.addEventListener('click', function(e) {
+                    let li = e.target.closest('li.contact-item');
+                    if (li) {
+                        userList.querySelectorAll('li.contact-item').forEach(el => el.classList.remove('selected'));
+                        li.classList.add('selected');
+                        // Optionally, trigger chat load here
+                    }
+                });
+            }
+        });
     </script>
     <script src="../assets/js/messages.js"></script>
 </body>
