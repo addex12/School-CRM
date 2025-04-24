@@ -609,3 +609,4 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
 // Flush output buffer
 ob_end_flush();
 ?>
+<script src="../includes/activity-tracker.js"></script>

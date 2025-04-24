@@ -149,5 +149,6 @@
     </div>
 </footer>
 <script src="../assets/js/main.js"></script>
+<script src="../includes/activity-tracker.js"></script>
 </body>
 </html>

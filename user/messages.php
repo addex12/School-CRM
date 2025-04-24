@@ -226,6 +226,7 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
         });
     </script>
     <script src="../assets/js/messages.js"></script>
+    <script src="../includes/activity-tracker.js"></script>
 </body>
 </html>
 <?php ob_end_flush(); ?>

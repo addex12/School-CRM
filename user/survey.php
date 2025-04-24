@@ -170,5 +170,6 @@ try {
     </div>
     <?php include 'includes/footer.php'; ?>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="../includes/activity-tracker.js"></script>
 </body>
 </html>

@@ -74,5 +74,6 @@ GitHub: https://github.com/addex12
             });
         });
     </script>
+    <script src="../includes/activity-tracker.js"></script>
 </body>
 </html>

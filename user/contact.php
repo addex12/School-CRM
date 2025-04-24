@@ -150,4 +150,5 @@ body, input, textarea, select, button {
 </div>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
 </div>
+<script src="../includes/activity-tracker.js"></script>
 

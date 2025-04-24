@@ -302,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
+<script src="../includes/activity-tracker.js"></script>
 <style>
 .inbox-container {
     max-width: 1200px;

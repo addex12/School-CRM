@@ -226,5 +226,6 @@ $feedback->execute([$_SESSION['user_id']]);
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <script src="../includes/activity-tracker.js"></script>
 </body>
 </html>

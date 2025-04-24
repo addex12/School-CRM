@@ -30,6 +30,7 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src=../includes/activity-tracker.js"></script>
     <style>
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
         .main-header {

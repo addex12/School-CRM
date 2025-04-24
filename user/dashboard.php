@@ -464,5 +464,6 @@ try {
         });
     });
     </script>
+    <script src="../includes/activity-tracker.js"></script>
 </body>
 </html>

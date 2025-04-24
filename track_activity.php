@@ -38,6 +38,8 @@ $stmt->execute([
     $user_id, $username, $role, $action, $element, $element_id, $element_class, $text, $href, $page, $ip, $timestamp, $created_at
 ]);
 
+// Now supports logging of click, input, copy, paste, cut, focus, blur, etc. via JS tracker
+
 // Also log to activity_log file
 $logLine = json_encode([
     'user_id' => $user_id,

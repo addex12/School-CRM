@@ -82,3 +82,4 @@ body, input, textarea, select, button {
     font-size: 15px;
 }
 </style>
+<script src="../includes/activity-tracker.js"></script>
