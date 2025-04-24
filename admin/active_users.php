@@ -188,7 +188,7 @@ if ($has_users):
             <span style="color:#aaa;">Offline</span>
         <?php endif; ?>
     </td>
-    <td class="role" data-role-id="<?= htmlspecialchars($user['role_id'] ?? '') ?>"><?= htmlspecialchars($user['role_name'] ?? ''])) ?></td>
+    <td class="role" data-role-id="<?= htmlspecialchars($user['role_id'] ?? '') ?>"><?= htmlspecialchars($user['role_name'] ?? '') ?></td>
     <td class="status" data-status="<?= (int)$user['active'] ?>">
         <?= ((int)$user['active'] === 1 ? 'Active' : 'Inactive') ?>
     </td>
