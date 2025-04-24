@@ -7,16 +7,16 @@ requireAdmin();
 $pageTitle = "Admin Messaging";
 
 // Get all non-admin users
-$users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id != 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+$users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id != 1 AND active = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
 // Get all admins (including self)
-$admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1 AND active = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+$admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1  ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
-// Get unread counts for each user
+// Get unread counts for each user (highlight users with unread messages)
 $unreadCounts = [];
-$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY receiver_id");
+$stmt = $pdo->query("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY sender_id");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $unreadCounts[$row['receiver_id']] = $row['unread'];
+    $unreadCounts[$row['sender_id']] = $row['unread'];
 }
 
 // Simulate online users (last_active within 5 minutes)
@@ -163,6 +163,11 @@ foreach ($admins as $a) {
             font-size: 12px;
             margin-left: 7px;
             font-weight: 600;
+        }
+        .user-list li.unread-highlight {
+            background: #fffbe6 !important;
+            font-weight: 600;
+            border-left: 4px solid #e74c3c;
         }
         .chat-section {
             flex: 1;
@@ -338,15 +343,18 @@ foreach ($admins as $a) {
                         </div>
                         <ul id="user-list" class="user-list">
                             <li data-user-id="broadcast" class="contact-item">Broadcast to All Users</li>
-                            <?php foreach ($users as $user): ?>
-                                <li data-user-id="<?= $user['id'] ?>" class="contact-item<?= in_array($user['id'], $onlineUsers) ? ' online' : '' ?>">
+                            <?php foreach ($users as $user): 
+                                $isOnline = in_array($user['id'], $onlineUsers);
+                                $hasUnread = isset($unreadCounts[$user['id']]);
+                            ?>
+                                <li data-user-id="<?= $user['id'] ?>" class="contact-item<?= $isOnline ? ' online' : '' ?><?= $hasUnread ? ' unread-highlight' : '' ?>">
                                     <span>
-                                        <?php if (in_array($user['id'], $onlineUsers)): ?>
+                                        <?php if ($isOnline): ?>
                                             <span class="online-dot"></span>
                                         <?php endif; ?>
                                         <?= htmlspecialchars($user['username']) ?>
                                     </span>
-                                    <?php if (isset($unreadCounts[$user['id']])): ?>
+                                    <?php if ($hasUnread): ?>
                                         <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                     <?php endif; ?>
                                 </li>
