@@ -38,11 +38,14 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     // Always have a valid WHERE clause
     $where_sql = count($where) ? implode(' AND ', $where) : '1';
 
-    // Fix: Remove any parameters from $params that are not present in $where_sql
+    // Ensure $params only contains placeholders present in $where_sql (robust for both :key and key)
     foreach (array_keys($params) as $key) {
-        // PDO placeholders can be used as :key or key, so check both
         $plain = ltrim($key, ':');
-        if (strpos($where_sql, $key) === false && strpos($where_sql, $plain) === false) {
+        if (
+            strpos($where_sql, $key) === false &&
+            strpos($where_sql, $plain) === false &&
+            strpos($where_sql, ':' . $plain) === false
+        ) {
             unset($params[$key]);
         }
     }
