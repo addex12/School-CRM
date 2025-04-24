@@ -55,6 +55,6 @@ $logLine = json_encode([
     'created_at' => $created_at
 ]) . PHP_EOL;
 
-file_put_contents(__DIR__ . '/activity_log', $logLine, FILE_APPEND);
+file_put_contents(__DIR__ . '/log', $logLine, FILE_APPEND);
 
 echo 'ok';
