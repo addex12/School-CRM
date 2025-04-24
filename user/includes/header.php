@@ -185,21 +185,42 @@ if (isset($_SESSION['user_id'])) {
             </div>
         </div>
         <?php
-        // Show latest announcement bar if available
+        // Show latest announcement bar if available (public or assigned to user role)
         require_once '../includes/config.php';
-        $announcement = $pdo->query("SELECT id, title, content FROM announcements WHERE is_public=1 AND NOW() BETWEEN start_date AND end_date ORDER BY start_date DESC LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-        if ($announcement):
+        $userRoleId = $_SESSION['role_id'] ?? null;
+        $announcement = $pdo->query("
+            SELECT id, title, content, is_public, target_roles 
+            FROM announcements 
+            WHERE NOW() BETWEEN start_date AND end_date 
+            ORDER BY start_date DESC
+        ")->fetchAll(PDO::FETCH_ASSOC);
+
+        $showAnnouncement = null;
+        foreach ($announcement as $ann) {
+            if ($ann['is_public']) {
+                $showAnnouncement = $ann;
+                break;
+            }
+            if ($userRoleId && !empty($ann['target_roles'])) {
+                $rolesArr = array_map('trim', explode(',', $ann['target_roles']));
+                if (in_array($userRoleId, $rolesArr)) {
+                    $showAnnouncement = $ann;
+                    break;
+                }
+            }
+        }
+        if ($showAnnouncement):
         ?>
         <div class="announcement-bar" style="font-size:0.93em; cursor:pointer;" onclick="showAnnouncementPopup()">
             <i class="fas fa-bullhorn"></i>
-            <strong><?= htmlspecialchars($announcement['title']) ?></strong>
+            <strong><?= htmlspecialchars($showAnnouncement['title']) ?></strong>
             <span style="font-size:0.93em; color:#215967; margin-left:8px;">(Click to view details)</span>
         </div>
         <div id="announcementPopup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,62,80,0.18);z-index:9999;">
             <div style="background:#fff;max-width:420px;margin:8% auto;padding:28px 22px 18px 22px;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.13);position:relative;">
                 <span onclick="document.getElementById('announcementPopup').style.display='none';" style="position:absolute;top:10px;right:18px;font-size:1.5em;color:#888;cursor:pointer;">&times;</span>
-                <h3 style="color:#215967;margin-top:0;"><i class="fas fa-bullhorn"></i> <?= htmlspecialchars($announcement['title']) ?></h3>
-                <div style="font-size:1em;color:#36414c;"><?= nl2br(htmlspecialchars($announcement['content'])) ?></div>
+                <h3 style="color:#215967;margin-top:0;"><i class="fas fa-bullhorn"></i> <?= htmlspecialchars($showAnnouncement['title']) ?></h3>
+                <div style="font-size:1em;color:#36414c;"><?= nl2br(htmlspecialchars($showAnnouncement['content'])) ?></div>
             </div>
         </div>
         <script>
@@ -210,3 +231,5 @@ if (isset($_SESSION['user_id'])) {
         <?php endif; ?>
     </header>
     <main class="content-wrapper"></main>
+</body>
+</html>
