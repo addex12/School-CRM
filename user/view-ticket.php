@@ -104,5 +104,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <button type="submit" class="erpnext-btn btn-primary">Submit Reply</button>
     </form>
+
+    <!-- Back and Cancel Links -->
+    <div style="margin-top: 20px;">
+        <a href="contact.php" class="erpnext-btn">Back</a>
+        <a href="contact.php" class="erpnext-btn btn-primary">Cancel</a>
+    </div>
 </div>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
