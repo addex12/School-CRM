@@ -6,6 +6,7 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
+ob_start();
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
