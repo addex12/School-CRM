@@ -142,7 +142,7 @@ function getUserRoleName($roleId) {
                 <div class="telegram-chat-container">
                     <div class="telegram-chat-list" id="chatList">
                         <?php foreach ($messages as $message): ?>
-                            <div class="telegram-chat-item <?= $message['sender_id'] == $userId ? 'own' : 'other' ?>">
+                            <div class="telegram-chat-item message-item <?= $message['sender_id'] == $userId ? 'own' : 'other' ?>" data-status="<?= $message['is_read'] ? 'read' : 'unread' ?>">
                                 <div class="chat-header">
                                     <span class="sender"><?= htmlspecialchars($message['sender_name'] ?? '') ?></span>
                                     <span class="date"><?= date('M j, Y g:i a', strtotime($message['sent_at'])) ?></span>
@@ -298,28 +298,28 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const msg = document.getElementById('telegramMessage').value.trim();
         if (!msg) return;
-        // Dynamically get receiverId from PHP array (to avoid JS/PHP mismatch)
+        // Dynamically get receiverId from PHP array (to avoid JS/PHP mismatch)t
         let receiverId = null;
-        <?php
-        // Output a JS array of online admin IDs
-        $adminIds = [];
-        foreach ($onlineAdmins as $admin) {
+        <?php if (!empty($onlineAdmins)): ?>
+        // Output a JS array of online admin IDs0]['id'] ?>;
+        $adminIds = [];empty($onlineUsers)): ?>
+        foreach ($onlineAdmins as $admin) {ers[0]['id'] ?>;
             $adminIds[] = (int)$admin['id'];
-        }
+        }   alert('No one is online to receive your message.');
         $userIds = [];
         foreach ($onlineUsers as $user) {
             $userIds[] = (int)$user['id'];
-        }
-        ?>
-        const onlineAdmins = <?= json_encode($adminIds) ?>;
+        }ormData.append('receiver_id', receiverId);
+        ?>rmData.append('message', msg);
+        const onlineAdmins = <?= json_encode($adminIds) ?>;', {
         const onlineUsers = <?= json_encode($userIds) ?>;
         if (onlineAdmins.length > 0) {
             receiverId = onlineAdmins[0];
         } else if (onlineUsers.length > 0) {
-            receiverId = onlineUsers[0];
-        } else {
+            receiverId = onlineUsers[0];egramMessage').value = '';
+        } else {tion.reload();
             alert('No one is online to receive your message.');
-            return;
+            return;Failed to send message.');
         }
         const formData = new FormData();
         formData.append('receiver_id', receiverId);
@@ -327,184 +327,184 @@ document.addEventListener('DOMContentLoaded', () => {
         const response = await fetch('/api/send_message.php', {
             method: 'POST',
             body: formData
-        });
+        });th: 1200px;
         if (response.ok) {
             document.getElementById('telegramMessage').value = '';
             location.reload();
-        } else {
-            alert('Failed to send message.');
+        } else {s: 8px;
+            alert('Failed to send message.');;
         }
-    });
-});
-</script>
+    });layout {
+}); display: flex;
+</script>32px;
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
 <style>
 .inbox-container {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
+    margin: 0 auto;x;
+    padding: 20px;px;
+    background: #fff;x;
+    border-radius: 8px;;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.inbox-layout {
-    display: flex;
-    gap: 32px;
+}   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+.inbox-layout {: 0;
+    display: flex;tive;
+    gap: 32px;;
     align-items: flex-start;
-}
+}   flex-direction: column;
 .inbox-sidebar {
     width: 290px;
     min-width: 230px;
-    max-width: 320px;
+    max-width: 320px;5rem;
     padding: 18px 15px;
     background: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     flex-shrink: 0;
-    position: relative;
+    position: relative;m;
     z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 18px;
-}
+    gap: 18px;: 1.5px solid #d1d8dd;
+}   margin: 0.5em 0 1.2em 0;
 .sidebar-section {
     margin-bottom: 1.5rem;
-}
-.sidebar-title {
+}   display: flex;
+.sidebar-title {on: column;
     font-size: 1.1em;
     font-weight: 600;
     color: #215967;
     margin-bottom: 0.7em;
-}
+}   align-items: center;
 .sidebar-divider {
-    border: none;
+    border: none;0;
     border-top: 1.5px solid #d1d8dd;
     margin: 0.5em 0 1.2em 0;
-}
+}   width: 10px;
 .online-users-list {
-    display: flex;
+    display: flex; 50%;
     flex-direction: column;
-    gap: 0.5em;
+    gap: 0.5em;line-block;
 }
-.online-user {
-    display: flex;
+.online-user {dmin {
+    display: flex;07bff;
     align-items: center;
     gap: 0.5em;
-    padding: 6px 0;
-}
+    padding: 6px 0;0;
+}   color: #215967;
 .user-status {
     width: 10px;
-    height: 10px;
+    height: 10px;93em;
     border-radius: 50%;
     background: #27ae60;
     display: inline-block;
-}
-.user-status.admin {
+}   color: #888;
+.user-status.admin {m;
     background: #007bff;
 }
-.username {
+.username {tions {
     font-weight: 500;
     color: #215967;
-}
+}   margin-top: 0.5em;
 .user-role {
     font-size: 0.93em;
-    color: #888;
-}
-.no-users {
+    color: #888;#27ae60;
+}   color: #fff;
+.no-users {color: #27ae60;
     color: #888;
     font-size: 0.98em;
-    margin: 0.5em 0;
-}
+    margin: 0.5em 0;150;
+}   color: #fff;
 .message-actions {
     display: flex;
-    gap: 0.5em;
+    gap: 0.5em;ne;
     margin-top: 0.5em;
-}
-.reply-message {
+}   z-index: 9999;
+.reply-message {: 0; width: 100vw; height: 100vh;
     background: #27ae60;
-    color: #fff;
+    color: #fff;rgba(0,0,0,0.25);
     border-color: #27ae60;
-}
+}modal-content {
 .reply-message:hover {
     background: #219150;
-    color: #fff;
-}
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 9999;
+    color: #fff;x 24px 18px 24px;
+}   border-radius: 8px;
+.modal {h: 100%;
+    display: none;px;
+    position: fixed;ve;
+    z-index: 9999;2px 16px rgba(0,0,0,0.13);
     left: 0; top: 0; width: 100vw; height: 100vh;
     overflow: auto;
     background: rgba(0,0,0,0.25);
-}
+}   right: 18px;
 .modal-content {
     background: #fff;
     margin: 7% auto;
     padding: 30px 24px 18px 24px;
     border-radius: 8px;
-    width: 100%;
+    width: 100%;h: 1000px) {
     max-width: 420px;
-    position: relative;
+    position: relative; column;
     box-shadow: 0 2px 16px rgba(0,0,0,0.13);
-}
-.close-modal {
+}   }
+.close-modal {ebar {
     position: absolute;
-    right: 18px;
-    top: 12px;
+    right: 18px;h: 100%;
+    top: 12px;-bottom: 20px;
     font-size: 1.5em;
     color: #888;
-    cursor: pointer;
-}
-@media (max-width: 1000px) {
+    cursor: pointer;00px) {
+}   .main-content-container {
+@media (max-width: 1000px) {2vw;
     .inbox-layout {
         flex-direction: column;
-        gap: 0;
+        gap: 0;: 8px;
     }
     .inbox-sidebar {
-        width: 100%;
+        width: 100%;;
         max-width: 100%;
         margin-bottom: 20px;
-    }
-}
+    } input, textarea, select, button {
+}   font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
 @media (max-width: 700px) {
     .main-content-container {
         padding: 10px 2vw 0 2vw;
-    }
+    }ackground: #f5f7fa;
     .inbox-container {
+        padding: 8px; #d1d8dd;
+    }order-radius: 4px;
+    .inbox-sidebar {x;
         padding: 8px;
-    }
-    .inbox-sidebar {
-        padding: 8px;
-    }
-}
+    }ransition: background 0.2s, color 0.2s;
+}   cursor: pointer;
 body, input, textarea, select, button {
     font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
-    font-size: 15px;
-}
-.erpnext-btn {
+    font-size: 15px;bfc;
+}   color: #fff;
+.erpnext-btn {or: #007bfc;
     background: #f5f7fa;
-    color: #36414c;
+    color: #36414c;imary:hover {
     border: 1px solid #d1d8dd;
     border-radius: 4px;
     padding: 8px 18px;
-    font-weight: 500;
+    font-weight: 500;ndary {
     transition: background 0.2s, color 0.2s;
     cursor: pointer;
-}
+}   border-color: #d1d8dd;
 .erpnext-btn.btn-primary {
-    background: #007bfc;
-    color: #fff;
+    background: #007bfc;ry:hover {
+    color: #fff;#e4e8ec;
     border-color: #007bfc;
-}
+}erpnext-input {
 .erpnext-btn.btn-primary:hover {
     background: #0056b3;
-    color: #fff;
-}
+    color: #fff; 12px;
+}   font-size: 15px;
 .erpnext-btn.btn-secondary {
     background: #f5f7fa;
     color: #36414c;
     border-color: #d1d8dd;
-}
+}   outline: none;
 .erpnext-btn.btn-secondary:hover {
     background: #e4e8ec;
 }
@@ -512,152 +512,140 @@ body, input, textarea, select, button {
     border: 1px solid #d1d8dd;
     border-radius: 4px;
     padding: 8px 12px;
-    font-size: 15px;
+    font-size: 15px;;
     background: #f5f7fa;
-    color: #36414c;
-}
+    color: #36414c;0.7rem;
+}   max-width: 220px;
 .erpnext-input:focus {
     outline: none;
     border-color: #007bfc;
     background: #fff;
-}
-.search-bar {
-    background: #f5f7fa;
+}   border-radius: 4px;
+.search-bar {d: #f9fafb;
+    background: #f5f7fa;1d8dd;
     border-radius: 5px;
     padding: 2px 2px;
     box-shadow: none;
-    border: none;
+    border: none;8px;
     margin-bottom: 0.7rem;
-    max-width: 220px;
-}
-.search-mini {
+    max-width: 220px;x;
+}   margin: 0;
+.search-mini { 28px;
     font-size: 0.95em;
     padding: 4px 6px;
-    border-radius: 4px;
-    background: #f9fafb;
+    border-radius: 4px;;
+    background: #f9fafb;ter;
     border: 1px solid #d1d8dd;
-    margin: 0;
-}
+    margin: 0;ni i {
+}   margin: 0;
 .search-btn-mini {
-    padding: 5px 8px;
-    font-size: 1em;
+    padding: 5px 8px;00px) {
+    font-size: 1em;{
     border-radius: 4px;
-    margin: 0;
-    min-width: 28px;
+    margin: 0;dth: 100%;
+    min-width: 28px;m: 20px;
     min-height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-}
+}       max-width: 100%;
 .search-btn-mini i {
-    margin: 0;
-}
+    margin: 0;ni {
+}       max-width: 70px;
 @media (max-width: 1000px) {
     .inbox-sidebar {
-        width: 100%;
+        width: 100%;00px) {
         max-width: 100%;
-        margin-bottom: 20px;
-    }
-    .search-bar {
+        margin-bottom: 20px;mn;
+    }   gap: 0.15rem;
+    .search-bar {2px 2px;
         flex-wrap: wrap;
         gap: 0.2rem;
         max-width: 100%;
-    }
-    .search-mini {
+    }   width: 100%;
+    .search-mini { 100%;
         max-width: 70px;
     }
-}
+}telegram-chat-container {
 @media (max-width: 700px) {
-    .search-bar {
-        flex-direction: column;
-        gap: 0.15rem;
+    .search-bar {: 8px;
+        flex-direction: column;0,0,0,0.07);
+        gap: 0.15rem;x 10px 18px;
         padding: 2px 2px;
         max-width: 100%;
-    }
+    }lex-direction: column;
     .search-mini {
-        width: 100%;
+        width: 100%;;
         max-width: 100%;
-    }
-}
+    }gram-chat-list {
+}   flex: 1;
 .telegram-chat-container {
     background: #f5f7fa;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.07);
     padding: 18px 18px 10px 18px;
     min-height: 350px;
-    display: flex;
+    display: flex;m {
     flex-direction: column;
-    height: 500px;
-    max-height: 60vh;
-}
-.telegram-chat-list {
-    flex: 1;
-    overflow-y: auto;
+    height: 500px;16px;
+    max-height: 60vh;px;
+}   background: #fff;
+.telegram-chat-list { 2px rgba(44,62,80,0.04);
+    flex: 1;ottom: 0.2em;
+    overflow-y: auto;start;
     margin-bottom: 1em;
     display: flex;
     flex-direction: column;
-    gap: 0.7em;
-}
+    gap: 0.7em; #e2efda;
+}   align-self: flex-end;
 .telegram-chat-item {
-    max-width: 80%;
+    max-width: 80%; .chat-header {
     padding: 12px 16px;
     border-radius: 12px;
     background: #fff;
     box-shadow: 0 1px 2px rgba(44,62,80,0.04);
     margin-bottom: 0.2em;
-    align-self: flex-start;
+    align-self: flex-start;between;
     position: relative;
-}
+}telegram-chat-item .chat-body .subject {
 .telegram-chat-item.own {
     background: #e2efda;
     align-self: flex-end;
-}
+}   margin-bottom: 0.2em;
 .telegram-chat-item .chat-header {
-    font-size: 0.97em;
+    font-size: 0.97em;hat-body .content {
     color: #215967;
     font-weight: 600;
     margin-bottom: 0.2em;
-    display: flex;
+    display: flex;m .chat-actions {
     justify-content: space-between;
-}
+}   display: flex;
 .telegram-chat-item .chat-body .subject {
     font-size: 1em;
     font-weight: 500;
-    color: #007bfc;
+    color: #007bfc; solid #d1d8dd;
     margin-bottom: 0.2em;
-}
+}   background: #f5f7fa;
 .telegram-chat-item .chat-body .content {
     font-size: 1em;
-    color: #36414c;
-}
+    color: #36414c;20px;
+}   padding: 10px 16px;
 .telegram-chat-item .chat-actions {
-    margin-top: 0.5em;
-    display: flex;
+    margin-top: 0.5em;#d1d8dd;
+    display: flex;ff;
     gap: 0.5em;
-}
-.telegram-send-form {
+}media (max-width: 900px) {
+.telegram-send-form {ntainer {
     border-top: 1px solid #d1d8dd;
-    padding-top: 0.7em;
+    padding-top: 0.7em;px;
     background: #f5f7fa;
-}
-#telegramMessage {
+}   }
+#telegramMessage {-item {
     border-radius: 20px;
-    padding: 10px 16px;
+    padding: 10px 16px;px;
     font-size: 1em;
     border: 1px solid #d1d8dd;
     background: #fff;
 }
 @media (max-width: 900px) {
-    .telegram-chat-container {
-        padding: 8px 4px 6px 4px;
-        min-height: 220px;
-        height: 320px;
-    }
-    .telegram-chat-item {
-        max-width: 96%;
-        padding: 8px 10px;
-    }
-}
-</style>
-
-<?php ob_end_flush(); ?>
+    .telegram-chat-container {        padding: 8px 4px 6px 4px;        min-height: 220px;        height: 320px;    }    .telegram-chat-item {        max-width: 96%;        padding: 8px 10px;    }}</style><?php ob_end_flush(); ?>
