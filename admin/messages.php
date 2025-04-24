@@ -9,6 +9,9 @@ $pageTitle = "Admin Messaging";
 // Get all non-admin users
 $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id != 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
+// Get all admins (including self)
+$admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+
 // Get unread counts for each user
 $unreadCounts = [];
 $stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY receiver_id");
@@ -22,6 +25,13 @@ $onlineUsers = [];
 foreach ($users as $u) {
     if (!empty($u['last_active']) && strtotime($u['last_active']) > $now - 300) {
         $onlineUsers[] = $u['id'];
+    }
+}
+// Simulate online admins
+$onlineAdmins = [];
+foreach ($admins as $a) {
+    if (!empty($a['last_active']) && strtotime($a['last_active']) > $now - 300) {
+        $onlineAdmins[] = $a['id'];
     }
 }
 ?>
@@ -270,6 +280,13 @@ foreach ($users as $u) {
                         <div class="online-users">
                             <i class="fas fa-circle" style="color:#27ae60;font-size:0.9em;"></i>
                             Online:
+                            <?php foreach ($admins as $admin): ?>
+                                <?php if (in_array($admin['id'], $onlineAdmins)): ?>
+                                    <span class="online-user-pill" style="background:#007bff;">
+                                        <?= htmlspecialchars($admin['username']) ?> (Admin)
+                                    </span>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
                             <?php foreach ($users as $user): ?>
                                 <?php if (in_array($user['id'], $onlineUsers)): ?>
                                     <span class="online-user-pill"><?= htmlspecialchars($user['username']) ?></span>
