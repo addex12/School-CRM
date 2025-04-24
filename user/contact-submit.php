@@ -7,17 +7,7 @@
  * GitHub: https://github.com/addex12
  */
 require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/db.php';
-
-// Ensure $pdo is initialized
-if (!isset($pdo)) {
-    try {
-        $pdo = new PDO('mysql:host=your_host;dbname=your_database', 'your_username', 'your_password');
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        die('Database connection failed: ' . $e->getMessage());
-    }
-}
+require_once __DIR__ . '/../includes/db.php'; // Ensure this file initializes $pdo
 
 // Get user information
 $user_id = $_SESSION['user_id'] ?? null;
