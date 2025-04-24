@@ -14,14 +14,14 @@ error_log("GET: " . print_r($_GET, true));
 error_log("SESSION: " . print_r($_SESSION, true));
 
 // Validate input
-if (!isset($_GET['user_id'])) {
+if (!isset($_GET['sender_id'])) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing user_id']);
+    echo json_encode(['success' => false, 'error' => 'Missing sender_id']);
     exit;
 }
 
 $current_user_id = $_SESSION['sender_id'] ?? null;
-$other_user_id = $_GET['sender_id'] ?? null;
+$other_user_id = $_GET['sender_id'];
 
 if (!$current_user_id) {
     http_response_code(401);
