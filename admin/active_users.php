@@ -17,7 +17,8 @@ $role_id = trim($_GET['role'] ?? '');
 // Add status filter
 $status_filter = isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['status'] === '1') ? $_GET['status'] : '';
 
-$where = ["u.active = 1"];
+// Only filter by active if status filter is set, otherwise show all
+$where = [];
 $params = [];
 
 if ($search !== '') {
@@ -34,6 +35,11 @@ if ($role_id !== '') {
 if ($status_filter !== '') {
     $where[] = "u.active = :status";
     $params[':status'] = $status_filter;
+}
+
+// If no status filter, show only active users by default
+if ($status_filter === '') {
+    $where[] = "u.active = 1";
 }
 
 $where_sql = implode(' AND ', $where);
@@ -80,7 +86,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     $role_id = trim($_GET['role'] ?? '');
     $status_filter = isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['status'] === '1') ? $_GET['status'] : '';
 
-    $where = ["u.active = 1"];
+    $where = [];
     $params = [];
 
     if ($search !== '') {
@@ -97,6 +103,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     if ($status_filter !== '') {
         $where[] = "u.active = :status";
         $params[':status'] = $status_filter;
+    }
+    // If no status filter, show only active users by default
+    if ($status_filter === '') {
+        $where[] = "u.active = 1";
     }
 
     $where_sql = implode(' AND ', $where);
