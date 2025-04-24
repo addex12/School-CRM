@@ -67,7 +67,10 @@ try {
             UPDATE messages SET is_read = 1
             WHERE receiver_id = :current_user AND sender_id = :contact_id
         ");
-        $update->execute($params);
+        $update->execute([
+            'current_user' => $current_user_id,
+            'contact_id' => $contact_id
+        ]);
 
         foreach ($messages as &$msg) {
             $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
