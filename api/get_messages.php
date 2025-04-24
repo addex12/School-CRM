@@ -46,7 +46,7 @@ try {
         
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':current_user_id', $current_user_id, PDO::PARAM_INT);
-        $stmt->execute();
+        $success = $stmt->execute();
     } else {
         // Handle one-to-one conversations
         $query = "SELECT m.*, u.username as sender 
@@ -57,13 +57,13 @@ try {
                  ORDER BY m.sent_at ASC";
         
         $stmt = $pdo->prepare($query);
-        $stmt->execute([
+        $success = $stmt->execute([
             'current_user_id' => $current_user_id,
             'other_user_id' => $other_user_id
         ]);
     }
 
-    if (!$stmt->execute()) {
+    if (!$success) {
         $error = $stmt->errorInfo();
         throw new Exception("Query failed: " . $error[2]);
     }
