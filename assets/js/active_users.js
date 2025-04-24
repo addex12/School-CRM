@@ -15,7 +15,7 @@ function fetchUsers() {
     if (roleInput.value) params.append('role', roleInput.value);
     if (statusInput.value !== "") params.append('status', statusInput.value);
 
-    fetch('active_users.php?' + params.toString())
+    fetch('admin/ajax_active_users.php?' + params.toString())
         .then(res => res.text())
         .then(html => {
             usersTableBody.innerHTML = html;
@@ -42,7 +42,7 @@ function saveRow(tr) {
     const username = tr.querySelector('.username').value.trim();
     const role_id = tr.querySelector('.role').value;
     const online = tr.querySelector('.online').checked ? 1 : 0;
-    fetch('active_users.php', {
+    fetch('admin/ajax_active_users.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: new URLSearchParams({
@@ -66,7 +66,7 @@ function saveRow(tr) {
 function deleteRow(tr) {
     const id = tr.getAttribute('data-id');
     if (!confirm('Are you sure you want to delete this user?')) return;
-    fetch('active_users.php', {
+    fetch('admin/ajax_active_users.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: new URLSearchParams({
@@ -166,7 +166,7 @@ function makeEditableRow(tr) {
         const role_id = roleTd.querySelector('select').value;
         const status = statusTd.querySelector('select').value;
         // Always set online to false (0) when saving
-        fetch('active_users.php', {
+        fetch('admin/ajax_active_users.php', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: new URLSearchParams({
@@ -236,7 +236,7 @@ bulkDeleteBtn.addEventListener('click', function() {
     if (!rows.length) return;
     if (!confirm('Delete selected users?')) return;
     const ids = rows.map(tr => tr.getAttribute('data-id'));
-    fetch('active_users.php', {
+    fetch('admin/ajax_active_users.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: new URLSearchParams({
@@ -255,7 +255,7 @@ bulkStatusSelect.addEventListener('change', function() {
     const status = bulkStatusSelect.value;
     if (!rows.length || status === "") return;
     const ids = rows.map(tr => tr.getAttribute('data-id'));
-    fetch('active_users.php', {
+    fetch('admin/ajax_active_users.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: new URLSearchParams({
@@ -276,7 +276,7 @@ bulkRoleSelect.addEventListener('change', function() {
     const role_id = bulkRoleSelect.value;
     if (!rows.length || role_id === "") return;
     const ids = rows.map(tr => tr.getAttribute('data-id'));
-    fetch('active_users.php', {
+    fetch('admin/ajax_active_users.php', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: new URLSearchParams({
@@ -304,5 +304,66 @@ bulkExportBtn.addEventListener('click', function() {
     if (roleInput.value) params.append('role', roleInput.value);
     if (statusInput.value !== "") params.append('status', statusInput.value);
 
-    window.open('active_users.php?' + params.toString(), '_blank');
+    window.open('admin/ajax_active_users.php?' + params.toString(), '_blank');
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Edit button functionality
+    document.querySelectorAll('.crud-btn.edit').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var tr = btn.closest('tr');
+            if (!tr) return;
+            if (tr.classList.contains('editing')) return;
+            tr.classList.add('editing');
+            // ...existing code for edit UI...
+            // Save handler
+            actionsTd.querySelector('.save').addEventListener('click', function() {
+                var newUsername = usernameTd.querySelector('input').value.trim();
+                var newRoleId = roleTd.querySelector('select').value;
+                var newStatus = statusTd.querySelector('select').value;
+                var userId = tr.getAttribute('data-id');
+                var formData = new FormData();
+                formData.append('ajax', 'update_user');
+                formData.append('id', userId);
+                formData.append('username', newUsername);
+                formData.append('role_id', newRoleId);
+                formData.append('status', newStatus);
+                fetch('admin/ajax_active_users.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.text())
+                .then(function(response) {
+                    // ...existing code...
+                });
+            });
+            // ...existing code...
+        });
+    });
+
+    // Delete button functionality
+    function deleteHandler(e) {
+        var btn = e.target.closest('.crud-btn.delete');
+        var tr = btn.closest('tr');
+        var userId = tr.getAttribute('data-id');
+        if (confirm('Are you sure you want to delete this user?')) {
+            var formData = new FormData();
+            formData.append('ajax', 'delete_user');
+            formData.append('id', userId);
+            fetch('admin/ajax_active_users.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.text())
+            .then(function(response) {
+                // ...existing code...
+            });
+        }
+    }
+    document.querySelectorAll('.crud-btn.delete').forEach(function(btn) {
+        btn.addEventListener('click', deleteHandler);
+    });
+
+    // All other AJAX (search/filter, bulk actions, export) should also use 'admin/ajax_active_users.php'
+    // ...existing code...
 });
