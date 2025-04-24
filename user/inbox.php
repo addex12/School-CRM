@@ -111,16 +111,16 @@ function getUserRoleName($roleId) {
                 <hr class="sidebar-divider">
                 <div class="sidebar-section">
                     <h3 class="sidebar-title">Online Users</h3>
-                    <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.5rem;">
-                        <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input" style="flex:1;">
-                        <select name="role" id="roleFilter" class="erpnext-input">
+                    <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.3rem;align-items:center;">
+                        <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input search-mini" style="flex:1;max-width:110px;">
+                        <select name="role" id="roleFilter" class="erpnext-input search-mini" style="max-width:90px;">
                             <option value="">All Roles</option>
                             <?php foreach ($roles as $role): ?>
                                 <option value="<?= htmlspecialchars($role) ?>" <?= $role === $roleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i></button>
-                        <a href="inbox.php" class="erpnext-btn btn-secondary">Clear</a>
+                        <button type="submit" class="erpnext-btn btn-primary search-btn-mini" title="Search"><i class="fas fa-search"></i></button>
+                        <a href="inbox.php" class="erpnext-btn btn-secondary search-btn-mini" title="Clear"><i class="fas fa-times"></i></a>
                     </form>
                     <div class="online-users-list">
                         <?php if (count($onlineUsers) > 0): ?>
@@ -482,6 +482,61 @@ body, input, textarea, select, button {
     outline: none;
     border-color: #007bfc;
     background: #fff;
+}
+.search-bar {
+    background: #f5f7fa;
+    border-radius: 5px;
+    padding: 3px 4px;
+    box-shadow: none;
+    border: none;
+    margin-bottom: 0.7rem;
+}
+.search-mini {
+    font-size: 0.97em;
+    padding: 5px 8px;
+    border-radius: 4px;
+    background: #f9fafb;
+    border: 1px solid #d1d8dd;
+    margin: 0;
+}
+.search-btn-mini {
+    padding: 6px 10px;
+    font-size: 1em;
+    border-radius: 4px;
+    margin: 0;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.search-btn-mini i {
+    margin: 0;
+}
+@media (max-width: 1000px) {
+    .inbox-sidebar {
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+    .search-bar {
+        flex-wrap: wrap;
+        gap: 0.3rem;
+    }
+    .search-mini {
+        max-width: 100px;
+    }
+}
+@media (max-width: 700px) {
+    .search-bar {
+        flex-direction: column;
+        gap: 0.2rem;
+        padding: 2px 2px;
+    }
+    .search-mini {
+        width: 100%;
+        max-width: 100%;
+    }
 }
 </style>
 
