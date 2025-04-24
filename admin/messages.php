@@ -5,20 +5,15 @@ require_once '../includes/db.php';
 requireAdmin();
 
 $pageTitle = "Admin Messaging";
-$isAdmin = ($_SESSION['role_id'] ?? 0) === 1; // Changed to role_id to match your DB
 
 // Get all non-admin users
 $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id != 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
-// Get unread counts for each user (messages sent to admin)
+// Get unread counts for each user
 $unreadCounts = [];
-$admin_id = $_SESSION['user_id'] ?? null; // Changed from sender_id to user_id
-if ($admin_id) {
-    $stmt = $pdo->prepare("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = :admin_id GROUP BY sender_id");
-    $stmt->execute(['admin_id' => $admin_id]);
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $unreadCounts[$row['sender_id']] = $row['unread'];
-    }
+$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY receiver_id");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $unreadCounts[$row['receiver_id']] = $row['unread'];
 }
 
 // Simulate online users (last_active within 5 minutes)
@@ -33,11 +28,234 @@ foreach ($users as $u) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Rest of the head section remains the same -->
+    <meta charset="UTF-8">
+    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
+        .messaging-container {
+            display: flex;
+            height: 70vh;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+        }
+        .contact-list {
+            width: 270px;
+            border-right: 1px solid #e5e7eb;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+        }
+        .contact-list-header {
+            padding: 1rem 1.2rem 0.5rem 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #215967;
+            background: #f5f7fa;
+        }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem 0.5rem 1.2rem;
+            background: #f5f7fa;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 1rem;
+        }
+        .search-bar .erpnext-btn {
+            padding: 8px 16px;
+            font-size: 1em;
+        }
+        .online-users {
+            padding: 0.5rem 1.2rem 0.5rem 1.2rem;
+            background: #e2efda;
+            border-bottom: 1px solid #e5e7eb;
+            color: #215967;
+            font-size: 0.98em;
+        }
+        .online-user-pill {
+            display: inline-block;
+            background: #27ae60;
+            color: #fff;
+            border-radius: 1em;
+            padding: 0.2em 0.9em;
+            font-size: 0.97em;
+            margin-right: 0.4em;
+        }
+        .user-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .user-list li {
+            padding: 10px 1.2rem;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1em;
+            transition: background 0.13s;
+        }
+        .user-list li:hover {
+            background-color: #e2efda;
+        }
+        .user-list li.selected {
+            background-color: #dbeafe;
+        }
+        .user-list .online-dot {
+            width: 10px;
+            height: 10px;
+            background: #27ae60;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 7px;
+        }
+        .unread-badge {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 12px;
+            margin-left: 7px;
+            font-weight: 600;
+        }
+        .chat-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .chat-header {
+            padding: 1rem 1.5rem 0.7rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #215967;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f5f7fa;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 15px 18px;
+            overflow-y: auto;
+            background: #f9f9f9;
+        }
+        .message-form {
+            padding: 15px 18px;
+            border-top: 1px solid #e5e7eb;
+            background: #fff;
+            display: flex;
+            gap: 1rem;
+        }
+        .message-form textarea {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 1rem;
+            resize: none;
+        }
+        .message-form .erpnext-btn {
+            padding: 10px 22px;
+            font-size: 1em;
+        }
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px 14px;
+            border-radius: 7px;
+            max-width: 70%;
+            word-break: break-word;
+            font-size: 1em;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+        }
+        .chat-message.own {
+            background-color: #e2efda;
+            margin-left: auto;
+            color: #215967;
+        }
+        .chat-message.other {
+            background-color: #f1f1f1;
+            margin-right: auto;
+            color: #222d32;
+        }
+        .msg-time {
+            font-size: 12px;
+            color: #777;
+            display: block;
+            margin-top: 5px;
+        }
+        .edit-btn, .delete-btn {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 0.98em;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        .edit-btn:hover, .delete-btn:hover {
+            color: #e74c3c;
+        }
+        @media (max-width: 900px) {
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 400px;
+            }
+            .contact-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                min-height: 60px;
+                max-height: 120px;
+            }
+            .chat-section {
+                min-width: 0;
+            }
+        }
+        @media (max-width: 600px) {
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .contact-list {
+                width: 100%;
+                min-width: 0;
+                max-width: 100vw;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                font-size: 0.98em;
+            }
+            .chat-section {
+                min-width: 0;
+            }
+            .chat-messages {
+                padding: 8px;
+            }
+            .message-form {
+                padding: 8px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header"><h1 style="color:#215967;font-weight:700;"><i class="fas fa-envelope"></i> <?= htmlspecialchars($pageTitle) ?></h1></header>
             <div class="content">
@@ -103,8 +321,7 @@ foreach ($users as $u) {
             const clearUserSearch = document.getElementById('clearUserSearch');
 
             let selectedUserId = null;
-            let currentUser = <?= (int)($_SESSION['user_id'] ?? 0) ?>; // Changed from sender_id to user_id
-            let isAdmin = <?= $isAdmin ? 'true' : 'false' ?>;
+            let currentUser = <?= $_SESSION['user_id'] ?? 0 ?>;
 
             // Prepare users data for search
             const usersData = <?= json_encode($users) ?>;
@@ -113,7 +330,7 @@ foreach ($users as $u) {
             function filterUserList() {
                 const val = userSearch.value.toLowerCase();
                 userList.querySelectorAll('li.contact-item').forEach(function(li) {
-                    if (li.dataset.userId === "broadcast") return;
+                    if (li.dataset.userId === "broadcast") return; // always show broadcast
                     const username = li.textContent.toLowerCase();
                     li.style.display = username.includes(val) ? '' : 'none';
                 });
@@ -132,49 +349,47 @@ foreach ($users as $u) {
             // Load messages for selected user
             function loadMessages(userId) {
                 if (!userId) return;
-                // Use GET and sender_id to match your API
-                fetch('../api/get_messages.php?sender_id=' + encodeURIComponent(userId))
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        chatMessages.innerHTML = '';
-                        if (data.messages.length > 0) {
-                            data.messages.forEach(msg => {
-                                const messageDiv = document.createElement('div');
-                                messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
-                                let showEdit = msg.is_own || isAdmin;
-                                messageDiv.innerHTML = `
-                                    <strong>${msg.sender}</strong>
-                                    <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
-                                    <span class="msg-time">${msg.sent_at}</span>
-                                    ${
-                                        showEdit
-                                        ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
-                                           <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
-                                        : ''
-                                    }
-                                `;
-                                chatMessages.appendChild(messageDiv);
-                            });
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                            markAsRead(userId);
+                fetch(`../api/get_messages.php?user_id=${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            chatMessages.innerHTML = '';
+                            if (data.messages.length > 0) {
+                                data.messages.forEach(msg => {
+                                    const messageDiv = document.createElement('div');
+                                    messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
+                                    messageDiv.innerHTML = `
+                                        <strong>${msg.sender}</strong>
+                                        <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
+                                        <span class="msg-time">${msg.sent_at}</span>
+                                        ${
+                                            msg.is_own
+                                            ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
+                                               <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
+                                            : ''
+                                        }
+                                    `;
+                                    chatMessages.appendChild(messageDiv);
+                                });
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                                markAsRead(userId);
+                            } else {
+                                chatMessages.innerHTML = '<p>No messages yet. Start the conversation!</p>';
+                            }
                         } else {
-                            chatMessages.innerHTML = '<p>No messages yet. Start the conversation!</p>';
+                            chatMessages.innerHTML = `<p>Error loading messages: ${data.error}</p>`;
                         }
-                    } else {
-                        chatMessages.innerHTML = `<p>Error loading messages: ${data.error}</p>`;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    chatMessages.innerHTML = '<p>Error loading messages</p>';
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        chatMessages.innerHTML = '<p>Error loading messages</p>';
+                    });
             }
 
             // Mark messages as read
             function markAsRead(senderId) {
                 if (senderId === 'broadcast') return;
-                fetch(`../api/mark_read.php?sender_id=${senderId}`)
+                fetch(`../api/mark_read.php?user_id=${senderId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -193,7 +408,7 @@ foreach ($users as $u) {
                 if (!message || !selectedUserId) return;
                 const formData = new FormData();
                 formData.append('receiver_id', selectedUserId);
-                formData.append('content', message);
+                formData.append('message', message);
                 fetch('../api/send_message.php', {
                     method: 'POST',
                     body: formData
@@ -235,28 +450,24 @@ foreach ($users as $u) {
                 }
             }, 5000);
 
-            // Handle Edit and Delete actions
+            // The following endpoints are used for message CRUD via AJAX:
+            //   - ../api/edit_message.php
+            //   - ../api/delete_message.php
+
+            // Handle Edit and Delete actions with robust event delegation
             chatMessages.addEventListener('click', function(e) {
                 // Edit message
                 const editBtn = e.target.closest('.edit-btn');
                 if (editBtn) {
                     e.preventDefault();
                     const msgId = editBtn.getAttribute('data-msg-id');
-                    let oldText = '';
-                    try {
-                        oldText = decodeURIComponent(editBtn.getAttribute('data-msg-text'));
-                    } catch (err) {
-                        oldText = '';
-                    }
+                    const oldText = decodeURIComponent(editBtn.getAttribute('data-msg-text'));
                     const newText = prompt('Edit your message:', oldText);
                     if (newText !== null && newText.trim() !== '' && newText !== oldText) {
-                        const formData = new FormData();
-                        formData.append('id', msgId);
-                        formData.append('content', newText);
-                        
                         fetch('../api/edit_message.php', {
                             method: 'POST',
-                            body: formData
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: msgId, message: newText })
                         })
                         .then(res => res.json())
                         .then(data => {
@@ -275,12 +486,10 @@ foreach ($users as $u) {
                     e.preventDefault();
                     const msgId = deleteBtn.getAttribute('data-msg-id');
                     if (confirm('Are you sure you want to delete this message?')) {
-                        const formData = new FormData();
-                        formData.append('id', msgId);
-                        
                         fetch('../api/delete_message.php', {
                             method: 'POST',
-                            body: formData
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id: msgId })
                         })
                         .then(res => res.json())
                         .then(data => {
@@ -296,6 +505,7 @@ foreach ($users as $u) {
             });
 
             // Show online users at the top by default
+            // Move online users to top of the list
             function moveOnlineUsersToTop() {
                 const ul = document.getElementById('user-list');
                 const online = [];
@@ -320,3 +530,4 @@ foreach ($users as $u) {
     </script>
 </body>
 </html>
+<?php ob_end_flush(); ?>

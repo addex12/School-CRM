@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $current_user_id = $_SESSION['user_id'] ?? null;
 $receiver_id = $_POST['receiver_id'] ?? null;
-$content = trim($_POST['content'] ?? '');
+$message = trim($_POST['message'] ?? '');
 
 if (!$current_user_id) {
     http_response_code(401);
@@ -21,42 +21,32 @@ if (!$current_user_id) {
     exit;
 }
 
-if (!$receiver_id || !$content) {
+if (!$receiver_id || !$message) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing receiver_id or content']);
+    echo json_encode(['success' => false, 'error' => 'Missing receiver_id or message']);
     exit;
 }
 
 try {
     if ($receiver_id === 'broadcast') {
         // Send to all non-admin users
-        $stmt = $pdo->query("SELECT id FROM users WHERE role_id != 1 AND id != $current_user_id");
+        $stmt = $pdo->query("SELECT id FROM users WHERE role_id != 1");
         $user_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-        if (empty($user_ids)) {
-            echo json_encode(['success' => false, 'error' => 'No users to broadcast to']);
-            exit;
-        }
-
+        
         $pdo->beginTransaction();
-        $stmt = $pdo->prepare("
-            INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
-            VALUES (?, ?, ?, NOW(), 0)
-        ");
-
+        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read, is_admin) 
+                              VALUES (?, ?, ?, NOW(), 0, 1)");
+        
         foreach ($user_ids as $uid) {
-            $stmt->execute([$current_user_id, $uid, $content]);
+            $stmt->execute([$current_user_id, $uid, $message]);
         }
-
+        
         $pdo->commit();
     } else {
-        // Single recipient message
-        $receiver_id = (int)$receiver_id;
-        $stmt = $pdo->prepare("
-            INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
-            VALUES (?, ?, ?, NOW(), 0)
-        ");
-        $stmt->execute([$current_user_id, $receiver_id, $content]);
+        // Send to single user
+        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read, is_admin) 
+                              VALUES (?, ?, ?, NOW(), 0, 1)");
+        $stmt->execute([$current_user_id, $receiver_id, $message]);
     }
     
     echo json_encode(['success' => true]);

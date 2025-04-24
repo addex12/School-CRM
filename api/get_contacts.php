@@ -13,10 +13,9 @@ try {
     }
     
     $contacts = [];
-    $isAdmin = ($_SESSION['role_id'] ?? 0) == 1;
     
     // Add broadcast option for admins
-    if ($isAdmin) {
+    if (isAdmin()) {
         $contacts[] = [
             'id' => 'broadcast',
             'username' => 'Broadcast to All Users',
@@ -32,7 +31,6 @@ try {
         LEFT JOIN messages m ON m.sender_id = u.id 
             AND m.receiver_id = :current_user 
             AND m.is_read = 0
-            AND m.deleted_by_receiver = 0
         WHERE u.id != :current_user
         GROUP BY u.id, u.username
         ORDER BY u.username
@@ -53,4 +51,9 @@ try {
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+}
+
+function isAdmin() {
+    // Implement your admin check logic here
+    return $_SESSION['role_id'] ?? 0 === 1;
 }
