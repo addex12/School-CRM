@@ -12,7 +12,8 @@
             { "title": "User List", "icon": "users", "link": "users.php" },
             { "title": "Add User", "icon": "user-plus", "link": "add_users.php" },
             { "title": "Active Users", "icon": "user-tag", "link": "active_users.php" },
-            { "title": "Edit Users", "icon": "edit", "link": "edit_user.php" }
+            { "title": "Edit Users", "icon": "edit", "link": "edit_user.php" },
+            { "title": "User Roles", "icon": "user-lock", "link": "user_roles.php" }
 
         ],
         "id": "users-menu"

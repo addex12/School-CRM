@@ -12,160 +12,166 @@ require_once '../includes/config.php';
 
 $pageTitle = "Manage User Roles";
 
-// Handle add/edit/delete role actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    try {
-        if (isset($_POST['add_role'])) {
-            $role_name = trim($_POST['role_name']);
-            if (empty($role_name)) throw new Exception("Role name is required.");
-            $stmt = $pdo->prepare("INSERT INTO roles (role_name) VALUES (?)");
+// Handle add role
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_role'])) {
+    $role_name = trim($_POST['role_name']);
+    if ($role_name !== '') {
+        $stmt = $pdo->prepare("INSERT INTO roles (role_name) VALUES (?)");
+        try {
             $stmt->execute([$role_name]);
             $_SESSION['success'] = "Role added successfully!";
-            header("Location: user_roles.php");
-            exit();
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Error: " . $e->getMessage();
         }
-        if (isset($_POST['edit_role'])) {
-            $role_id = intval($_POST['role_id']);
-            $role_name = trim($_POST['role_name']);
-            if (empty($role_name)) throw new Exception("Role name is required.");
-            $stmt = $pdo->prepare("UPDATE roles SET role_name = ? WHERE id = ?");
-            $stmt->execute([$role_name, $role_id]);
-            $_SESSION['success'] = "Role updated successfully!";
-            header("Location: user_roles.php");
-            exit();
-        }
-        if (isset($_POST['delete_role'])) {
-            $role_id = intval($_POST['role_id']);
-            $stmt = $pdo->prepare("DELETE FROM roles WHERE id = ?");
-            $stmt->execute([$role_id]);
-            $_SESSION['success'] = "Role deleted successfully!";
-            header("Location: user_roles.php");
-            exit();
-        }
-    } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
+    } else {
+        $_SESSION['error'] = "Role name cannot be empty.";
     }
+    header("Location: user_roles.php");
+    exit;
 }
 
 // Fetch all roles
-$roles = $pdo->query("SELECT * FROM roles ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
+$roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll(PDO::FETCH_ASSOC);
+
+// Handle delete role
+if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
+    $role_id = intval($_GET['delete']);
+    $stmt = $pdo->prepare("DELETE FROM roles WHERE id = ?");
+    try {
+        $stmt->execute([$role_id]);
+        $_SESSION['success'] = "Role deleted successfully!";
+    } catch (PDOException $e) {
+        $_SESSION['error'] = "Error: " . $e->getMessage();
+    }
+    header("Location: user_roles.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Roles - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <title>User Roles Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
-        .roles-container {
+        body { font-family: Inter, Arial, sans-serif; background: #f5f7fa; margin: 0; }
+        .container { margin-left: 270px; padding: 2rem; }
+        .erp-card {
             background: #fff;
-            border-radius: 12px;
+            border-radius: 8px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
         }
-        .roles-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .roles-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .roles-table {
+        h2 { color: #215967; margin-bottom: 1.5rem; }
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
             width: 100%;
-            border-collapse: collapse;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
         }
-        .roles-table th, .roles-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
+        th, td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
             text-align: left;
         }
-        .roles-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #34495e;
-        }
-        .roles-table tr:hover {
+        th {
             background: #f4f8fb;
+            color: #215967;
+            font-weight: 600;
         }
-        .role-actions button {
-            margin-right: 8px;
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) { background: #f8fafc; }
+        .actions button, .actions a {
+            background: #f3f4f6;
+            border: none;
+            color: #215967;
+            border-radius: 4px;
+            padding: 0.4rem 0.7rem;
+            margin-right: 6px;
+            cursor: pointer;
+            transition: background 0.18s;
+            text-decoration: none;
         }
+        .actions button:hover, .actions a:hover { background: #e2efda; }
+        .erp-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.18s;
+            margin-bottom: 1rem;
+        }
+        .erp-btn:hover { background: #215967; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { font-weight: 600; color: #215967; }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            background: #f9fafb;
+            font-size: 1rem;
+        }
+        .alert-success { background: #dcfce7; color: #27ae60; padding: 0.7rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
+        .alert-error { background: #fee2e2; color: #e74c3c; padding: 0.7rem 1rem; border-radius: 6px; margin-bottom: 1rem; }
         @media (max-width: 900px) {
-            .roles-container {
-                padding: 1rem 0.5rem;
-            }
-            .roles-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
+            .container { margin-left: 70px; padding: 1rem; }
+            .erp-card { padding: 1rem; }
         }
         @media (max-width: 600px) {
-            .roles-table th, .roles-table td {
-                padding: 8px 6px;
-            }
+            .container { margin-left: 0; padding: 0.5rem; }
         }
+        .erp-btn i { margin-right: 6px; }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1>User Roles</h1>
-            </header>
-            <div class="content">
-                <div class="roles-container">
-                    <div class="roles-header">
-                        <h2>User Roles</h2>
-                        <form method="POST" style="display:flex;gap:10px;">
-                            <input type="text" name="role_name" placeholder="New role name" required>
-                            <button type="submit" name="add_role" class="btn btn-primary">Add Role</button>
-                        </form>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="roles-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Role Name</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($roles)): ?>
-                                    <?php foreach ($roles as $role): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($role['id']) ?></td>
-                                            <td><?= htmlspecialchars($role['role_name']) ?></td>
-                                            <td class="role-actions">
-                                                <form method="POST" style="display:inline;">
-                                                    <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
-                                                    <input type="text" name="role_name" value="<?= htmlspecialchars($role['role_name']) ?>" required style="width:120px;">
-                                                    <button type="submit" name="edit_role" class="btn btn-secondary btn-sm">Edit</button>
-                                                </form>
-                                                <form method="POST" style="display:inline;">
-                                                    <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
-                                                    <button type="submit" name="delete_role" class="btn btn-danger btn-sm" onclick="return confirm('Delete this role?')">Delete</button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="3">No roles found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="container">
+                <div class="erp-card">
+                    <h2><i class="fas fa-user-tag"></i> User Roles</h2>
+                    <?php if (isset($_SESSION['success'])): ?>
+                        <div class="alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="alert-error"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                    <?php endif; ?>
+                    <form method="post" style="margin-bottom:2rem;">
+                        <div class="form-group">
+                            <label for="role_name">Add New Role</label>
+                            <input type="text" name="role_name" id="role_name" required placeholder="Enter role name">
+                        </div>
+                        <button type="submit" name="add_role" class="erp-btn"><i class="fas fa-plus"></i> Add Role</button>
+                    </form>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Role Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($roles as $role): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($role['id']) ?></td>
+                                <td><?= htmlspecialchars($role['role_name']) ?></td>
+                                <td class="actions">
+                                    <a href="?delete=<?= $role['id'] ?>" onclick="return confirm('Delete this role?');" title="Delete"><i class="fas fa-trash"></i> Delete</a>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
