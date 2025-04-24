@@ -46,24 +46,25 @@ try {
         
         $stmt = $pdo->prepare($query);
         $stmt->bindParam(':current_user_id', $current_user_id, PDO::PARAM_INT);
-        $success = $stmt->execute();
     } else {
         // Handle one-to-one conversations
         $query = "SELECT m.*, u.username as sender 
                  FROM messages m
                  JOIN users u ON m.sender_id = u.id
-                 WHERE (m.sender_id = :current_user_id AND m.receiver_id = :other_user_id)
-                 OR (m.sender_id = :other_user_id AND m.receiver_id = :current_user_id)
+                 WHERE (m.sender_id = :current_user1 AND m.receiver_id = :user_id1)
+                 OR (m.sender_id = :user_id2 AND m.receiver_id = :current_user2)
                  ORDER BY m.sent_at ASC";
         
         $stmt = $pdo->prepare($query);
-        $success = $stmt->execute([
-            'current_user_id' => $current_user_id,
-            'other_user_id' => $other_user_id
+        $stmt->execute([
+            'current_user1' => $current_user_id,
+            'user_id1' => $other_user_id,
+            'user_id2' => $other_user_id,
+            'current_user2' => $current_user_id
         ]);
     }
 
-    if (!$success) {
+    if (!$stmt->execute()) {
         $error = $stmt->errorInfo();
         throw new Exception("Query failed: " . $error[2]);
     }
