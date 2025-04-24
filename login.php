@@ -9,6 +9,11 @@
 // Start output buffering
 ob_start();
 
+// Start session before any session usage
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Include configuration first
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db.php';
@@ -60,11 +65,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     error_log('Audit log insert failed (login): ' . $e->getMessage());
                 }
 
+                // --- Log to file ---
+                $logDir = __DIR__ . '/logs';
+                if (!is_dir($logDir)) {
+                    mkdir($logDir, 0777, true);
+                }
+                $logFile = $logDir . '/user_activity.log';
+                $logEntry = sprintf(
+                    "[%s] LOGIN: user_id=%s, username=%s, ip=%s\n",
+                    date('Y-m-d H:i:s'),
+                    $user['id'],
+                    $user['username'],
+                    $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                );
+                file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+                // --- End log to file ---
+
                 // Set session
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
                 $_SESSION['logged_in'] = true;
+                $_SESSION['activity_tracking'] = true; // Enable activity tracking
 
                 // Set remember me cookie if checked
                 if ($remember) {
@@ -482,61 +504,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // --- Activity Tracking ---
             // Only track if user is logged in (session variable set via PHP)
-            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
-            function sendActivity(action, details = {}) {
-                const payload = Object.assign({
-                    action: action,
-                    page: window.location.pathname,
-                    timestamp: new Date().toISOString()
-                }, details);
-                fetch('track_activity.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
-                });
-            }
+            <?php
+            $track = isset($_SESSION['activity_tracking']) && $_SESSION['activity_tracking'] === true;
+            ?>
+            if (<?php echo json_encode($track); ?>) {
+                function sendActivity(action, details = {}) {
+                    const payload = Object.assign({
+                        action: action,
+                        page: window.location.pathname,
+                        timestamp: new Date().toISOString()
+                    }, details);
+                    fetch('track_activity.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                }
 
-            // Track clicks
-            document.body.addEventListener('click', function(e) {
-                let target = e.target;
-                sendActivity('click', {
-                    tag: target.tagName,
-                    id: target.id || null,
-                    class: target.className || null,
-                    text: (target.innerText || target.value || '').substring(0, 100),
-                    href: target.href || null
-                });
-            });
-
-            // Track copy
-            document.body.addEventListener('copy', function(e) {
-                let selection = window.getSelection().toString();
-                sendActivity('copy', {
-                    text: selection.substring(0, 255)
-                });
-            });
-
-            // Track paste
-            document.body.addEventListener('paste', function(e) {
-                let pasted = (e.clipboardData || window.clipboardData).getData('text');
-                sendActivity('paste', {
-                    text: pasted.substring(0, 255)
-                });
-            });
-
-            // Track input changes (optional, for text fields)
-            document.body.addEventListener('input', function(e) {
-                let target = e.target;
-                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-                    sendActivity('input', {
+                // Track clicks
+                document.body.addEventListener('click', function(e) {
+                    let target = e.target;
+                    sendActivity('click', {
                         tag: target.tagName,
                         id: target.id || null,
                         class: target.className || null,
-                        value: (target.value || '').substring(0, 100)
+                        text: (target.innerText || target.value || '').substring(0, 100),
+                        href: target.href || null
                     });
-                }
-            });
-            <?php endif; ?>
+                });
+
+                // Track copy
+                document.body.addEventListener('copy', function(e) {
+                    let selection = window.getSelection().toString();
+                    sendActivity('copy', {
+                        text: selection.substring(0, 255)
+                    });
+                });
+
+                // Track paste
+                document.body.addEventListener('paste', function(e) {
+                    let pasted = (e.clipboardData || window.clipboardData).getData('text');
+                    sendActivity('paste', {
+                        text: pasted.substring(0, 255)
+                    });
+                });
+
+                // Track input changes (optional, for text fields)
+                document.body.addEventListener('input', function(e) {
+                    let target = e.target;
+                    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                        sendActivity('input', {
+                            tag: target.tagName,
+                            id: target.id || null,
+                            class: target.className || null,
+                            value: (target.value || '').substring(0, 100)
+                        });
+                    }
+                });
+            }
             // --- End Activity Tracking ---
         });
     </script>
