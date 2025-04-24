@@ -54,8 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Set role_id to NULL explicitly (no default, no parent, no role)
+    // Assign "new" role if it exists, otherwise NULL
     $role_id = null;
+    $role_stmt = $pdo->prepare("SELECT id FROM roles WHERE role_name = ?");
+    $role_stmt->execute(['new']);
+    $role_row = $role_stmt->fetch(PDO::FETCH_ASSOC);
+    if ($role_row && isset($role_row['id'])) {
+        $role_id = $role_row['id'];
+    }
 
     // Set user as inactive by default (use 'active' column, not 'is_active')
     $active = 0;
