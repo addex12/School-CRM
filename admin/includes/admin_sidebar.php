@@ -154,7 +154,7 @@ if (file_exists($configPath)) {
 }
 .admin-sidebar.collapsed ~ .admin-main,
 body .admin-sidebar.collapsed + .admin-main {
-    margin-left: 56px;
+    margin-left: 60px;
 }
 </style>
 <div class="admin-sidebar" id="adminSidebar">
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (window.innerWidth <= 600) {
             if (main) main.style.marginLeft = '0';
         } else if (sidebar.classList.contains('collapsed')) {
-            if (main) main.style.marginLeft = '56px';
+            if (main) main.style.marginLeft = '60px';
         } else {
             if (main) main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
         }
