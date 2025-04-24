@@ -8,9 +8,87 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
 
 // AJAX: Search/filter users
 if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
-    // ...existing code for search/filter...
-    // ...copy from original file, lines 38-97...
-    // ...existing code...
+    $search = trim($_GET['search'] ?? '');
+    $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
+    $role_id = trim($_GET['role'] ?? '');
+    $status_filter = isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['status'] === '1') ? $_GET['status'] : '';
+
+    $where = [];
+    $params = [];
+
+    if ($search !== '') {
+        $where[] = "u.username LIKE :search";
+        $params[':search'] = "%$search%";
+    }
+    if ($filter_online) {
+        $where[] = "u.online = 1";
+    }
+    if ($role_id !== '') {
+        $where[] = "u.role_id = :role_id";
+        $params[':role_id'] = $role_id;
+    }
+    if ($status_filter !== '') {
+        $where[] = "u.active = :status";
+        $params[':status'] = $status_filter;
+    }
+    // If no status filter, show only active users by default
+    if ($status_filter === '') {
+        $where[] = "u.active = 1";
+    }
+
+    $where_sql = implode(' AND ', $where);
+
+    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.active, r.role_name AS role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE $where_sql
+        ORDER BY u.username");
+    $stmt->execute($params);
+    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Split users into online and offline
+    $online_users = [];
+    $offline_users = [];
+    foreach ($users as $user) {
+        if (!empty($user['online'])) {
+            $online_users[] = $user;
+        } else {
+            $offline_users[] = $user;
+        }
+    }
+
+    foreach ($users as &$user) {
+        $user['active'] = (int)$user['active'];
+    }
+
+    ob_clean();
+    $has_users = (count($online_users) > 0) || (count($offline_users) > 0);
+    if ($has_users) {
+        $all_users = array_merge($online_users, $offline_users);
+        foreach ($all_users as $user) {
+            echo '<tr data-id="' . htmlspecialchars($user['id']) . '">';
+            echo '<td class="select-col"><input type="checkbox" class="row-select"></td>';
+            echo '<td>' . htmlspecialchars($user['id']) . '</td>';
+            echo '<td class="username">' . htmlspecialchars($user['username']) . '</td>';
+            echo '<td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>';
+            echo '<td class="online">';
+            if (!empty($user['online'])) {
+                echo '<span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>';
+            } else {
+                echo '<span style="color:#aaa;">Offline</span>';
+            }
+            echo '</td>';
+            echo '<td class="role" data-role-id="' . htmlspecialchars($user['role_id'] ?? '') . '">' . htmlspecialchars($user['role_name'] ?? '') . '</td>';
+            echo '<td class="status" data-status="' . (int)$user['active'] . '">' . ((int)$user['active'] === 1 ? 'Active' : 'Inactive') . '</td>';
+            echo '<td>
+                <button class="crud-btn edit">Edit</button>
+                <button class="crud-btn delete">Delete</button>
+            </td>';
+            echo '</tr>';
+        }
+    } else {
+        echo '<tr><td colspan="8" class="text-center">No active users found</td></tr>';
+    }
     exit;
 }
 
@@ -34,25 +112,50 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'update_user') {
 
 // AJAX: Delete user
 if (isset($_POST['ajax']) && $_POST['ajax'] === 'delete_user') {
-    // ...existing code for delete...
+    $id = intval($_POST['id']);
+    $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
+    $ok = $stmt->execute([':id' => $id]);
+    echo $ok ? 'success' : 'fail';
     exit;
 }
 
 // AJAX: Bulk delete
 if (isset($_POST['ajax']) && $_POST['ajax'] === 'bulk_delete') {
-    // ...existing code for bulk delete...
+    $ids = json_decode($_POST['ids'] ?? '[]', true);
+    if (is_array($ids) && count($ids)) {
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id IN ($in)");
+        $stmt->execute($ids);
+    }
+    echo 'success';
     exit;
 }
 
 // AJAX: Bulk status
 if (isset($_POST['ajax']) && $_POST['ajax'] === 'bulk_status') {
-    // ...existing code for bulk status...
+    $ids = json_decode($_POST['ids'] ?? '[]', true);
+    $status = ($_POST['status'] === '1') ? 1 : 0;
+    if (is_array($ids) && count($ids)) {
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("UPDATE users SET active = ? WHERE id IN ($in)");
+        $params = array_merge([$status], $ids);
+        $stmt->execute($params);
+    }
+    echo 'success';
     exit;
 }
 
 // AJAX: Bulk role
 if (isset($_POST['ajax']) && $_POST['ajax'] === 'bulk_role') {
-    // ...existing code for bulk role...
+    $ids = json_decode($_POST['ids'] ?? '[]', true);
+    $role_id = trim($_POST['role_id']);
+    if (is_array($ids) && count($ids) && $role_id !== '') {
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id IN ($in)");
+        $params = array_merge([$role_id], $ids);
+        $stmt->execute($params);
+    }
+    echo 'success';
     exit;
 }
 
