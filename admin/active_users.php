@@ -926,33 +926,35 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'bulk_role') {
 }
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'bulk_export') {
     $ids = json_decode($_GET['ids'] ?? '[]', true);
-    header('Content-Type: text/csv');
+    // Output headers before any whitespace or output
+    header('Content-Type: text/csv; charset=utf-8');
     header('Content-Disposition: attachment; filename="users_export.csv"');
+    // Remove any output buffering before writing CSV
+    if (ob_get_level()) ob_end_clean();
     $out = fopen('php://output', 'w');
     fputcsv($out, ['ID', 'Username', 'Last Active', 'Online', 'Role', 'Status']);
     $where = [];
     $params = [];
     if (is_array($ids) && count($ids)) {
-        $where[] = "id IN (" . implode(',', array_fill(0, count($ids), '?')) . ")";
+        $where[] = "u.id IN (" . implode(',', array_fill(0, count($ids), '?')) . ")";
         $params = array_merge($params, $ids);
     }
     if (isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['status'] === '1')) {
-        $where[] = "active = ?";
+        $where[] = "u.active = ?";
         $params[] = $_GET['status'];
     }
     if (isset($_GET['role']) && $_GET['role'] !== '') {
-        $where[] = "role_id = ?";
+        $where[] = "u.role_id = ?";
         $params[] = $_GET['role'];
     }
     if (isset($_GET['online']) && $_GET['online'] === '1') {
-        $where[] = "online = 1";
+        $where[] = "u.online = 1";
     }
     if (isset($_GET['search']) && $_GET['search'] !== '') {
-        $where[] = "username LIKE ?";
+        $where[] = "u.username LIKE ?";
         $params[] = '%' . $_GET['search'] . '%';
     }
     $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-    // Fix: select role_name using join for export
     $sql = "SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.active, r.role_name
             FROM users u
             LEFT JOIN roles r ON u.role_id = r.id
