@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    // $role = $_POST['role'] ?? 'parent'; // Remove role assignment
+    // Do not set $role at all, and do not assign any default
 
     // Validation
     if (empty($username)) $errors['username'] = "Username is required";
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Remove role_id logic, set to NULL for now
+    // Set role_id to NULL explicitly (no default, no parent, no role)
     $role_id = null;
 
     if (empty($errors)) {
