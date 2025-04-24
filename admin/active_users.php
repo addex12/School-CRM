@@ -601,7 +601,7 @@ else:
             // Default to 0 (offline) if not online-dot exists, 1 if online-dot exists
             let online = 0;
             if (onlineTd && onlineTd.querySelector('.online-dot')) {
-                online = 1;
+                online = 0;
             }
             fetch('active_users.php', {
                 method: 'POST',
@@ -611,7 +611,7 @@ else:
                     id: id,
                     username: username,
                     role_id: role_id,
-                    online: online,
+                    online: offline,
                     active: 1
                 })
             }).then(res => res.text()).then(resp => {
