@@ -360,7 +360,14 @@ try {
                             <div class="survey-description" id="ann-content-<?= $idx ?>">
                                 <?= nl2br(htmlspecialchars(mb_strimwidth($a['content'], 0, 250, '...'))) ?>
                                 <?php if (mb_strlen($a['content']) > 250): ?>
-                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="showPopup('<?= 'Announcement' ?>', <?= json_encode($a['title']) ?>, <?= json_encode($a['content']) ?>)">Read more</a>
+                                    <a href="javascript:void(0);" 
+                                       class="erpnext-btn btn-sm read-more-link" 
+                                       style="background:#f1c40f;color:#215967;margin-left:8px;"
+                                       data-type="announcement"
+                                       data-title="<?= htmlspecialchars($a['title'], ENT_QUOTES) ?>"
+                                       data-content="<?= htmlspecialchars($a['content'], ENT_QUOTES) ?>">
+                                       Read more
+                                    </a>
                                 <?php endif; ?>
                             </div>
                             <div class="survey-meta">
@@ -387,7 +394,14 @@ try {
                             <div class="survey-description" id="kb-content-<?= $kidx ?>">
                                 <?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 250, '...'))) ?>
                                 <?php if (mb_strlen($article['content']) > 250): ?>
-                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="showPopup('Knowledge Base', <?= json_encode($article['title']) ?>, <?= json_encode($article['content']) ?>)">Read more</a>
+                                    <a href="javascript:void(0);" 
+                                       class="erpnext-btn btn-sm read-more-link" 
+                                       style="background:#007bfc;color:#fff;margin-left:8px;"
+                                       data-type="kb"
+                                       data-title="<?= htmlspecialchars($article['title'], ENT_QUOTES) ?>"
+                                       data-content="<?= htmlspecialchars($article['content'], ENT_QUOTES) ?>">
+                                       Read more
+                                    </a>
                                 <?php endif; ?>
                             </div>
                             <div class="survey-meta">
@@ -412,7 +426,13 @@ try {
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
     function showPopup(type, title, content) {
-        document.getElementById('popupTitle').innerHTML = (type ? '<i class="fas fa-bullhorn"></i> ' : '') + htmlspecialchars(title);
+        var icon = '';
+        if (type === 'announcement') {
+            icon = '<i class="fas fa-bullhorn"></i> ';
+        } else if (type === 'kb' || type === 'Knowledge Base') {
+            icon = '<i class="fas fa-book"></i> ';
+        }
+        document.getElementById('popupTitle').innerHTML = icon + htmlspecialchars(title);
         document.getElementById('popupContent').innerHTML = nl2br(htmlspecialchars(content));
         document.getElementById('popupModal').style.display = 'block';
     }
@@ -431,7 +451,18 @@ try {
     function nl2br(str) {
         return String(str).replace(/\r\n|\r|\n/g, "<br>");
     }
-    // Set initial data-expanded attribute (not needed for popup version)
+
+    // Responsive: Attach event listeners after DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.read-more-link').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                var type = this.getAttribute('data-type');
+                var title = this.getAttribute('data-title');
+                var content = this.getAttribute('data-content');
+                showPopup(type, title, content);
+            });
+        });
+    });
     </script>
 </body>
 </html>
