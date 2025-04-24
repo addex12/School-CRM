@@ -507,6 +507,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php
             $track = isset($_SESSION['activity_tracking']) && $_SESSION['activity_tracking'] === true;
             ?>
+            // Helper to log activity to 'log' file via AJAX
+            function logToFile(data) {
+                fetch('log_activity.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+            }
+
             if (<?php echo json_encode($track); ?>) {
                 function sendActivity(action, details = {}) {
                     const payload = Object.assign({
@@ -514,6 +523,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         page: window.location.pathname,
                         timestamp: new Date().toISOString()
                     }, details);
+                    // Log to 'log' file
+                    logToFile(payload);
                     fetch('track_activity.php', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -567,15 +578,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // --- Activity Tracking on Login Button ---
             document.getElementById('login-btn')?.addEventListener('click', function(e) {
                 // Track login attempt
+                const loginPayload = {
+                    action: 'login_attempt',
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                    username: document.getElementById('username')?.value || ''
+                };
+                // Log to 'log' file
+                logToFile(loginPayload);
                 fetch('track_activity.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        action: 'login_attempt',
-                        page: window.location.pathname,
-                        timestamp: new Date().toISOString(),
-                        username: document.getElementById('username')?.value || ''
-                    })
+                    body: JSON.stringify(loginPayload)
                 });
             });
             // --- End Activity Tracking on Login Button ---
