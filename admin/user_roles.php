@@ -152,7 +152,6 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
                 <h1><i class="fas fa-user-tag"></i> User Roles</h1>
             </header>
             </div>
-    </div>
             <div class="container">
                 <div class="erp-card">
                     <?php if (isset($_SESSION['success'])): ?>
@@ -195,7 +194,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 </div>
 
 </div>
-<?php include 'includes/footer.php'; ?>
+
 </body>            
 
 </html>
