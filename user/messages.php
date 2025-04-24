@@ -13,14 +13,15 @@ requireLogin();
 
 $pageTitle = "Messaging";
 
-// Get all non-admin users
-$users = $pdo->query("SELECT id, username FROM users WHERE role_id != 0 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+// Get all online admins
+$users = $pdo->query("SELECT id, username FROM users WHERE role_id = 0 AND online = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
-// Get unread counts for each user
+// Get unread counts for each admin
 $unreadCounts = [];
-$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY receiver_id");
+$stmt = $pdo->prepare("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = ? GROUP BY sender_id");
+$stmt->execute([$_SESSION['user_id']]);
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $unreadCounts[$row['receiver_id']] = $row['unread'];
+    $unreadCounts[$row['sender_id']] = $row['unread'];
 }
 
 // Get selected user from query string (for direct chat from inbox)
@@ -172,6 +173,17 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             margin: 0 auto;
             padding: 40px 20px 0 20px;
         }
+        .online-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #28c76f;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+            border: 1px solid #fff;
+            box-shadow: 0 0 2px #28c76f;
+        }
     </style>
 </head>
 <body>
@@ -186,23 +198,29 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             <div class="messaging-container">
                 <aside class="contact-list">
                     <h2 style="font-size: 1.2rem; font-weight: 600; margin: 18px 0 10px 18px; color:#007bff;">
-                        <i class="fas fa-users"></i> Users
+                        <i class="fas fa-users"></i> Online Admins
                     </h2>
                     <ul id="user-list" class="user-list">
                         <?php foreach ($users as $user): ?>
                             <li data-user-id="<?= $user['id'] ?>" class="contact-item">
-                                <span><?= htmlspecialchars($user['username']) ?></span>
+                                <span>
+                                    <span class="online-dot"></span>
+                                    <?= htmlspecialchars($user['username']) ?>
+                                </span>
                                 <?php if (isset($unreadCounts[$user['id']])): ?>
                                     <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                 <?php endif; ?>
                             </li>
                         <?php endforeach; ?>
+                        <?php if (empty($users)): ?>
+                            <li style="color:#888;">No admins are online.</li>
+                        <?php endif; ?>
                     </ul>
                 </aside>
                 <section class="chat-section">
                     <div id="chat-header" class="chat-header">
                         <h3 style="margin:0; font-size:1.1rem; color:#333;">
-                            <i class="fas fa-comment-dots"></i> Select a user to start chatting
+                            <i class="fas fa-comment-dots"></i> Select an online admin to start chatting
                         </h3>
                     </div>
                     <div id="chat-messages" class="chat-messages"></div>
@@ -233,13 +251,12 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             // Load messages for selected user
             function loadMessages(userId) {
                 if (!userId) return;
-                
+                chatMessages.innerHTML = '<p>Loading messages...</p>';
                 fetch(`../api/get_messages.php?user_id=${userId}`)
                     .then(response => response.json())
                     .then(data => {
+                        chatMessages.innerHTML = '';
                         if (data.success) {
-                            chatMessages.innerHTML = '';
-                            
                             if (data.messages.length > 0) {
                                 data.messages.forEach(msg => {
                                     const messageDiv = document.createElement('div');
@@ -248,15 +265,10 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                                         <strong>${msg.sender}</strong>
                                         <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
                                         <span class="msg-time">${msg.sent_at}</span>
-
                                     `;
                                     chatMessages.appendChild(messageDiv);
                                 });
-                                
-                                // Scroll to bottom
                                 chatMessages.scrollTop = chatMessages.scrollHeight;
-                                
-                                // Mark messages as read
                                 markAsRead(userId);
                             } else {
                                 chatMessages.innerHTML = '<p>No messages yet. Start the conversation!</p>';
@@ -266,24 +278,19 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                         }
                     })
                     .catch(error => {
-                        console.error('Error:', error);
                         chatMessages.innerHTML = '<p>Error loading messages</p>';
                     });
             }
             
             // Mark messages as read
             function markAsRead(senderId) {
-                if (senderId === 'broadcast') return;
-                
+                if (!senderId) return;
                 fetch(`../api/mark_read.php?user_id=${senderId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update unread count in UI
                             const badge = document.querySelector(`li[data-user-id="${senderId}"] .unread-badge`);
-                            if (badge) {
-                                badge.remove();
-                            }
+                            if (badge) badge.remove();
                         }
                     });
             }
@@ -291,14 +298,11 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             // Send message
             messageForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
                 const message = messageInput.value.trim();
                 if (!message || !selectedUserId) return;
-                
                 const formData = new FormData();
                 formData.append('receiver_id', selectedUserId);
                 formData.append('message', message);
-                
                 fetch('../api/send_message.php', {
                     method: 'POST',
                     body: formData
@@ -313,7 +317,6 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     alert('Failed to send message');
                 });
             });
@@ -322,24 +325,14 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             userList.addEventListener('click', function(e) {
                 const li = e.target.closest('li[data-user-id]');
                 if (!li) return;
-                
-                // Update selected user
                 selectedUserId = li.getAttribute('data-user-id');
                 receiverInput.value = selectedUserId;
-                
-                // Update UI
                 document.querySelectorAll('.contact-item').forEach(item => {
                     item.classList.remove('selected');
                 });
                 li.classList.add('selected');
-                
-                // Update header
                 chatHeader.innerHTML = `<h3>Chat with ${li.textContent.trim()}</h3>`;
-                
-                // Show message form
                 messageForm.style.display = 'block';
-                
-                // Load messages
                 loadMessages(selectedUserId);
             });
             
@@ -355,12 +348,12 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                 }
             }
 
-            // Poll for new messages every 5 seconds
-            setInterval(() => {
-                if (selectedUserId) {
-                    loadMessages(selectedUserId);
-                }
-            }, 5000);
+            // Remove polling/loading loop
+            // setInterval(() => {
+            //     if (selectedUserId) {
+            //         loadMessages(selectedUserId);
+            //     }
+            // }, 5000);
 
             // The following endpoints are used for message CRUD via AJAX:
             //   - ../api/edit_message.php
