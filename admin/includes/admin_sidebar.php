@@ -179,20 +179,25 @@ document.addEventListener('DOMContentLoaded', function() {
     var toggle = document.getElementById('sidebarToggle');
     var main = document.querySelector('.admin-main');
     // Restore collapsed state from localStorage
-    if (localStorage.getItem('sidebar-collapsed') === '1') {
-        sidebar.classList.add('collapsed');
-        if (main) main.style.marginLeft = '60px';
-    }
-    toggle.addEventListener('click', function() {
-        sidebar.classList.toggle('collapsed');
-        if (sidebar.classList.contains('collapsed')) {
+    function setSidebarCollapsed(collapsed) {
+        if (collapsed) {
+            sidebar.classList.add('collapsed');
             if (main) main.style.marginLeft = '60px';
             localStorage.setItem('sidebar-collapsed', '1');
         } else {
+            sidebar.classList.remove('collapsed');
             if (main) main.style.marginLeft = '240px';
             localStorage.setItem('sidebar-collapsed', '0');
         }
+    }
+    // Initial state
+    setSidebarCollapsed(localStorage.getItem('sidebar-collapsed') === '1');
+
+    toggle.addEventListener('click', function() {
+        var isCollapsed = sidebar.classList.contains('collapsed');
+        setSidebarCollapsed(!isCollapsed);
     });
+
     // Submenu toggle
     document.querySelectorAll('.sidebar-parent').forEach(function(parent) {
         parent.addEventListener('click', function(e) {
