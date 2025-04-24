@@ -144,7 +144,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
         .erp-btn i { margin-right: 6px; }
     </style>
 </head>
-<body>
+<bod>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
@@ -190,7 +190,8 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
             </div>
         </div>
     </div>
+</div>
             <?php include 'includes/footer.php'; ?>
 
-</body>
+</bod>
 </html>
