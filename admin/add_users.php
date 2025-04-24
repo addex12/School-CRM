@@ -444,3 +444,4 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <script src="../assets/js/bulk_import_progress.js"></script>
 </body>
 </html>
+<?php ob_flush(); // Flush the output buffer ?>
