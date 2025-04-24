@@ -1,7 +1,17 @@
 <?php
-require_once '../includes/config.php';
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
+ob_start(); // Start output buffering
 require_once '../includes/auth.php';
 requireAdmin();
+require_once '../includes/config.php';
+require_once '../includes/functions.php';
+require_once '../includes/db.php';
 
 $pageTitle = "Add User";
 
