@@ -415,7 +415,7 @@ foreach ($users as $u) {
                 if (!message || !selectedUserId) return;
                 const formData = new FormData();
                 formData.append('receiver_id', selectedUserId);
-                formData.append('content', message); // <-- use 'content' key
+                formData.append('content', message); // <-- use 'content' not 'message'
                 fetch('../api/send_message.php', {
                     method: 'POST',
                     body: formData

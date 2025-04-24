@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $current_user_id = $_SESSION['user_id'] ?? null;
 $receiver_id = $_POST['receiver_id'] ?? null;
-$message = trim($_POST['message'] ?? '');
+$content = trim($_POST['content'] ?? '');
 
 if (!$current_user_id) {
     http_response_code(401);
@@ -21,9 +21,9 @@ if (!$current_user_id) {
     exit;
 }
 
-if (!$receiver_id || !$message) {
+if (!$receiver_id || !$content) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'Missing receiver_id or message']);
+    echo json_encode(['success' => false, 'error' => 'Missing receiver_id or content']);
     exit;
 }
 
@@ -38,7 +38,7 @@ try {
                               VALUES (?, ?, ?, NOW(), 0)");
         
         foreach ($user_ids as $uid) {
-            $stmt->execute([$current_user_id, $uid, $message]);
+            $stmt->execute([$current_user_id, $uid, $content]);
         }
         
         $pdo->commit();
@@ -46,7 +46,7 @@ try {
         // Send to single user
         $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
                               VALUES (?, ?, ?, NOW(), 0)");
-        $stmt->execute([$current_user_id, $receiver_id, $message]);
+        $stmt->execute([$current_user_id, $receiver_id, $content]);
     }
     
     echo json_encode(['success' => true]);
