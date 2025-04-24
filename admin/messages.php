@@ -12,11 +12,11 @@ $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id 
 // Get all admins (including self)
 $admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
-// Get unread counts for each user (fix: group by sender_id, not receiver_id)
+// Get unread counts for each user
 $unreadCounts = [];
-$stmt = $pdo->query("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY sender_id");
+$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY receiver_id");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $unreadCounts[$row['sender_id']] = $row['unread'];
+    $unreadCounts[$row['receiver_id']] = $row['unread'];
 }
 
 // Simulate online users (last_active within 5 minutes)
@@ -45,7 +45,7 @@ foreach ($admins as $a) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 1.2rem 0.5rem; }
+        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
         .messaging-container {
             display: flex;
             height: 70vh;
@@ -54,12 +54,9 @@ foreach ($admins as $a) {
             background: #fff;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            min-height: 400px;
         }
         .contact-list {
-            width: 220px;
-            min-width: 180px;
-            max-width: 100vw;
+            width: 270px;
             border-right: 1px solid #e5e7eb;
             overflow-y: auto;
             background: #f8f9fa;
@@ -67,8 +64,8 @@ foreach ($admins as $a) {
             flex-direction: column;
         }
         .contact-list-header {
-            padding: 0.7rem 1rem 0.4rem 1rem;
-            font-size: 1rem;
+            padding: 1rem 1.2rem 0.5rem 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #215967;
             background: #f5f7fa;
@@ -76,47 +73,56 @@ foreach ($admins as $a) {
         .search-bar {
             display: flex;
             align-items: center;
-            gap: 0.3rem;
-            padding: 0.3rem 1rem 0.3rem 1rem;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem 0.5rem 1.2rem;
             background: #f5f7fa;
         }
         .search-bar input {
             flex: 1;
-            padding: 6px 10px;
+            padding: 8px 12px;
             border: 1px solid #e5e7eb;
-            border-radius: 4px;
+            border-radius: 5px;
             background: #f9fafb;
-            font-size: 0.95rem;
+            font-size: 1rem;
         }
         .search-bar .erpnext-btn {
-            padding: 5px 10px;
-            font-size: 0.95em;
+            padding: 8px 16px;
+            font-size: 1em;
         }
         .online-users {
-            padding: 0.3rem 1rem 0.3rem 1rem;
+            padding: 0.5rem 1.2rem 0.5rem 1.2rem;
             background: #f5f7fa;
             border-bottom: 1px solid #e5e7eb;
             color: #215967;
-            font-size: 0.93em;
+            font-size: 0.98em;
         }
         .online-section-title {
             font-weight: 600;
             color: #215967;
-            margin-bottom: 0.15em;
-            margin-top: 0.3em;
-            font-size: 0.93em;
+            margin-bottom: 0.2em;
+            margin-top: 0.5em;
+            font-size: 0.97em;
         }
-        .online-admin-pill, .online-user-pill {
+        .online-admin-pill {
             display: inline-block;
+            background: #007bff;
+            color: #fff;
             border-radius: 1em;
-            padding: 0.15em 0.7em;
-            font-size: 0.93em;
-            margin-right: 0.3em;
-            margin-bottom: 0.15em;
-            white-space: nowrap;
+            padding: 0.2em 0.9em;
+            font-size: 0.97em;
+            margin-right: 0.4em;
+            margin-bottom: 0.2em;
         }
-        .online-admin-pill { background: #007bff; color: #fff; }
-        .online-user-pill { background: #27ae60; color: #fff; }
+        .online-user-pill {
+            display: inline-block;
+            background: #27ae60;
+            color: #fff;
+            border-radius: 1em;
+            padding: 0.2em 0.9em;
+            font-size: 0.97em;
+            margin-right: 0.4em;
+            margin-bottom: 0.2em;
+        }
         .user-list {
             list-style: none;
             margin: 0;
@@ -125,15 +131,14 @@ foreach ($admins as $a) {
             overflow-y: auto;
         }
         .user-list li {
-            padding: 7px 1rem;
+            padding: 10px 1.2rem;
             cursor: pointer;
             border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.97em;
+            font-size: 1em;
             transition: background 0.13s;
-            min-height: 36px;
         }
         .user-list li:hover {
             background-color: #e2efda;
@@ -142,20 +147,20 @@ foreach ($admins as $a) {
             background-color: #dbeafe;
         }
         .user-list .online-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background: #27ae60;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 5px;
+            margin-right: 7px;
         }
         .unread-badge {
             background-color: #e74c3c;
             color: white;
             border-radius: 50%;
-            padding: 1px 6px;
-            font-size: 11px;
-            margin-left: 5px;
+            padding: 2px 7px;
+            font-size: 12px;
+            margin-left: 7px;
             font-weight: 600;
         }
         .chat-section {
@@ -163,11 +168,10 @@ foreach ($admins as $a) {
             display: flex;
             flex-direction: column;
             min-width: 0;
-            background: #f9f9f9;
         }
         .chat-header {
-            padding: 0.7rem 1rem 0.5rem 1rem;
-            font-size: 1rem;
+            padding: 1rem 1.5rem 0.7rem 1.5rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #215967;
             border-bottom: 1px solid #e5e7eb;
@@ -175,138 +179,87 @@ foreach ($admins as $a) {
         }
         .chat-messages {
             flex: 1;
-            padding: 10px 8px;
+            padding: 15px 18px;
             overflow-y: auto;
             background: #f9f9f9;
-            display: flex;
-            flex-direction: column;
         }
         .message-form {
-            padding: 8px 8px;
+            padding: 15px 18px;
             border-top: 1px solid #e5e7eb;
             background: #fff;
             display: flex;
-            gap: 0.5rem;
+            gap: 1rem;
         }
         .message-form textarea {
             flex: 1;
-            padding: 7px 10px;
+            padding: 10px 12px;
             border: 1px solid #e5e7eb;
-            border-radius: 4px;
+            border-radius: 5px;
             background: #f9fafb;
-            font-size: 0.97rem;
+            font-size: 1rem;
             resize: none;
         }
         .message-form .erpnext-btn {
-            padding: 7px 14px;
-            font-size: 0.97em;
+            padding: 10px 22px;
+            font-size: 1em;
         }
         .chat-message {
-            margin-bottom: 7px;
-            padding: 7px 12px;
-            border-radius: 15px;
-            max-width: 85%;
+            margin-bottom: 15px;
+            padding: 10px 14px;
+            border-radius: 7px;
+            max-width: 70%;
             word-break: break-word;
-            font-size: 0.97em;
+            font-size: 1em;
             box-shadow: 0 1px 2px rgba(44,62,80,0.04);
-            position: relative;
-            clear: both;
         }
         .chat-message.own {
-            background: #d1f7c4;
+            background-color: #e2efda;
             margin-left: auto;
             color: #215967;
-            border-bottom-right-radius: 4px;
-            border-bottom-left-radius: 15px;
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            align-self: flex-end;
         }
         .chat-message.other {
-            background: #fff;
+            background-color: #f1f1f1;
             margin-right: auto;
             color: #222d32;
-            border-bottom-left-radius: 4px;
-            border-bottom-right-radius: 15px;
-            border-top-left-radius: 15px;
-            border-top-right-radius: 15px;
-            align-self: flex-start;
         }
         .msg-time {
-            font-size: 10px;
-            color: #aaa;
-            margin-top: 2px;
+            font-size: 12px;
+            color: #777;
             display: block;
-            text-align: right;
-        }
-        .chat-message strong {
-            font-size: 0.95em;
-            color: #007bff;
-            font-weight: 600;
+            margin-top: 5px;
         }
         .edit-btn, .delete-btn {
             background: none;
             border: none;
             color: #3b82f6;
-            font-size: 0.95em;
-            margin-left: 6px;
+            font-size: 0.98em;
+            margin-left: 8px;
             cursor: pointer;
         }
         .edit-btn:hover, .delete-btn:hover {
             color: #e74c3c;
         }
-        .notification-bell {
-            position: relative;
-            display: inline-block;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-        .notification-bell .fa-bell {
-            font-size: 1.2rem;
-            color: #e74c3c;
-        }
-        .notification-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: #e74c3c;
-            color: #fff;
-            border-radius: 50%;
-            padding: 1px 6px;
-            font-size: 0.8em;
-            font-weight: 600;
-            z-index: 2;
-        }
-        .user-list li.unread-highlight {
-            background: #fffbe6 !important;
-            font-weight: 600;
-            border-left: 3px solid #e74c3c;
-        }
         @media (max-width: 900px) {
-            .admin-main { padding: 0.5rem 0.2rem; }
             .messaging-container {
                 flex-direction: column;
                 height: auto;
-                min-height: 320px;
+                min-height: 400px;
             }
             .contact-list {
                 width: 100%;
-                min-width: 0;
-                max-width: 100vw;
                 border-right: none;
                 border-bottom: 1px solid #e5e7eb;
-                font-size: 0.97em;
+                min-height: 60px;
+                max-height: 120px;
             }
             .chat-section {
                 min-width: 0;
             }
         }
         @media (max-width: 600px) {
-            .admin-main { padding: 0.2rem 0.1rem; }
             .messaging-container {
                 flex-direction: column;
                 height: auto;
-                min-height: 200px;
             }
             .contact-list {
                 width: 100%;
@@ -314,24 +267,16 @@ foreach ($admins as $a) {
                 max-width: 100vw;
                 border-right: none;
                 border-bottom: 1px solid #e5e7eb;
-                font-size: 0.93em;
+                font-size: 0.98em;
             }
             .chat-section {
                 min-width: 0;
             }
             .chat-messages {
-                padding: 4px;
+                padding: 8px;
             }
             .message-form {
-                padding: 4px;
-            }
-            .chat-header {
-                padding: 0.5rem 0.5rem 0.3rem 0.5rem;
-                font-size: 0.97rem;
-            }
-            .user-list li {
-                padding: 5px 0.5rem;
-                font-size: 0.93em;
+                padding: 8px;
             }
         }
     </style>
@@ -340,20 +285,7 @@ foreach ($admins as $a) {
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header" style="display:flex;align-items:center;justify-content:space-between;">
-                <h1 style="color:#215967;font-weight:700;">
-                    <i class="fas fa-envelope"></i> <?= htmlspecialchars($pageTitle) ?>
-                </h1>
-                <?php
-                $totalUnread = array_sum($unreadCounts);
-                ?>
-                <?php if ($totalUnread > 0): ?>
-                    <span class="notification-bell" id="notificationBell" title="Unread Messages">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge"><?= $totalUnread ?></span>
-                    </span>
-                <?php endif; ?>
-            </header>
+            <header class="admin-header"><h1 style="color:#215967;font-weight:700;"><i class="fas fa-envelope"></i> <?= htmlspecialchars($pageTitle) ?></h1></header>
             <div class="content">
                 <div class="messaging-container">
                     <aside class="contact-list">
@@ -363,7 +295,7 @@ foreach ($admins as $a) {
                             <button class="erpnext-btn btn-primary" id="searchUserBtn" style="margin-left:0;"><i class="fas fa-search"></i></button>
                             <button class="erpnext-btn btn-secondary" id="clearUserSearch" style="margin-left:0;">Clear</button>
                         </div>
-                        <div class="online-users"></div></div>
+                        <div class="online-users">
                             <div class="online-section-title"><i class="fas fa-circle" style="color:#007bff;font-size:0.9em;"></i> Online Admins</div>
                             <?php foreach ($admins as $admin): ?>
                                 <?php if (in_array($admin['id'], $onlineAdmins)): ?>
@@ -379,31 +311,15 @@ foreach ($admins as $a) {
                         </div>
                         <ul id="user-list" class="user-list">
                             <li data-user-id="broadcast" class="contact-item">Broadcast to All Users</li>
-                            <?php
-                            // Sort users: unread first, then online, then others
-                            $usersSorted = $users;
-                            usort($usersSorted, function($a, $b) use ($unreadCounts, $onlineUsers) {
-                                $aUnread = isset($unreadCounts[$a['id']]) ? 1 : 0;
-                                $bUnread = isset($unreadCounts[$b['id']]) ? 1 : 0;
-                                if ($aUnread !== $bUnread) return $bUnread - $aUnread;
-                                $aOnline = in_array($a['id'], $onlineUsers) ? 1 : 0;
-                                $bOnline = in_array($b['id'], $onlineUsers) ? 1 : 0;
-                                if ($aOnline !== $bOnline) return $bOnline - $aOnline;
-                                return strcmp($a['username'], $b['username']);
-                            });
-                            foreach ($usersSorted as $user):
-                                $isOnline = in_array($user['id'], $onlineUsers);
-                                $hasUnread = isset($unreadCounts[$user['id']]);
-                            ?>
-                                <li data-user-id="<?= $user['id'] ?>"
-                                    class="contact-item<?= $isOnline ? ' online' : '' ?><?= $hasUnread ? ' unread-highlight' : '' ?>">
+                            <?php foreach ($users as $user): ?>
+                                <li data-user-id="<?= $user['id'] ?>" class="contact-item<?= in_array($user['id'], $onlineUsers) ? ' online' : '' ?>">
                                     <span>
-                                        <?php if ($isOnline): ?>
+                                        <?php if (in_array($user['id'], $onlineUsers)): ?>
                                             <span class="online-dot"></span>
                                         <?php endif; ?>
                                         <?= htmlspecialchars($user['username']) ?>
                                     </span>
-                                    <?php if ($hasUnread): ?>
+                                    <?php if (isset($unreadCounts[$user['id']])): ?>
                                         <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                     <?php endif; ?>
                                 </li>
@@ -414,7 +330,7 @@ foreach ($admins as $a) {
                         <div id="chat-header" class="chat-header">
                             <h3>Select a user to start chatting</h3>
                         </div>
-                        <div id="chat-messages" class="chat-messages" style="display:flex;flex-direction:column;"></div>
+                        <div id="chat-messages" class="chat-messages"></div>
                         <form id="message-form" class="message-form" style="display:none;">
                             <input type="hidden" name="receiver_id" id="receiver_id">
                             <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required></textarea>
@@ -478,7 +394,7 @@ foreach ($admins as $a) {
                                     messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
                                     messageDiv.innerHTML = `
                                         <strong>${msg.sender}</strong>
-                                        <p class="msg-text" data-msg-id="${msg.id}" style="margin:0 0 2px 0;">${msg.message}</p>
+                                        <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
                                         <span class="msg-time">${msg.sent_at}</span>
                                         ${
                                             msg.is_own
@@ -492,7 +408,7 @@ foreach ($admins as $a) {
                                 chatMessages.scrollTop = chatMessages.scrollHeight;
                                 markAsRead(userId);
                             } else {
-                                chatMessages.innerHTML = '<p style="color:#888;text-align:center;">No messages yet. Start the conversation!</p>';
+                                chatMessages.innerHTML = '<p>No messages yet. Start the conversation!</p>';
                             }
                         } else {
                             chatMessages.innerHTML = `<p>Error loading messages: ${data.error}</p>`;
@@ -644,18 +560,6 @@ foreach ($admins as $a) {
                 if (broadcast) ul.insertBefore(broadcast, ul.firstChild);
             }
             moveOnlineUsersToTop();
-
-            // Notification bell click: select first unread user
-            const notificationBell = document.getElementById('notificationBell');
-            if (notificationBell) {
-                notificationBell.addEventListener('click', function() {
-                    const firstUnread = document.querySelector('.user-list li.unread-highlight');
-                    if (firstUnread) {
-                        firstUnread.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        firstUnread.click();
-                    }
-                });
-            }
         });
     </script>
 </body>
