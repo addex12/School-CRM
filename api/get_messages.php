@@ -13,16 +13,20 @@ header('Content-Type: application/json');
 error_log("GET: " . print_r($_GET, true));
 error_log("SESSION: " . print_r($_SESSION, true));
 
-// Validate input
-if (!isset($_GET['user_id'])) {
+// Accept user_id from GET or POST (JSON)
+$user_id = $_GET['user_id'] ?? null;
+if ($user_id === null) {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $user_id = $input['user_id'] ?? null;
+}
+
+if ($user_id === null || $user_id === '') {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing user_id']);
     exit;
 }
 
 $current_user_id = $_SESSION['user_id'] ?? null;
-$other_user_id = $_GET['user_id'];
-
 if (!$current_user_id) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Not authenticated']);
@@ -35,34 +39,20 @@ try {
         throw new Exception('Database connection failed');
     }
 
-    if ($other_user_id === 'broadcast') {
-        // Handle broadcast messages
-        $query = "SELECT m.*, u.username as sender 
-                 FROM messages m
-                 JOIN users u ON m.sender_id = u.id
-                 WHERE m.receiver_id = :current_user_id 
-                 AND m.is_admin = 1
-                 ORDER BY m.sent_at ASC";
-        
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':current_user_id', $current_user_id, PDO::PARAM_INT);
-    } else {
-        // Handle one-to-one conversations
-        $query = "SELECT m.*, u.username as sender 
-                 FROM messages m
-                 JOIN users u ON m.sender_id = u.id
-                 WHERE (m.sender_id = :current_user1 AND m.receiver_id = :user_id1)
+    // Handle one-to-one conversations
+    $query = "SELECT m.*, u.username as sender 
+              FROM messages m
+              JOIN users u ON m.sender_id = u.id
+              WHERE (m.sender_id = :current_user1 AND m.receiver_id = :user_id1)
                  OR (m.sender_id = :user_id2 AND m.receiver_id = :current_user2)
-                 ORDER BY m.sent_at ASC";
-        
-        $stmt = $pdo->prepare($query);
-        $stmt->execute([
-            'current_user1' => $current_user_id,
-            'user_id1' => $other_user_id,
-            'user_id2' => $other_user_id,
-            'current_user2' => $current_user_id
-        ]);
-    }
+              ORDER BY m.sent_at ASC";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([
+        'current_user1' => $current_user_id,
+        'user_id1' => $user_id,
+        'user_id2' => $user_id,
+        'current_user2' => $current_user_id
+    ]);
 
     if (!$stmt->execute()) {
         $error = $stmt->errorInfo();
@@ -88,7 +78,7 @@ try {
         'messages' => $messages,
         'debug_info' => [
             'current_user' => $current_user_id,
-            'other_user' => $other_user_id,
+            'other_user' => $user_id,
             'message_count' => count($messages)
         ]
     ]);
@@ -102,7 +92,7 @@ try {
         'debug_info' => [
             'error_message' => $e->getMessage(),
             'current_user' => $current_user_id,
-            'other_user' => $other_user_id
+            'other_user' => $user_id
         ]
     ]);
 }
