@@ -35,13 +35,21 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $settings[$row['setting_key']] = $row['setting_value'];
 }
 
-// Define settings fields for School CRM (no education/curriculum/academic year)
+// Define settings fields for School CRM (add site logo, cards, etc.)
 $settings_fields = [
     'general' => [
         'site_name' => ['label' => 'Site Name', 'type' => 'text'],
+        'site_logo' => ['label' => 'Site Logo URL', 'type' => 'text'],
         'admin_email' => ['label' => 'Admin Email', 'type' => 'email'],
         'timezone' => ['label' => 'Timezone', 'type' => 'text'],
         'language' => ['label' => 'Default Language', 'type' => 'text'],
+        'dashboard_cards' => ['label' => 'Dashboard Cards (comma separated)', 'type' => 'text'],
+    ],
+    'appearance' => [
+        'primary_color' => ['label' => 'Primary Color', 'type' => 'text'],
+        'secondary_color' => ['label' => 'Secondary Color', 'type' => 'text'],
+        'sidebar_bg' => ['label' => 'Sidebar Background', 'type' => 'text'],
+        'sidebar_text_color' => ['label' => 'Sidebar Text Color', 'type' => 'text'],
     ],
     'email' => [
         'smtp_host' => ['label' => 'SMTP Host', 'type' => 'text'],
@@ -67,39 +75,40 @@ $settings_fields = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
+        .admin-main { margin-left: 260px; padding: 1.2rem 0.5rem; }
         .erp-card {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 2.5rem;
-            margin-bottom: 2rem;
+            padding: 1.2rem 1.2rem;
+            margin-bottom: 1.2rem;
             max-width: 700px;
             border: 1px solid #e5e7eb;
         }
         .erp-card h2 {
             color: #2563eb;
             font-weight: 600;
-            margin-bottom: 1.2rem;
-            font-size: 1.25rem;
+            margin-bottom: 0.9rem;
+            font-size: 1.1rem;
             letter-spacing: 0.01em;
         }
         .form-group {
-            margin-bottom: 1.3rem;
+            margin-bottom: 1rem;
         }
         label {
             font-weight: 600;
             color: #215967;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             display: block;
+            font-size: 0.97em;
         }
         input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
             width: 100%;
-            padding: 10px 12px;
+            padding: 7px 10px;
             border: 1px solid #e5e7eb;
-            border-radius: 5px;
+            border-radius: 4px;
             background: #f9fafb;
-            font-size: 1rem;
+            font-size: 0.97em;
             transition: border 0.2s;
         }
         input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus {
@@ -109,53 +118,79 @@ $settings_fields = [
         }
         input[type="checkbox"] {
             accent-color: #2563eb;
-            margin-right: 6px;
-            transform: scale(1.15);
+            margin-right: 4px;
+            transform: scale(1.07);
         }
         .erpnext-btn {
             background: linear-gradient(90deg, #2563eb 0%, #215967 100%);
             color: #fff;
             border: none;
-            border-radius: 5px;
-            padding: 0.5rem 1.2rem;
-            font-size: 1rem;
+            border-radius: 4px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.97em;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.18s, box-shadow 0.18s;
-            margin-bottom: 1rem;
+            margin-bottom: 0.7rem;
             box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             display: inline-flex;
             align-items: center;
-            gap: 0.5em;
+            gap: 0.4em;
+        }
+        .erpnext-btn i {
+            font-size: 0.97em;
         }
         .erpnext-btn:hover, .erpnext-btn:focus {
             background: linear-gradient(90deg, #215967 0%, #2563eb 100%);
             box-shadow: 0 2px 8px rgba(44,62,80,0.12);
         }
-        .settings-section { margin-bottom: 2.5rem; }
+        .settings-section { margin-bottom: 1.5rem; }
         .admin-header {
-            margin-bottom: 2rem;
+            margin-bottom: 1.2rem;
             border-bottom: 1.5px solid #e5e7eb;
-            padding-bottom: 1rem;
+            padding-bottom: 0.7rem;
         }
         .admin-header h1 {
             color: #2563eb;
             font-weight: 700;
-            font-size: 2rem;
+            font-size: 1.3rem;
             letter-spacing: 0.01em;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 0.7em;
+            gap: 0.5em;
+        }
+        .admin-header i {
+            font-size: 1.1em;
+        }
+        .admin-tools-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .admin-tools-list li {
+            margin-bottom: 0.3rem;
+        }
+        .admin-tools-list .erpnext-btn {
+            font-size: 0.95em;
+            padding: 0.3rem 0.7rem;
+            gap: 0.3em;
+        }
+        .admin-tools-list i {
+            font-size: 0.95em;
         }
         @media (max-width: 900px) {
-            .admin-main { margin-left: 70px; padding: 1rem; }
-            .erp-card { padding: 1rem; }
+            .admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
+            .erp-card { padding: 0.7rem; }
         }
         @media (max-width: 600px) {
-            .admin-main { margin-left: 0; padding: 0.5rem; }
-            .erp-card { padding: 0.7rem; }
-            .admin-header h1 { font-size: 1.2rem; }
+            .admin-main { margin-left: 0; padding: 0.3rem; }
+            .erp-card { padding: 0.4rem; }
+            .admin-header h1 { font-size: 1rem; }
+            .erp-card h2 { font-size: 1em; }
         }
     </style>
 </head>
@@ -192,13 +227,13 @@ $settings_fields = [
             </div>
             <div class="erp-card">
                 <h2>Other Admin Tools</h2>
-                <ul style="list-style:none;padding:0;">
-                    <li><a href="user_roles.php" class="erpnext-btn" style="margin-bottom:8px;"><i class="fas fa-user-tag"></i> Manage User Roles</a></li>
-                    <li><a href="manage_roles.php" class="erpnext-btn" style="margin-bottom:8px;"><i class="fas fa-user-shield"></i> Manage Role Permissions</a></li>
-                    <li><a href="user_permissions.php" class="erpnext-btn" style="margin-bottom:8px;"><i class="fas fa-user-lock"></i> User Permissions</a></li>
-                    <li><a href="backup.php" class="erpnext-btn" style="margin-bottom:8px;"><i class="fas fa-database"></i> Backup & Restore</a></li>
-                    <li><a href="audit_log.php" class="erpnext-btn" style="margin-bottom:8px;"><i class="fas fa-history"></i> Audit Trail</a></li>
-                    <li><a href="system_logs.php" class="erpnext-btn"><i class="fas fa-file-alt"></i> System Logs</a></li>
+                <ul class="admin-tools-list">
+                    <li><a href="user_roles.php" class="erpnext-btn"><i class="fas fa-user-tag"></i> Roles</a></li>
+                    <li><a href="manage_roles.php" class="erpnext-btn"><i class="fas fa-user-shield"></i> Permissions</a></li>
+                    <li><a href="user_permissions.php" class="erpnext-btn"><i class="fas fa-user-lock"></i> User Perms</a></li>
+                    <li><a href="backup.php" class="erpnext-btn"><i class="fas fa-database"></i> Backup</a></li>
+                    <li><a href="audit_log.php" class="erpnext-btn"><i class="fas fa-history"></i> Audit</a></li>
+                    <li><a href="system_logs.php" class="erpnext-btn"><i class="fas fa-file-alt"></i> Logs</a></li>
                 </ul>
             </div>
         </div>
