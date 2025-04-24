@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.getElementById('adminSidebar');
     var toggle = document.getElementById('sidebarToggle');
     var main = document.querySelector('.admin-main');
-    // Restore collapsed state from localStorage
+    // Helper to set collapsed state
     function setSidebarCollapsed(collapsed) {
         if (collapsed) {
             sidebar.classList.add('collapsed');
@@ -193,9 +193,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial state
     setSidebarCollapsed(localStorage.getItem('sidebar-collapsed') === '1');
 
-    toggle.addEventListener('click', function() {
+    // Always toggle collapsed state on button click
+    toggle.addEventListener('click', function(e) {
+        e.stopPropagation();
         var isCollapsed = sidebar.classList.contains('collapsed');
         setSidebarCollapsed(!isCollapsed);
+    });
+
+    // Also allow expanding sidebar by clicking anywhere on the collapsed sidebar (optional UX)
+    sidebar.addEventListener('click', function(e) {
+        if (sidebar.classList.contains('collapsed') && e.target === sidebar) {
+            setSidebarCollapsed(false);
+        }
     });
 
     // Submenu toggle
