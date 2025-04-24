@@ -4,10 +4,10 @@ require_once __DIR__ . '/../includes/db.php';
 
 global $pdo;
 
+// Validate and retrieve ticket ID
 $ticket_id = $_GET['id'] ?? null;
-
-if (!$ticket_id) {
-    header('Location: contact.php?error=Ticket ID is required.');
+if (!$ticket_id || !is_numeric($ticket_id)) {
+    header('Location: contact.php?error=Ticket ID is required and must be valid.');
     exit;
 }
 

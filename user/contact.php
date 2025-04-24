@@ -203,9 +203,9 @@ body, input, textarea, select, button {
                             <td><?= htmlspecialchars($ticket['status']) ?></td>
                             <td><?= htmlspecialchars($ticket['created_at']) ?></td>
                             <td class="ticket-actions">
-                                <a href="view-ticket.php?id=<?= $ticket['id'] ?>">View</a>
-                                <a href="edit-ticket.php?id=<?= $ticket['id'] ?>">Edit</a>
-                                <a href="delete-ticket.php?id=<?= $ticket['id'] ?>" onclick="return confirm('Are you sure you want to delete this ticket?');">Delete</a>
+                                <a href="view-ticket.php?id=<?= urlencode($ticket['id']) ?>">View</a>
+                                <a href="edit-ticket.php?id=<?= urlencode($ticket['id']) ?>">Edit</a>
+                                <a href="delete-ticket.php?id=<?= urlencode($ticket['id']) ?>" onclick="return confirm('Are you sure you want to delete this ticket?');">Delete</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
