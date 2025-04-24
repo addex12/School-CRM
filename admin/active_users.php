@@ -216,8 +216,9 @@ else:
                 </table>
             </div>
         </div>
-        <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
+            <?php include __DIR__ . '/includes/footer.php'; ?>
+
     <!-- Link the JS file for all row/bulk actions and AJAX -->
     <script src="../assets/js/active_users.js"></script>
     <script>
