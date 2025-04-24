@@ -270,8 +270,10 @@ else:
                     roleTd.querySelector('select').value = currentRoleId;
                     statusTd.innerHTML = '<select class="edit-status"><option value="1">Active</option><option value="0">Inactive</option></select>';
                     statusTd.querySelector('select').value = currentStatus;
-                    actionsTd.innerHTML = '<button class="crud-btn save">Save</button> <button class="crud-btn cancel">Cancel</button>';
-                    actionsTd.querySelector('.save').onclick = function() {
+                    actionsTd.innerHTML = '<button class="crud-btn save" type="button">Save</button> <button class="crud-btn cancel" type="button">Cancel</button>';
+
+                    // Re-bind save/cancel after replacing innerHTML
+                    actionsTd.querySelector('.save').addEventListener('click', function() {
                         var newUsername = usernameTd.querySelector('input').value.trim();
                         var newRoleId = roleTd.querySelector('select').value;
                         var newStatus = statusTd.querySelector('select').value;
@@ -294,10 +296,10 @@ else:
                                 alert('Failed to update user.');
                             }
                         });
-                    };
-                    actionsTd.querySelector('.cancel').onclick = function() {
+                    });
+                    actionsTd.querySelector('.cancel').addEventListener('click', function() {
                         fetchUsersTable();
-                    };
+                    });
                 };
             });
             document.querySelectorAll('.crud-btn.delete').forEach(function(btn) {
@@ -325,8 +327,18 @@ else:
             });
         }
 
-        // Real-time search: trigger fetch on input
-        document.getElementById('searchInput').addEventListener('input', function() {
+        // Real-time search: trigger fetch on input, and prevent form submit from interfering
+        const searchInput = document.getElementById('searchInput');
+        const userSearchForm = document.getElementById('userSearchForm');
+
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(fetchUsersTable, 200); // debounce for smoother UX
+        });
+
+        userSearchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
             fetchUsersTable();
         });
 

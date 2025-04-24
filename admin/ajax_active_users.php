@@ -104,8 +104,13 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'update_user') {
         ':active' => $active,
         ':id' => $id
     ]);
-    echo $ok ? 'success' : 'fail';
-    exit;
+    if ($ok) {
+        echo "success";
+        exit;
+    } else {
+        echo "error";
+        exit;
+    }
 }
 
 // AJAX: Delete user
