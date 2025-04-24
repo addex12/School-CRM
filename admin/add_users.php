@@ -263,10 +263,8 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-
         <div class="admin-main">
             <header class="admin-header">
-                <h1 style="font-size:2rem;font-weight:600;color:#1976d2;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:2px solid #e5e7eb;">
                     <?= htmlspecialchars($pageTitle) ?>
                 </h1>
             </header>
