@@ -139,28 +139,19 @@ function getUserRoleName($roleId) {
             </aside>
             <main class="inbox-main">
                 <h1>Your Inbox</h1>
-                <div class="inbox-controls" style="display:flex;gap:1rem;margin-bottom:20px;">
-                    <input type="text" id="search" placeholder="Search messages..." class="erpnext-input search-bar" style="flex:1;">
-                    <select id="filter" class="erpnext-input filter-dropdown">
-                        <option value="all">All Messages</option>
-                        <option value="unread">Unread</option>
-                        <option value="read">Read</option>
-                    </select>
-                </div>
-                <div class="message-list">
-                    <?php if (count($messages) > 0): ?>
+                <div class="telegram-chat-container">
+                    <div class="telegram-chat-list" id="chatList">
                         <?php foreach ($messages as $message): ?>
-                            <div class="message-item" data-status="<?= $message['is_read'] ? 'read' : 'unread' ?>">
-                                <div class="message-header">
+                            <div class="telegram-chat-item <?= $message['sender_id'] == $userId ? 'own' : 'other' ?>">
+                                <div class="chat-header">
                                     <span class="sender"><?= htmlspecialchars($message['sender_name'] ?? '') ?></span>
                                     <span class="date"><?= date('M j, Y g:i a', strtotime($message['sent_at'])) ?></span>
                                 </div>
-                                <div class="message-body">
-                                    <h3 class="subject"><?= htmlspecialchars($message['subject'] ?? '') ?></h3>
-                                    <p class="content"><?= htmlspecialchars(substr($message['content'] ?? '', 0, 100)) ?>...</p>
+                                <div class="chat-body">
+                                    <div class="subject"><?= htmlspecialchars($message['subject'] ?? '') ?></div>
+                                    <div class="content"><?= nl2br(htmlspecialchars($message['content'] ?? '')) ?></div>
                                 </div>
-                                <div class="message-actions">
-                                    <button class="erpnext-btn btn-primary view-message" data-id="<?= $message['id'] ?>">View</button>
+                                <div class="chat-actions">
                                     <button class="erpnext-btn btn-secondary mark-read" data-id="<?= $message['id'] ?>" <?= $message['is_read'] ? 'disabled' : '' ?>>
                                         <?= $message['is_read'] ? 'Read' : 'Mark as Read' ?>
                                     </button>
@@ -168,9 +159,14 @@ function getUserRoleName($roleId) {
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                    <?php else: ?>
-                        <p class="no-messages">No messages found.</p>
-                    <?php endif; ?>
+                        <?php if (count($messages) == 0): ?>
+                            <p class="no-messages">No messages found.</p>
+                        <?php endif; ?>
+                    </div>
+                    <form id="telegramSendForm" class="telegram-send-form" style="display:flex;gap:0.5em;margin-top:1em;">
+                        <input type="text" id="telegramMessage" class="erpnext-input" placeholder="Type a message..." style="flex:1;">
+                        <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                    </form>
                 </div>
             </main>
         </div>
@@ -296,6 +292,36 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Failed to send reply.');
         }
     };
+
+    // Telegram style send message (to admin if any online, else disabled)
+    document.getElementById('telegramSendForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const msg = document.getElementById('telegramMessage').value.trim();
+        if (!msg) return;
+        // Send to first online admin if any, else first online user, else alert
+        let receiverId = null;
+        <?php if (!empty($onlineAdmins)): ?>
+            receiverId = <?= (int)$onlineAdmins[0]['id'] ?>;
+        <?php elseif (!empty($onlineUsers)): ?>
+            receiverId = <?= (int)$onlineUsers[0]['id'] ?>;
+        <?php else: ?>
+            alert('No one is online to receive your message.');
+            return;
+        <?php endif; ?>
+        const formData = new FormData();
+        formData.append('receiver_id', receiverId);
+        formData.append('message', msg);
+        const response = await fetch('/api/send_message.php', {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            document.getElementById('telegramMessage').value = '';
+            location.reload();
+        } else {
+            alert('Failed to send message.');
+        }
+    });
 });
 </script>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
@@ -538,6 +564,85 @@ body, input, textarea, select, button {
     .search-mini {
         width: 100%;
         max-width: 100%;
+    }
+}
+.telegram-chat-container {
+    background: #f5f7fa;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    padding: 18px 18px 10px 18px;
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    max-height: 60vh;
+}
+.telegram-chat-list {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7em;
+}
+.telegram-chat-item {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+    margin-bottom: 0.2em;
+    align-self: flex-start;
+    position: relative;
+}
+.telegram-chat-item.own {
+    background: #e2efda;
+    align-self: flex-end;
+}
+.telegram-chat-item .chat-header {
+    font-size: 0.97em;
+    color: #215967;
+    font-weight: 600;
+    margin-bottom: 0.2em;
+    display: flex;
+    justify-content: space-between;
+}
+.telegram-chat-item .chat-body .subject {
+    font-size: 1em;
+    font-weight: 500;
+    color: #007bfc;
+    margin-bottom: 0.2em;
+}
+.telegram-chat-item .chat-body .content {
+    font-size: 1em;
+    color: #36414c;
+}
+.telegram-chat-item .chat-actions {
+    margin-top: 0.5em;
+    display: flex;
+    gap: 0.5em;
+}
+.telegram-send-form {
+    border-top: 1px solid #d1d8dd;
+    padding-top: 0.7em;
+    background: #f5f7fa;
+}
+#telegramMessage {
+    border-radius: 20px;
+    padding: 10px 16px;
+    font-size: 1em;
+    border: 1px solid #d1d8dd;
+    background: #fff;
+}
+@media (max-width: 900px) {
+    .telegram-chat-container {
+        padding: 8px 4px 6px 4px;
+        min-height: 220px;
+        height: 320px;
+    }
+    .telegram-chat-item {
+        max-width: 96%;
+        padding: 8px 10px;
     }
 }
 </style>
