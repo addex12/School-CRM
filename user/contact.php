@@ -134,11 +134,14 @@ body, input, textarea, select, button {
         </div>
         <?php if (isset($_GET['success'])): ?>
             <div class="alert alert-success">
-                Your support ticket has been submitted successfully. Ticket #<?= htmlspecialchars($_GET['ticket']) ?>
+                Your support ticket has been submitted successfully. 
+                <?php if (!empty($_GET['ticket'])): ?>
+                    Ticket #<?= htmlspecialchars($_GET['ticket']) ?>
+                <?php endif; ?>
             </div>
         <?php elseif (isset($_GET['error'])): ?>
             <div class="alert alert-danger">
-                Error submitting your request: <?= htmlspecialchars($_GET['error']) ?>
+                Error submitting your request: <?= htmlspecialchars($_GET['error'] ?? 'Unknown error') ?>
             </div>
         <?php endif; ?>
 
