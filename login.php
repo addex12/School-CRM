@@ -29,51 +29,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Get user from database
-        $stmt = $pdo->prepare("SELECT id, username, password, role_id FROM users WHERE username = ?");
+        $stmt = $pdo->prepare("SELECT id, username, password, role_id, active FROM users WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            // Update last_login, last_active, and set online=1
-            $pdo->prepare("UPDATE users SET last_login = NOW(), last_active = NOW(), online = 1 WHERE id = ?")->execute([$user['id']]);
+            if ($user['active'] != 1) {
+                $error = "Your account is not active. Please contact the administrator.";
+            } else {
+                // Update last_login, last_active, and set online=1
+                $pdo->prepare("UPDATE users SET last_login = NOW(), last_active = NOW(), online = 1 WHERE id = ?")->execute([$user['id']]);
 
-            // Log the login action to audit_logs
-            try {
-                $stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action, details, ip_address, created_at) VALUES (?, ?, ?, ?, NOW())");
-                $stmt->execute([
-                    $user['id'],
-                    'login',
-                    'User logged in',
-                    $_SERVER['REMOTE_ADDR'] ?? 'unknown'
-                ]);
-            } catch (Exception $e) {
-                error_log('Audit log insert failed (login): ' . $e->getMessage());
+                // Log the login action to audit_logs
+                try {
+                    $stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action, details, ip_address, created_at) VALUES (?, ?, ?, ?, NOW())");
+                    $stmt->execute([
+                        $user['id'],
+                        'login',
+                        'User logged in',
+                        $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                    ]);
+                } catch (Exception $e) {
+                    error_log('Audit log insert failed (login): ' . $e->getMessage());
+                }
+
+                // Set session
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['logged_in'] = true;
+
+                // Set remember me cookie if checked
+                if ($remember) {
+                    $token = bin2hex(random_bytes(32));
+                    $expiry = time() + (30 * 24 * 60 * 60); // 30 days
+                    setcookie('remember_token', $token, $expiry, '/');
+                    
+                    // Store token in database
+                    $pdo->prepare("UPDATE users SET remember_token = ?, token_expiry = ? WHERE id = ?")
+                        ->execute([$token, date('Y-m-d H:i:s', $expiry), $user['id']]);
+                }
+
+                // Redirect based on role and active status
+                if ($user['role_id'] == 1 && $user['active'] == 1) { 
+                    header("Location: " . BASE_URL . "/admin/dashboard.php");
+                } else { 
+                    header("Location: " . BASE_URL . "/user/dashboard.php");
+                }
+                exit();
             }
-
-            // Set session
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role_id'] = $user['role_id'];
-            $_SESSION['logged_in'] = true;
-
-            // Set remember me cookie if checked
-            if ($remember) {
-                $token = bin2hex(random_bytes(32));
-                $expiry = time() + (30 * 24 * 60 * 60); // 30 days
-                setcookie('remember_token', $token, $expiry, '/');
-                
-                // Store token in database
-                $pdo->prepare("UPDATE users SET remember_token = ?, token_expiry = ? WHERE id = ?")
-                    ->execute([$token, date('Y-m-d H:i:s', $expiry), $user['id']]);
-            }
-
-            // Redirect based on role
-            if ($user['role_id'] == 1) { 
-                header("Location: " . BASE_URL . "/admin/dashboard.php");
-            } else { 
-                header("Location: " . BASE_URL . "/user/dashboard.php");
-            }
-            exit();
         } else {
             $error = "Invalid username or password.";
         }
