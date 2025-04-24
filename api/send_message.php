@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$current_user_id = $_SESSION['user_id'] ?? null;
+$current_user_id = $_SESSION['sender_id'] ?? null;
 $receiver_id = $_POST['receiver_id'] ?? null;
 $content = trim($_POST['content'] ?? '');
 
