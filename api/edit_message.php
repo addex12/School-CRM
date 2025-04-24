@@ -16,10 +16,17 @@ if (!isset($data['id'], $data['message']) || trim($data['message']) === '') {
 $messageId = (int)$data['id'];
 $newMessage = trim($data['message']);
 $userId = $_SESSION['user_id'];
+$userRole = $_SESSION['role'] ?? null; // Assuming role is stored in session
 
-// Only allow editing own messages
-$stmt = $pdo->prepare("SELECT * FROM messages WHERE id = ? AND sender_id = ?");
-$stmt->execute([$messageId, $userId]);
+if ($userRole === 'admin') {
+    // Admin can edit any message
+    $stmt = $pdo->prepare("SELECT * FROM messages WHERE id = ?");
+    $stmt->execute([$messageId]);
+} else {
+    // Non-admin can only edit their own messages
+    $stmt = $pdo->prepare("SELECT * FROM messages WHERE id = ? AND sender_id = ?");
+    $stmt->execute([$messageId, $userId]);
+}
 $message = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$message) {
