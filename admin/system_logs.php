@@ -185,6 +185,6 @@ $totalPages = ceil($total / $perPage);
             </div>
         </div>
     </div>
-    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
+    <?php include 'includes/footer.php'; ?>
