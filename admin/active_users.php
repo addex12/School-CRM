@@ -126,7 +126,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
             echo '</td>';
             echo '<td class="role" data-role-id="' . htmlspecialchars($user['role_id']) . '">' . htmlspecialchars($user['role_name']) . '</td>';
-            echo '<td class="status">' . htmlspecialchars($user['status']) . '</td>';
+            // Show status as "Active" or "Inactive" based on value
+            echo '<td class="status" data-status="' . (int)$user['status'] . '">' . ((int)$user['status'] === 1 ? 'Active' : 'Inactive') . '</td>';
             echo '<td>
                 <button class="crud-btn edit">Edit</button>
                 <button class="crud-btn delete">Delete</button>
@@ -147,15 +148,14 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'update_user') {
     $role_id = trim($_POST['role_id']);
     $status = isset($_POST['status']) ? trim($_POST['status']) : '';
     $active = isset($_POST['active']) ? 1 : 0;
-    $online = isset($_POST['online']) ? 1 : 0;
 
-    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, status = :status, active = :active, online = :online WHERE id = :id");
+    // Do not update the online column, leave it as is
+    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, status = :status, active = :active WHERE id = :id");
     $ok = $stmt->execute([
         ':username' => $username,
         ':role_id' => $role_id,
         ':status' => $status,
         ':active' => $active,
-        ':online' => $online,
         ':id' => $id
     ]);
     echo $ok ? 'success' : 'fail';
@@ -427,7 +427,9 @@ if ($has_users):
         <?php endif; ?>
     </td>
     <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
-    <td class="status"><?= htmlspecialchars($user['status']) ?></td>
+    <td class="status" data-status="<?= (int)$user['status'] ?>">
+        <?= ((int)$user['status'] === 1 ? 'Active' : 'Inactive') ?>
+    </td>
     <td>
         <button class="crud-btn edit">Edit</button>
         <button class="crud-btn delete">Delete</button>
@@ -581,7 +583,7 @@ else:
         const orig = {
             username: usernameTd.textContent.trim(),
             role_id: roleTd.getAttribute('data-role-id'),
-            status: statusTd ? statusTd.textContent.trim() : '',
+            status: statusTd ? statusTd.getAttribute('data-status') : '0',
             role_name: roleTd.textContent.trim()
         };
 
@@ -593,8 +595,11 @@ else:
             roleOptions += `<option value="<?= htmlspecialchars($id) ?>" ${orig.role_id == "<?= htmlspecialchars($id) ?>" ? 'selected' : ''}><?= htmlspecialchars($name) ?></option>`;
         <?php endforeach; ?>
         roleTd.innerHTML = `<select class="crud-editable" name="role">${roleOptions}</select>`;
-        // Status input
-        statusTd.innerHTML = `<input class="crud-editable" name="status" value="${orig.status}">`;
+        // Status select (0/1)
+        statusTd.innerHTML = `<select class="crud-editable" name="status">
+            <option value="1" ${orig.status == "1" ? "selected" : ""}>Active</option>
+            <option value="0" ${orig.status == "0" ? "selected" : ""}>Inactive</option>
+        </select>`;
         // Online status remains as plain text (not editable)
 
         // Actions: Save/Cancel
@@ -606,7 +611,7 @@ else:
         actionsTd.querySelector('.save').onclick = function() {
             const username = usernameTd.querySelector('input').value.trim();
             const role_id = roleTd.querySelector('select').value;
-            const status = statusTd.querySelector('input').value.trim();
+            const status = statusTd.querySelector('select').value;
             // Always set online to false (0) when saving
             fetch('active_users.php', {
                 method: 'POST',
