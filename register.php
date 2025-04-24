@@ -57,12 +57,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Set role_id to NULL explicitly (no default, no parent, no role)
     $role_id = null;
 
+    // Set user as inactive by default
+    $is_active = 0;
+
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, is_active) VALUES (?, ?, ?, ?, ?)");
         
-        if ($stmt->execute([$username, $email, $hashed_password, $role_id])) {
-            $_SESSION['success'] = "Registration successful! Please login.";
+        if ($stmt->execute([$username, $email, $hashed_password, $role_id, $is_active])) {
+            $_SESSION['success'] = "Registration successful! Please wait for admin approval before logging in.";
             header("Location: login.php");
             exit();
         } else {
