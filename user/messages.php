@@ -14,9 +14,9 @@ requireLogin();
 
 $pageTitle = "Messaging";
 
-// Get all online admins (role_id = 0 and online = 1), exclude current user
+// Get all online admins (role = 'admin' and online = 1), exclude current user
 $currentUserId = $_SESSION['user_id'];
-$usersStmt = $pdo->prepare("SELECT id, username FROM users WHERE role_id = 0 AND online = 1 AND id != ? ORDER BY username");
+$usersStmt = $pdo->prepare("SELECT id, username FROM users WHERE role = 'admin' AND online = 1 AND id != ? ORDER BY username");
 $usersStmt->execute([$currentUserId]);
 $users = $usersStmt->fetchAll(PDO::FETCH_ASSOC);
 
