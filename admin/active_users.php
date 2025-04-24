@@ -131,8 +131,8 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
             echo '</td>';
             echo '<td class="role" data-role-id="' . htmlspecialchars($user['role_id']) . '">' . htmlspecialchars($user['role_name']) . '</td>';
-            // Show status as "Active" or "Inactive" based on value
-            echo '<td class="status" data-status="' . (int)$user['status'] . '">' . ((int)$user['status'] === 1 ? 'Active' : 'Inactive') . '</td>';
+            // Show status as "Active" or "Inactive" based on value of 'active' column
+            echo '<td class="status" data-status="' . (int)$user['active'] . '">' . ((int)$user['active'] === 1 ? 'Active' : 'Inactive') . '</td>';
             echo '<td>
                 <button class="crud-btn edit">Edit</button>
                 <button class="crud-btn delete">Delete</button>
@@ -152,14 +152,13 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'update_user') {
     $username = trim($_POST['username']);
     $role_id = trim($_POST['role_id']);
     $status = isset($_POST['status']) ? trim($_POST['status']) : '';
-    $active = isset($_POST['active']) ? 1 : 0;
+    $active = $status; // use status value for active
 
     // Do not update the online column, leave it as is
-    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, status = :status, active = :active WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, active = :active WHERE id = :id");
     $ok = $stmt->execute([
         ':username' => $username,
         ':role_id' => $role_id,
-        ':status' => $status,
         ':active' => $active,
         ':id' => $id
     ]);
@@ -432,8 +431,8 @@ if ($has_users):
         <?php endif; ?>
     </td>
     <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
-    <td class="status" data-status="<?= (int)$user['status'] ?>">
-        <?= ((int)$user['status'] === 1 ? 'Active' : 'Inactive') ?>
+    <td class="status" data-status="<?= (int)$user['active'] ?>">
+        <?= ((int)$user['active'] === 1 ? 'Active' : 'Inactive') ?>
     </td>
     <td>
         <button class="crud-btn edit">Edit</button>
@@ -627,8 +626,7 @@ else:
                     username: username,
                     role_id: role_id,
                     status: status,
-                    online: false ? 1 : 0,
-                    active: 1
+                    active: status, // send as both for compatibility
                 })
             }).then(res => res.text()).then(resp => {
                 if (resp.trim() === 'success') {
