@@ -32,18 +32,26 @@ try {
         // Send to all non-admin users
         $stmt = $pdo->query("SELECT id FROM users WHERE role_id != 1");
         $user_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
-        
+
+        if (!$user_ids) {
+            echo json_encode(['success' => false, 'error' => 'No users to broadcast to']);
+            exit;
+        }
+
         $pdo->beginTransaction();
         $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
                               VALUES (?, ?, ?, NOW(), 0)");
-        
+
         foreach ($user_ids as $uid) {
+            // Optionally skip sending to yourself
+            if ($uid == $current_user_id) continue;
             $stmt->execute([$current_user_id, $uid, $content]);
         }
-        
+
         $pdo->commit();
     } else {
-        // Send to single user
+        // Ensure receiver_id is an integer
+        $receiver_id = (int)$receiver_id;
         $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
                               VALUES (?, ?, ?, NOW(), 0)");
         $stmt->execute([$current_user_id, $receiver_id, $content]);
