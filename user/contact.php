@@ -9,9 +9,19 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php';
 
+global $pdo;
+
 // Get user information
 $user_id = $_SESSION['user_id'] ?? null;
 $user_email = $_SESSION['email'] ?? '';
+
+// Fetch user's support tickets
+$tickets = [];
+if ($user_id) {
+    $stmt = $pdo->prepare('SELECT * FROM support_tickets WHERE user_id = :user_id ORDER BY created_at DESC');
+    $stmt->execute([':user_id' => $user_id]);
+    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
 
 <style>
@@ -90,6 +100,28 @@ body, input, textarea, select, button {
     margin: 0 auto;
     padding: 40px 20px 0 20px;
 }
+.ticket-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.ticket-table th, .ticket-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.ticket-table th {
+    background-color: #f5f7fa;
+    color: #36414c;
+}
+.ticket-actions a {
+    margin-right: 10px;
+    text-decoration: none;
+    color: #007bfc;
+}
+.ticket-actions a:hover {
+    text-decoration: underline;
+}
 </style>
 
 <?php include_once __DIR__ . '/includes/header.php'; ?>
@@ -110,6 +142,7 @@ body, input, textarea, select, button {
             </div>
         <?php endif; ?>
 
+        <!-- Support Ticket Form -->
         <form id="contact-form" class="contact-form" action="contact-submit.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="user_id" value="<?= $user_id ?>">
             
@@ -146,6 +179,41 @@ body, input, textarea, select, button {
             
             <button type="submit" class="erpnext-btn btn-primary">Submit Ticket</button>
         </form>
+
+        <!-- Display User's Support Tickets -->
+        <h3>Your Support Tickets</h3>
+        <?php if (count($tickets) > 0): ?>
+            <table class="ticket-table">
+                <thead>
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Subject</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($tickets as $ticket): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($ticket['ticket_number']) ?></td>
+                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
+                            <td><?= htmlspecialchars($ticket['priority']) ?></td>
+                            <td><?= htmlspecialchars($ticket['status']) ?></td>
+                            <td><?= htmlspecialchars($ticket['created_at']) ?></td>
+                            <td class="ticket-actions">
+                                <a href="view-ticket.php?id=<?= $ticket['id'] ?>">View</a>
+                                <a href="edit-ticket.php?id=<?= $ticket['id'] ?>">Edit</a>
+                                <a href="delete-ticket.php?id=<?= $ticket['id'] ?>" onclick="return confirm('Are you sure you want to delete this ticket?');">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p>No support tickets found.</p>
+        <?php endif; ?>
     </div>
 </div>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
