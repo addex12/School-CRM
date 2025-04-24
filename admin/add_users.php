@@ -360,6 +360,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             </div>
         </div>
     </div>
+    <?php include './includes/footer.php'; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('bulkImportForm');
