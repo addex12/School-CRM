@@ -462,7 +462,6 @@ foreach ($users as $u) {
                 if (editBtn) {
                     e.preventDefault();
                     const msgId = editBtn.getAttribute('data-msg-id');
-                    // Use JSON.parse to decode the message text
                     let oldText = '';
                     try {
                         oldText = JSON.parse(editBtn.getAttribute('data-msg-text'));
@@ -478,6 +477,7 @@ foreach ($users as $u) {
                         })
                         .then(res => res.json())
                         .then(data => {
+                            console.log('Edit response:', data); // Debug: log backend response
                             if (data.success) {
                                 loadMessages(selectedUserId);
                             } else {
