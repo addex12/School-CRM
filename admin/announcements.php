@@ -291,4 +291,3 @@ if ($action === 'edit' && $id) {
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
-<?php ob_end_flush(); ?>
