@@ -24,10 +24,13 @@ if (!Auth::isLoggedIn()) {
 
 // Get current user data
 try {
+    if (!isset($pdo) || !$pdo) {
+        throw new Exception("Database connection not established.");
+    }
     $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch();
-} catch (PDOException $e) {
+} catch (Exception $e) {
     error_log("User data fetch error: " . $e->getMessage());
     header("Location: error.php");
     exit();
