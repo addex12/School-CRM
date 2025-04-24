@@ -326,7 +326,7 @@ $chart_json = json_encode($chart_data);
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include '../includes/admin_sidebar.php'; ?>
+        <?php include 'includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">
             <header class="admin-header">
@@ -470,7 +470,7 @@ $chart_json = json_encode($chart_data);
                                         
                                         <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                         <td>
-                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="erpnext-btn erpnext-btn-info btn-sm">
+                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
                                         </td>
@@ -482,10 +482,10 @@ $chart_json = json_encode($chart_data);
 
                     <!-- Pagination -->
                     <nav class="mt-4">
-                        <ul class="pagination justify-content-center" style="gap: 0.5rem;">
+                        <ul class="pagination justify-content-center">
                             <?php if ($page > 1): ?>
                                 <li class="page-item">
-                                    <a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= $date_filter ?>">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= $date_filter ?>">
                                         <i class="fas fa-chevron-left"></i> Previous
                                     </a>
                                 </li>
@@ -497,15 +497,15 @@ $chart_json = json_encode($chart_data);
                             $end_page = min($total_pages, $page + 2);
                             
                             if ($start_page > 1) {
-                                echo '<li class="page-item"><a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id='.$survey_id.'&page=1'.$date_filter.'">1</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page=1'.$date_filter.'">1</a></li>';
                                 if ($start_page > 2) {
-                                    echo '<li class="page-item disabled"><span class="erpnext-btn erpnext-btn-secondary page-link">...</span></li>';
+                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                                 }
                             }
                             
                             for ($i = $start_page; $i <= $end_page; $i++): ?>
                                 <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                    <a class="erpnext-btn <?= $i == $page ? 'erpnext-btn-primary' : 'erpnext-btn-secondary' ?> page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= $date_filter ?>">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= $date_filter ?>">
                                         <?= $i ?>
                                     </a>
                                 </li>
@@ -513,15 +513,15 @@ $chart_json = json_encode($chart_data);
                             
                             if ($end_page < $total_pages) {
                                 if ($end_page < $total_pages - 1) {
-                                    echo '<li class="page-item disabled"><span class="erpnext-btn erpnext-btn-secondary page-link">...</span></li>';
+                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                                 }
-                                echo '<li class="page-item"><a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id='.$survey_id.'&page='.$total_pages.$date_filter.'">'.$total_pages.'</a></li>';
+                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page='.$total_pages.$date_filter.'">'.$total_pages.'</a></li>';
                             }
                             ?>
                             
                             <?php if ($page < $total_pages): ?>
                                 <li class="page-item">
-                                    <a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= $date_filter ?>">
+                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= $date_filter ?>">
                                         Next <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
@@ -537,7 +537,7 @@ $chart_json = json_encode($chart_data);
         </div>
     </div>
 
-    <script>
+    <>
         // Pass PHP data to JavaScript
         const chartData = <?= $chart_json ?>;
         
@@ -606,9 +606,9 @@ $chart_json = json_encode($chart_data);
                                 }
                             }
                         }
-                    }
-                });
-            }
+                    } // Ensure this matches the opening parenthesis or brace earlier in the code
+                }); // Close the outer function or block properly
+            
             
             // Field-specific charts
             chartData.fields.forEach(field => {
@@ -638,30 +638,16 @@ $chart_json = json_encode($chart_data);
                                 options: {
                                     responsive: true,
                                     cutout: '60%',
-                                            font: { size: 14 }
-                                        },
-                                        legend: { display: false },
-                                        datalabels: {
-                                            anchor: 'end',
-                                            align: 'end',
-                                            formatter: value => value,
-                                            color: '#4361ee',
-                                            font: { weight: 'bold' }
-                                        }
+                                    plugins: { // <-- Add this comma to fix the error
+                                        font: { size: 14 }
                                     },
-                                    scales: {
-                                        x: {
-                                            beginAtZero: true,
-                                            ticks: { precision: 0 },
-                                            grid: {
-                                                color: 'rgba(0, 0, 0, 0.05)'
-                                            }
-                                        },
-                                        y: {
-                                            grid: {
-                                                display: false
-                                            }
-                                        }
+                                    legend: { display: false },
+                                    datalabels: {
+                                        anchor: 'end',
+                                        align: 'end',
+                                        formatter: value => value,
+                                        color: '#4361ee',
+                                        font: { weight: 'bold' }
                                     }
                                 },
                                 plugins: [ChartDataLabels]
@@ -669,6 +655,7 @@ $chart_json = json_encode($chart_data);
                             break;
                             
                         case 'number':
+                            // Add logic for handling 'number' field type here
                             // Histogram for numeric responses
                             const numericValues = fieldAnalytics
                                 .filter(item => !isNaN(parseFloat(item.field_value)))
@@ -743,53 +730,52 @@ $chart_json = json_encode($chart_data);
                             }
                             break;
                             
-                        default:
-                            // Default bar chart for other types
-                            new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: fieldAnalytics.map(item => `Option ${item.field_value}`),
-                                    datasets: [{
-                                        label: 'Responses',
-                                        data: fieldAnalytics.map(item => item.count),
-                                        backgroundColor: '#4895ef',
-                                        borderWidth: 0,
-                                        borderRadius: 4
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: field.field_label,
-                                            font: { size: 14 }
-                                        },
-                                        legend: { display: false }
+                        // Default bar chart for other types
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: fieldAnalytics.map(item => `Option ${item.field_value}`),
+                                datasets: [{
+                                    label: 'Responses',
+                                    data: fieldAnalytics.map(item => item.count),
+                                    backgroundColor: '#4895ef',
+                                    borderWidth: 0,
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: field.field_label,
+                                        font: { size: 14 }
                                     },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            grid: {
-                                                color: 'rgba(0, 0, 0, 0.05)'
-                                            }
-                                        },
-                                        x: {
-                                            grid: {
-                                                display: false
-                                            }
+                                    legend: { display: false }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)'
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
                                         }
                                     }
                                 }
-                            });
+                            }
+                        });
                     }
                 } else {
                     // No data available for this field
                     ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
                 }
             });
-        });
-
+            }
+        
         // PDF Export functionality
         document.addEventListener('DOMContentLoaded', function() {
             var exportBtn = document.getElementById('export-pdf');
@@ -838,9 +824,8 @@ $chart_json = json_encode($chart_data);
                 if (dropdown) dropdown.style.display = '';
             });
         }
+    }
     </script>
     <script src="../assets/js/results-export.js"></script>
-</body>
-</html>
 </body>
 </html>
