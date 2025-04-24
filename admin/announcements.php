@@ -22,12 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
     $end_date = $_POST['end_date'] ?? date('Y-m-d', strtotime('+7 days'));
     $is_public = isset($_POST['is_public']) ? 1 : 0;
     $target_roles = isset($_POST['target_roles']) && is_array($_POST['target_roles']) ? implode(',', $_POST['target_roles']) : '';
-    if ($title && $content) {
-        $stmt = $pdo->prepare("INSERT INTO announcements (title, content, start_date, end_date, is_public, target_roles, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
-        $stmt->execute([$title, $content, $start_date, $end_date, $is_public, $target_roles]);
+    $created_by = $_SESSION['user_id'] ?? null;
+    if ($title && $content && $created_by) {
+        $stmt = $pdo->prepare("INSERT INTO announcements (title, content, created_by, start_date, end_date, is_public, target_roles, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmt->execute([$title, $content, $created_by, $start_date, $end_date, $is_public, $target_roles]);
         $message = "Announcement added successfully!";
     } else {
-        $error = "Title and content are required.";
+        $error = "Title, content, and creator are required.";
     }
 }
 
