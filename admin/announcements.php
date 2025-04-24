@@ -11,13 +11,20 @@ $id = isset($_GET['id']) ? intval($_GET['id']) : null;
 $message = '';
 $error = '';
 
+// Fetch all roles for assignment
+$roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll(PDO::FETCH_ASSOC);
+
 // Create
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
     $title = trim($_POST['title'] ?? '');
     $content = trim($_POST['content'] ?? '');
+    $start_date = $_POST['start_date'] ?? date('Y-m-d');
+    $end_date = $_POST['end_date'] ?? date('Y-m-d', strtotime('+7 days'));
+    $is_public = isset($_POST['is_public']) ? 1 : 0;
+    $target_roles = isset($_POST['target_roles']) && is_array($_POST['target_roles']) ? implode(',', $_POST['target_roles']) : '';
     if ($title && $content) {
-        $stmt = $pdo->prepare("INSERT INTO announcements (title, content, created_at, updated_at) VALUES (?, ?, NOW(), NOW())");
-        $stmt->execute([$title, $content]);
+        $stmt = $pdo->prepare("INSERT INTO announcements (title, content, start_date, end_date, is_public, target_roles, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmt->execute([$title, $content, $start_date, $end_date, $is_public, $target_roles]);
         $message = "Announcement added successfully!";
     } else {
         $error = "Title and content are required.";
@@ -28,9 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'add') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'edit' && $id) {
     $title = trim($_POST['title'] ?? '');
     $content = trim($_POST['content'] ?? '');
+    $start_date = $_POST['start_date'] ?? date('Y-m-d');
+    $end_date = $_POST['end_date'] ?? date('Y-m-d', strtotime('+7 days'));
+    $is_public = isset($_POST['is_public']) ? 1 : 0;
+    $target_roles = isset($_POST['target_roles']) && is_array($_POST['target_roles']) ? implode(',', $_POST['target_roles']) : '';
     if ($title && $content) {
-        $stmt = $pdo->prepare("UPDATE announcements SET title=?, content=?, updated_at=NOW() WHERE id=?");
-        $stmt->execute([$title, $content, $id]);
+        $stmt = $pdo->prepare("UPDATE announcements SET title=?, content=?, start_date=?, end_date=?, is_public=?, target_roles=?, updated_at=NOW() WHERE id=?");
+        $stmt->execute([$title, $content, $start_date, $end_date, $is_public, $target_roles, $id]);
         $message = "Announcement updated successfully!";
         $id = null;
     } else {
@@ -55,6 +66,7 @@ if ($action === 'edit' && $id) {
     $stmt = $pdo->prepare("SELECT * FROM announcements WHERE id=?");
     $stmt->execute([$id]);
     $editAnnouncement = $stmt->fetch(PDO::FETCH_ASSOC);
+    $editAnnouncement['target_roles'] = !empty($editAnnouncement['target_roles']) ? explode(',', $editAnnouncement['target_roles']) : [];
 }
 ?>
 <!DOCTYPE html>
@@ -200,6 +212,31 @@ if ($action === 'edit' && $id) {
                         <?php endif; ?>
                         <input type="text" name="title" class="erpnext-input" placeholder="Title" value="<?= htmlspecialchars($editAnnouncement['title'] ?? '') ?>" required>
                         <textarea name="content" class="erpnext-input" placeholder="Content" rows="5" required><?= htmlspecialchars($editAnnouncement['content'] ?? '') ?></textarea>
+                        <div style="display:flex;gap:1em;flex-wrap:wrap;">
+                            <div>
+                                <label>Start Date:</label>
+                                <input type="date" name="start_date" class="erpnext-input" value="<?= htmlspecialchars($editAnnouncement['start_date'] ?? date('Y-m-d')) ?>" required>
+                            </div>
+                            <div>
+                                <label>End Date:</label>
+                                <input type="date" name="end_date" class="erpnext-input" value="<?= htmlspecialchars($editAnnouncement['end_date'] ?? date('Y-m-d', strtotime('+7 days'))) ?>" required>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:0.5em;">
+                                <input type="checkbox" name="is_public" id="is_public" value="1" <?= !empty($editAnnouncement['is_public']) ? 'checked' : '' ?>>
+                                <label for="is_public" style="margin:0;">Public (Show to everyone)</label>
+                            </div>
+                        </div>
+                        <div style="margin:1em 0;">
+                            <label>Target Roles (if not public):</label>
+                            <select name="target_roles[]" class="erpnext-input" multiple style="min-width:180px;">
+                                <?php foreach ($roles as $role): ?>
+                                    <option value="<?= $role['id'] ?>" <?= isset($editAnnouncement['target_roles']) && in_array($role['id'], $editAnnouncement['target_roles']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($role['role_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <small style="color:#888;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple roles.</small>
+                        </div>
                         <button type="submit" class="erpnext-btn btn-primary"><?= $editAnnouncement ? 'Update' : 'Add' ?> Announcement</button>
                         <?php if ($editAnnouncement): ?>
                             <a href="announcements.php" class="erpnext-btn btn-secondary" style="margin-left:0.7em;">Cancel</a>
@@ -211,15 +248,34 @@ if ($action === 'edit' && $id) {
                 <?php if (count($announcements) > 0): ?>
                     <?php foreach ($announcements as $ann): ?>
                         <div class="ann-card">
-                            <div class="ann-card-title"><?= htmlspecialchars($ann['title']) ?></div>
+                            <div class="ann-card-title"><?= htmlspecialchars($ann['title']) ?>
+                                <?php if ($ann['is_public']): ?>
+                                    <span style="background:#007bfc;color:#fff;font-size:0.8em;padding:2px 8px;border-radius:4px;margin-left:8px;">Public</span>
+                                <?php endif; ?>
+                            </div>
                             <div class="ann-card-meta">
-                                Last updated: <?= date('M j, Y g:i a', strtotime($ann['updated_at'])) ?>
+                                <span>From: <?= date('M j, Y', strtotime($ann['start_date'])) ?></span>
+                                <span>To: <?= date('M j, Y', strtotime($ann['end_date'])) ?></span>
+                                <span style="margin-left:1em;">Last updated: <?= date('M j, Y g:i a', strtotime($ann['updated_at'])) ?></span>
                             </div>
                             <div class="ann-card-content"><?= nl2br(htmlspecialchars(mb_strimwidth($ann['content'], 0, 300, '...'))) ?></div>
                             <div class="ann-card-actions">
                                 <a href="announcements.php?action=edit&id=<?= $ann['id'] ?>" class="erpnext-btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
                                 <a href="announcements.php?action=delete&id=<?= $ann['id'] ?>" class="erpnext-btn btn-secondary btn-sm" onclick="return confirm('Delete this announcement?');"><i class="fas fa-trash"></i> Delete</a>
                             </div>
+                            <?php if (!$ann['is_public'] && !empty($ann['target_roles'])): ?>
+                                <div style="font-size:0.93em;color:#888;margin-top:0.5em;">
+                                    <i class="fas fa-users"></i> Targeted to roles: 
+                                    <?php
+                                    $roleIds = explode(',', $ann['target_roles']);
+                                    $roleNames = array_map(function($rid) use ($roles) {
+                                        foreach ($roles as $r) if ($r['id'] == $rid) return $r['role_name'];
+                                        return '';
+                                    }, $roleIds);
+                                    echo htmlspecialchars(implode(', ', array_filter($roleNames)));
+                                    ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -231,8 +287,7 @@ if ($action === 'edit' && $id) {
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
 <?php ob_end_flush(); ?>
