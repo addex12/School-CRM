@@ -473,12 +473,12 @@ foreach ($users as $u) {
                         fetch('../api/edit_message.php', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: msgId, message: newText })
+                            body: JSON.stringify({ id: msgId, message: newText }) // <-- ensure 'message' key
                         })
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                loadMessages(selectedUserId);
+                                loadMessages(selectedUserId); // reload messages after edit
                             } else {
                                 alert('Failed to edit message: ' + (data.error || 'Unknown error'));
                             }
