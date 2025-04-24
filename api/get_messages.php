@@ -27,17 +27,17 @@ try {
             FROM messages m
             JOIN users u ON m.sender_id = u.id
             WHERE m.receiver_id IS NULL
-            ORDER BY m.created_at ASC
+            ORDER BY m.sent_at ASC
         ");
         $stmt->execute();
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($messages as &$msg) {
             $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
             $msg['sender'] = $msg['sender_username'];
-            $msg['sent_at'] = $msg['created_at'];
+            $msg['sent_at'] = $msg['sent_at'];
+            $msg['message'] = $msg['content'];
         }
     } else {
-        // Ensure both parameters are set and not null
         $params = [
             'current_user' => $current_user_id,
             'contact_id' => $contact_id
@@ -54,7 +54,7 @@ try {
                 OR
                 (m.sender_id = :contact_id AND m.receiver_id = :current_user AND m.deleted_by_receiver = 0)
             )
-            ORDER BY m.created_at ASC
+            ORDER BY m.sent_at ASC
         ");
         $stmt->execute($params);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -69,7 +69,8 @@ try {
         foreach ($messages as &$msg) {
             $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
             $msg['sender'] = $msg['sender_username'];
-            $msg['sent_at'] = $msg['created_at'];
+            $msg['sent_at'] = $msg['sent_at'];
+            $msg['message'] = $msg['content'];
         }
     }
 
