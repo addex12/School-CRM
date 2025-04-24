@@ -185,10 +185,10 @@ if (isset($_SESSION['user_id'])) {
             </div>
         </div>
         <?php
-        // Show latest announcement bar if available (public or assigned to user role)
+        // Show latest announcement bar if available (public or assigned to user role, or both)
         require_once '../includes/config.php';
         $userRoleId = $_SESSION['role_id'] ?? null;
-        $announcement = $pdo->query("
+        $announcements = $pdo->query("
             SELECT id, title, content, is_public, target_roles 
             FROM announcements 
             WHERE NOW() BETWEEN start_date AND end_date 
@@ -196,17 +196,20 @@ if (isset($_SESSION['user_id'])) {
         ")->fetchAll(PDO::FETCH_ASSOC);
 
         $showAnnouncement = null;
-        foreach ($announcement as $ann) {
+        foreach ($announcements as $ann) {
+            $showToRole = false;
             if ($ann['is_public']) {
-                $showAnnouncement = $ann;
-                break;
+                $showToRole = true;
             }
             if ($userRoleId && !empty($ann['target_roles'])) {
                 $rolesArr = array_map('trim', explode(',', $ann['target_roles']));
                 if (in_array($userRoleId, $rolesArr)) {
-                    $showAnnouncement = $ann;
-                    break;
+                    $showToRole = true;
                 }
+            }
+            if ($showToRole) {
+                $showAnnouncement = $ann;
+                break;
             }
         }
         if ($showAnnouncement):

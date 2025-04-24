@@ -287,15 +287,39 @@ try {
             <!-- Announcements Section -->
             <h2 class="section-title"><i class="fas fa-bullhorn"></i> Announcements</h2>
             <?php
-            $announcements = $pdo->query("SELECT title, content, start_date, end_date FROM announcements WHERE NOW() BETWEEN start_date AND end_date ORDER BY start_date DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+            $userRoleId = $_SESSION['role_id'] ?? null;
+            $announcements = $pdo->query("
+                SELECT title, content, start_date, end_date, is_public, target_roles 
+                FROM announcements 
+                WHERE NOW() BETWEEN start_date AND end_date 
+                ORDER BY start_date DESC LIMIT 5
+            ")->fetchAll(PDO::FETCH_ASSOC);
+
+            // Filter: show if public OR assigned to user role
+            $visibleAnnouncements = [];
+            foreach ($announcements as $a) {
+                $showToRole = false;
+                if ($a['is_public']) {
+                    $showToRole = true;
+                }
+                if ($userRoleId && !empty($a['target_roles'])) {
+                    $rolesArr = array_map('trim', explode(',', $a['target_roles']));
+                    if (in_array($userRoleId, $rolesArr)) {
+                        $showToRole = true;
+                    }
+                }
+                if ($showToRole) {
+                    $visibleAnnouncements[] = $a;
+                }
+            }
             ?>
-            <?php if (empty($announcements)): ?>
+            <?php if (empty($visibleAnnouncements)): ?>
                 <div style="background:#fff3cd;color:#856404;padding:18px 20px;border-radius:8px;margin-bottom:18px;">
                     No announcements at this time.
                 </div>
             <?php else: ?>
                 <div class="survey-cards">
-                    <?php foreach ($announcements as $a): ?>
+                    <?php foreach ($visibleAnnouncements as $a): ?>
                         <div class="survey-card" style="border-left:4px solid #f1c40f;">
                             <h3 style="color:#215967;"><i class="fas fa-bullhorn"></i> <?= htmlspecialchars($a['title']) ?></h3>
                             <div class="survey-description"><?= nl2br(htmlspecialchars($a['content'])) ?></div>
