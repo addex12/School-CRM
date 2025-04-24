@@ -191,8 +191,8 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
         </div>
     </div>
 </div>
-
-</bod>            
+</div>
+</body>            
 
 </html>
 <?php include 'includes/footer.php'; ?>
