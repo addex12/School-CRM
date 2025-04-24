@@ -23,7 +23,7 @@ if (!isset($pdo) || !$pdo) {
     error_log("Database connection established successfully.");
 }
 
-// School CRM Dashboard widgets (revamped)
+// Add more widgets for dashboard revamp
 $widgets = [
     [
         "title" => "Total Users",
@@ -32,27 +32,23 @@ $widgets = [
         "query" => "SELECT COUNT(*) FROM users"
     ],
     [
-        "title" => "Students",
+        "title" => "Total Students",
         "icon" => "fa-user-graduate",
         "color" => "purple",
         "query" => "SELECT COUNT(*) FROM students"
     ],
     [
-        "title" => "Teachers",
+        "title" => "Total Teachers",
         "icon" => "fa-chalkboard-teacher",
         "color" => "teal",
-        // Fixed: Use staff table with role filter if teachers table does not exist
-        // "query" => "SELECT COUNT(*) FROM teachers"
-        "query" => "SELECT COUNT(*) FROM staff WHERE role = 'teacher'"
+        "query" => "SELECT COUNT(*) FROM teachers"
     ],
-    [
-        "title" => "Parents",
-        "icon" => "fa-user-friends",
-        "color" => "yellow",
-        // Fixed: Use guardians table if parents table does not exist
-        // "query" => "SELECT COUNT(*) FROM parents"
-        "query" => "SELECT COUNT(*) FROM guardians"
-    ],
+    /**[
+        "title" => "Total Classes",
+        "icon" => "fa-school",
+        "color" => "orange",
+        "query" => "SELECT COUNT(*) FROM classes"
+    ],**/
     [
         "title" => "Active Surveys",
         "icon" => "fa-poll",
@@ -60,9 +56,9 @@ $widgets = [
         "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
     ],
     [
-        "title" => "Feedback",
+        "title" => "Feedback Received",
         "icon" => "fa-comments",
-        "color" => "orange",
+        "color" => "yellow",
         "query" => "SELECT COUNT(*) FROM feedback"
     ],
     [
@@ -71,14 +67,33 @@ $widgets = [
         "color" => "red",
         "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
     ],
+    /**[
+        "title" => "Number of Classes",
+        "icon" => "fa-school",
+        "color" => "orange",
+        "query" => "SELECT COUNT(*) FROM classes"
+    ],**/
+    /**[
+        "title" => "Number of Sections",
+        "icon" => "fa-th-large",
+        "color" => "teal",
+        "query" => "SELECT COUNT(*) FROM sections"
+    ],
+    // Add widget for total curriculums
     [
-        "title" => "Messages",
-        "icon" => "fa-envelope",
+        "title" => "Total Curriculums",
+        "icon" => "fa-list",
         "color" => "blue",
-        // Fixed: Use inbox table if messages table does not exist
-        // "query" => "SELECT COUNT(*) FROM messages"
-        "query" => "SELECT COUNT(*) FROM inbox"
-    ]
+        "query" => "SELECT COUNT(*) FROM curriculums"
+    ]**/
+    
+    // Add widget for curriculum-grade/class mappings
+    /**[
+      /**  "title" => "Curriculum-Grade/Class Mappings",
+        "icon" => "fa-layer-group",
+        "color" => "purple",
+        "query" => "SELECT COUNT(*) FROM curriculum_grades"
+    ]**/
 ];
 
 foreach ($widgets as &$widget) {
@@ -182,67 +197,6 @@ try {
 } catch (Exception $e) {
     $gradeByLevel = [];
 }
-
-// Fetch survey participation stats for chart
-$surveyStats = [];
-try {
-    // Ensure surveys and survey_responses tables exist and columns are correct
-    $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
-        FROM surveys s
-        LEFT JOIN survey_responses sr ON s.id = sr.survey_id
-        GROUP BY s.id, s.title
-        ORDER BY responses DESC
-        LIMIT 7");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $surveyStats[$row['title']] = $row['responses'];
-    }
-} catch (Exception $e) {
-    $surveyStats = [];
-}
-
-// Fetch feedback rating distribution for chart
-$feedbackRatings = [];
-try {
-    // Ensure feedback table and rating column exist
-    $stmt = $pdo->query("SELECT rating, COUNT(*) as count FROM feedback GROUP BY rating ORDER BY rating");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $feedbackRatings[$row['rating']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $feedbackRatings = [];
-}
-
-// Fetch support ticket status distribution for chart
-$ticketStatus = [];
-try {
-    // Ensure support_tickets table and status column exist
-    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM support_tickets GROUP BY status");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $ticketStatus[$row['status']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $ticketStatus = [];
-}
-
-// Error log viewer: read last 20 lines of error.log
-$errorLogLines = [];
-$errorLogPath = realpath(__DIR__ . '/../error.log');
-if ($errorLogPath && is_readable($errorLogPath)) {
-    $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $errorLogLines = array_slice($lines, -20);
-} else {
-    $errorLogLines = [];
-}
-
-// Fetch recent activity log
-$activityLog = [];
-try {
-    // Ensure activity_log table and columns exist
-    $stmt = $pdo->query("SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10");
-    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    $activityLog = [];
-}
 ?>
 
 <!DOCTYPE html>
@@ -254,23 +208,41 @@ try {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/dashboard.js" defer></script>
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
         .admin-dashboard {
             display: flex;
             min-height: 100vh;
-            background: #f5f7fa;
+            background: #f4f6fa;
         }
         .admin-main {
             flex: 1;
             padding: 2rem 2.5rem;
         }
-        .admin-header h1 {
-            color: #2563eb;
-            font-size: 2.2rem;
-            font-weight: 700;
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
-            letter-spacing: 0.01em;
+        }
+        .users-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+        .users-header .btn {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.18s;
+            text-decoration: none;
+        }
+        .users-header .btn:hover {
+            background: #217dbb;
         }
         .widget-grid {
             display: grid;
@@ -286,7 +258,6 @@ try {
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
-            border-top: 4px solid #007bfc;
         }
         .dashboard-widget i {
             font-size: 2.2rem;
@@ -410,40 +381,67 @@ try {
             }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../assets/js/dashboard.js" defer></script>
 </head>
 <body>
-    <div class="admin-dashboard"></div>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+            </header>
+            <div class="content">
+
+                <!-- Quick Links Section -->
+                <div class="quick-links">
+                    <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
+                    <!--<a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
+                    <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
+                    <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
+                    <a href="curriculums.php" class="quick-link"><i class="fas fa-list"></i><span>Curriculums</span></a>
+                    <a href="sections.php" class="quick-link"><i class="fas fa-th-large"></i><span>Sections</span></a>
+                    <a href="subjects.php" class="quick-link"><i class="fas fa-book"></i><span>Subjects</span></a>
+                    <a href="grading_scales.php" class="quick-link"><i class="fas fa-chart-line"></i><span>Grading Scales</span></a>
+                    <a href="grades.php" class="quick-link"><i class="fas fa-file-alt"></i><span>Grades</span></a> -->
+                    <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
+                    <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
+                    <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                </div>
+
                 <!-- Widgets Section -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
                         <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= is_numeric($widget['count']) ? number_format($widget['count']) : htmlspecialchars($widget['count']) ?></h3>
+                            <h3><?= htmlspecialchars($widget['count']) ?></h3>
                             <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Survey Participation Chart -->
-                <div class="dashboard-section">
-                    <h2>Survey Participation</h2>
-                    <canvas id="surveyParticipationChart" height="80"></canvas>
-                </div>
+                <!-- Grade Scale Chart -->
+               <!-- <div class="dashboard-section">
+                    <h2>Grade Scale Distribution (All Students)</h2>
+                    <canvas id="gradeScaleChart" height="80"></canvas>
+                </div> -->
 
-                <!-- Feedback Ratings Chart -->
-                <div class="dashboard-section">
-                    <h2>Feedback Ratings</h2>
-                    <canvas id="feedbackRatingsChart" height="80"></canvas>
-                </div>
+                 <!--Grade Distribution by Class -->
+                <!--<div class="dashboard-section">
+                    <h2>Grade Distribution by Class</h2>
+                    <canvas id="gradeByClassChart" height="100"></canvas>
+                </div> -->
 
-                <!-- Support Ticket Status Chart -->
-                <div class="dashboard-section">
-                    <h2>Support Ticket Status</h2>
-                    <canvas id="ticketStatusChart" height="80"></canvas>
-                </div>
+                <!-- Grade Distribution by Section -->
+                <!--<div class="dashboard-section">
+                    <h2>Grade Distribution by Section</h2>
+                    <canvas id="gradeBySectionChart" height="100"></canvas>
+                </div> -->
 
+                <!-- Grade Distribution by Level/Grade -->
+               <!-- <div class="dashboard-section">
+                    <h2>Grade Distribution by Level/Grade</h2>
+                    <canvas id="gradeByLevelChart" height="100"></canvas>
+                </div> -->
+                    
                 <!-- System Stats Section -->
                 <div class="dashboard-section">
                     <h2>System Stats</h2>
@@ -638,48 +636,6 @@ try {
             type: 'bar',
             data: { labels: levelLabels, datasets: datasetsByLevel },
             options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
-        });
-
-        // Survey Participation Chart
-        new Chart(document.getElementById('surveyParticipationChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode(array_keys($surveyStats)) ?>,
-                datasets: [{
-                    label: 'Responses',
-                    data: <?= json_encode(array_values($surveyStats)) ?>,
-                    backgroundColor: '#3b82f6'
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
-
-        // Feedback Ratings Chart
-        new Chart(document.getElementById('feedbackRatingsChart').getContext('2d'), {
-            type: 'pie',
-            data: {
-                labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
-                datasets: [{
-                    label: 'Feedback Ratings',
-                    data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                    backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
-                }]
-            },
-            options: { responsive: true }
-        });
-
-        // Support Ticket Status Chart
-        new Chart(document.getElementById('ticketStatusChart').getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: <?= json_encode(array_keys($ticketStatus)) ?>,
-                datasets: [{
-                    label: 'Tickets',
-                    data: <?= json_encode(array_values($ticketStatus)) ?>,
-                    backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
-                }]
-            },
-            options: { responsive: true }
         });
     </script>
 </body>
