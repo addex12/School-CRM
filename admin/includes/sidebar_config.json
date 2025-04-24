@@ -81,9 +81,9 @@
     {
       "title": "Logout",
       "icon": "sign-out-alt",
-      "link": "logout.php"
+      "link": "../../logout.php"
     }
   ]
-  
+
    
 }
