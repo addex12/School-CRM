@@ -30,6 +30,24 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 // Get selected user from query string (for direct chat from inbox)
 $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
+
+// Handle delete message request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_message_id'])) {
+    $messageId = intval($_POST['delete_message_id']);
+    $stmt = $pdo->prepare('DELETE FROM messages WHERE id = :id AND (sender_id = :user_id OR receiver_id = :user_id)');
+    $stmt->execute([':id' => $messageId, ':user_id' => $_SESSION['user_id']]);
+    echo json_encode(['success' => true]);
+    exit;
+}
+
+// Handle clear chat request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
+    $chatWith = intval($_POST['clear_chat_with']);
+    $stmt = $pdo->prepare('DELETE FROM messages WHERE (sender_id = :user_id AND receiver_id = :chat_with) OR (sender_id = :chat_with AND receiver_id = :user_id)');
+    $stmt->execute([':user_id' => $_SESSION['user_id'], ':chat_with' => $chatWith]);
+    echo json_encode(['success' => true]);
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -224,6 +242,11 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                             <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </form>
+                    <div style="margin-top: 12px;">
+                        <button id="clear-chat" class="erpnext-btn btn-secondary" style="display:none;">
+                            <i class="fas fa-trash-alt"></i> Clear Chat
+                        </button>
+                    </div>
                 </section>
             </div>
         </div>
@@ -249,6 +272,51 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                     }
                 });
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const clearChatButton = document.getElementById('clear-chat');
+            const chatMessages = document.getElementById('chat-messages');
+
+            // Handle clear chat
+            clearChatButton.addEventListener('click', function () {
+                const receiverId = document.getElementById('receiver_id').value;
+                if (receiverId && confirm('Are you sure you want to clear this chat?')) {
+                    fetch('messages.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ clear_chat_with: receiverId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            chatMessages.innerHTML = ''; // Clear chat messages from UI
+                            alert('Chat cleared successfully.');
+                        }
+                    });
+                }
+            });
+
+            // Handle delete individual message
+            chatMessages.addEventListener('click', function (e) {
+                if (e.target.classList.contains('delete-message')) {
+                    const messageId = e.target.dataset.messageId;
+                    if (messageId && confirm('Are you sure you want to delete this message?')) {
+                        fetch('messages.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ delete_message_id: messageId })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                e.target.closest('.message-item').remove(); // Remove message from UI
+                                alert('Message deleted successfully.');
+                            }
+                        });
+                    }
+                }
+            });
         });
     </script>
     <script src="../assets/js/messages.js"></script>

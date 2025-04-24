@@ -199,8 +199,6 @@ if (isset($_SESSION['user_id'])) {
                 <a href="messages.php" class="<?= basename($_SERVER['PHP_SELF']) === 'messages.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Messages
                 </a>
-                <a href="inbox.php" class="<?= basename($_SERVER['PHP_SELF']) === 'inbox.php' ? 'active' : '' ?>">
-                    <i class="fas fa-inbox"></i> Inbox
                 <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>">
                     <i class="fas fa-user"></i> Account
                 </a>
