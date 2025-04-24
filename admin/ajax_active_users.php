@@ -31,16 +31,20 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     if ($status_filter !== '') {
         $where[] = "u.active = :status";
         $params[':status'] = $status_filter;
-    }
-    if ($status_filter === '') {
+    } elseif ($status_filter === '') {
         $where[] = "u.active = 1";
     }
 
     // Always have a valid WHERE clause
-    if (count($where) === 0) {
-        $where_sql = '1';
-    } else {
-        $where_sql = implode(' AND ', $where);
+    $where_sql = count($where) ? implode(' AND ', $where) : '1';
+
+    // Ensure $params only contains placeholders present in $where_sql
+    foreach (array_keys($params) as $key) {
+        // Remove colon for strpos check
+        $placeholder = strpos($key, ':') === 0 ? substr($key, 1) : $key;
+        if (strpos($where_sql, $key) === false && strpos($where_sql, $placeholder) === false) {
+            unset($params[$key]);
+        }
     }
 
     $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.active, r.role_name AS role_name
