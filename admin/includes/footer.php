@@ -9,19 +9,20 @@
 ?>
 <style>
     .admin-footer {
-        position: sticky;
+        position: relative;
         bottom: 0;
         left: 0;
         width: 100%;
         background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
         color: #f5f6fa;
-        padding: 14px 30px;
+        padding: 18px 30px 14px 30px;
         display: flex;
         align-items: center;
         border-top: 1px solid #374150;
         font-size: 13px;
         z-index: 100;
         box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
+        min-height: 56px;
     }
     .footer-content {
         display: flex;
@@ -68,10 +69,18 @@
         font-size: 12px;
         font-weight: 500;
         transition: color 0.2s;
+        padding: 6px 14px;
+        border-radius: 4px;
+        background: #2563eb;
+        margin-right: 4px;
+        border: 1px solid #215967;
+        box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+        display: inline-block;
     }
     .footer-link:hover {
-        color: #f1c40f;
-        text-decoration: underline;
+        color: #fff;
+        background: #215967;
+        text-decoration: none;
     }
     .developer-info {
         text-align: right;
@@ -87,9 +96,14 @@
         color: #f5f6fa;
         font-size: 17px;
         transition: color 0.2s, transform 0.2s;
+        background: #007bfc;
+        border-radius: 50%;
+        padding: 4px 7px 2px 7px;
+        display: inline-block;
     }
     .social-link:hover {
         color: #f1c40f;
+        background: #215967;
         transform: scale(1.15);
     }
     @media (max-width: 900px) {
@@ -118,6 +132,10 @@
         }
         .social-links {
             gap: 8px;
+        }
+        .footer-link {
+            padding: 5px 10px;
+            font-size: 11px;
         }
     }
 </style>
