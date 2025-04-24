@@ -414,30 +414,7 @@ try {
     <script src="../assets/js/dashboard.js" defer></script>
 </head>
 <body>
-    <div class="admin-dashboard"></div>
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="content">
-
-                <!-- Quick Links Section -->
-                <div class="quick-links">
-                    <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                    <!--<a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
-                    <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
-                    <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
-                    <a href="curriculums.php" class="quick-link"><i class="fas fa-list"></i><span>Curriculums</span></a>
-                    <a href="sections.php" class="quick-link"><i class="fas fa-th-large"></i><span>Sections</span></a>
-                    <a href="subjects.php" class="quick-link"><i class="fas fa-book"></i><span>Subjects</span></a>
-                    <a href="grading_scales.php" class="quick-link"><i class="fas fa-chart-line"></i><span>Grading Scales</span></a>
-                    <a href="grades.php" class="quick-link"><i class="fas fa-file-alt"></i><span>Grades</span></a> -->
-                    <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
-                    <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
-                    <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                </div>
-
+    <div class="admin-dashboard">
                 <!-- Widgets Section -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
