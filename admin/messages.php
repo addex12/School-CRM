@@ -358,13 +358,14 @@ foreach ($users as $u) {
                                 data.messages.forEach(msg => {
                                     const messageDiv = document.createElement('div');
                                     messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
+                                    // Use JSON.stringify to safely encode message text for attribute
                                     messageDiv.innerHTML = `
                                         <strong>${msg.sender}</strong>
                                         <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
                                         <span class="msg-time">${msg.sent_at}</span>
                                         ${
                                             msg.is_own
-                                            ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
+                                            ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text='${JSON.stringify(msg.message)}'>Edit</button>
                                                <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
                                             : ''
                                         }
@@ -461,7 +462,13 @@ foreach ($users as $u) {
                 if (editBtn) {
                     e.preventDefault();
                     const msgId = editBtn.getAttribute('data-msg-id');
-                    const oldText = decodeURIComponent(editBtn.getAttribute('data-msg-text'));
+                    // Use JSON.parse to decode the message text
+                    let oldText = '';
+                    try {
+                        oldText = JSON.parse(editBtn.getAttribute('data-msg-text'));
+                    } catch (err) {
+                        oldText = '';
+                    }
                     const newText = prompt('Edit your message:', oldText);
                     if (newText !== null && newText.trim() !== '' && newText !== oldText) {
                         fetch('../api/edit_message.php', {

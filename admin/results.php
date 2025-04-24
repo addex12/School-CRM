@@ -470,7 +470,7 @@ $chart_json = json_encode($chart_data);
                                         
                                         <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                         <td>
-                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="erpnext-btn erpnext-btn-info btn-sm">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
                                         </td>
@@ -482,10 +482,10 @@ $chart_json = json_encode($chart_data);
 
                     <!-- Pagination -->
                     <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
+                        <ul class="pagination justify-content-center" style="gap: 0.5rem;">
                             <?php if ($page > 1): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= $date_filter ?>">
+                                    <a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= $date_filter ?>">
                                         <i class="fas fa-chevron-left"></i> Previous
                                     </a>
                                 </li>
@@ -497,15 +497,15 @@ $chart_json = json_encode($chart_data);
                             $end_page = min($total_pages, $page + 2);
                             
                             if ($start_page > 1) {
-                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page=1'.$date_filter.'">1</a></li>';
+                                echo '<li class="page-item"><a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id='.$survey_id.'&page=1'.$date_filter.'">1</a></li>';
                                 if ($start_page > 2) {
-                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                    echo '<li class="page-item disabled"><span class="erpnext-btn erpnext-btn-secondary page-link">...</span></li>';
                                 }
                             }
                             
                             for ($i = $start_page; $i <= $end_page; $i++): ?>
                                 <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= $date_filter ?>">
+                                    <a class="erpnext-btn <?= $i == $page ? 'erpnext-btn-primary' : 'erpnext-btn-secondary' ?> page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= $date_filter ?>">
                                         <?= $i ?>
                                     </a>
                                 </li>
@@ -513,15 +513,15 @@ $chart_json = json_encode($chart_data);
                             
                             if ($end_page < $total_pages) {
                                 if ($end_page < $total_pages - 1) {
-                                    echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                                    echo '<li class="page-item disabled"><span class="erpnext-btn erpnext-btn-secondary page-link">...</span></li>';
                                 }
-                                echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page='.$total_pages.$date_filter.'">'.$total_pages.'</a></li>';
+                                echo '<li class="page-item"><a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id='.$survey_id.'&page='.$total_pages.$date_filter.'">'.$total_pages.'</a></li>';
                             }
                             ?>
                             
                             <?php if ($page < $total_pages): ?>
                                 <li class="page-item">
-                                    <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= $date_filter ?>">
+                                    <a class="erpnext-btn erpnext-btn-secondary page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= $date_filter ?>">
                                         Next <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>
