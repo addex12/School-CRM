@@ -141,7 +141,7 @@ if (file_exists($configPath)) {
             foreach ($items as $item) {
                 $hasSub = isset($item['items']) && is_array($item['items']);
                 $icon = isset($item['icon']) ? 'fa-' . $item['icon'] : 'fa-circle';
-                $active = (basename($_SERVER['PHP_SELF']) === $item['link']) ? 'active' : '';
+                $active = (basename($_SERVER['PHP_SELF']) === $item['link'] || $current) ? 'active' : '';
                 if ($hasSub) {
                     echo '<li>';
                     echo '<a href="#" class="sidebar-parent"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title']) . '</span> <i class="fas fa-chevron-down" style="margin-left:auto;font-size:0.85em;"></i></a>';
