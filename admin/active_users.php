@@ -216,6 +216,8 @@ else:
             </div>
         </div>
     </div>
+    <?php include __DIR__ . '/includes/footer.php'; ?>
+
     <script src="../assets/js/active_users.js"></script>
     <script>
     // AJAX table refresh logic
@@ -255,7 +257,6 @@ else:
         // fetchUsersTable();
     });
     </script>
-                    <?php include __DIR__ . '/includes/footer.php'; ?>
 
 </body>
 </html>
