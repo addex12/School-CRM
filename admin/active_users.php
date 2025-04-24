@@ -34,7 +34,7 @@ $where_sql = implode(' AND ', $where);
 
 try {
     // Fix: Use correct role name column for both main and AJAX queries
-    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, r.role_name AS role_name
+    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.status, r.role_name AS role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         WHERE $where_sql
@@ -90,7 +90,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
     $where_sql = implode(' AND ', $where);
 
-    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, r.role_name AS role_name
+    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.status, r.role_name AS role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         WHERE $where_sql
@@ -126,6 +126,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             }
             echo '</td>';
             echo '<td class="role" data-role-id="' . htmlspecialchars($user['role_id']) . '">' . htmlspecialchars($user['role_name']) . '</td>';
+            echo '<td class="status">' . htmlspecialchars($user['status']) . '</td>';
             echo '<td>
                 <button class="crud-btn edit">Edit</button>
                 <button class="crud-btn delete">Delete</button>
@@ -133,7 +134,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             echo '</tr>';
         }
     } else {
-        echo '<tr><td colspan="6" class="text-center">No active users found</td></tr>';
+        echo '<tr><td colspan="7" class="text-center">No active users found</td></tr>';
     }
     exit;
 }
@@ -144,13 +145,15 @@ if (isset($_POST['ajax']) && $_POST['ajax'] === 'update_user') {
     $id = intval($_POST['id']);
     $username = trim($_POST['username']);
     $role_id = trim($_POST['role_id']);
+    $status = isset($_POST['status']) ? trim($_POST['status']) : '';
     $active = isset($_POST['active']) ? 1 : 0;
     $online = isset($_POST['online']) ? 1 : 0;
 
-    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, active = :active, online = :online WHERE id = :id");
+    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, status = :status, active = :active, online = :online WHERE id = :id");
     $ok = $stmt->execute([
         ':username' => $username,
         ':role_id' => $role_id,
+        ':status' => $status,
         ':active' => $active,
         ':online' => $online,
         ':id' => $id
@@ -401,6 +404,7 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
                             <th>Last Active</th>
                             <th>Online</th>
                             <th>Role</th>
+                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -423,6 +427,7 @@ if ($has_users):
         <?php endif; ?>
     </td>
     <td class="role" data-role-id="<?= htmlspecialchars($user['role_id']) ?>"><?= htmlspecialchars($user['role_name']) ?></td>
+    <td class="status"><?= htmlspecialchars($user['status']) ?></td>
     <td>
         <button class="crud-btn edit">Edit</button>
         <button class="crud-btn delete">Delete</button>
@@ -433,7 +438,7 @@ if ($has_users):
 else:
 ?>
 <tr>
-    <td colspan="6" class="text-center">No active users found</td>
+    <td colspan="7" class="text-center">No active users found</td>
 </tr>
 <?php endif; ?>
 </tbody>
@@ -568,6 +573,7 @@ else:
         const id = tr.getAttribute('data-id');
         const usernameTd = tr.querySelector('.username');
         const roleTd = tr.querySelector('.role');
+        const statusTd = tr.querySelector('.status');
         const onlineTd = tr.querySelector('.online');
         const actionsTd = tr.querySelector('td:last-child');
 
@@ -575,10 +581,11 @@ else:
         const orig = {
             username: usernameTd.textContent.trim(),
             role_id: roleTd.getAttribute('data-role-id'),
+            status: statusTd ? statusTd.textContent.trim() : '',
             role_name: roleTd.textContent.trim()
         };
 
-        // Replace with inputs for username and role only
+        // Replace with inputs for username, role, and status
         usernameTd.innerHTML = `<input class="crud-editable" name="username" value="${orig.username}">`;
         // Role select
         let roleOptions = `<option value="">Select</option>`;
@@ -586,6 +593,8 @@ else:
             roleOptions += `<option value="<?= htmlspecialchars($id) ?>" ${orig.role_id == "<?= htmlspecialchars($id) ?>" ? 'selected' : ''}><?= htmlspecialchars($name) ?></option>`;
         <?php endforeach; ?>
         roleTd.innerHTML = `<select class="crud-editable" name="role">${roleOptions}</select>`;
+        // Status input
+        statusTd.innerHTML = `<input class="crud-editable" name="status" value="${orig.status}">`;
         // Online status remains as plain text (not editable)
 
         // Actions: Save/Cancel
@@ -597,8 +606,8 @@ else:
         actionsTd.querySelector('.save').onclick = function() {
             const username = usernameTd.querySelector('input').value.trim();
             const role_id = roleTd.querySelector('select').value;
+            const status = statusTd.querySelector('input').value.trim();
             // Always set online to false (0) when saving
-            const online = false;
             fetch('active_users.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -607,7 +616,8 @@ else:
                     id: id,
                     username: username,
                     role_id: role_id,
-                    online: online ? 1 : 0,
+                    status: status,
+                    online: false ? 1 : 0,
                     active: 1
                 })
             }).then(res => res.text()).then(resp => {
