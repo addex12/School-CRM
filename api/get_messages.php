@@ -38,6 +38,11 @@ try {
             $msg['message'] = $msg['content'];
         }
     } else {
+        // Make sure contact_id is not 'broadcast'
+        if ($contact_id === 'broadcast') {
+            throw new Exception('Invalid contact id');
+        }
+        // Use the same params array for both queries, keys without colons
         $params = [
             'current_user' => $current_user_id,
             'contact_id' => $contact_id
@@ -59,7 +64,7 @@ try {
         $stmt->execute($params);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Mark as read
+        // Mark as read (use same params)
         $update = $pdo->prepare("
             UPDATE messages SET is_read = 1
             WHERE receiver_id = :current_user AND sender_id = :contact_id
