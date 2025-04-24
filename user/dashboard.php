@@ -405,33 +405,38 @@ try {
     function toggleAnnContent(idx, content) {
         var el = document.getElementById('ann-content-' + idx);
         if (el.dataset.expanded === "1") {
-            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) +
+                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
             el.dataset.expanded = "0";
         } else {
-            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content)) +
+                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
             el.dataset.expanded = "1";
         }
     }
     function toggleKbContent(idx, content) {
         var el = document.getElementById('kb-content-' + idx);
         if (el.dataset.expanded === "1") {
-            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) +
+                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
             el.dataset.expanded = "0";
         } else {
-            el.innerHTML = nl2br(htmlspecialchars(content)) + '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
+            el.innerHTML = nl2br(htmlspecialchars(content)) +
+                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
             el.dataset.expanded = "1";
         }
     }
     // Utility functions for HTML escaping and nl2br
     function htmlspecialchars(str) {
-        return str.replace(/&/g, '&amp;')
-                  .replace(/"/g, '&quot;')
-                  .replace(/'/g, '&#039;')
-                  .replace(/</g, '&lt;')
-                  .replace(/>/g, '&gt;');
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
     function nl2br(str) {
-        return str.replace(/\n/g, "<br>");
+        return String(str).replace(/\r\n|\r|\n/g, "<br>");
     }
     // Set initial data-expanded attribute
     document.addEventListener('DOMContentLoaded', function() {
