@@ -360,7 +360,7 @@ try {
                             <div class="survey-description" id="ann-content-<?= $idx ?>">
                                 <?= nl2br(htmlspecialchars(mb_strimwidth($a['content'], 0, 250, '...'))) ?>
                                 <?php if (mb_strlen($a['content']) > 250): ?>
-                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(<?= $idx ?>, <?= json_encode($a['content']) ?>)">Read more</a>
+                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="showPopup('<?= 'Announcement' ?>', <?= json_encode($a['title']) ?>, <?= json_encode($a['content']) ?>)">Read more</a>
                                 <?php endif; ?>
                             </div>
                             <div class="survey-meta">
@@ -387,7 +387,7 @@ try {
                             <div class="survey-description" id="kb-content-<?= $kidx ?>">
                                 <?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 250, '...'))) ?>
                                 <?php if (mb_strlen($article['content']) > 250): ?>
-                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(<?= $kidx ?>, <?= json_encode($article['content']) ?>)">Read more</a>
+                                    <a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="showPopup('Knowledge Base', <?= json_encode($article['title']) ?>, <?= json_encode($article['content']) ?>)">Read more</a>
                                 <?php endif; ?>
                             </div>
                             <div class="survey-meta">
@@ -397,34 +397,27 @@ try {
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+
+            <!-- Popup Modal -->
+            <div id="popupModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,62,80,0.18);z-index:9999;">
+                <div style="background:#fff;max-width:480px;margin:7% auto;padding:28px 22px 18px 22px;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.13);position:relative;">
+                    <span onclick="closePopup()" style="position:absolute;top:10px;right:18px;font-size:1.5em;color:#888;cursor:pointer;">&times;</span>
+                    <h3 id="popupTitle" style="color:#215967;margin-top:0;"></h3>
+                    <div id="popupContent" style="font-size:1em;color:#36414c;"></div>
+                </div>
+            </div>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script>
-    function toggleAnnContent(idx, content) {
-        var el = document.getElementById('ann-content-' + idx);
-        if (el.dataset.expanded === "1") {
-            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) +
-                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
-            el.dataset.expanded = "0";
-        } else {
-            el.innerHTML = nl2br(htmlspecialchars(content)) +
-                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#f1c40f;color:#215967;margin-left:8px;" onclick="toggleAnnContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
-            el.dataset.expanded = "1";
-        }
+    function showPopup(type, title, content) {
+        document.getElementById('popupTitle').innerHTML = (type ? '<i class="fas fa-bullhorn"></i> ' : '') + htmlspecialchars(title);
+        document.getElementById('popupContent').innerHTML = nl2br(htmlspecialchars(content));
+        document.getElementById('popupModal').style.display = 'block';
     }
-    function toggleKbContent(idx, content) {
-        var el = document.getElementById('kb-content-' + idx);
-        if (el.dataset.expanded === "1") {
-            el.innerHTML = nl2br(htmlspecialchars(content).substring(0, 250)) +
-                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Read more</a>';
-            el.dataset.expanded = "0";
-        } else {
-            el.innerHTML = nl2br(htmlspecialchars(content)) +
-                '<a href="javascript:void(0);" class="erpnext-btn btn-sm" style="background:#007bfc;color:#fff;margin-left:8px;" onclick="toggleKbContent(' + idx + ', ' + JSON.stringify(content) + ')">Show less</a>';
-            el.dataset.expanded = "1";
-        }
+    function closePopup() {
+        document.getElementById('popupModal').style.display = 'none';
     }
     // Utility functions for HTML escaping and nl2br
     function htmlspecialchars(str) {
@@ -438,15 +431,7 @@ try {
     function nl2br(str) {
         return String(str).replace(/\r\n|\r|\n/g, "<br>");
     }
-    // Set initial data-expanded attribute
-    document.addEventListener('DOMContentLoaded', function() {
-        <?php foreach ($visibleAnnouncements as $idx => $a): ?>
-        document.getElementById('ann-content-<?= $idx ?>').dataset.expanded = "0";
-        <?php endforeach; ?>
-        <?php foreach ($kb as $kidx => $article): ?>
-        document.getElementById('kb-content-<?= $kidx ?>').dataset.expanded = "0";
-        <?php endforeach; ?>
-    });
+    // Set initial data-expanded attribute (not needed for popup version)
     </script>
 </body>
 </html>
