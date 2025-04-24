@@ -497,7 +497,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <script>
-   document.addEventListener('DOMContentLoaded', function() {
+        // Enhance form usability
+        document.addEventListener('DOMContentLoaded', function() {
+            // Focus on username field on page load
+            document.getElementById('username')?.focus();
+
+            // --- Activity Tracking ---
+            // Only track if user is logged in (session variable set via PHP)
+            <?php
+            $track = isset($_SESSION['activity_tracking']) && $_SESSION['activity_tracking'] === true;
+            ?>
+            // Helper to log activity to 'log' file via AJAX
+            function logToFile(data) {
+                fetch('log_activity.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+            }
+
+            if (<?php echo json_encode($track); ?>) {
+                function sendActivity(action, details = {}) {
+                    const payload = Object.assign({
+                        action: action,
+                        page: window.location.pathname,
+                        timestamp: new Date().toISOString()
+                    }, details);
+                    // Log to 'log' file
+                    logToFile(payload);
+                    fetch('track_activity.php', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                }
+
+                // Track clicks
+                document.body.addEventListener('click', function(e) {
+                    let target = e.target;
+                    sendActivity('click', {
+                        tag: target.tagName,
+                        id: target.id || null,
+                        class: target.className || null,
+                        text: (target.innerText || target.value || '').substring(0, 100),
+                        href: target.href || null
+                    });
+                });
+
+                // Track copy
+                document.body.addEventListener('copy', function(e) {
+                    let selection = window.getSelection().toString();
+                    sendActivity('copy', {
+                        text: selection.substring(0, 255)
+                    });
+                });
+
+                // Track paste
+                document.body.addEventListener('paste', function(e) {
+                    let pasted = (e.clipboardData || window.clipboardData).getData('text');
+                    sendActivity('paste', {
+                        text: pasted.substring(0, 255)
+                    });
+                });
+
+                // Track input changes (optional, for text fields)
+                document.body.addEventListener('input', function(e) {
+                    let target = e.target;
+                    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                        sendActivity('input', {
+                            tag: target.tagName,
+                            id: target.id || null,
+                            class: target.className || null,
+                            value: (target.value || '').substring(0, 100)
+                        });
+                    }
+                });
+            }
+            // --- End Activity Tracking ---
+
+            // --- Activity Tracking on Login Button ---
+            document.getElementById('login-btn')?.addEventListener('click', function(e) {
+                // Track login attempt
+                const loginPayload = {
+                    action: 'login_attempt',
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                    username: document.getElementById('username')?.value || ''
+                };
+                // Log to 'log' file
+                logToFile(loginPayload);
+                fetch('track_activity.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(loginPayload)
+                });
+            });
+            // --- End Activity Tracking on Login Button ---
+        });
+        document.addEventListener('DOMContentLoaded', function() {
     // Enhanced activity tracking - always active
     function sendActivity(action, details = {}) {
         const payload = Object.assign({
@@ -655,5 +752,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     });
 });
+    </script>
+</body>
+</html>
 
+<?php
+// Show public announcements after login
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
+    try {
+        $announcements = $pdo->query("SELECT title, content, created_at FROM announcements WHERE is_public = 1 ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+        if ($announcements) {
+            echo '<div class="public-announcements" style="max-width:500px;margin:2rem auto 0 auto;background:#f9fafb;border-radius:8px;padding:1.5rem 2rem;box-shadow:0 2px 8px rgba(44,62,80,0.07);">';
+            echo '<h3 style="color:#215967;margin-bottom:1rem;"><i class="fas fa-bullhorn"></i> Announcements</h3>';
+            foreach ($announcements as $ann) {
+                echo '<div style="margin-bottom:1.2rem;">';
+                echo '<strong style="color:#3b82f6;">' . htmlspecialchars($ann['title']) . '</strong><br>';
+                echo '<span style="color:#666;font-size:0.95em;">' . date('M j, Y g:i A', strtotime($ann['created_at'])) . '</span>';
+                echo '<div style="margin-top:0.5em;color:#333;">' . nl2br(htmlspecialchars($ann['content'])) . '</div>';
+                echo '</div>';
+            }
+            
+            echo '</div>';
+        }
+        
+    } catch (Exception $e) {
+        // Ignore announcement errors
+    }
+}
+
+
+// Flush output buffer
+ob_end_flush();
+?>
 <script src="../includes/activity-tracker.js"></script>
