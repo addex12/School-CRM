@@ -6,6 +6,12 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
+
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php'; // Ensure this file initializes $pdo
 
@@ -62,6 +68,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: contact.php?success=1&ticket=$ticket_number");
         exit;
     } catch (Exception $e) {
+        // Log the error for debugging
+        error_log($e->getMessage());
         // Redirect with error message
         header('Location: contact.php?error=' . urlencode($e->getMessage()));
         exit;
