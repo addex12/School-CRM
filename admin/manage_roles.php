@@ -1,29 +1,29 @@
 <?php
-require_once '../includes/db_connect.php';
+require_once '../includes/config.php';
 
 // Fetch roles
 $roles = [];
-$result = $conn->query("SELECT id, name FROM roles");
+$result = $pdo->query("SELECT id, name FROM roles");
 if ($result) {
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $roles[] = $row;
     }
 }
 
 // Fetch all permissions
 $permissions = [];
-$res = $conn->query("SELECT id, name, label FROM permissions ORDER BY label");
+$res = $pdo->query("SELECT id, name, label FROM permissions ORDER BY label");
 if ($res) {
-    while ($row = $res->fetch_assoc()) {
+    while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
         $permissions[] = $row;
     }
 }
 
 // Fetch assigned permissions for each role
 $role_permissions = [];
-$res = $conn->query("SELECT role_id, permission_id FROM role_permissions");
+$res = $pdo->query("SELECT role_id, permission_id FROM role_permissions");
 if ($res) {
-    while ($row = $res->fetch_assoc()) {
+    while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
         $role_permissions[$row['role_id']][] = $row['permission_id'];
     }
 }
@@ -34,12 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'], $_POST['pe
     $perms = array_map('intval', $_POST['permissions']);
 
     // Remove all current permissions
-    $conn->query("DELETE FROM role_permissions WHERE role_id = $role_id");
+    $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ?")->execute([$role_id]);
     // Add selected permissions
-    $stmt = $conn->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)");
     foreach ($perms as $perm_id) {
-        $stmt->bind_param("ii", $role_id, $perm_id);
-        $stmt->execute();
+        $stmt->execute([$role_id, $perm_id]);
     }
     header("Location: manage_roles.php");
     exit;

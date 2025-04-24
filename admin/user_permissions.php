@@ -1,14 +1,14 @@
 <?php
-require_once '../includes/db_connect.php'; // adjust path if needed
+require_once '../includes/config.php';
 
 // Fetch users and their roles
 $users = [];
 $sql = "SELECT users.id, users.username, roles.id AS role_id, roles.name AS role_name
         FROM users
         LEFT JOIN roles ON users.role_id = roles.id";
-$result = $conn->query($sql);
+$result = $pdo->query($sql);
 if ($result) {
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $users[] = [
             'id' => $row['id'],
             'name' => $row['username'],
@@ -20,18 +20,18 @@ if ($result) {
 
 // Fetch all roles
 $roles = [];
-$res = $conn->query("SELECT id, name FROM roles");
+$res = $pdo->query("SELECT id, name FROM roles");
 if ($res) {
-    while ($row = $res->fetch_assoc()) {
+    while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
         $roles[] = $row;
     }
 }
 
 // Fetch permissions for each role
 $role_permissions = [];
-$res = $conn->query("SELECT role_id, permissions.label FROM role_permissions JOIN permissions ON role_permissions.permission_id = permissions.id");
+$res = $pdo->query("SELECT role_id, permissions.label FROM role_permissions JOIN permissions ON role_permissions.permission_id = permissions.id");
 if ($res) {
-    while ($row = $res->fetch_assoc()) {
+    while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
         $role_permissions[$row['role_id']][] = $row['label'];
     }
 }
@@ -40,9 +40,8 @@ if ($res) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['role_id'])) {
     $user_id = intval($_POST['user_id']);
     $role_id = intval($_POST['role_id']);
-    $stmt = $conn->prepare("UPDATE users SET role_id = ? WHERE id = ?");
-    $stmt->bind_param("ii", $role_id, $user_id);
-    $stmt->execute();
+    $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id = ?");
+    $stmt->execute([$role_id, $user_id]);
     header("Location: user_permissions.php");
     exit;
 }
