@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['ro
                             <?php foreach ($users as $user): ?>
                             <tr>
                                 <td><?= htmlspecialchars($user['name']) ?></td>
-                                <td><?= htmlspecialchars($user['role']) ?></td>
+                                <td><?= htmlspecialchars($user['role'] ?? '') ?></td>
                                 <td>
                                     <?php
                                     $perms = $role_permissions[$user['role_id']] ?? [];
