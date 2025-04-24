@@ -615,7 +615,7 @@ CREATE TABLE `survey_responses` (
   `survey_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
+  `answers` longtext CHARACTER SET utf8mb4 COLLATE=utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -783,6 +783,19 @@ INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_
 (5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'mcdc@gmail.com', 'Efream', 'Yohannes', 1, '2025-04-25 02:04:48', 1, 1, '2025-03-25 11:47:11', '2025-04-24 16:04:48', 'avatar_5_7aa6215a045431e8.jpg'),
 (4458, 'ibrahim', '$2y$10$Djik3HGaTGfUIie2ZE4xq.FXCjQZs85AnoDnLRUc9z1FfNDRCNJle', 'ibrahimkebede@gmail.com', NULL, NULL, 2, '2025-04-25 03:03:36', 1, 1, '2025-04-23 15:50:30', '2025-04-24 17:02:35', 'default.jpg'),
 (4471, 'adugna', '$2y$10$qkVyRXmdutRbn73CKiAqJuUg8Ix.RBoE4EPjgcs/s.RqaNX5o5PCa', 'gizawadugna@gmail.com', NULL, NULL, 5, NULL, 0, 0, '2025-04-24 14:06:37', NULL, 'default.jpg');
+
+--
+-- Table structure for table `knowledge_base`
+--
+
+CREATE TABLE IF NOT EXISTS `knowledge_base` (
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `content` TEXT NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for dumped tables
