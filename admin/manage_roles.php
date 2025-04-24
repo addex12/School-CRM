@@ -3,7 +3,7 @@ require_once '../includes/config.php';
 
 // Fetch roles
 $roles = [];
-$result = $pdo->query("SELECT id, name FROM roles");
+$result = $pdo->query("SELECT id, role_name FROM roles");
 if ($result) {
     while ($row = $result->fetch(PDO::FETCH_ASSOC)) {
         $roles[] = $row;
@@ -127,48 +127,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'], $_POST['pe
     </style>
 </head>
 <body>
-    <?php include 'includes/admin_sidebar.php'; ?>
-    <div class="container">
-        <div class="erp-card">
-            <h2><i class="fas fa-user-shield"></i> Manage Roles</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Role Name</th>
-                        <th>Permissions</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($roles as $role): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($role['name']) ?></td>
-                        <td>
-                            <form method="post" action="">
-                                <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
-                                <div class="permissions-list">
-                                <?php foreach ($permissions as $perm): ?>
-                                    <label>
-                                        <input type="checkbox" name="permissions[]" value="<?= $perm['id'] ?>"
-                                            <?= in_array($perm['id'], $role_permissions[$role['id']] ?? []) ? 'checked' : '' ?>>
-                                        <?= htmlspecialchars($perm['label']) ?>
-                                    </label>
-                                <?php endforeach; ?>
-                                </div>
-                                <button type="submit" class="erp-btn" style="padding:0.3rem 1rem;font-size:0.95rem;margin-top:0.5rem;">
-                                    <i class="fas fa-save"></i>Save
-                                </button>
-                            </form>
-                        </td>
-                        <td class="actions">
-                            <button title="Edit"><i class="fas fa-edit"></i></button>
-                            <button title="Delete"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-user-shield"></i> Manage Roles</h1>
+            </header>
+            <div class="container">
+                <div class="erp-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Role Name</th>
+                                <th>Permissions</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($roles as $role): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($role['role_name']) ?></td>
+                                <td>
+                                    <form method="post" action="">
+                                        <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
+                                        <div class="permissions-list">
+                                        <?php foreach ($permissions as $perm): ?>
+                                            <label>
+                                                <input type="checkbox" name="permissions[]" value="<?= $perm['id'] ?>"
+                                                    <?= in_array($perm['id'], $role_permissions[$role['id']] ?? []) ? 'checked' : '' ?>>
+                                                <?= htmlspecialchars($perm['label']) ?>
+                                            </label>
+                                        <?php endforeach; ?>
+                                        </div>
+                                        <button type="submit" class="erp-btn" style="padding:0.3rem 1rem;font-size:0.95rem;margin-top:0.5rem;">
+                                            <i class="fas fa-save"></i>Save
+                                        </button>
+                                    </form>
+                                </td>
+                                <td class="actions">
+                                    <button title="Edit"><i class="fas fa-edit"></i></button>
+                                    <button title="Delete"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+            <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>

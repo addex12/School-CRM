@@ -3,7 +3,7 @@ require_once '../includes/config.php';
 
 // Fetch users and their roles
 $users = [];
-$sql = "SELECT users.id, users.username, roles.id AS role_id, roles.name AS role_name
+$sql = "SELECT users.id, users.username, roles.id AS role_id, roles.role_name AS role_name
         FROM users
         LEFT JOIN roles ON users.role_id = roles.id";
 $result = $pdo->query($sql);
@@ -20,7 +20,7 @@ if ($result) {
 
 // Fetch all roles
 $roles = [];
-$res = $pdo->query("SELECT id, name FROM roles");
+$res = $pdo->query("SELECT id, role_name FROM roles");
 if ($res) {
     while ($row = $res->fetch(PDO::FETCH_ASSOC)) {
         $roles[] = $row;
@@ -114,48 +114,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['ro
     </style>
 </head>
 <body>
-    <?php include 'includes/admin_sidebar.php'; ?>
-    <div class="container">
-        <div class="erp-card">
-            <h2><i class="fas fa-user-lock"></i> User Permissions</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Role</th>
-                        <th>Permissions</th>
-                        <th>Change Role</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($user['name']) ?></td>
-                        <td><?= htmlspecialchars($user['role']) ?></td>
-                        <td>
-                            <?php
-                            $perms = $role_permissions[$user['role_id']] ?? [];
-                            echo $perms ? implode(', ', array_map('htmlspecialchars', $perms)) : '<span style="color:#aaa;">No permissions</span>';
-                            ?>
-                        </td>
-                        <td>
-                            <form method="post" action="">
-                                <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
-                                <select name="role_id">
-                                    <?php foreach ($roles as $role): ?>
-                                        <option value="<?= $role['id'] ?>"<?= $role['id'] == $user['role_id'] ? ' selected' : '' ?>>
-                                            <?= htmlspecialchars($role['name']) ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <button type="submit"><i class="fas fa-save"></i> Update</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-user-lock"></i> User Permissions</h1>
+            </header>
+            <div class="container">
+                <div class="erp-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Role</th>
+                                <th>Permissions</th>
+                                <th>Change Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($users as $user): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($user['name']) ?></td>
+                                <td><?= htmlspecialchars($user['role']) ?></td>
+                                <td>
+                                    <?php
+                                    $perms = $role_permissions[$user['role_id']] ?? [];
+                                    echo $perms ? implode(', ', array_map('htmlspecialchars', $perms)) : '<span style="color:#aaa;">No permissions</span>';
+                                    ?>
+                                </td>
+                                <td>
+                                    <form method="post" action="">
+                                        <input type="hidden" name="user_id" value="<?= $user['id'] ?>">
+                                        <select name="role_id">
+                                            <?php foreach ($roles as $role): ?>
+                                                <option value="<?= $role['id'] ?>"<?= $role['id'] == $user['role_id'] ? ' selected' : '' ?>>
+                                                    <?= htmlspecialchars($role['role_name']) ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="submit"><i class="fas fa-save"></i> Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+            <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
