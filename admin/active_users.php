@@ -597,12 +597,8 @@ else:
         actionsTd.querySelector('.save').onclick = function() {
             const username = usernameTd.querySelector('input').value.trim();
             const role_id = roleTd.querySelector('select').value;
-            // Online status is not editable, so get the current value from the DOM
-            // Default to 0 (offline) if not online-dot exists, 1 if online-dot exists
-            let online = 0;
-            if (onlineTd && onlineTd.querySelector('.online-dot')) {
-                online = 1;
-            }
+            // Online status is not editable, always set to 0 (offline) on edit/save
+            const online = 0;
             fetch('active_users.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
