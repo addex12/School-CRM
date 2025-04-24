@@ -114,7 +114,7 @@ try {
 
 // Error log viewer: read last 20 lines of error.log
 $errorLogLines = [];
-$errorLogPath = realpath(__DIR__ . '/../error.log');
+$errorLogPath = realpath(__DIR__ . '/../error_log');
 if ($errorLogPath && is_readable($errorLogPath)) {
     $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $errorLogLines = array_slice($lines, -20);
