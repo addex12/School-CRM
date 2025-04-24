@@ -209,9 +209,10 @@ else:
                 </table>
             </div>
         </div>
-        <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
     <script src="../assets/js/active_users.js"></script>
 </body>
+        <?php include __DIR__ . '/includes/footer.php'; ?>
+
 </html>
 <?php ob_end_flush(); ?>
