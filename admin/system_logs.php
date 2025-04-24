@@ -29,77 +29,84 @@ $totalPages = ceil($total / $perPage);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
+        .admin-main { margin-left: 260px; padding: 1.2rem 0.5rem; }
         .erp-card {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 2.5rem;
-            margin-bottom: 2rem;
+            padding: 1.2rem 1.2rem;
+            margin-bottom: 1.2rem;
             max-width: 900px;
             border: 1px solid #e5e7eb;
         }
         .erp-card h2 {
             color: #2563eb;
             font-weight: 600;
-            margin-bottom: 1.2rem;
-            font-size: 1.25rem;
+            margin-bottom: 0.9rem;
+            font-size: 1.1rem;
         }
         .erpnext-btn {
             background: linear-gradient(90deg, #2563eb 0%, #215967 100%);
             color: #fff;
             border: none;
-            border-radius: 5px;
-            padding: 0.5rem 1.2rem;
-            font-size: 1rem;
+            border-radius: 4px;
+            padding: 0.35rem 0.9rem;
+            font-size: 0.97em;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.18s, box-shadow 0.18s;
-            margin-bottom: 1rem;
+            margin-bottom: 0.7rem;
             box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             display: inline-flex;
             align-items: center;
-            gap: 0.5em;
+            gap: 0.4em;
+        }
+        .erpnext-btn i {
+            font-size: 0.97em;
         }
         .erpnext-btn:hover, .erpnext-btn:focus {
             background: linear-gradient(90deg, #215967 0%, #2563eb 100%);
             box-shadow: 0 2px 8px rgba(44,62,80,0.12);
         }
         .admin-header {
-            margin-bottom: 2rem;
+            margin-bottom: 1.2rem;
             border-bottom: 1.5px solid #e5e7eb;
-            padding-bottom: 1rem;
+            padding-bottom: 0.7rem;
         }
         .admin-header h1 {
             color: #2563eb;
             font-weight: 700;
-            font-size: 2rem;
+            font-size: 1.3rem;
             letter-spacing: 0.01em;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 0.7em;
+            gap: 0.5em;
+        }
+        .admin-header i {
+            font-size: 1.1em;
         }
         @media (max-width: 900px) {
-            .admin-main { margin-left: 70px; padding: 1rem; }
-            .erp-card { padding: 1rem; }
+            .admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
+            .erp-card { padding: 0.7rem; }
         }
         @media (max-width: 600px) {
-            .admin-main { margin-left: 0; padding: 0.5rem; }
-            .erp-card { padding: 0.7rem; }
-            .admin-header h1 { font-size: 1.2rem; }
+            .admin-main { margin-left: 0; padding: 0.3rem; }
+            .erp-card { padding: 0.4rem; }
+            .admin-header h1 { font-size: 1rem; }
+            .erp-card h2 { font-size: 1em; }
         }
         .erp-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             background: #fff;
         }
         .erp-table th, .erp-table td {
-            padding: 0.7em 1em;
+            padding: 0.5em 0.7em;
             border-bottom: 1px solid #e5e7eb;
             text-align: left;
-            font-size: 0.98rem;
+            font-size: 0.95rem;
         }
         .erp-table th {
             background: #f3f6fa;
@@ -111,11 +118,11 @@ $totalPages = ceil($total / $perPage);
         }
         .erp-pagination {
             display: flex;
-            gap: 0.5em;
+            gap: 0.3em;
             align-items: center;
         }
         .erp-pagination a, .erp-pagination span {
-            padding: 0.3em 0.8em;
+            padding: 0.2em 0.6em;
             border-radius: 4px;
             background: #f3f6fa;
             color: #2563eb;
@@ -123,6 +130,7 @@ $totalPages = ceil($total / $perPage);
             font-weight: 500;
             border: 1px solid #e5e7eb;
             transition: background 0.15s;
+            font-size: 0.95em;
         }
         .erp-pagination .active, .erp-pagination a:hover {
             background: #2563eb;
@@ -181,10 +189,10 @@ $totalPages = ceil($total / $perPage);
                     <?php endfor; ?>
                 </div>
                 <?php endif; ?>
-                <a href="audit_trail.php" class="erpnext-btn"><i class="fas fa-history"></i> View Audit Trail</a>
+                <a href="audit_trail.php" class="erpnext-btn"><i class="fas fa-history"></i> Audit Trail</a>
             </div>
         </div>
     </div>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
-    <?php include 'includes/footer.php'; ?>
