@@ -41,6 +41,63 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/messages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body, input, textarea, select, button {
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+        }
+        .erpnext-btn {
+            background: #f5f7fa;
+            color: #36414c;
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 18px;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .erpnext-btn.btn-primary {
+            background: #007bfc;
+            color: #fff;
+            border-color: #007bfc;
+        }
+        .erpnext-btn.btn-primary:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+        .erpnext-btn.btn-secondary {
+            background: #f5f7fa;
+            color: #36414c;
+            border-color: #d1d8dd;
+        }
+        .erpnext-btn.btn-secondary:hover {
+            background: #e4e8ec;
+        }
+        .erpnext-input, .erpnext-textarea {
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 15px;
+            background: #f5f7fa;
+            color: #36414c;
+        }
+        .erpnext-input:focus, .erpnext-textarea:focus {
+            outline: none;
+            border-color: #007bfc;
+            background: #fff;
+        }
+        .erpnext-label {
+            font-weight: 500;
+            color: #36414c;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .user-list li.selected {
+            background-color: #eaf3fb;
+            font-weight: 600;
+        }
+        /* ...keep .online-dot, .unread-badge, etc. from messages.css... */
+    </style>
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
@@ -82,8 +139,9 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
                     <div id="chat-messages" class="chat-messages"></div>
                     <form id="message-form" class="message-form" style="display:none;">
                         <input type="hidden" name="receiver_id" id="receiver_id">
-                        <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required style="width:100%;resize:vertical;"></textarea>
-                        <button type="submit" class="btn btn-primary" style="margin-top:8px;">
+                        <label class="erpnext-label" for="message-input">Message</label>
+                        <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required class="erpnext-textarea" style="width:100%;resize:vertical;"></textarea>
+                        <button type="submit" class="erpnext-btn btn-primary" style="margin-top:8px;">
                             <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </form>

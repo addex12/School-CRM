@@ -76,8 +76,8 @@ function getUserRoleName($roleId) {
             <div class="inbox-sidebar">
                 <h3>Online Users</h3>
                 <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.5rem;">
-                    <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" style="flex:1;">
-                    <select name="role" id="roleFilter">
+                    <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input" style="flex:1;">
+                    <select name="role" id="roleFilter" class="erpnext-input">
                         <option value="">All Roles</option>
                         <?php foreach ($roles as $role): ?>
                             <option value="<?= htmlspecialchars($role) ?>" <?= $role === $roleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
@@ -93,7 +93,7 @@ function getUserRoleName($roleId) {
                                 <span class="user-status"></span>
                                 <span class="username"><?= htmlspecialchars($user['username']) ?></span>
                                 <span class="user-role">(<?= htmlspecialchars($user['role_name'] ?? getUserRoleName($user['role_id'])) ?>)</span>
-                                <button class="btn btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
+                                <button class="erpnext-btn btn-primary btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -104,8 +104,8 @@ function getUserRoleName($roleId) {
             <div class="inbox-main">
                 <h1>Your Inbox</h1>
                 <div class="inbox-controls" style="display:flex;gap:1rem;margin-bottom:20px;">
-                    <input type="text" id="search" placeholder="Search messages..." class="search-bar" style="flex:1;">
-                    <select id="filter" class="filter-dropdown">
+                    <input type="text" id="search" placeholder="Search messages..." class="erpnext-input search-bar" style="flex:1;">
+                    <select id="filter" class="erpnext-input filter-dropdown">
                         <option value="all">All Messages</option>
                         <option value="unread">Unread</option>
                         <option value="read">Read</option>
@@ -124,8 +124,8 @@ function getUserRoleName($roleId) {
                                     <p class="content"><?= htmlspecialchars(substr($message['content'] ?? '', 0, 100)) ?>...</p>
                                 </div>
                                 <div class="message-actions">
-                                    <button class="btn btn-primary view-message" data-id="<?= $message['id'] ?>">View</button>
-                                    <button class="btn btn-secondary mark-read" data-id="<?= $message['id'] ?>" <?= $message['is_read'] ? 'disabled' : '' ?>>
+                                    <button class="erpnext-btn btn-primary view-message" data-id="<?= $message['id'] ?>">View</button>
+                                    <button class="erpnext-btn btn-secondary mark-read" data-id="<?= $message['id'] ?>" <?= $message['is_read'] ? 'disabled' : '' ?>>
                                         <?= $message['is_read'] ? 'Read' : 'Mark as Read' ?>
                                     </button>
                                 </div>
@@ -459,6 +459,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
 #chatForm button {
     padding: 10px 20px;
+}
+
+body, input, textarea, select, button {
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+}
+.erpnext-btn {
+    background: #f5f7fa;
+    color: #36414c;
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 18px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+}
+.erpnext-btn.btn-primary {
+    background: #007bfc;
+    color: #fff;
+    border-color: #007bfc;
+}
+.erpnext-btn.btn-primary:hover {
+    background: #0056b3;
+    color: #fff;
+}
+.erpnext-btn.btn-secondary {
+    background: #f5f7fa;
+    color: #36414c;
+    border-color: #d1d8dd;
+}
+.erpnext-btn.btn-secondary:hover {
+    background: #e4e8ec;
+}
+.erpnext-input {
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 15px;
+    background: #f5f7fa;
+    color: #36414c;
+}
+.erpnext-input:focus {
+    outline: none;
+    border-color: #007bfc;
+    background: #fff;
 }
 </style>
 

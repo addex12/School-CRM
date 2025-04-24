@@ -104,6 +104,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // No polling or setInterval here!
+
     // The following endpoints are used for message CRUD via AJAX:
     //   - ../api/edit_message.php
     //   - ../api/delete_message.php
