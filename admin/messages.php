@@ -91,10 +91,27 @@ foreach ($admins as $a) {
         }
         .online-users {
             padding: 0.5rem 1.2rem 0.5rem 1.2rem;
-            background: #e2efda;
+            background: #f5f7fa;
             border-bottom: 1px solid #e5e7eb;
             color: #215967;
             font-size: 0.98em;
+        }
+        .online-section-title {
+            font-weight: 600;
+            color: #215967;
+            margin-bottom: 0.2em;
+            margin-top: 0.5em;
+            font-size: 0.97em;
+        }
+        .online-admin-pill {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            border-radius: 1em;
+            padding: 0.2em 0.9em;
+            font-size: 0.97em;
+            margin-right: 0.4em;
+            margin-bottom: 0.2em;
         }
         .online-user-pill {
             display: inline-block;
@@ -104,6 +121,7 @@ foreach ($admins as $a) {
             padding: 0.2em 0.9em;
             font-size: 0.97em;
             margin-right: 0.4em;
+            margin-bottom: 0.2em;
         }
         .user-list {
             list-style: none;
@@ -278,15 +296,13 @@ foreach ($admins as $a) {
                             <button class="erpnext-btn btn-secondary" id="clearUserSearch" style="margin-left:0;">Clear</button>
                         </div>
                         <div class="online-users">
-                            <i class="fas fa-circle" style="color:#27ae60;font-size:0.9em;"></i>
-                            Online:
+                            <div class="online-section-title"><i class="fas fa-circle" style="color:#007bff;font-size:0.9em;"></i> Online Admins</div>
                             <?php foreach ($admins as $admin): ?>
                                 <?php if (in_array($admin['id'], $onlineAdmins)): ?>
-                                    <span class="online-user-pill" style="background:#007bff;">
-                                        <?= htmlspecialchars($admin['username']) ?> (Admin)
-                                    </span>
+                                    <span class="online-admin-pill"><?= htmlspecialchars($admin['username']) ?> (Admin)</span>
                                 <?php endif; ?>
                             <?php endforeach; ?>
+                            <div class="online-section-title" style="margin-top:0.7em;"><i class="fas fa-circle" style="color:#27ae60;font-size:0.9em;"></i> Online Users</div>
                             <?php foreach ($users as $user): ?>
                                 <?php if (in_array($user['id'], $onlineUsers)): ?>
                                     <span class="online-user-pill"><?= htmlspecialchars($user['username']) ?></span>
