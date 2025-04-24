@@ -16,7 +16,19 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
 // AJAX: Update user
 if (isset($_POST['ajax']) && $_POST['ajax'] === 'update_user') {
-    // ...existing code for update...
+    $id = intval($_POST['id']);
+    $username = trim($_POST['username']);
+    $role_id = trim($_POST['role_id']);
+    $status = isset($_POST['status']) ? trim($_POST['status']) : '';
+    $active = $status;
+    $stmt = $pdo->prepare("UPDATE users SET username = :username, role_id = :role_id, active = :active WHERE id = :id");
+    $ok = $stmt->execute([
+        ':username' => $username,
+        ':role_id' => $role_id,
+        ':active' => $active,
+        ':id' => $id
+    ]);
+    echo $ok ? 'success' : 'fail';
     exit;
 }
 

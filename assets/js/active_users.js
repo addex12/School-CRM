@@ -315,8 +315,30 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!tr) return;
             if (tr.classList.contains('editing')) return;
             tr.classList.add('editing');
-            // ...existing code for edit UI...
-            // Save handler
+
+            var usernameTd = tr.querySelector('.username');
+            var roleTd = tr.querySelector('.role');
+            var statusTd = tr.querySelector('.status');
+            var actionsTd = btn.parentElement;
+
+            var currentUsername = usernameTd.textContent.trim();
+            var currentRoleId = roleTd.getAttribute('data-role-id');
+            var currentStatus = statusTd.getAttribute('data-status');
+
+            // Build role select
+            var roleOptions = '';
+            window.activeUserRoles.forEach(function(role) {
+                roleOptions += '<option value="' + role.id + '">' + role.name + '</option>';
+            });
+
+            usernameTd.innerHTML = '<input type="text" value="' + currentUsername.replace(/"/g, '&quot;') + '" class="edit-username" style="width:120px;">';
+            roleTd.innerHTML = '<select class="edit-role">' + roleOptions + '</select>';
+            roleTd.querySelector('select').value = currentRoleId;
+            statusTd.innerHTML = '<select class="edit-status"><option value="1">Active</option><option value="0">Inactive</option></select>';
+            statusTd.querySelector('select').value = currentStatus;
+
+            actionsTd.innerHTML = '<button class="crud-btn save">Save</button> <button class="crud-btn cancel">Cancel</button>';
+
             actionsTd.querySelector('.save').addEventListener('click', function() {
                 var newUsername = usernameTd.querySelector('input').value.trim();
                 var newRoleId = roleTd.querySelector('select').value;
@@ -328,16 +350,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 formData.append('username', newUsername);
                 formData.append('role_id', newRoleId);
                 formData.append('status', newStatus);
-                fetch('admin/ajax_active_users.php', {
+                fetch('ajax_active_users.php', {
                     method: 'POST',
                     body: formData
                 })
                 .then(res => res.text())
                 .then(function(response) {
-                    // ...existing code...
+                    if (response.trim() === 'success') {
+                        usernameTd.textContent = newUsername;
+                        roleTd.textContent = roleTd.querySelector('select').selectedOptions[0].textContent;
+                        roleTd.setAttribute('data-role-id', newRoleId);
+                        statusTd.textContent = newStatus === '1' ? 'Active' : 'Inactive';
+                        statusTd.setAttribute('data-status', newStatus);
+                        actionsTd.innerHTML = '<button class="crud-btn edit">Edit</button> <button class="crud-btn delete">Delete</button>';
+                        tr.classList.remove('editing');
+                        // Re-bind edit/delete
+                        setTimeout(function() {
+                            tr.querySelector('.crud-btn.edit').addEventListener('click', arguments.callee.caller);
+                            tr.querySelector('.crud-btn.delete').addEventListener('click', deleteHandler);
+                        }, 0);
+                    } else {
+                        alert('Failed to update user.');
+                    }
                 });
             });
-            // ...existing code...
+
+            actionsTd.querySelector('.cancel').addEventListener('click', function() {
+                window.location.reload();
+            });
         });
     });
 
@@ -350,13 +390,17 @@ document.addEventListener('DOMContentLoaded', function() {
             var formData = new FormData();
             formData.append('ajax', 'delete_user');
             formData.append('id', userId);
-            fetch('admin/ajax_active_users.php', {
+            fetch('ajax_active_users.php', {
                 method: 'POST',
                 body: formData
             })
             .then(res => res.text())
             .then(function(response) {
-                // ...existing code...
+                if (response.trim() === 'success') {
+                    tr.remove();
+                } else {
+                    alert('Failed to delete user.');
+                }
             });
         }
     }
@@ -367,3 +411,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // All other AJAX (search/filter, bulk actions, export) should also use 'admin/ajax_active_users.php'
     // ...existing code...
 });
+
+// Helper: Set roles for JS (add this in a <script> tag in your PHP file)
+window.activeUserRoles = [
+    // ...populate from PHP...
+    // Example: {id: 1, name: "Admin"}, {id: 2, name: "Teacher"}, ...
+];
