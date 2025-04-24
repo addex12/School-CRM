@@ -64,13 +64,6 @@
         }
     </style>
     <div class="footer-content">
-        <div class="footer-section quick-links">
-            <h4>Quick Links</h4>
-            <ul>
-                <li><a href="faq.php">FAQ</a></li>
-                <li><a href="terms.php">Terms of Service</a></li>
-            </ul>
-        </div>
         <div class="footer-section contact-info">
             <h4>Contact Info</h4>
             <p>Email: <a href="mailto:contactus@flipperschools.com">contactus@flipperschools.com</a></p>
