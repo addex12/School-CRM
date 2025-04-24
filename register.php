@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    $role = $_POST['role'] ?? 'parent';
+    // $role = $_POST['role'] ?? 'parent'; // Remove role assignment
 
     // Validation
     if (empty($username)) $errors['username'] = "Username is required";
@@ -54,14 +54,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Get role_id from roles table
+    // Remove role_id logic, set to NULL for now
     $role_id = null;
-    $roleStmt = $pdo->prepare("SELECT id FROM roles WHERE role_name = ?");
-    $roleStmt->execute([$role]);
-    $role_id = $roleStmt->fetchColumn();
-    if (!$role_id) {
-        $errors['general'] = "Registration failed: Role not found. Please contact admin.";
-    }
 
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
