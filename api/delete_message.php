@@ -4,47 +4,71 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 
 header('Content-Type: application/json');
-requireAdmin();
 
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!isset($data['id'])) {
+    http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Invalid input']);
     exit;
 }
 
 $messageId = (int)$data['id'];
 $userId = $_SESSION['user_id'];
-$bothSides = !empty($data['both_sides']); // true if deleting for both sender and receiver
+$isAdmin = isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1;
+$bothSides = !empty($data['both_sides']);
 
-// Only allow deleting own messages or as admin
+// Fetch message
 $stmt = $pdo->prepare("SELECT * FROM messages WHERE id = ?");
 $stmt->execute([$messageId]);
 $message = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$message) {
+    http_response_code(404);
     echo json_encode(['success' => false, 'error' => 'Message not found']);
     exit;
 }
 
+// Soft delete logic: set deleted_by_sender or deleted_by_receiver
 if ($bothSides) {
-    // Delete the message for everyone
+    if (!$isAdmin) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'error' => 'Permission denied']);
+        exit;
+    }
+    // Admin: delete for both sides (hard delete)
     $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
     $success = $stmt->execute([$messageId]);
 } else {
-    // "Soft delete" for current user: you may want to implement a flag (e.g., deleted_by_sender/deleted_by_receiver)
-    // For now, only allow sender to delete their own message
+    // Only sender or receiver can soft delete for themselves
     if ($message['sender_id'] == $userId) {
-        $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
+        // Mark as deleted by sender
+        $stmt = $pdo->prepare("UPDATE messages SET deleted_by_sender = 1 WHERE id = ?");
+        $success = $stmt->execute([$messageId]);
+    } elseif ($message['receiver_id'] == $userId) {
+        // Mark as deleted by receiver
+        $stmt = $pdo->prepare("UPDATE messages SET deleted_by_receiver = 1 WHERE id = ?");
         $success = $stmt->execute([$messageId]);
     } else {
+        http_response_code(403);
         echo json_encode(['success' => false, 'error' => 'Permission denied']);
         exit;
+    }
+    // Optionally, hard delete if both have deleted
+    if ($success) {
+        $stmt = $pdo->prepare("SELECT deleted_by_sender, deleted_by_receiver FROM messages WHERE id = ?");
+        $stmt->execute([$messageId]);
+        $flags = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($flags && $flags['deleted_by_sender'] && $flags['deleted_by_receiver']) {
+            $stmt = $pdo->prepare("DELETE FROM messages WHERE id = ?");
+            $stmt->execute([$messageId]);
+        }
     }
 }
 
 if ($success) {
     echo json_encode(['success' => true]);
 } else {
+    http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Failed to delete message']);
 }
