@@ -597,8 +597,8 @@ else:
         actionsTd.querySelector('.save').onclick = function() {
             const username = usernameTd.querySelector('input').value.trim();
             const role_id = roleTd.querySelector('select').value;
-            // Always set online to 0 (offline) when saving
-            const online = 0;fline;
+            // Always set online to false (0) when saving
+            const online = false;
             fetch('active_users.php', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -607,7 +607,7 @@ else:
                     id: id,
                     username: username,
                     role_id: role_id,
-                    online: online,
+                    online: online ? 1 : 0,
                     active: 1
                 })
             }).then(res => res.text()).then(resp => {
