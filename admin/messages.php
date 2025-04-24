@@ -12,11 +12,11 @@ $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id 
 // Get all admins (including self)
 $admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
-// Get unread counts for each user
+// Get unread counts for each user (fix: group by sender_id, not receiver_id)
 $unreadCounts = [];
-$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY receiver_id");
+$stmt = $pdo->query("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY sender_id");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $unreadCounts[$row['receiver_id']] = $row['unread'];
+    $unreadCounts[$row['sender_id']] = $row['unread'];
 }
 
 // Simulate online users (last_active within 5 minutes)
@@ -204,29 +204,47 @@ foreach ($admins as $a) {
             font-size: 1em;
         }
         .chat-message {
-            margin-bottom: 15px;
-            padding: 10px 14px;
-            border-radius: 7px;
-            max-width: 70%;
+            margin-bottom: 10px;
+            padding: 10px 16px;
+            border-radius: 18px;
+            max-width: 75%;
             word-break: break-word;
             font-size: 1em;
             box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            position: relative;
+            clear: both;
         }
         .chat-message.own {
-            background-color: #e2efda;
+            background: #d1f7c4;
             margin-left: auto;
             color: #215967;
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 18px;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            align-self: flex-end;
         }
         .chat-message.other {
-            background-color: #f1f1f1;
+            background: #fff;
             margin-right: auto;
             color: #222d32;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 18px;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            align-self: flex-start;
         }
         .msg-time {
-            font-size: 12px;
-            color: #777;
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 4px;
             display: block;
-            margin-top: 5px;
+            text-align: right;
+        }
+        .chat-message strong {
+            font-size: 0.97em;
+            color: #007bff;
+            font-weight: 600;
         }
         .edit-btn, .delete-btn {
             background: none;
@@ -238,6 +256,33 @@ foreach ($admins as $a) {
         }
         .edit-btn:hover, .delete-btn:hover {
             color: #e74c3c;
+        }
+        .notification-bell {
+            position: relative;
+            display: inline-block;
+            margin-right: 18px;
+            cursor: pointer;
+        }
+        .notification-bell .fa-bell {
+            font-size: 1.5rem;
+            color: #e74c3c;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 7px;
+            font-size: 0.85em;
+            font-weight: 600;
+            z-index: 2;
+        }
+        .user-list li.unread-highlight {
+            background: #fffbe6 !important;
+            font-weight: 600;
+            border-left: 4px solid #e74c3c;
         }
         @media (max-width: 900px) {
             .messaging-container {
@@ -285,7 +330,20 @@ foreach ($admins as $a) {
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header"><h1 style="color:#215967;font-weight:700;"><i class="fas fa-envelope"></i> <?= htmlspecialchars($pageTitle) ?></h1></header>
+            <header class="admin-header" style="display:flex;align-items:center;justify-content:space-between;">
+                <h1 style="color:#215967;font-weight:700;">
+                    <i class="fas fa-envelope"></i> <?= htmlspecialchars($pageTitle) ?>
+                </h1>
+                <?php
+                $totalUnread = array_sum($unreadCounts);
+                ?>
+                <?php if ($totalUnread > 0): ?>
+                    <span class="notification-bell" id="notificationBell" title="Unread Messages">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge"><?= $totalUnread ?></span>
+                    </span>
+                <?php endif; ?>
+            </header>
             <div class="content">
                 <div class="messaging-container">
                     <aside class="contact-list">
@@ -295,7 +353,7 @@ foreach ($admins as $a) {
                             <button class="erpnext-btn btn-primary" id="searchUserBtn" style="margin-left:0;"><i class="fas fa-search"></i></button>
                             <button class="erpnext-btn btn-secondary" id="clearUserSearch" style="margin-left:0;">Clear</button>
                         </div>
-                        <div class="online-users">
+                        <div class="online-users"></div></div>
                             <div class="online-section-title"><i class="fas fa-circle" style="color:#007bff;font-size:0.9em;"></i> Online Admins</div>
                             <?php foreach ($admins as $admin): ?>
                                 <?php if (in_array($admin['id'], $onlineAdmins)): ?>
@@ -311,15 +369,31 @@ foreach ($admins as $a) {
                         </div>
                         <ul id="user-list" class="user-list">
                             <li data-user-id="broadcast" class="contact-item">Broadcast to All Users</li>
-                            <?php foreach ($users as $user): ?>
-                                <li data-user-id="<?= $user['id'] ?>" class="contact-item<?= in_array($user['id'], $onlineUsers) ? ' online' : '' ?>">
+                            <?php
+                            // Sort users: unread first, then online, then others
+                            $usersSorted = $users;
+                            usort($usersSorted, function($a, $b) use ($unreadCounts, $onlineUsers) {
+                                $aUnread = isset($unreadCounts[$a['id']]) ? 1 : 0;
+                                $bUnread = isset($unreadCounts[$b['id']]) ? 1 : 0;
+                                if ($aUnread !== $bUnread) return $bUnread - $aUnread;
+                                $aOnline = in_array($a['id'], $onlineUsers) ? 1 : 0;
+                                $bOnline = in_array($b['id'], $onlineUsers) ? 1 : 0;
+                                if ($aOnline !== $bOnline) return $bOnline - $aOnline;
+                                return strcmp($a['username'], $b['username']);
+                            });
+                            foreach ($usersSorted as $user):
+                                $isOnline = in_array($user['id'], $onlineUsers);
+                                $hasUnread = isset($unreadCounts[$user['id']]);
+                            ?>
+                                <li data-user-id="<?= $user['id'] ?>"
+                                    class="contact-item<?= $isOnline ? ' online' : '' ?><?= $hasUnread ? ' unread-highlight' : '' ?>">
                                     <span>
-                                        <?php if (in_array($user['id'], $onlineUsers)): ?>
+                                        <?php if ($isOnline): ?>
                                             <span class="online-dot"></span>
                                         <?php endif; ?>
                                         <?= htmlspecialchars($user['username']) ?>
                                     </span>
-                                    <?php if (isset($unreadCounts[$user['id']])): ?>
+                                    <?php if ($hasUnread): ?>
                                         <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                     <?php endif; ?>
                                 </li>
@@ -330,7 +404,7 @@ foreach ($admins as $a) {
                         <div id="chat-header" class="chat-header">
                             <h3>Select a user to start chatting</h3>
                         </div>
-                        <div id="chat-messages" class="chat-messages"></div>
+                        <div id="chat-messages" class="chat-messages" style="display:flex;flex-direction:column;"></div>
                         <form id="message-form" class="message-form" style="display:none;">
                             <input type="hidden" name="receiver_id" id="receiver_id">
                             <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required></textarea>
@@ -394,7 +468,7 @@ foreach ($admins as $a) {
                                     messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
                                     messageDiv.innerHTML = `
                                         <strong>${msg.sender}</strong>
-                                        <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
+                                        <p class="msg-text" data-msg-id="${msg.id}" style="margin:0 0 2px 0;">${msg.message}</p>
                                         <span class="msg-time">${msg.sent_at}</span>
                                         ${
                                             msg.is_own
@@ -408,7 +482,7 @@ foreach ($admins as $a) {
                                 chatMessages.scrollTop = chatMessages.scrollHeight;
                                 markAsRead(userId);
                             } else {
-                                chatMessages.innerHTML = '<p>No messages yet. Start the conversation!</p>';
+                                chatMessages.innerHTML = '<p style="color:#888;text-align:center;">No messages yet. Start the conversation!</p>';
                             }
                         } else {
                             chatMessages.innerHTML = `<p>Error loading messages: ${data.error}</p>`;
@@ -560,6 +634,18 @@ foreach ($admins as $a) {
                 if (broadcast) ul.insertBefore(broadcast, ul.firstChild);
             }
             moveOnlineUsersToTop();
+
+            // Notification bell click: select first unread user
+            const notificationBell = document.getElementById('notificationBell');
+            if (notificationBell) {
+                notificationBell.addEventListener('click', function() {
+                    const firstUnread = document.querySelector('.user-list li.unread-highlight');
+                    if (firstUnread) {
+                        firstUnread.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstUnread.click();
+                    }
+                });
+            }
         });
     </script>
 </body>
