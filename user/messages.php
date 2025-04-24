@@ -146,6 +146,32 @@ $selectedUserId = isset($_GET['user_id']) ? intval($_GET['user_id']) : null;
             margin-left: auto;
             font-weight: 600;
         }
+        .chat-messages {
+            max-height: 400px; /* Set a maximum height */
+            overflow-y: auto; /* Enable vertical scrolling */
+            padding: 10px;
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            background: #f9f9f9;
+            margin-bottom: 12px;
+            resize: vertical; /* Allow resizing */
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #d1d8dd;
+            border-radius: 4px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #b0b8c1;
+        }
+        .message-form textarea {
+            width: 100%;
+            resize: vertical; /* Allow resizing */
+            min-height: 60px; /* Set a minimum height */
+            max-height: 200px; /* Set a maximum height */
+        }
     </style>
 </head>
 <body>
