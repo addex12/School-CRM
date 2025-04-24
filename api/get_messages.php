@@ -31,6 +31,7 @@ try {
         ");
         $stmt->execute();
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Do NOT run the update query for broadcast
         foreach ($messages as &$msg) {
             $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
             $msg['sender'] = $msg['sender_username'];
@@ -62,15 +63,17 @@ try {
         $stmt->execute($params);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Only run this update for non-broadcast messages
-        $update = $pdo->prepare("
-            UPDATE messages SET is_read = 1
-            WHERE receiver_id = :current_user AND sender_id = :contact_id
-        ");
-        $update->execute([
-            'current_user' => $current_user_id,
-            'contact_id' => $contact_id
-        ]);
+        // Only run this update for non-broadcast messages and only if contact_id is numeric
+        if (is_numeric($contact_id)) {
+            $update = $pdo->prepare("
+                UPDATE messages SET is_read = 1
+                WHERE receiver_id = :current_user AND sender_id = :contact_id
+            ");
+            $update->execute([
+                'current_user' => $current_user_id,
+                'contact_id' => $contact_id
+            ]);
+        }
 
         foreach ($messages as &$msg) {
             $msg['is_own'] = ($msg['sender_id'] == $current_user_id);
