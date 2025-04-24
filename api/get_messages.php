@@ -36,16 +36,28 @@ try {
     }
 
     if ($other_user_id === 'broadcast') {
-        // Handle broadcast messages
-        $query = "SELECT m.*, u.username as sender 
-                 FROM messages m
-                 JOIN users u ON m.sender_id = u.id
-                 WHERE m.receiver_id = :current_user_id 
-                 AND m.is_admin = 1
-                 ORDER BY m.sent_at ASC";
-        
-        $stmt = $pdo->prepare($query);
-        $stmt->bindParam(':current_user_id', $current_user_id, PDO::PARAM_INT);
+        // Fetch all messages sent by the current admin to all users (broadcasts)
+        $stmt = $pdo->prepare("SELECT m.*, u.username AS sender 
+            FROM messages m 
+            JOIN users u ON m.sender_id = u.id 
+            WHERE m.sender_id = ? AND m.receiver_id IN (SELECT id FROM users WHERE role_id != 1)
+            ORDER BY m.sent_at ASC");
+        $stmt->execute([$current_user_id]);
+        $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'success' => true,
+            'messages' => array_map(function($msg) {
+                return [
+                    'id' => $msg['id'],
+                    'sender' => $msg['sender'],
+                    'message' => $msg['content'],
+                    'sent_at' => $msg['sent_at'],
+                    'is_own' => true
+                ];
+            }, $messages)
+        ]);
+        exit;
     } else {
         // Handle one-to-one conversations
         $query = "SELECT m.*, u.username as sender 
