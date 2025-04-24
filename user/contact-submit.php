@@ -15,7 +15,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/db.php'; // Ensure this file initializes $pdo
 
-global $pdo;
+global $pdo; // Ensure $pdo is accessible
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
