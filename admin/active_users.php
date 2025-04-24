@@ -90,7 +90,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
 
     $where_sql = implode(' AND ', $where);
 
-    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.status, r.role_name AS role_name
+    $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.active, r.role_name AS role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
         WHERE $where_sql
@@ -107,6 +107,11 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         } else {
             $offline_users[] = $user;
         }
+    }
+
+
+    foreach ($users as &$user) {
+        $user['active'] = (int)$user['active'];
     }
 
     ob_clean();
