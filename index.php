@@ -5,6 +5,8 @@ session_start();
 // Include required files
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
+require_once __DIR__ . '/includes/config.php'; // Ensure this path is correct
+
 
 // Ensure the Auth class exists
 if (!class_exists('Auth')) {
