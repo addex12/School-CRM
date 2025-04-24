@@ -18,7 +18,7 @@ $newMessage = trim($data['message']);
 $userId = $_SESSION['user_id'];
 $isAdmin = isset($_SESSION['role_id']) && $_SESSION['role_id'] == 1;
 
-// Fetch message
+// Fetch message from the correct table
 $stmt = $pdo->prepare("SELECT * FROM messages WHERE id = ?");
 $stmt->execute([$messageId]);
 $message = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -36,8 +36,8 @@ if ($message['sender_id'] != $userId && !$isAdmin) {
     exit;
 }
 
-// Update message (use 'content' column)
-$stmt = $pdo->prepare("UPDATE messages SET content = ?, edited_at = NOW() WHERE id = ?");
+// Update message content in the messages table
+$stmt = $pdo->prepare("UPDATE messages SET content = ?, created_at = NOW() WHERE id = ?");
 $success = $stmt->execute([$newMessage, $messageId]);
 
 if ($success) {
