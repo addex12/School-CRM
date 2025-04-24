@@ -38,18 +38,17 @@ try {
             $msg['message'] = $msg['content'];
         }
     } else {
-        // Make sure contact_id is not 'broadcast'
-        if ($contact_id === 'broadcast') {
-            throw new Exception('Invalid contact id');
+        // Ensure both parameters are set and not empty
+        if (empty($current_user_id) || empty($contact_id)) {
+            throw new Exception('User ID or Contact ID missing');
         }
-        // Use the same params array for both queries, keys without colons
         $params = [
             'current_user' => $current_user_id,
             'contact_id' => $contact_id
         ];
         $stmt = $pdo->prepare("
-            SELECT m.*, 
-                   us.username AS sender_username, 
+            SELECT m.*,
+                   us.username AS sender_username,
                    ur.username AS receiver_username
             FROM messages m
             JOIN users us ON m.sender_id = us.id

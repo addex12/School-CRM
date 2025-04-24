@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 24, 2025 at 10:50 PM
+-- Generation Time: Apr 25, 2025 at 03:06 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.19
 
@@ -20,6 +20,21 @@ SET time_zone = "+00:00";
 --
 -- Database: `flipperschool_parent_survey_system`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_logs`
+--
+
+CREATE TABLE `activity_logs` (
+  `id` int(11) NOT NULL,
+  `username` varchar(100) DEFAULT NULL,
+  `role` varchar(50) DEFAULT NULL,
+  `action` text NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `timestamp` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
@@ -108,11 +123,29 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `details`, `ip_address`, `c
 (48, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 11:00:56'),
 (49, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:03:03'),
 (52, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:16:23'),
-(53, 4470, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:38:24'),
+(53, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:38:24'),
 (54, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:54:51'),
 (55, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 12:15:33'),
 (56, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 12:27:41'),
-(57, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 12:35:36');
+(57, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 12:35:36'),
+(58, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 13:02:22'),
+(59, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 13:05:32'),
+(60, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 13:06:05'),
+(61, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 13:41:43'),
+(62, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 13:50:14'),
+(63, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 14:02:49'),
+(64, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 14:34:51'),
+(65, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 14:50:35'),
+(66, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 15:23:23'),
+(67, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 15:29:00'),
+(68, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 15:55:17'),
+(69, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 15:55:25'),
+(70, 5, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 16:04:35'),
+(71, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 16:04:48'),
+(72, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 16:39:05'),
+(73, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 16:47:59'),
+(74, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 17:02:35'),
+(75, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 17:03:32');
 
 -- --------------------------------------------------------
 
@@ -184,8 +217,25 @@ CREATE TABLE `messages` (
   `subject` varchar(255) DEFAULT NULL,
   `content` text NOT NULL,
   `sent_at` datetime DEFAULT current_timestamp(),
-  `is_read` tinyint(1) NOT NULL DEFAULT 0
+  `is_read` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_by_sender` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_by_receiver` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `sender_id`, `receiver_id`, `subject`, `content`, `sent_at`, `is_read`, `deleted_by_sender`, `deleted_by_receiver`, `created_at`) VALUES
+(3, 4, 4458, NULL, 'hello', '2025-04-25 02:16:53', 1, 0, 0, '2025-04-25 02:58:20'),
+(4, 5, 4458, NULL, 'hi are fine', '2025-04-25 02:17:10', 0, 0, 0, '2025-04-25 02:58:20'),
+(5, 5, 4471, NULL, 'test 123', '2025-04-25 02:18:01', 0, 0, 0, '2025-04-25 02:58:20'),
+(7, 4, 4471, NULL, 'hey', '2025-04-25 02:41:35', 0, 0, 0, '2025-04-25 02:58:20'),
+(8, 4, 4458, NULL, 'hu', '2025-04-25 02:42:58', 0, 0, 0, '2025-04-25 02:58:20'),
+(9, 4, 4458, NULL, 'hi', '2025-04-25 02:51:39', 0, 0, 0, '2025-04-25 02:58:20'),
+(10, 4, 4458, NULL, 'hi', '2025-04-25 02:53:40', 0, 0, 0, '2025-04-25 02:58:20'),
+(11, 4, 4458, NULL, 'hi', '2025-04-25 03:04:06', 0, 0, 0, '2025-04-25 03:04:06');
 
 -- --------------------------------------------------------
 
@@ -297,7 +347,8 @@ INSERT INTO `roles` (`id`, `role_name`, `description`, `created_at`) VALUES
 (1, 'admin', 'System Administrator', '2025-03-28 16:53:20'),
 (2, 'teacher', 'Teaching Staff', '2025-03-28 16:52:46'),
 (3, 'parent', 'Student Parent', '2025-03-28 16:53:05'),
-(4, 'student', 'School Student', '2025-03-28 16:53:39');
+(4, 'student', 'School Student', '2025-03-28 16:53:39'),
+(5, 'new', NULL, '2025-04-24 13:07:03');
 
 -- --------------------------------------------------------
 
@@ -309,6 +360,78 @@ CREATE TABLE `role_permissions` (
   `role_id` int(11) NOT NULL,
   `permission_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `role_permissions`
+--
+
+INSERT INTO `role_permissions` (`role_id`, `permission_id`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7),
+(1, 8),
+(1, 9),
+(1, 10),
+(1, 11),
+(1, 12),
+(1, 13),
+(1, 14),
+(1, 15),
+(1, 16),
+(1, 17),
+(1, 18),
+(1, 19),
+(1, 20),
+(1, 21),
+(1, 22),
+(1, 23),
+(1, 24),
+(1, 25),
+(1, 26),
+(1, 27),
+(1, 28),
+(1, 29),
+(1, 30),
+(1, 31),
+(1, 32),
+(1, 33),
+(1, 34),
+(1, 35),
+(1, 36),
+(1, 37),
+(1, 38),
+(1, 39),
+(1, 40),
+(1, 41),
+(1, 42),
+(2, 3),
+(2, 6),
+(2, 7),
+(2, 8),
+(2, 11),
+(2, 13),
+(2, 17),
+(2, 19),
+(2, 20),
+(2, 21),
+(2, 24),
+(2, 25),
+(2, 26),
+(2, 27),
+(2, 28),
+(2, 30),
+(2, 34),
+(2, 36),
+(2, 37),
+(2, 38),
+(2, 39),
+(2, 40),
+(2, 41),
+(2, 42);
 
 -- --------------------------------------------------------
 
@@ -395,6 +518,13 @@ CREATE TABLE `surveys` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `surveys`
+--
+
+INSERT INTO `surveys` (`id`, `title`, `description`, `category_id`, `status`, `created_by`, `starts_at`, `ends_at`, `is_anonymous`, `is_active`, `created_at`) VALUES
+(3, 'Teachers Survey', 'This is survey for teachers', 2, 2, 4, '2025-04-24 14:50:00', '2025-05-24 15:50:00', 1, 1, '2025-04-24 15:52:57');
+
 -- --------------------------------------------------------
 
 --
@@ -450,6 +580,14 @@ CREATE TABLE `survey_fields` (
   `display_order` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `survey_fields`
+--
+
+INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `field_name`, `field_options`, `is_required`, `display_order`) VALUES
+(3, 3, 'rating', 'On a scale of 1-5, how satisfied are you with your current teaching workload?', '', NULL, 1, 0),
+(4, 3, 'radio', 'Do you feel you have adequate planning time during the school day?', '', '[\"Yes\",\"No\"]', 1, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -491,6 +629,13 @@ CREATE TABLE `survey_roles` (
   `survey_id` int(11) NOT NULL,
   `role_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `survey_roles`
+--
+
+INSERT INTO `survey_roles` (`id`, `survey_id`, `role_id`) VALUES
+(2, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -537,13 +682,23 @@ CREATE TABLE `system_settings` (
 --
 
 INSERT INTO `system_settings` (`id`, `setting_key`, `academic_year`, `term`, `setting_value`, `setting_group`, `created_at`, `updated_at`) VALUES
-(1, 'site_name', NULL, NULL, 'School CRM System', 'general', '2025-04-22 23:46:38', '2025-04-22 23:46:38'),
+(1, 'site_name', NULL, NULL, 'Flipper International School CRM System', 'general', '2025-04-22 23:46:38', '2025-04-24 14:09:16'),
 (2, 'site_email', NULL, NULL, 'admin@school.edu', 'general', '2025-04-22 23:46:38', '2025-04-22 23:46:38'),
 (3, 'timezone', NULL, NULL, 'Africa/Nairobi', 'general', '2025-04-22 23:46:38', '2025-04-22 23:47:40'),
 (4, 'items_per_page', NULL, NULL, '20', 'general', '2025-04-22 23:46:38', '2025-04-22 23:47:40'),
 (11, 'enable_surveys', NULL, NULL, '1', 'features', '2025-04-23 00:11:40', '2025-04-23 00:11:40'),
 (12, 'enable_notifications', NULL, NULL, '1', 'features', '2025-04-23 00:11:40', '2025-04-23 00:11:40'),
-(13, 'enable_chat', NULL, NULL, '1', 'features', '2025-04-23 00:11:40', '2025-04-23 00:11:40');
+(13, 'enable_chat', NULL, NULL, '1', 'features', '2025-04-23 00:11:40', '2025-04-23 00:11:40'),
+(16, 'admin_email', NULL, NULL, 'adugna.gizaw@flipperschools.com', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(18, 'language', NULL, NULL, 'English', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(19, 'smtp_host', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(20, 'smtp_port', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(21, 'smtp_user', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(22, 'smtp_pass', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(23, 'smtp_secure', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(24, 'from_email', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(25, 'password_min_length', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58'),
+(26, 'session_timeout', NULL, NULL, '', 'general', '2025-04-24 13:12:58', '2025-04-24 13:12:58');
 
 -- --------------------------------------------------------
 
@@ -624,27 +779,20 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `online`, `active`, `created_at`, `last_login`, `avatar`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, '2025-04-24 22:35:36', 1, 1, '2025-03-24 16:50:31', '2025-04-24 12:35:36', 'admin_avatar.jpg'),
-(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'mcdc@gmail.com', 'Efream', 'Yohannes', 2, NULL, 0, 1, '2025-03-25 11:47:11', '2025-04-21 07:40:11', 'student_avatar5.jpg'),
-(4458, 'ibrahim', '$2y$10$Djik3HGaTGfUIie2ZE4xq.FXCjQZs85AnoDnLRUc9z1FfNDRCNJle', 'ibrahimkebede@gmail.com', NULL, NULL, 2, '2025-04-24 20:57:13', 0, 1, '2025-04-23 15:50:30', '2025-04-24 10:47:37', 'default.jpg'),
-(4470, 'adugna', '$2y$10$GGW1sY104GqRiQCPV/EyYOFnFu3DT6653waaSd81mXq4pHA.cJtXm', 'gizawadugna@gmail.com', NULL, NULL, NULL, '2025-04-24 21:38:41', 1, 0, '2025-04-24 11:31:57', '2025-04-24 11:38:24', 'default.jpg');
-
---
--- Table structure for table `activity_logs`
---
-
-CREATE TABLE IF NOT EXISTS activity_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) DEFAULT NULL,
-    role VARCHAR(50) DEFAULT NULL,
-    action TEXT NOT NULL,
-    ip_address VARCHAR(45) DEFAULT NULL,
-    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, '2025-04-25 03:03:32', 1, 1, '2025-03-24 16:50:31', '2025-04-24 17:03:32', 'admin_avatar.jpg'),
+(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'mcdc@gmail.com', 'Efream', 'Yohannes', 1, '2025-04-25 02:04:48', 1, 1, '2025-03-25 11:47:11', '2025-04-24 16:04:48', 'avatar_5_7aa6215a045431e8.jpg'),
+(4458, 'ibrahim', '$2y$10$Djik3HGaTGfUIie2ZE4xq.FXCjQZs85AnoDnLRUc9z1FfNDRCNJle', 'ibrahimkebede@gmail.com', NULL, NULL, 2, '2025-04-25 03:03:36', 1, 1, '2025-04-23 15:50:30', '2025-04-24 17:02:35', 'default.jpg'),
+(4471, 'adugna', '$2y$10$qkVyRXmdutRbn73CKiAqJuUg8Ix.RBoE4EPjgcs/s.RqaNX5o5PCa', 'gizawadugna@gmail.com', NULL, NULL, 5, NULL, 0, 0, '2025-04-24 14:06:37', NULL, 'default.jpg');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `announcements`
@@ -811,6 +959,12 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `activity_logs`
+--
+ALTER TABLE `activity_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `announcements`
 --
 ALTER TABLE `announcements`
@@ -820,7 +974,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `feedback_subjects`
@@ -832,7 +986,7 @@ ALTER TABLE `feedback_subjects`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `parents`
@@ -856,7 +1010,7 @@ ALTER TABLE `response_data`
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `students`
@@ -874,7 +1028,7 @@ ALTER TABLE `student_parents`
 -- AUTO_INCREMENT for table `surveys`
 --
 ALTER TABLE `surveys`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `survey_categories`
@@ -886,7 +1040,7 @@ ALTER TABLE `survey_categories`
 -- AUTO_INCREMENT for table `survey_fields`
 --
 ALTER TABLE `survey_fields`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `survey_responses`
@@ -898,13 +1052,13 @@ ALTER TABLE `survey_responses`
 -- AUTO_INCREMENT for table `survey_roles`
 --
 ALTER TABLE `survey_roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `system_settings`
 --
 ALTER TABLE `system_settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `teachers`
@@ -928,7 +1082,7 @@ ALTER TABLE `transcripts`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4471;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4472;
 
 --
 -- Constraints for dumped tables
