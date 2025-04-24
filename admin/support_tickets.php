@@ -48,12 +48,14 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #36414c;
             border: 1px solid #d1d8dd;
             border-radius: 4px;
-            padding: 8px 18px;
+            padding: 6px 12px;
+            font-size: 0.95rem;
             font-weight: 500;
             transition: background 0.2s, color 0.2s;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            line-height: 1.2;
         }
         .erpnext-btn.btn-primary {
             background: #007bfc;
@@ -71,6 +73,10 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         .erpnext-btn.btn-secondary:hover {
             background: #e4e8ec;
+        }
+        .erpnext-btn.btn-sm {
+            padding: 3px 7px;
+            font-size: 0.85rem;
         }
         .tickets-table {
             width: 100%;
@@ -96,13 +102,17 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .status-open { color: #27ae60; font-weight: 500; }
         .status-closed { color: #e74c3c; font-weight: 500; }
         .ticket-actions a {
-            margin-right: 8px;
+            margin-right: 6px;
             color: #3498db;
             text-decoration: none;
-            font-size: 1.1em;
+            font-size: 1em;
+            vertical-align: middle;
         }
         .ticket-actions a:last-child {
             margin-right: 0;
+        }
+        .ticket-actions i {
+            font-size: 1em;
         }
         .erpnext-card {
             background: #f8f9fa;
@@ -116,8 +126,26 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .admin-main, .dashboard-section { padding: 1rem 0.5rem; }
         }
         @media (max-width: 600px) {
+            .tickets-header h2 {
+                font-size: 1.1rem;
+            }
+            .erpnext-btn, .erpnext-btn.btn-primary, .erpnext-btn.btn-secondary {
+                padding: 4px 8px;
+                font-size: 0.8rem;
+            }
+            .erpnext-btn.btn-sm {
+                padding: 2px 5px;
+                font-size: 0.75rem;
+            }
+            .ticket-actions i {
+                font-size: 0.9em;
+            }
             .tickets-table th, .tickets-table td {
-                padding: 8px 6px;
+                padding: 6px 4px;
+                font-size: 0.85em;
+            }
+            .erpnext-card {
+                padding: 0.7rem 0.5rem;
             }
         }
     </style>
