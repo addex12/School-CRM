@@ -71,12 +71,83 @@ $feedback->execute([$_SESSION['user_id']]);
     <link rel="stylesheet" href="../assets/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        body, input, textarea, select, button {
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+        }
+        .erpnext-btn {
+            background: #f5f7fa;
+            color: #36414c;
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 18px;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .erpnext-btn.btn-primary {
+            background: #007bfc;
+            color: #fff;
+            border-color: #007bfc;
+        }
+        .erpnext-btn.btn-primary:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+        .erpnext-btn.btn-success {
+            background: #28a745;
+            color: #fff;
+            border-color: #28a745;
+        }
+        .erpnext-btn.btn-success:hover {
+            background: #218838;
+        }
+        .erpnext-input, .erpnext-textarea {
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 15px;
+            background: #f5f7fa;
+            color: #36414c;
+        }
+        .erpnext-input:focus, .erpnext-textarea:focus {
+            outline: none;
+            border-color: #007bfc;
+            background: #fff;
+        }
+        .erpnext-label {
+            font-weight: 500;
+            color: #36414c;
+            margin-bottom: 4px;
+            display: block;
+        }
         .rating-stars { color: #ffd700; font-size: 1.5em; }
         .feedback-history { margin-top: 30px; }
         .main-content-container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 20px 0 20px;
+        }
+        .star-rating {
+            direction: rtl;
+            unicode-bidi: bidi-override;
+            display: inline-block;
+        }
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .star-rating input[type="radio"]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: orange;
+        }
+        .star-rating input[type="radio"]:checked ~ label {
+            color: orange;
         }
     </style>
 </head>
@@ -92,8 +163,8 @@ $feedback->execute([$_SESSION['user_id']]);
                 <!-- Feedback Form -->
                 <form method="POST">
                     <div class="form-group">
-                        <label for="subject">Subject:</label>
-                        <select name="subject" id="subject" class="form-control" required>
+                        <label class="erpnext-label" for="subject">Subject:</label>
+                        <select name="subject" id="subject" class="erpnext-input" required>
                             <option value="">Select subject...</option>
                             <?php foreach ($subjects as $subject): ?>
                                 <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
@@ -102,12 +173,12 @@ $feedback->execute([$_SESSION['user_id']]);
                     </div>
                     
                     <div class="form-group">
-                        <label>Message:</label>
-                        <textarea name="message" rows="5" required></textarea>
+                        <label class="erpnext-label">Message:</label>
+                        <textarea name="message" rows="5" required class="erpnext-textarea"></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label for="rating">Rating:</label>
+                        <label class="erpnext-label" for="rating">Rating:</label>
                         <div class="star-rating" style="font-size:2em; color:gold;">
                             <?php for ($i = 5; $i >= 1; $i--): ?>
                                 <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;">
@@ -115,31 +186,8 @@ $feedback->execute([$_SESSION['user_id']]);
                             <?php endfor; ?>
                         </div>
                     </div>
-                    <style>
-                        .star-rating {
-                            direction: rtl;
-                            unicode-bidi: bidi-override;
-                            display: inline-block;
-                        }
-                        .star-rating input[type="radio"] {
-                            display: none;
-                        }
-                        .star-rating label {
-                            color: #ccc;
-                            cursor: pointer;
-                            transition: color 0.2s;
-                        }
-                        .star-rating input[type="radio"]:checked ~ label,
-                        .star-rating label:hover,
-                        .star-rating label:hover ~ label {
-                            color: orange;
-                        }
-                        .star-rating input[type="radio"]:checked ~ label {
-                            color: orange;
-                        }
-                    </style>
                     
-                    <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                    <button type="submit" class="erpnext-btn btn-primary">Submit Feedback</button>
                 </form>
 
                 <!-- Feedback History -->
@@ -160,10 +208,10 @@ $feedback->execute([$_SESSION['user_id']]);
                                     <form method="post" class="mt-2">
                                         <input type="hidden" name="feedback_id" value="<?= $item['id'] ?>">
                                         <div class="form-group">
-                                            <label for="user_reply_<?= $item['id'] ?>">Your Reply:</label>
-                                            <textarea name="user_reply" id="user_reply_<?= $item['id'] ?>" class="form-control" rows="2" required></textarea>
+                                            <label class="erpnext-label" for="user_reply_<?= $item['id'] ?>">Your Reply:</label>
+                                            <textarea name="user_reply" id="user_reply_<?= $item['id'] ?>" class="erpnext-textarea" rows="2" required></textarea>
                                         </div>
-                                        <button type="submit" name="user_reply_submit" class="btn btn-sm btn-success">Send Reply</button>
+                                        <button type="submit" name="user_reply_submit" class="erpnext-btn btn-success">Send Reply</button>
                                     </form>
                                 <?php else: ?>
                                     <div class="alert alert-secondary mt-2">

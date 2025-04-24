@@ -46,29 +46,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Compose Message</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body, input, textarea, select, button {
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+        }
+        .erpnext-btn {
+            background: #f5f7fa;
+            color: #36414c;
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 18px;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+        }
+        .erpnext-btn.btn-primary {
+            background: #007bfc;
+            color: #fff;
+            border-color: #007bfc;
+        }
+        .erpnext-btn.btn-primary:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+        .erpnext-input, .erpnext-textarea {
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 15px;
+            background: #f5f7fa;
+            color: #36414c;
+        }
+        .erpnext-input:focus, .erpnext-textarea:focus {
+            outline: none;
+            border-color: #007bfc;
+            background: #fff;
+        }
+        .erpnext-label {
+            font-weight: 500;
+            color: #36414c;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .compose-container {
+            max-width:700px;
+            margin:40px auto;
+        }
+    </style>
 </head>
 <body>
     <?php include '../includes/header.php'; ?>
     
-    <div class="compose-container" style="max-width:700px;margin:40px auto;">
+    <div class="compose-container">
         <h1 style="color:#007bff;">
             <i class="fas fa-pen"></i> Compose New Message
         </h1>
         
         <form id="composeForm">
             <div class="form-group">
-                <label>Recipient Username:</label>
-                <input type="text" name="recipient" required>
+                <label class="erpnext-label">Recipient Username:</label>
+                <input type="text" name="recipient" required class="erpnext-input">
             </div>
             
             <div class="form-group">
-                <label>Subject:</label>
-                <input type="text" name="subject" required>
+                <label class="erpnext-label">Subject:</label>
+                <input type="text" name="subject" required class="erpnext-input">
             </div>
             
             <div class="form-group">
-                <label>Message:</label>
-                <textarea name="content" rows="8" required></textarea>
+                <label class="erpnext-label">Message:</label>
+                <textarea name="content" rows="8" required class="erpnext-textarea"></textarea>
             </div>
             
             <div class="form-group">
@@ -78,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </label>
             </div>
             
-            <button type="submit" class="btn btn-primary">Send Message</button>
+            <button type="submit" class="erpnext-btn btn-primary">Send Message</button>
         </form>
     </div>
 

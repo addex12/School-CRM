@@ -37,22 +37,28 @@ requireLogin();
             color: #555;
             margin-bottom: 30px;
         }
-        .btn-primary {
+        .erpnext-btn {
             display: inline-block;
             padding: 10px 20px;
-            background: #3498db;
+            background: #007bfc;
             color: white;
             text-decoration: none;
             border-radius: 5px;
             transition: background 0.3s;
+            border: 1px solid #007bfc;
+            font-weight: 500;
         }
-        .btn-primary:hover {
-            background: #2980b9;
+        .erpnext-btn:hover {
+            background: #0056b3;
         }
         .main-content-container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 40px 20px 0 20px;
+        }
+        body, input, textarea, select, button {
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
         }
     </style>
 </head>
@@ -64,7 +70,7 @@ requireLogin();
                 <i class="fas fa-check-circle"></i> Thank You!
             </h1>
             <p>We appreciate your time and effort in completing the survey.</p>
-            <a href="dashboard.php" class="btn-primary">Back to Dashboard</a>
+            <a href="dashboard.php" class="erpnext-btn">Back to Dashboard</a>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>

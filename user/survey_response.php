@@ -225,6 +225,43 @@ foreach ($survey_data as $row) {
             margin: 0 auto;
             padding: 40px 20px 0 20px;
         }
+        .erpnext-btn {
+            background: #007bfc;
+            color: #fff;
+            border: 1px solid #007bfc;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .erpnext-btn:hover {
+            background: #0056b3;
+        }
+        .erpnext-input, .erpnext-textarea, .form-control {
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 15px;
+            background: #f5f7fa;
+            color: #36414c;
+        }
+        .erpnext-input:focus, .erpnext-textarea:focus, .form-control:focus {
+            outline: none;
+            border-color: #007bfc;
+            background: #fff;
+        }
+        .erpnext-label, .form-label {
+            font-weight: 500;
+            color: #36414c;
+            margin-bottom: 4px;
+            display: block;
+        }
+        body, input, textarea, select, button {
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
+        }
     </style>
 </head>
 <body>
@@ -250,7 +287,7 @@ foreach ($survey_data as $row) {
                 
                 <?php foreach ($survey['questions'] as $question): ?>
                     <div class="question-group">
-                        <label class="question-label">
+                        <label class="form-label">
                             <?= htmlspecialchars($question['label']) ?>
                             <?php if ($question['required']): ?>
                                 <span class="required">*</span>
@@ -261,13 +298,13 @@ foreach ($survey_data as $row) {
                             case 'text': ?>
                                 <input type="text" 
                                        name="field_<?= $question['id'] ?>" 
-                                       class="form-control"
+                                       class="erpnext-input"
                                        <?= $question['required'] ? 'required' : '' ?>>
                                 <?php break; 
                                 
                             case 'textarea': ?>
                                 <textarea name="field_<?= $question['id'] ?>" 
-                                          class="form-control"
+                                          class="erpnext-textarea"
                                           <?= $question['required'] ? 'required' : '' ?>></textarea>
                                 <?php break; 
                                 
@@ -310,7 +347,7 @@ foreach ($survey_data as $row) {
                                 
                             case 'select': ?>
                                 <select name="field_<?= $question['id'] ?>" 
-                                        class="form-control"
+                                        class="erpnext-input"
                                         <?= $question['required'] ? 'required' : '' ?>>
                                     <option value="">-- Select an option --</option>
                                     <?php foreach ($question['options'] as $option): ?>
@@ -324,20 +361,20 @@ foreach ($survey_data as $row) {
                             case 'number': ?>
                                 <input type="number" 
                                        name="field_<?= $question['id'] ?>" 
-                                       class="form-control"
+                                       class="erpnext-input"
                                        <?= $question['required'] ? 'required' : '' ?>>
                                 <?php break; 
                                 
                             case 'date': ?>
                                 <input type="date" 
                                        name="field_<?= $question['id'] ?>" 
-                                       class="form-control"
+                                       class="erpnext-input"
                                        <?= $question['required'] ? 'required' : '' ?>>
                                 <?php break; 
                                 
                             case 'rating': ?>
                                 <select name="field_<?= $question['id'] ?>" 
-                                        class="form-control"
+                                        class="erpnext-input"
                                         <?= $question['required'] ? 'required' : '' ?>>
                                     <option value="">-- Select rating --</option>
                                     <option value="1">1 - Poor</option>
@@ -353,7 +390,7 @@ foreach ($survey_data as $row) {
                 <?php endforeach; ?>
                 
                 <div class="form-group text-center">
-                    <button type="submit" class="btn-submit">
+                    <button type="submit" class="erpnext-btn">
                         <i class="fas fa-paper-plane"></i> Submit Survey
                     </button>
                 </div>

@@ -52,8 +52,33 @@ if (!$message['is_read']) {
             <?= nl2br(htmlspecialchars($message['content'] ?? '')) ?>
         </div>
         <div style="margin-top:24px;">
-            <a href="inbox.php" class="btn btn-secondary">&larr; Back to Inbox</a>
+            <a href="inbox.php" class="erpnext-btn btn-secondary">&larr; Back to Inbox</a>
         </div>
     </div>
 </div>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
+<style>
+.erpnext-btn {
+    background: #f5f7fa;
+    color: #36414c;
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 18px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+}
+.erpnext-btn.btn-secondary {
+    background: #f5f7fa;
+    color: #36414c;
+    border-color: #d1d8dd;
+}
+.erpnext-btn.btn-secondary:hover {
+    background: #e4e8ec;
+}
+body, input, textarea, select, button {
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+}
+</style>

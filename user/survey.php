@@ -92,17 +92,24 @@ try {
             background: #fff3cd;
             color: #856404;
         }
-        .btn {
+        .erpnext-btn {
             display: inline-block;
             padding: 8px 16px;
-            background: #3498db;
+            background: #007bfc;
             color: white;
             text-decoration: none;
             border-radius: 4px;
             margin-top: 10px;
+            border: 1px solid #007bfc;
+            font-weight: 500;
+            transition: background 0.2s;
         }
-        .btn:hover {
-            background: #2980b9;
+        .erpnext-btn:hover {
+            background: #0056b3;
+        }
+        body, input, textarea, select, button {
+            font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+            font-size: 15px;
         }
         .time-left {
             font-weight: bold;
@@ -151,7 +158,7 @@ try {
                                 <div class="survey-status status-pending">
                                     <i class="fas fa-exclamation-circle"></i> Pending
                                 </div>
-                                <a href="survey_response.php?id=<?= $survey['id'] ?>" class="btn">
+                                <a href="survey_response.php?id=<?= $survey['id'] ?>" class="erpnext-btn">
                                     Take Survey
                                 </a>
                             <?php endif; ?>

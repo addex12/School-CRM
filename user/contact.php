@@ -38,42 +38,47 @@ $user_email = $_SESSION['email'] ?? '';
 .contact-form .form-group {
     margin-bottom: 18px;
 }
-.contact-form label {
+body, input, textarea, select, button {
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+}
+.erpnext-btn {
+    background: #f5f7fa;
+    color: #36414c;
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 18px;
     font-weight: 500;
-    margin-bottom: 6px;
-    display: block;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
 }
-.contact-form input[type="text"],
-.contact-form input[type="email"],
-.contact-form select,
-.contact-form textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1em;
-    background: #f8fafd;
-}
-.contact-form textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-.contact-form .form-control-file {
-    padding: 6px 0;
-}
-.contact-form .btn-primary {
-    width: 100%;
-    padding: 12px 0;
-    font-size: 1.1em;
-    border-radius: 4px;
-    background: #007bff;
-    border: none;
+.erpnext-btn.btn-primary {
+    background: #007bfc;
     color: #fff;
-    margin-top: 10px;
-    transition: background 0.2s;
+    border-color: #007bfc;
 }
-.contact-form .btn-primary:hover {
+.erpnext-btn.btn-primary:hover {
     background: #0056b3;
+    color: #fff;
+}
+.erpnext-input, .erpnext-textarea {
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 15px;
+    background: #f5f7fa;
+    color: #36414c;
+}
+.erpnext-input:focus, .erpnext-textarea:focus {
+    outline: none;
+    border-color: #007bfc;
+    background: #fff;
+}
+.erpnext-label {
+    font-weight: 500;
+    color: #36414c;
+    margin-bottom: 4px;
+    display: block;
 }
 @media (max-width: 700px) {
     .contact-main-container {
@@ -109,18 +114,18 @@ $user_email = $_SESSION['email'] ?? '';
             <input type="hidden" name="user_id" value="<?= $user_id ?>">
             
             <div class="form-group">
-                <label for="email">Your Email</label>
-                <input type="email" id="email" name="email" class="form-control" value="<?= htmlspecialchars($user_email) ?>" required>
+                <label class="erpnext-label" for="email">Your Email</label>
+                <input type="email" id="email" name="email" class="erpnext-input" value="<?= htmlspecialchars($user_email) ?>" required>
             </div>
             
             <div class="form-group">
-                <label for="subject">Subject</label>
-                <input type="text" id="subject" name="subject" class="form-control" required>
+                <label class="erpnext-label" for="subject">Subject</label>
+                <input type="text" id="subject" name="subject" class="erpnext-input" required>
             </div>
             
             <div class="form-group">
-                <label for="priority">Priority</label>
-                <select id="priority" name="priority" class="form-control" required>
+                <label class="erpnext-label" for="priority">Priority</label>
+                <select id="priority" name="priority" class="erpnext-input" required>
                     <option value="low">Low</option>
                     <option value="medium" selected>Medium</option>
                     <option value="high">High</option>
@@ -129,17 +134,17 @@ $user_email = $_SESSION['email'] ?? '';
             </div>
             
             <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+                <label class="erpnext-label" for="message">Message</label>
+                <textarea id="message" name="message" class="erpnext-textarea" rows="5" required></textarea>
             </div>
             
             <div class="form-group">
-                <label for="attachment">Attachment (if any)</label>
-                <input type="file" id="attachment" name="attachment" class="form-control-file">
+                <label class="erpnext-label" for="attachment">Attachment (if any)</label>
+                <input type="file" id="attachment" name="attachment" class="erpnext-input">
                 <small class="text-muted">Max 5MB (PDF, JPG, PNG, DOCX allowed)</small>
             </div>
             
-            <button type="submit" class="btn btn-primary">Submit Ticket</button>
+            <button type="submit" class="erpnext-btn btn-primary">Submit Ticket</button>
         </form>
     </div>
 </div>
