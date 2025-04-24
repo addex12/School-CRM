@@ -210,54 +210,12 @@ else:
 <tr>
     <td colspan="8" class="text-center">No active users found</td>
 </tr>
-<?php endif; ?>
-                    </tbody>
-                </table>
+<?php endif; ?>t src="../assets/js/active_users.js"></script>
+</tbody>
             </div>
         </div>
-    </div>
-    <?php include __DIR__ . '/includes/footer.php'; ?>
-
-    <script src="../assets/js/active_users.js"></script>
-    <script>
-    // AJAX table refresh logic
-    document.addEventListener('DOMContentLoaded', function() {
-        function fetchUsersTable() {
-            const search = document.getElementById('searchInput').value;
-            const online = document.getElementById('onlineInput').checked ? 1 : '';
-            const role = document.getElementById('roleInput').value;
-            const status = document.getElementById('statusInput').value;
-            const params = new URLSearchParams({
-                ajax: 1,
-                search: search,
-                online: online,
-                role: role,
-                status: status
-            });
-            fetch('ajax_active_users.php?' + params.toString())
-                .then(res => res.text())
-                .then(html => {
-                    document.getElementById('usersTableBody').innerHTML = html;
-                });
-        }
-
-        // Refresh button reloads table via AJAX
-        document.querySelector('.refresh-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            fetchUsersTable();
-        });
-
-        // Filter/search form submits via AJAX
-        document.getElementById('userSearchForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            fetchUsersTable();
-        });
-
-        // Uncomment the next line if you want AJAX table load on first page load:
-        // fetchUsersTable();
-    });
-    </script>
-
-</body>
-</html>
 <?php ob_end_flush(); ?>
+</html>
+</table> <?php include __DIR__ . '/includes/footer.php'; ?>
+
+</body>    
