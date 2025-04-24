@@ -210,51 +210,53 @@ else:
 <tr>
     <td colspan="8" class="text-center">No active users found</td>
 </tr>
-<?php endif; ?>t src="../assets/js/active_users.js"></script>
-</tbody>
-                </table> <?php include __DIR__ . '/includes/footer.php'; ?>
+<?php endif; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
+    </div>
+    <script src="../assets/js/active_users.js"></script>
+    <script>
+    // AJAX table refresh logic
+    document.addEventListener('DOMContentLoaded', function() {
+        function fetchUsersTable() {
+            const search = document.getElementById('searchInput').value;
+            const online = document.getElementById('onlineInput').checked ? 1 : '';
+            const role = document.getElementById('roleInput').value;
+            const status = document.getElementById('statusInput').value;
+            const params = new URLSearchParams({
+                ajax: 1,
+                search: search,
+                online: online,
+                role: role,
+                status: status
+            });
+            fetch('ajax_active_users.php?' + params.toString())
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('usersTableBody').innerHTML = html;
+                });
+        }
 
+        // Refresh button reloads table via AJAX
+        document.querySelector('.refresh-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            fetchUsersTable();
+        });
 
+        // Filter/search form submits via AJAX
+        document.getElementById('userSearchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetchUsersTable();
+        });
 
+        // Uncomment the next line if you want AJAX table load on first page load:
+        // fetchUsersTable();
+    });
+    </script>
+                    <?php include __DIR__ . '/includes/footer.php'; ?>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<?php ob_end_flush(); ?></html></body>    </script>    // fetchUsersTable();    // Initial load (if you want AJAX always)    });        fetchUsersTable();        e.preventDefault();    document.getElementById('userSearchForm').addEventListener('submit', function(e) {    // Optionally, auto-refresh table on filter/search submit    }            });                document.getElementById('usersTableBody').innerHTML = html;            .then(html => {            .then(res => res.text())        fetch('ajax_active_users.php?' + params.toString())        });            status: status            role: role,            online: online,            search: search,            ajax: 1,        const params = new URLSearchParams({        const status = document.getElementById('statusInput').value;        const role = document.getElementById('roleInput').value;        const online = document.getElementById('onlineInput').checked ? 1 : '';        const search = document.getElementById('searchInput').value;        // Gather current filter values    function fetchUsersTable() {    });        fetchUsersTable();        e.preventDefault();    document.querySelector('.refresh-btn').addEventListener('click', function(e) {    // Fix: Always reload table via AJAX after refresh, not full page reload    <script>    <script src="../assets/js/active_users.js"></script>    </div>        <?php include __DIR__ . '/includes/footer.php'; ?><?php ob_end_flush(); ?>
+</body>
+</html>
+<?php ob_end_flush(); ?>
