@@ -175,6 +175,8 @@ $chart_json = json_encode($chart_data);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         /* Modern, clean styling */
         .stat-card {
@@ -787,8 +789,56 @@ $chart_json = json_encode($chart_data);
                 }
             });
         });
+
+        // PDF Export functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            var exportBtn = document.getElementById('export-pdf');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    exportResultsToPDF();
+                });
+            }
+        });
+
+        function exportResultsToPDF() {
+            // Select the main content to export (adjust selector as needed)
+            var content = document.querySelector('.admin-main');
+            if (!content) return;
+
+            // Hide export dropdown for PDF
+            var dropdown = document.querySelector('.dropdown');
+            if (dropdown) dropdown.style.display = 'none';
+
+            html2canvas(content, {scale: 2}).then(function(canvas) {
+                var imgData = canvas.toDataURL('image/png');
+                var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
+                var pageWidth = pdf.internal.pageSize.getWidth();
+                var pageHeight = pdf.internal.pageSize.getHeight();
+                var imgWidth = pageWidth - 40;
+                var imgHeight = canvas.height * imgWidth / canvas.width;
+
+                var position = 20;
+                if (imgHeight < pageHeight - 40) {
+                    pdf.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
+                } else {
+                    // Multi-page
+                    let heightLeft = imgHeight;
+                    let y = position;
+                    while (heightLeft > 0) {
+                        pdf.addImage(imgData, 'PNG', 20, y, imgWidth, imgHeight);
+                        heightLeft -= (pageHeight - 40);
+                        if (heightLeft > 0) {
+                            pdf.addPage();
+                            y = 0;
+                        }
+                    }
+                }
+                pdf.save('survey_results.pdf');
+                if (dropdown) dropdown.style.display = '';
+            });
+        }
     </script>
-    
     <script src="../assets/js/results-export.js"></script>
 </body>
 </html>
