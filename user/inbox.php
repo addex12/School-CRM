@@ -43,6 +43,22 @@ try {
     error_log("Error fetching online users: " . $e->getMessage());
 }
 
+// Fetch online admins (role_id = 0 and online = 1)
+try {
+    $adminStmt = $pdo->prepare("
+        SELECT u.id, u.username, u.email, u.role_id, u.last_activity, COALESCE(r.role_name, 'No Role') as role_name
+        FROM users u
+        LEFT JOIN roles r ON u.role_id = r.id
+        WHERE u.role_id = 0 AND u.online = 1 AND u.id != :self
+        ORDER BY u.username ASC
+    ");
+    $adminStmt->bindValue(':self', $userId);
+    $adminStmt->execute();
+    $onlineAdmins = $adminStmt->fetchAll();
+} catch (PDOException $e) {
+    $onlineAdmins = [];
+}
+
 // Fetch messages
 try {
     $stmt = $pdo->prepare("
@@ -73,8 +89,24 @@ function getUserRoleName($roleId) {
 <div class="main-content-container" style="max-width:1200px;margin:0 auto;padding:40px 20px 0 20px;">
     <div class="inbox-container">
         <div class="inbox-layout">
-            <div class="inbox-sidebar">
-                <h3>Online Users</h3>
+            <aside class="inbox-sidebar">
+                <h3 style="margin-bottom: 1rem;">Online Admins</h3>
+                <div class="online-users-list">
+                    <?php if (count($onlineAdmins) > 0): ?>
+                        <?php foreach ($onlineAdmins as $user): ?>
+                            <div class="online-user">
+                                <span class="user-status"></span>
+                                <span class="username"><?= htmlspecialchars($user['username']) ?></span>
+                                <span class="user-role">(<?= htmlspecialchars($user['role_name']) ?>)</span>
+                                <button class="erpnext-btn btn-primary btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="no-users">No admins currently online</p>
+                    <?php endif; ?>
+                </div>
+                <hr style="margin: 1.5rem 0;">
+                <h3 style="margin-bottom: 1rem;">Online Users</h3>
                 <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.5rem;">
                     <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input" style="flex:1;">
                     <select name="role" id="roleFilter" class="erpnext-input">
@@ -100,8 +132,8 @@ function getUserRoleName($roleId) {
                         <p class="no-users">No users currently online</p>
                     <?php endif; ?>
                 </div>
-            </div>
-            <div class="inbox-main">
+            </aside>
+            <main class="inbox-main">
                 <h1>Your Inbox</h1>
                 <div class="inbox-controls" style="display:flex;gap:1rem;margin-bottom:20px;">
                     <input type="text" id="search" placeholder="Search messages..." class="erpnext-input search-bar" style="flex:1;">
@@ -135,7 +167,7 @@ function getUserRoleName($roleId) {
                         <p class="no-messages">No messages found.</p>
                     <?php endif; ?>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 </div>
@@ -166,8 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (filter === 'unread' && message.dataset.status === 'unread') {
                 message.style.display = '';
             } else if (filter === 'read' && message.dataset.status === 'read') {
-                message.style.display = '';
-            } else {
                 message.style.display = 'none';
             }
         });
@@ -224,243 +254,49 @@ document.addEventListener('DOMContentLoaded', () => {
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
 .inbox-layout {
     display: flex;
     gap: 20px;
+    align-items: flex-start;
 }
-
 .inbox-sidebar {
-    width: 250px;
+    width: 270px;
+    min-width: 230px;
+    max-width: 320px;
     padding: 15px;
     background: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
-
 .inbox-main {
     flex: 1;
+    min-width: 0;
 }
-
-.online-users-list {
-    margin-top: 15px;
-}
-
-.online-user {
-    display: flex;
-    align-items: center;
-    padding: 8px 10px;
-    margin-bottom: 5px;
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.user-status {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #28a745;
-    margin-right: 8px;
-}
-
-.username {
-    font-weight: 500;
-    color: #333;
-}
-
-.user-role {
-    font-size: 0.8em;
-    color: #6c757d;
-    margin-left: 5px;
-}
-
-.no-users {
-    color: #6c757d;
-    font-size: 0.9em;
-    text-align: center;
-    padding: 10px;
-}
-
-.inbox-controls {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.search-bar {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-right: 10px;
-}
-
-.filter-dropdown {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.message-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.message-item {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #f9f9f9;
-    transition: background 0.3s;
-}
-
-.message-item:hover {
-    background: #f1f1f1;
-}
-
-.message-item[data-status="unread"] {
-    background: #e7f3ff;
-    border-left: 3px solid #007bff;
-}
-
-.message-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-.sender {
-    font-weight: bold;
-    color: #333;
-}
-
-.date {
-    font-size: 0.9em;
-    color: #666;
-}
-
-.subject {
-    font-size: 1.1em;
-    margin: 0;
-    color: #007bff;
-}
-
-.content {
-    font-size: 0.9em;
-    color: #555;
-}
-
-.message-actions {
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
-}
-
-.btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    transition: opacity 0.3s;
-}
-
-.btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.btn-primary {
-    background: #007bff;
-    color: #fff;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: #fff;
-}
-
-.btn-secondary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    /* Remove default browser styling for disabled buttons (like stop icon) */
-    background-image: none !important;
-}
-
-.no-messages {
-    text-align: center;
-    color: #666;
-    font-size: 1.1em;
-    padding: 20px;
-}
-
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
     .inbox-layout {
         flex-direction: column;
+        gap: 0;
     }
-    
     .inbox-sidebar {
         width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
     }
 }
-
-/* Chat Modal Styles */
-.chat-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+@media (max-width: 700px) {
+    .main-content-container {
+        padding: 10px 2vw 0 2vw;
+    }
+    .inbox-container {
+        padding: 8px;
+    }
+    .inbox-sidebar {
+        padding: 8px;
+    }
 }
-
-.chat-modal-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 400px;
-    max-width: 90%;
-}
-
-.close-chat {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 20px;
-    color: #333;
-}
-
-.chat-messages {
-    max-height: 300px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    padding: 10px;
-    background: #f9f9f9;
-}
-
-#chatInput {
-    width: calc(100% - 80px);
-    padding: 10px;
-    margin-right: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-#chatForm button {
-    padding: 10px 20px;
-}
-
 body, input, textarea, select, button {
     font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
     font-size: 15px;
