@@ -27,6 +27,15 @@ if ($res) {
     }
 }
 
+// Fetch permissions for each role
+$role_permissions = [];
+$res = $conn->query("SELECT role_id, permissions.label FROM role_permissions JOIN permissions ON role_permissions.permission_id = permissions.id");
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $role_permissions[$row['role_id']][] = $row['label'];
+    }
+}
+
 // Handle role update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['role_id'])) {
     $user_id = intval($_POST['user_id']);
@@ -115,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['ro
                     <tr>
                         <th>User</th>
                         <th>Role</th>
+                        <th>Permissions</th>
                         <th>Change Role</th>
                     </tr>
                 </thead>
@@ -123,6 +133,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['user_id'], $_POST['ro
                     <tr>
                         <td><?= htmlspecialchars($user['name']) ?></td>
                         <td><?= htmlspecialchars($user['role']) ?></td>
+                        <td>
+                            <?php
+                            $perms = $role_permissions[$user['role_id']] ?? [];
+                            echo $perms ? implode(', ', array_map('htmlspecialchars', $perms)) : '<span style="color:#aaa;">No permissions</span>';
+                            ?>
+                        </td>
                         <td>
                             <form method="post" action="">
                                 <input type="hidden" name="user_id" value="<?= $user['id'] ?>">

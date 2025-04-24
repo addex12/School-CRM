@@ -1,7 +1,7 @@
 <?php
-require_once '../includes/db_connect.php'; // adjust path if needed
+require_once '../includes/db_connect.php';
 
-// Fetch roles from the database
+// Fetch roles
 $roles = [];
 $result = $conn->query("SELECT id, name FROM roles");
 if ($result) {
@@ -10,10 +10,40 @@ if ($result) {
     }
 }
 
-// Static permissions list (replace with DB if you have a permissions table)
-$permissions = [
-    'View Dashboard', 'Manage Users', 'Manage Surveys', 'Manage Students', 'Manage Teachers', 'Manage Parents', 'Send Messages', 'View Reports', 'Manage Settings'
-];
+// Fetch all permissions
+$permissions = [];
+$res = $conn->query("SELECT id, name, label FROM permissions ORDER BY label");
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $permissions[] = $row;
+    }
+}
+
+// Fetch assigned permissions for each role
+$role_permissions = [];
+$res = $conn->query("SELECT role_id, permission_id FROM role_permissions");
+if ($res) {
+    while ($row = $res->fetch_assoc()) {
+        $role_permissions[$row['role_id']][] = $row['permission_id'];
+    }
+}
+
+// Handle permission update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'], $_POST['permissions'])) {
+    $role_id = intval($_POST['role_id']);
+    $perms = array_map('intval', $_POST['permissions']);
+
+    // Remove all current permissions
+    $conn->query("DELETE FROM role_permissions WHERE role_id = $role_id");
+    // Add selected permissions
+    $stmt = $conn->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)");
+    foreach ($perms as $perm_id) {
+        $stmt->bind_param("ii", $role_id, $perm_id);
+        $stmt->execute();
+    }
+    header("Location: manage_roles.php");
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -102,7 +132,6 @@ $permissions = [
     <div class="container">
         <div class="erp-card">
             <h2><i class="fas fa-user-shield"></i> Manage Roles</h2>
-            <button class="erp-btn"><i class="fas fa-plus"></i> Add Role</button>
             <table>
                 <thead>
                     <tr>
@@ -116,17 +145,20 @@ $permissions = [
                     <tr>
                         <td><?= htmlspecialchars($role['name']) ?></td>
                         <td>
-                            <!-- In production, fetch assigned permissions from DB -->
                             <form method="post" action="">
+                                <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
                                 <div class="permissions-list">
                                 <?php foreach ($permissions as $perm): ?>
                                     <label>
-                                        <input type="checkbox" name="permissions[<?= $role['id'] ?>][]" value="<?= $perm ?>">
-                                        <?= htmlspecialchars($perm) ?>
+                                        <input type="checkbox" name="permissions[]" value="<?= $perm['id'] ?>"
+                                            <?= in_array($perm['id'], $role_permissions[$role['id']] ?? []) ? 'checked' : '' ?>>
+                                        <?= htmlspecialchars($perm['label']) ?>
                                     </label>
                                 <?php endforeach; ?>
                                 </div>
-                                <button type="submit" class="erp-btn" style="padding:0.3rem 1rem;font-size:0.95rem;margin-top:0.5rem;"><i class="fas fa-save"></i>Save</button>
+                                <button type="submit" class="erp-btn" style="padding:0.3rem 1rem;font-size:0.95rem;margin-top:0.5rem;">
+                                    <i class="fas fa-save"></i>Save
+                                </button>
                             </form>
                         </td>
                         <td class="actions">
