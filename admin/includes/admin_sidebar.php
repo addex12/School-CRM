@@ -141,7 +141,8 @@ if (file_exists($configPath)) {
             foreach ($items as $item) {
                 $hasSub = isset($item['items']) && is_array($item['items']);
                 $icon = isset($item['icon']) ? 'fa-' . $item['icon'] : 'fa-circle';
-                $active = (basename($_SERVER['PHP_SELF']) === $item['link'] ?? '') ? 'active' : '';
+                // Fix: Only check 'link' if it exists and is not empty
+                $active = (isset($item['link']) && basename($_SERVER['PHP_SELF']) === $item['link']) ? 'active' : '';
                 if ($hasSub) {
                     echo '<li>';
                     echo '<a href="#" class="sidebar-parent"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <i class="fas fa-chevron-down" style="margin-left:auto;font-size:0.85em;"></i></a>';
@@ -149,9 +150,10 @@ if (file_exists($configPath)) {
                     renderSidebarMenu($item['items'], $current);
                     echo '</ul>';
                     echo '</li>';
-                } else {
+                } elseif (isset($item['link'])) {
                     echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="' . $active . '"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
                 }
+                // If neither 'items' nor 'link', skip rendering this item
             }
         }
         // Use config if available, else fallback to static menu
