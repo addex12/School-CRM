@@ -21,8 +21,9 @@ $status_filter = isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['st
 $where = [];
 $params = [];
 
+// Default: show all active users (online and offline) if no filters/search
 if ($search !== '') {
-    $where[] = "u.username LIKE :search";
+    $where[] = "(u.username LIKE :search OR u.email LIKE :search)";
     $params[':search'] = "%$search%";
 }
 if ($filter_online) {
@@ -324,6 +325,11 @@ else:
             });
         }
 
+        // Real-time search: trigger fetch on input
+        document.getElementById('searchInput').addEventListener('input', function() {
+            fetchUsersTable();
+        });
+
         document.querySelector('.refresh-btn').addEventListener('click', function(e) {
             e.preventDefault(); // Prevent default button action
             fetchUsersTable();  // Reload table via AJAX
@@ -387,6 +393,9 @@ else:
 
         // Initial binding for edit/delete
         bindRowActions();
+
+        // On page load, show all active users (default)
+        fetchUsersTable();
     });
     </script>
 </body>
