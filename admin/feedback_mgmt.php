@@ -226,7 +226,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     });
     </script>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
                 <h1 style="color:#215967;font-weight:700;"><i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?></h1>

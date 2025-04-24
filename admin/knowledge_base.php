@@ -27,7 +27,7 @@ $pageTitle = "Knowledge Base";
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <div class="dashboard-section">
                 <div class="kb-header"><i class="fas fa-book"></i> Knowledge Base</div>

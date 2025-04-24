@@ -401,7 +401,7 @@ try {
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>

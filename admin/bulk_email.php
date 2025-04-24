@@ -79,7 +79,7 @@ if ($roleStmt) {
 </head>
 <body>
     <div class="admin-dashboard">
-    <?php include 'includes/admin_sidebar.php'; ?>
+    <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
     <div class="admin-main">
         <div class="content">
             <?php if (isset($_SESSION['success'])): ?>

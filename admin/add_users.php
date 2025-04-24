@@ -262,13 +262,13 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
                 <?= htmlspecialchars($pageTitle) ?>
             </header>
 
-            <div class="admin-content"></div></div>
+            <div class="admin-content">
                 <?php if (isset($_SESSION['error'])): ?>
                     <div class="erpnext-error-message">
                         <?= htmlspecialchars($_SESSION['error']);
