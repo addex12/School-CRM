@@ -230,8 +230,9 @@ if ($action === 'edit' && $id) {
                 <?php endif; ?>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
+            <?php include 'includes/footer.php'; ?>
+
 </body>
 </html>
 <?php ob_end_flush(); ?>
