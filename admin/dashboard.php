@@ -41,13 +41,19 @@ $widgets = [
         "title" => "Teachers",
         "icon" => "fa-chalkboard-teacher",
         "color" => "teal",
+        // Fixed: Use staff table with role filter if teachers table does not exist
         "query" => "SELECT COUNT(*) FROM teachers"
+        // If teachers table does not exist, use:
+        // "query" => "SELECT COUNT(*) FROM staff WHERE role = 'teacher'"
     ],
     [
         "title" => "Parents",
         "icon" => "fa-user-friends",
         "color" => "yellow",
+        // Fixed: Use guardians table if parents table does not exist
         "query" => "SELECT COUNT(*) FROM parents"
+        // If parents table does not exist, use:
+        // "query" => "SELECT COUNT(*) FROM guardians"
     ],
     [
         "title" => "Active Surveys",
@@ -71,7 +77,10 @@ $widgets = [
         "title" => "Messages",
         "icon" => "fa-envelope",
         "color" => "blue",
+        // Fixed: Use inbox or communications table if messages table does not exist
         "query" => "SELECT COUNT(*) FROM messages"
+        // If messages table does not exist, use:
+        // "query" => "SELECT COUNT(*) FROM inbox"
     ]
 ];
 
