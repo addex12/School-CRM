@@ -225,41 +225,23 @@ try {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../assets/js/dashboard.js" defer></script>
     <style>
+        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
         .admin-dashboard {
             display: flex;
             min-height: 100vh;
-            background: #f4f6fa;
+            background: #f5f7fa;
         }
         .admin-main {
             flex: 1;
             padding: 2rem 2.5rem;
         }
-        .users-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .admin-header h1 {
+            color: #2563eb;
+            font-size: 2.2rem;
+            font-weight: 700;
             margin-bottom: 1.5rem;
-        }
-        .users-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .users-header .btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-        }
-        .users-header .btn:hover {
-            background: #217dbb;
+            letter-spacing: 0.01em;
         }
         .widget-grid {
             display: grid;
@@ -275,6 +257,7 @@ try {
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
+            border-top: 4px solid #007bfc;
         }
         .dashboard-widget i {
             font-size: 2.2rem;
@@ -398,6 +381,8 @@ try {
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/dashboard.js" defer></script>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -429,7 +414,7 @@ try {
                     <?php foreach ($widgets as $widget): ?>
                         <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= htmlspecialchars($widget['count']) ?></h3>
+                            <h3><?= is_numeric($widget['count']) ? number_format($widget['count']) : htmlspecialchars($widget['count']) ?></h3>
                             <p><?= htmlspecialchars($widget['title']) ?></p>
                         </div>
                     <?php endforeach; ?>
