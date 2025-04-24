@@ -45,7 +45,7 @@ foreach ($admins as $a) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
+        .admin-main { margin-left: 260px; padding: 1.2rem 0.5rem; }
         .messaging-container {
             display: flex;
             height: 70vh;
@@ -54,9 +54,12 @@ foreach ($admins as $a) {
             background: #fff;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            min-height: 400px;
         }
         .contact-list {
-            width: 270px;
+            width: 220px;
+            min-width: 180px;
+            max-width: 100vw;
             border-right: 1px solid #e5e7eb;
             overflow-y: auto;
             background: #f8f9fa;
@@ -64,8 +67,8 @@ foreach ($admins as $a) {
             flex-direction: column;
         }
         .contact-list-header {
-            padding: 1rem 1.2rem 0.5rem 1.2rem;
-            font-size: 1.1rem;
+            padding: 0.7rem 1rem 0.4rem 1rem;
+            font-size: 1rem;
             font-weight: 700;
             color: #215967;
             background: #f5f7fa;
@@ -73,56 +76,47 @@ foreach ($admins as $a) {
         .search-bar {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.2rem 0.5rem 1.2rem;
+            gap: 0.3rem;
+            padding: 0.3rem 1rem 0.3rem 1rem;
             background: #f5f7fa;
         }
         .search-bar input {
             flex: 1;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid #e5e7eb;
-            border-radius: 5px;
+            border-radius: 4px;
             background: #f9fafb;
-            font-size: 1rem;
+            font-size: 0.95rem;
         }
         .search-bar .erpnext-btn {
-            padding: 8px 16px;
-            font-size: 1em;
+            padding: 5px 10px;
+            font-size: 0.95em;
         }
         .online-users {
-            padding: 0.5rem 1.2rem 0.5rem 1.2rem;
+            padding: 0.3rem 1rem 0.3rem 1rem;
             background: #f5f7fa;
             border-bottom: 1px solid #e5e7eb;
             color: #215967;
-            font-size: 0.98em;
+            font-size: 0.93em;
         }
         .online-section-title {
             font-weight: 600;
             color: #215967;
-            margin-bottom: 0.2em;
-            margin-top: 0.5em;
-            font-size: 0.97em;
+            margin-bottom: 0.15em;
+            margin-top: 0.3em;
+            font-size: 0.93em;
         }
-        .online-admin-pill {
+        .online-admin-pill, .online-user-pill {
             display: inline-block;
-            background: #007bff;
-            color: #fff;
             border-radius: 1em;
-            padding: 0.2em 0.9em;
-            font-size: 0.97em;
-            margin-right: 0.4em;
-            margin-bottom: 0.2em;
+            padding: 0.15em 0.7em;
+            font-size: 0.93em;
+            margin-right: 0.3em;
+            margin-bottom: 0.15em;
+            white-space: nowrap;
         }
-        .online-user-pill {
-            display: inline-block;
-            background: #27ae60;
-            color: #fff;
-            border-radius: 1em;
-            padding: 0.2em 0.9em;
-            font-size: 0.97em;
-            margin-right: 0.4em;
-            margin-bottom: 0.2em;
-        }
+        .online-admin-pill { background: #007bff; color: #fff; }
+        .online-user-pill { background: #27ae60; color: #fff; }
         .user-list {
             list-style: none;
             margin: 0;
@@ -131,14 +125,15 @@ foreach ($admins as $a) {
             overflow-y: auto;
         }
         .user-list li {
-            padding: 10px 1.2rem;
+            padding: 7px 1rem;
             cursor: pointer;
             border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 1em;
+            font-size: 0.97em;
             transition: background 0.13s;
+            min-height: 36px;
         }
         .user-list li:hover {
             background-color: #e2efda;
@@ -147,20 +142,20 @@ foreach ($admins as $a) {
             background-color: #dbeafe;
         }
         .user-list .online-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             background: #27ae60;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 7px;
+            margin-right: 5px;
         }
         .unread-badge {
             background-color: #e74c3c;
             color: white;
             border-radius: 50%;
-            padding: 2px 7px;
-            font-size: 12px;
-            margin-left: 7px;
+            padding: 1px 6px;
+            font-size: 11px;
+            margin-left: 5px;
             font-weight: 600;
         }
         .chat-section {
@@ -168,10 +163,11 @@ foreach ($admins as $a) {
             display: flex;
             flex-direction: column;
             min-width: 0;
+            background: #f9f9f9;
         }
         .chat-header {
-            padding: 1rem 1.5rem 0.7rem 1.5rem;
-            font-size: 1.1rem;
+            padding: 0.7rem 1rem 0.5rem 1rem;
+            font-size: 1rem;
             font-weight: 600;
             color: #215967;
             border-bottom: 1px solid #e5e7eb;
@@ -179,37 +175,39 @@ foreach ($admins as $a) {
         }
         .chat-messages {
             flex: 1;
-            padding: 15px 18px;
+            padding: 10px 8px;
             overflow-y: auto;
             background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
         }
         .message-form {
-            padding: 15px 18px;
+            padding: 8px 8px;
             border-top: 1px solid #e5e7eb;
             background: #fff;
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
         }
         .message-form textarea {
             flex: 1;
-            padding: 10px 12px;
+            padding: 7px 10px;
             border: 1px solid #e5e7eb;
-            border-radius: 5px;
+            border-radius: 4px;
             background: #f9fafb;
-            font-size: 1rem;
+            font-size: 0.97rem;
             resize: none;
         }
         .message-form .erpnext-btn {
-            padding: 10px 22px;
-            font-size: 1em;
+            padding: 7px 14px;
+            font-size: 0.97em;
         }
         .chat-message {
-            margin-bottom: 10px;
-            padding: 10px 16px;
-            border-radius: 18px;
-            max-width: 75%;
+            margin-bottom: 7px;
+            padding: 7px 12px;
+            border-radius: 15px;
+            max-width: 85%;
             word-break: break-word;
-            font-size: 1em;
+            font-size: 0.97em;
             box-shadow: 0 1px 2px rgba(44,62,80,0.04);
             position: relative;
             clear: both;
@@ -219,9 +217,9 @@ foreach ($admins as $a) {
             margin-left: auto;
             color: #215967;
             border-bottom-right-radius: 4px;
-            border-bottom-left-radius: 18px;
-            border-top-left-radius: 18px;
-            border-top-right-radius: 18px;
+            border-bottom-left-radius: 15px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
             align-self: flex-end;
         }
         .chat-message.other {
@@ -229,20 +227,20 @@ foreach ($admins as $a) {
             margin-right: auto;
             color: #222d32;
             border-bottom-left-radius: 4px;
-            border-bottom-right-radius: 18px;
-            border-top-left-radius: 18px;
-            border-top-right-radius: 18px;
+            border-bottom-right-radius: 15px;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
             align-self: flex-start;
         }
         .msg-time {
-            font-size: 11px;
+            font-size: 10px;
             color: #aaa;
-            margin-top: 4px;
+            margin-top: 2px;
             display: block;
             text-align: right;
         }
         .chat-message strong {
-            font-size: 0.97em;
+            font-size: 0.95em;
             color: #007bff;
             font-weight: 600;
         }
@@ -250,8 +248,8 @@ foreach ($admins as $a) {
             background: none;
             border: none;
             color: #3b82f6;
-            font-size: 0.98em;
-            margin-left: 8px;
+            font-size: 0.95em;
+            margin-left: 6px;
             cursor: pointer;
         }
         .edit-btn:hover, .delete-btn:hover {
@@ -260,51 +258,36 @@ foreach ($admins as $a) {
         .notification-bell {
             position: relative;
             display: inline-block;
-            margin-right: 18px;
+            margin-right: 10px;
             cursor: pointer;
         }
         .notification-bell .fa-bell {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #e74c3c;
         }
         .notification-badge {
             position: absolute;
-            top: -7px;
-            right: -7px;
+            top: -6px;
+            right: -6px;
             background: #e74c3c;
             color: #fff;
             border-radius: 50%;
-            padding: 2px 7px;
-            font-size: 0.85em;
+            padding: 1px 6px;
+            font-size: 0.8em;
             font-weight: 600;
             z-index: 2;
         }
         .user-list li.unread-highlight {
             background: #fffbe6 !important;
             font-weight: 600;
-            border-left: 4px solid #e74c3c;
+            border-left: 3px solid #e74c3c;
         }
         @media (max-width: 900px) {
+            .admin-main { padding: 0.5rem 0.2rem; }
             .messaging-container {
                 flex-direction: column;
                 height: auto;
-                min-height: 400px;
-            }
-            .contact-list {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #e5e7eb;
-                min-height: 60px;
-                max-height: 120px;
-            }
-            .chat-section {
-                min-width: 0;
-            }
-        }
-        @media (max-width: 600px) {
-            .messaging-container {
-                flex-direction: column;
-                height: auto;
+                min-height: 320px;
             }
             .contact-list {
                 width: 100%;
@@ -312,16 +295,43 @@ foreach ($admins as $a) {
                 max-width: 100vw;
                 border-right: none;
                 border-bottom: 1px solid #e5e7eb;
-                font-size: 0.98em;
+                font-size: 0.97em;
+            }
+            .chat-section {
+                min-width: 0;
+            }
+        }
+        @media (max-width: 600px) {
+            .admin-main { padding: 0.2rem 0.1rem; }
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 200px;
+            }
+            .contact-list {
+                width: 100%;
+                min-width: 0;
+                max-width: 100vw;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                font-size: 0.93em;
             }
             .chat-section {
                 min-width: 0;
             }
             .chat-messages {
-                padding: 8px;
+                padding: 4px;
             }
             .message-form {
-                padding: 8px;
+                padding: 4px;
+            }
+            .chat-header {
+                padding: 0.5rem 0.5rem 0.3rem 0.5rem;
+                font-size: 0.97rem;
+            }
+            .user-list li {
+                padding: 5px 0.5rem;
+                font-size: 0.93em;
             }
         }
     </style>
