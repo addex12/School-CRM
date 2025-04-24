@@ -5,6 +5,7 @@ require_once '../includes/db.php';
 requireAdmin();
 
 $pageTitle = "Admin Messaging";
+$isAdmin = ($_SESSION['role'] ?? '') === 'admin'; // Add this line
 
 // Get all non-admin users
 $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id != 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
@@ -322,6 +323,7 @@ foreach ($users as $u) {
 
             let selectedUserId = null;
             let currentUser = <?= $_SESSION['user_id'] ?? 0 ?>;
+            let isAdmin = <?= $isAdmin ? 'true' : 'false' ?>; // Pass admin status to JS
 
             // Prepare users data for search
             const usersData = <?= json_encode($users) ?>;
@@ -350,7 +352,7 @@ foreach ($users as $u) {
             function loadMessages(userId) {
                 if (!userId) return;
                 fetch(`../api/get_messages.php?user_id=${userId}`)
-                    .then(response => response.json()) // <-- FIXED: was response0on()
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             chatMessages.innerHTML = '';
@@ -358,13 +360,14 @@ foreach ($users as $u) {
                                 data.messages.forEach(msg => {
                                     const messageDiv = document.createElement('div');
                                     messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
-                                    // Use encodeURIComponent for attribute safety
+                                    // Show edit/delete if own OR admin
+                                    let showEdit = msg.is_own || isAdmin;
                                     messageDiv.innerHTML = `
                                         <strong>${msg.sender}</strong>
                                         <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
                                         <span class="msg-time">${msg.sent_at}</span>
                                         ${
-                                            msg.is_own
+                                            showEdit
                                             ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
                                                <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
                                             : ''
