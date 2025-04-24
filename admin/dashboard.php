@@ -85,6 +85,17 @@ foreach ($widgets as &$widget) {
     }
 }
 
+// Fetch unread messages from users to admin
+$unreadMessagesCount = 0;
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE is_read = 0 AND receiver_id = ? AND sender_id IN (SELECT id FROM users WHERE role_id != 0)");
+    $stmt->execute([$_SESSION['user_id']]);
+    $unreadMessagesCount = $stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {
+    $unreadMessagesCount = 0;
+    error_log("Unread Messages Error: " . $e->getMessage());
+}
+
 // Fetch recent activity log
 $activityLog = [];
 try {
@@ -348,10 +359,23 @@ try {
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <?php
+        // Make unreadMessagesCount available to sidebar
+        $ADMIN_UNREAD_MESSAGES = $unreadMessagesCount;
+        include __DIR__ . '/includes/admin_sidebar.php';
+        ?>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
+                <?php if ($unreadMessagesCount > 0): ?>
+                    <a href="messages.php" class="erpnext-btn btn-secondary" style="position:relative;">
+                        <i class="fas fa-envelope"></i>
+                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
+                            <?= $unreadMessagesCount ?>
+                        </span>
+                        New Messages
+                    </a>
+                <?php endif; ?>
             </header>
             <div class="content">
 

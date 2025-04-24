@@ -12,6 +12,7 @@ $sidebarConfig = [];
 if (file_exists($configPath)) {
     $sidebarConfig = json_decode(file_get_contents($configPath), true);
 }
+$unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 ?>
 <style>
 /* ERPNext/modern sidebar styling */
@@ -197,6 +198,17 @@ body .admin-sidebar.collapsed + .admin-main {
             <li><a href="add_users.php"><i class="fas fa-user-plus"></i> <span>Add Users</span></a></li>
             <li><a href="roles.php"><i class="fas fa-user-tag"></i> <span>Roles</span></a></li>
             <li><a href="settings.php"><i class="fas fa-cogs"></i> <span>Settings</span></a></li>
+            <li>
+                <a href="messages.php">
+                    <i class="fas fa-envelope"></i>
+                    Messages
+                    <?php if ($unread > 0): ?>
+                        <span style="background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;margin-left:6px;">
+                            <?= $unread ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
+            </li>
             <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             <?php
         }
