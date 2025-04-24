@@ -308,6 +308,7 @@ foreach ($users as $u) {
             </div>
         </div>
     </div>
+    <?php include 'includes/footer.php'; ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const userList = document.getElementById('user-list');
