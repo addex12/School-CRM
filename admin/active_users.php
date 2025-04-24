@@ -176,87 +176,85 @@ function getUserRoleName($roleId) {
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
-                        <?php
-                        $has_users = (isset($online_users) && count($online_users) > 0) || (isset($offline_users) && count($offline_users) > 0);
-                        if ($has_users):
-                            $all_users = array_merge($online_users, $offline_users);
-                            foreach ($all_users as $user):
-                        ?>
-                        <tr data-id="<?= htmlspecialchars($user['id']) ?>">
-                            <td class="select-col"><input type="checkbox" class="row-select"></td>
-                            <td><?= htmlspecialchars($user['id']) ?></td>
-                            <td class="username"><?= htmlspecialchars($user['username']) ?></td>
-                            <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
-                            <td class="online">
-                                <?php if (!empty($user['online'])): ?>
-                                    <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
-                                <?php else: ?>
-                                    <span style="color:#aaa;">Offline</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="role" data-role-id="<?= htmlspecialchars($user['role_id'] ?? '') ?>">
-                                <?= htmlspecialchars($user['role_name'] ?? getUserRoleName($user['role_id'])) ?>
-                            </td>
-                            <td class="status" data-status="<?= (int)$user['active'] ?>">
-                                <?= ((int)$user['active'] === 1 ? 'Active' : 'Inactive') ?>
-                            </td>
-                            <td>
-                                <button class="crud-btn edit">Edit</button>
-                                <button class="crud-btn delete">Delete</button>
-                            </td>
-                        </tr>
-                        <?php
-                            endforeach;
-                        else:
-                        ?>
-                        <tr>
-                            <td colspan="8" class="text-center">No active users found</td>
-                        </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+<?php
+$has_users = (isset($online_users) && count($online_users) > 0) || (isset($offline_users) && count($offline_users) > 0);
+if ($has_users):
+    $all_users = array_merge($online_users, $offline_users);
+    foreach ($all_users as $user):
+?>
+<tr data-id="<?= htmlspecialchars($user['id']) ?>">
+    <td class="select-col"><input type="checkbox" class="row-select"></td>
+    <td><?= htmlspecialchars($user['id']) ?></td>
+    <td class="username"><?= htmlspecialchars($user['username']) ?></td>
+    <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
+    <td class="online">
+        <?php if (!empty($user['online'])): ?>
+            <span class="online-dot"></span> <span style="color:#27ae60;font-weight:500;">Online</span>
+        <?php else: ?>
+            <span style="color:#aaa;">Offline</span>
+        <?php endif; ?>
+    </td>
+    <td class="role" data-role-id="<?= htmlspecialchars($user['role_id'] ?? '') ?>"><?= htmlspecialchars($user['role_name'] ?? getUserRoleName($user['role_id'])) ?></td>
+    <td class="status" data-status="<?= (int)$user['active'] ?>">
+        <?= ((int)$user['active'] === 1 ? 'Active' : 'Inactive') ?>
+    </td>
+    <td>
+        <button class="crud-btn edit">Edit</button>
+        <button class="crud-btn delete">Delete</button>
+    </td>
+</tr>
+<?php
+    endforeach;
+else:
+?>
+<tr>
+    <td colspan="8" class="text-center">No active users found</td>
+</tr>
+<?php endif; ?>t src="../assets/js/active_users.js"></script>
+</tbody>
+                </table> <?php include __DIR__ . '/includes/footer.php'; ?>
             </div>
         </div>
-        <?php include __DIR__ . '/includes/footer.php'; ?>
-    </div>
-    <!-- Use the correct relative path for the JS file -->
-    <script src="../assets/js/active_users.js"></script>
-    <script>
-    // AJAX table refresh logic
-    document.addEventListener('DOMContentLoaded', function() {
-        function fetchUsersTable() {
-            const search = document.getElementById('searchInput').value;
-            const online = document.getElementById('onlineInput').checked ? 1 : '';
-            const role = document.getElementById('roleInput').value;
-            const status = document.getElementById('statusInput').value;
-            const params = new URLSearchParams({
-                ajax: 1,
-                search: search,
-                online: online,
-                role: role,
-                status: status
-            });
-            fetch('ajax_active_users.php?' + params.toString())
-                .then(res => res.text())
-                .then(html => {
-                    document.getElementById('usersTableBody').innerHTML = html;
-                });
-        }
 
-        document.querySelector('.refresh-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            fetchUsersTable();
-        });
 
-        document.getElementById('userSearchForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            fetchUsersTable();
-        });
 
-        // Optionally, load table via AJAX on first load:
-        // fetchUsersTable();
-    });
-    </script>
-</body>
-</html>
-<?php ob_end_flush(); ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php ob_end_flush(); ?></html></body>    </script>    // fetchUsersTable();    // Initial load (if you want AJAX always)    });        fetchUsersTable();        e.preventDefault();    document.getElementById('userSearchForm').addEventListener('submit', function(e) {    // Optionally, auto-refresh table on filter/search submit    }            });                document.getElementById('usersTableBody').innerHTML = html;            .then(html => {            .then(res => res.text())        fetch('ajax_active_users.php?' + params.toString())        });            status: status            role: role,            online: online,            search: search,            ajax: 1,        const params = new URLSearchParams({        const status = document.getElementById('statusInput').value;        const role = document.getElementById('roleInput').value;        const online = document.getElementById('onlineInput').checked ? 1 : '';        const search = document.getElementById('searchInput').value;        // Gather current filter values    function fetchUsersTable() {    });        fetchUsersTable();        e.preventDefault();    document.querySelector('.refresh-btn').addEventListener('click', function(e) {    // Fix: Always reload table via AJAX after refresh, not full page reload    <script>    <script src="../assets/js/active_users.js"></script>    </div>        <?php include __DIR__ . '/includes/footer.php'; ?><?php ob_end_flush(); ?>
