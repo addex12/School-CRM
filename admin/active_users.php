@@ -153,7 +153,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 echo '<span style="color:#aaa;">Offline</span>';
             }
             echo '</td>';
-            echo '<td class="role" data-role-id="' . htmlspecialchars($user['role_id']) . '">' . htmlspecialchars($user['role_name']) . '</td>';
+            echo '<td class="role" data-role-id="' . htmlspecialchars($user['role_id'] ?? '') . '">' . htmlspecialchars($user['role_name'] ?? '') . '</td>';
             // Show status as "Active" or "Inactive" based on value of 'active' column
             echo '<td class="status" data-status="' . (int)$user['active'] . '">' . ((int)$user['active'] === 1 ? 'Active' : 'Inactive') . '</td>';
             echo '<td>
