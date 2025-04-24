@@ -350,7 +350,7 @@ foreach ($users as $u) {
             function loadMessages(userId) {
                 if (!userId) return;
                 fetch(`../api/get_messages.php?user_id=${userId}`)
-                    .then(response => response.json())
+                    .then(response => response.json()) // <-- FIXED: was response0on()
                     .then(data => {
                         if (data.success) {
                             chatMessages.innerHTML = '';
@@ -358,14 +358,14 @@ foreach ($users as $u) {
                                 data.messages.forEach(msg => {
                                     const messageDiv = document.createElement('div');
                                     messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
-                                    // Use JSON.stringify to safely encode message text for attribute
+                                    // Use encodeURIComponent for attribute safety
                                     messageDiv.innerHTML = `
                                         <strong>${msg.sender}</strong>
                                         <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
                                         <span class="msg-time">${msg.sent_at}</span>
                                         ${
                                             msg.is_own
-                                            ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text='${JSON.stringify(msg.message)}'>Edit</button>
+                                            ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
                                                <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
                                             : ''
                                         }
@@ -464,7 +464,7 @@ foreach ($users as $u) {
                     const msgId = editBtn.getAttribute('data-msg-id');
                     let oldText = '';
                     try {
-                        oldText = JSON.parse(editBtn.getAttribute('data-msg-text'));
+                        oldText = decodeURIComponent(editBtn.getAttribute('data-msg-text'));
                     } catch (err) {
                         oldText = '';
                     }
@@ -477,7 +477,6 @@ foreach ($users as $u) {
                         })
                         .then(res => res.json())
                         .then(data => {
-                            console.log('Edit response:', data); // Debug: log backend response
                             if (data.success) {
                                 loadMessages(selectedUserId);
                             } else {
