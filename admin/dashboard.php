@@ -88,7 +88,7 @@ foreach ($widgets as &$widget) {
 // Fetch recent activity log
 $activityLog = [];
 try {
-    $stmt = $pdo->query("SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10");
+    $stmt = $pdo->query("SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10");
     $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Activity Log Error: " . $e->getMessage());
