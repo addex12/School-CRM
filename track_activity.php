@@ -27,13 +27,33 @@ $href = $data['href'] ?? '';
 $page = $data['page'] ?? '';
 $ip = $_SERVER['REMOTE_ADDR'] ?? '';
 $timestamp = date('Y-m-d H:i:s');
+$created_at = $timestamp; // For explicit created_at column
 
-// Insert into activity_logs
+// Insert into activity_logs table (with created_at)
 $stmt = $pdo->prepare("INSERT INTO activity_logs 
-    (user_id, username, role, action, element, element_id, element_class, text, href, page, ip_address, timestamp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    (user_id, username, role, action, element, element_id, element_class, text, href, page, ip_address, timestamp, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 $stmt->execute([
-    $user_id, $username, $role, $action, $element, $element_id, $element_class, $text, $href, $page, $ip, $timestamp
+    $user_id, $username, $role, $action, $element, $element_id, $element_class, $text, $href, $page, $ip, $timestamp, $created_at
 ]);
+
+// Also log to activity_log file
+$logLine = json_encode([
+    'user_id' => $user_id,
+    'username' => $username,
+    'role' => $role,
+    'action' => $action,
+    'element' => $element,
+    'element_id' => $element_id,
+    'element_class' => $element_class,
+    'text' => $text,
+    'href' => $href,
+    'page' => $page,
+    'ip_address' => $ip,
+    'timestamp' => $timestamp,
+    'created_at' => $created_at
+]) . PHP_EOL;
+
+file_put_contents(__DIR__ . '/activity_log', $logLine, FILE_APPEND);
 
 echo 'ok';
