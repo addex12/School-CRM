@@ -6,15 +6,15 @@
       "link": "dashboard.php"
     },
     {
-        "title": "Users",
-        "icon": "users",
-        "items": [
-            { "title": "User List", "icon": "users", "link": "users.php" },
-            { "title": "Add User", "icon": "user-plus", "link": "add_users.php" },
-            { "title": "Active Users", "icon": "user-tag", "link": "active_users.php" },
-            { "title": "Edit Users", "icon": "edit", "link": "edit_user.php" }
-        ],
-        "id": "users-menu"
+      "title": "Users",
+      "icon": "users",
+      "items": [
+        { "title": "User List", "icon": "users", "link": "users.php" },
+        { "title": "Add User", "icon": "user-plus", "link": "add_users.php" },
+        { "title": "Active Users", "icon": "user-tag", "link": "active_users.php" },
+        { "title": "Edit Users", "icon": "edit", "link": "edit_user.php" }
+      ],
+      "id": "users-menu"
     },
     {
       "title": "Surveys",
@@ -23,7 +23,8 @@
         { "title": "All Surveys", "icon": "poll", "link": "surveys.php" },
         { "title": "Create Survey", "icon": "plus-circle", "link": "survey_builder.php" },
         { "title": "Survey Results", "icon": "chart-bar", "link": "survey_statistics.php" },
-        { "title": "Survey Categories", "icon": "file-alt", "link": "categories.php" }
+        { "title": "Survey Categories", "icon": "file-alt", "link": "categories.php" },
+        { "title": "All Responses", "icon": "list", "link": "all_responses.php" }
       ],
       "id": "surveys-menu"
     },
@@ -55,6 +56,16 @@
       "id": "parents-menu"
     },
     {
+      "title": "Academics",
+      "icon": "school",
+      "items": [
+        { "title": "Classes", "icon": "school", "link": "classes.php" },
+        { "title": "Grades", "icon": "file-alt", "link": "grades.php" },
+        { "title": "Reports", "icon": "chart-line", "link": "generate_reports.php" }
+      ],
+      "id": "academics-menu"
+    },
+    {
       "title": "Communications",
       "icon": "envelope",
       "items": [
@@ -76,12 +87,11 @@
     {
       "title": "Feedback",
       "icon": "comments",
-        "items": [
-            { "title": "Manage", "icon": "comments", "link": "feedback_mgmt.php" },
-            { "title": "View Feedbacks", "icon": "plus-circle", "link": "feedback.php" }
-        ],
+      "items": [
+        { "title": "Manage", "icon": "comments", "link": "feedback_mgmt.php" },
+        { "title": "View Feedbacks", "icon": "plus-circle", "link": "feedback.php" }
+      ],
       "id": "feedback-menu"
-     
     },
     {
       "title": "Settings",
@@ -92,7 +102,7 @@
         { "title": "Permissions", "icon": "shield-alt", "link": "permissions.php" },
         { "title": "Backup & Restore", "icon": "database", "link": "restore.php" },
         { "title": "System Logs", "icon": "file-alt", "link": "system_logs.php" },
-        { "title": "Audit Trail", "icon": "history", "link": "audit_trail.php" }    
+        { "title": "Audit Trail", "icon": "history", "link": "audit_trail.php" }
       ],
       "id": "settings-menu"
     },

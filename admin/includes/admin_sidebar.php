@@ -6,18 +6,15 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-// Load sidebar configuration from JSON
+// Sidebar config path
 $configPath = __DIR__ . '/sidebar_config.json';
-$sidebarItems = [];
+$sidebarConfig = [];
 if (file_exists($configPath)) {
-    $json = file_get_contents($configPath);
-    $data = json_decode($json, true);
-    $sidebarItems = isset($data['menu']) ? $data['menu'] : $data;
+    $sidebarConfig = json_decode(file_get_contents($configPath), true);
 }
-$current = basename($_SERVER['PHP_SELF']);
 ?>
 <style>
-/* ERPNext/Frappe inspired sidebar styles */
+/* ERPNext/modern sidebar styling */
 .admin-sidebar {
     width: 240px;
     background: #222d32;
@@ -43,6 +40,9 @@ $current = basename($_SERVER['PHP_SELF']);
     background: #1976d2;
     letter-spacing: 1px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 .admin-sidebar .sidebar-toggle {
     background: none;
@@ -50,8 +50,7 @@ $current = basename($_SERVER['PHP_SELF']);
     color: #fff;
     font-size: 1.3rem;
     cursor: pointer;
-    margin: 0.5rem 0 0.5rem 0.5rem;
-    align-self: flex-end;
+    margin-left: 10px;
 }
 .admin-sidebar ul {
     list-style: none;
@@ -71,6 +70,7 @@ $current = basename($_SERVER['PHP_SELF']);
     font-size: 1rem;
     transition: background 0.15s, color 0.15s;
     border-left: 4px solid transparent;
+    font-weight: 500;
 }
 .admin-sidebar ul li a.active,
 .admin-sidebar ul li a:hover {
@@ -95,6 +95,20 @@ $current = basename($_SERVER['PHP_SELF']);
     justify-content: center;
     padding: 0.85rem 0.5rem;
 }
+.admin-sidebar .submenu {
+    background: #263043;
+    padding-left: 0.5rem;
+}
+.admin-sidebar .submenu li a {
+    font-size: 0.97em;
+    padding-left: 2.5rem;
+    border-left: none;
+}
+.admin-sidebar .submenu li a.active,
+.admin-sidebar .submenu li a:hover {
+    background: #215967;
+    color: #fff;
+}
 @media (max-width: 900px) {
     .admin-sidebar {
         position: absolute;
@@ -113,10 +127,7 @@ $current = basename($_SERVER['PHP_SELF']);
     margin-left: 60px;
 }
 </style>
-<button class="sidebar-toggle" id="sidebarToggle">
-    <i class="fas fa-bars"></i>
-</button>
-<aside class="admin-sidebar" id="adminSidebar">
+<div class="admin-sidebar" id="adminSidebar">
     <div class="sidebar-header">
         <span>Admin</span>
         <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
@@ -124,14 +135,42 @@ $current = basename($_SERVER['PHP_SELF']);
         </button>
     </div>
     <ul>
-        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-        <li><a href="active_users.php"><i class="fas fa-users"></i> <span>Active Users</span></a></li>
-        <li><a href="add_users.php"><i class="fas fa-user-plus"></i> <span>Add Users</span></a></li>
-        <li><a href="roles.php"><i class="fas fa-user-tag"></i> <span>Roles</span></a></li>
-        <li><a href="settings.php"><i class="fas fa-cogs"></i> <span>Settings</span></a></li>
-        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+        <?php
+        // Helper to render menu recursively
+        function renderSidebarMenu($items, $current = '') {
+            foreach ($items as $item) {
+                $hasSub = isset($item['items']) && is_array($item['items']);
+                $icon = isset($item['icon']) ? 'fa-' . $item['icon'] : 'fa-circle';
+                $active = (basename($_SERVER['PHP_SELF']) === $item['link']) ? 'active' : '';
+                if ($hasSub) {
+                    echo '<li>';
+                    echo '<a href="#" class="sidebar-parent"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title']) . '</span> <i class="fas fa-chevron-down" style="margin-left:auto;font-size:0.85em;"></i></a>';
+                    echo '<ul class="submenu" style="display:none;">';
+                    renderSidebarMenu($item['items'], $current);
+                    echo '</ul>';
+                    echo '</li>';
+                } else {
+                    echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="' . $active . '"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
+                }
+            }
+        }
+        // Use config if available, else fallback to static menu
+        if (!empty($sidebarConfig['menu'])) {
+            renderSidebarMenu($sidebarConfig['menu']);
+        } else {
+            // Fallback static menu (minimal)
+            ?>
+            <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li><a href="active_users.php"><i class="fas fa-users"></i> <span>Active Users</span></a></li>
+            <li><a href="add_users.php"><i class="fas fa-user-plus"></i> <span>Add Users</span></a></li>
+            <li><a href="roles.php"><i class="fas fa-user-tag"></i> <span>Roles</span></a></li>
+            <li><a href="settings.php"><i class="fas fa-cogs"></i> <span>Settings</span></a></li>
+            <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
+            <?php
+        }
+        ?>
     </ul>
-</aside>
+</div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.getElementById('adminSidebar');
@@ -152,75 +191,15 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('sidebar-collapsed', '0');
         }
     });
-});
-</script>
-<script>
-// ERPNext/Frappe inspired sidebar JS
-(function() {
     // Submenu toggle
-    var headers = document.querySelectorAll('.category-header');
-    headers.forEach(function(header) {
-        header.addEventListener('click', function(e) {
-            var targetId = header.getAttribute('data-target');
-            var submenu = document.getElementById(targetId.replace('#',''));
-            var icon = header.querySelector('.collapse-icon');
-            // Close all submenus except this one
-            document.querySelectorAll('.submenu').forEach(function(sm) {
-                if (sm !== submenu) {
-                    sm.classList.remove('open');
-                    sm.style.display = 'none';
-                }
-            });
-            document.querySelectorAll('.collapse-icon').forEach(function(ic) {
-                if (ic !== icon) ic.classList.remove('fa-chevron-up');
-                if (ic !== icon) ic.classList.add('fa-chevron-down');
-            });
-            if (submenu) {
-                var isOpen = submenu.classList.contains('open');
-                if (isOpen) {
-                    submenu.classList.remove('open');
-                    submenu.style.display = 'none';
-                    if(icon) { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); }
-                } else {
-                    submenu.classList.add('open');
-                    submenu.style.display = 'block';
-                    if(icon) { icon.classList.add('fa-chevron-up'); icon.classList.remove('fa-chevron-down'); }
-                }
+    document.querySelectorAll('.sidebar-parent').forEach(function(parent) {
+        parent.addEventListener('click', function(e) {
+            e.preventDefault();
+            var submenu = parent.nextElementSibling;
+            if (submenu && submenu.classList.contains('submenu')) {
+                submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
             }
         });
     });
-    // On page load, ensure only submenu with .submenu-item.active is open
-    document.querySelectorAll('.submenu').forEach(function(sm) {
-        var active = sm.querySelector('.submenu-item.active');
-        if (active) {
-            sm.classList.add('open');
-            sm.style.display = 'block';
-            var chevron = sm.parentElement.querySelector('.collapse-icon');
-            if (chevron) {
-                chevron.classList.add('fa-chevron-up');
-                chevron.classList.remove('fa-chevron-down');
-            }
-        } else {
-            sm.classList.remove('open');
-            sm.style.display = 'none';
-        }
-    });
-    // Sidebar hamburger toggle for mobile/tablet
-    var sidebar = document.getElementById('adminSidebar');
-    var sidebarToggle = document.getElementById('sidebarToggle');
-    if (sidebar && sidebarToggle) {
-        sidebarToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            sidebar.classList.toggle('open');
-        });
-    }
-    // Close sidebar on outside click (mobile)
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 600 && sidebar && sidebar.classList.contains('open')) {
-            if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
-                sidebar.classList.remove('open');
-            }
-        }
-    });
-})();
+});
 </script>
