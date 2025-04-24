@@ -11,80 +11,136 @@
 <footer class="main-footer">
     <style>
         .main-footer {
-            background-color: #343a40; /* Dark background */
-            color: #ffffff; /* White text */
-            padding: 40px 20px;
-            border-top: 5px solid #007bff; /* Blue top border */
+            background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
+            color: #f5f6fa;
+            padding: 28px 18px 18px 18px;
+            border-top: 3px solid #007bfc;
+            font-size: 14px;
+            box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
+            margin-top: 0;
+            width: 100%;
         }
-
         .footer-content {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
+            gap: 30px;
             flex-wrap: wrap;
+            width: 100%;
         }
-
         .footer-section {
-            flex: 1;
-            min-width: 200px; /* Ensures sections don't get too small */
-            margin: 10px;
+            flex: 1 1 0;
+            min-width: 180px;
+            padding: 0 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-
         .footer-section h4 {
-            margin-bottom: 15px;
-            font-size: 1.5em;
-            color: #007bff; /* Blue headings */
+            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: #f1c40f;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
-
         .footer-section ul {
             list-style-type: none;
             padding: 0;
+            margin: 0;
         }
-
         .footer-section ul li {
-            margin: 10px 0;
+            margin: 7px 0;
         }
-
-        .footer-section ul li a {
+        .footer-section ul li a,
+        .footer-section a {
             text-decoration: none;
-            color: #ffffff; /* White links */
-            transition: color 0.3s;
+            color: #f5f6fa;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 4px;
+            background: #2563eb;
+            margin-right: 4px;
+            border: 1px solid #215967;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            display: inline-block;
+            transition: background 0.18s, color 0.18s;
         }
-
-        .footer-section ul li a:hover {
-            color: #007bff; /* Change link color on hover */
-            text-decoration: underline;
+        .footer-section ul li a:hover,
+        .footer-section a:hover {
+            background: #215967;
+            color: #fff;
+            text-decoration: none;
         }
-
+        .footer-section p,
+        .footer-section a {
+            color: #bfc9d1;
+            font-size: 13px;
+        }
+        .footer-section .footer-link {
+            color: #f5f6fa;
+        }
+        .footer-section .footer-link:hover {
+            color: #f1c40f;
+        }
         .footer-bottom {
             text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            font-size: 0.9em;
-            color: #cccccc; /* Light gray text */
+            margin-top: 18px;
+            padding: 8px 0 0 0;
+            font-size: 0.98em;
+            color: #bfc9d1;
+        }
+        @media (max-width: 900px) {
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            .footer-section {
+                min-width: 100%;
+                padding: 0 2px;
+            }
+        }
+        @media (max-width: 600px) {
+            .main-footer {
+                padding: 12px 4px 8px 4px;
+                font-size: 12px;
+            }
+            .footer-section {
+                padding: 0 1px;
+            }
+            .footer-section h4 {
+                font-size: 1em;
+            }
+            .footer-section ul li a,
+            .footer-section a {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
         }
     </style>
     <div class="footer-content">
         <div class="footer-section quick-links">
             <h4>Quick Links</h4>
             <ul>
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="faq.php">FAQ</a></li>
-                <li><a href="terms.php">Terms of Service</a></li>
+                <li><a href="dashboard.php" class="footer-link">Dashboard</a></li>
+                <li><a href="faq.php" class="footer-link">FAQ</a></li>
+                <li><a href="terms.php" class="footer-link">Terms of Service</a></li>
             </ul>
         </div>
         <div class="footer-section contact-info">
             <h4>Contact Info</h4>
-            <p>Email: <a href="mailto:contactus@flipperschools.com">contactus@flipperschools.com</a></p>
-            <p>Phone: <a href="tel:+251925582067">+251925582067</a></p>
+            <p>Email: <a href="mailto:contactus@flipperschools.com" class="footer-link">contactus@flipperschools.com</a></p>
+            <p>Phone: <a href="tel:+251925582067" class="footer-link">+251925582067</a></p>
         </div>
         <div class="footer-section developer-info">
             <h4>Developer</h4>
             <p><strong>Adugna Gizaw</strong></p>
-            <p>Email: <a href="mailto:gizawadugna@gmail.com">gizawadugna@gmail.com</a></p>
+            <p>Email: <a href="mailto:gizawadugna@gmail.com" class="footer-link">gizawadugna@gmail.com</a></p>
             <p>
-                <a href="https://www.linkedin.com/in/eleganceict" target="_blank">LinkedIn</a> |
-                <a href="https://twitter.com/eleganceict1" target="_blank">Twitter</a> |
-                <a href="https://github.com/addex12" target="_blank">GitHub</a>
+                <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="footer-link">LinkedIn</a>
+                <a href="https://twitter.com/eleganceict1" target="_blank" class="footer-link">Twitter</a>
+                <a href="https://github.com/addex12" target="_blank" class="footer-link">GitHub</a>
             </p>
         </div>
     </div>
