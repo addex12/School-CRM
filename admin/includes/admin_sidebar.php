@@ -124,7 +124,7 @@ if (file_exists($configPath)) {
     transition: margin-left 0.2s;
 }
 .admin-sidebar.collapsed ~ .admin-main {
-    margin-left: 60px;
+    margin-left: 50px;
 }
 </style>
 <div class="admin-sidebar" id="adminSidebar">
