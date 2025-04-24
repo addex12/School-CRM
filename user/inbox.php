@@ -43,16 +43,15 @@ try {
     error_log("Error fetching online users: " . $e->getMessage());
 }
 
-// Fetch online admins (role_id = 1 and active in last 5 min)
+// Fetch online admins (role_name = 'admin' and online = 1)
 try {
     $adminStmt = $pdo->prepare("
         SELECT u.id, u.username, u.email, u.role_id, u.last_activity, COALESCE(r.role_name, 'No Role') as role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.role_id = 1 AND u.last_activity > :threshold AND u.id != :self
+        WHERE u.online = 1 AND r.role_name = 'admin' AND u.id != :self
         ORDER BY u.username ASC
     ");
-    $adminStmt->bindValue(':threshold', $onlineThreshold);
     $adminStmt->bindValue(':self', $userId);
     $adminStmt->execute();
     $onlineAdmins = $adminStmt->fetchAll();
@@ -111,10 +110,10 @@ function getUserRoleName($roleId) {
                 <hr class="sidebar-divider">
                 <div class="sidebar-section">
                     <h3 class="sidebar-title">Online Users</h3>
-                    <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.3rem;align-items:center;">
-                        <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input search-mini" style="flex:1;max-width:110px;">
-                        <select name="role" id="roleFilter" class="erpnext-input search-mini" style="max-width:90px;">
-                            <option value="">All Roles</option>
+                    <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.2rem;align-items:center;max-width:220px;">
+                        <input type="text" name="search" id="onlineUserSearch" placeholder="Search..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input search-mini" style="flex:1;max-width:80px;">
+                        <select name="role" id="roleFilter" class="erpnext-input search-mini" style="max-width:70px;">
+                            <option value="">All</option>
                             <?php foreach ($roles as $role): ?>
                                 <option value="<?= htmlspecialchars($role) ?>" <?= $role === $roleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
                             <?php endforeach; ?>
@@ -486,26 +485,27 @@ body, input, textarea, select, button {
 .search-bar {
     background: #f5f7fa;
     border-radius: 5px;
-    padding: 3px 4px;
+    padding: 2px 2px;
     box-shadow: none;
     border: none;
     margin-bottom: 0.7rem;
+    max-width: 220px;
 }
 .search-mini {
-    font-size: 0.97em;
-    padding: 5px 8px;
+    font-size: 0.95em;
+    padding: 4px 6px;
     border-radius: 4px;
     background: #f9fafb;
     border: 1px solid #d1d8dd;
     margin: 0;
 }
 .search-btn-mini {
-    padding: 6px 10px;
+    padding: 5px 8px;
     font-size: 1em;
     border-radius: 4px;
     margin: 0;
-    min-width: 32px;
-    min-height: 32px;
+    min-width: 28px;
+    min-height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -521,17 +521,19 @@ body, input, textarea, select, button {
     }
     .search-bar {
         flex-wrap: wrap;
-        gap: 0.3rem;
+        gap: 0.2rem;
+        max-width: 100%;
     }
     .search-mini {
-        max-width: 100px;
+        max-width: 70px;
     }
 }
 @media (max-width: 700px) {
     .search-bar {
         flex-direction: column;
-        gap: 0.2rem;
+        gap: 0.15rem;
         padding: 2px 2px;
+        max-width: 100%;
     }
     .search-mini {
         width: 100%;
