@@ -30,7 +30,7 @@ if (file_exists($configPath)) {
     flex-direction: column;
 }
 .admin-sidebar.collapsed {
-    width: 60px;
+    width: 50px;
 }
 .admin-sidebar .sidebar-header {
     padding: 1.2rem 1.5rem;
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function setSidebarCollapsed(collapsed) {
         if (collapsed) {
             sidebar.classList.add('collapsed');
-            if (main) main.style.marginLeft = '10px';
+            if (main) main.style.marginLeft = '50px';
             localStorage.setItem('sidebar-collapsed', '1');
         } else {
             sidebar.classList.remove('collapsed');
@@ -202,7 +202,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Also allow expanding sidebar by clicking anywhere on the collapsed sidebar (optional UX)
     sidebar.addEventListener('click', function(e) {
-        if (sidebar.classList.contains('collapsed') && e.target === sidebar) {
+        if (
+            sidebar.classList.contains('collapsed') &&
+            (e.target === sidebar || e.target === sidebar.querySelector('.sidebar-header') || e.target === sidebar.querySelector('.sidebar-header span'))
+        ) {
             setSidebarCollapsed(false);
         }
     });
