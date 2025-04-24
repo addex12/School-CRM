@@ -10,7 +10,7 @@ $pageTitle = "Admin Messaging";
 $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id != 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
 // Get all admins (including self)
-$admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
+$admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1 AND active = 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
 // Get unread counts for each user
 $unreadCounts = [];
@@ -54,6 +54,7 @@ foreach ($admins as $a) {
             background: #fff;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            position: relative;
         }
         .contact-list {
             width: 270px;
@@ -168,6 +169,9 @@ foreach ($admins as $a) {
             display: flex;
             flex-direction: column;
             min-width: 0;
+            border-radius: 0 8px 8px 0;
+            background: #eaeff7;
+            box-shadow: 0 1px 3px rgba(44,62,80,0.04);
         }
         .chat-header {
             padding: 1rem 1.5rem 0.7rem 1.5rem;
@@ -181,7 +185,7 @@ foreach ($admins as $a) {
             flex: 1;
             padding: 15px 18px;
             overflow-y: auto;
-            background: #f9f9f9;
+            background: #eaeff7;
         }
         .message-form {
             padding: 15px 18px;
@@ -204,36 +208,59 @@ foreach ($admins as $a) {
             font-size: 1em;
         }
         .chat-message {
-            margin-bottom: 15px;
-            padding: 10px 14px;
-            border-radius: 7px;
-            max-width: 70%;
+            margin-bottom: 7px;
+            padding: 9px 14px;
+            border-radius: 18px;
+            max-width: 85%;
             word-break: break-word;
-            font-size: 1em;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            font-size: 0.97em;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.07);
+            position: relative;
+            clear: both;
+            display: flex;
+            flex-direction: column;
         }
         .chat-message.own {
-            background-color: #e2efda;
+            background: #d1f7c4;
             margin-left: auto;
             color: #215967;
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 18px;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            align-self: flex-end;
+            border: 1px solid #b2e59f;
         }
         .chat-message.other {
-            background-color: #f1f1f1;
+            background: #fff;
             margin-right: auto;
             color: #222d32;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 18px;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            align-self: flex-start;
+            border: 1px solid #e0e0e0;
         }
         .msg-time {
-            font-size: 12px;
-            color: #777;
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 2px;
             display: block;
-            margin-top: 5px;
+            text-align: right;
+        }
+        .chat-message strong {
+            font-size: 0.95em;
+            color: #007bff;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
         .edit-btn, .delete-btn {
             background: none;
             border: none;
             color: #3b82f6;
-            font-size: 0.98em;
-            margin-left: 8px;
+            font-size: 0.95em;
+            margin-left: 6px;
             cursor: pointer;
         }
         .edit-btn:hover, .delete-btn:hover {
@@ -326,15 +353,27 @@ foreach ($admins as $a) {
                             <?php endforeach; ?>
                         </ul>
                     </aside>
-                    <section class="chat-section">
-                        <div id="chat-header" class="chat-header">
-                            <h3>Select a user to start chatting</h3>
+                    <section class="chat-section"></section>
+                        <div class="message-card-header">
+                            <span id="chat-header-title">
+                                <i class="fas fa-paper-plane" style="color:#007bff;margin-right:6px;"></i>
+                                <span id="chat-header-user">Select a user to start chatting</span>
+                            </span>
+                            <?php
+                            $totalUnread = array_sum($unreadCounts);
+                            ?>
+                            <?php if ($totalUnread > 0): ?>
+                                <span class="message-notification-bell" id="messageNotificationBell" title="Unread Messages">
+                                    <i class="fas fa-bell"></i>
+                                    <span class="message-notification-badge"><?= $totalUnread ?></span>
+                                </span>
+                            <?php endif; ?>
                         </div>
                         <div id="chat-messages" class="chat-messages"></div>
                         <form id="message-form" class="message-form" style="display:none;">
                             <input type="hidden" name="receiver_id" id="receiver_id">
-                            <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required></textarea>
-                            <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
+                            <textarea name="message" id="message-input" rows="2" placeholder="Type your message..." required></textarea>
+                            <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i></button>
                         </form>
                     </section>
                 </div>
@@ -560,6 +599,37 @@ foreach ($admins as $a) {
                 if (broadcast) ul.insertBefore(broadcast, ul.firstChild);
             }
             moveOnlineUsersToTop();
+
+            // Notification bell click: select first unread user
+            const messageNotificationBell = document.getElementById('messageNotificationBell');
+            if (messageNotificationBell) {
+                messageNotificationBell.addEventListener('click', function() {
+                    const firstUnread = document.querySelector('.user-list li .unread-badge');
+                    if (firstUnread) {
+                        const li = firstUnread.closest('li');
+                        if (li) {
+                            li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            li.click();
+                        }
+                    }
+                });
+            }
+
+            // Update chat header title on user select
+            const chatHeaderUser = document.getElementById('chat-header-user');
+            userList.addEventListener('click', function(e) {
+                const li = e.target.closest('li[data-user-id]');
+                if (!li) return;
+                selectedUserId = li.getAttribute('data-user-id');
+                receiverInput.value = selectedUserId;
+                document.querySelectorAll('.contact-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                li.classList.add('selected');
+                chatHeaderUser.textContent = li.textContent.trim();
+                messageForm.style.display = 'flex';
+                loadMessages(selectedUserId);
+            });
         });
     </script>
 </body>
