@@ -10,11 +10,15 @@ $isAdmin = ($_SESSION['role'] ?? '') === 'admin'; // Add this line
 // Get all non-admin users
 $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id != 1 ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
-// Get unread counts for each user
+// Get unread counts for each user (messages sent to admin)
 $unreadCounts = [];
-$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['receiver_id']} GROUP BY receiver_id");
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $unreadCounts[$row['receiver_id']] = $row['unread'];
+$admin_id = $_SESSION['sender_id'] ?? null;
+if ($admin_id) {
+    $stmt = $pdo->prepare("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = :admin_id GROUP BY sender_id");
+    $stmt->execute(['admin_id' => $admin_id]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $unreadCounts[$row['sender_id']] = $row['unread'];
+    }
 }
 
 // Simulate online users (last_active within 5 minutes)
