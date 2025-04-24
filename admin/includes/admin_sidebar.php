@@ -140,7 +140,7 @@ if (file_exists($configPath)) {
         left: 0;
     }
     .admin-sidebar.collapsed {
-        width: 60px;
+        width: 70px;
         left: 0;
     }
     .admin-main {
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (collapsed) {
             sidebar.classList.add('collapsed');
             sidebar.classList.remove('open');
-            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '56px' : '56px';
+            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '60px' : '60px';
             localStorage.setItem('sidebar-collapsed', '1');
         } else {
             sidebar.classList.remove('collapsed');
