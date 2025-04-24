@@ -132,6 +132,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         $all_users = array_merge($online_users, $offline_users);
         foreach ($all_users as $user) {
             echo '<tr data-id="' . htmlspecialchars($user['id']) . '">';
+            echo '<td class="select-col"><input type="checkbox" class="row-select"></td>';
             echo '<td>' . htmlspecialchars($user['id']) . '</td>';
             echo '<td class="username">' . htmlspecialchars($user['username']) . '</td>';
             echo '<td>' . htmlspecialchars($user['last_active'] ?? '') . '</td>';
@@ -152,7 +153,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             echo '</tr>';
         }
     } else {
-        echo '<tr><td colspan="7" class="text-center">No active users found</td></tr>';
+        echo '<tr><td colspan="8" class="text-center">No active users found</td></tr>';
     }
     exit;
 }
@@ -371,6 +372,39 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
             padding: 3px 7px;
             font-size: 1em;
         }
+        .bulk-actions-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            background: #f1f5fa;
+            padding: 10px 14px;
+            border-radius: 6px;
+        }
+        .bulk-actions-bar select, .bulk-actions-bar button {
+            font-size: 1em;
+            padding: 6px 12px;
+            border-radius: 5px;
+            border: 1px solid #cfd8dc;
+            background: #fff;
+            color: #1976d2;
+        }
+        .bulk-actions-bar button {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            margin-left: 6px;
+        }
+        .bulk-actions-bar button:hover {
+            background: #125ea2;
+        }
+        .users-table th.select-col, .users-table td.select-col {
+            width: 36px;
+            text-align: center;
+        }
+        .users-table th.select-col input[type="checkbox"] {
+            accent-color: #1976d2;
+        }
     </style>
 </head>
 <body>
@@ -394,6 +428,24 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
                 <?php if (!empty($error)): ?>
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
+
+                <!-- Bulk Actions Bar -->
+                <div class="bulk-actions-bar" id="bulkActionsBar" style="display:none;">
+                    <span id="selectedCount">0 selected</span>
+                    <button type="button" id="bulkDeleteBtn"><i class="fas fa-trash"></i> Delete</button>
+                    <select id="bulkStatusSelect">
+                        <option value="">Set Status...</option>
+                        <option value="1">Set Active</option>
+                        <option value="0">Set Inactive</option>
+                    </select>
+                    <select id="bulkRoleSelect">
+                        <option value="">Set Role...</option>
+                        <?php foreach ($roles as $id => $name): ?>
+                            <option value="<?= htmlspecialchars($id) ?>"><?= htmlspecialchars($name) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <button type="button" id="bulkExportBtn"><i class="fas fa-download"></i> Export</button>
+                </div>
 
                 <form class="erpnext-search-form" id="userSearchForm" method="get" action="">
                     <input type="text" name="search" id="searchInput" placeholder="Search username..." value="<?= htmlspecialchars($search) ?>">
@@ -421,6 +473,7 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
                 <table class="users-table" id="allUsersTable">
                     <thead>
                         <tr>
+                            <th class="select-col"><input type="checkbox" id="selectAll"></th>
                             <th>ID</th>
                             <th>Username</th>
                             <th>Last Active</th>
@@ -438,6 +491,7 @@ if ($has_users):
     foreach ($all_users as $user):
 ?>
 <tr data-id="<?= htmlspecialchars($user['id']) ?>">
+    <td class="select-col"><input type="checkbox" class="row-select"></td>
     <td><?= htmlspecialchars($user['id']) ?></td>
     <td class="username"><?= htmlspecialchars($user['username']) ?></td>
     <td><?= htmlspecialchars($user['last_active'] ?? '') ?></td>
@@ -462,7 +516,7 @@ if ($has_users):
 else:
 ?>
 <tr>
-    <td colspan="7" class="text-center">No active users found</td>
+    <td colspan="8" class="text-center">No active users found</td>
 </tr>
 <?php endif; ?>
 </tbody>
@@ -702,7 +756,205 @@ else:
             }
         });
     }
+
+    // Bulk selection logic
+    const selectAll = document.getElementById('selectAll');
+    const bulkActionsBar = document.getElementById('bulkActionsBar');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    const bulkStatusSelect = document.getElementById('bulkStatusSelect');
+    const bulkRoleSelect = document.getElementById('bulkRoleSelect');
+    const bulkExportBtn = document.getElementById('bulkExportBtn');
+    const selectedCount = document.getElementById('selectedCount');
+
+    function getSelectedRows() {
+        return Array.from(document.querySelectorAll('.row-select:checked')).map(cb => cb.closest('tr'));
+    }
+
+    function updateBulkBar() {
+        const selected = getSelectedRows();
+        selectedCount.textContent = selected.length + " selected";
+        bulkActionsBar.style.display = selected.length > 0 ? "flex" : "none";
+    }
+
+    function clearBulkSelection() {
+        document.querySelectorAll('.row-select').forEach(cb => cb.checked = false);
+        updateBulkBar();
+    }
+
+    // Handle select all
+    selectAll.addEventListener('change', function() {
+        document.querySelectorAll('.row-select').forEach(cb => cb.checked = selectAll.checked);
+        updateBulkBar();
+    });
+
+    // Handle row select
+    usersTableBody.addEventListener('change', function(e) {
+        if (e.target.classList.contains('row-select')) {
+            updateBulkBar();
+            // Uncheck selectAll if any unchecked
+            if (!e.target.checked) selectAll.checked = false;
+        }
+    });
+
+    // Bulk Delete
+    bulkDeleteBtn.addEventListener('click', function() {
+        const rows = getSelectedRows();
+        if (!rows.length) return;
+        if (!confirm('Delete selected users?')) return;
+        const ids = rows.map(tr => tr.getAttribute('data-id'));
+        fetch('active_users.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                ajax: 'bulk_delete',
+                ids: JSON.stringify(ids)
+            })
+        }).then(res => res.text()).then(resp => {
+            fetchUsers();
+            clearBulkSelection();
+        });
+    });
+
+    // Bulk Status Change
+    bulkStatusSelect.addEventListener('change', function() {
+        const rows = getSelectedRows();
+        const status = bulkStatusSelect.value;
+        if (!rows.length || status === "") return;
+        const ids = rows.map(tr => tr.getAttribute('data-id'));
+        fetch('active_users.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                ajax: 'bulk_status',
+                ids: JSON.stringify(ids),
+                status: status
+            })
+        }).then(res => res.text()).then(resp => {
+            fetchUsers();
+            clearBulkSelection();
+            bulkStatusSelect.value = "";
+        });
+    });
+
+    // Bulk Role Change
+    bulkRoleSelect.addEventListener('change', function() {
+        const rows = getSelectedRows();
+        const role_id = bulkRoleSelect.value;
+        if (!rows.length || role_id === "") return;
+        const ids = rows.map(tr => tr.getAttribute('data-id'));
+        fetch('active_users.php', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                ajax: 'bulk_role',
+                ids: JSON.stringify(ids),
+                role_id: role_id
+            })
+        }).then(res => res.text()).then(resp => {
+            fetchUsers();
+            clearBulkSelection();
+            bulkRoleSelect.value = "";
+        });
+    });
+
+    // Bulk Export
+    bulkExportBtn.addEventListener('click', function() {
+        const rows = getSelectedRows();
+        const ids = rows.map(tr => tr.getAttribute('data-id'));
+        const params = new URLSearchParams();
+        params.append('ajax', 'bulk_export');
+        params.append('ids', JSON.stringify(ids));
+        // Add current filters
+        if (searchInput.value) params.append('search', searchInput.value);
+        if (onlineInput.checked) params.append('online', '1');
+        if (roleInput.value) params.append('role', roleInput.value);
+        if (statusInput.value !== "") params.append('status', statusInput.value);
+
+        window.open('active_users.php?' + params.toString(), '_blank');
+    });
+
     </script>
 </body>
 </html>
 <?php ob_end_flush(); ?>
+
+<?php
+// Bulk AJAX handlers (add after other AJAX handlers)
+if (isset($_POST['ajax']) && $_POST['ajax'] === 'bulk_delete') {
+    $ids = json_decode($_POST['ids'] ?? '[]', true);
+    if (is_array($ids) && count($ids)) {
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("DELETE FROM users WHERE id IN ($in)");
+        $stmt->execute($ids);
+    }
+    echo 'success';
+    exit;
+}
+if (isset($_POST['ajax']) && $_POST['ajax'] === 'bulk_status') {
+    $ids = json_decode($_POST['ids'] ?? '[]', true);
+    $status = ($_POST['status'] === '1') ? 1 : 0;
+    if (is_array($ids) && count($ids)) {
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("UPDATE users SET active = ? WHERE id IN ($in)");
+        $params = array_merge([$status], $ids);
+        $stmt->execute($params);
+    }
+    echo 'success';
+    exit;
+}
+if (isset($_POST['ajax']) && $_POST['ajax'] === 'bulk_role') {
+    $ids = json_decode($_POST['ids'] ?? '[]', true);
+    $role_id = trim($_POST['role_id']);
+    if (is_array($ids) && count($ids) && $role_id !== '') {
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $pdo->prepare("UPDATE users SET role_id = ? WHERE id IN ($in)");
+        $params = array_merge([$role_id], $ids);
+        $stmt->execute($params);
+    }
+    echo 'success';
+    exit;
+}
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'bulk_export') {
+    $ids = json_decode($_GET['ids'] ?? '[]', true);
+    header('Content-Type: text/csv');
+    header('Content-Disposition: attachment; filename="users_export.csv"');
+    $out = fopen('php://output', 'w');
+    fputcsv($out, ['ID', 'Username', 'Last Active', 'Online', 'Role', 'Status']);
+    $where = [];
+    $params = [];
+    if (is_array($ids) && count($ids)) {
+        $where[] = "id IN (" . implode(',', array_fill(0, count($ids), '?')) . ")";
+        $params = array_merge($params, $ids);
+    }
+    if (isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['status'] === '1')) {
+        $where[] = "active = ?";
+        $params[] = $_GET['status'];
+    }
+    if (isset($_GET['role']) && $_GET['role'] !== '') {
+        $where[] = "role_id = ?";
+        $params[] = $_GET['role'];
+    }
+    if (isset($_GET['online']) && $_GET['online'] === '1') {
+        $where[] = "online = 1";
+    }
+    if (isset($_GET['search']) && $_GET['search'] !== '') {
+        $where[] = "username LIKE ?";
+        $params[] = '%' . $_GET['search'] . '%';
+    }
+    $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+    $stmt = $pdo->prepare("SELECT id, username, last_active, online, role_id, active FROM users $where_sql ORDER BY username");
+    $stmt->execute($params);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        fputcsv($out, [
+            $row['id'],
+            $row['username'],
+            $row['last_active'],
+            $row['online'] ? 'Online' : 'Offline',
+            $row['role_id'],
+            $row['active'] ? 'Active' : 'Inactive'
+        ]);
+    }
+    fclose($out);
+    exit;
+}
+?>
