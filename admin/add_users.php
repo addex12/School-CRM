@@ -257,181 +257,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <style>
-        .admin-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            overflow: hidden;
-            /* Prevent content overflow */
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            /* Ensure two equal columns */
-            gap: 2rem;
-            margin-top: 2rem;
-            align-items: start;
-            /* Align items at the start for consistent alignment */
-        }
-
-        .admin-main {
-            margin-left: 250px;
-            /* Adjust to ensure it doesn't overlap the sidebar */
-        }
-
-        .card {
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            /* Ensure content stacks properly */
-            justify-content: space-between;
-            /* Space out content evenly */
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            background: #f9fafb;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.375rem;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-secondary {
-            background: #6b7280;
-            color: white;
-            border: none;
-        }
-
-        .success-message {
-            background: #dcfce7;
-            color: #16a34a;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .admin-header h1 {
-            font-size: 2rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .file-upload {
-            border: 2px dashed #e5e7eb;
-            border-radius: 0.5rem;
-            padding: 2rem;
-            text-align: center;
-            background: #f8fafc;
-        }
-
-        .erpnext-btn,
-        .btn,
-        .btn-primary,
-        .btn-secondary {
-            display: inline-block;
-            padding: 10px 22px;
-            font-size: 15px;
-            border-radius: 4px;
-            border: none;
-            background: #f5f7fa;
-            color: #222d32;
-            font-weight: 600;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44, 62, 80, 0.04);
-            cursor: pointer;
-            margin-right: 4px;
-        }
-
-        .erpnext-btn:hover,
-        .btn:hover,
-        .btn-primary:hover,
-        .btn-secondary:hover {
-            background: #e2efda;
-            color: #215967;
-        }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-        }
-
-        .btn-secondary {
-            background: #eaeaea;
-            color: #666;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            background: #f3f4f6;
-            border-radius: 6px;
-            margin: 1rem 0;
-            height: 28px;
-            overflow: hidden;
-            box-shadow: 0 1px 2px rgba(44, 62, 80, 0.04);
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: #3b82f6;
-            color: #fff;
-            font-weight: 600;
-            text-align: center;
-            line-height: 28px;
-            border-radius: 6px 0 0 6px;
-            transition: width 0.3s;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/add_users.css">
 </head>
 
 <body>
@@ -440,19 +266,21 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
         <div class="admin-main">
             <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1> <!-- Ensure consistent styling -->
+                <h1 style="font-size:2rem;font-weight:600;color:#1976d2;margin-bottom:1rem;padding-bottom:0.5rem;border-bottom:2px solid #e5e7eb;">
+                    <?= htmlspecialchars($pageTitle) ?>
+                </h1>
             </header>
 
             <div class="admin-content">
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message">
+                    <div class="erpnext-error-message">
                         <?= htmlspecialchars($_SESSION['error']);
                         unset($_SESSION['error']); ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['bulk_import_errors'])): ?>
-                    <div class="error-message">
+                    <div class="erpnext-error-message">
                         <h3>Some rows were skipped due to errors:</h3>
                         <ul>
                             <?php foreach ($_SESSION['bulk_import_errors'] as $error): ?>
@@ -462,38 +290,32 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         <?php unset($_SESSION['bulk_import_errors']); ?>
                     </div>
                 <?php endif; ?>
-                <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message">
-                        <?= htmlspecialchars($_SESSION['error']);
-                        unset($_SESSION['error']); ?>
-                    </div>
-                <?php endif; ?>
 
                 <?php if (isset($_SESSION['success'])): ?>
-                    <div class="success-message">
+                    <div class="erpnext-success-message">
                         <?= htmlspecialchars($_SESSION['success']);
                         unset($_SESSION['success']); ?>
                     </div>
                 <?php endif; ?>
 
-                <div class="form-grid">
+                <div class="erpnext-form-grid">
                     <!-- Single User Form -->
-                    <div class="card">
+                    <div class="erpnext-card">
                         <h2>Create Single User</h2>
                         <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
-                            <div class="form-group">
+                            <div class="erpnext-form-group">
                                 <label>Username</label>
                                 <input type="text" name="username" required>
                             </div>
 
-                            <div class="form-group">
+                            <div class="erpnext-form-group">
                                 <label>Email Address</label>
                                 <input type="email" name="email" required>
                             </div>
 
-                            <div class="form-group">
+                            <div class="erpnext-form-group">
                                 <label>User Role</label>
                                 <select name="role_id" required>
                                     <?php foreach ($roles as $role): ?>
@@ -503,46 +325,33 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-                            <?php if (isset($_SESSION['error'])): ?>
-                                <div class="error-message">
-                                    <?= htmlspecialchars($_SESSION['error']);
-                                    unset($_SESSION['error']); ?>
-                                </div>
-                            <?php endif; ?>
 
-                            <?php if (isset($_SESSION['success'])): ?>
-                                <div class="success-message">
-                                    <?= htmlspecialchars($_SESSION['success']);
-                                    unset($_SESSION['success']); ?>
-                                </div>
-                            <?php endif; ?>
-
-                            <button type="submit" name="create_user" class="btn btn-primary">
+                            <button type="submit" name="create_user" class="erpnext-btn erpnext-btn-primary">
                                 Create User
                             </button>
                         </form>
                     </div>
 
                     <!-- Bulk Import -->
-                    <div class="card">
+                    <div class="erpnext-card">
                         <h2>Bulk Import Users</h2>
-                        <div class="file-upload">
+                        <div style="margin-bottom:1rem;">
                             <p>Download our CSV template to ensure proper formatting:</p>
-                            <a href="download_template.php" class="erpnext-btn btn-secondary">
+                            <a href="download_template.php" class="erpnext-btn erpnext-btn-secondary">
                                 Download Template
                             </a>
                         </div>
 
-                        <form method="POST" enctype="multipart/form-data" class="mt-4" id="bulkImportForm">
+                        <form method="POST" enctype="multipart/form-data" id="bulkImportForm">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            <div class="form-group">
+                            <div class="erpnext-form-group">
                                 <label>Upload CSV File</label>
                                 <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
                             </div>
-                            <div class="progress-bar-container" id="progressContainer" style="display:none;">
-                                <div class="progress-bar" id="progressBar" style="width:0%;">0%</div>
+                            <div class="erpnext-progress-bar-container" id="progressContainer" style="display:none;">
+                                <div class="erpnext-progress-bar" id="progressBar" style="width:0%;">0%</div>
                             </div>
-                            <button type="submit" name="bulk_import" class="erpnext-btn btn-primary" id="importBtn">
+                            <button type="submit" name="bulk_import" class="erpnext-btn erpnext-btn-primary" id="importBtn">
                                 Import Users
                             </button>
                         </form>
@@ -588,11 +397,10 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                         if (xhr.readyState === 4) {
                             progressBar.style.width = '100%';
                             if (xhr.status === 200) {
-                                // Try to parse response for errors/success
                                 var parser = new DOMParser();
                                 var doc = parser.parseFromString(xhr.responseText, 'text/html');
-                                var errorMsg = doc.querySelector('.error-message');
-                                var successMsg = doc.querySelector('.success-message');
+                                var errorMsg = doc.querySelector('.erpnext-error-message');
+                                var successMsg = doc.querySelector('.erpnext-success-message');
                                 if (errorMsg) {
                                     progressBar.style.background = '#e74c3c';
                                     progressBar.textContent = errorMsg.textContent.trim();
@@ -627,5 +435,4 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     </script>
     <script src="../assets/js/bulk_import_progress.js"></script>
 </body>
-
 </html>
