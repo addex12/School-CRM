@@ -38,14 +38,9 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     // Always have a valid WHERE clause
     $where_sql = count($where) ? implode(' AND ', $where) : '1';
 
-    // Ensure $params only contains placeholders present in $where_sql (robust for both :key and key)
+    // FINAL robust parameter cleanup: only keep params that match a :key in $where_sql
     foreach (array_keys($params) as $key) {
-        $plain = ltrim($key, ':');
-        if (
-            strpos($where_sql, $key) === false &&
-            strpos($where_sql, $plain) === false &&
-            strpos($where_sql, ':' . $plain) === false
-        ) {
+        if (strpos($where_sql, $key) === false) {
             unset($params[$key]);
         }
     }
