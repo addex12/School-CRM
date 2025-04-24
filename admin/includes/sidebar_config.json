@@ -23,7 +23,7 @@
         { "title": "All Surveys", "icon": "poll", "link": "surveys.php" },
         { "title": "Create Survey", "icon": "plus-circle", "link": "survey_builder.php" },
         { "title": "Survey Results", "icon": "chart-bar", "link": "survey_statistics.php" },
-        { "title": "Survey Categories", "icon": "file-alt", "link": "categories.php" },
+        { "title": "Categories", "icon": "file-alt", "link": "categories.php" },
         { "title": "All Responses", "icon": "list", "link": "all_responses.php" }
       ],
       "id": "surveys-menu"
