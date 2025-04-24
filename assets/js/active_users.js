@@ -412,6 +412,51 @@ document.addEventListener('DOMContentLoaded', function() {
     // ...existing code...
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    function fetchUsersTable() {
+        const search = document.getElementById('searchInput').value;
+        const online = document.getElementById('onlineInput').checked ? 1 : '';
+        const role = document.getElementById('roleInput').value;
+        const status = document.getElementById('statusInput').value;
+        const params = new URLSearchParams({
+            ajax: 1,
+            search: search,
+            online: online,
+            role: role,
+            status: status
+        });
+        fetch('ajax_active_users.php?' + params.toString())
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('usersTableBody').innerHTML = html;
+                bindRowActions();
+            });
+    }
+
+    document.querySelector('.refresh-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        fetchUsersTable();
+    });
+
+    document.getElementById('userSearchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        fetchUsersTable();
+    });
+
+    // ...bulk actions and row edit/delete logic as in previous suggestions...
+    // (see previous answer for full JS code)
+    function getSelectedUserIds() {
+        return Array.from(document.querySelectorAll('.row-select:checked'))
+            .map(cb => cb.closest('tr').getAttribute('data-id'));
+    }
+
+    function bindRowActions() {
+        // ...edit/delete button logic...
+        // (see previous answer for full JS code)
+    }
+    bindRowActions();
+});
+
 // Helper: Set roles for JS (add this in a <script> tag in your PHP file)
 window.activeUserRoles = [
     // ...populate from PHP...

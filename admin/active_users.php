@@ -217,7 +217,8 @@ else:
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-    <!-- Link the correct JS and ensure AJAX endpoints are correct -->
-   </body>
+    <!-- Link the JS file for all row/bulk actions and AJAX -->
+    <script src="../assets/js/active_users.js"></script>
+</body>
 </html>
 <?php ob_end_flush(); ?>
