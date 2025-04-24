@@ -34,8 +34,8 @@ try {
         $user_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
         
         $pdo->beginTransaction();
-        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read, is_admin) 
-                              VALUES (?, ?, ?, NOW(), 0, 1)");
+        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
+                              VALUES (?, ?, ?, NOW(), 0)");
         
         foreach ($user_ids as $uid) {
             $stmt->execute([$current_user_id, $uid, $message]);
@@ -44,8 +44,8 @@ try {
         $pdo->commit();
     } else {
         // Send to single user
-        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read, is_admin) 
-                              VALUES (?, ?, ?, NOW(), 0, 1)");
+        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
+                              VALUES (?, ?, ?, NOW(), 0)");
         $stmt->execute([$current_user_id, $receiver_id, $message]);
     }
     
