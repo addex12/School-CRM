@@ -67,7 +67,6 @@
         <div class="footer-section quick-links">
             <h4>Quick Links</h4>
             <ul>
-                <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="faq.php">FAQ</a></li>
                 <li><a href="terms.php">Terms of Service</a></li>
             </ul>
