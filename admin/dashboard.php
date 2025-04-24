@@ -536,55 +536,69 @@ try {
         <?php include 'includes/footer.php'; ?>
     </div>
     <script>
-
-        // Initialize Chart.js
-        Chart.defaults.global.defaultFontColor = '#333';
-        Chart.defaults.global.defaultFontFamily = 'Poppins';
-        Chart.defaults.global.defaultFontStyle = 'normal';
-        Chart.defaults.global.defaultFontSize = 14;
-        Chart.defaults.global.defaultFontWeight = 'normal';
-        Chart.defaults.global.defaultColor = '#333';       
         // Survey Participation Chart
-        new Chart(document.getElementById('surveyParticipationChart').getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode(array_keys($surveyStats)) ?>,
-                datasets: [{
-                    label: 'Responses',
-                    data: <?= json_encode(array_values($surveyStats)) ?>,
-                    backgroundColor: '#3b82f6'
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
+        (function() {
+            const ctx = document.getElementById('surveyParticipationChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: <?= json_encode(array_keys($surveyStats)) ?>,
+                        datasets: [{
+                            label: 'Responses',
+                            data: <?= json_encode(array_values($surveyStats)) ?>,
+                            backgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { beginAtZero: true },
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        })();
 
         // Feedback Ratings Chart
-        new Chart(document.getElementById('feedbackRatingsChart').getContext('2d'), {
-            type: 'pie',
-            data: {
-                labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
-                datasets: [{
-                    label: 'Feedback Ratings',
-                    data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                    backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
-                }]
-            },
-            options: { responsive: true }
-        });
+        (function() {
+            const ctx = document.getElementById('feedbackRatingsChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
+                        datasets: [{
+                            label: 'Feedback Ratings',
+                            data: <?= json_encode(array_values($feedbackRatings)) ?>,
+                            backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
+                        }]
+                    },
+                    options: { responsive: true }
+                });
+            }
+        })();
 
         // Support Ticket Status Chart
-        new Chart(document.getElementById('ticketStatusChart').getContext('2d'), {
-            type: 'doughnut',
-            data: {
-                labels: <?= json_encode(array_keys($ticketStatus)) ?>,
-                datasets: [{
-                    label: 'Tickets',
-                    data: <?= json_encode(array_values($ticketStatus)) ?>,
-                    backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
-                }]
-            },
-            options: { responsive: true }
-        });
+        (function() {
+            const ctx = document.getElementById('ticketStatusChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: <?= json_encode(array_keys($ticketStatus)) ?>,
+                        datasets: [{
+                            label: 'Tickets',
+                            data: <?= json_encode(array_values($ticketStatus)) ?>,
+                            backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
+                        }]
+                    },
+                    options: { responsive: true }
+                });
+            }
+        })();
     </script>
 </body>
 </html>
