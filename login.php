@@ -15,6 +15,13 @@ require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/functions.php';
 
+// Show public announcements on the login page (even before login)
+try {
+    $announcements = $pdo->query("SELECT title, content, created_at FROM announcements WHERE is_public = 1 ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $announcements = [];
+}
+
 // Check if user is already logged in
 if (isLoggedIn()) {
     header("Location: " . BASE_URL . "index.php");
@@ -453,15 +460,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-    
+
+    <?php if (!empty($announcements)): ?>
+        <div class="public-announcements" style="max-width:500px;margin:2rem auto 0 auto;background:#f9fafb;border-radius:8px;padding:1.5rem 2rem;box-shadow:0 2px 8px rgba(44,62,80,0.07);">
+            <h3 style="color:#215967;margin-bottom:1rem;"><i class="fas fa-bullhorn"></i> Announcements</h3>
+            <?php foreach ($announcements as $ann): ?>
+                <div style="margin-bottom:1.2rem;">
+                    <strong style="color:#3b82f6;"><?php echo htmlspecialchars($ann['title']); ?></strong><br>
+                    <span style="color:#666;font-size:0.95em;"><?php echo date('M j, Y g:i A', strtotime($ann['created_at'])); ?></span>
+                    <div style="margin-top:0.5em;color:#333;"><?php echo nl2br(htmlspecialchars($ann['content'])); ?></div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
     <script>
         // Enhance form usability
         document.addEventListener('DOMContentLoaded', function() {
             // Focus on username field on page load
             document.getElementById('username')?.focus();
-            
-            // Toggle password visibility (could be enhanced with an eye icon)
-            // Add any additional JavaScript functionality here
+
+            // --- Activity Tracking ---
+            // Only track if user is logged in (session variable set via PHP)
+            <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+            document.body.addEventListener('click', function(e) {
+                let target = e.target;
+                let info = {
+                    tag: target.tagName,
+                    id: target.id || null,
+                    class: target.className || null,
+                    text: (target.innerText || target.value || '').substring(0, 100),
+                    href: target.href || null,
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString()
+                };
+                // Send activity to backend
+                fetch('track_activity.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(info)
+                });
+            });
+            <?php endif; ?>
+            // --- End Activity Tracking ---
         });
     </script>
 </body>
