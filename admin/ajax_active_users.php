@@ -47,6 +47,13 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         }
     }
 
+    // Remove unused parameters if their placeholders are not in $where_sql
+    foreach (array_keys($params) as $key) {
+        if (strpos($where_sql, $key) === false) {
+            unset($params[$key]);
+        }
+    }
+
     $stmt = $pdo->prepare("SELECT u.id, u.username, u.last_active, u.online, u.role_id, u.active, r.role_name AS role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
