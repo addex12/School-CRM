@@ -24,7 +24,7 @@ try {
         SELECT u.id, u.username, u.email, u.role_id, u.last_activity, COALESCE(r.role_name, 'No Role') as role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.last_activity > :threshold AND u.id != :self
+        WHERE u.last_activity > :threshold AND u.id != :self AND u.role_id != 1
         $roleSql
         $searchSql
         ORDER BY u.last_activity DESC
@@ -43,15 +43,16 @@ try {
     error_log("Error fetching online users: " . $e->getMessage());
 }
 
-// Fetch online admins (role_id = 0 and online = 1)
+// Fetch online admins (role_id = 1 and active in last 5 min)
 try {
     $adminStmt = $pdo->prepare("
         SELECT u.id, u.username, u.email, u.role_id, u.last_activity, COALESCE(r.role_name, 'No Role') as role_name
         FROM users u
         LEFT JOIN roles r ON u.role_id = r.id
-        WHERE u.role_id = 0 AND u.online = 1 AND u.id != :self
+        WHERE u.role_id = 1 AND u.last_activity > :threshold AND u.id != :self
         ORDER BY u.username ASC
     ");
+    $adminStmt->bindValue(':threshold', $onlineThreshold);
     $adminStmt->bindValue(':self', $userId);
     $adminStmt->execute();
     $onlineAdmins = $adminStmt->fetchAll();
@@ -90,47 +91,51 @@ function getUserRoleName($roleId) {
     <div class="inbox-container">
         <div class="inbox-layout">
             <aside class="inbox-sidebar">
-                <h3 style="margin-bottom: 1rem;">Online Admins</h3>
-                <div class="online-users-list">
-                    <?php if (count($onlineAdmins) > 0): ?>
-                        <?php foreach ($onlineAdmins as $user): ?>
-                            <div class="online-user">
-                                <span class="user-status"></span>
-                                <span class="username"><?= htmlspecialchars($user['username']) ?></span>
-                                <span class="user-role">(<?= htmlspecialchars($user['role_name']) ?>)</span>
-                                <button class="erpnext-btn btn-primary btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p class="no-users">No admins currently online</p>
-                    <?php endif; ?>
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Online Admins</h3>
+                    <div class="online-users-list">
+                        <?php if (count($onlineAdmins) > 0): ?>
+                            <?php foreach ($onlineAdmins as $user): ?>
+                                <div class="online-user">
+                                    <span class="user-status admin"></span>
+                                    <span class="username"><?= htmlspecialchars($user['username']) ?></span>
+                                    <span class="user-role">(<?= htmlspecialchars($user['role_name']) ?>)</span>
+                                    <button class="erpnext-btn btn-primary btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="no-users">No admins currently online</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
-                <hr style="margin: 1.5rem 0;">
-                <h3 style="margin-bottom: 1rem;">Online Users</h3>
-                <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.5rem;">
-                    <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input" style="flex:1;">
-                    <select name="role" id="roleFilter" class="erpnext-input">
-                        <option value="">All Roles</option>
-                        <?php foreach ($roles as $role): ?>
-                            <option value="<?= htmlspecialchars($role) ?>" <?= $role === $roleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i></button>
-                    <a href="inbox.php" class="erpnext-btn btn-secondary">Clear</a>
-                </form>
-                <div class="online-users-list">
-                    <?php if (count($onlineUsers) > 0): ?>
-                        <?php foreach ($onlineUsers as $user): ?>
-                            <div class="online-user">
-                                <span class="user-status"></span>
-                                <span class="username"><?= htmlspecialchars($user['username']) ?></span>
-                                <span class="user-role">(<?= htmlspecialchars($user['role_name'] ?? getUserRoleName($user['role_id'])) ?>)</span>
-                                <button class="erpnext-btn btn-primary btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p class="no-users">No users currently online</p>
-                    <?php endif; ?>
+                <hr class="sidebar-divider">
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">Online Users</h3>
+                    <form method="get" class="search-bar" id="onlineUserSearchForm" style="margin-bottom:1.2rem;display:flex;gap:0.5rem;">
+                        <input type="text" name="search" id="onlineUserSearch" placeholder="Search users..." value="<?= htmlspecialchars($search) ?>" class="erpnext-input" style="flex:1;">
+                        <select name="role" id="roleFilter" class="erpnext-input">
+                            <option value="">All Roles</option>
+                            <?php foreach ($roles as $role): ?>
+                                <option value="<?= htmlspecialchars($role) ?>" <?= $role === $roleFilter ? 'selected' : '' ?>><?= htmlspecialchars($role) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-search"></i></button>
+                        <a href="inbox.php" class="erpnext-btn btn-secondary">Clear</a>
+                    </form>
+                    <div class="online-users-list">
+                        <?php if (count($onlineUsers) > 0): ?>
+                            <?php foreach ($onlineUsers as $user): ?>
+                                <div class="online-user">
+                                    <span class="user-status"></span>
+                                    <span class="username"><?= htmlspecialchars($user['username']) ?></span>
+                                    <span class="user-role">(<?= htmlspecialchars($user['role_name'] ?? getUserRoleName($user['role_id'])) ?>)</span>
+                                    <button class="erpnext-btn btn-primary btn-chat" data-user-id="<?= $user['id'] ?>">Chat</button>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="no-users">No users currently online</p>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </aside>
             <main class="inbox-main">
@@ -160,6 +165,7 @@ function getUserRoleName($roleId) {
                                     <button class="erpnext-btn btn-secondary mark-read" data-id="<?= $message['id'] ?>" <?= $message['is_read'] ? 'disabled' : '' ?>>
                                         <?= $message['is_read'] ? 'Read' : 'Mark as Read' ?>
                                     </button>
+                                    <button class="erpnext-btn btn-primary reply-message" data-id="<?= $message['id'] ?>" data-sender-id="<?= $message['sender_id'] ?>" data-sender-name="<?= htmlspecialchars($message['sender_name']) ?>">Reply</button>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -171,6 +177,20 @@ function getUserRoleName($roleId) {
         </div>
     </div>
 </div>
+
+<!-- Reply Modal -->
+<div id="replyModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close-modal" id="closeReplyModal">&times;</span>
+        <h2>Reply to <span id="replyToName"></span></h2>
+        <form id="replyForm">
+            <input type="hidden" id="replyReceiverId" name="receiver_id">
+            <textarea id="replyMessage" name="message" rows="4" class="erpnext-input" style="width:100%;" placeholder="Type your reply..." required></textarea>
+            <button type="submit" class="erpnext-btn btn-primary" style="margin-top:10px;">Send Reply</button>
+        </form>
+    </div>
+</div>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // Search/filter for messages
@@ -242,6 +262,41 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = '../admin/messages.php?user_id=' + encodeURIComponent(userId);
         });
     });
+
+    // Reply modal logic
+    const replyModal = document.getElementById('replyModal');
+    const closeReplyModal = document.getElementById('closeReplyModal');
+    const replyForm = document.getElementById('replyForm');
+    const replyToName = document.getElementById('replyToName');
+    const replyReceiverId = document.getElementById('replyReceiverId');
+    const replyMessage = document.getElementById('replyMessage');
+
+    document.querySelectorAll('.reply-message').forEach(btn => {
+        btn.addEventListener('click', () => {
+            replyToName.textContent = btn.getAttribute('data-sender-name');
+            replyReceiverId.value = btn.getAttribute('data-sender-id');
+            replyMessage.value = '';
+            replyModal.style.display = 'block';
+        });
+    });
+    closeReplyModal.onclick = () => replyModal.style.display = 'none';
+    window.onclick = (event) => { if (event.target == replyModal) replyModal.style.display = 'none'; };
+
+    replyForm.onsubmit = async function(e) {
+        e.preventDefault();
+        const formData = new FormData(replyForm);
+        const response = await fetch('/api/send_message.php', {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            replyModal.style.display = 'none';
+            alert('Reply sent!');
+            location.reload();
+        } else {
+            alert('Failed to send reply.');
+        }
+    };
 });
 </script>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
@@ -256,24 +311,111 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 .inbox-layout {
     display: flex;
-    gap: 20px;
+    gap: 32px;
     align-items: flex-start;
 }
 .inbox-sidebar {
-    width: 270px;
+    width: 290px;
     min-width: 230px;
     max-width: 320px;
-    padding: 15px;
+    padding: 18px 15px;
     background: #f8f9fa;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     flex-shrink: 0;
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
-.inbox-main {
-    flex: 1;
-    min-width: 0;
+.sidebar-section {
+    margin-bottom: 1.5rem;
+}
+.sidebar-title {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #215967;
+    margin-bottom: 0.7em;
+}
+.sidebar-divider {
+    border: none;
+    border-top: 1.5px solid #d1d8dd;
+    margin: 0.5em 0 1.2em 0;
+}
+.online-users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+.online-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 6px 0;
+}
+.user-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #27ae60;
+    display: inline-block;
+}
+.user-status.admin {
+    background: #007bff;
+}
+.username {
+    font-weight: 500;
+    color: #215967;
+}
+.user-role {
+    font-size: 0.93em;
+    color: #888;
+}
+.no-users {
+    color: #888;
+    font-size: 0.98em;
+    margin: 0.5em 0;
+}
+.message-actions {
+    display: flex;
+    gap: 0.5em;
+    margin-top: 0.5em;
+}
+.reply-message {
+    background: #27ae60;
+    color: #fff;
+    border-color: #27ae60;
+}
+.reply-message:hover {
+    background: #219150;
+    color: #fff;
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    overflow: auto;
+    background: rgba(0,0,0,0.25);
+}
+.modal-content {
+    background: #fff;
+    margin: 7% auto;
+    padding: 30px 24px 18px 24px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.13);
+}
+.close-modal {
+    position: absolute;
+    right: 18px;
+    top: 12px;
+    font-size: 1.5em;
+    color: #888;
+    cursor: pointer;
 }
 @media (max-width: 1000px) {
     .inbox-layout {
