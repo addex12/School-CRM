@@ -30,16 +30,6 @@
     },
     
     {
-      "title": "Academics",
-      "icon": "school",
-      "items": [
-        { "title": "Classes", "icon": "school", "link": "classes.php" },
-        { "title": "Grades", "icon": "file-alt", "link": "grades.php" },
-        { "title": "Reports", "icon": "chart-line", "link": "generate_reports.php" }
-      ],
-      "id": "academics-menu"
-    },
-    {
       "title": "Communications",
       "icon": "envelope",
       "items": [
