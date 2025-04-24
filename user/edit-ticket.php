@@ -42,6 +42,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <?php include_once __DIR__ . '/includes/header.php'; ?>
+
+<style>
+.main-content-container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 8px; /* Adjusted for smaller card styling */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+    padding: 24px; /* Reduced padding */
+}
+.erpnext-btn {
+    background: #f5f7fa;
+    color: #36414c;
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 6px 12px; /* Reduced padding */
+    font-size: 0.875rem; /* Smaller font size */
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+}
+.erpnext-btn.btn-primary {
+    background: #007bfc;
+    color: #fff;
+    border-color: #007bfc;
+}
+.erpnext-btn.btn-primary:hover {
+    background: #0056b3;
+    color: #fff;
+}
+</style>
+
 <div class="main-content-container">
     <h2>Edit Ticket</h2>
     <form method="POST">

@@ -29,9 +29,9 @@ if ($user_id) {
     max-width: 600px;
     margin: 40px auto 0 auto;
     background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-    padding: 32px 24px 32px 24px;
+    border-radius: 8px; /* Adjusted for smaller card styling */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+    padding: 24px; /* Reduced padding */
 }
 .contact-header {
     text-align: center;
@@ -39,11 +39,12 @@ if ($user_id) {
 }
 .contact-header h2 {
     color: #007bff;
-    font-size: 2rem;
+    font-size: 1.5rem; /* Smaller font size */
     margin-bottom: 8px;
 }
 .contact-header i {
     margin-right: 8px;
+    font-size: 1.2rem; /* Smaller icon size */
 }
 .contact-form .form-group {
     margin-bottom: 18px;
@@ -57,7 +58,8 @@ body, input, textarea, select, button {
     color: #36414c;
     border: 1px solid #d1d8dd;
     border-radius: 4px;
-    padding: 8px 18px;
+    padding: 6px 12px; /* Reduced padding */
+    font-size: 0.875rem; /* Smaller font size */
     font-weight: 500;
     transition: background 0.2s, color 0.2s;
     cursor: pointer;
@@ -107,7 +109,8 @@ body, input, textarea, select, button {
 }
 .ticket-table th, .ticket-table td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 6px; /* Reduced padding */
+    font-size: 0.875rem; /* Smaller font size */
     text-align: left;
 }
 .ticket-table th {
@@ -118,6 +121,7 @@ body, input, textarea, select, button {
     margin-right: 10px;
     text-decoration: none;
     color: #007bfc;
+    font-size: 0.875rem; /* Smaller font size */
 }
 .ticket-actions a:hover {
     text-decoration: underline;
