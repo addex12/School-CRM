@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$current_user_id = $_SESSION['sender_id'] ?? null;
+$current_user_id = $_SESSION['user_id'] ?? null;
 $receiver_id = $_POST['receiver_id'] ?? null;
 $content = trim($_POST['content'] ?? '');
 
@@ -30,30 +30,32 @@ if (!$receiver_id || !$content) {
 try {
     if ($receiver_id === 'broadcast') {
         // Send to all non-admin users
-        $stmt = $pdo->query("SELECT id FROM users WHERE role_id != 1");
+        $stmt = $pdo->query("SELECT id FROM users WHERE role_id != 1 AND id != $current_user_id");
         $user_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        if (!$user_ids) {
+        if (empty($user_ids)) {
             echo json_encode(['success' => false, 'error' => 'No users to broadcast to']);
             exit;
         }
 
         $pdo->beginTransaction();
-        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
-                              VALUES (?, ?, ?, NOW(), 0)");
+        $stmt = $pdo->prepare("
+            INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
+            VALUES (?, ?, ?, NOW(), 0)
+        ");
 
         foreach ($user_ids as $uid) {
-            // Optionally skip sending to yourself
-            if ($uid == $current_user_id) continue;
             $stmt->execute([$current_user_id, $uid, $content]);
         }
 
         $pdo->commit();
     } else {
-        // Ensure receiver_id is an integer
+        // Single recipient message
         $receiver_id = (int)$receiver_id;
-        $stmt = $pdo->prepare("INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
-                              VALUES (?, ?, ?, NOW(), 0)");
+        $stmt = $pdo->prepare("
+            INSERT INTO messages (sender_id, receiver_id, content, sent_at, is_read) 
+            VALUES (?, ?, ?, NOW(), 0)
+        ");
         $stmt->execute([$current_user_id, $receiver_id, $content]);
     }
     

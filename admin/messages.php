@@ -103,7 +103,7 @@ foreach ($users as $u) {
             const clearUserSearch = document.getElementById('clearUserSearch');
 
             let selectedUserId = null;
-            let currentUser = <?= $_SESSION['user_id'] ?? 0 ?>; // Changed from sender_id to user_id
+            let currentUser = <?= (int)($_SESSION['user_id'] ?? 0) ?>; // Changed from sender_id to user_id
             let isAdmin = <?= $isAdmin ? 'true' : 'false' ?>;
 
             // Prepare users data for search
@@ -132,14 +132,8 @@ foreach ($users as $u) {
             // Load messages for selected user
             function loadMessages(userId) {
                 if (!userId) return;
-                
-                const formData = new FormData();
-                formData.append('contact_id', userId);
-                
-                fetch('../api/get_messages.php', {
-                    method: 'POST',
-                    body: formData
-                })
+                // Use GET and sender_id to match your API
+                fetch('../api/get_messages.php?sender_id=' + encodeURIComponent(userId))
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -151,11 +145,11 @@ foreach ($users as $u) {
                                 let showEdit = msg.is_own || isAdmin;
                                 messageDiv.innerHTML = `
                                     <strong>${msg.sender}</strong>
-                                    <p class="msg-text" data-msg-id="${msg.id}">${msg.content}</p>
+                                    <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
                                     <span class="msg-time">${msg.sent_at}</span>
                                     ${
                                         showEdit
-                                        ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.content)}">Edit</button>
+                                        ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
                                            <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
                                         : ''
                                     }
