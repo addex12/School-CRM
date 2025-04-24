@@ -19,142 +19,98 @@ $current = basename($_SERVER['PHP_SELF']);
 <style>
 /* ERPNext/Frappe inspired sidebar styles */
 .admin-sidebar {
-    background: #f5f7fa;
-    color: #222d32;
-    width: 260px;
+    width: 240px;
+    background: #222d32;
+    color: #fff;
     min-height: 100vh;
     position: fixed;
-    top: 0;
     left: 0;
-    z-index: 200;
-    padding-top: 0;
-    box-shadow: 2px 0 8px rgba(44,62,80,0.07);
+    top: 0;
+    z-index: 100;
+    transition: width 0.2s;
+    overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    border-right: 1px solid #e5e7eb;
-    font-family: "Inter", "Segoe UI", Arial, sans-serif;
 }
-.sidebar-header {
-    padding: 1.5rem 2rem 1rem 2rem;
-    font-size: 1.3rem;
+.admin-sidebar.collapsed {
+    width: 60px;
+}
+.admin-sidebar .sidebar-header {
+    padding: 1.2rem 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: #215967;
+    color: #fff;
+    background: #1976d2;
     letter-spacing: 1px;
-    background: #fff;
-    border-bottom: 1px solid #e5e7eb;
-}
-.admin-sidebar ul { list-style: none; padding: 0; margin: 0; }
-.admin-sidebar li { margin-bottom: 0; }
-.admin-sidebar a {
-    color: #215967;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    padding: 0.85rem 2rem;
-    border-radius: 0;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: background 0.18s, color 0.18s;
-    gap: 12px;
-    border-left: 3px solid transparent;
-    letter-spacing: 0.01em;
-}
-.admin-sidebar li.active > a,
-.admin-sidebar a:hover,
-.admin-sidebar .submenu-item.active > a {
-    background: #e2efda;
-    color: #215967;
-    border-left: 3px solid #3b82f6;
-}
-.admin-sidebar .menu-category > .category-header {
-    padding: 0.85rem 2rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #215967;
-    cursor: pointer;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    user-select: none;
-}
-.admin-sidebar .category-header .collapse-icon {
-    margin-left: auto;
-    font-size: 1em;
-    transition: transform 0.2s;
-}
-.admin-sidebar .category-header.open .collapse-icon {
-    transform: rotate(180deg);
-}
-.admin-sidebar .submenu {
-    background: #f8fafc;
-    padding-left: 0;
-    border-left: 2px solid #e5e7eb;
-    display: none;
-}
-.admin-sidebar .submenu.open { display: block; }
-.admin-sidebar .submenu-item a {
-    padding: 0.7rem 2.5rem;
-    font-size: 0.97rem;
-    color: #215967;
-    border-left: 3px solid transparent;
-}
-.admin-sidebar .submenu-item.active > a,
-.admin-sidebar .submenu-item a:hover {
-    background: #e2efda;
-    color: #2563eb;
-    border-left: 3px solid #3b82f6;
-}
-.admin-sidebar i {
-    font-size: 1.15em;
-    min-width: 20px;
     text-align: center;
 }
-.sidebar-toggle {
+.admin-sidebar .sidebar-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.3rem;
+    cursor: pointer;
+    margin: 0.5rem 0 0.5rem 0.5rem;
+    align-self: flex-end;
+}
+.admin-sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+.admin-sidebar ul li {
+    width: 100%;
+}
+.admin-sidebar ul li a {
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 1.5rem;
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: background 0.15s, color 0.15s;
+    border-left: 4px solid transparent;
+}
+.admin-sidebar ul li a.active,
+.admin-sidebar ul li a:hover {
+    background: #1976d2;
+    color: #fff;
+    border-left: 4px solid #fff;
+}
+.admin-sidebar ul li a i {
+    margin-right: 1rem;
+    font-size: 1.1em;
+    min-width: 22px;
+    text-align: center;
+}
+.admin-sidebar.collapsed ul li a span {
     display: none;
+}
+.admin-sidebar.collapsed .sidebar-header {
+    font-size: 1.5rem;
+    padding: 1.2rem 0.5rem;
+}
+.admin-sidebar.collapsed ul li a {
+    justify-content: center;
+    padding: 0.85rem 0.5rem;
 }
 @media (max-width: 900px) {
     .admin-sidebar {
-        width: 60px;
-        padding-top: 0;
+        position: absolute;
+        z-index: 200;
+        min-height: 100%;
     }
-    .sidebar-header { display: none; }
-    .admin-sidebar a, .admin-sidebar .category-header {
-        padding: 0.85rem 0.7rem;
-        font-size: 0;
-    }
-    .admin-sidebar a .menu-text, .admin-sidebar a .category-text {
-        display: none;
-    }
-    .admin-sidebar i {
-        margin-right: 0;
-        font-size: 1.3em;
-    }
-    .sidebar-toggle {
-        display: block;
-        position: fixed;
-        top: 12px;
-        left: 12px;
-        background: #fff;
-        color: #215967;
-        padding: 10px;
-        border-radius: 6px;
-        cursor: pointer;
-        z-index: 300;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    .admin-main {
+        margin-left: 0 !important;
     }
 }
-@media (max-width: 600px) {
-    .admin-sidebar {
-        left: -260px;
-        width: 220px;
-        transition: left 0.2s;
-    }
-    .admin-sidebar.open {
-        left: 0;
-    }
+.admin-main {
+    margin-left: 240px;
+    transition: margin-left 0.2s;
+}
+.admin-sidebar.collapsed ~ .admin-main {
+    margin-left: 60px;
 }
 </style>
 <button class="sidebar-toggle" id="sidebarToggle">
@@ -162,48 +118,42 @@ $current = basename($_SERVER['PHP_SELF']);
 </button>
 <aside class="admin-sidebar" id="adminSidebar">
     <div class="sidebar-header">
-        <i class="fas fa-comments"></i> School CRM
+        <span>Admin</span>
+        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
     </div>
-    <ul class="sidebar-menu">
-        <?php foreach ($sidebarItems as $item): ?>
-            <?php if (isset($item['items'])): // Category with subitems ?>
-                <li class="menu-category">
-                    <div class="category-header<?= (isset($item['open']) && $item['open']) ? ' open' : '' ?>" data-toggle="collapse" data-target="#<?= $item['id'] ?>">
-                        <i class="fas fa-<?= $item['icon'] ?> category-icon"></i>
-                        <span class="category-text"><?= $item['title'] ?></span>
-                        <i class="fas fa-chevron-down collapse-icon"></i>
-                    </div>
-                    <ul class="submenu" id="<?= $item['id'] ?>"<?php
-                        $active = false;
-                        foreach ($item['items'] as $subitem) {
-                            if (basename($_SERVER['PHP_SELF']) == $subitem['link']) {
-                                $active = true;
-                                break;
-                            }
-                        }
-                        echo $active ? ' style="display:block"' : '';
-                    ?>>
-                        <?php foreach ($item['items'] as $subitem): ?>
-                            <li class="submenu-item <?= basename($_SERVER['PHP_SELF']) == $subitem['link'] ? 'active' : '' ?>">
-                                <a href="<?= $subitem['link'] ?>">
-                                    <i class="fas fa-<?= $subitem['icon'] ?>"></i>
-                                    <span class="menu-text"><?= $subitem['title'] ?></span>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </li>
-            <?php else: // Single menu item ?>
-                <li class="menu-item <?= basename($_SERVER['PHP_SELF']) == $item['link'] ? 'active' : '' ?>">
-                    <a href="<?= $item['link'] ?>" class="menu-link">
-                        <i class="fas fa-<?= $item['icon'] ?> menu-icon"></i>
-                        <span class="menu-text"><?= $item['title'] ?></span>
-                    </a>
-                </li>
-            <?php endif; ?>
-        <?php endforeach; ?>
+    <ul>
+        <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+        <li><a href="active_users.php"><i class="fas fa-users"></i> <span>Active Users</span></a></li>
+        <li><a href="add_users.php"><i class="fas fa-user-plus"></i> <span>Add Users</span></a></li>
+        <li><a href="roles.php"><i class="fas fa-user-tag"></i> <span>Roles</span></a></li>
+        <li><a href="settings.php"><i class="fas fa-cogs"></i> <span>Settings</span></a></li>
+        <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
     </ul>
 </aside>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('adminSidebar');
+    var toggle = document.getElementById('sidebarToggle');
+    var main = document.querySelector('.admin-main');
+    // Restore collapsed state from localStorage
+    if (localStorage.getItem('sidebar-collapsed') === '1') {
+        sidebar.classList.add('collapsed');
+        if (main) main.style.marginLeft = '60px';
+    }
+    toggle.addEventListener('click', function() {
+        sidebar.classList.toggle('collapsed');
+        if (sidebar.classList.contains('collapsed')) {
+            if (main) main.style.marginLeft = '60px';
+            localStorage.setItem('sidebar-collapsed', '1');
+        } else {
+            if (main) main.style.marginLeft = '240px';
+            localStorage.setItem('sidebar-collapsed', '0');
+        }
+    });
+});
+</script>
 <script>
 // ERPNext/Frappe inspired sidebar JS
 (function() {
