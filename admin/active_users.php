@@ -81,6 +81,12 @@ try {
 // Fetch roles for filter dropdown (id => name)
 $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetchAll(PDO::FETCH_KEY_PAIR);
 
+// Helper for role name (for offline rendering)
+function getUserRoleName($roleId) {
+    global $roles;
+    return $roles[$roleId] ?? 'Unknown';
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -204,15 +210,51 @@ else:
 <tr>
     <td colspan="8" class="text-center">No active users found</td>
 </tr>
-<?php endif; ?>
+<?php endif; ?>t src="../assets/js/active_users.js"></script>
 </tbody>
-                </table>
+                </table> <?php include __DIR__ . '/includes/footer.php'; ?>
             </div>
         </div>
-    </div>
-    <script src="../assets/js/active_users.js"></script>
-</body>
-        <?php include __DIR__ . '/includes/footer.php'; ?>
 
-</html>
-<?php ob_end_flush(); ?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php ob_end_flush(); ?></html></body>    </script>    // fetchUsersTable();    // Initial load (if you want AJAX always)    });        fetchUsersTable();        e.preventDefault();    document.getElementById('userSearchForm').addEventListener('submit', function(e) {    // Optionally, auto-refresh table on filter/search submit    }            });                document.getElementById('usersTableBody').innerHTML = html;            .then(html => {            .then(res => res.text())        fetch('ajax_active_users.php?' + params.toString())        });            status: status            role: role,            online: online,            search: search,            ajax: 1,        const params = new URLSearchParams({        const status = document.getElementById('statusInput').value;        const role = document.getElementById('roleInput').value;        const online = document.getElementById('onlineInput').checked ? 1 : '';        const search = document.getElementById('searchInput').value;        // Gather current filter values    function fetchUsersTable() {    });        fetchUsersTable();        e.preventDefault();    document.querySelector('.refresh-btn').addEventListener('click', function(e) {    // Fix: Always reload table via AJAX after refresh, not full page reload    <script>    <script src="../assets/js/active_users.js"></script>    </div>        <?php include __DIR__ . '/includes/footer.php'; ?><?php ob_end_flush(); ?>
