@@ -38,7 +38,6 @@ try {
             $msg['message'] = $msg['content'];
         }
     } else {
-        // Ensure both parameters are set and not empty
         if (empty($current_user_id) || empty($contact_id)) {
             throw new Exception('User ID or Contact ID missing');
         }
@@ -63,7 +62,7 @@ try {
         $stmt->execute($params);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Mark as read (use same params)
+        // Only run this update for non-broadcast messages
         $update = $pdo->prepare("
             UPDATE messages SET is_read = 1
             WHERE receiver_id = :current_user AND sender_id = :contact_id
