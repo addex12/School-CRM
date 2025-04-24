@@ -367,11 +367,11 @@ foreach ($users as $u) {
                                 let showEdit = msg.is_own || isAdmin;
                                 messageDiv.innerHTML = `
                                     <strong>${msg.sender}</strong>
-                                    <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
+                                    <p class="msg-text" data-msg-id="${msg.id}">${msg.content}</p>
                                     <span class="msg-time">${msg.sent_at}</span>
                                     ${
                                         showEdit
-                                        ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
+                                        ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.content)}">Edit</button>
                                            <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
                                         : ''
                                     }
@@ -415,7 +415,7 @@ foreach ($users as $u) {
                 if (!message || !selectedUserId) return;
                 const formData = new FormData();
                 formData.append('receiver_id', selectedUserId);
-                formData.append('message', message);
+                formData.append('content', message); // <-- use 'content' key
                 fetch('../api/send_message.php', {
                     method: 'POST',
                     body: formData
@@ -479,7 +479,7 @@ foreach ($users as $u) {
                         fetch('../api/edit_message.php', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: msgId, message: newText }) // <-- ensure 'message' key
+                            body: JSON.stringify({ id: msgId, content: newText }) // <-- use 'content' key
                         })
                         .then(res => res.json())
                         .then(data => {
