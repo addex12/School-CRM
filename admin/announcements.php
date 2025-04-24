@@ -215,12 +215,21 @@ if ($action === 'edit' && $id) {
                         <textarea name="content" class="erpnext-input" placeholder="Content" rows="5" required><?= htmlspecialchars($editAnnouncement['content'] ?? '') ?></textarea>
                         <div style="display:flex;gap:1em;flex-wrap:wrap;">
                             <div>
-                                <label>Start Date:</label>
-                                <input type="date" name="start_date" class="erpnext-input" value="<?= htmlspecialchars($editAnnouncement['start_date'] ?? date('Y-m-d')) ?>" required>
+                                <label>Start Date & Time:</label>
+                                <?php
+                                    $now = date('Y-m-d\TH:i');
+                                    $defaultStart = $editAnnouncement['start_date'] ?? $now;
+                                    $defaultEnd = $editAnnouncement['end_date'] ?? date('Y-m-d\TH:i', strtotime('+5 days'));
+                                ?>
+                                <input type="datetime-local" name="start_date" class="erpnext-input"
+                                    value="<?= htmlspecialchars(str_replace(' ', 'T', $defaultStart)) ?>"
+                                    min="<?= $now ?>" required>
                             </div>
                             <div>
-                                <label>End Date:</label>
-                                <input type="date" name="end_date" class="erpnext-input" value="<?= htmlspecialchars($editAnnouncement['end_date'] ?? date('Y-m-d', strtotime('+7 days'))) ?>" required>
+                                <label>End Date & Time:</label>
+                                <input type="datetime-local" name="end_date" class="erpnext-input"
+                                    value="<?= htmlspecialchars(str_replace(' ', 'T', $defaultEnd)) ?>"
+                                    min="<?= date('Y-m-d\TH:i', strtotime('+5 days')) ?>" required>
                             </div>
                             <div style="display:flex;align-items:center;gap:0.5em;">
                                 <input type="checkbox" name="is_public" id="is_public" value="1" <?= !empty($editAnnouncement['is_public']) ? 'checked' : '' ?>>
@@ -228,15 +237,16 @@ if ($action === 'edit' && $id) {
                             </div>
                         </div>
                         <div style="margin:1em 0;">
-                            <label>Target Roles (if not public):</label>
-                            <select name="target_roles[]" class="erpnext-input" multiple style="min-width:180px;">
+                            <label>Target Role (if not public):</label>
+                            <select name="target_roles[]" class="erpnext-input" style="min-width:180px;">
+                                <option value="">-- Select Role --</option>
                                 <?php foreach ($roles as $role): ?>
                                     <option value="<?= $role['id'] ?>" <?= isset($editAnnouncement['target_roles']) && in_array($role['id'], $editAnnouncement['target_roles']) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($role['role_name']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
-                            <small style="color:#888;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple roles.</small>
+                            <small style="color:#888;">Choose a role to target (leave blank for none).</small>
                         </div>
                         <button type="submit" class="erpnext-btn btn-primary"><?= $editAnnouncement ? 'Update' : 'Add' ?> Announcement</button>
                         <?php if ($editAnnouncement): ?>
