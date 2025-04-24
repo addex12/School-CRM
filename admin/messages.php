@@ -351,43 +351,46 @@ foreach ($users as $u) {
             // Load messages for selected user
             function loadMessages(userId) {
                 if (!userId) return;
-                fetch(`../api/get_messages.php?user_id=${userId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            chatMessages.innerHTML = '';
-                            if (data.messages.length > 0) {
-                                data.messages.forEach(msg => {
-                                    const messageDiv = document.createElement('div');
-                                    messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
-                                    // Show edit/delete if own OR admin
-                                    let showEdit = msg.is_own || isAdmin;
-                                    messageDiv.innerHTML = `
-                                        <strong>${msg.sender}</strong>
-                                        <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
-                                        <span class="msg-time">${msg.sent_at}</span>
-                                        ${
-                                            showEdit
-                                            ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
-                                               <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
-                                            : ''
-                                        }
-                                    `;
-                                    chatMessages.appendChild(messageDiv);
-                                });
-                                chatMessages.scrollTop = chatMessages.scrollHeight;
-                                markAsRead(userId);
-                            } else {
-                                chatMessages.innerHTML = '<p>No messages yet. Start the conversation!</p>';
-                            }
+                fetch('../api/get_messages.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contact_id: userId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        chatMessages.innerHTML = '';
+                        if (data.messages.length > 0) {
+                            data.messages.forEach(msg => {
+                                const messageDiv = document.createElement('div');
+                                messageDiv.className = `chat-message ${msg.is_own ? 'own' : 'other'}`;
+                                let showEdit = msg.is_own || isAdmin;
+                                messageDiv.innerHTML = `
+                                    <strong>${msg.sender}</strong>
+                                    <p class="msg-text" data-msg-id="${msg.id}">${msg.message}</p>
+                                    <span class="msg-time">${msg.sent_at}</span>
+                                    ${
+                                        showEdit
+                                        ? `<button class="edit-btn" data-msg-id="${msg.id}" data-msg-text="${encodeURIComponent(msg.message)}">Edit</button>
+                                           <button class="delete-btn" data-msg-id="${msg.id}">Delete</button>`
+                                        : ''
+                                    }
+                                `;
+                                chatMessages.appendChild(messageDiv);
+                            });
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                            markAsRead(userId);
                         } else {
-                            chatMessages.innerHTML = `<p>Error loading messages: ${data.error}</p>`;
+                            chatMessages.innerHTML = '<p>No messages yet. Start the conversation!</p>';
                         }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        chatMessages.innerHTML = '<p>Error loading messages</p>';
-                    });
+                    } else {
+                        chatMessages.innerHTML = `<p>Error loading messages: ${data.error}</p>`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    chatMessages.innerHTML = '<p>Error loading messages</p>';
+                });
             }
 
             // Mark messages as read
