@@ -1,4 +1,4 @@
-<div?php
+<?php
 require_once '../includes/auth.php';
 requireAdmin();
 $pageTitle = "Permissions";
@@ -74,7 +74,7 @@ $pageTitle = "Permissions";
         }
     </style>
 </head>
-<b>
+<body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
@@ -89,11 +89,7 @@ $pageTitle = "Permissions";
             </div>
         </div>
     </div>
-    </div></div></div>
-    </div>
-    </div>
+            <?php include 'includes/footer.php'; ?>
 
-    </body>
-</body>    <?php include 'includes/footer.php'; ?>
-
+</body>
 </html>
