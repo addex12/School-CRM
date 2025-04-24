@@ -74,7 +74,7 @@ try {
         $messages[] = [
             'id' => $row['id'],
             'sender' => $row['sender'],
-            'message' => $row['content'],
+            'message' => $row['content'], // <-- ensure key is 'message'
             'sent_at' => date('M j, Y g:i a', strtotime($row['sent_at'])),
             'is_own' => $row['sender_id'] == $current_user_id
         ];
