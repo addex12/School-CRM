@@ -2,7 +2,8 @@
 session_start();
 require_once __DIR__ . '/includes/config.php';
 
-if (!isset($_SESSION['user_id'])) {
+// Ensure session is active and user is logged in
+if (!isset($_SESSION['user_id']) || !$_SESSION['logged_in']) {
     http_response_code(403);
     exit('Not logged in');
 }
@@ -18,7 +19,7 @@ if (!$data) {
 $user_id = $_SESSION['user_id'];
 $username = $_SESSION['username'] ?? '';
 $role = $_SESSION['role_id'] ?? '';
-$action = 'click';
+$action = $data['action'] ?? 'click'; // Allow JS to send custom action, fallback to 'click'
 $element = $data['tag'] ?? '';
 $element_id = $data['id'] ?? '';
 $element_class = $data['class'] ?? '';
@@ -27,7 +28,7 @@ $href = $data['href'] ?? '';
 $page = $data['page'] ?? '';
 $ip = $_SERVER['REMOTE_ADDR'] ?? '';
 $timestamp = date('Y-m-d H:i:s');
-$created_at = $timestamp; // For explicit created_at column
+$created_at = $timestamp;
 
 // Insert into activity_logs table (with created_at)
 $stmt = $pdo->prepare("INSERT INTO activity_logs 
