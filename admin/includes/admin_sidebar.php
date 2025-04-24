@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function setSidebarCollapsed(collapsed) {
         if (collapsed) {
             sidebar.classList.add('collapsed');
-            if (main) main.style.marginLeft = '60px';
+            if (main) main.style.marginLeft = '90px';
             localStorage.setItem('sidebar-collapsed', '1');
         } else {
             sidebar.classList.remove('collapsed');
