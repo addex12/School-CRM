@@ -253,6 +253,19 @@ function export_users_csv($pdo, $ids = [], $filters = []) {
     exit;
 }
 
+// --- Export handler: call external export function ---
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'bulk_export') {
+    require_once __DIR__ . '/export_users.php';
+    $ids = json_decode($_GET['ids'] ?? '[]', true);
+    $filters = [
+        'status' => isset($_GET['status']) ? $_GET['status'] : null,
+        'role' => isset($_GET['role']) ? $_GET['role'] : null,
+        'online' => isset($_GET['online']) ? $_GET['online'] : null,
+        'search' => isset($_GET['search']) ? $_GET['search'] : null,
+    ];
+    export_users_csv($pdo, $ids, $filters);
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
