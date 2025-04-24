@@ -88,8 +88,7 @@ $pageTitle = "Permissions";
                 <a href="user_permissions.php" class="erpnext-btn"><i class="fas fa-user-lock"></i> User Permissions</a>
             </div>
         </div>
-    </div>
-            <?php include 'includes/footer.php'; ?>
+    </div>        <?php include 'includes/footer.php'; ?>
 
 </body>
 </html>
