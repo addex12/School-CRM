@@ -89,7 +89,8 @@ $pageTitle = "Permissions";
             </div>
         </div>
     </div>
-    </div>
+    </div></div></div>
+    
     </body>
 </body>    <?php include 'includes/footer.php'; ?>
 
