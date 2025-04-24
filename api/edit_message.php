@@ -29,8 +29,8 @@ if (!$message) {
     exit;
 }
 
-// Only sender or admin can edit
-if ($message['sender_id'] != $userId && !$isAdmin) {
+// Only admin can edit
+if (!$isAdmin) {
     http_response_code(403);
     echo json_encode(['success' => false, 'error' => 'Permission denied']);
     exit;
