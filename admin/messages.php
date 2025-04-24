@@ -12,7 +12,7 @@ $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id 
 
 // Get unread counts for each user
 $unreadCounts = [];
-$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['user_id']} GROUP BY receiver_id");
+$stmt = $pdo->query("SELECT receiver_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = {$_SESSION['receiver_id']} GROUP BY receiver_id");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $unreadCounts[$row['receiver_id']] = $row['unread'];
 }
@@ -322,7 +322,7 @@ foreach ($users as $u) {
             const clearUserSearch = document.getElementById('clearUserSearch');
 
             let selectedUserId = null;
-            let currentUser = <?= $_SESSION['user_id'] ?? 0 ?>;
+            let currentUser = <?= $_SESSION['sender_id'] ?? 0 ?>;
             let isAdmin = <?= $isAdmin ? 'true' : 'false' ?>; // Pass admin status to JS
 
             // Prepare users data for search
@@ -396,7 +396,7 @@ foreach ($users as $u) {
             // Mark messages as read
             function markAsRead(senderId) {
                 if (senderId === 'broadcast') return;
-                fetch(`../api/mark_read.php?user_id=${senderId}`)
+                fetch(`../api/mark_read.php?sender_id=${senderId}`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
