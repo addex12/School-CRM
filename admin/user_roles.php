@@ -151,7 +151,6 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
             <header class="admin-header">
                 <h1><i class="fas fa-user-tag"></i> User Roles</h1>
             </header>
-            </div>
             <div class="container">
                 <div class="erp-card">
                     <?php if (isset($_SESSION['success'])): ?>
