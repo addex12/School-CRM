@@ -63,7 +63,19 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
             margin-bottom: 2rem;
             max-width: 600px;
         }
-        h2 { color: #215967; margin-bottom: 1.5rem; }
+        .erp-card h2 {
+            color: #215967;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .admin-header h1 {
+            color: #215967;
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
         table {
             border-collapse: separate;
             border-spacing: 0;
@@ -136,9 +148,11 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
+            <header class="admin-header">
+                <h1><i class="fas fa-user-tag"></i> User Roles</h1>
+            </header>
             <div class="container">
                 <div class="erp-card">
-                    <h2><i class="fas fa-user-tag"></i> User Roles</h2>
                     <?php if (isset($_SESSION['success'])): ?>
                         <div class="alert-success"><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
                     <?php endif; ?>

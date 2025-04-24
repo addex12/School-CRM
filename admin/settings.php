@@ -75,11 +75,14 @@ $settings_fields = [
             padding: 2rem 2.5rem;
             margin-bottom: 2rem;
             max-width: 700px;
+            border: 1px solid #e5e7eb;
         }
         .erp-card h2 {
-            color: #215967;
-            font-weight: 700;
+            color: #2563eb;
+            font-weight: 600;
             margin-bottom: 1.2rem;
+            font-size: 1.25rem;
+            letter-spacing: 0.01em;
         }
         .form-group {
             margin-bottom: 1.3rem;
@@ -97,13 +100,20 @@ $settings_fields = [
             border-radius: 5px;
             background: #f9fafb;
             font-size: 1rem;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus {
+            border: 1.5px solid #2563eb;
+            outline: none;
+            background: #fff;
         }
         input[type="checkbox"] {
             accent-color: #2563eb;
             margin-right: 6px;
+            transform: scale(1.15);
         }
         .erpnext-btn {
-            background: #2563eb;
+            background: linear-gradient(90deg, #2563eb 0%, #215967 100%);
             color: #fff;
             border: none;
             border-radius: 5px;
@@ -111,11 +121,33 @@ $settings_fields = [
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.18s;
+            transition: background 0.18s, box-shadow 0.18s;
             margin-bottom: 1rem;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
         }
-        .erpnext-btn:hover { background: #215967; }
+        .erpnext-btn:hover, .erpnext-btn:focus {
+            background: linear-gradient(90deg, #215967 0%, #2563eb 100%);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.12);
+        }
         .settings-section { margin-bottom: 2.5rem; }
+        .admin-header {
+            margin-bottom: 2rem;
+            border-bottom: 1.5px solid #e5e7eb;
+            padding-bottom: 1rem;
+        }
+        .admin-header h1 {
+            color: #2563eb;
+            font-weight: 700;
+            font-size: 2rem;
+            letter-spacing: 0.01em;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+        }
         @media (max-width: 900px) {
             .admin-main { margin-left: 70px; padding: 1rem; }
             .erp-card { padding: 1rem; }
@@ -123,6 +155,7 @@ $settings_fields = [
         @media (max-width: 600px) {
             .admin-main { margin-left: 0; padding: 0.5rem; }
             .erp-card { padding: 0.7rem; }
+            .admin-header h1 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -131,7 +164,7 @@ $settings_fields = [
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-cogs"></i> <?= htmlspecialchars($pageTitle) ?></h1>
+                <h1><i class="fas fa-cogs"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="erp-card">
                 <?php include 'includes/alerts.php'; ?>
@@ -170,7 +203,6 @@ $settings_fields = [
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
