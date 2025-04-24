@@ -15,9 +15,20 @@ $pageTitle = "Support Tickets";
 // Load tickets configuration
 $ticketsConfig = json_decode(file_get_contents(__DIR__ . '/tickets.json'), true);
 
-// Fetch ticket priorities dynamically
-$stmt = $pdo->query("SELECT * FROM ticket_priorities ORDER BY id ASC");
-$ticketPriorities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch ticket priorities dynamically (fallback if table does not exist)
+$ticketPriorities = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM ticket_priorities ORDER BY id ASC");
+    $ticketPriorities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    // Fallback: use static priorities if table is missing
+    $ticketPriorities = [
+        ['value' => 'low', 'label' => 'Low', 'color' => '#27ae60'],
+        ['value' => 'medium', 'label' => 'Medium', 'color' => '#f1c40f'],
+        ['value' => 'high', 'label' => 'High', 'color' => '#e67e22'],
+        ['value' => 'urgent', 'label' => 'Urgent', 'color' => '#e74c3c'],
+    ];
+}
 
 // Handle ticket status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
