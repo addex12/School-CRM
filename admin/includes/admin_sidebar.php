@@ -30,7 +30,7 @@ if (file_exists($configPath)) {
     flex-direction: column;
 }
 .admin-sidebar.collapsed {
-    width: 75px;
+    width: 90px;
 }
 .admin-sidebar .sidebar-header {
     padding: 1.2rem 1.5rem;
