@@ -483,23 +483,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // --- Activity Tracking ---
             // Only track if user is logged in (session variable set via PHP)
             <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+            function sendActivity(action, details = {}) {
+                const payload = Object.assign({
+                    action: action,
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString()
+                }, details);
+                fetch('track_activity.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+            }
+
+            // Track clicks
             document.body.addEventListener('click', function(e) {
                 let target = e.target;
-                let info = {
+                sendActivity('click', {
                     tag: target.tagName,
                     id: target.id || null,
                     class: target.className || null,
                     text: (target.innerText || target.value || '').substring(0, 100),
-                    href: target.href || null,
-                    page: window.location.pathname,
-                    timestamp: new Date().toISOString()
-                };
-                // Send activity to backend
-                fetch('track_activity.php', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(info)
+                    href: target.href || null
                 });
+            });
+
+            // Track copy
+            document.body.addEventListener('copy', function(e) {
+                let selection = window.getSelection().toString();
+                sendActivity('copy', {
+                    text: selection.substring(0, 255)
+                });
+            });
+
+            // Track paste
+            document.body.addEventListener('paste', function(e) {
+                let pasted = (e.clipboardData || window.clipboardData).getData('text');
+                sendActivity('paste', {
+                    text: pasted.substring(0, 255)
+                });
+            });
+
+            // Track input changes (optional, for text fields)
+            document.body.addEventListener('input', function(e) {
+                let target = e.target;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                    sendActivity('input', {
+                        tag: target.tagName,
+                        id: target.id || null,
+                        class: target.className || null,
+                        value: (target.value || '').substring(0, 100)
+                    });
+                }
             });
             <?php endif; ?>
             // --- End Activity Tracking ---
