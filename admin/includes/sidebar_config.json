@@ -96,7 +96,15 @@
         { "title": "Audit Trail", "icon": "history", "link": "audit_trail.php" }    
       ],
       "id": "settings-menu"
+    },
+    {
+      "title": "Role Management",
+      "icon": "user-shield",
+      "items": [
+        { "title": "Manage Roles", "icon": "user-shield", "link": "manage_roles.php" },
+        { "title": "User Permissions", "icon": "user-lock", "link": "user_permissions.php" }
+      ],
+      "id": "role-management-menu"
     }
-
   ]
 }
