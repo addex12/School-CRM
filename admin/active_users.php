@@ -8,12 +8,14 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
-$pageTitle = "Active Users";
+$pageTitle = "Users";
 
 // Handle search/filter
 $search = trim($_GET['search'] ?? '');
 $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
 $role_id = trim($_GET['role'] ?? '');
+// Add status filter
+$status_filter = isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['status'] === '1') ? $_GET['status'] : '';
 
 $where = ["u.active = 1"];
 $params = [];
@@ -28,6 +30,10 @@ if ($filter_online) {
 if ($role_id !== '') {
     $where[] = "u.role_id = :role_id";
     $params[':role_id'] = $role_id;
+}
+if ($status_filter !== '') {
+    $where[] = "u.active = :status";
+    $params[':status'] = $status_filter;
 }
 
 $where_sql = implode(' AND ', $where);
@@ -72,6 +78,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     $search = trim($_GET['search'] ?? '');
     $filter_online = isset($_GET['online']) && $_GET['online'] === '1';
     $role_id = trim($_GET['role'] ?? '');
+    $status_filter = isset($_GET['status']) && ($_GET['status'] === '0' || $_GET['status'] === '1') ? $_GET['status'] : '';
 
     $where = ["u.active = 1"];
     $params = [];
@@ -86,6 +93,10 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     if ($role_id !== '') {
         $where[] = "u.role_id = :role_id";
         $params[':role_id'] = $role_id;
+    }
+    if ($status_filter !== '') {
+        $where[] = "u.active = :status";
+        $params[':status'] = $status_filter;
     }
 
     $where_sql = implode(' AND ', $where);
@@ -398,6 +409,12 @@ $roles = $pdo->query("SELECT id, role_name FROM roles ORDER BY role_name")->fetc
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <!-- Status filter dropdown -->
+                    <select name="status" id="statusInput">
+                        <option value="">All Statuses</option>
+                        <option value="1" <?= $status_filter === '1' ? 'selected' : '' ?>>Active</option>
+                        <option value="0" <?= $status_filter === '0' ? 'selected' : '' ?>>Inactive</option>
+                    </select>
                     <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search</button>
                 </form>
 
@@ -459,6 +476,7 @@ else:
     const searchInput = document.getElementById('searchInput');
     const onlineInput = document.getElementById('onlineInput');
     const roleInput = document.getElementById('roleInput');
+    const statusInput = document.getElementById('statusInput');
     const usersTableBody = document.getElementById('usersTableBody');
     const form = document.getElementById('userSearchForm');
     let searchTimeout = null;
@@ -469,6 +487,7 @@ else:
         params.append('search', searchInput.value);
         if (onlineInput.checked) params.append('online', '1');
         if (roleInput.value) params.append('role', roleInput.value);
+        if (statusInput.value !== "") params.append('status', statusInput.value);
 
         fetch('active_users.php?' + params.toString())
             .then(res => res.text())
@@ -483,6 +502,7 @@ else:
     });
     onlineInput.addEventListener('change', fetchUsers);
     roleInput.addEventListener('change', fetchUsers);
+    statusInput.addEventListener('change', fetchUsers);
 
     // Also fetch on form submit (search button)
     form.addEventListener('submit', function(e) {
