@@ -147,6 +147,55 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
             height: auto;
         }
 
+        /* ERPNext card and button styling */
+        .erpnext-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            margin: 2rem 0;
+        }
+        .erpnext-btn {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.18s;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .erpnext-btn-primary {
+            background: #3498db;
+        }
+        .erpnext-btn-primary:hover {
+            background: #217dbb;
+        }
+        .erpnext-btn-secondary {
+            background: #eaeaea;
+            color: #666;
+        }
+        .erpnext-btn-secondary:hover {
+            background: #e2efda;
+            color: #215967;
+        }
+        .erpnext-btn-danger {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .erpnext-btn-danger:hover {
+            background: #c0392b;
+        }
+        .erpnext-btn-info {
+            background: #00bcd4;
+            color: #fff;
+        }
+        .erpnext-btn-info:hover {
+            background: #0097a7;
+        }
+
         @media (max-width: 900px) {
             .admin-main {
                 margin-left: 0 !important;
@@ -194,20 +243,20 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include '../includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">
             <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
                 <h1 class="page-title" style="margin: 0; flex: 1;"><?= htmlspecialchars($survey['title']) ?> Preview</h1>
                 <div class="header-actions" style="flex-shrink: 0;">
-                    <a href="surveys.php" class="btn btn-back" style="margin-right: 10px;">
+                    <a href="surveys.php" class="erpnext-btn erpnext-btn-secondary" style="margin-right: 10px;">
                         <i class="fas fa-arrow-left"></i> Back to Surveys
                     </a>
                 </div>
             </header>
 
             <div class="content" style="margin-top: 20px;">
-                <div class="survey-info" aria-label="Survey Information">
+                <div class="survey-info erpnext-card" aria-label="Survey Information">
                     <div class="survey-meta">
                         <h2>Survey Details</h2>
                         <div class="meta-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
@@ -248,7 +297,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                     </div>
                 </div>
 
-                <div class="preview-container" aria-label="Survey Fields Preview">
+                <div class="preview-container erpnext-card" aria-label="Survey Fields Preview">
                     <?php if (empty($fields)): ?>
                         <div class="alert alert-info" role="alert" style="text-align:center;">
                             No fields have been added to this survey yet.
@@ -357,10 +406,10 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                     <?php endif; ?>
 
                     <div class="form-actions" style="display: flex; justify-content: center; gap: 20px;">
-                        <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="btn btn-edit">
+                        <a href="survey_builder.php?survey_id=<?= $survey['id'] ?>" class="erpnext-btn erpnext-btn-info">
                             <i class="fas fa-edit"></i> Edit Survey
                         </a>
-                        <a href="results.php?survey_id=<?= $survey['id'] ?>" class="btn btn-primary">
+                        <a href="results.php?survey_id=<?= $survey['id'] ?>" class="erpnext-btn erpnext-btn-primary">
                             <i class="fas fa-chart-bar"></i> View Results
                         </a>
                     </div>
@@ -368,7 +417,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
             </div>
         </div>
         
-        <?php include 'includes/footer.php'; ?>
+        <?php include '../includes/footer.php'; ?>
     </div>
 
     <script>

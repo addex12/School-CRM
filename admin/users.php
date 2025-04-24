@@ -24,6 +24,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/add_users.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .users-container {
@@ -98,6 +99,43 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 padding: 8px 6px;
             }
         }
+        .erpnext-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            margin: 2rem 0;
+        }
+        .erpnext-btn {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.18s;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .erpnext-btn-primary {
+            background: #3498db;
+        }
+        .erpnext-btn-primary:hover {
+            background: #217dbb;
+        }
+        .erpnext-form-group {
+            margin-bottom: 1.5rem;
+        }
+        .erpnext-search-bar {
+            width: 100%;
+            max-width: 350px;
+            padding: 0.5rem 1rem;
+            border: 1px solid #dbe4ea;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -108,13 +146,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <div class="users-container">
+                <div class="erpnext-card">
                     <div class="users-header">
                         <h2>User List</h2>
-                        <a href="add_users.php" class="btn"><i class="fas fa-user-plus"></i> Add User</a>
+                        <a href="add_users.php" class="erpnext-btn erpnext-btn-primary"><i class="fas fa-user-plus"></i> Add User</a>
                     </div>
+                    <input type="text" id="userSearch" class="erpnext-search-bar" placeholder="Search users...">
                     <div class="table-responsive">
-                        <table class="users-table">
+                        <table class="users-table" id="usersTable">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -160,7 +199,23 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
+    <script>
+        // Real-time search for users table
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInput = document.getElementById('userSearch');
+            var table = document.getElementById('usersTable');
+            if (searchInput && table) {
+                searchInput.addEventListener('keyup', function() {
+                    var filter = searchInput.value.toLowerCase();
+                    var rows = table.querySelectorAll('tbody tr');
+                    rows.forEach(function(row) {
+                        var text = row.textContent.toLowerCase();
+                        row.style.display = text.indexOf(filter) > -1 ? '' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

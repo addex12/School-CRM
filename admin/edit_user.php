@@ -183,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <?php include '../includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
                 <h1 style="color:#215967;font-weight:700;"><i class="fas fa-user-edit"></i> <?= htmlspecialchars($pageTitle) ?></h1>
