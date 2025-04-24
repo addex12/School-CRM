@@ -77,6 +77,13 @@
         { "title": "User Permissions", "icon": "user-lock", "link": "user_permissions.php" }
       ],
       "id": "role-management-menu"
+    },
+    {
+      "title": "Logout",
+      "icon": "sign-out-alt",
+      "link": "logout.php"
     }
   ]
+  
+   
 }
