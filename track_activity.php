@@ -23,8 +23,8 @@ if (!$data) {
 }
 
 // Basic data sanitization
-$activityType = filter_var($data['type'] ?? 'unknown', FILTER_SANITIZE_STRING);
-$timestamp = filter_var($data['timestamp'] ?? date('Y-m-d H:i:s'), FILTER_SANITIZE_STRING);
+$activityType = filter_var($data['type'] ?? 'unknown', FILTER_SANITIZE_SPECIAL_CHARS);
+$timestamp = filter_var($data['timestamp'] ?? date('Y-m-d H:i:s'), FILTER_SANITIZE_SPECIAL_CHARS);
 
 // Get user info if available
 $userId = $_SESSION['user_id'] ?? null;
@@ -66,3 +66,4 @@ try {
     error_log("Activity tracking error: " . $e->getMessage());
     http_response_code(500);
 }
+?>

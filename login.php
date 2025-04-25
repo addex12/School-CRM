@@ -129,6 +129,8 @@ if (isset($user) && is_array($user)) {
     // Store in database
     $pdo->prepare("UPDATE users SET tracking_token = ? WHERE id = ?")
         ->execute([$trackingToken, $user['id']]);
+} else {
+    $error = "Invalid username or password.";
 }
 ?>
 
