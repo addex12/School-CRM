@@ -71,17 +71,8 @@ $activityData = [
     'battery_level' => $data['battery'] ?? null
 ];
 
-try {
-    // Insert into database with new mobile-specific fields
-    $stmt = $pdo->prepare("INSERT INTO user_activity 
-        (user_id, tracking_id, fingerprint, action_type, ip_address, user_agent, 
-         timestamp, details, device_data, is_mobile, app_foreground, battery_level)
-        VALUES (:user_id, :tracking_id, :fingerprint, :action_type, :ip_address, 
-                :user_agent, :timestamp, :details, :device_data, :is_mobile, 
-                :app_foreground, :battery_level)");
-    
-    $stmt->execute($activityData);
-    
+
+   try { 
     // Enhanced logging
     $logDir = __DIR__ . '/logs/';
     if (!is_dir($logDir)) {
@@ -93,8 +84,8 @@ try {
     
     http_response_code(200);
     echo 'OK';
-} catch (PDOException $e) {
-    error_log("Activity tracking error: " . $e->getMessage());
+} catch (Exception $e) {
     http_response_code(500);
+    echo 'Error: ' . $e->getMessage();
 }
 ?>
