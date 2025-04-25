@@ -202,27 +202,27 @@ function sendPasswordChangeNotification($email) {
 <style>
 /* Profile Page Custom Styles */
 .profile-main-container {
-    max-width: 900px;
-    margin: 40px auto 0 auto;
+    max-width: 800px;
+    margin: 40px auto;
     background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
-    padding: 32px 24px 32px 24px;
+    border-radius: 8px; /* Smaller card styling */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+    padding: 24px; /* Reduced padding */
 }
 .profile-header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
 }
 .profile-avatar {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 16px;
+    width: 100px; /* Smaller avatar size */
+    height: 100px;
+    margin-bottom: 12px;
     border-radius: 50%;
     overflow: hidden;
-    border: 4px solid #007bff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 3px solid #007bff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
     background: #f8f9fa;
     display: flex;
     align-items: center;
@@ -238,7 +238,7 @@ function sendPasswordChangeNotification($email) {
 }
 .profile-info h3 {
     margin: 0 0 6px 0;
-    font-size: 1.5rem;
+    font-size: 1.25rem; /* Smaller font size */
     color: #222;
 }
 .profile-info .card-text {
@@ -246,11 +246,76 @@ function sendPasswordChangeNotification($email) {
     margin-bottom: 4px;
 }
 .profile-info .badge {
-    font-size: 1em;
+    font-size: 0.9rem; /* Smaller badge size */
     margin-bottom: 6px;
 }
 .profile-info .text-muted {
-    font-size: 0.95em;
+    font-size: 0.85rem; /* Smaller text size */
+}
+.profile-forms-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px; /* Reduced gap */
+    margin-top: 16px;
+}
+.profile-form-card {
+    flex: 1 1 340px;
+    background: #f8fafd;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    padding: 18px; /* Reduced padding */
+    min-width: 320px;
+}
+.profile-form-card .card-header {
+    background: #007bff;
+    color: #fff;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 16px; /* Reduced padding */
+    margin: -18px -16px 16px -16px;
+}
+.profile-form-card .card-header.bg-secondary {
+    background: #6c757d;
+}
+.erpnext-btn {
+    background: #f5f7fa;
+    color: #36414c;
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 6px 12px; /* Smaller button size */
+    font-size: 0.875rem; /* Smaller font size */
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+}
+.erpnext-btn.btn-primary {
+    background: #007bfc;
+    color: #fff;
+    border-color: #007bfc;
+}
+.erpnext-btn.btn-primary:hover {
+    background: #0056b3;
+    color: #fff;
+}
+.erpnext-btn.btn-secondary {
+    background: #6c757d;
+    color: #fff;
+    border-color: #6c757d;
+}
+.erpnext-btn.btn-secondary:hover {
+    background: #5a6268;
+}
+.erpnext-input, .erpnext-textarea {
+    border: 1px solid #d1d8dd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 0.875rem; /* Smaller font size */
+    background: #f5f7fa;
+    color: #36414c;
+}
+.erpnext-input:focus, .erpnext-textarea:focus {
+    outline: none;
+    border-color: #007bfc;
+    background: #fff;
 }
 @media (max-width: 600px) {
     .profile-main-container {
@@ -259,59 +324,13 @@ function sendPasswordChangeNotification($email) {
     .profile-header {
         padding: 0;
     }
-}
-.profile-forms-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 24px;
-    margin-top: 24px;
-}
-.profile-form-card {
-    flex: 1 1 340px;
-    background: #f8fafd;
-    border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    padding: 24px 18px;
-    min-width: 320px;
-}
-.profile-form-card .card-header {
-    background: #007bff;
-    color: #fff;
-    border-radius: 8px 8px 0 0;
-    padding: 12px 18px;
-    margin: -24px -18px 18px -18px;
-}
-.profile-form-card .card-header.bg-secondary {
-    background: #6c757d;
-}
-.btn {
-    font-size: 1em;
-    padding: 10px 0;
-    border-radius: 4px;
-}
-.btn-primary {
-    background: #007bff;
-    border: none;
-}
-.btn-secondary {
-    background: #6c757d;
-    border: none;
-}
-@media (max-width: 900px) {
     .profile-forms-row {
         flex-direction: column;
-        gap: 18px;
+        gap: 12px; /* Reduced gap for smaller screens */
     }
-    .profile-form-card {
-        min-width: unset;
-    }
-}
-.main-content-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px 20px 0 20px;
 }
 </style>
+
 <?php include_once __DIR__ . '/../includes/header.php'; ?>
 <div class="main-content-container">
     <div class="profile-main-container">
@@ -357,7 +376,7 @@ function sendPasswordChangeNotification($email) {
                         <div class="mb-3">
                             <label for="username" class="form-label">Username:</label>
                             <input type="text" id="username" name="username" 
-                                   class="form-control"
+                                   class="erpnext-input"
                                    value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
                                    required
                                    pattern="[a-zA-Z0-9_]{3,30}"
@@ -366,18 +385,18 @@ function sendPasswordChangeNotification($email) {
                         <div class="mb-3">
                             <label for="email" class="form-label">Email:</label>
                             <input type="email" id="email" name="email" 
-                                   class="form-control"
+                                   class="erpnext-input"
                                    value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
                                    required>
                         </div>
                         <div class="mb-3">
                             <label for="avatar" class="form-label">Profile Picture:</label>
                             <input type="file" id="avatar" name="avatar" 
-                                   class="form-control"
+                                   class="erpnext-input"
                                    accept="image/jpeg,image/png,image/gif">
                             <small class="form-text text-muted">Max 2MB (JPG, PNG, GIF only)</small>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Update Profile</button>
+                        <button type="submit" class="erpnext-btn btn-primary w-100">Update Profile</button>
                     </form>
                 </div>
             </div>
@@ -393,12 +412,12 @@ function sendPasswordChangeNotification($email) {
                         <div class="mb-3">
                             <label for="current_password" class="form-label">Current Password:</label>
                             <input type="password" id="current_password" name="current_password" 
-                                   class="form-control" required>
+                                   class="erpnext-input" required>
                         </div>
                         <div class="mb-3">
                             <label for="new_password" class="form-label">New Password:</label>
                             <input type="password" id="new_password" name="new_password" 
-                                   class="form-control"
+                                   class="erpnext-input"
                                    required
                                    pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
                                    title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
@@ -407,20 +426,19 @@ function sendPasswordChangeNotification($email) {
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label">Confirm New Password:</label>
                             <input type="password" id="confirm_password" name="confirm_password" 
-                                   class="form-control" required>
+                                   class="erpnext-input" required>
                         </div>
-                        <button type="submit" class="btn btn-secondary w-100">Change Password</button>
+                        <button type="submit" class="erpnext-btn btn-secondary w-100">Change Password</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<?php include_once __DIR__ . '/includes/footer.php'; ?>
+<?php include_once __DIR__ . '/../includes/footer.php'; ?>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="js/profile.js"></script>
 <script src="../includes/activity-tracker.js"></script>
 </body>
 </html>

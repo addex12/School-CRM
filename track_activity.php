@@ -1,72 +1,68 @@
 <?php
 session_start();
 require_once __DIR__ . '/includes/config.php';
+require_once __DIR__ . '/includes/db.php';
 
-// Log all activity regardless of login status (but still record user info if available)
-$user_id = $_SESSION['user_id'] ?? 'guest';
-$logged_in = $_SESSION['logged_in'] ?? false;
-$username = $_SESSION['username'] ?? 'guest';
-$role = $_SESSION['role_id'] ?? 'guest';
+// Security headers
+header("Content-Security-Policy: default-src 'self'");
+header("X-Content-Type-Options: nosniff");
 
-$data = json_decode(file_get_contents('php://input'), true);
+// Validate request
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    exit;
+}
+
+// Get raw input
+$input = file_get_contents('php://input');
+$data = json_decode($input, true);
 
 if (!$data) {
     http_response_code(400);
-    exit('No data');
+    exit;
 }
 
-// Enhanced data collection with additional fields
-$action = $data['action'] ?? 'unknown';
-$element = $data['tag'] ?? '';
-$element_id = $data['id'] ?? '';
-$element_class = $data['class'] ?? '';
-$text = $data['text'] ?? '';
-$value = $data['value'] ?? '';
-$href = $data['href'] ?? '';
-$page = $data['page'] ?? $_SERVER['REQUEST_URI'] ?? '';
-$ip = $_SERVER['REMOTE_ADDR'] ?? '';
-$user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-$timestamp = date('Y-m-d H:i:s');
-$created_at = $timestamp;
+// Basic data sanitization
+$activityType = filter_var($data['type'] ?? 'unknown', FILTER_SANITIZE_STRING);
+$timestamp = filter_var($data['timestamp'] ?? date('Y-m-d H:i:s'), FILTER_SANITIZE_STRING);
 
-// Insert into activity_logs table
-try {
-    $stmt = $pdo->prepare("INSERT INTO activity_logs 
-        (user_id, username, role, action, element, element_id, element_class, text, value, href, page, ip_address, user_agent, timestamp, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([
-        $user_id, $username, $role, $action, $element, $element_id, $element_class, 
-        $text, $value, $href, $page, $ip, $user_agent, $timestamp, $created_at
-    ]);
-} catch (PDOException $e) {
-    error_log("Activity log insert failed: " . $e->getMessage());
-}
+// Get user info if available
+$userId = $_SESSION['user_id'] ?? null;
+$username = $_SESSION['username'] ?? 'guest';
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
 
-// Enhanced log file entry
-$logLine = json_encode([
-    'user_id' => $user_id,
+// Prepare activity data
+$activityData = [
+    'user_id' => $userId,
     'username' => $username,
-    'role' => $role,
-    'action' => $action,
-    'element' => $element,
-    'element_id' => $element_id,
-    'element_class' => $element_class,
-    'text' => $text,
-    'value' => $value,
-    'href' => $href,
-    'page' => $page,
+    'activity_type' => $activityType,
     'ip_address' => $ip,
-    'user_agent' => $user_agent,
+    'user_agent' => $userAgent,
     'timestamp' => $timestamp,
-    'created_at' => $created_at
-]) . PHP_EOL;
+    'details' => json_encode($data)
+];
 
-// Ensure log directory exists
-$logDir = __DIR__ . '/logs';
-if (!is_dir($logDir)) {
-    mkdir($logDir, 0755, true);
+try {
+    // Insert into database
+    $stmt = $pdo->prepare("INSERT INTO user_activity 
+        (user_id, username, activity_type, ip_address, user_agent, timestamp, details)
+        VALUES (:user_id, :username, :activity_type, :ip_address, :user_agent, :timestamp, :details)");
+    
+    $stmt->execute($activityData);
+    
+    // Also log to file for redundancy
+    $logDir = __DIR__ . '/logs/activity';
+    if (!is_dir($logDir)) {
+        mkdir($logDir, 0755, true);
+    }
+    
+    $logFile = $logDir . '/' . date('Y-m-d') . '.log';
+    file_put_contents($logFile, json_encode($activityData) . PHP_EOL, FILE_APPEND | LOCK_EX);
+    
+    http_response_code(200);
+    echo 'OK';
+} catch (PDOException $e) {
+    error_log("Activity tracking error: " . $e->getMessage());
+    http_response_code(500);
 }
-
-file_put_contents($logDir . '/activity.log', $logLine, FILE_APPEND);
-
-echo 'ok';
