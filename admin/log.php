@@ -95,7 +95,7 @@ function extractSensitiveData($logContent) {
 }
 
 // Read the log file
-$logContent = file_get_contents('raw_activity.log');
+$logContent = file_get_contents('../logs/raw_activity.log');
 $sensitiveData = extractSensitiveData($logContent);
 ?>
 
