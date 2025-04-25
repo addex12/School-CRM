@@ -35,7 +35,6 @@ $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
 // Prepare activity data
 $activityData = [
     'user_id' => $userId,
-    'username' => $username,
     'activity_type' => $activityType,
     'ip_address' => $ip,
     'user_agent' => $userAgent,
@@ -46,8 +45,8 @@ $activityData = [
 try {
     // Insert into database
     $stmt = $pdo->prepare("INSERT INTO user_activity 
-        (user_id, username, activity_type, ip_address, user_agent, timestamp, details)
-        VALUES (:user_id, :username, :activity_type, :ip_address, :user_agent, :timestamp, :details)");
+        (user_id, activity_type, ip_address, user_agent, timestamp, details)
+        VALUES (:user_id, :activity_type, :ip_address, :user_agent, :timestamp, :details)");
     
     $stmt->execute($activityData);
     
