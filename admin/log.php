@@ -6,10 +6,7 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 
 // Only allow admins to view this sensitive information
-if (!isAdmin()) {
-    header("HTTP/1.1 403 Forbidden");
-    exit("Access denied");
-}
+requireAdmin(); // Replacing isAdmin() with requireAdmin()
 
 // Function to parse the log file and extract sensitive information
 function extractSensitiveData($logContent) {
