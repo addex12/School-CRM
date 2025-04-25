@@ -71,7 +71,7 @@ try {
         mkdir($logDir, 0755, true);
     }
     
-    $logFile = $logDir . '/logs_' . '.log';
+    $logFile = $logDir . '/logs' . '.log';
     file_put_contents($logFile, json_encode($activityData) . PHP_EOL, FILE_APPEND | LOCK_EX);
     
     http_response_code(200);
