@@ -66,7 +66,7 @@ try {
     $stmt->execute($activityData);
     
     // Also log to file for redundancy
-    $logDir = __DIR__ . '/logs/';
+    $logDir = __DIR__ . '/logs/logs.log';
     if (!is_dir($logDir)) {
         mkdir($logDir, 0755, true);
     }
