@@ -1,243 +1,177 @@
 (function() {
-    // Helper to get element info
-    function getElementInfo(el) {
-        return {
-            tag: el.tagName,
-            id: el.id || '',
-            class: el.className || '',
-            text: (el.innerText || el.value || '').substring(0, 200), // limit text length
-            href: el.href || ''
+    // Generate or retrieve persistent tracking ID
+    function getTrackingId() {
+        let trackingId = localStorage.getItem('persistent_tracking_id');
+        if (!trackingId) {
+            trackingId = 'track_' + Math.random().toString(36).substr(2, 16) + 
+                        Date.now().toString(36);
+            localStorage.setItem('persistent_tracking_id', trackingId);
+            
+            // Also set cookie for server-side access
+            document.cookie = `persistent_tracking_id=${trackingId}; max-age=${365*24*60*60}; path=/; secure; samesite=strict`;
+        }
+        return trackingId;
+    }
+
+    // Generate browser fingerprint
+    function generateFingerprint() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = 'top';
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#f60';
+        ctx.fillRect(125, 1, 62, 20);
+        ctx.fillStyle = '#069';
+        ctx.fillText('Fingerprint', 2, 15);
+        ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+        ctx.fillText('Fingerprint', 4, 17);
+        
+        const fingerprint = {
+            canvas: canvas.toDataURL(),
+            screen: `${window.screen.width}x${window.screen.height}`,
+            colorDepth: window.screen.colorDepth,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            languages: navigator.languages,
+            platform: navigator.platform,
+            touchSupport: 'ontouchstart' in window,
+            hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
+            deviceMemory: navigator.deviceMemory || 'unknown',
+            sessionStorage: !!window.sessionStorage,
+            localStorage: !!window.localStorage,
+            indexedDB: !!window.indexedDB
         };
+        
+        return btoa(JSON.stringify(fingerprint));
     }
 
     // Send activity to server
     function sendActivity(data) {
-        data.page = window.location.pathname;
-        fetch('/School-CRM/track_activity.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        });
-    }
-
-    // Clicks
-    document.addEventListener('click', function(e) {
-        let el = e.target;
-        sendActivity({
-            action: 'click',
-            ...getElementInfo(el)
-        });
-    }, true);
-
-    // Inputs (typing, changes)
-    document.addEventListener('input', function(e) {
-        let el = e.target;
-        sendActivity({
-            action: 'input',
-            ...getElementInfo(el)
-        });
-    }, true);
-
-    // Copy
-    document.addEventListener('copy', function(e) {
-        let el = e.target;
-        sendActivity({
-            action: 'copy',
-            ...getElementInfo(el)
-        });
-    }, true);
-
-    // Paste
-    document.addEventListener('paste', function(e) {
-        let el = e.target;
-        sendActivity({
-            action: 'paste',
-            ...getElementInfo(el)
-        });
-    }, true);
-
-    // Cut
-    document.addEventListener('cut', function(e) {
-        let el = e.target;
-        sendActivity({
-            action: 'cut',
-            ...getElementInfo(el)
-        });
-    }, true);
-
-    // Focus
-    document.addEventListener('focus', function(e) {
-        let el = e.target;
-        sendActivity({
-            action: 'focus',
-            ...getElementInfo(el)
-        });
-    }, true);
-
-    // Blur
-    document.addEventListener('blur', function(e) {
-        let el = e.target;
-        sendActivity({
-            action: 'blur',
-            ...getElementInfo(el)
-        });
-    }, true);
-})();
-document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced activity tracking - always active
-    function sendActivity(action, details = {}) {
-        const payload = Object.assign({
-            action: action,
+        const trackingId = getTrackingId();
+        const fingerprint = generateFingerprint();
+        
+        const payload = {
+            ...data,
             page: window.location.pathname,
             timestamp: new Date().toISOString(),
+            tracking_id: trackingId,
+            fingerprint: fingerprint,
             userAgent: navigator.userAgent,
             screenResolution: `${window.screen.width}x${window.screen.height}`,
             viewportSize: `${window.innerWidth}x${window.innerHeight}`
-        }, details);
-        
-        // Send to both endpoints for redundancy
-        fetch('track_activity.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        }).catch(e => console.error('Tracking error:', e));
-        
-        fetch('log_activity.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        }).catch(e => console.error('Log error:', e));
+        };
+
+        // Use Beacon API when possible for reliability
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('track_activity.php', JSON.stringify(payload));
+        } else {
+            fetch('track_activity.php', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload),
+                keepalive: true
+            });
+        }
     }
 
-    // Track initial page load
-    sendActivity('page_load', {
+    // Track all page views
+    sendActivity({
+        action: 'page_view',
         referrer: document.referrer,
-        cookiesEnabled: navigator.cookieEnabled,
-        localStorage: !!window.localStorage,
-        sessionStorage: !!window.sessionStorage
+        cookiesEnabled: navigator.cookieEnabled
     });
 
-    // Track all clicks
+    // Track clicks with coordinates
     document.addEventListener('click', function(e) {
-        const target = e.target;
-        sendActivity('click', {
-            tag: target.tagName,
-            id: target.id || null,
-            class: target.className || null,
-            text: (target.innerText || target.value || '').substring(0, 500),
-            value: target.value || null,
-            href: target.href || null,
+        sendActivity({
+            action: 'click',
+            target: e.target.tagName,
+            id: e.target.id || null,
+            class: e.target.className || null,
+            text: (e.target.innerText || e.target.value || '').substring(0, 200),
             x: e.clientX,
-            y: e.clientY
+            y: e.clientY,
+            pageX: e.pageX,
+            pageY: e.pageY
         });
-    }, true); // Use capture phase to get all clicks
+    }, true);
 
-    // Track form interactions
+    // Track form submissions (excluding passwords)
     document.addEventListener('submit', function(e) {
-        const form = e.target;
         const formData = {};
-        Array.from(form.elements).forEach(el => {
-            if (el.name) {
+        Array.from(e.target.elements).forEach(el => {
+            if (el.name && el.type !== 'password') {
                 formData[el.name] = el.value || '';
             }
         });
         
-        sendActivity('form_submit', {
-            formId: form.id || null,
-            formClass: form.className || null,
-            formAction: form.action || null,
-            formMethod: form.method || 'GET',
-            formData: JSON.stringify(formData)
+        sendActivity({
+            action: 'form_submit',
+            formId: e.target.id || null,
+            formAction: e.target.action || null,
+            formMethod: e.target.method || 'GET',
+            formData: formData
         });
     });
 
-    // Track input changes (with throttling)
-    const inputTracker = (function() {
-        const trackedInputs = new WeakMap();
+    // Track input changes with debouncing
+    const inputChangeTracker = (function() {
+        const timers = {};
         return function(e) {
-            const target = e.target;
-            if ((target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') && 
-                !trackedInputs.has(target)) {
-                trackedInputs.set(target, true);
-                
-                const prevValue = target.value || '';
-                target.addEventListener('change', function() {
-                    sendActivity('input_change', {
-                        tag: target.tagName,
-                        id: target.id || null,
-                        class: target.className || null,
-                        name: target.name || null,
-                        type: target.type || null,
-                        previousValue: prevValue,
-                        newValue: target.value || ''
-                    });
+            if (e.target.type === 'password') return;
+            
+            clearTimeout(timers[e.target.name]);
+            timers[e.target.name] = setTimeout(() => {
+                sendActivity({
+                    action: 'input_change',
+                    element: e.target.tagName,
+                    name: e.target.name || null,
+                    type: e.target.type || 'text',
+                    value: (e.target.value || '').substring(0, 200)
                 });
-            }
+            }, 500);
         };
     })();
     
-    document.addEventListener('focus', inputTracker, true);
+    document.addEventListener('input', inputChangeTracker);
 
-    // Track copy, paste, cut
-    ['copy', 'paste', 'cut'].forEach(event => {
+    // Track copy/paste actions
+    ['copy', 'paste'].forEach(event => {
         document.addEventListener(event, function(e) {
-            const text = (event === 'paste') ? 
-                (e.clipboardData || window.clipboardData).getData('text') :
-                window.getSelection().toString();
+            const text = event === 'paste' 
+                ? (e.clipboardData || window.clipboardData).getData('text')
+                : window.getSelection().toString();
                 
-            sendActivity(event, {
-                text: text.substring(0, 1000),
-                targetId: e.target.id || null,
-                targetClass: e.target.className || null
+            sendActivity({
+                action: event,
+                text: text.substring(0, 200),
+                target: e.target.tagName,
+                targetId: e.target.id || null
             });
         });
     });
 
-    // Track tab/window visibility changes
-    document.addEventListener('visibilitychange', function() {
-        sendActivity('visibility_change', {
-            isVisible: !document.hidden,
-            timeHidden: document.hidden ? new Date().toISOString() : null
-        });
-    });
-
-    // Track beforeunload (page exit)
+    // Track page exit events
     window.addEventListener('beforeunload', function() {
-        navigator.sendBeacon('track_activity.php', JSON.stringify({
+        sendActivity({
             action: 'page_exit',
-            page: window.location.pathname,
-            timestamp: new Date().toISOString()
-        }));
-    });
-
-    // Detect password manager autofill
-    setInterval(function() {
-        document.querySelectorAll('input[type="password"]').forEach(pwd => {
-            if (pwd.value && !pwd.hasAttribute('data-tracked-autofill')) {
-                pwd.setAttribute('data-tracked-autofill', 'true');
-                sendActivity('password_autofill', {
-                    fieldId: pwd.id || null,
-                    fieldName: pwd.name || null
-                });
-            }
+            timeOnPage: performance.now() / 1000
         });
-    }, 1000);
-
-    // Track key events (with filtering for sensitive inputs)
-    document.addEventListener('keydown', function(e) {
-        const target = e.target;
-        const isSensitive = target.type === 'password' || 
-                          target.type === 'email' || 
-                          target.type === 'tel' || 
-                          target.type === 'number';
-        
-        if (!isSensitive) {
-            sendActivity('keydown', {
-                key: e.key,
-                code: e.code,
-                targetTag: target.tagName,
-                targetId: target.id || null
-            });
-        }
     });
-});
+
+    // Track navigation
+    window.addEventListener('popstate', function() {
+        sendActivity({
+            action: 'navigation',
+            from: document.referrer,
+            to: window.location.href
+        });
+    });
+
+    // Heartbeat for session tracking
+    setInterval(() => {
+        sendActivity({
+            action: 'heartbeat',
+            timeOnPage: performance.now() / 1000
+        });
+    }, 300000); // Every 5 minutes
+})();

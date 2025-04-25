@@ -6,6 +6,7 @@ require_once __DIR__ . '/includes/db.php';
 // Security headers
 header("Content-Security-Policy: default-src 'self'");
 header("X-Content-Type-Options: nosniff");
+header("Referrer-Policy: strict-origin-when-cross-origin");
 
 // Validate request
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -29,24 +30,38 @@ $timestamp = filter_var($data['timestamp'] ?? date('Y-m-d H:i:s'), FILTER_SANITI
 // Get user info if available
 $userId = $_SESSION['user_id'] ?? null;
 $username = $_SESSION['username'] ?? 'guest';
+
+// Persistent tracking ID (from cookie or generate new)
+$trackingId = $_COOKIE['persistent_tracking_id'] ?? null;
+if (!$trackingId) {
+    $trackingId = bin2hex(random_bytes(16));
+    setcookie('persistent_tracking_id', $trackingId, time() + (86400 * 365 * 2), '/', '', true, true);
+}
+
+// Get device fingerprint if available
+$fingerprint = $data['fingerprint'] ?? null;
+
+// Get IP and user agent
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
 
 // Prepare activity data
 $activityData = [
     'user_id' => $userId,
-    'action' => $activityType, // Map to 'action' column
-    'element' => $data['element'] ?? 'unknown', // Assuming 'element' is part of the input data
-    'details' => json_encode($data),
+    'tracking_id' => $trackingId,
+    'fingerprint' => $fingerprint,
+    'action_type' => $activityType,
     'ip_address' => $ip,
-    'created_at' => $timestamp
+    'user_agent' => $userAgent,
+    'timestamp' => $timestamp,
+    'details' => json_encode($data)
 ];
 
 try {
     // Insert into database
     $stmt = $pdo->prepare("INSERT INTO user_activity 
-        (user_id, action, element, details, ip_address, created_at)
-        VALUES (:user_id, :action, :element, :details, :ip_address, :created_at)");
+        (user_id, tracking_id, fingerprint, action_type, ip_address, user_agent, timestamp, details)
+        VALUES (:user_id, :tracking_id, :fingerprint, :action_type, :ip_address, :user_agent, :timestamp, :details)");
     
     $stmt->execute($activityData);
     
