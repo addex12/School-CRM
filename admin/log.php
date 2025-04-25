@@ -6,7 +6,7 @@ require_once '../includes/config.php';
 require_once '../includes/db.php';
 
 // Enhanced admin verification with IP whitelisting
-requireAdminWithIPCheck(); 
+requireAdmin(); 
 
 // Configuration
 $logFiles = [
