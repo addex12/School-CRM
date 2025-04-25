@@ -133,7 +133,7 @@ if ($errorLogPath && is_readable($errorLogPath)) {
 
 // Parse activity logs for the table
 $activityLogs = [];
-$logFilePath = realpath(__DIR__ . '/../logs/raw_activity.log'); // Assuming logs are stored in this file
+$logFilePath = realpath(__DIR__ . '/../logs/user_activity.log'); // Assuming logs are stored in this file
 if ($logFilePath && is_readable($logFilePath)) {
     $lines = file($logFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
