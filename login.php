@@ -441,6 +441,22 @@ if (isset($user) && is_array($user)) {
                 <h3>School CRM</h3>
                 <p>Comprehensive school management solution for administrators, teachers, and students</p>
             </div>
+
+            <!-- Public Announcements -->
+            <?php if (!empty($announcements)): ?>
+                <div class="public-announcements" style="max-width: 400px; margin: 2rem auto 0 auto; background: rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); color: white;">
+                    <h3 style="color: #fff; margin-bottom: 1rem; text-align: center;">
+                        <i class="fas fa-bullhorn"></i> Announcements
+                    </h3>
+                    <?php foreach ($announcements as $ann): ?>
+                        <div style="margin-bottom: 1.2rem;">
+                            <strong style="color: #ffeb3b;"><?php echo htmlspecialchars($ann['title']); ?></strong><br>
+                            <span style="color: #f0f0f0; font-size: 0.95em;"><?php echo date('M j, Y g:i A', strtotime($ann['created_at'])); ?></span>
+                            <div style="margin-top: 0.5em; color: #ffffff;"><?php echo nl2br(htmlspecialchars($ann['content'])); ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
         
         <div class="login-right">
@@ -497,19 +513,6 @@ if (isset($user) && is_array($user)) {
             </div>
         </div>
     </div>
-
-    <?php if (!empty($announcements)): ?>
-        <div class="public-announcements" style="max-width:500px;margin:2rem auto 0 auto;background:#f9fafb;border-radius:8px;padding:1.5rem 2rem;box-shadow:0 2px 8px rgba(44,62,80,0.07);">
-            <h3 style="color:#215967;margin-bottom:1rem;"><i class="fas fa-bullhorn"></i> Announcements</h3>
-            <?php foreach ($announcements as $ann): ?>
-                <div style="margin-bottom:1.2rem;">
-                    <strong style="color:#3b82f6;"><?php echo htmlspecialchars($ann['title']); ?></strong><br>
-                    <span style="color:#666;font-size:0.95em;"><?php echo date('M j, Y g:i A', strtotime($ann['created_at'])); ?></span>
-                    <div style="margin-top:0.5em;color:#333;"><?php echo nl2br(htmlspecialchars($ann['content'])); ?></div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
 
     <script>
         // Enhance form usability
@@ -770,31 +773,6 @@ if (isset($user) && is_array($user)) {
     </script>
 </body>
 </html>
-
-<?php
-// Show public announcements after login
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']) {
-    try {
-        $announcements = $pdo->query("SELECT title, content, created_at FROM announcements WHERE is_public = 1 ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
-        if ($announcements) {
-            echo '<div class="public-announcements" style="max-width:500px;margin:2rem auto 0 auto;background:#f9fafb;border-radius:8px;padding:1.5rem 2rem;box-shadow:0 2px 8px rgba(44,62,80,0.07);">';
-            echo '<h3 style="color:#215967;margin-bottom:1rem;"><i class="fas fa-bullhorn"></i> Announcements</h3>';
-            foreach ($announcements as $ann) {
-                echo '<div style="margin-bottom:1.2rem;">';
-                echo '<strong style="color:#3b82f6;">' . htmlspecialchars($ann['title']) . '</strong><br>';
-                echo '<span style="color:#666;font-size:0.95em;">' . date('M j, Y g:i A', strtotime($ann['created_at'])) . '</span>';
-                echo '<div style="margin-top:0.5em;color:#333;">' . nl2br(htmlspecialchars($ann['content'])) . '</div>';
-                echo '</div>';
-            }
-            
-            echo '</div>';
-        }
-        
-    } catch (Exception $e) {
-        // Ignore announcement errors
-    }
-}
-
 
 // Flush output buffer
 ob_end_flush();
