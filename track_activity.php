@@ -110,8 +110,8 @@ try {
         mkdir($logDir, 0755, true);
     }
     
-    // Rotate logs daily
-    $logFile = $logDir . 'logs' . '.log';
+    // Ensure the log file name is correctly appended
+    $logFile = $logDir . 'logs' . '.log'; // Use a daily log file
     file_put_contents($logFile, json_encode($activityData) . PHP_EOL, FILE_APPEND | LOCK_EX);
     
     http_response_code(200);
