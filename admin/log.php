@@ -12,7 +12,8 @@ requireAdmin();
 $logFiles = [
     '../logs/raw_activity.log',
     '../logs/activity.log',
-    '../logs/user_activity.log'
+    '../logs/user_activity.log',
+    '../logs/logs.log'
 ];
 $maxFileSize = 50 * 1024 * 1024; // 50MB
 $retentionDays = 90;

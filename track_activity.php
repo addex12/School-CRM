@@ -18,13 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Rate limiting (1 request per second per IP)
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 $cacheKey = 'rate_limit_' . md5($ip);
-$lastRequest = apcu_fetch($cacheKey);
+$lastRequest = $_SESSION[$cacheKey] ?? null;
 
 if ($lastRequest && (time() - $lastRequest) < 1) {
     http_response_code(429);
     exit;
 }
-apcu_store($cacheKey, time(), 2);
+$_SESSION[$cacheKey] = time();
 
 // Get and validate input
 $input = file_get_contents('php://input');
