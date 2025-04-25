@@ -66,15 +66,14 @@ try {
     $stmt->execute($activityData);
     
     // Also log to file for redundancy
-    $logDir = __DIR__ . '/log/';
+    $logDir = __DIR__ . '/logs';
     if (!is_dir($logDir)) {
         mkdir($logDir, 0755, true);
     }
     
-    $logFile = $logDir . 'logs.log';
+    $logFile = $logDir . '/logs_' . '.log';
     file_put_contents($logFile, json_encode($activityData) . PHP_EOL, FILE_APPEND | LOCK_EX);
-    file_put_contents($logDir . '/raw_activity.log', $entry, FILE_APPEND | LOCK_EX);
-
+    
     http_response_code(200);
     echo 'OK';
 } catch (PDOException $e) {
