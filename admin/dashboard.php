@@ -131,22 +131,25 @@ if ($errorLogPath && is_readable($errorLogPath)) {
     $errorLogLines = array_slice($lines, -20);
 }
 
-// Parse log data for display
-$logData = [];
-$logFilePath = realpath(__DIR__ . '/../logs/activity.log'); // Adjust path as needed
+// Parse activity logs for the table
+$activityLogs = [];
+$logFilePath = realpath(__DIR__ . '/../logs/activity.log'); // Assuming logs are stored in this file
 if ($logFilePath && is_readable($logFilePath)) {
     $lines = file($logFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
-        preg_match('/^\[(.*?)\] (.*?): (.*)$/', $line, $matches);
+        preg_match('/\[(.*?)\] (.*?): (.*)/', $line, $matches);
         if (count($matches) === 4) {
-            $logData[] = [
+            $activityLogs[] = [
                 'timestamp' => $matches[1],
                 'action' => $matches[2],
-                'details' => $matches[3],
+                'details' => $matches[3]
             ];
         }
     }
 }
+
+// Limit the number of logs displayed
+$activityLogs = array_slice($activityLogs, -20);
 
 // Fetch survey participation stats for chart
 $surveyStats = [];
@@ -409,7 +412,6 @@ try {
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                    <a href="#logTable" class="quick-link"><i class="fas fa-file-alt"></i><span>View Logs</span></a>
                 </div>
 
                 <!-- Widgets Section -->
@@ -499,6 +501,37 @@ try {
                     </div>
                 </div>
 
+                <!-- User Activity Logs Section -->
+                <div class="dashboard-section">
+                    <h2>User Activity Logs</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($activityLogs)): ?>
+                                    <?php foreach ($activityLogs as $log): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($log['timestamp']) ?></td>
+                                            <td><?= htmlspecialchars($log['action']) ?></td>
+                                            <td><?= htmlspecialchars($log['details']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3">No activity logs found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Feedback Section -->
                 <div class="dashboard-section">
                     <h2>Recent Feedback</h2>
@@ -572,37 +605,6 @@ try {
                         </table>
                     </div>
                 </div>
-
-                <!-- Log Table Section -->
-                <div class="dashboard-section" id="logTable">
-                    <h2>Activity Logs</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Action</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($logData)): ?>
-                                    <?php foreach ($logData as $log): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($log['timestamp']) ?></td>
-                                            <td><?= htmlspecialchars($log['action']) ?></td>
-                                            <td><?= htmlspecialchars($log['details']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="3">No logs available.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
         </div>
         <?php include 'includes/footer.php'; ?>
@@ -663,7 +665,7 @@ try {
                         labels: <?= json_encode(array_keys($ticketStatus)) ?>,
                         datasets: [{
                             label: 'Tickets',
-                            data: <?= json_encode(array.values($ticketStatus)) ?>,
+                            data: <?= json_encode(array_values($ticketStatus)) ?>,
                             backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
                         }]
                     },
