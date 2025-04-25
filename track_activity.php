@@ -66,12 +66,12 @@ try {
     $stmt->execute($activityData);
     
     // Also log to file for redundancy
-    $logDir = __DIR__ . '/log/logs.log';
+    $logDir = __DIR__ . '/log/';
     if (!is_dir($logDir)) {
         mkdir($logDir, 0755, true);
     }
     
-    $logFile = $logDir . '/' . date('Y-m-d') . '.log';
+    $logFile = $logDir . '/logs.log';
     file_put_contents($logFile, json_encode($activityData) . PHP_EOL, FILE_APPEND | LOCK_EX);
     
     http_response_code(200);
