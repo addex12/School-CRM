@@ -67,7 +67,7 @@ $activityData = [
     'device_data' => json_encode($deviceData),
     'details' => json_encode($data),
     'is_mobile' => $data['is_mobile'] ?? false,
-    'app_foreground' => $data['app_state'] === 'foreground' ?? true,
+    'app_foreground' => ($data['app_state'] ?? null) === 'foreground', // Safely handle undefined key
     'battery_level' => $data['battery'] ?? null
 ];
 
