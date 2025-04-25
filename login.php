@@ -776,7 +776,5 @@ if (isset($user) && is_array($user)) {
 </body>
 </html>
 
-// Flush output buffer
-ob_end_flush();
-?>
+
 <script src="../includes/activity-tracker.js"></script>
