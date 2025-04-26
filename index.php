@@ -40,6 +40,18 @@ try {
     header("Location: error.php");
     exit();
 }
+
+// Redirect based on user role
+if ($user['role_name'] === 'admin') {
+    header("Location: admin/dashboard.php");
+    exit();
+} elseif ($user['role_name'] === 'user') {
+    header("Location: user/dashboard.php");
+    exit();
+} else {
+    header("Location: error.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
