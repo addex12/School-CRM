@@ -61,6 +61,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Edit Ticket - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <style>
+        .erpnext-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .erpnext-btn {
+            background: #f5f7fa;
+            color: #36414c;
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .erpnext-btn.btn-primary {
+            background: #007bfc;
+            color: #fff;
+            border-color: #007bfc;
+        }
+        .erpnext-btn.btn-primary:hover {
+            background: #0056b3;
+            color: #fff;
+        }
+        .erpnext-btn.btn-secondary {
+            background: #f5f7fa;
+            color: #36414c;
+            border-color: #d1d8dd;
+        }
+        .erpnext-btn.btn-secondary:hover {
+            background: #e4e8ec;
+        }
+        @media (max-width: 600px) {
+            .erpnext-card {
+                padding: 1rem;
+            }
+            .erpnext-btn {
+                padding: 6px 12px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -70,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h1>Edit Ticket</h1>
             </header>
             <div class="content">
-                <div class="dashboard-section" style="max-width:500px;">
+                <div class="erpnext-card" style="max-width:500px; margin:auto;">
                     <?php if ($error): ?>
                         <div style="color:#e74c3c;"><?= htmlspecialchars($error) ?></div>
                     <?php endif; ?>
@@ -111,14 +159,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 ?>
                             </select>
                         </div>
-                        <button type="submit" class="btn" style="background:#3498db;color:#fff;">Update Ticket</button>
-                        <a href="support_tickets.php" class="btn" style="background:#aaa;color:#fff;margin-left:10px;">Cancel</a>
+                        <button type="submit" class="erpnext-btn btn-primary">Update Ticket</button>
+                        <a href="support_tickets.php" class="erpnext-btn btn-secondary">Cancel</a>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
