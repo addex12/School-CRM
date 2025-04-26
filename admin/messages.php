@@ -176,6 +176,37 @@ foreach ($admins as $a) {
             font-weight: 600;
             flex-shrink: 0; /* Prevent shrinking */
         }
+        .chat-message {
+            margin-bottom: 7px;
+            padding: 9px 14px;
+            border-radius: 18px;
+            max-width: 85%;
+            word-break: break-word;
+            font-size: 0.97em;
+            box-shadow: 0 1px 2px rgba(44,62,80,0.07);
+            position: relative;
+            clear: both;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 1; /* Allow shrinking */
+            flex-grow: 1; /* Allow growing */
+            min-width: 150px; /* Minimum width for readability */
+            max-width: 100%; /* Ensure it adapts to screen size */
+        }
+        .chat-message strong {
+            font-size: 0.95em;
+            color: #007bff;
+            font-weight: 600;
+            margin-bottom: 2px;
+            white-space: normal; /* Allow wrapping for names */
+            overflow-wrap: break-word; /* Ensure wrapping for long names */
+        }
+        .chat-message p {
+            margin: 0;
+            word-wrap: break-word; /* Wrap long words */
+            overflow-wrap: break-word; /* Ensure wrapping for long text */
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+        }
         @media (max-width: 900px) {
             .contact-list {
                 width: 100%;
