@@ -174,7 +174,7 @@ foreach ($admins as $a) {
             display: flex;
             flex-direction: column;
             min-width: 0;
-            border-radius: 0 8px 8px 0;
+            border-radius: 0 20px 20px 0;
             background: #eaeff7;
             box-shadow: 0 1px 3px rgba(44,62,80,0.04);
         }
@@ -305,7 +305,7 @@ foreach ($admins as $a) {
                 min-width: 0;
             }
             .chat-messages {
-                padding: 20px;
+                padding: 8px;
             }
             .message-form {
                 padding: 8px;
