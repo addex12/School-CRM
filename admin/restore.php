@@ -191,28 +191,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
     </style>
 </head>
 <body>
-    <div class="restore-container">
-        <div class="restore-header">
-            <h1><i class="fas fa-database"></i> Restore Backup</h1>
-            <a href="backup.php" class="btn"><i class="fas fa-arrow-left"></i> Back to Backup</a>
-        </div>
-        <form method="POST">
-            <div class="restore-card">
-                <h2>Select Backup File</h2>
-                <p>Choose a backup file to restore your system.</p>
-                <input type="text" name="backup_file" placeholder="Enter backup file name" required>
-                <button type="submit" name="restore_backup" class="btn">
-                    <i class="fas fa-upload"></i> Restore
-                </button>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <div class="restore-container">
+                <div class="restore-header">
+                    <h1><i class="fas fa-database"></i> Restore Backup</h1>
+                    <a href="backup.php" class="btn"><i class="fas fa-arrow-left"></i> Back to Backup</a>
+                </div>
+                <form method="POST">
+                    <div class="restore-card">
+                        <h2>Select Backup File</h2>
+                        <p>Choose a backup file to restore your system.</p>
+                        <input type="text" name="backup_file" placeholder="Enter backup file name" required>
+                        <button type="submit" name="restore_backup" class="btn">
+                            <i class="fas fa-upload"></i> Restore
+                        </button>
+                    </div>
+                </form>
+                <div class="restore-card">
+                    <h2>Restore Progress</h2>
+                    <div class="progress-bar">
+                        <div class="progress" id="progress"></div>
+                    </div>
+                    <p id="progress-message" style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f8c8d;">No progress yet.</p>
+                </div>
             </div>
-        </form>
-        <div class="restore-card">
-            <h2>Restore Progress</h2>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
-            </div>
-            <p id="progress-message" style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f8c8d;">No progress yet.</p>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
     <script>
         (function() {
