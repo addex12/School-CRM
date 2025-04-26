@@ -1,0 +1,58 @@
+{
+    "widgets": [
+        {
+            "title": "Total Users",
+            "icon": "fa-users",
+            "color": "blue",
+            "query": "SELECT COUNT(*) FROM users"
+        },
+        {
+            "title": "Students",
+            "icon": "fa-user-graduate",
+            "color": "purple",
+            "query": "SELECT COUNT(*) FROM students"
+        },
+        {
+            "title": "Teachers",
+            "icon": "fa-chalkboard-teacher",
+            "color": "teal",
+            "query": "SELECT COUNT(*) FROM teachers"
+        },
+        {
+            "title": "Parents",
+            "icon": "fa-user-friends",
+            "color": "yellow",
+            "query": "SELECT COUNT(*) FROM parents"
+        },
+        {
+            "title": "Active Surveys",
+            "icon": "fa-poll",
+            "color": "green",
+            "query": "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
+        },
+        {
+            "title": "Feedback",
+            "icon": "fa-comments",
+            "color": "orange",
+            "query": "SELECT COUNT(*) FROM feedback"
+        },
+        {
+            "title": "Open Tickets",
+            "icon": "fa-ticket-alt",
+            "color": "red",
+            "query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
+        },
+        {
+            "title": "Completed Tickets",
+            "icon": "fa-check-circle",
+            "color": "green",
+            "query": "SELECT COUNT(*) FROM support_tickets WHERE status = 'completed'"
+        },
+        {
+            "title": "Messages",
+            "icon": "fa-envelope",
+            "color": "blue",
+            "query": "SELECT COUNT(*) FROM messages"
+        }
+    ]
+}

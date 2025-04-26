@@ -24,62 +24,14 @@ if (!isset($pdo) || !$pdo) {
 }
 
 // School CRM Dashboard widgets (revamped)
-$widgets = [
-    [
-        "title" => "Total Users",
-        "icon" => "fa-users",
-        "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM users"
-    ],
-    [
-        "title" => "Students",
-        "icon" => "fa-user-graduate",
-        "color" => "purple",
-        "query" => "SELECT COUNT(*) FROM students"
-    ],
-    [
-        "title" => "Teachers",
-        "icon" => "fa-chalkboard-teacher",
-        "color" => "teal",
-        "query" => "SELECT COUNT(*) FROM teachers"
-    ],
-    [
-        "title" => "Parents",
-        "icon" => "fa-user-friends",
-        "color" => "yellow",
-        "query" => "SELECT COUNT(*) FROM parents"
-    ],
-    [
-        "title" => "Active Surveys",
-        "icon" => "fa-poll",
-        "color" => "green",
-        "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
-    ],
-    [
-        "title" => "Feedback",
-        "icon" => "fa-comments",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM feedback"
-    ],
-    [
-        "title" => "Open Tickets",
-        "icon" => "fa-ticket-alt",
-        "color" => "red",
-        "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
-    ],
-    [
-        "title" => "Completed Tickets", // Replacing the duplicate card
-        "icon" => "fa-check-circle",
-        "color" => "green",
-        "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'completed'"
-    ],
-    [
-        "title" => "Messages",
-        "icon" => "fa-envelope",
-        "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM messages"
-    ]
-];
+$dashboardConfigPath = realpath(__DIR__ . '/../config/dashboard.json');
+if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
+    $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
+    $widgets = $dashboardConfig['widgets'] ?? [];
+} else {
+    error_log("Dashboard configuration file not found or unreadable.");
+    $widgets = [];
+}
 
 foreach ($widgets as &$widget) {
     try {
