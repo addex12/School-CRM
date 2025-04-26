@@ -355,6 +355,7 @@ foreach ($admins as $a) {
                                         <?= htmlspecialchars($user['username']) ?>
                                     </span>
                                     <?php if ($hasUnread): ?>
+                                        <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                     <?php endif; ?>
                                 </li>
                             <?php endforeach; ?>
@@ -378,7 +379,6 @@ foreach ($admins as $a) {
                         </div>
                         <div id="chat-messages" class="chat-messages"></div>
                         <form id="message-form" class="message-form" style="display:none;">
-                            <input type="hidden" name="receiver_id" id="receiver_id">
                             <textarea name="message" id="message-input" rows="2" placeholder="Type your message..." required></textarea>
                             <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i></button>
                         </form>
