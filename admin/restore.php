@@ -116,23 +116,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
             margin-bottom: 1rem;
         }
         .restore-header h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             color: #34495e;
             margin: 0;
         }
         .restore-header .btn {
-            font-size: 0.9rem;
-            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
         }
         .restore-card {
-            background: #f9f9f9;
+            background: #f8f9fa;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             padding: 1rem;
             margin-bottom: 1rem;
         }
         .restore-card h2 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #34495e;
             margin: 0 0 0.5rem 0;
         }
@@ -144,6 +144,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
         .restore-card .btn {
             font-size: 0.8rem;
             padding: 0.3rem 0.6rem;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .restore-card .btn:hover {
+            background: #217dbb;
         }
         .progress-bar {
             width: 100%;
