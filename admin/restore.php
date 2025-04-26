@@ -219,7 +219,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
             </div>
         </div>
     </div>
-     <?php include 'includes/footer.php'; ?>
+            <?php include 'includes/footer.php'; ?>
+
     <script>
         (function() {
             const progressBar = document.getElementById('progress');
