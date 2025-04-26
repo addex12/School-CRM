@@ -95,99 +95,121 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .events-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
+    .events-container {
+        max-width: 100%; /* Allow full width */
+        margin: 0 auto;
+        padding: 1rem;
+        box-sizing: border-box; /* Include padding in width calculations */
+    }
+    .events-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    }
+    .events-header h1 {
+        font-size: 1.8rem;
+        color: #34495e;
+        margin-bottom: 0.5rem; /* Add spacing for smaller screens */
+    }
+    .btn {
+        background: #007bfc;
+        color: #fff;
+        border: none;
+        padding: 0.4rem 0.8rem;
+        border-radius: 4px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: background 0.18s, transform 0.18s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+    .btn:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    }
+    .events-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+        gap: 1rem;
+    }
+    .event-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    .event-card input, .event-card textarea, .event-card button {
+        font-size: 0.9rem;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%; /* Ensure inputs take full width */
+        box-sizing: border-box;
+    }
+    .event-card .actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+    }
+    .event-card .actions button {
+        flex: 1;
+    }
+    .event-form {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 1rem;
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+    .event-form .form-group {
+        margin-bottom: 1rem;
+    }
+    .event-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    .event-form input, .event-form textarea {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    @media (max-width: 768px) {
         .events-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .events-header h1 {
-            font-size: 1.8rem;
-            color: #34495e;
-        }
-        .btn {
-            background: #007bfc;
-            color: #fff;
-            border: none;
-            padding: 0.4rem 0.8rem; /* Smaller padding */
-            border-radius: 4px; /* Slightly smaller border radius */
-            font-weight: 500;
-            font-size: 0.9rem; /* Reduced font size */
-            transition: background 0.18s, transform 0.18s;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn:hover {
-            background: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Slightly reduced shadow */
+            flex-direction: column;
+            align-items: flex-start;
         }
         .event-card {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 0.8rem;
         }
-        .event-card form {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+        .event-card h2 {
+            font-size: 1rem;
         }
-        .event-card input, .event-card textarea, .event-card button {
+        .event-card p {
             font-size: 0.9rem;
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
         }
-        .event-card button {
-            background: #007bfc;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: background 0.2s;
+    }
+    @media (max-width: 480px) {
+        .btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
         }
-        .event-card button:hover {
-            background: #0056b3;
+        .event-card {
+            padding: 0.6rem;
         }
-        .event-card .actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-        .event-card .actions button {
-            flex: 1;
-        }
-        @media (max-width: 768px) {
-            .events-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-            .event-card {
-                padding: 0.8rem;
-            }
-            .event-card h2 {
-                font-size: 1rem;
-            }
-            .event-card p {
-                font-size: 0.9rem;
-            }
-        }
-        @media (max-width: 480px) {
-            .btn {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-            }
-        }
+    }
     </style>
 </head>
 <body>
