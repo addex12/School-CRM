@@ -417,6 +417,9 @@ nav a.active {
 
 /* Chat header */
 .chat-header {
+    flex: 1;
+    display: flex;
+    align-items: center;
     padding: 15px;
     border-bottom: 1px solid #ddd;
     background: #f8f9fa;
