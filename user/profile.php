@@ -338,7 +338,7 @@ function sendPasswordChangeNotification($email) {
             <div class="profile-avatar">
                 <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
                      alt="Profile Picture"
-                     onerror="this.src='../uploads/avatars/default.jpg'">
+                     onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
             </div>
             <div class="profile-info">
                 <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
@@ -443,4 +443,3 @@ function sendPasswordChangeNotification($email) {
 </body>
 </html>
 
-<?php ob_end_flush(); ?>
