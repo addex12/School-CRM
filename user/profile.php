@@ -442,6 +442,5 @@ function sendPasswordChangeNotification($email) {
 <script src="../includes/activity-tracker.js"></script>
 </body>
 </html>
-<?php
-exit;
-?>
+
+<?php ob_end_flush(); ?>
