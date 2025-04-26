@@ -412,13 +412,6 @@ $paginatedEntries = array_slice($allEntries, ($page - 1) * $perPage, $perPage);
             margin-bottom: 20px;
         }
         
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
         }
         
         .stat-card-header {
@@ -583,20 +576,115 @@ $paginatedEntries = array_slice($allEntries, ($page - 1) * $perPage, $perPage);
                 </button>
             </div>
         </div>
-
-        <!-- Pagination Controls -->
-        <div class="pagination-controls">
-            <p>Page <?php echo $page; ?> of <?php echo $totalPages; ?></p>
-            <div>
-                <?php if ($page > 1): ?>
-                    <a href="?page=<?php echo $page - 1; ?>" class="action-btn btn-secondary">Previous</a>
-                <?php endif; ?>
-                <?php if ($page < $totalPages): ?>
-                    <a href="?page=<?php echo $page + 1; ?>" class="action-btn btn-secondary">Next</a>
-                <?php endif; ?>
+        
+        <!-- Statistics Cards -->
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-card-title">Total Events</span>
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-card-value"><?php echo count($allEntries); ?></div>
+                <div class="stat-card-footer">Last 24h: <?php echo count(array_filter($allEntries, function($e) {
+                    return strtotime($e['timestamp']) > strtotime('-24 hours');
+                })); ?></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-card-title">Critical Risks</span>
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="stat-card-value" style="color: var(--critical);">
+                    <?php echo count(array_filter($allEntries, function($e) {
+                        return $e['risk_level'] === 'Critical';
+                    })); ?>
+                </div>
+                <div class="stat-card-footer">Requires immediate attention</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-card-title">Login Attempts</span>
+                    <i class="fas fa-sign-in-alt"></i>
+                </div>
+                <div class="stat-card-value">
+                    <?php echo count(array_filter($allEntries, function($e) {
+                        return $e['type'] === 'Login Attempt';
+                    })); ?>
+                </div>
+                <div class="stat-card-footer">Failed: <?php echo count(array_filter($allEntries, function($e) {
+                    return $e['type'] === 'Login Attempt' && $e['status'] === 'Attempted';
+                })); ?></div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <span class="stat-card-title">Password Exposures</span>
+                    <i class="fas fa-key"></i>
+                </div>
+                <div class="stat-card-value" style="color: var(--high);">
+                    <?php echo count(array_filter($allEntries, function($e) {
+                        return !empty($e['password']);
+                    })); ?>
+                </div>
+                <div class="stat-card-footer">Including autofill events</div>
             </div>
         </div>
-
+        
+        <!-- Filter Controls -->
+        <div class="filter-container">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">Date Range</label>
+                    <input type="date" id="dateFrom" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">to</label>
+                    <input type="date" id="dateTo" class="filter-input">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Risk Level</label>
+                    <select id="riskLevel" class="filter-input">
+                        <option value="">All</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label class="filter-label">Event Type</label>
+                    <select id="eventType" class="filter-input">
+                        <option value="">All</option>
+                        <option value="Login Attempt">Login Attempt</option>
+                        <option value="Password Autofill">Password Autofill</option>
+                        <option value="Form Input">Form Input</option>
+                        <option value="Form Submission">Form Submission</option>
+                        <option value="Clipboard Copy">Clipboard Copy</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">IP Address</label>
+                    <input type="text" id="ipFilter" class="filter-input" placeholder="Filter by IP">
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Username</label>
+                    <input type="text" id="usernameFilter" class="filter-input" placeholder="Filter by username">
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button id="resetFilters" class="action-btn">
+                    <i class="fas fa-undo"></i> Reset
+                </button>
+                <button id="applyFilters" class="action-btn btn-info">
+                    <i class="fas fa-filter"></i> Apply Filters
+                </button>
+            </div>
+        </div>
+        
         <!-- Main Data Table -->
         <table id="securityTable" class="security-table display nowrap" style="width:100%">
             <thead>
@@ -614,7 +702,7 @@ $paginatedEntries = array_slice($allEntries, ($page - 1) * $perPage, $perPage);
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($paginatedEntries as $entry): ?>
+                <?php foreach ($allEntries as $entry): ?>
                 <tr class="risk-<?php echo strtolower($entry['risk_level']); ?>">
                     <td>
                         <?php echo !empty($entry['timestamp']) ? 
@@ -672,7 +760,31 @@ $paginatedEntries = array_slice($allEntries, ($page - 1) * $perPage, $perPage);
                 <?php endforeach; ?>
             </tbody>
         </table>
+        
+        <!-- Details Modal -->
+        <div id="detailsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Event Details</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div id="modalBody"></div>
+                <div class="timeline-container" id="relatedEvents">
+                    <h4>Related Events</h4>
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <script>
         $(document).ready(function() {
             // Initialize DataTable with enhanced features
