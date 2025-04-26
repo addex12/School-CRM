@@ -365,6 +365,7 @@ foreach ($admins as $a) {
                         <div class="message-card-header">
                             <span id="chat-header-title">
                                 <i class="fas fa-paper-plane" style="color:#007bff;margin-right:6px;"></i>
+                                <span id="chat-header-user">Select a user to start chatting</span>
                             </span>
                             <?php
                             $totalUnread = array_sum($unreadCounts);
@@ -378,6 +379,7 @@ foreach ($admins as $a) {
                         </div>
                         <div id="chat-messages" class="chat-messages"></div>
                         <form id="message-form" class="message-form" style="display:none;">
+                            <input type="hidden" name="receiver_id" id="receiver_id">
                             <textarea name="message" id="message-input" rows="2" placeholder="Type your message..." required></textarea>
                             <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i></button>
                         </form>
