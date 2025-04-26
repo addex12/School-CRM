@@ -29,7 +29,7 @@ try {
         throw new Exception("Database connection not established.");
     }
     $stmt = $pdo->prepare("
-        SELECT u.id, u.username, u.role_id, r.role_name 
+        SELECT u.id, u.username, u.email, u.first_name, u.last_name, u.role_id, u.last_active, u.online, u.active, u.avatar, r.role_name 
         FROM users u 
         LEFT JOIN roles r ON u.role_id = r.id 
         WHERE u.id = ?
@@ -40,6 +40,17 @@ try {
     if (!$user) {
         throw new Exception("User not found.");
     }
+
+    // Check if the user is active
+    if (!$user['active']) {
+        error_log("Inactive user attempted to log in: " . $user['username']);
+        header("Location: inactive.php");
+        exit();
+    }
+
+    // Update last active timestamp and online status
+    $updateStmt = $pdo->prepare("UPDATE users SET last_active = NOW(), online = 1 WHERE id = ?");
+    $updateStmt->execute([$user['id']]);
 } catch (Exception $e) {
     error_log("User data fetch error: " . $e->getMessage());
     header("Location: error.php");
@@ -47,21 +58,9 @@ try {
 }
 
 // Redirect based on role_id
-switch ($user['role_id']) {
-    case 1: // Admin role
-        header("Location: admin/dashboard.php");
-        break;
-    case 2: // Teacher role
-        header("Location: teacher/dashboard.php");
-        break;
-    case 3: // Student role
-        header("Location: student/dashboard.php");
-        break;
-    case 4: // Parent role
-        header("Location: parent/dashboard.php");
-        break;
-    default: // Unknown role
-        header("Location: error.php");
-        break;
+if ($user['role_id'] === 1) { // Admin role
+    header("Location: admin/dashboard.php");
+} else { // All other roles
+    header("Location: user/dashboard.php");
 }
 exit();
