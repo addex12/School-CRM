@@ -3,14 +3,6 @@ session_start();
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-if (!class_exists('Auth')) {
-    class Auth {
-        public static function isAdmin(): bool {
-            return isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true;
-        }
-    }
-}
-
 if (!Auth::isAdmin()) {
     header("Location: ../login.php");
     exit();
