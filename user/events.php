@@ -63,6 +63,7 @@ include 'includes/header.php';
                         <?= date('M j, Y g:i A', strtotime($event['start_date'])) ?> 
                         to <?= date('M j, Y g:i A', strtotime($event['end_date'])) ?>
                     </small>
+                    <p>Created At: <?= date('M j, Y g:i A', strtotime($event['created_at'])) ?></p>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
