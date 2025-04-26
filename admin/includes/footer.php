@@ -47,6 +47,7 @@
         display: flex;
         flex-direction: column;
         gap: 2px;
+        align-items: center; /* Center content for better responsiveness */
     }
     .footer-main-info {
         max-width: 220px;
@@ -72,23 +73,23 @@
         flex-wrap: wrap;
     }
     .footer-link {
-        color: #f5f6fa;
+        color: #fff;
         text-decoration: none;
         font-size: 12px;
         font-weight: 500;
-        transition: color 0.2s;
+        transition: all 0.2s ease-in-out;
         padding: 6px 14px;
         border-radius: 4px;
-        background: #2563eb;
+        background: #007bfc; /* Updated to match Frappe/Jinja design */
         margin-right: 4px;
-        border: 1px solid #215967;
-        box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+        border: none; /* Removed border */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
         display: inline-block;
     }
     .footer-link:hover {
-        color: #fff;
-        background: #215967;
-        text-decoration: none;
+        background: #0056b3; /* Darker shade for hover effect */
+        transform: translateY(-2px); /* Slight lift on hover */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
     }
     .developer-info {
         text-align: right;
@@ -125,25 +126,18 @@
         }
     }
     @media (max-width: 600px) {
-        .admin-footer {
-            padding: 10px 8px;
-            font-size: 12px;
-        }
-        .footer-main-info {
-            max-width: 100%;
-        }
-        .footer-section {
-            padding: 0 2px;
-        }
-        .quick-link-list {
-            gap: 10px;
-        }
-        .social-links {
-            gap: 8px;
-        }
         .footer-link {
             padding: 5px 10px;
             font-size: 11px;
+        }
+        .footer-section {
+            padding: 0 5px; /* Adjust padding for smaller screens */
+        }
+        .footer-main-info {
+            text-align: center; /* Center align text for smaller screens */
+        }
+        .quick-link-list {
+            justify-content: center; /* Center links for smaller screens */
         }
     }
 </style>
