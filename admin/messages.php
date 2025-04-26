@@ -224,28 +224,25 @@ foreach ($admins as $a) {
             clear: both;
             display: flex;
             flex-direction: column;
+            flex-shrink: 1; /* Allow shrinking */
+            flex-grow: 1; /* Allow growing */
+            min-width: 150px; /* Minimum width for readability */
+            max-width: 90%; /* Maximum width before wrapping */
         }
-        .chat-message.own {
-            background: #d1f7c4;
-            margin-left: auto;
-            color: #215967;
-            border-bottom-right-radius: 4px;
-            border-bottom-left-radius: 18px;
-            border-top-left-radius: 18px;
-            border-top-right-radius: 18px;
-            align-self: flex-end;
-            border: 1px solid #b2e59f;
+        .chat-message strong {
+            font-size: 0.95em;
+            color: #007bff;
+            font-weight: 600;
+            margin-bottom: 2px;
+            white-space: nowrap; /* Prevent wrapping for names */
+            overflow: hidden;
+            text-overflow: ellipsis; /* Add ellipsis for long names */
         }
-        .chat-message.other {
-            background: #fff;
-            margin-right: auto;
-            color: #222d32;
-            border-bottom-left-radius: 4px;
-            border-bottom-right-radius: 18px;
-            border-top-left-radius: 18px;
-            border-top-right-radius: 18px;
-            align-self: flex-start;
-            border: 1px solid #e0e0e0;
+        .chat-message p {
+            margin: 0;
+            word-wrap: break-word; /* Wrap long words */
+            overflow-wrap: break-word; /* Ensure wrapping for long text */
+            white-space: pre-wrap; /* Preserve whitespace and wrap text */
         }
         .msg-time {
             font-size: 10px;
@@ -253,12 +250,6 @@ foreach ($admins as $a) {
             margin-top: 2px;
             display: block;
             text-align: right;
-        }
-        .chat-message strong {
-            font-size: 0.95em;
-            color: #007bff;
-            font-weight: 600;
-            margin-bottom: 2px;
         }
         .edit-btn, .delete-btn {
             background: none;
