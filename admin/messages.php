@@ -352,9 +352,9 @@ foreach ($admins as $a) {
                                         <?php if ($isOnline): ?>
                                             <span class="online-dot"></span>
                                         <?php endif; ?>
+                                        <?= htmlspecialchars($user['username']) ?>
                                     </span>
                                     <?php if ($hasUnread): ?>
-                                        <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                     <?php endif; ?>
                                 </li>
                             <?php endforeach; ?>
