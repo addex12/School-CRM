@@ -60,15 +60,15 @@ try {
 
         <main>
             <div class="welcome-section">
-                <h1>Welcome, <?php echo htmlspecialchars($user['username']); ?></h1>
-                <p>Your role: <?php echo htmlspecialchars($user['role']); ?></p>
+                <h1>Welcome, <?php echo htmlspecialchars($user['username'] ?? 'Guest'); ?></h1>
+                <p>Your role: <?php echo htmlspecialchars($user['role'] ?? 'Unknown'); ?></p>
             </div>
 
             <div class="dashboard-content">
                 <div class="quick-actions">
                     <h2>Quick Actions</h2>
                     <div class="action-grid">
-                        <?php if ($user['role'] === 'admin'): ?>
+                        <?php if (($user['role'] ?? '') === 'admin'): ?>
                             <a href="admin/students.php" class="action-card">
                                 <i class="fas fa-users"></i>
                                 <span>Manage Students</span>
