@@ -1,42 +1,62 @@
 <?php
-include('../config.php'); // Include database connection
+session_start();
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/auth.php';
 
-$query = "SELECT * FROM events";
-$result = $conn->query($query);
+if (!Auth::isLoggedIn()) {
+    header("Location: ../login.php");
+    exit();
+}
+
+$pageTitle = "Manage Events";
+
+// Fetch events from the database
+try {
+    $stmt = $pdo->prepare("SELECT id, title, start_date, end_date, created_at FROM events ORDER BY start_date ASC");
+    $stmt->execute();
+    $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Error fetching events: " . $e->getMessage());
+    $events = [];
+}
+
+include 'includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Events</title>
-</head>
-<body>
-    <h1>Events</h1>
-    <a href="event-create.php">Create New Event</a>
-    <table border="1">
+<main>
+    <h1>Manage Events</h1>
+    <a href="event-create.php" class="btn btn-primary">Create New Event</a>
+    <table border="1" style="width: 100%; margin-top: 20px;">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Title</th>
-                <th>Description</th>
-                <th>Date</th>
+                <th>Start Date</th>
+                <th>End Date</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            <?php while ($event = $result->fetch_assoc()): ?>
+            <?php if (!empty($events)): ?>
+                <?php foreach ($events as $event): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($event['id']) ?></td>
+                        <td><?= htmlspecialchars($event['title']) ?></td>
+                        <td><?= date('M j, Y g:i A', strtotime($event['start_date'])) ?></td>
+                        <td><?= date('M j, Y g:i A', strtotime($event['end_date'])) ?></td>
+                        <td></td>
+                            <a href="event-edit.php?id=<?= $event['id'] ?>">Edit</a>
+                            <a href="event-delete.php?id=<?= $event['id'] ?>" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
                 <tr>
-                    <td><?php echo $event['id']; ?></td>
-                    <td><?php echo $event['title']; ?></td>
-                    <td><?php echo $event['description']; ?></td>
-                    <td><?php echo $event['date']; ?></td>
-                    <td>
-                        <a href="event-edit.php?id=<?php echo $event['id']; ?>">Edit</a>
-                        <a href="event-delete.php?id=<?php echo $event['id']; ?>" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
-                    </td>
+                    <td colspan="5">No events found.</td>
                 </tr>
-            <?php endwhile; ?>
+            <?php endif; ?>
         </tbody>
     </table>
-</body>
-</html>
+</main>
+
+<?php include 'includes/footer.php'; ?>

@@ -1,21 +1,28 @@
 <?php
-include('../config.php'); // Include database connection
+session_start();
+require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/../includes/auth.php';
 
-if (isset($_GET['id'])) {
-    $event_id = $_GET['id'];
+if (!Auth::isLoggedIn()) {
+    header("Location: ../login.php");
+    exit();
+}
 
-    $delete_query = "DELETE FROM events WHERE id = ?";
-    $stmt = $conn->prepare($delete_query);
-    $stmt->bind_param("i", $event_id);
+$event_id = $_GET['id'] ?? null;
 
-    if ($stmt->execute()) {
-        header("Location: events.php?message=Event deleted successfully");
-        exit();
-    } else {
-        echo "Error deleting event.";
-    }
-} else {
-    header("Location: events.php?message=Invalid event ID");
+if (!$event_id) {
+    header("Location: events.php?error=Invalid event ID");
+    exit();
+}
+
+try {
+    $stmt = $pdo->prepare("DELETE FROM events WHERE id = ?");
+    $stmt->execute([$event_id]);
+    header("Location: events.php?message=Event deleted successfully");
+    exit();
+} catch (Exception $e) {
+    error_log("Error deleting event: " . $e->getMessage());
+    header("Location: events.php?error=Failed to delete event");
     exit();
 }
 ?>
