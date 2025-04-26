@@ -4,13 +4,12 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Prevent access to .htaccess and other sensitive files
-<FilesMatch "^\.">
-    Require all denied
-</FilesMatch>
-
 # Ensure the default file loaded is index.php
 DirectoryIndex index.php
+
+# Prevent appending index.php to the URL
+RewriteCond %{REQUEST_URI} ^/index\.php$
+RewriteRule ^(.*)index\.php$ / [L,R=301]
 
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php82” package as the default “PHP” programming language.
