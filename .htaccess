@@ -1,19 +1,28 @@
 RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
 
-# Redirect all HTTP traffic to HTTPS
-RewriteCond %{HTTPS} !=on
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Force HTTPS (uncomment if using HTTPS)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Ensure the default file loaded is index.php
-DirectoryIndex index.php
+# Prevent directory listing
+Options -Indexes
 
-# Prevent appending index.php to the URL
-RewriteCond %{REQUEST_URI} ^/index\.php$
-RewriteRule ^(.*)index\.php$ / [L,R=301]
+# Set default charset
+AddDefaultCharset UTF-8
 
-# php -- BEGIN cPanel-generated handler, do not edit
-# Set the “ea-php82” package as the default “PHP” programming language.
-<IfModule mime_module>
-  AddHandler application/x-httpd-ea-php82 .php .php8 .phtml
+# Cache control
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/* "access plus 1 year"
 </IfModule>
-# php -- END cPanel-generated handler, do not edit
+
+# Protect sensitive files
+<FilesMatch "^(db\.php|config\.php|\.htaccess|\.env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
