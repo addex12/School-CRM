@@ -45,34 +45,34 @@ include 'includes/header.php';
     <!-- Upcoming Event Card -->
     <?php if (!empty($events)): ?>
         <?php $nextEvent = $events[0]; ?>
-        <div class="event-card">
-            <h2>Next Event</h2>
-            <h3><?= htmlspecialchars($nextEvent['title']) ?></h3>
-            <p>
+        <div class="event-card" style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+            <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Next Event</h2>
+            <h3 style="font-size: 1.25rem; margin-bottom: 8px;"><?= htmlspecialchars($nextEvent['title']) ?></h3>
+            <p style="font-size: 0.9rem; color: #555;">
                 <?= date('M j, Y g:i A', strtotime($nextEvent['start_date'])) ?> 
                 to <?= date('M j, Y g:i A', strtotime($nextEvent['end_date'])) ?>
             </p>
-            <a href="event-details.php?id=<?= $nextEvent['id'] ?>" class="btn-primary">View Details</a>
+            <a href="event-details.php?id=<?= $nextEvent['id'] ?>" class="btn-primary" style="display: inline-block; padding: 8px 16px; background-color: #007bff; color: #fff; text-decoration: none; border-radius: 4px; font-size: 0.9rem; text-align: center;">View Details</a>
         </div>
     <?php endif; ?>
 
-    <div id="calendar"></div>
+    <div id="calendar" style="margin-bottom: 16px;"></div>
 
     <div class="events-list">
-        <h2>Upcoming Events</h2>
+        <h2 style="font-size: 1.5rem; margin-bottom: 16px;">Upcoming Events</h2>
         <?php if (!empty($events)): ?>
             <?php foreach ($events as $event): ?>
-                <div class="event-item">
-                    <h3><?= htmlspecialchars($event['title']) ?></h3>
-                    <small>
+                <div class="event-item" style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                    <h3 style="font-size: 1.25rem; margin-bottom: 8px;"><?= htmlspecialchars($event['title']) ?></h3>
+                    <small style="font-size: 0.9rem; color: #555;">
                         <?= date('M j, Y g:i A', strtotime($event['start_date'])) ?> 
                         to <?= date('M j, Y g:i A', strtotime($event['end_date'])) ?>
                     </small>
-                    <p>Created At: <?= date('M j, Y g:i A', strtotime($event['created_at'])) ?></p>
+                    <p style="font-size: 0.9rem; color: #555;">Created At: <?= date('M j, Y g:i A', strtotime($event['created_at'])) ?></p>
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p>No upcoming events found.</p>
+            <p style="font-size: 0.9rem; color: #555;">No upcoming events found.</p>
         <?php endif; ?>
     </div>
 </main>
