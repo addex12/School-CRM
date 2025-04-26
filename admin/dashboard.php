@@ -27,7 +27,62 @@ if (!isset($pdo) || !$pdo) {
 $dashboardConfigPath = realpath(__DIR__ . '/../config/dashboard.json');
 if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
     $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
-    $widgets = $dashboardConfig['widgets'] ?? [];
+    $widgets = $dashboardConfig['widgets'] ?? [
+        [
+            "title" => "Total Users",
+            "icon" => "fa-users",
+            "color" => "blue",
+            "query" => "SELECT COUNT(*) FROM users"
+        ],
+        [
+            "title" => "Active Users",
+            "icon" => "fa-user-check",
+            "color" => "green",
+            "query" => "SELECT COUNT(*) FROM users WHERE status = 'active'"
+        ],
+        [
+            "title" => "Inactive Users",
+            "icon" => "fa-user-times",
+            "color" => "red",
+            "query" => "SELECT COUNT(*) FROM users WHERE status = 'inactive'"
+        ],
+        [
+            "title" => "Total Courses",
+            "icon" => "fa-book",
+            "color" => "purple",
+            "query" => "SELECT COUNT(*) FROM courses"
+        ],
+        [
+            "title" => "Enrolled Students",
+            "icon" => "fa-user-graduate",
+            "color" => "orange",
+            "query" => "SELECT COUNT(*) FROM course_enrollments"
+        ],
+        [
+            "title" => "New Feedback",
+            "icon" => "fa-comments",
+            "color" => "teal",
+            "query" => "SELECT COUNT(*) FROM feedback WHERE is_read = 0"
+        ],
+        [
+            "title" => "Open Tickets",
+            "icon" => "fa-ticket-alt",
+            "color" => "red",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
+        ],
+        [
+            "title" => "Completed Tickets",
+            "icon" => "fa-check-circle",
+            "color" => "green",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'completed'"
+        ],
+        [
+            "title" => "Pending Tickets", // Replacing the duplicate card
+            "icon" => "fa-clock",
+            "color" => "orange",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'pending'"
+        ],
+    ];
 } else {
     error_log("Dashboard configuration file not found or unreadable.");
     $widgets = [];
