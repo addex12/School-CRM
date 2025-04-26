@@ -15,7 +15,7 @@ $pageTitle = "Manage Events";
 
 // Fetch all events from the database
 try {
-    $stmt = $pdo->prepare("SELECT id, title, start_date, end_date, created_at FROM events ORDER BY start_date ASC");
+    $stmt = $pdo->prepare("SELECT id, title, start_date, end_date, description, created_at FROM events ORDER BY start_date ASC");
     $stmt->execute();
     $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
@@ -123,37 +123,24 @@ include 'includes/admin_sidebar.php';
                 <input type="text" id="searchInput" placeholder="Search events..." onkeyup="filterTable()">
             </div>
             <div class="card">
-                <?php if (!empty($events)): ?>
-                    <table class="table table-bordered" id="eventsTable">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($events as $event): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($event['title']) ?></td>
-                                    <td><?= date('M j, Y g:i A', strtotime($event['start_date'])) ?></td>
-                                    <td><?= date('M j, Y g:i A', strtotime($event['end_date'])) ?></td>
-                                    <td>
-                                        <a href="event-edit.php?id=<?= $event['id'] ?>" class="btn btn-secondary btn-sm">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
-                                        <a href="event-delete.php?id=<?= $event['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this event?');">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No events found.</p>
-                <?php endif; ?>
+                <div class="events-list">
+                    <h2 style="font-size: 1.5rem; margin-bottom: 16px;">All Events</h2>
+                    <?php if (!empty($events)): ?>
+                        <?php foreach ($events as $event): ?>
+                            <div class="event-item" style="border: 1px solid #ddd; border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                                <h3 style="font-size: 1.25rem; margin-bottom: 8px;"><?= htmlspecialchars($event['title']) ?></h3>
+                                <small style="font-size: 0.9rem; color: #555;">
+                                    <?= date('M j, Y g:i A', strtotime($event['start_date'])) ?> 
+                                    to <?= date('M j, Y g:i A', strtotime($event['end_date'])) ?>
+                                </small>
+                                <p style="font-size: 0.9rem; color: #555; margin-top: 8px;"><?= nl2br(htmlspecialchars($event['description'])) ?></p>
+                                <p style="font-size: 0.9rem; color: #555;">Created At: <?= date('M j, Y g:i A', strtotime($event['created_at'])) ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p style="font-size: 0.9rem; color: #555;">No events found.</p>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
 

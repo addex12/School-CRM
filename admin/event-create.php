@@ -4,13 +4,17 @@ require_once __DIR__ . '/../includes/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
+    $description = $_POST['description'];
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
     $user_id = $_SESSION['user_id']; // Assuming user_id is stored in the session
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO events (user_id, title, start_date, end_date, created_at) VALUES (?, ?, ?, ?, NOW())");
-        $stmt->execute([$user_id, $title, $start_date, $end_date]);
+        $stmt = $pdo->prepare("
+            INSERT INTO events (user_id, title, description, start_date, end_date, created_at) 
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([$user_id, $title, $description, $start_date, $end_date]);
         $_SESSION['success'] = "Event created successfully.";
         header("Location: events.php");
         exit();
@@ -46,6 +50,10 @@ include 'includes/admin_sidebar.php';
                 <div class="form-group">
                     <label for="title" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 600; color: #34495e;">Event Title</label>
                     <input type="text" id="title" name="title" class="form-control" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" required>
+                </div>
+                <div class="form-group">
+                    <label for="description" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 600; color: #34495e;">Description</label>
+                    <textarea id="description" name="description" rows="4" class="form-control" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" required></textarea>
                 </div>
                 <div class="form-group">
                     <label for="start_date" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 600; color: #34495e;">Start Date</label>
