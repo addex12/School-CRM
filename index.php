@@ -28,7 +28,7 @@ try {
         throw new Exception("Database connection not established.");
     }
     $stmt = $pdo->prepare("
-        SELECT u.*, r.role_name 
+        SELECT u.id, u.username, u.email, u.first_name, u.last_name, u.role_id, u.last_active, u.online, u.active, u.avatar, r.role_name 
         FROM users u 
         LEFT JOIN roles r ON u.role_id = r.id 
         WHERE u.id = ?
