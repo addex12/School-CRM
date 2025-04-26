@@ -7,9 +7,6 @@ require_once __DIR__ . '/includes/config.php'; // This must define $pdo
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
-<?php
-// filepath: /opt/lampp/htdocs/School-CRM/index.php
-// ...existing code...
 if (!Auth::isLoggedIn()) {
     error_log("Redirecting to login.php because user is not logged in.");
     header("Location: login.php");
