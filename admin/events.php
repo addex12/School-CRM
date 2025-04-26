@@ -24,6 +24,7 @@ try {
 }
 
 include 'includes/admin_sidebar.php';
+?>
 
 <div class="admin-main">
     <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
@@ -95,9 +96,12 @@ include 'includes/admin_sidebar.php';
             </div>
         </div>
     </div>
-
 </div>
-    <?php include 'includes/footer.php'; ?>
+
+<?php 
+include 'includes/footer.php'; 
+?>
+<?php include 'includes/footer.php'; ?>
 
 <script>
     function filterTable() {
