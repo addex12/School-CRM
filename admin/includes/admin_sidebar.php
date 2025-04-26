@@ -148,6 +148,8 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     .admin-main {
         margin-left: 0 !important;
         padding-left: 0 !important;
+        position: relative; /* Ensure content adjusts properly */
+        z-index: 1; /* Ensure content is above the sidebar */
     }
 }
 .admin-main {
@@ -280,15 +282,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Responsive: adjust margin on resize
-    window.addEventListener('resize', function() {
+    // Adjust main content margin dynamically
+    function adjustMainMargin() {
         if (window.innerWidth <= 600) {
-            if (main) main.style.marginLeft = '0';
+            if (sidebar.classList.contains('open')) {
+                main.style.marginLeft = sidebar.offsetWidth + 'px';
+            } else {
+                main.style.marginLeft = '0';
+            }
         } else if (sidebar.classList.contains('collapsed')) {
-            if (main) main.style.marginLeft = '60px';
+            main.style.marginLeft = '60px';
         } else {
-            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
+            main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
         }
+    }
+
+    // Update margin on sidebar toggle
+    toggle.addEventListener('click', function() {
+        adjustMainMargin();
     });
+
+    // Update margin on window resize
+    window.addEventListener('resize', adjustMainMargin);
+
+    // Initial adjustment
+    adjustMainMargin();
 });
 </script>
