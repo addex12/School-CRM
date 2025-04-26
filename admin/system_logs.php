@@ -45,8 +45,8 @@ try {
             margin: 0;
         }
         .logs-header .btn {
-            font-size: 0.9rem;
-            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            padding: 0.3rem 0.6rem;
         }
         .table {
             width: 100%;
@@ -81,39 +81,50 @@ try {
     </style>
 </head>
 <body>
-    <div class="logs-container">
-        <div class="logs-header">
-            <h1><i class="fas fa-file-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
-            <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1><i class="fas fa-file-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
+            </header>
+            <div class="content">
+                <div class="logs-container">
+                    <div class="logs-header">
+                        <h1>System Logs</h1>
+                        <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+                    </div>
+                    <div>
+                        <?php if (!empty($logs)): ?>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Log Level</th>
+                                        <th>Message</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($logs as $log): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($log['id']) ?></td>
+                                            <td class="log-level <?= strtolower($log['log_level']) ?>">
+                                                <?= htmlspecialchars($log['log_level']) ?>
+                                            </td>
+                                            <td><?= htmlspecialchars($log['message']) ?></td>
+                                            <td><?= htmlspecialchars(date('M j, Y g:i A', strtotime($log['created_at']))) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <p>No logs found.</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>
-            <?php if (!empty($logs)): ?>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Log Level</th>
-                            <th>Message</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($logs as $log): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($log['id']) ?></td>
-                                <td class="log-level <?= strtolower($log['log_level']) ?>">
-                                    <?= htmlspecialchars($log['log_level']) ?>
-                                </td>
-                                <td><?= htmlspecialchars($log['message']) ?></td>
-                                <td><?= htmlspecialchars(date('M j, Y g:i A', strtotime($log['created_at']))) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            <?php else: ?>
-                <p>No logs found.</p>
-            <?php endif; ?>
-        </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 </body>
 </html>
