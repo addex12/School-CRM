@@ -27,7 +27,12 @@ try {
     if (!isset($pdo) || !$pdo) {
         throw new Exception("Database connection not established.");
     }
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("
+        SELECT u.*, r.role_name 
+        FROM users u 
+        LEFT JOIN roles r ON u.role_id = r.id 
+        WHERE u.id = ?
+    ");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch();
 } catch (Exception $e) {
@@ -61,7 +66,7 @@ try {
         <main>
             <div class="welcome-section">
                 <h1>Welcome, <?php echo htmlspecialchars($user['username'] ?? 'Guest'); ?></h1>
-                <p>Your role: <?php echo htmlspecialchars($user['role'] ?? 'Unknown'); ?></p>
+                <p>Your role: <?php echo htmlspecialchars($user['role_name'] ?? 'Unknown'); ?></p>
             </div>
 
             <div class="dashboard-content">
