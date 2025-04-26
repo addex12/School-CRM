@@ -102,49 +102,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .restore-container {
-            max-width: 100%;
+            max-width: 800px;
             margin: 2rem auto;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
-            width: 90%;
         }
         .restore-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 1rem;
-            flex-wrap: wrap;
         }
         .restore-header h1 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: #34495e;
             margin: 0;
         }
         .restore-header .btn {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             padding: 0.4rem 0.8rem;
-            background: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .restore-header .btn:hover {
-            background: #0056b3;
         }
         .restore-card {
-            background: #f8f9fa;
+            background: #f9f9f9;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             padding: 1rem;
             margin-bottom: 1rem;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
         }
         .restore-card h2 {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #34495e;
             margin: 0 0 0.5rem 0;
         }
@@ -155,16 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
         }
         .restore-card .btn {
             font-size: 0.8rem;
-            padding: 0.4rem 0.8rem;
-            background: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .restore-card .btn:hover {
-            background: #218838;
+            padding: 0.3rem 0.6rem;
         }
         .progress-bar {
             width: 100%;
@@ -179,46 +158,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
             width: 0;
             transition: width 0.3s;
         }
-        @media (max-width: 768px) {
-            .restore-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .restore-header h1 {
-                margin-bottom: 1rem;
-            }
-        }
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <div class="restore-container">
-                <div class="restore-header">
-                    <h1><i class="fas fa-database"></i> Restore Backup</h1>
-                    <a href="backup.php" class="btn"><i class="fas fa-arrow-left"></i> Back to Backup</a>
-                </div>
-                <form method="POST">
-                    <div class="restore-card">
-                        <h2>Select Backup File</h2>
-                        <p>Choose a backup file to restore your system.</p>
-                        <input type="text" name="backup_file" placeholder="Enter backup file name" required>
-                        <button type="submit" name="restore_backup" class="btn">
-                            <i class="fas fa-upload"></i> Restore
-                        </button>
-                    </div>
-                </form>
-                <div class="restore-card">
-                    <h2>Restore Progress</h2>
-                    <div class="progress-bar">
-                        <div class="progress" id="progress"></div>
-                    </div>
-                    <p id="progress-message" style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f8c8d;">No progress yet.</p>
-                </div>
-            </div>
+    <div class="restore-container">
+        <div class="restore-header">
+            <h1><i class="fas fa-database"></i> Restore Backup</h1>
+            <a href="backup.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Backup</a>
         </div>
-        <?php include 'includes/footer.php'; ?>
+        <form method="POST">
+            <div class="restore-card">
+                <h2>Select Backup File</h2>
+                <p>Choose a backup file to restore your system.</p>
+                <input type="text" name="backup_file" placeholder="Enter backup file name" required>
+                <button type="submit" name="restore_backup" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Restore
+                </button>
+            </div>
+        </form>
+        <div class="restore-card">
+            <h2>Restore Progress</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p id="progress-message" style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f8c8d;">No progress yet.</p>
+        </div>
     </div>
     <script>
         (function() {
