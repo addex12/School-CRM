@@ -2,197 +2,118 @@
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
+require_once '../includes/db.php';
+
 $pageTitle = "System Logs";
 
-// Pagination setup
-$perPage = 30;
-$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$offset = ($page - 1) * $perPage;
-
-// Fetch logs
-$stmt = $pdo->prepare("SELECT * FROM activity_logs ORDER BY timestamp DESC LIMIT :offset, :perpage");
-$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-$stmt->bindValue(':perpage', $perPage, PDO::PARAM_INT);
-$stmt->execute();
-$logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Count total logs for pagination
-$total = $pdo->query("SELECT COUNT(*) FROM activity_logs")->fetchColumn();
-$totalPages = ceil($total / $perPage);
+// Fetch logs from the database
+$logs = [];
+try {
+    $stmt = $pdo->query("SELECT id, log_level, message, created_at FROM system_logs ORDER BY created_at DESC LIMIT 100");
+    $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    $_SESSION['error'] = "Failed to fetch system logs: " . $e->getMessage();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 1.2rem 0.5rem; }
-        .erp-card {
+        .logs-container {
+            max-width: 1000px;
+            margin: 2rem auto;
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.2rem 1.2rem;
-            margin-bottom: 1.2rem;
-            max-width: 900px;
-            border: 1px solid #e5e7eb;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
         }
-        .erp-card h2 {
-            color: #2563eb;
-            font-weight: 600;
-            margin-bottom: 0.9rem;
-            font-size: 1.1rem;
-        }
-        .erpnext-btn {
-            background: linear-gradient(90deg, #2563eb 0%, #215967 100%);
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 0.35rem 0.9rem;
-            font-size: 0.97em;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.18s, box-shadow 0.18s;
-            margin-bottom: 0.7rem;
-            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4em;
-        }
-        .erpnext-btn i {
-            font-size: 0.97em;
-        }
-        .erpnext-btn:hover, .erpnext-btn:focus {
-            background: linear-gradient(90deg, #215967 0%, #2563eb 100%);
-            box-shadow: 0 2px 8px rgba(44,62,80,0.12);
-        }
-        .admin-header {
-            margin-bottom: 1.2rem;
-            border-bottom: 1.5px solid #e5e7eb;
-            padding-bottom: 0.7rem;
-        }
-        .admin-header h1 {
-            color: #2563eb;
-            font-weight: 700;
-            font-size: 1.3rem;
-            letter-spacing: 0.01em;
-            margin: 0;
+        .logs-header {
             display: flex;
             align-items: center;
-            gap: 0.5em;
+            justify-content: space-between;
+            margin-bottom: 1rem;
         }
-        .admin-header i {
-            font-size: 1.1em;
+        .logs-header h1 {
+            font-size: 1.5rem;
+            color: #34495e;
+            margin: 0;
         }
-        @media (max-width: 900px) {
-            .admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
-            .erp-card { padding: 0.7rem; }
+        .logs-header .btn {
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
         }
-        @media (max-width: 600px) {
-            .admin-main { margin-left: 0; padding: 0.3rem; }
-            .erp-card { padding: 0.4rem; }
-            .admin-header h1 { font-size: 1rem; }
-            .erp-card h2 { font-size: 1em; }
-        }
-        .erp-table {
+        .table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 1.2rem;
-            background: #fff;
+            margin-top: 1rem;
         }
-        .erp-table th, .erp-table td {
-            padding: 0.5em 0.7em;
-            border-bottom: 1px solid #e5e7eb;
+        .table th, .table td {
+            padding: 10px;
+            border: 1px solid #ddd;
             text-align: left;
-            font-size: 0.95rem;
         }
-        .erp-table th {
-            background: #f3f6fa;
-            color: #215967;
-            font-weight: 600;
+        .table th {
+            background: #f4f6f9;
+            color: #34495e;
         }
-        .erp-table tr:hover {
-            background: #f5faff;
+        .table tr:nth-child(even) {
+            background: #f9f9f9;
         }
-        .erp-pagination {
-            display: flex;
-            gap: 0.3em;
-            align-items: center;
+        .log-level {
+            font-weight: bold;
+            text-transform: uppercase;
         }
-        .erp-pagination a, .erp-pagination span {
-            padding: 0.2em 0.6em;
-            border-radius: 4px;
-            background: #f3f6fa;
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 500;
-            border: 1px solid #e5e7eb;
-            transition: background 0.15s;
-            font-size: 0.95em;
+        .log-level.error {
+            color: #e74c3c;
         }
-        .erp-pagination .active, .erp-pagination a:hover {
-            background: #2563eb;
-            color: #fff;
+        .log-level.warning {
+            color: #f39c12;
+        }
+        .log-level.info {
+            color: #3498db;
         }
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><i class="fas fa-file-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="erp-card">
-                <h2>System Logs</h2>
-                <p>Below are all user, admin, and system activities. Every action is logged for traceability.</p>
-                <div style="overflow-x:auto;">
-                    <table class="erp-table">
-                        <thead>
+    <div class="logs-container">
+        <div class="logs-header">
+            <h1><i class="fas fa-file-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
+            <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+        <div>
+            <?php if (!empty($logs)): ?>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Log Level</th>
+                            <th>Message</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($logs as $log): ?>
                             <tr>
-                                <th>#</th>
-                                <th>User</th>
-                                <th>Role</th>
-                                <th>Action</th>
-                                <th>IP Address</th>
-                                <th>Timestamp</th>
+                                <td><?= htmlspecialchars($log['id']) ?></td>
+                                <td class="log-level <?= strtolower($log['log_level']) ?>">
+                                    <?= htmlspecialchars($log['log_level']) ?>
+                                </td>
+                                <td><?= htmlspecialchars($log['message']) ?></td>
+                                <td><?= htmlspecialchars(date('M j, Y g:i A', strtotime($log['created_at']))) ?></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                        <?php if ($logs): ?>
-                            <?php foreach ($logs as $i => $log): ?>
-                                <tr>
-                                    <td><?= $offset + $i + 1 ?></td>
-                                    <td><?= htmlspecialchars($log['username'] ?? '-') ?></td>
-                                    <td><?= htmlspecialchars($log['role'] ?? '-') ?></td>
-                                    <td><?= htmlspecialchars($log['action']) ?></td>
-                                    <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                    <td><?= htmlspecialchars($log['timestamp']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr><td colspan="6" style="text-align:center;">No logs found.</td></tr>
-                        <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php if ($totalPages > 1): ?>
-                <div class="erp-pagination">
-                    <?php for ($p = 1; $p <= $totalPages; $p++): ?>
-                        <?php if ($p == $page): ?>
-                            <span class="active"><?= $p ?></span>
-                        <?php else: ?>
-                            <a href="?page=<?= $p ?>"><?= $p ?></a>
-                        <?php endif; ?>
-                    <?php endfor; ?>
-                </div>
-                <?php endif; ?>
-                <a href="audit_trail.php" class="erpnext-btn"><i class="fas fa-history"></i> Audit Trail</a>
-            </div>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>No logs found.</p>
+            <?php endif; ?>
         </div>
     </div>
-    <?php include 'includes/footer.php'; ?>
 </body>
 </html>

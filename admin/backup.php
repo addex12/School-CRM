@@ -49,7 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {
         ];
         foreach ($files as $file) {
             $filePath = $file->getRealPath();
-            // Skip excluded directories
             foreach ($excludeDirs as $excluded) {
                 if ($excluded && strpos($filePath, $excluded) === 0) {
                     continue 2;
@@ -62,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {
         }
 
         $zip->close();
-        unlink($dbDumpFile); // Remove the temporary database dump file
+        unlink($dbDumpFile);
 
         $_SESSION['success'] = "System backup created successfully!";
         header("Location: backup.php");
@@ -72,13 +71,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {
     }
 }
 
-// Ensure the backups directory exists
 $backupDir = __DIR__ . '/../backups';
 if (!is_dir($backupDir)) {
-    mkdir($backupDir, 0755, true); // Create the directory if it doesn't exist
+    mkdir($backupDir, 0755, true);
 }
 
-// Fetch existing backups
 $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [];
 ?>
 
@@ -89,97 +86,138 @@ $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .backup-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        .backup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .backup-header h1 {
+            font-size: 1.5rem;
+            color: #34495e;
+            margin: 0;
+        }
+        .backup-header .btn {
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+        }
+        .backup-card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .backup-card h2 {
+            font-size: 1.2rem;
+            color: #34495e;
+            margin: 0 0 0.5rem 0;
+        }
+        .backup-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        .backup-card .btn {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .table th, .table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .table th {
+            background: #f4f6f9;
+            color: #34495e;
+        }
+        .table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .table-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar .progress {
+            height: 8px;
+            background: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+    </style>
 </head>
 <body>
-    <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="content">
-                <?php include 'includes/alerts.php'; ?>
-
-                <section class="form-section">
-                    <h2>Create Full System Backup</h2>
-                    <form id="backupForm" method="POST">
-                        <button type="submit" id="backupBtn" name="backup_system" class="btn btn-primary">Backup Now</button>
-                    </form>
-                    <div id="backupProgress" style="display:none; margin-top:10px;">
-                        <div style="width:100%;background:#eee;border-radius:4px;overflow:hidden;">
-                            <div id="progressBar" style="width:0%;height:20px;background:#007bff;"></div>
-                        </div>
-                        <div id="progressStatus" style="margin-top:5px;font-size:14px;color:#333;">Starting backup...</div>
-                    </div>
-                </section>
-
-                <section class="table-section">
-                    <h2>Existing Backups</h2>
-                    <?php if (count($backups) > 0): ?>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Filename</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($backups as $backup): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($backup) ?></td>
-                                        <td><?= date('M j, Y g:i A', filemtime($backupDir . '/' . $backup)) ?></td>
-                                        <td>
-                                            <a href="../backups/<?= urlencode($backup) ?>" class="btn btn-secondary" download>Download</a>
-                                            <form method="POST" action="restore.php" style="display:inline;">
-                                                <input type="hidden" name="backup_file" value="<?= htmlspecialchars($backup) ?>">
-                                                <button type="submit" name="restore_backup" class="btn btn-warning" onclick="return confirm('Are you sure you want to restore this backup?')">Restore</button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <p>No backups found.</p>
-                    <?php endif; ?>
-                </section>
+    <div class="backup-container">
+        <div class="backup-header">
+            <h1><i class="fas fa-database"></i> <?= htmlspecialchars($pageTitle) ?></h1>
+            <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </div>
+        <form method="POST">
+            <div class="backup-card">
+                <h2>Create Backup</h2>
+                <p>Click the button below to create a full system backup.</p>
+                <button type="submit" name="backup_system" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Backup Now
+                </button>
             </div>
+        </form>
+        <div class="backup-card">
+            <h2>Existing Backups</h2>
+            <?php if (count($backups) > 0): ?>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Filename</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($backups as $backup): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($backup) ?></td>
+                                <td><?= date('M j, Y g:i A', filemtime($backupDir . '/' . $backup)) ?></td>
+                                <td class="table-actions">
+                                    <a href="../backups/<?= urlencode($backup) ?>" class="btn btn-secondary" download>
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                    <form method="POST" action="restore.php" style="display:inline;">
+                                        <input type="hidden" name="backup_file" value="<?= htmlspecialchars($backup) ?>">
+                                        <button type="submit" name="restore_backup" class="btn btn-warning" onclick="return confirm('Are you sure you want to restore this backup?')">
+                                            <i class="fas fa-undo"></i> Restore
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>No backups found.</p>
+            <?php endif; ?>
         </div>
     </div>
-    <?php include 'includes/footer.php'; ?>
-    <script src="../assets/js/backup.js"></script>
-    <script>
-    // Restore progress bar logic
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('form[action="restore.php"]').forEach(function(form) {
-            form.addEventListener('submit', function(e) {
-                // Show progress bar
-                let progressBar = document.createElement('div');
-                progressBar.id = 'restoreProgress';
-                progressBar.style.marginTop = '10px';
-                progressBar.innerHTML = `
-                    <div style="width:100%;background:#eee;border-radius:4px;overflow:hidden;">
-                        <div id="restoreBar" style="width:0%;height:20px;background:#28a745;"></div>
-                    </div>
-                    <div id="restoreStatus" style="margin-top:5px;font-size:14px;color:#333;">Starting restore...</div>
-                `;
-                form.parentNode.insertBefore(progressBar, form.nextSibling);
-                // Start polling
-                let interval = setInterval(function() {
-                    fetch('restore_status.php')
-                        .then(r => r.json())
-                        .then(data => {
-                            document.getElementById('restoreBar').style.width = data.percent + '%';
-                            document.getElementById('restoreStatus').textContent = data.message;
-                            if (data.percent >= 100) {
-                                clearInterval(interval);
-                            }
-                        });
-                }, 1000);
-            });
-        });
-    });
-    </script>
 </body>
 </html>
