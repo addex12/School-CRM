@@ -15,14 +15,13 @@
         width: 100%;
         background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
         color: #f5f6fa;
-        padding: 18px 30px 14px 30px;
+        padding: 18px 30px; /* Removed fixed height, using padding for spacing */
         display: flex;
         align-items: center;
         border-top: 1px solid #374150;
         font-size: 13px;
         z-index: 100;
         box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
-        min-height: 56px;
         flex-shrink: 0; /* Ensures the footer does not shrink */
     }
     .admin-main {
