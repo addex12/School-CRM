@@ -47,6 +47,50 @@ $pageTitle = "Edit Event";
 include 'includes/admin_sidebar.php';
 ?>
 
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .admin-main {
+        flex: 1;
+    }
+    .admin-header h1 {
+        font-family: 'Nunito Sans', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    .form-group label {
+        font-family: 'Nunito Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #34495e;
+    }
+    .form-control {
+        font-family: 'Nunito Sans', sans-serif;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .btn-primary {
+        font-family: 'Nunito Sans', sans-serif;
+        font-size: 16px;
+        font-weight: 700;
+        background-color: #3498db;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+</style>
+
 <div class="admin-main">
     <header class="admin-header">
         <h1><?= htmlspecialchars($pageTitle) ?></h1>

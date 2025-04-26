@@ -23,7 +23,7 @@ try {
     $stmt = $pdo->prepare("
         SELECT id, title, start_date, end_date, created_at 
         FROM events 
-        WHERE user_id = ? 
+        WHERE user_id = ? OR user_id IS NULL 
         ORDER BY start_date ASC
     ");
     $stmt->execute([$_SESSION['user_id']]);
