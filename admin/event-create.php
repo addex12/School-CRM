@@ -32,9 +32,7 @@ include 'includes/admin_sidebar.php';
         display: flex;
         flex-direction: column;
     }
-    .admin-main {
-        flex: 1;
-    }
+
 </style>
 
 <div class="admin-main">
