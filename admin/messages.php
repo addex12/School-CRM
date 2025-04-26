@@ -377,6 +377,7 @@ foreach ($admins as $a) {
                                 </span>
                             <?php endif; ?>
                         </div>
+                        <div id="chat-messages" class="chat-messages"></div>
                         <form id="message-form" class="message-form" style="display:none;">
                             <input type="hidden" name="receiver_id" id="receiver_id">
                             <textarea name="message" id="message-input" rows="2" placeholder="Type your message..." required></textarea>
