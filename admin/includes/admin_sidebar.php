@@ -145,6 +145,23 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
         width: 70px;
         left: 0;
     }
+    .admin-sidebar.icon-only {
+        width: 70px;
+        left: 0;
+        overflow: hidden;
+    }
+    .admin-sidebar.icon-only .sidebar-header,
+    .admin-sidebar.icon-only ul {
+        display: none;
+    }
+    .admin-sidebar.icon-only .sidebar-toggle {
+        display: block;
+        width: 100%;
+        height: 70px;
+        font-size: 1.5rem;
+        text-align: center;
+        padding: 0;
+    }
     .admin-main {
         margin-left: 0 !important;
         padding: 1rem; /* Add padding for better spacing */
@@ -229,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var sidebar = document.getElementById('adminSidebar');
     var toggle = document.getElementById('sidebarToggle');
     var main = document.querySelector('.admin-main');
+
     // Helper to set collapsed state
     function setSidebarCollapsed(collapsed) {
         if (collapsed) {
@@ -249,20 +267,20 @@ document.addEventListener('DOMContentLoaded', function() {
             localStorage.setItem('sidebar-collapsed', '0');
         }
     }
-    // Initial state
-    setSidebarCollapsed(localStorage.getItem('sidebar-collapsed') === '1');
 
+    // Toggle sidebar for very small screens
     toggle.addEventListener('click', function(e) {
         e.stopPropagation();
-        var isCollapsed = sidebar.classList.contains('collapsed');
-        // On mobile, toggle open/close instead of collapse
         if (window.innerWidth <= 600) {
             if (sidebar.classList.contains('open')) {
                 sidebar.classList.remove('open');
+                sidebar.classList.add('icon-only');
             } else {
+                sidebar.classList.remove('icon-only');
                 sidebar.classList.add('open');
             }
         } else {
+            var isCollapsed = sidebar.classList.contains('collapsed');
             setSidebarCollapsed(!isCollapsed);
         }
     });
