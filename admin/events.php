@@ -98,10 +98,7 @@ include 'includes/admin_sidebar.php';
     </div>
 </div>
 
-<?php 
-include 'includes/footer.php'; 
-?>
-<?php include 'includes/footer.php'; ?>
+<?php require_once 'includes/footer.php'; ?>
 
 <script>
     function filterTable() {
