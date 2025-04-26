@@ -26,6 +26,89 @@ try {
 include 'includes/admin_sidebar.php';
 ?>
 
+<style>
+    .admin-main {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+    }
+
+    .admin-header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        border-radius: 5px;
+    }
+
+    .admin-header h1 {
+        font-size: 24px;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        text-decoration: none;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+    }
+
+    .dashboard-section {
+        margin: 20px 0;
+    }
+
+    .card {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .table th, .table td {
+        padding: 10px;
+        text-align: left;
+        border: 1px solid #ddd;
+    }
+
+    .table th {
+        background-color: #f1f1f1;
+    }
+
+    .search-bar {
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .search-bar input {
+        padding: 8px;
+        width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+</style>
+
 <div class="admin-main">
     <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
         <h1 style="margin: 0;"><?= htmlspecialchars($pageTitle) ?></h1>
@@ -38,9 +121,12 @@ include 'includes/admin_sidebar.php';
         <!-- Events Table Section -->
         <div class="dashboard-section">
             <h2>All Events</h2>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search events..." onkeyup="filterTable()">
+            </div>
             <div class="card">
                 <?php if (!empty($events)): ?>
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" id="eventsTable">
                         <thead>
                             <tr>
                                 <th>Title</th>
@@ -107,5 +193,28 @@ include 'includes/admin_sidebar.php';
         </div>
     </div>
 </div>
+
+<script>
+    function filterTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('eventsTable');
+        const rows = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let match = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                if (cells[j].innerText.toLowerCase().includes(filter)) {
+                    match = true;
+                    break;
+                }
+            }
+
+            rows[i].style.display = match ? '' : 'none';
+        }
+    }
+</script>
 
 <?php include 'includes/footer.php'; ?>
