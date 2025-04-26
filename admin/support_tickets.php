@@ -23,39 +23,25 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .dashboard-section {
+        .erpnext-card {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            margin-bottom: 2rem;
-            padding: 2rem 2.5rem;
-        }
-        .tickets-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 1.5rem;
             margin-bottom: 1.5rem;
-        }
-        .tickets-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
         }
         .erpnext-btn {
             background: #f5f7fa;
             color: #36414c;
             border: 1px solid #d1d8dd;
             border-radius: 4px;
-            padding: 6px 12px;
+            padding: 8px 16px;
             font-size: 0.95rem;
             font-weight: 500;
             transition: background 0.2s, color 0.2s;
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
-            line-height: 1.2;
         }
         .erpnext-btn.btn-primary {
             background: #007bfc;
@@ -75,77 +61,16 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: #e4e8ec;
         }
         .erpnext-btn.btn-sm {
-            padding: 3px 7px;
+            padding: 6px 12px;
             font-size: 0.85rem;
         }
-        .tickets-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #f8f9fa;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(44,62,80,0.04);
-        }
-        .tickets-table th, .tickets-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
-        }
-        .tickets-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #34495e;
-        }
-        .tickets-table tr:hover {
-            background: #f4f8fb;
-        }
-        .status-open { color: #27ae60; font-weight: 500; }
-        .status-closed { color: #e74c3c; font-weight: 500; }
-        .ticket-actions a {
-            margin-right: 6px;
-            color: #3498db;
-            text-decoration: none;
-            font-size: 1em;
-            vertical-align: middle;
-        }
-        .ticket-actions a:last-child {
-            margin-right: 0;
-        }
-        .ticket-actions i {
-            font-size: 1em;
-        }
-        .erpnext-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(44,62,80,0.04);
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1.2rem;
-            position: relative;
-        }
-        @media (max-width: 900px) {
-            .admin-main, .dashboard-section { padding: 1rem 0.5rem; }
-        }
         @media (max-width: 600px) {
-            .tickets-header h2 {
-                font-size: 1.1rem;
-            }
-            .erpnext-btn, .erpnext-btn.btn-primary, .erpnext-btn.btn-secondary {
-                padding: 4px 8px;
-                font-size: 0.8rem;
-            }
-            .erpnext-btn.btn-sm {
-                padding: 2px 5px;
-                font-size: 0.75rem;
-            }
-            .ticket-actions i {
-                font-size: 0.9em;
-            }
-            .tickets-table th, .tickets-table td {
-                padding: 6px 4px;
-                font-size: 0.85em;
-            }
             .erpnext-card {
-                padding: 0.7rem 0.5rem;
+                padding: 1rem;
+            }
+            .erpnext-btn {
+                padding: 6px 12px;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -158,64 +83,62 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <div class="dashboard-section">
+                <div class="erpnext-card">
                     <div class="tickets-header">
                         <h2>Support Tickets</h2>
                         <a href="add_ticket.php" class="erpnext-btn btn-primary"><i class="fas fa-plus"></i> Add Ticket</a>
                     </div>
-                    <div class="erpnext-card">
-                        <div class="table-responsive">
-                            <table class="tickets-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>User</th>
-                                        <th>Email</th>
-                                        <th>Subject</th>
-                                        <th>Status</th>
-                                        <th>Priority</th>
-                                        <th>Created At</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($tickets)): ?>
-                                        <?php foreach ($tickets as $ticket): ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars($ticket['id']) ?></td>
-                                                <td><?= htmlspecialchars($ticket['username'] ?? '-') ?></td>
-                                                <td><?= htmlspecialchars($ticket['email'] ?? '-') ?></td>
-                                                <td><?= htmlspecialchars($ticket['subject']) ?></td>
-                                                <td>
-                                                    <?php
-                                                    $statusColors = [
-                                                        'open' => '#27ae60',
-                                                        'in_progress' => '#3498db',
-                                                        'on_hold' => '#f1c40f',
-                                                        'resolved' => '#27ae60',
-                                                    ];
-                                                    $status = strtolower($ticket['status']);
-                                                    $color = $statusColors[$status] ?? '#34495e';
-                                                    ?>
-                                                    <span style="color: <?= $color ?>; font-weight: 500;"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $status))) ?></span>
-                                                </td>
-                                                <td><?= htmlspecialchars($ticket['priority']) ?></td>
-                                                <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
-                                                <td class="ticket-actions">
-                                                    <a href="tickets.php?id=<?= $ticket['id'] ?>" class="erpnext-btn btn-secondary btn-sm" title="View"><i class="fas fa-eye"></i></a>
-                                                    <a href="edit_ticket.php?id=<?= $ticket['id'] ?>" class="erpnext-btn btn-primary btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
-                                                    <a href="delete_ticket.php?id=<?= $ticket['id'] ?>" class="erpnext-btn btn-secondary btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this ticket?')"><i class="fas fa-trash-alt"></i></a>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="tickets-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($tickets)): ?>
+                                    <?php foreach ($tickets as $ticket): ?>
                                         <tr>
-                                            <td colspan="8">No tickets found.</td>
+                                            <td><?= htmlspecialchars($ticket['id']) ?></td>
+                                            <td><?= htmlspecialchars($ticket['username'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($ticket['email'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
+                                            <td>
+                                                <?php
+                                                $statusColors = [
+                                                    'open' => '#27ae60',
+                                                    'in_progress' => '#3498db',
+                                                    'on_hold' => '#f1c40f',
+                                                    'resolved' => '#27ae60',
+                                                ];
+                                                $status = strtolower($ticket['status']);
+                                                $color = $statusColors[$status] ?? '#34495e';
+                                                ?>
+                                                <span style="color: <?= $color ?>; font-weight: 500;"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $status))) ?></span>
+                                            </td>
+                                            <td><?= htmlspecialchars($ticket['priority']) ?></td>
+                                            <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
+                                            <td class="ticket-actions">
+                                                <a href="tickets.php?id=<?= $ticket['id'] ?>" class="erpnext-btn btn-secondary btn-sm" title="View"><i class="fas fa-eye"></i></a>
+                                                <a href="edit_ticket.php?id=<?= $ticket['id'] ?>" class="erpnext-btn btn-primary btn-sm" title="Edit"><i class="fas fa-edit"></i></a>
+                                                <a href="delete_ticket.php?id=<?= $ticket['id'] ?>" class="erpnext-btn btn-secondary btn-sm" title="Delete" onclick="return confirm('Are you sure you want to delete this ticket?')"><i class="fas fa-trash-alt"></i></a>
+                                            </td>
                                         </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="8">No tickets found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
