@@ -25,6 +25,17 @@ try {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        .admin-dashboard {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .admin-main {
+            flex: 1;
+        }
+        .footer {
+            margin-top: auto;
+        }
         .logs-container {
             max-width: 1000px;
             margin: 2rem auto;
@@ -124,7 +135,9 @@ try {
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
+        <footer class="footer">
+            <?php include 'includes/footer.php'; ?>
+        </footer>
     </div>
 </body>
 </html>
