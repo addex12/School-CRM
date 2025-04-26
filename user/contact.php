@@ -160,7 +160,16 @@ body, input, textarea, select, button {
             
             <div class="form-group">
                 <label class="erpnext-label" for="subject">Subject</label>
-                <input type="text" id="subject" name="subject" class="erpnext-input" required>
+                <select id="subject" name="subject" class="erpnext-input" required onchange="toggleCustomSubject(this)">
+                    <option value="" disabled selected>Select a subject</option>
+                    <option value="Technical Issue">Technical Issue</option>
+                    <option value="Billing Inquiry">Billing Inquiry</option>
+                    <option value="Account Access">Account Access</option>
+                    <option value="Feature Request">Feature Request</option>
+                    <option value="Feedback">Feedback</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="text" id="custom-subject" name="custom_subject" class="erpnext-input" placeholder="Enter custom subject" style="display:none; margin-top:10px;">
             </div>
             
             <div class="form-group">
@@ -226,4 +235,16 @@ body, input, textarea, select, button {
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
 </div>
 <script src="../includes/activity-tracker.js"></script>
+<script>
+    function toggleCustomSubject(select) {
+        const customSubjectInput = document.getElementById('custom-subject');
+        if (select.value === 'Other') {
+            customSubjectInput.style.display = 'block';
+            customSubjectInput.required = true;
+        } else {
+            customSubjectInput.style.display = 'none';
+            customSubjectInput.required = false;
+        }
+    }
+</script>
 
