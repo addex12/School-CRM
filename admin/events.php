@@ -133,7 +133,7 @@ include 'includes/admin_sidebar.php';
                                     <?= date('M j, Y g:i A', strtotime($event['start_date'])) ?> 
                                     to <?= date('M j, Y g:i A', strtotime($event['end_date'])) ?>
                                 </small>
-                                <p style="font-size: 0.9rem; color: #555; margin-top: 8px;"><?= nl2br(htmlspecialchars($event['description']) ?? '') ?></p>
+                                <p style="font-size: 0.9rem; color: #555; margin-top: 8px;"><?= nl2br(htmlspecialchars($event['description'] ? $event['description'] : '')) ?></p>
                                 <p style="font-size: 0.9rem; color: #555;">Created At: <?= date('M j, Y g:i A', strtotime($event['created_at'])) ?></p>
                             </div>
                         <?php endforeach; ?>
