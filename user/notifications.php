@@ -27,6 +27,16 @@ try {
     error_log("Error fetching notifications: " . $e->getMessage());
     $notifications = [];
 }
+
+// Fetch unread notifications count
+try {
+    $unreadStmt = $pdo->prepare("SELECT COUNT(*) AS unread_count FROM notifications WHERE user_id = ? AND is_read = 0");
+    $unreadStmt->execute([$_SESSION['user_id']]);
+    $unreadCount = $unreadStmt->fetch(PDO::FETCH_ASSOC)['unread_count'];
+} catch (Exception $e) {
+    error_log("Error fetching unread notifications count: " . $e->getMessage());
+    $unreadCount = 0;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
