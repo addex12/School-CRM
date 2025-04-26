@@ -116,6 +116,8 @@ a:hover {
 }
 
 .message-form button[type="submit"]:not(:disabled) {
+    flex: 1;
+    padding: 10px 20px;
     background: #007bff;
     color: #fff;
     cursor: pointer;
