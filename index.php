@@ -29,27 +29,39 @@ try {
         throw new Exception("Database connection not established.");
     }
     $stmt = $pdo->prepare("
-        SELECT u.id, u.username, u.email, u.first_name, u.last_name, u.role_id, u.last_active, u.online, u.active, u.avatar, r.role_name 
+        SELECT u.id, u.username, u.role_id, r.role_name 
         FROM users u 
         LEFT JOIN roles r ON u.role_id = r.id 
         WHERE u.id = ?
     ");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch();
+
+    if (!$user) {
+        throw new Exception("User not found.");
+    }
 } catch (Exception $e) {
     error_log("User data fetch error: " . $e->getMessage());
     header("Location: error.php");
     exit();
 }
 
-// Redirect based on user role
-if ($user['role_name'] === 'admin') {
-    header("Location: admin/dashboard.php");
-    exit();
-} elseif ($user['role_name'] === 'user') {
-    header("Location: user/dashboard.php");
-    exit();
-} else {
-    header("Location: error.php");
-    exit();
+// Redirect based on role_id
+switch ($user['role_id']) {
+    case 1: // Admin role
+        header("Location: admin/dashboard.php");
+        break;
+    case 2: // Teacher role
+        header("Location: teacher/dashboard.php");
+        break;
+    case 3: // Student role
+        header("Location: student/dashboard.php");
+        break;
+    case 4: // Parent role
+        header("Location: parent/dashboard.php");
+        break;
+    default: // Unknown role
+        header("Location: error.php");
+        break;
 }
+exit();
