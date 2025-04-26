@@ -82,16 +82,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div style="margin-bottom:1rem;">
                             <label for="status">Status</label>
                             <select name="status" id="status" required>
-                                <option value="open" <?= $ticket['status'] == 'open' ? 'selected' : '' ?>>Open</option>
-                                <option value="closed" <?= $ticket['status'] == 'closed' ? 'selected' : '' ?>>Closed</option>
+                                <?php
+                                $statusStmt = $pdo->query("SHOW COLUMNS FROM support_tickets LIKE 'status'");
+                                $statusRow = $statusStmt->fetch(PDO::FETCH_ASSOC);
+                                if ($statusRow && preg_match("/^enum\((.*)\)$/", $statusRow['Type'], $matches)) {
+                                    $statuses = str_getcsv($matches[1], ',', "'");
+                                    foreach ($statuses as $status) {
+                                        $selected = $ticket['status'] === $status ? 'selected' : '';
+                                        echo "<option value=\"" . htmlspecialchars($status) . "\" $selected>" . htmlspecialchars(ucwords(str_replace('_', ' ', $status))) . "</option>";
+                                    }
+                                }
+                                ?>
                             </select>
                         </div>
                         <div style="margin-bottom:1rem;">
                             <label for="priority">Priority</label>
                             <select name="priority" id="priority" required>
-                                <option value="low" <?= $ticket['priority'] == 'low' ? 'selected' : '' ?>>Low</option>
-                                <option value="medium" <?= $ticket['priority'] == 'medium' ? 'selected' : '' ?>>Medium</option>
-                                <option value="high" <?= $ticket['priority'] == 'high' ? 'selected' : '' ?>>High</option>
+                                <?php
+                                $priorityStmt = $pdo->query("SHOW COLUMNS FROM support_tickets LIKE 'priority'");
+                                $priorityRow = $priorityStmt->fetch(PDO::FETCH_ASSOC);
+                                if ($priorityRow && preg_match("/^enum\((.*)\)$/", $priorityRow['Type'], $matches)) {
+                                    $priorities = str_getcsv($matches[1], ',', "'");
+                                    foreach ($priorities as $priority) {
+                                        $selected = $ticket['priority'] === $priority ? 'selected' : '';
+                                        echo "<option value=\"" . htmlspecialchars($priority) . "\" $selected>" . htmlspecialchars(ucwords($priority)) . "</option>";
+                                    }
+                                }
+                                ?>
                             </select>
                         </div>
                         <button type="submit" class="btn" style="background:#3498db;color:#fff;">Update Ticket</button>
