@@ -21,13 +21,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event'])) {
         $description = trim($_POST['description']);
         $start_date = $_POST['start_date'];
         $end_date = $_POST['end_date'];
+        $user_id = $_SESSION['user_id']; // Assuming the user is logged in
+
+        // Check if user_id exists in the users table
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        if (!$stmt->fetch()) {
+            throw new Exception("Invalid user ID. Please ensure the user exists.");
+        }
 
         if (empty($title) || empty($start_date) || empty($end_date)) {
             throw new Exception("Title, start date, and end date are required.");
         }
 
-        $stmt = $pdo->prepare("INSERT INTO events (title, description, start_date, end_date) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$title, $description, $start_date, $end_date]);
+        $stmt = $pdo->prepare("INSERT INTO events (title, description, start_date, end_date, user_id) VALUES (?, ?, ?, ?, ?)");
+        $stmt->execute([$title, $description, $start_date, $end_date, $user_id]);
 
         $_SESSION['success'] = "Event added successfully!";
         header("Location: events.php");
