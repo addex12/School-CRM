@@ -191,19 +191,37 @@ foreach ($admins as $a) {
             padding: 15px 18px;
             overflow-y: auto;
             background: #eaeff7;
+        }
+        .message-form {
+            padding: 15px 18px;
+            border-top: 1px solid #e5e7eb;
+            background: #fff;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            gap: 1rem;
+        }
+        .message-form textarea {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
+            background: #f9fafb;
+            font-size: 1rem;
+            resize: none;
+        }
+        .message-form .erpnext-btn {
+            padding: 10px 22px;
+            font-size: 1em;
         }
         .chat-message {
             margin-bottom: 7px;
-            padding: 10px 15px;
+            padding: 9px 14px;
             border-radius: 18px;
-            max-width: 75%;
+            max-width: 85%;
             word-break: break-word;
             font-size: 0.97em;
             box-shadow: 0 1px 2px rgba(44,62,80,0.07);
             position: relative;
+            clear: both;
             display: flex;
             flex-direction: column;
         }
@@ -212,7 +230,10 @@ foreach ($admins as $a) {
             margin-left: auto;
             color: #215967;
             border-bottom-right-radius: 4px;
+            border-bottom-left-radius: 18px;
             border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            align-self: flex-end;
             border: 1px solid #b2e59f;
         }
         .chat-message.other {
@@ -220,65 +241,74 @@ foreach ($admins as $a) {
             margin-right: auto;
             color: #222d32;
             border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 18px;
+            border-top-left-radius: 18px;
             border-top-right-radius: 18px;
+            align-self: flex-start;
             border: 1px solid #e0e0e0;
         }
         .msg-time {
             font-size: 10px;
             color: #aaa;
-            margin-top: 5px;
+            margin-top: 2px;
+            display: block;
             text-align: right;
         }
         .chat-message strong {
             font-size: 0.95em;
             color: #007bff;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
-        .message-form {
-            padding: 15px 18px;
-            border-top: 1px solid #e5e7eb;
-            background: #fff;
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-        .message-form textarea {
-            flex: 1;
-            padding: 10px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 18px;
-            background: #f9fafb;
-            font-size: 1rem;
-            resize: none;
-        }
-        .message-form .erpnext-btn {
-            padding: 10px 22px;
-            font-size: 1em;
-            background-color: #007bff;
-            color: #fff;
+        .edit-btn, .delete-btn {
+            background: none;
             border: none;
-            border-radius: 18px;
+            color: #3b82f6;
+            font-size: 0.95em;
+            margin-left: 6px;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
-        .message-form .erpnext-btn:hover {
-            background-color: #0056b3;
+        .edit-btn:hover, .delete-btn:hover {
+            color: #e74c3c;
+        }
+        @media (max-width: 900px) {
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 400px;
+            }
+            .contact-list {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                min-height: 60px;
+                max-height: 120px;
+            }
+            .chat-section {
+                min-width: 0;
+            }
         }
         @media (max-width: 600px) {
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+            }
+            .contact-list {
+                width: 100%;
+                min-width: 0;
+                max-width: 100vw;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                font-size: 0.98em;
+            }
+            .chat-section {
+                min-width: 0;
+            }
             .chat-messages {
-                padding: 10px;
+                padding: 8px;
             }
             .message-form {
-                padding: 10px;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            .message-form textarea {
-                width: 100%;
-            }
-            .message-form .erpnext-btn {
-                width: 100%;
+                padding: 8px;
             }
         }
     </style>
@@ -349,7 +379,7 @@ foreach ($admins as $a) {
                         <div id="chat-messages" class="chat-messages"></div>
                         <form id="message-form" class="message-form" style="display:none;">
                             <textarea name="message" id="message-input" rows="2" placeholder="Type your message..." required></textarea>
-                            <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
+                            <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i></button>
                         </form>
                     </section>
                 </div>
