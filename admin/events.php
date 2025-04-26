@@ -112,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         transition: margin-left 0.3s ease; /* Smooth transition for sidebar toggle */
         min-height: 100vh; /* Ensure the main content takes full height */
         box-sizing: border-box;
+        overflow-x: hidden; /* Prevent horizontal scrolling */
     }
 
     @media (max-width: 768px) {
@@ -124,17 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .admin-main {
             margin-left: 0; /* Remove margin for smaller screens */
             padding: 1rem; /* Adjust padding for smaller screens */
-        }
-    }
-
-    .admin-dashboard {
-        display: flex;
-        flex-direction: column;
-    }
-
-    @media (min-width: 769px) {
-        .admin-dashboard {
-            flex-direction: row; /* Sidebar and main content side by side */
         }
     }
 
