@@ -361,7 +361,7 @@ foreach ($admins as $a) {
                             <?php endforeach; ?>
                         </ul>
                     </aside>
-                    <section class="chat-section"></section>
+                    <section class="chat-section">
                         <div class="message-card-header">
                             <span id="chat-header-title">
                                 <i class="fas fa-paper-plane" style="color:#007bff;margin-right:6px;"></i>
