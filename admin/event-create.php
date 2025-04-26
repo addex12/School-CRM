@@ -6,10 +6,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'];
     $start_date = $_POST['start_date'];
     $end_date = $_POST['end_date'];
+    $user_id = $_SESSION['user_id']; // Assuming user_id is stored in the session
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO events (title, start_date, end_date) VALUES (?, ?, ?)");
-        $stmt->execute([$title, $start_date, $end_date]);
+        $stmt = $pdo->prepare("INSERT INTO events (user_id, title, start_date, end_date, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([$user_id, $title, $start_date, $end_date]);
         $_SESSION['success'] = "Event created successfully.";
         header("Location: events.php");
         exit();
