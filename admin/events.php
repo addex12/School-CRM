@@ -1,11 +1,13 @@
 <?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../includes/auth.php';
 
-if (!Auth::isAdmin()) {
-    header("Location: ../login.php");
-    exit();
+error_log("Database connection not established.");
+$_SESSION['error'] = "Database connection not established.";
+header("Location: ../error.php");
+exit();
+} else {
+error_log("Database connection established successfully.");
 }
 
 $pageTitle = "Manage Events";
