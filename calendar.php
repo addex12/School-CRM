@@ -3,6 +3,14 @@ session_start();
 require_once __DIR__ . '/includes/config.php';
 require_once 'includes/auth.php';
 
+if (!class_exists('Auth')) {
+    class Auth {
+        public static function isLoggedIn(): bool {
+            return isset($_SESSION['user_id']);
+        }
+    }
+}
+
 if (!Auth::isLoggedIn()) {
     header("Location: login.php");
     exit();
