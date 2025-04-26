@@ -23,27 +23,40 @@ $pageTitle = "Create Event";
 include 'includes/admin_sidebar.php';
 ?>
 
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .admin-main {
+        flex: 1;
+    }
+</style>
+
 <div class="admin-main">
     <header class="admin-header">
-        <h1 style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 600; color: #333;"><?= htmlspecialchars($pageTitle) ?></h1>
+        <h1 style="font-family: 'Nunito Sans', sans-serif; font-size: 26px; font-weight: 700; color: #2c3e50;"><?= htmlspecialchars($pageTitle) ?></h1>
     </header>
 
     <div class="content">
-        <div class="card" style="max-width: 600px; margin: auto; padding: 20px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border-radius: 10px; background-color: #fff;">
+        <div class="card" style="max-width: 600px; margin: auto; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); border-radius: 8px; background-color: #f9f9f9;">
             <form method="POST" class="form">
                 <div class="form-group">
-                    <label for="title" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #555;">Event Title</label>
-                    <input type="text" id="title" name="title" class="form-control" style="font-family: 'Inter', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+                    <label for="title" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 600; color: #34495e;">Event Title</label>
+                    <input type="text" id="title" name="title" class="form-control" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" required>
                 </div>
                 <div class="form-group">
-                    <label for="start_date" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #555;">Start Date</label>
-                    <input type="datetime-local" id="start_date" name="start_date" class="form-control" style="font-family: 'Inter', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+                    <label for="start_date" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 600; color: #34495e;">Start Date</label>
+                    <input type="datetime-local" id="start_date" name="start_date" class="form-control" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" required>
                 </div>
                 <div class="form-group">
-                    <label for="end_date" style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #555;">End Date</label>
-                    <input type="datetime-local" id="end_date" name="end_date" class="form-control" style="font-family: 'Inter', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;" required>
+                    <label for="end_date" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; font-weight: 600; color: #34495e;">End Date</label>
+                    <input type="datetime-local" id="end_date" name="end_date" class="form-control" style="font-family: 'Nunito Sans', sans-serif; font-size: 14px; padding: 10px; border: 1px solid #ccc; border-radius: 4px;" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 600; background-color: #007bff; border: none; padding: 12px 24px; border-radius: 6px; color: white; cursor: pointer; transition: background-color 0.3s;">
+                <button type="submit" class="btn btn-primary" style="font-family: 'Nunito Sans', sans-serif; font-size: 16px; font-weight: 700; background-color: #3498db; border: none; padding: 12px 24px; border-radius: 6px; color: white; cursor: pointer; transition: background-color 0.3s;">
                     Create Event
                 </button>
             </form>
