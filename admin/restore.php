@@ -89,4 +89,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
         exit();
     }
 }
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restore Backup - Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .restore-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        .restore-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .restore-header h1 {
+            font-size: 1.5rem;
+            color: #34495e;
+            margin: 0;
+        }
+        .restore-header .btn {
+            font-size: 0.9rem;
+            padding: 0.4rem 0.8rem;
+        }
+        .restore-card {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .restore-card h2 {
+            font-size: 1.2rem;
+            color: #34495e;
+            margin: 0 0 0.5rem 0;
+        }
+        .restore-card p {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+        .restore-card .btn {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.6rem;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+        .progress-bar .progress {
+            height: 8px;
+            background: #3498db;
+            width: 0;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="restore-container">
+        <div class="restore-header">
+            <h1><i class="fas fa-database"></i> Restore Backup</h1>
+            <a href="backup.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Backup</a>
+        </div>
+        <form method="POST">
+            <div class="restore-card">
+                <h2>Select Backup File</h2>
+                <p>Choose a backup file to restore your system.</p>
+                <input type="text" name="backup_file" placeholder="Enter backup file name" required>
+                <button type="submit" name="restore_backup" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Restore
+                </button>
+            </div>
+        </form>
+        <div class="restore-card">
+            <h2>Restore Progress</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <p id="progress-message" style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f8c8d;">No progress yet.</p>
+        </div>
+    </div>
+    <script>
+        (function() {
+            const progressBar = document.getElementById('progress');
+            const progressMessage = document.getElementById('progress-message');
+            const progressFile = '../restore_progress.txt';
+
+            function fetchProgress() {
+                fetch(progressFile + '?t=' + new Date().getTime())
+                    .then(response => response.json())
+                    .then(data => {
+                        progressBar.style.width = data.percent + '%';
+                        progressMessage.textContent = data.message;
+                        if (data.percent < 100) {
+                            setTimeout(fetchProgress, 1000);
+                        }
+                    })
+                    .catch(() => {
+                        progressMessage.textContent = 'Unable to fetch progress.';
+                    });
+            }
+
+            fetchProgress();
+        })();
+    </script>
+</body>
+</html>
 
