@@ -49,10 +49,14 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     background: none;
     border: none;
     color: #fff;
-    font-size: 1rem; /* Reduced font size */
+    font-size: 1.5rem; /* Increased font size for better visibility */
     cursor: pointer;
     margin-left: 10px;
     padding: 0.4rem 0.6rem; /* Smaller padding */
+    position: fixed; /* Ensure it stays visible */
+    top: 10px; /* Adjust position */
+    left: 10px; /* Adjust position */
+    z-index: 300; /* Ensure it is above other elements */
 }
 .admin-sidebar ul {
     list-style: none;
@@ -150,6 +154,10 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
         padding-left: 0 !important;
         position: relative; /* Ensure content adjusts properly */
         z-index: 1; /* Ensure content is above the sidebar */
+    }
+    .admin-sidebar .sidebar-toggle {
+        top: 15px; /* Adjust for smaller screens */
+        left: 15px; /* Adjust for smaller screens */
     }
 }
 .admin-main {
