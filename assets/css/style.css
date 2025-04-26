@@ -109,19 +109,6 @@ a:hover {
     border-radius: 4px;
 }
 
-.message-form button[type="submit"]:disabled {
-    background: #ccc;
-    cursor: not-allowed;
-    color: #666;
-}
-
-.message-form button[type="submit"]:not(:disabled) {
-    flex: 1;
-    padding: 10px 20px;
-    background: #007bff;
-    color: #fff;
-    cursor: pointer;
-}
 
 .unread-badge {
     background: #dc3545;
