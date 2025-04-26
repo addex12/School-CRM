@@ -71,16 +71,22 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
             "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
         ],
         [
-            "title" => "Completed Tickets",
-            "icon" => "fa-check-circle",
-            "color" => "green",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'completed'"
+            "title" => "In Progress Tickets",
+            "icon" => "fa-spinner",
+            "color" => "blue",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'in_progress'"
         ],
         [
-            "title" => "Pending Tickets", // Replacing the duplicate card
-            "icon" => "fa-clock",
-            "color" => "orange",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'pending'"
+            "title" => "On Hold Tickets",
+            "icon" => "fa-pause-circle",
+            "color" => "yellow",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'on_hold'"
+        ],
+        [
+            "title" => "Resolved Tickets",
+            "icon" => "fa-check-circle",
+            "color" => "green",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
         ],
     ];
 } else {
