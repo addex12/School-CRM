@@ -2,16 +2,6 @@
 // Start the session
 session_start();
 
-// Include required files
-require_once __DIR__ . '/includes/config.php'; // This must define $pdo
-require_once 'includes/db.php';
-require_once 'includes/auth.php';
-
-if (!Auth::isLoggedIn()) {
-    error_log("Redirecting to login.php because user is not logged in.");
-    header("Location: login.php");
-    exit();
-}
 // Ensure the Auth class exists
 if (!class_exists('Auth')) {
     class Auth {
@@ -21,6 +11,17 @@ if (!class_exists('Auth')) {
     }
 }
 
+// Include required files
+require_once __DIR__ . '/includes/config.php'; // This must define $pdo
+require_once 'includes/db.php';
+require_once 'includes/auth.php';
+
+// Check if the user is logged in
+if (!Auth::isLoggedIn()) {
+    error_log("Redirecting to login.php because user is not logged in.");
+    header("Location: login.php");
+    exit();
+}
 
 // Get current user data
 try {
@@ -52,4 +53,3 @@ if ($user['role_name'] === 'admin') {
     header("Location: error.php");
     exit();
 }
-// No replacement needed as the HTML is unreachable and should be removed.
