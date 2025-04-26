@@ -27,13 +27,6 @@ include 'includes/admin_sidebar.php';
 ?>
 
 <style>
-    .admin-main {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-        background-color: #f8f9fa;
-        font-family: Arial, sans-serif;
-    }
 
     .content {
         flex: 1; /* Ensures the content takes up available space */
