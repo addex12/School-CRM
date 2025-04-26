@@ -95,6 +95,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+    .admin-main {
+        margin-left: 250px; /* Adjust for sidebar width */
+        padding: 2rem;
+        transition: margin-left 0.3s ease; /* Smooth transition for sidebar toggle */
+    }
+
+    @media (max-width: 768px) {
+        .admin-main {
+            margin-left: 0; /* Remove margin for smaller screens */
+            padding: 1rem; /* Adjust padding for smaller screens */
+        }
+    }
+
+    .admin-dashboard {
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media (min-width: 769px) {
+        .admin-dashboard {
+            flex-direction: row; /* Sidebar and main content side by side */
+        }
+    }
+
     .events-container {
         max-width: 100%; /* Allow full width */
         margin: 0 auto;
