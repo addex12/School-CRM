@@ -331,7 +331,7 @@ function sendPasswordChangeNotification($email) {
 }
 </style>
 
-<?php include_once __DIR__ . '/../includes/header.php'; ?>
+<?php include_once 'includes/header.php'; ?>
 <div class="main-content-container">
     <div class="profile-main-container">
         <div class="profile-header">
