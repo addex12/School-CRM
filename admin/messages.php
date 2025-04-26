@@ -305,7 +305,7 @@ foreach ($admins as $a) {
                 min-width: 0;
             }
             .chat-messages {
-                padding: 8px;
+                padding: 20px;
             }
             .message-form {
                 padding: 8px;
