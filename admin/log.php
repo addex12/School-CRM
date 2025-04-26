@@ -1,6 +1,6 @@
 <?php
 // credentials_dashboard.php
-$title = "Log Monitoring Dashboard";
+$title = "Activity Monitoring Dashboard";
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
@@ -17,23 +17,21 @@ $logFiles = [
 ];
 $maxFileSize = 50 * 1024 * 1024; // 50MB
 $retentionDays = 90;
-$maxEntries = 1000; // Limit the number of entries processed
 
 // Function to safely read log files with rotation check
-function readLogWithRotation($filePath, $maxEntries) {
+function readLogWithRotation($filePath) {
     global $maxFileSize;
-
-    if (!file_exists($filePath)) return [];
-
+    
+    if (!file_exists($filePath)) return '';
+    
     // Check if log rotation is needed
     if (filesize($filePath) > $maxFileSize) {
         $backupPath = $filePath . '.' . date('Ymd-His');
         rename($filePath, $backupPath);
         file_put_contents($filePath, '');
     }
-
-    $lines = file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    return array_slice($lines, -$maxEntries); // Limit the number of lines read
+    
+    return file_get_contents($filePath);
 }
 
 // Enhanced data extraction with pattern matching
@@ -201,21 +199,16 @@ function calculateRiskLevel($score) {
 // Read and process all log files
 $allEntries = [];
 foreach ($logFiles as $logFile) {
-    $logContent = readLogWithRotation($logFile, $maxEntries);
-    $allEntries = array_merge($allEntries, extractSensitiveData(implode("\n", $logContent)));
+    $logContent = readLogWithRotation($logFile);
+    $allEntries = array_merge($allEntries, extractSensitiveData($logContent));
 }
 
 // Sort by timestamp descending
 usort($allEntries, function($a, $b) {
     return strtotime($b['timestamp']) - strtotime($a['timestamp']);
 });
-
-// Paginate results
-$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$perPage = 50; // Number of entries per page
-$totalPages = ceil(count($allEntries) / $perPage);
-$paginatedEntries = array_slice($allEntries, ($page - 1) * $perPage, $perPage);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -412,6 +405,13 @@ $paginatedEntries = array_slice($allEntries, ($page - 1) * $perPage, $perPage);
             margin-bottom: 20px;
         }
         
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
         }
         
         .stat-card-header {
