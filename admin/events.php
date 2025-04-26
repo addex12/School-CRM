@@ -95,13 +95,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+    .admin-sidebar {
+        position: fixed; /* Ensure the sidebar stays fixed */
+        top: 0;
+        left: 0;
+        width: 250px;
+        height: 100%;
+        z-index: 1000; /* Ensure the sidebar is above other elements */
+        background: #2c3e50;
+        overflow-y: auto;
+    }
+
     .admin-main {
         margin-left: 250px; /* Adjust for sidebar width */
         padding: 2rem;
         transition: margin-left 0.3s ease; /* Smooth transition for sidebar toggle */
+        min-height: 100vh; /* Ensure the main content takes full height */
+        box-sizing: border-box;
     }
 
     @media (max-width: 768px) {
+        .admin-sidebar {
+            width: 100%; /* Sidebar takes full width on smaller screens */
+            height: auto;
+            position: relative; /* Sidebar becomes part of the flow */
+        }
+
         .admin-main {
             margin-left: 0; /* Remove margin for smaller screens */
             padding: 1rem; /* Adjust padding for smaller screens */
