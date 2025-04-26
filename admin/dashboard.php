@@ -68,6 +68,12 @@ $widgets = [
         "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
     ],
     [
+        "title" => "Completed Tickets", // Replacing the duplicate card
+        "icon" => "fa-check-circle",
+        "color" => "green",
+        "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'completed'"
+    ],
+    [
         "title" => "Messages",
         "icon" => "fa-envelope",
         "color" => "blue",
