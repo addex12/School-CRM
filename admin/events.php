@@ -207,10 +207,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="event-card">
                                 <form method="POST">
                                     <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
-                                    <input type="text" name="title" value="<?= htmlspecialchars($event['title']) ?>" required>
-                                    <textarea name="description" rows="2"><?= htmlspecialchars($event['description']) ?></textarea>
-                                    <input type="datetime-local" name="start_date" value="<?= date('Y-m-d\TH:i', strtotime($event['start_date'])) ?>" required>
-                                    <input type="datetime-local" name="end_date" value="<?= date('Y-m-d\TH:i', strtotime($event['end_date'])) ?>" required>
+                                    <input type="text" name="title" value="<?= htmlspecialchars($event['title'] ?? '') ?>" required>
+                                    <textarea name="description" rows="2"><?= htmlspecialchars($event['description'] ?? '') ?></textarea>
+                                    <input type="datetime-local" name="start_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($event['start_date'] ?? ''))) ?>" required>
+                                    <input type="datetime-local" name="end_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($event['end_date'] ?? ''))) ?>" required>
                                     <div class="actions">
                                         <button type="submit" name="edit_event">Save</button>
                                         <button type="submit" name="delete_event" style="background: #e74c3c;">Delete</button>
