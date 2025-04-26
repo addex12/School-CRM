@@ -26,6 +26,8 @@ try {
 include 'includes/admin_sidebar.php';
 ?>
 
+<link rel="stylesheet" href="../assets/css/style.css"> <!-- Ensure the correct CSS file is included -->
+
 <div class="admin-main">
     <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
         <h1 style="margin: 0;"><?= htmlspecialchars($pageTitle) ?></h1>
@@ -97,8 +99,8 @@ include 'includes/admin_sidebar.php';
         </div>
     </div>
 </div>
-                        </div>
-<?php require_once 'includes/footer.php'; ?>
+
+<?php require_once 'includes/footer.php'; ?> <!-- Ensure the footer is included correctly -->
 
 <script>
     function filterTable() {
