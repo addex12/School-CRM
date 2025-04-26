@@ -197,10 +197,42 @@ function sendPasswordChangeNotification($email) {
     error_log("Password changed notification sent to: $email");
 }
 
+// Fetch unread notifications count
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) AS unread_count FROM notifications WHERE user_id = ? AND is_read = 0");
+    $stmt->execute([$_SESSION['user_id']]);
+    $notificationCount = $stmt->fetchColumn();
+} catch (Exception $e) {
+    error_log("Error fetching unread notifications count: " . $e->getMessage());
+    $notificationCount = 0;
+}
 ?>
-
-<style>
-/* Profile Page Custom Styles */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .notification-icon {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .notification-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 50%;
+            padding: 5px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        /* Profile Page Custom Styles */
 .profile-main-container {
     max-width: 800px;
     margin: 40px auto;
@@ -329,10 +361,28 @@ function sendPasswordChangeNotification($email) {
         gap: 12px; /* Reduced gap for smaller screens */
     }
 }
-</style>
-
-<?php include_once 'includes/header.php'; ?>
-<div class="main-content-container">
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <nav>
+                <div class="logo">School CRM</div>
+                <ul class="nav-links">
+                    <li><a href="profile.php" class="active">Profile</a></li>
+                    <li><a href="events.php">Events</a></li>
+                    <li><a href="notifications.php" class="notification-icon">
+                        Notifications
+                        <?php if ($notificationCount > 0): ?>
+                            <span class="badge"><?= $notificationCount ?></span>
+                        <?php endif; ?>
+                    </a></li>
+                    <li><a href="../logout.php">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <div class="main-content-container">
     <div class="profile-main-container">
         <div class="profile-header">
             <div class="profile-avatar">
@@ -435,11 +485,11 @@ function sendPasswordChangeNotification($email) {
         </div>
     </div>
 </div>
-<?php include_once 'includes/footer.php'; ?>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="../includes/activity-tracker.js"></script>
+        </main>
+        <footer>
+            <!-- ...existing code... -->
+        </footer>
+    </div>
 </body>
 </html>
 
