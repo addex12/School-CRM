@@ -44,6 +44,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event'])) {
         $_SESSION['error'] = $e->getMessage();
     }
 }
+
+// Handle inline edit and delete actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['edit_event'])) {
+        try {
+            $event_id = intval($_POST['event_id']);
+            $title = trim($_POST['title']);
+            $description = trim($_POST['description']);
+            $start_date = $_POST['start_date'];
+            $end_date = $_POST['end_date'];
+
+            if (empty($title) || empty($start_date) || empty($end_date)) {
+                throw new Exception("Title, start date, and end date are required.");
+            }
+
+            $stmt = $pdo->prepare("UPDATE events SET title = ?, description = ?, start_date = ?, end_date = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $start_date, $end_date, $event_id]);
+
+            $_SESSION['success'] = "Event updated successfully!";
+            header("Location: events.php");
+            exit();
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+        }
+    }
+
+    if (isset($_POST['delete_event'])) {
+        try {
+            $event_id = intval($_POST['event_id']);
+            $stmt = $pdo->prepare("DELETE FROM events WHERE id = ?");
+            $stmt->execute([$event_id]);
+
+            $_SESSION['success'] = "Event deleted successfully!";
+            header("Location: events.php");
+            exit();
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -87,6 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event'])) {
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
         .event-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
             background: #fff;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
@@ -94,19 +137,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event'])) {
             margin-bottom: 1rem;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
-        .event-card h2 {
-            font-size: 1.2rem;
-            color: #34495e;
-            margin-bottom: 0.5rem;
+        .event-card form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
-        .event-card p {
-            font-size: 0.95rem;
-            color: #7f8c8d;
-            margin-bottom: 0.5rem;
-        }
-        .event-card .event-dates {
+        .event-card input, .event-card textarea, .event-card button {
             font-size: 0.9rem;
-            color: #888;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .event-card button {
+            background: #007bfc;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .event-card button:hover {
+            background: #0056b3;
+        }
+        .event-card .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .event-card .actions button {
+            flex: 1;
         }
         @media (max-width: 768px) {
             .events-header {
@@ -148,12 +205,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event'])) {
                     <?php if (!empty($events)): ?>
                         <?php foreach ($events as $event): ?>
                             <div class="event-card">
-                                <h2><?= htmlspecialchars($event['title']) ?></h2>
-                                <p><?= htmlspecialchars($event['description']) ?></p>
-                                <p class="event-dates">
-                                    From: <?= date('M j, Y g:i A', strtotime($event['start_date'])) ?><br>
-                                    To: <?= date('M j, Y g:i A', strtotime($event['end_date'])) ?>
-                                </p>
+                                <form method="POST">
+                                    <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
+                                    <input type="text" name="title" value="<?= htmlspecialchars($event['title']) ?>" required>
+                                    <textarea name="description" rows="2"><?= htmlspecialchars($event['description']) ?></textarea>
+                                    <input type="datetime-local" name="start_date" value="<?= date('Y-m-d\TH:i', strtotime($event['start_date'])) ?>" required>
+                                    <input type="datetime-local" name="end_date" value="<?= date('Y-m-d\TH:i', strtotime($event['end_date'])) ?>" required>
+                                    <div class="actions">
+                                        <button type="submit" name="edit_event">Save</button>
+                                        <button type="submit" name="delete_event" style="background: #e74c3c;">Delete</button>
+                                    </div>
+                                </form>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
