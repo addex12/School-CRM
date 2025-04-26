@@ -1,24 +1,21 @@
 <?php
-session_start();
-require_once __DIR__ . '/../includes/config.php';
+include('../config.php'); // Include database connection
 
-if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-    $eventId = (int)$_GET['id'];
+if (isset($_GET['id'])) {
+    $event_id = $_GET['id'];
 
-    try {
-        $stmt = $pdo->prepare("DELETE FROM events WHERE id = :id");
-        $stmt->bindParam(':id', $eventId, PDO::PARAM_INT);
-        $stmt->execute();
+    $delete_query = "DELETE FROM events WHERE id = ?";
+    $stmt = $conn->prepare($delete_query);
+    $stmt->bind_param("i", $event_id);
 
-        $_SESSION['success'] = "Event deleted successfully.";
-        header("Location: events.php");
+    if ($stmt->execute()) {
+        header("Location: events.php?message=Event deleted successfully");
         exit();
-    } catch (Exception $e) {
-        error_log("Error deleting event: " . $e->getMessage());
-        $_SESSION['error'] = "Error deleting event.";
+    } else {
+        echo "Error deleting event.";
     }
 } else {
-    header("Location: events.php");
+    header("Location: events.php?message=Invalid event ID");
     exit();
 }
 ?>
