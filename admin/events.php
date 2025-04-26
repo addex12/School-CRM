@@ -23,7 +23,7 @@ try {
     $events = [];
 }
 
-include __DIR__ . '/../includes/admin_sidebar.php';
+include 'includes/admin_sidebar.php';
 ?>
 
 <div class="admin-main">
@@ -108,4 +108,4 @@ include __DIR__ . '/../includes/admin_sidebar.php';
     </div>
 </div>
 
-<?php include __DIR__ . '/../includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
