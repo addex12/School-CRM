@@ -187,13 +187,17 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <td><?= htmlspecialchars($ticket['email'] ?? '-') ?></td>
                                                 <td><?= htmlspecialchars($ticket['subject']) ?></td>
                                                 <td>
-                                                    <?php if (strtolower($ticket['status']) == 'open'): ?>
-                                                        <span class="status-open">Open</span>
-                                                    <?php elseif (strtolower($ticket['status']) == 'closed'): ?>
-                                                        <span class="status-closed">Closed</span>
-                                                    <?php else: ?>
-                                                        <?= htmlspecialchars($ticket['status']) ?>
-                                                    <?php endif; ?>
+                                                    <?php
+                                                    $statusColors = [
+                                                        'open' => '#27ae60',
+                                                        'in_progress' => '#3498db',
+                                                        'on_hold' => '#f1c40f',
+                                                        'resolved' => '#27ae60',
+                                                    ];
+                                                    $status = strtolower($ticket['status']);
+                                                    $color = $statusColors[$status] ?? '#34495e';
+                                                    ?>
+                                                    <span style="color: <?= $color ?>; font-weight: 500;"><?= htmlspecialchars(ucwords(str_replace('_', ' ', $status))) ?></span>
                                                 </td>
                                                 <td><?= htmlspecialchars($ticket['priority']) ?></td>
                                                 <td><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></td>
