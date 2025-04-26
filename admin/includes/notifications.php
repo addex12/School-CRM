@@ -21,6 +21,26 @@ function time_ago($datetime) {
 }
 ?>
 
+<style>
+    .notifications-dropdown .badge {
+        font-size: 0.8rem; /* Reduced font size */
+        padding: 4px 8px; /* Smaller padding */
+        background: #e74c3c; /* Red background */
+        color: #fff;
+        border-radius: 50%;
+        font-weight: 600;
+    }
+    .notifications-list .notification-item {
+        font-size: 0.85rem; /* Reduced font size */
+        padding: 6px 10px; /* Smaller padding */
+        border-bottom: 1px solid #ddd;
+    }
+    .notifications-list .notification-item small {
+        font-size: 0.75rem; /* Smaller timestamp */
+        color: #888;
+    }
+</style>
+
 <div class="notifications-dropdown">
     <i class="fas fa-bell"></i>
     <?php if (count($notifications) > 0): ?>

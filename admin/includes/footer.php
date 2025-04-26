@@ -75,10 +75,10 @@
     .footer-link {
         color: #fff;
         text-decoration: none;
-        font-size: 12px;
+        font-size: 11px; /* Reduced font size */
         font-weight: 500;
         transition: all 0.2s ease-in-out;
-        padding: 6px 14px;
+        padding: 4px 10px; /* Smaller padding */
         border-radius: 4px;
         background: #007bfc; /* Updated to match Frappe/Jinja design */
         margin-right: 4px;
@@ -103,17 +103,17 @@
     }
     .social-link {
         color: #f5f6fa;
-        font-size: 17px;
+        font-size: 14px; /* Reduced font size */
         transition: color 0.2s, transform 0.2s;
         background: #007bfc;
         border-radius: 50%;
-        padding: 4px 7px 2px 7px;
+        padding: 3px 6px; /* Smaller padding */
         display: inline-block;
     }
     .social-link:hover {
         color: #f1c40f;
         background: #215967;
-        transform: scale(1.15);
+        transform: scale(1.1); /* Slightly smaller hover effect */
     }
     @media (max-width: 900px) {
         .footer-content {

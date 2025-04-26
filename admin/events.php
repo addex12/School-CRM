@@ -114,9 +114,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #007bfc;
             color: #fff;
             border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
+            padding: 0.4rem 0.8rem; /* Smaller padding */
+            border-radius: 4px; /* Slightly smaller border radius */
             font-weight: 500;
+            font-size: 0.9rem; /* Reduced font size */
             transition: background 0.18s, transform 0.18s;
             text-decoration: none;
             display: inline-block;
@@ -124,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn:hover {
             background: #0056b3;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Slightly reduced shadow */
         }
         .event-card {
             display: flex;

@@ -49,9 +49,10 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     background: none;
     border: none;
     color: #fff;
-    font-size: 1.3rem;
+    font-size: 1rem; /* Reduced font size */
     cursor: pointer;
     margin-left: 10px;
+    padding: 0.4rem 0.6rem; /* Smaller padding */
 }
 .admin-sidebar ul {
     list-style: none;
@@ -65,10 +66,10 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 .admin-sidebar ul li a {
     display: flex;
     align-items: center;
-    padding: 0.85rem 1.5rem;
+    padding: 0.6rem 1rem; /* Smaller padding */
     color: #fff;
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 0.9rem; /* Reduced font size */
     transition: background 0.15s, color 0.15s;
     border-left: 4px solid transparent;
     font-weight: 500;
@@ -80,8 +81,8 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     border-left: 4px solid #fff;
 }
 .admin-sidebar ul li a i {
-    margin-right: 1rem;
-    font-size: 1.1em;
+    margin-right: 0.8rem; /* Reduced margin */
+    font-size: 1rem; /* Adjusted icon size */
     min-width: 22px;
     text-align: center;
 }
@@ -101,8 +102,8 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     padding-left: 0.5rem;
 }
 .admin-sidebar .submenu li a {
-    font-size: 0.97em;
-    padding-left: 2.5rem;
+    font-size: 0.85rem; /* Smaller font size for submenu */
+    padding-left: 2rem; /* Adjusted padding */
     border-left: none;
 }
 .admin-sidebar .submenu li a.active,
