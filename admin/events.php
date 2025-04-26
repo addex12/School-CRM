@@ -1,4 +1,4 @@
-<?php
+<d?php
 session_start();
 require_once __DIR__ . '/../includes/config.php';
 
@@ -97,7 +97,7 @@ include 'includes/admin_sidebar.php';
         </div>
     </div>
 </div>
-
+                        </div>
 <?php require_once 'includes/footer.php'; ?>
 
 <script>
