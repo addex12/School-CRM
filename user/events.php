@@ -28,6 +28,12 @@ try {
     ");
     $stmt->execute([$_SESSION['user_id']]);
     $events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Debugging: Log the number of events fetched
+    error_log("Number of events fetched: " . count($events));
+    if (empty($events)) {
+        error_log("No events found for user_id: " . $_SESSION['user_id']);
+    }
 } catch (Exception $e) {
     error_log("Error fetching events: " . $e->getMessage());
     $events = [];
