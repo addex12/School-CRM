@@ -365,7 +365,6 @@ foreach ($admins as $a) {
                         <div class="message-card-header">
                             <span id="chat-header-title">
                                 <i class="fas fa-paper-plane" style="color:#007bff;margin-right:6px;"></i>
-                                <span id="chat-header-user">Select a user to start chatting</span>
                             </span>
                             <?php
                             $totalUnread = array_sum($unreadCounts);
