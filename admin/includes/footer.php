@@ -23,6 +23,15 @@
         z-index: 100;
         box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
         min-height: 56px;
+        flex-shrink: 0; /* Ensures the footer does not shrink */
+    }
+    .admin-main {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh; /* Ensures the page takes up the full height of the viewport */
+    }
+    .content {
+        flex: 1; /* Ensures the content takes up available space */
     }
     .footer-content {
         display: flex;
