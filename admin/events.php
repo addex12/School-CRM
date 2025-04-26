@@ -36,8 +36,6 @@ include 'includes/admin_sidebar.php';
     }
 
     .admin-header {
-        background-color: #007bff;
-        color: white;
         padding: 15px;
         border-radius: 5px;
     }
