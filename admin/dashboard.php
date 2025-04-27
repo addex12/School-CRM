@@ -256,6 +256,24 @@ try {
     error_log("Monthly New Users Error: " . $e->getMessage());
 }
 
+// Fetch counts for notifications
+$newMessages = [];
+$newTickets = [];
+$newSurveyResponses = [];
+
+try {
+    $stmt = $pdo->prepare("SELECT id, subject, created_at FROM messages WHERE is_read = 0 AND receiver_id = ? ORDER BY created_at DESC LIMIT 5");
+    $stmt->execute([$_SESSION['user_id']]);
+    $newMessages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->query("SELECT id, title, created_at FROM support_tickets WHERE status = 'open' ORDER BY created_at DESC LIMIT 5");
+    $newTickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $stmt = $pdo->query("SELECT id, survey_id, created_at FROM survey_responses WHERE is_new = 1 ORDER BY created_at DESC LIMIT 5");
+    $newSurveyResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Notification Error: " . $e->getMessage());
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -399,6 +417,29 @@ try {
         .quick-link i {
             font-size: 1.2rem; /* Smaller icon size */
             margin-bottom: 0.25rem;
+        }
+
+        .notification-bar {
+            background: #f39c12;
+            color: #fff;
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .notification-bar a {
+            color: #fff;
+            text-decoration: underline;
+            margin: 0 10px;
+        }
+
+        .notification-bar a:hover {
+            color: #34495e;
         }
 
         @media (max-width: 900px) {
@@ -578,6 +619,11 @@ try {
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
+            <!-- Notification Bar -->
+            <div class="notification-bar" id="notificationBar">
+                <!-- Content will be dynamically updated -->
+            </div>
+
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
@@ -643,6 +689,32 @@ try {
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const newMessages = <?= json_encode($newMessages) ?>;
+            const newTickets = <?= json_encode($newTickets) ?>;
+            const newSurveyResponses = <?= json_encode($newSurveyResponses) ?>;
+            const notificationBar = document.getElementById('notificationBar');
+
+            let notifications = [];
+
+            if (newMessages.length > 0) {
+                notifications.push(`<a href="messages.php">${newMessages.length} new message(s)</a>`);
+            }
+            if (newTickets.length > 0) {
+                notifications.push(`<a href="support_tickets.php">${newTickets.length} new support ticket(s)</a>`);
+            }
+            if (newSurveyResponses.length > 0) {
+                notifications.push(`<a href="surveys.php">${newSurveyResponses.length} new survey response(s)</a>`);
+            }
+
+            if (notifications.length > 0) {
+                notificationBar.innerHTML = notifications.join(' | ');
+                notificationBar.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 
 </html>
