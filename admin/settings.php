@@ -15,6 +15,21 @@ $pageTitle = "System Settings";
 // Handle settings update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
+        // Handle file upload for site logo
+        if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = '../uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $fileName = basename($_FILES['site_logo']['name']);
+            $targetFile = $uploadDir . $fileName;
+            if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $targetFile)) {
+                $_POST['settings']['site_logo'] = $targetFile;
+            } else {
+                $_SESSION['error'] = "Failed to upload site logo.";
+            }
+        }
+
         foreach ($_POST['settings'] as $key => $value) {
             $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?)
                 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
@@ -39,24 +54,37 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 $settings_fields = [
     'general' => [
         'site_name' => ['label' => 'Site Name', 'type' => 'text'],
-        'site_logo' => ['label' => 'Site Logo URL', 'type' => 'text'],
+        'site_logo' => ['label' => 'Site Logo', 'type' => 'file'],
         'admin_email' => ['label' => 'Admin Email', 'type' => 'email'],
         'timezone' => ['label' => 'Timezone', 'type' => 'text'],
         'language' => ['label' => 'Default Language', 'type' => 'text'],
         'dashboard_cards' => ['label' => 'Dashboard Cards (comma separated)', 'type' => 'text'],
     ],
-    'appearance' => [
-        'primary_color' => ['label' => 'Primary Color', 'type' => 'text'],
-        'secondary_color' => ['label' => 'Secondary Color', 'type' => 'text'],
-        'sidebar_bg' => ['label' => 'Sidebar Background', 'type' => 'text'],
-        'sidebar_text_color' => ['label' => 'Sidebar Text Color', 'type' => 'text'],
-    ],
     'email' => [
-        'smtp_host' => ['label' => 'SMTP Host', 'type' => 'text'],
+        'smtp_host' => [
+            'label' => 'SMTP Host',
+            'type' => 'select',
+            'options' => [
+                '' => 'Select SMTP Provider',
+                'smtp.gmail.com' => 'Gmail',
+                'smtp.mail.yahoo.com' => 'Yahoo',
+                'smtp.office365.com' => 'Office 365',
+                'smtp.mailgun.org' => 'Mailgun',
+                'smtp.sendgrid.net' => 'SendGrid',
+            ]
+        ],
         'smtp_port' => ['label' => 'SMTP Port', 'type' => 'number'],
         'smtp_user' => ['label' => 'SMTP Username', 'type' => 'text'],
         'smtp_pass' => ['label' => 'SMTP Password', 'type' => 'password'],
-        'smtp_secure' => ['label' => 'SMTP Secure (ssl/tls)', 'type' => 'text'],
+        'smtp_secure' => [
+            'label' => 'SMTP Secure',
+            'type' => 'select',
+            'options' => [
+                '' => 'Select Security',
+                'ssl' => 'SSL',
+                'tls' => 'TLS',
+            ]
+        ],
         'from_email' => ['label' => 'From Email', 'type' => 'email'],
     ],
     'security' => [
@@ -203,7 +231,7 @@ $settings_fields = [
             </header>
             <div class="erp-card">
                 <?php include 'includes/alerts.php'; ?>
-                <form method="POST" autocomplete="off">
+                <form method="POST" enctype="multipart/form-data" autocomplete="off">
                     <input type="hidden" name="update_settings" value="1">
                     <?php foreach ($settings_fields as $section => $fields): ?>
                         <div class="settings-section">
@@ -214,6 +242,19 @@ $settings_fields = [
                                     <?php if ($field['type'] === 'checkbox'): ?>
                                         <input type="checkbox" id="<?= $key ?>" name="settings[<?= $key ?>]" value="1"
                                             <?= !empty($settings[$key]) && $settings[$key] == '1' ? 'checked' : '' ?>>
+                                    <?php elseif ($field['type'] === 'select'): ?>
+                                        <select id="<?= $key ?>" name="settings[<?= $key ?>]">
+                                            <?php foreach ($field['options'] as $optionValue => $optionLabel): ?>
+                                                <option value="<?= $optionValue ?>" <?= isset($settings[$key]) && $settings[$key] == $optionValue ? 'selected' : '' ?>>
+                                                    <?= $optionLabel ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    <?php elseif ($field['type'] === 'file'): ?>
+                                        <input type="file" id="<?= $key ?>" name="<?= $key ?>">
+                                        <?php if (!empty($settings[$key])): ?>
+                                            <p>Current Logo: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Site Logo" style="height: 50px;"></p>
+                                        <?php endif; ?>
                                     <?php else: ?>
                                         <input type="<?= $field['type'] ?>" id="<?= $key ?>" name="settings[<?= $key ?>]"
                                             value="<?= htmlspecialchars($settings[$key] ?? '') ?>">
