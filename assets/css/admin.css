@@ -113,12 +113,12 @@ body, html {
 }
 
 table {
-    width: 100%;
+    width: 80%; /* Reduce table width */
+    margin: 0 auto; /* Center the table */
     border-collapse: collapse;
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 0;
     font-size: 1em;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
 }
@@ -133,17 +133,29 @@ th {
     background: #f7fafd;
     color: #3498db;
     font-weight: 700;
-    font-size: 1.05em;
-    border-bottom: 2px solid #eaf6ff;
+    text-align: center; /* Center align table headers */
 }
 
-tr:last-child td {
-    border-bottom: none;
+@media (max-width: 768px) {
+    table {
+        width: 100%; /* Make table take full width on smaller screens */
+        font-size: 0.9rem; /* Reduce font size for smaller screens */
+    }
+
+    th, td {
+        padding: 10px; /* Reduce padding for smaller screens */
+        word-wrap: break-word; /* Allow text to wrap within cells */
+    }
 }
 
-tr:hover {
-    background: #f4f8fb;
-    transition: background 0.2s;
+@media (max-width: 480px) {
+    table {
+        font-size: 0.8rem; /* Further reduce font size for very small screens */
+    }
+
+    th, td {
+        padding: 8px; /* Further reduce padding */
+    }
 }
 
 @media (max-width: 900px) {
