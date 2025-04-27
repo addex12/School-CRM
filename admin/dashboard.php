@@ -69,6 +69,12 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
             "icon" => "fa-check-circle",
             "color" => "green",
             "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
+        ],
+        [
+            "title" => "Completed Tickets",
+            "icon" => "fa-check-double",
+            "color" => "purple",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'completed'"
         ]
     ];
 } else {
