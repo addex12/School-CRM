@@ -24,75 +24,56 @@ if (!isset($pdo) || !$pdo) {
 }
 
 // School CRM Dashboard widgets (revamped)
-$dashboardConfigPath = realpath(__DIR__ . '/../config/dashboard.json');
-if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
-    $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
-    $widgets = $dashboardConfig['widgets'] ?? [
-        [
-            "title" => "Total Users",
-            "icon" => "fa-users",
-            "color" => "blue",
-            "query" => "SELECT COUNT(*) FROM users"
-        ],
-        [
-            "title" => "Active Users",
-            "icon" => "fa-user-check",
-            "color" => "green",
-            "query" => "SELECT COUNT(*) FROM users WHERE status = 'active'"
-        ],
-        [
-            "title" => "Inactive Users",
-            "icon" => "fa-user-times",
-            "color" => "red",
-            "query" => "SELECT COUNT(*) FROM users WHERE status = 'inactive'"
-        ],
-        [
-            "title" => "Total Courses",
-            "icon" => "fa-book",
-            "color" => "purple",
-            "query" => "SELECT COUNT(*) FROM courses"
-        ],
-        [
-            "title" => "Enrolled Students",
-            "icon" => "fa-user-graduate",
-            "color" => "orange",
-            "query" => "SELECT COUNT(*) FROM course_enrollments"
-        ],
-        [
-            "title" => "New Feedback",
-            "icon" => "fa-comments",
-            "color" => "teal",
-            "query" => "SELECT COUNT(*) FROM feedback WHERE is_read = 0"
-        ],
-        [
-            "title" => "Open Tickets",
-            "icon" => "fa-ticket-alt",
-            "color" => "red",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
-        ],
-        [
-            "title" => "In Progress Tickets",
-            "icon" => "fa-spinner",
-            "color" => "blue",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'in_progress'"
-        ],
-        [
-            "title" => "On Hold Tickets",
-            "icon" => "fa-pause-circle",
-            "color" => "yellow",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'on_hold'"
-        ],
-        [
-            "title" => "Resolved Tickets",
-            "icon" => "fa-check-circle",
-            "color" => "green",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
-        ],
-    ];
-} else {
-    error_log("Dashboard configuration file not found or unreadable.");
-    $widgets = [];
-}
+$widgets = [
+    [
+        "title" => "Total Users",
+        "icon" => "fa-users",
+        "color" => "blue",
+        "query" => "SELECT COUNT(*) FROM users"
+    ],
+    [
+        "title" => "Students",
+        "icon" => "fa-user-graduate",
+        "color" => "purple",
+        "query" => "SELECT COUNT(*) FROM students"
+    ],
+    [
+        "title" => "Teachers",
+        "icon" => "fa-chalkboard-teacher",
+        "color" => "teal",
+        "query" => "SELECT COUNT(*) FROM teachers"
+    ],
+    [
+        "title" => "Parents",
+        "icon" => "fa-user-friends",
+        "color" => "yellow",
+        "query" => "SELECT COUNT(*) FROM parents"
+    ],
+    [
+        "title" => "Active Surveys",
+        "icon" => "fa-poll",
+        "color" => "green",
+        "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
+    ],
+    [
+        "title" => "Feedback",
+        "icon" => "fa-comments",
+        "color" => "orange",
+        "query" => "SELECT COUNT(*) FROM feedback"
+    ],
+    [
+        "title" => "Open Tickets",
+        "icon" => "fa-ticket-alt",
+        "color" => "red",
+        "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
+    ],
+    [
+        "title" => "Messages",
+        "icon" => "fa-envelope",
+        "color" => "blue",
+        "query" => "SELECT COUNT(*) FROM messages"
+    ]
+];
 
 foreach ($widgets as &$widget) {
     try {
@@ -261,9 +242,8 @@ try {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 2rem;
-            margin: 0 auto; /* Center the grid horizontally */
+            margin-bottom: 2.5rem;
         }
-
         .dashboard-widget {
             background: #fff;
             border-radius: 12px;
@@ -272,9 +252,7 @@ try {
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
-            margin: 0 auto; /* Center the widget horizontally */
         }
-
         .dashboard-widget i {
             font-size: 2.2rem;
             margin-bottom: 0.7rem;
@@ -380,7 +358,6 @@ try {
         }
         @media (max-width: 600px) {
             .admin-main {
-                flex: 1;
                 padding: 10px 2px 80px;
             }
             .dashboard-widget, .dashboard-section {
@@ -390,12 +367,11 @@ try {
                 padding: 8px 6px;
             }
             .widget-grid {
-                grid-template-columns: 1fr; /* Stack widgets vertically on small screens */
-                gap: 1rem; /* Reduce gap between widgets */
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
-
-            .dashboard-widget {
-                width: 95%; /* Adjust widget width for small screens */
+            .dashboard-section h2 {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -436,7 +412,6 @@ try {
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                    <a href="events.php" class="quick-link"><i class="fas fa-calendar-plus"></i><span>Add Event</span></a>
                 </div>
 
                 <!-- Widgets Section -->
@@ -475,10 +450,6 @@ try {
                         <li>PHP Version: <?= phpversion() ?></li>
                         <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
                         <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
-                        <li>Database Name: <?= htmlspecialchars(DB_NAME ?? 'N/A') ?></li>
-                        <li>Database User: <?= htmlspecialchars(DB_USER ?? 'N/A') ?></li>
-                        <li>Database Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_VERSION) ?? 'N/A') ?></li>
-                        <li>Database Table Count: <?= htmlspecialchars($pdo->query('SHOW TABLES')->rowCount()) ?></li>
                         <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
                     </ul>
                 </div>
