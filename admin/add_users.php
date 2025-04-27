@@ -271,46 +271,25 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        .users-table {
-            width: 90%; /* Adjust table width for better responsiveness */
-            margin: 0 auto; /* Center the table */
-            border-collapse: collapse;
-            background: white;
+        .erpnext-form-grid {
+            display: flex;
+            flex-direction: column; /* Stack cards vertically */
+            align-items: center; /* Center align the cards */
+            gap: 1.5rem; /* Add spacing between cards */
+        }
+
+        .erpnext-card {
+            width: 90%; /* Adjust card width for better responsiveness */
+            max-width: 500px; /* Limit the maximum width of the cards */
+            padding: 1.5rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .users-table th, .users-table td {
-            padding: 10px; /* Adjust padding for better spacing */
-            border: 1px solid #ddd;
-            text-align: left;
-            font-size: 0.9rem; /* Adjust font size */
-        }
-
-        .users-table th {
-            background: #4e79a7;
-            color: white;
-            text-align: center; /* Center align table headers */
+            background: white;
+            border-radius: 8px;
         }
 
         @media (max-width: 768px) {
-            .users-table {
-                width: 100%; /* Make table take full width on smaller screens */
-                font-size: 0.85rem; /* Slightly reduce font size for smaller screens */
-            }
-
-            .users-table th, .users-table td {
-                padding: 8px; /* Reduce padding for smaller screens */
-                word-wrap: break-word; /* Allow text to wrap within cells */
-            }
-        }
-
-        @media (max-width: 480px) {
-            .users-table {
-                font-size: 0.8rem; /* Further reduce font size for very small screens */
-            }
-
-            .users-table th, .users-table td {
-                padding: 6px; /* Further reduce padding */
+            .erpnext-card {
+                width: 100%; /* Make cards take full width on smaller screens */
             }
         }
     </style>
