@@ -205,7 +205,6 @@ try {
 <body>
     <div class="admin-dashboard">
         <?php
-        // Make unreadMessagesCount available to sidebar
         $ADMIN_UNREAD_MESSAGES = $unreadMessagesCount;
         include __DIR__ . '/includes/admin_sidebar.php';
         ?>

@@ -1,5 +1,5 @@
 .admin-footer {
-    position: relative;
+    position: fixed; /* Fix footer at the bottom */
     bottom: 0;
     left: 0;
     width: 100%;
@@ -12,12 +12,12 @@
     font-size: 13px;
     z-index: 100;
     box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
-    flex-shrink: 0;
 }
 .admin-main {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    padding-bottom: 60px; /* Add padding to prevent content overlap with footer */
 }
 .content {
     flex: 1;
