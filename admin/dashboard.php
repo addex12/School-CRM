@@ -343,7 +343,9 @@ try {
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            height: 80px; /* Reduced height */
+            min-height: 80px; /* Allow dynamic height */
+            height: auto; /* Adjust height based on content */
+            word-wrap: break-word; /* Ensure text wraps within the widget */
         }
 
         .dashboard-widget:hover {
@@ -366,6 +368,9 @@ try {
         .dashboard-widget p {
             font-size: 0.7rem; /* Smaller font size */
             color: #7f8c8d;
+            margin: 0.25rem 0 0; /* Add spacing between text and other elements */
+            text-align: center;
+            line-height: 1.2; /* Improve readability */
         }
 
         .quick-links {
