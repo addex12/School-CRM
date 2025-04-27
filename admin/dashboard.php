@@ -229,10 +229,7 @@ try {
             min-height: 100vh;
             background: #f4f6fa;
         }
-        .admin-main {
-            flex: 1;
-            padding: 2rem 2.5rem;
-        }
+
         .users-header {
             display: flex;
             justify-content: space-between;
@@ -380,6 +377,7 @@ try {
         }
         @media (max-width: 600px) {
             .admin-main {
+                flex: 1;
                 padding: 10px 2px 80px;
             }
             .dashboard-widget, .dashboard-section {
