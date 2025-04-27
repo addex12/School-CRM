@@ -1,4 +1,11 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 // Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
@@ -536,8 +543,14 @@ $chart_json = json_encode($chart_data);
             </div>
         </div>
     </div>
-
-    <>
+</body> 
+</html>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> 
+   <script>
         // Pass PHP data to JavaScript
         const chartData = <?= $chart_json ?>;
         
@@ -606,175 +619,175 @@ $chart_json = json_encode($chart_data);
                                 }
                             }
                         }
-                    } // Ensure this matches the opening parenthesis or brace earlier in the code
-                }); // Close the outer function or block properly
+                    }
+                }); // Ensure this matches the opening parenthesis or brace earlier in the code
+            }
+        }); // Close the outer function or block properly
+
+        // Field-specific charts
+        chartData.fields.forEach(field => {
+            const fieldAnalytics = chartData.analytics[field.id] || [];
+            const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
             
-            
-            // Field-specific charts
-            chartData.fields.forEach(field => {
-                const fieldAnalytics = chartData.analytics[field.id] || [];
-                const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
-                
-                if (fieldAnalytics.length > 0) {
-                    switch(field.field_type) {
-                        case 'radio':
-                        case 'select':
-                        case 'rating':
-                            // Pie/Doughnut chart for single-select questions
-                            new Chart(ctx, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: fieldAnalytics.map(item => item.field_value),
-                                    datasets: [{
-                                        data: fieldAnalytics.map(item => item.count),
-                                        backgroundColor: [
-                                            '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', 
-                                            '#560bad', '#7209b7', '#b5179e', '#f72585',
-                                            '#3a0ca3', '#480ca8'
-                                        ],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    cutout: '60%',
-                                    plugins: { // <-- Add this comma to fix the error
-                                        font: { size: 14 }
-                                    },
-                                    legend: { display: false },
-                                    datalabels: {
-                                        anchor: 'end',
-                                        align: 'end',
-                                        formatter: value => value,
-                                        color: '#4361ee',
-                                        font: { weight: 'bold' }
-                                    }
-                                },
-                                plugins: [ChartDataLabels]
-                            });
-                            break;
-                            
-                        case 'number':
-                            // Add logic for handling 'number' field type here
-                            // Histogram for numeric responses
-                            const numericValues = fieldAnalytics
-                                .filter(item => !isNaN(parseFloat(item.field_value)))
-                                .map(item => parseFloat(item.field_value));
-                            
-                            if (numericValues.length > 0) {
-                                const min = Math.min(...numericValues);
-                                const max = Math.max(...numericValues);
-                                const binCount = Math.min(10, Math.ceil(Math.sqrt(numericValues.length)));
-                                const binSize = (max - min) / binCount;
-                                
-                                const bins = Array(binCount).fill(0);
-                                const labels = [];
-                                
-                                for (let i = 0; i < binCount; i++) {
-                                    const binStart = min + i * binSize;
-                                    const binEnd = binStart + binSize;
-                                    labels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
-                                    
-                                    bins[i] = numericValues.filter(val => 
-                                        val >= binStart && (i === binCount - 1 ? val <= binEnd : val < binEnd)
-                                    ).length;
-                                }
-                                
-                                new Chart(ctx, {
-                                    type: 'bar',
-                                    data: {
-                                        labels: labels,
-                                        datasets: [{
-                                            label: 'Frequency',
-                                            data: bins,
-                                            backgroundColor: '#4361ee',
-                                            borderWidth: 0,
-                                            borderRadius: 4
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        plugins: {
-                                            title: {
-                                                display: true,
-                                                text: `${field.field_label} Distribution`,
-                                                font: { size: 14 }
-                                            },
-                                            legend: { display: false }
-                                        },
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                                title: { 
-                                                    display: true, 
-                                                    text: 'Count',
-                                                    font: { weight: 'bold' }
-                                                },
-                                                grid: {
-                                                    color: 'rgba(0, 0, 0, 0.05)'
-                                                }
-                                            },
-                                            x: {
-                                                title: { 
-                                                    display: true, 
-                                                    text: 'Value Range',
-                                                    font: { weight: 'bold' }
-                                                },
-                                                grid: {
-                                                    display: false
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                            break;
-                            
-                        // Default bar chart for other types
+            if (fieldAnalytics.length > 0) {
+                switch(field.field_type) {
+                    case 'radio':
+                    case 'select':
+                    case 'rating':
+                        // Pie/Doughnut chart for single-select questions
                         new Chart(ctx, {
-                            type: 'bar',
+                            type: 'doughnut',
                             data: {
-                                labels: fieldAnalytics.map(item => `Option ${item.field_value}`),
+                                labels: fieldAnalytics.map(item => item.field_value),
                                 datasets: [{
-                                    label: 'Responses',
                                     data: fieldAnalytics.map(item => item.count),
-                                    backgroundColor: '#4895ef',
-                                    borderWidth: 0,
-                                    borderRadius: 4
+                                    backgroundColor: [
+                                        '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', 
+                                        '#560bad', '#7209b7', '#b5179e', '#f72585',
+                                        '#3a0ca3', '#480ca8'
+                                    ],
+                                    borderWidth: 1
                                 }]
                             },
                             options: {
                                 responsive: true,
+                                cutout: '60%',
                                 plugins: {
-                                    title: {
-                                        display: true,
-                                        text: field.field_label,
-                                        font: { size: 14 }
-                                    },
-                                    legend: { display: false }
+                                    font: { size: 14 }
                                 },
-                                scales: {
-                                    y: {
-                                        beginAtZero: true,
-                                        grid: {
-                                            color: 'rgba(0, 0, 0, 0.05)'
-                                        }
+                                legend: { display: false },
+                                datalabels: {
+                                    anchor: 'end',
+                                    align: 'end',
+                                    formatter: value => value,
+                                    color: '#4361ee',
+                                    font: { weight: 'bold' }
+                                }
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+                        break;
+                        
+                    case 'number':
+                        // Add logic for handling 'number' field type here
+                        // Histogram for numeric responses
+                        const numericValues = fieldAnalytics
+                            .filter(item => !isNaN(parseFloat(item.field_value)))
+                            .map(item => parseFloat(item.field_value));
+                        
+                        if (numericValues.length > 0) {
+                            const min = Math.min(...numericValues);
+                            const max = Math.max(...numericValues);
+                            const binCount = Math.min(10, Math.ceil(Math.sqrt(numericValues.length)));
+                            const binSize = (max - min) / binCount;
+                            
+                            const bins = Array(binCount).fill(0);
+                            const labels = [];
+                            
+                            for (let i = 0; i < binCount; i++) {
+                                const binStart = min + i * binSize;
+                                const binEnd = binStart + binSize;
+                                labels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
+                                
+                                bins[i] = numericValues.filter(val => 
+                                    val >= binStart && (i === binCount - 1 ? val <= binEnd : val < binEnd)
+                                ).length;
+                            }
+                            
+                            new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Frequency',
+                                        data: bins,
+                                        backgroundColor: '#4361ee',
+                                        borderWidth: 0,
+                                        borderRadius: 4
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        title: {
+                                            display: true,
+                                            text: `${field.field_label} Distribution`,
+                                            font: { size: 14 }
+                                        },
+                                        legend: { display: false }
                                     },
-                                    x: {
-                                        grid: {
-                                            display: false
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            title: { 
+                                                display: true, 
+                                                text: 'Count',
+                                                font: { weight: 'bold' }
+                                            },
+                                            grid: {
+                                                color: 'rgba(0, 0, 0, 0.05)'
+                                            }
+                                        },
+                                        x: {
+                                            title: { 
+                                                display: true, 
+                                                text: 'Value Range',
+                                                font: { weight: 'bold' }
+                                            },
+                                            grid: {
+                                                display: false
+                                            }
                                         }
                                     }
                                 }
+                            });
+                        }
+                        break;
+                        
+                    // Default bar chart for other types
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: fieldAnalytics.map(item => `Option ${item.field_value}`),
+                            datasets: [{
+                                label: 'Responses',
+                                data: fieldAnalytics.map(item => item.count),
+                                backgroundColor: '#4895ef',
+                                borderWidth: 0,
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: field.field_label,
+                                    font: { size: 14 }
+                                },
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
                             }
-                        });
-                    }
-                } else {
-                    // No data available for this field
-                    ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
+                        }
+                    });
                 }
-            });
+            } else {
+                // No data available for this field
+                ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
             }
+        });
         
         // PDF Export functionality
         document.addEventListener('DOMContentLoaded', function() {
@@ -824,8 +837,5 @@ $chart_json = json_encode($chart_data);
                 if (dropdown) dropdown.style.display = '';
             });
         }
-    }
     </script>
     <script src="../assets/js/results-export.js"></script>
-</body>
-</html>
