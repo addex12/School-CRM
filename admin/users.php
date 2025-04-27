@@ -84,19 +84,37 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .user-actions a:last-child {
             margin-right: 0;
         }
-        @media (max-width: 900px) {
-            .users-container {
-                padding: 1rem 0.5rem;
-            }
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 600px) {
             .users-header {
                 flex-direction: column;
-                gap: 1rem;
                 align-items: flex-start;
+                gap: 1rem;
             }
-        }
-        @media (max-width: 600px) {
+
+            .erpnext-search-bar {
+                width: 100%; /* Ensure search bar takes full width */
+            }
+
+            .table-responsive {
+                overflow-x: auto; /* Enable horizontal scrolling for tables */
+            }
+
             .users-table th, .users-table td {
-                padding: 8px 6px;
+                font-size: 0.85rem; /* Reduce font size for smaller screens */
+                padding: 8px; /* Adjust padding */
+            }
+
+            .users-table th {
+                white-space: nowrap; /* Prevent header text wrapping */
+            }
+
+            .users-table td {
+                white-space: nowrap; /* Prevent cell text wrapping */
+            }
+
+            .user-actions a {
+                font-size: 1rem; /* Adjust icon size */
             }
         }
         .erpnext-card {
