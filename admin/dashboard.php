@@ -237,43 +237,91 @@ $systemHealth = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
-            background: #f4f6fa;
-        }
+    .admin-dashboard {
+        display: flex;
+        min-height: 100vh;
+        background: #f4f6fa;
+    }
+    .admin-main {
+        flex: 1;
+        padding: 2rem 2.5rem;
+        margin-left: 240px; /* Ensure alignment with the sidebar */
+        transition: margin-left 0.2s;
+    }
+    .admin-sidebar.collapsed ~ .admin-main {
+        margin-left: 60px;
+    }
+    .dashboard-section {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 0.75rem; /* Compact padding */
+        margin-bottom: 1.5rem;
+    }
+    .dashboard-section h2 {
+        font-size: 1.2rem;
+        color: #34495e;
+        margin-bottom: 1rem;
+    }
+    .quick-link {
+        display: flex;
+        align-items: center;
+        padding: 0.25rem 0.5rem; /* Smaller button padding */
+        font-size: 0.875rem; /* Smaller font size */
+        background: #f0f4f7;
+        border-radius: 4px;
+        color: #34495e;
+        text-decoration: none;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .quick-link:hover {
+        background: #e0e6ed;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .quick-link i {
+        font-size: 0.875rem; /* Smaller icon size */
+        margin-right: 0.5rem;
+    }
+    .dashboard-widget {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.2s;
+    }
+    .dashboard-widget:hover {
+        transform: translateY(-4px);
+    }
+    .dashboard-widget i {
+        font-size: 1.5rem; /* Adjust icon size */
+        margin-bottom: 0.5rem;
+    }
+    .dashboard-widget h3 {
+        font-size: 1.25rem;
+        margin: 0;
+    }
+    .dashboard-widget p {
+        font-size: 0.875rem;
+        color: #7f8c8d;
+    }
+    @media (max-width: 900px) {
         .admin-main {
-            flex: 1;
-            padding: 2rem 2.5rem;
-            margin-left: 240px; /* Ensure alignment with the sidebar */
-            transition: margin-left 0.2s;
-        }
-        .admin-sidebar.collapsed ~ .admin-main {
             margin-left: 60px;
         }
-        .dashboard-section {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+    }
+    @media (max-width: 600px) {
+        .admin-main {
+            margin-left: 0;
+            padding: 1rem;
         }
-        .dashboard-section h2 {
-            font-size: 1.3rem;
-            color: #34495e;
-            margin-bottom: 1rem;
+        .dashboard-widget {
+            flex: 1 1 100%; /* Stack widgets vertically */
         }
-        @media (max-width: 900px) {
-            .admin-main {
-                margin-left: 60px;
-            }
-        }
-        @media (max-width: 600px) {
-            .admin-main {
-                margin-left: 0;
-                padding: 1rem;
-            }
-        }
+    }
     </style>
 </head>
 <body>
