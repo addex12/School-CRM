@@ -77,9 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="admin-dashboard">
@@ -91,55 +93,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
             <div class="content">
                 <?php include 'includes/alerts.php'; ?>
 
-                <section class="form-section">
+                <section class="form-section card">
                     <h2>Add New Category</h2>
                     <form method="POST">
                         <div class="form-group">
                             <label for="name">Category Name</label>
-                            <input type="text" name="name" id="name" required>
+                            <input type="text" name="name" id="name" class="form-control" required>
                         </div>
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea name="description" id="description" rows="3"></textarea>
+                            <textarea name="description" id="description" class="form-control" rows="3"></textarea>
                         </div>
-                        <button type="submit" name="add_category" class="btn btn-primary">Add Category</button>
+                        <button type="submit" name="add_category" class="btn btn-primary">
+                            <i class="fa fa-plus"></i> Add Category
+                        </button>
                     </form>
                 </section>
 
-                <section class="table-section">
+                <section class="table-section card">
                     <h2>Existing Categories</h2>
                     <?php if (count($categories) > 0): ?>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Description</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($categories as $category): ?>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td><?= htmlspecialchars($category['id']) ?></td>
-                                        <td><?= htmlspecialchars($category['name']) ?></td>
-                                        <td><?= htmlspecialchars($category['description'] ?? 'N/A') ?></td>
-                                        <td><?= date('M j, Y g:i A', strtotime($category['created_at'])) ?></td>
-                                        <td>
-                                            <!-- Edit Button -->
-                                            <button class="btn btn-secondary" onclick="editCategory(<?= $category['id'] ?>, '<?= htmlspecialchars($category['name']) ?>', '<?= htmlspecialchars($category['description']) ?>')">Edit</button>
-                                            
-                                            <!-- Delete Button -->
-                                            <form method="POST" style="display:inline;">
-                                                <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
-                                                <button type="submit" name="delete_category" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">Delete</button>
-                                            </form>
-                                        </td>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Description</th>
+                                        <th>Created At</th>
+                                        <th>Actions</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($categories as $category): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($category['id']) ?></td>
+                                            <td><?= htmlspecialchars($category['name']) ?></td>
+                                            <td><?= htmlspecialchars($category['description'] ?? 'N/A') ?></td>
+                                            <td><?= date('M j, Y g:i A', strtotime($category['created_at'])) ?></td>
+                                            <td>
+                                                <button class="btn btn-secondary" onclick="editCategory(<?= $category['id'] ?>, '<?= htmlspecialchars($category['name']) ?>', '<?= htmlspecialchars($category['description']) ?>')">
+                                                    <i class="fa fa-edit"></i> Edit
+                                                </button>
+                                                <form method="POST" style="display:inline;">
+                                                    <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
+                                                    <button type="submit" name="delete_category" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">
+                                                        <i class="fa fa-trash"></i> Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     <?php else: ?>
                         <p>No categories found.</p>
                     <?php endif; ?>
@@ -157,13 +164,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
                 <input type="hidden" name="category_id" id="editCategoryId">
                 <div class="form-group">
                     <label for="editName">Category Name</label>
-                    <input type="text" name="name" id="editName" required>
+                    <input type="text" name="name" id="editName" class="form-control" required>
                 </div>
                 <div class="form-group">
                     <label for="editDescription">Description</label>
-                    <textarea name="description" id="editDescription" rows="3"></textarea>
+                    <textarea name="description" id="editDescription" class="form-control" rows="3"></textarea>
                 </div>
-                <button type="submit" name="edit_category" class="btn btn-primary">Save Changes</button>
+                <button type="submit" name="edit_category" class="btn btn-primary">
+                    <i class="fa fa-save"></i> Save Changes
+                </button>
             </form>
         </div>
     </div>
@@ -182,6 +191,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
     </script>
 
     <style>
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -223,6 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
                 margin: 10px 0 !important;
             }
         }
+
         @media (max-width: 600px) {
             .form-section, .table-section {
                 padding: 8px !important;
