@@ -71,22 +71,16 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
             "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
         ],
         [
-            "title" => "In Progress Tickets",
-            "icon" => "fa-spinner",
-            "color" => "blue",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'in_progress'"
-        ],
-        [
-            "title" => "On Hold Tickets",
-            "icon" => "fa-pause-circle",
-            "color" => "yellow",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'on_hold'"
-        ],
-        [
-            "title" => "Resolved Tickets",
+            "title" => "Completed Tickets",
             "icon" => "fa-check-circle",
             "color" => "green",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'completed'"
+        ],
+        [
+            "title" => "Pending Tickets", // Replacing the duplicate card
+            "icon" => "fa-clock",
+            "color" => "orange",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'pending'"
         ],
     ];
 } else {
@@ -261,9 +255,8 @@ try {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 2rem;
-            margin: 0 auto; /* Center the grid horizontally */
+            margin-bottom: 2.5rem;
         }
-
         .dashboard-widget {
             background: #fff;
             border-radius: 12px;
@@ -272,9 +265,7 @@ try {
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
-            margin: 0 auto; /* Center the widget horizontally */
         }
-
         .dashboard-widget i {
             font-size: 2.2rem;
             margin-bottom: 0.7rem;
@@ -389,12 +380,11 @@ try {
                 padding: 8px 6px;
             }
             .widget-grid {
-                grid-template-columns: 1fr; /* Stack widgets vertically on small screens */
-                gap: 1rem; /* Reduce gap between widgets */
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
-
-            .dashboard-widget {
-                width: 95%; /* Adjust widget width for small screens */
+            .dashboard-section h2 {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -435,7 +425,6 @@ try {
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                    <a href="events.php" class="quick-link"><i class="fas fa-calendar-plus"></i><span>Add Event</span></a>
                 </div>
 
                 <!-- Widgets Section -->
