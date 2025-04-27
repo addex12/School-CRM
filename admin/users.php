@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -19,6 +20,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,57 +34,101 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             display: flex;
             flex-direction: column;
         }
+
         .admin-main {
             padding: 1rem;
         }
+
         .users-header {
             display: flex;
             flex-direction: column;
             gap: 1rem;
         }
+
         .users-header h2 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin: 0;
         }
+
         .users-header .erpnext-btn {
             align-self: flex-start;
         }
+
         .erpnext-search-bar {
             width: 100%;
             margin-bottom: 1rem;
             padding: 0.5rem;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
+
         .table-responsive {
             overflow-x: auto;
         }
+
         .users-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
-        .users-table th, .users-table td {
-            padding: 0.5rem;
+
+        .users-table th,
+        .users-table td {
+            padding: 0.4rem;
             text-align: left;
         }
+
         .users-table th {
             background-color: #f8f9fa;
         }
+
         .user-actions a {
-            margin-right: 0.5rem;
+            margin-right: 0.4rem;
         }
+
         @media (max-width: 768px) {
-            .users-table th, .users-table td {
-                font-size: 0.8rem;
+            .users-table th,
+            .users-table td {
+                font-size: 0.75rem;
                 padding: 0.3rem;
             }
+
             .users-header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
+            .users-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .erpnext-search-bar {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .users-table th,
+            .users-table td {
+                font-size: 0.7rem;
+                padding: 0.2rem;
+            }
+
+            .users-header h2 {
+                font-size: 1rem;
+            }
+
+            .erpnext-search-bar {
+                font-size: 0.75rem;
+                padding: 0.4rem;
+            }
+
+            .user-actions a {
+                margin-right: 0.3rem;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
@@ -163,4 +209,5 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         });
     </script>
 </body>
+
 </html>
