@@ -290,6 +290,7 @@ try {
             height: 100%;
             z-index: 1000;
             background: #f5f7fa;
+            overflow-y: auto;
         }
 
         .admin-main {
@@ -297,6 +298,7 @@ try {
             padding: 2rem;
             margin-left: 260px; /* Match sidebar width */
             transition: margin-left 0.2s;
+            overflow-x: hidden;
         }
 
         @media (max-width: 900px) {
@@ -333,7 +335,46 @@ try {
         .content {
             margin-top: 1rem;
         }
+
+        /* Fix for empty content area */
+        .admin-main .content {
+            min-height: calc(100vh - 100px); /* Adjust based on header/footer height */
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
     </style>
+    <script>
+        (function() {
+            const sidebar = document.querySelector('.admin-sidebar');
+            const mainContent = document.querySelector('.admin-main');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+
+            // Adjust content margin dynamically
+            function adjustContentMargin() {
+                if (window.innerWidth > 600) {
+                    mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '60px';
+                } else {
+                    mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
+                }
+            }
+
+            // Toggle sidebar and adjust content margin
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('open');
+                    adjustContentMargin();
+                });
+            }
+
+            // Adjust on window resize
+            window.addEventListener('resize', adjustContentMargin);
+
+            // Initial adjustment
+            adjustContentMargin();
+        })();
+    </script>
 </head>
 <body>
     <div class="admin-dashboard">
