@@ -286,12 +286,19 @@ try {
             background-color: #ffffff; /* Add subtle background color */
             display: flex;
             flex-direction: column;
-            align-items: right; /* Center align all contents */
+            align-items: center; /* Center align all contents */
             justify-content: flex-start; /* Align contents to the top */
         }
-
-        .admin-sidebar.collapsed~.admin-main {
-            margin-left: 60px;
+        @media (max-width: 900px) {
+            .admin-main {
+                margin-left: 60px; /* Adjust margin for smaller screens */
+            }
+        }
+        @media (max-width: 600px) {
+            .admin-main {
+                margin-left: 0; /* Remove margin for very small screens */
+                padding: 1rem; /* Adjust padding for better fit */
+            }
         }
 
         .dashboard-section {
