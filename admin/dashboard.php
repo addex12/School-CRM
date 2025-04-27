@@ -328,7 +328,7 @@ try {
 
         .widget-grid {
             display: auto-fit;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Smaller widget boxes */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Smaller widget boxes */
             gap: 0.5rem;
         }
 
