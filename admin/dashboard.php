@@ -1,214 +1,3 @@
-<?php
-/**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
-ob_start(); // Start output buffering
-require_once '../includes/auth.php';
-requireAdmin();
-require_once '../includes/config.php';
-require_once '../includes/functions.php';
-require_once '../includes/db.php';
-$pageTitle = "Admin Dashboard";
-
-if (!isset($pdo) || !$pdo) {
-    error_log("Database connection not established.");
-    $_SESSION['error'] = "Database connection not established.";
-    header("Location: ../error.php");
-    exit();
-} else {
-    error_log("Database connection established successfully.");
-}
-
-// School CRM Dashboard widgets (revamped)
-$dashboardConfigPath = realpath(__DIR__ . '/../config/dashboard.json');
-if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
-    $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
-    $widgets = $dashboardConfig['widgets'] ?? [
-        [
-            "title" => "Total Users",
-            "icon" => "fa-users",
-            "color" => "blue",
-            "query" => "SELECT COUNT(*) FROM users"
-        ],
-        [
-            "title" => "Active Users",
-            "icon" => "fa-user-check",
-            "color" => "green",
-            "query" => "SELECT COUNT(*) FROM users WHERE status = 'active'"
-        ],
-        [
-            "title" => "Inactive Users",
-            "icon" => "fa-user-times",
-            "color" => "red",
-            "query" => "SELECT COUNT(*) FROM users WHERE status = 'inactive'"
-        ],
-        [
-            "title" => "Total Courses",
-            "icon" => "fa-book",
-            "color" => "purple",
-            "query" => "SELECT COUNT(*) FROM courses"
-        ],
-        [
-            "title" => "Enrolled Students",
-            "icon" => "fa-user-graduate",
-            "color" => "orange",
-            "query" => "SELECT COUNT(*) FROM course_enrollments"
-        ],
-        [
-            "title" => "New Feedback",
-            "icon" => "fa-comments",
-            "color" => "teal",
-            "query" => "SELECT COUNT(*) FROM feedback WHERE is_read = 0"
-        ],
-        [
-            "title" => "Open Tickets",
-            "icon" => "fa-ticket-alt",
-            "color" => "red",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
-        ],
-        [
-            "title" => "In Progress Tickets",
-            "icon" => "fa-spinner",
-            "color" => "blue",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'in_progress'"
-        ],
-        [
-            "title" => "On Hold Tickets",
-            "icon" => "fa-pause-circle",
-            "color" => "yellow",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'on_hold'"
-        ],
-        [
-            "title" => "Resolved Tickets",
-            "icon" => "fa-check-circle",
-            "color" => "green",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
-        ],
-    ];
-} else {
-    error_log("Dashboard configuration file not found or unreadable.");
-    $widgets = [];
-}
-
-foreach ($widgets as &$widget) {
-    try {
-        $stmt = $pdo->query($widget['query']);
-        $widget['count'] = $stmt->fetchColumn() ?? 0;
-    } catch (Exception $e) {
-        $widget['count'] = "Error";
-        error_log("Widget Error: " . $e->getMessage());
-    }
-}
-
-// Fetch unread messages from users to admin
-$unreadMessagesCount = 0;
-try {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE is_read = 0 AND receiver_id = ? AND sender_id IN (SELECT id FROM users WHERE role_id != 0)");
-    $stmt->execute([$_SESSION['user_id']]);
-    $unreadMessagesCount = $stmt->fetchColumn() ?: 0;
-} catch (Exception $e) {
-    $unreadMessagesCount = 0;
-    error_log("Unread Messages Error: " . $e->getMessage());
-}
-
-// Fetch recent activity log
-$activityLog = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10");
-    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Activity Log Error: " . $e->getMessage());
-}
-
-// Fetch recent feedback
-$feedback = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 5");
-    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Feedback Error: " . $e->getMessage());
-}
-
-// Fetch recent support tickets
-$tickets = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM support_tickets ORDER BY created_at DESC LIMIT 5");
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Tickets Error: " . $e->getMessage());
-}
-
-// Error log viewer: read last 20 lines of error.log
-$errorLogLines = [];
-$errorLogPath = realpath(__DIR__ . '/../error_log');
-if ($errorLogPath && is_readable($errorLogPath)) {
-    $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $errorLogLines = array_slice($lines, -20);
-}
-
-// Parse activity logs for the table
-$activityLogs = [];
-$logFilePath = realpath(__DIR__ . '/../logs/user_activity.log'); // Assuming logs are stored in this file
-if ($logFilePath && is_readable($logFilePath)) {
-    $lines = file($logFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        preg_match('/\[(.*?)\] (.*?): (.*)/', $line, $matches);
-        if (count($matches) === 4) {
-            $activityLogs[] = [
-                'timestamp' => $matches[1],
-                'action' => $matches[2],
-                'details' => $matches[3]
-            ];
-        }
-    }
-}
-
-// Limit the number of logs displayed
-$activityLogs = array_slice($activityLogs, -20);
-
-// Fetch survey participation stats for chart
-$surveyStats = [];
-try {
-    $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
-        FROM surveys s
-        LEFT JOIN survey_responses sr ON s.id = sr.survey_id
-        GROUP BY s.id
-        ORDER BY responses DESC
-        LIMIT 7");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $surveyStats[$row['title']] = $row['responses'];
-    }
-} catch (Exception $e) {
-    $surveyStats = [];
-}
-
-// Fetch feedback rating distribution for chart
-$feedbackRatings = [];
-try {
-    $stmt = $pdo->query("SELECT rating, COUNT(*) as count FROM feedback GROUP BY rating ORDER BY rating");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $feedbackRatings[$row['rating']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $feedbackRatings = [];
-}
-
-// Fetch support ticket status distribution for chart
-$ticketStatus = [];
-try {
-    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM support_tickets GROUP BY status");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $ticketStatus[$row['status']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $ticketStatus = [];
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -225,73 +14,229 @@ try {
     <script src="../assets/js/dashboard.js" defer></script>
     <script src="../assets/js/jquery.min.js"></script>
     <style>
+        /* Frappe/Jinja style buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            text-decoration: none;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .btn-primary {
+            color: #fff;
+            background-color: #2490ef;
+            border-color: #2490ef;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a7fdb;
+            border-color: #1a7fdb;
+        }
+        
+        .btn-secondary {
+            color: #fff;
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            border-radius: 0.2rem;
+        }
+
+        /* Widget Grid */
         .widget-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2rem;
-            margin: 0 auto; /* Center the grid horizontally */
-            padding: 1rem; /* Add padding for better spacing */
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin: 1rem 0;
         }
 
         .dashboard-widget {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
-            margin: 0 auto; /* Center the widget horizontally */
-            max-width: 100%; /* Ensure responsiveness */
+            border: 1px solid #e5e7eb;
         }
 
         .dashboard-widget:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(44,62,80,0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .erpnext-btn {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: background-color 0.2s ease-in-out;
+        .dashboard-widget i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #2490ef;
         }
 
-        .erpnext-btn:hover {
-            background-color: #0056b3;
+        .dashboard-widget h3 {
+            font-size: 1.75rem;
+            margin: 0.5rem 0;
+            color: #2e2e2e;
         }
 
-        @media (max-width: 600px) {
-            .widget-grid {
-                grid-template-columns: 1fr; /* Stack widgets vertically on small screens */
-                gap: 1rem; /* Reduce gap between widgets */
-            }
-
-            .dashboard-widget {
-                width: 95%; /* Adjust widget width for small screens */
-                margin: 0 auto; /* Ensure proper alignment on small screens */
-            }
-
-            .admin-main {
-                padding: 1rem; /* Add padding to prevent content from being hidden under the sidebar */
-            }
+        .dashboard-widget p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.875rem;
         }
 
+        /* Responsive Layout */
         .admin-main {
-            padding: 2rem; /* Add padding to ensure content is not hidden under the sidebar */
-            margin-left: 250px; /* Adjust margin to account for the sidebar width */
-            transition: margin-left 0.3s ease-in-out;
+            padding: 1.5rem;
+            margin-left: 250px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .content {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .dashboard-section {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #2e2e2e;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .quick-link:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .quick-link i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #2490ef;
+        }
+
+        .quick-link span {
+            font-size: 0.875rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        table th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .admin-main {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .widget-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 1rem;
+            }
+            
+            .quick-links {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
         }
 
         @media (max-width: 768px) {
-            .admin-main {
-                margin-left: 0; /* Remove margin for smaller screens */
+            .widget-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            
+            .quick-links {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .widget-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .dashboard-widget {
+                padding: 1rem;
+            }
+            
+            .dashboard-widget i {
+                font-size: 1.5rem;
+            }
+            
+            .dashboard-widget h3 {
+                font-size: 1.5rem;
             }
         }
     </style>
@@ -304,12 +249,12 @@ try {
         include __DIR__ . '/includes/admin_sidebar.php';
         ?>
         <div class="admin-main">
-            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <header class="admin-header">
                 <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
                 <?php if ($unreadMessagesCount > 0): ?>
-                    <a href="messages.php" class="erpnext-btn btn-secondary" style="position:relative;">
+                    <a href="messages.php" class="btn btn-primary" style="position:relative;">
                         <i class="fas fa-envelope"></i>
-                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
+                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.75em;font-weight:600;">
                             <?= $unreadMessagesCount ?>
                         </span>
                         New Messages
@@ -317,18 +262,9 @@ try {
                 <?php endif; ?>
             </header>
             <div class="content">
-
                 <!-- Quick Links Section -->
                 <div class="quick-links">
                     <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                    <!--<a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
-                    <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
-                    <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
-                    <a href="curriculums.php" class="quick-link"><i class="fas fa-list"></i><span>Curriculums</span></a>
-                    <a href="sections.php" class="quick-link"><i class="fas fa-th-large"></i><span>Sections</span></a>
-                    <a href="subjects.php" class="quick-link"><i class="fas fa-book"></i><span>Subjects</span></a>
-                    <a href="grading_scales.php" class="quick-link"><i class="fas fa-chart-line"></i><span>Grading Scales</span></a>
-                    <a href="grades.php" class="quick-link"><i class="fas fa-file-alt"></i><span>Grades</span></a> -->
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
@@ -346,6 +282,7 @@ try {
                     <?php endforeach; ?>
                 </div>
 
+                <!-- Rest of the content remains the same -->
                 <!-- Survey Participation Chart -->
                 <div class="dashboard-section">
                     <h2>Survey Participation</h2>
