@@ -159,6 +159,32 @@ tr:hover {
         grid-template-columns: 1fr 1fr;
         gap: 20px;
     }
+    .admin-main, .container, .content {
+        margin-left: 0 !important;
+        padding: 10px 5px 80px !important;
+    }
+    .form-section, .table-section, .card, .dashboard-section {
+        padding: 12px !important;
+        margin: 10px 0 !important;
+    }
+    .widget-grid, .form-grid, .meta-grid, .grid-2, .grid-3 {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    .admin-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+    .table-responsive, .response-table, .users-table, .audit-log-table, .report-table, .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+    th, td {
+        white-space: nowrap;
+        font-size: 0.95em;
+    }
 }
 
 @media (max-width: 600px) {
@@ -175,6 +201,35 @@ tr:hover {
     }
     th, td {
         padding: 15px 6px 6px;
+    }
+    .admin-main, .container, .content {
+        padding: 5px 2px 80px !important;
+    }
+    .form-section, .table-section, .card, .dashboard-section {
+        padding: 8px !important;
+        margin: 6px 0 !important;
+    }
+    .form-actions, .header-actions {
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+    }
+    .admin-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+    .page-title, h1, h2 {
+        font-size: 1.2rem !important;
+    }
+    .table-responsive, .response-table, .users-table, .audit-log-table, .report-table, .table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+    th, td {
+        white-space: nowrap;
+        font-size: 0.95em;
     }
 }
 /* Survey Results Specific Styles */
