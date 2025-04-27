@@ -225,6 +225,36 @@ $systemHealth = [
     'current_time' => date('Y-m-d H:i:s') ?? 'Unknown',
 ];
 
+// Fetch user role distribution for chart
+$userRoleDistribution = [];
+try {
+    $stmt = $pdo->query("SELECT roles.name, COUNT(users.id) as count 
+                         FROM roles 
+                         LEFT JOIN users ON roles.id = users.role_id 
+                         GROUP BY roles.id");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $userRoleDistribution[$row['name']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $userRoleDistribution = [];
+    error_log("User Role Distribution Error: " . $e->getMessage());
+}
+
+// Fetch monthly new users for chart
+$monthlyNewUsers = [];
+try {
+    $stmt = $pdo->query("SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count 
+                         FROM users 
+                         GROUP BY month 
+                         ORDER BY month ASC");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $monthlyNewUsers[$row['month']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $monthlyNewUsers = [];
+    error_log("Monthly New Users Error: " . $e->getMessage());
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -236,77 +266,97 @@ $systemHealth = [
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- Add GSAP for animations -->
     <style>
     .admin-dashboard {
         display: flex;
         min-height: 100vh;
-        background: #f4f6fa;
+        background: linear-gradient(135deg, #f4f6fa, #e8ebf3); /* Add gradient background */
+        overflow-x: hidden;
     }
     .admin-main {
         flex: 1;
         padding: 2rem 2.5rem;
-        margin-left: 240px; /* Ensure alignment with the sidebar */
-        transition: margin-left 0.2s;
+        margin-left: 240px;
+        transition: margin-left 0.2s, background-color 0.3s ease-in-out;
+        background-color: #ffffff; /* Add subtle background color */
     }
     .admin-sidebar.collapsed ~ .admin-main {
         margin-left: 60px;
     }
     .dashboard-section {
         background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        padding: 0.75rem; /* Compact padding */
+        border-radius: 12px; /* Increase border radius */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
+        padding: 1rem; /* Adjust padding */
         margin-bottom: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
+    }
+    .dashboard-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
     .dashboard-section h2 {
-        font-size: 1.2rem;
-        color: #34495e;
+        font-size: 1.4rem; /* Increase font size */
+        color: #2c3e50;
         margin-bottom: 1rem;
+        text-transform: uppercase; /* Add text transformation */
+        letter-spacing: 0.5px;
     }
     .quick-link {
         display: flex;
         align-items: center;
-        padding: 0.25rem 0.5rem; /* Smaller button padding */
-        font-size: 0.875rem; /* Smaller font size */
-        background: #f0f4f7;
-        border-radius: 4px;
+        padding: 0.5rem 1rem; /* Adjust padding */
+        font-size: 1rem; /* Adjust font size */
+        background: linear-gradient(135deg, #f0f4f7, #dfe6ed); /* Add gradient */
+        border-radius: 8px;
         color: #34495e;
         text-decoration: none;
-        transition: background 0.2s, box-shadow 0.2s;
+        transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
     }
     .quick-link:hover {
-        background: #e0e6ed;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transform: translateY(-3px);
     }
     .quick-link i {
-        font-size: 0.875rem; /* Smaller icon size */
-        margin-right: 0.5rem;
+        font-size: 1.2rem; /* Adjust icon size */
+        margin-right: 0.75rem;
     }
     .dashboard-widget {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 0.75rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        border-radius: 12px; /* Increase border radius */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
         text-align: center;
-        transition: transform 0.2s;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
+        background: linear-gradient(135deg, #ffffff, #f9f9f9); /* Add gradient */
     }
     .dashboard-widget:hover {
-        transform: translateY(-4px);
+        transform: translateY(-5px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     }
     .dashboard-widget i {
-        font-size: 1.5rem; /* Adjust icon size */
-        margin-bottom: 0.5rem;
+        font-size: 2rem; /* Increase icon size */
+        margin-bottom: 0.75rem;
+        color: #5e64ff; /* Add consistent color */
     }
     .dashboard-widget h3 {
-        font-size: 1.25rem;
+        font-size: 1.5rem; /* Adjust font size */
         margin: 0;
+        color: #2c3e50;
     }
     .dashboard-widget p {
-        font-size: 0.875rem;
+        font-size: 1rem; /* Adjust font size */
         color: #7f8c8d;
+    }
+    .widget-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
+        gap: 1rem;
     }
     @media (max-width: 900px) {
         .admin-main {
@@ -325,6 +375,22 @@ $systemHealth = [
     </style>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Add GSAP animations for widgets
+        gsap.from(".dashboard-widget", {
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            stagger: 0.2
+        });
+
+        // Add GSAP animations for sections
+        gsap.from(".dashboard-section", {
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            stagger: 0.3
+        });
+
         // Survey Participation Chart
         const surveyCtx = document.getElementById('surveyChart').getContext('2d');
         new Chart(surveyCtx, {
@@ -406,6 +472,54 @@ $systemHealth = [
                 }
             }
         });
+
+        // User Role Distribution Chart
+        const roleCtx = document.getElementById('roleChart').getContext('2d');
+        new Chart(roleCtx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode(array_keys($userRoleDistribution)) ?>,
+                datasets: [{
+                    label: 'User Roles',
+                    data: <?= json_encode(array_values($userRoleDistribution)) ?>,
+                    backgroundColor: '#5e64ff',
+                    borderColor: '#34495e',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Monthly New Users Chart
+        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+        new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
+                datasets: [{
+                    label: 'New Users',
+                    data: <?= json_encode(array_values($monthlyNewUsers)) ?>,
+                    backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                    borderColor: '#5e64ff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
     });
     </script>
 </head>
@@ -433,6 +547,14 @@ $systemHealth = [
                 <div class="dashboard-section">
                     <h2>System Health Metrics</h2>
                     <canvas id="systemHealthChart"></canvas>
+                </div>
+                <div class="dashboard-section">
+                    <h2>User Role Distribution</h2>
+                    <canvas id="roleChart"></canvas>
+                </div>
+                <div class="dashboard-section">
+                    <h2>Monthly New Users</h2>
+                    <canvas id="monthlyChart"></canvas>
                 </div>
                 <!-- Quick Links Section -->
                 <div class="dashboard-section">
