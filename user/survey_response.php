@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo->commit();
         $_SESSION['success'] = "Thank you for completing the survey!";
-        header("Location: survey_response.php?success=1&id=$survey_id");
+        header("Location: dashboard.php?success=1&id=$survey_id");
         exit();
 
     } catch (Exception $e) {
