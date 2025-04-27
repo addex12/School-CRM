@@ -6,163 +6,271 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-// Sidebar config path
+// Load sidebar configuration from JSON
 $configPath = __DIR__ . '/sidebar_config.json';
-$sidebarConfig = [];
+$sidebarItems = [];
 if (file_exists($configPath)) {
-    $sidebarConfig = json_decode(file_get_contents($configPath), true);
+    $json = file_get_contents($configPath);
+    $data = json_decode($json, true);
+    $sidebarItems = isset($data['menu']) ? $data['menu'] : $data;
 }
-$unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
+$current = basename($_SERVER['PHP_SELF']);
 ?>
-<link rel="stylesheet" href="includes/admin_sidebar.css">
 <style>
-/* Remove inline sidebar styles */
-</style>
-<div class="admin-sidebar" id="adminSidebar">
-    <div class="sidebar-header">
-        <span>Admin</span>
-        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
-            <i class="fas fa-bars"></i>
-        </button>
-    </div>
-    <ul>
-        <?php
-        // Helper to render menu recursively
-        function renderSidebarMenu($items, $current = '') {
-            foreach ($items as $item) {
-                $hasSub = isset($item['items']) && is_array($item['items']);
-                $icon = isset($item['icon']) ? 'fa-' . $item['icon'] : 'fa-circle';
-                // Fix: Only check 'link' if it exists and is not empty
-                $active = (isset($item['link']) && basename($_SERVER['PHP_SELF']) === $item['link']) ? 'active' : '';
-                if ($hasSub) {
-                    echo '<li>';
-                    echo '<a href="#" class="sidebar-parent"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <i class="fas fa-chevron-down" style="margin-left:auto;font-size:0.85em;"></i></a>';
-                    echo '<ul class="submenu" style="display:none;">';
-                    renderSidebarMenu($item['items'], $current);
-                    echo '</ul>';
-                    echo '</li>';
-                } elseif (isset($item['link'])) {
-                    echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="' . $active . '"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
-                }
-                // If neither 'items' nor 'link', skip rendering this item
-            }
-        }
-        // Use config if available, else fallback to static menu
-        if (!empty($sidebarConfig['menu'])) {
-            renderSidebarMenu($sidebarConfig['menu']);
-        } else {
-            // Fallback static menu (minimal)
-            ?>
-            <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-            <li><a href="active_users.php"><i class="fas fa-users"></i> <span>Active Users</span></a></li>
-            <li><a href="add_users.php"><i class="fas fa-user-plus"></i> <span>Add Users</span></a></li>
-            <li><a href="roles.php"><i class="fas fa-user-tag"></i> <span>Roles</span></a></li>
-            <li><a href="settings.php"><i class="fas fa-cogs"></i> <span>Settings</span></a></li>
-            <li>
-                <a href="messages.php">
-                    <i class="fas fa-envelope"></i>
-                    Messages
-                    <?php if ($unread > 0): ?>
-                        <span style="background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;margin-left:6px;">
-                            <?= $unread ?>
-                        </span>
-                    <?php endif; ?>
-                </a>
-            </li>
-            <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
-            <?php
-        }
-        ?>
-    </ul>
-</div>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var sidebar = document.getElementById('adminSidebar');
-    var toggle = document.getElementById('sidebarToggle');
-    var main = document.querySelector('.admin-main');
-    // Helper to set collapsed state
-    function setSidebarCollapsed(collapsed) {
-        if (collapsed) {
-            sidebar.classList.add('collapsed');
-            sidebar.classList.remove('open');
-            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '60px' : '60px';
-            localStorage.setItem('sidebar-collapsed', '1');
-        } else {
-            sidebar.classList.remove('collapsed');
-            sidebar.classList.remove('open');
-            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
-            localStorage.setItem('sidebar-collapsed', '0');
-        }
+/* ERPNext/Frappe inspired sidebar styles */
+.admin-sidebar {
+    background: #f5f7fa;
+    color: #222d32;
+    width: 260px;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    padding-top: 0;
+    box-shadow: 2px 0 8px rgba(44,62,80,0.07);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e5e7eb;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+.sidebar-header {
+    padding: 1.5rem 2rem 1rem 2rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #215967;
+    letter-spacing: 1px;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+}
+.admin-sidebar ul { list-style: none; padding: 0; margin: 0; }
+.admin-sidebar li { margin-bottom: 0; }
+.admin-sidebar a {
+    color: #215967;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 0.85rem 2rem;
+    border-radius: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.18s, color 0.18s;
+    gap: 12px;
+    border-left: 3px solid transparent;
+    letter-spacing: 0.01em;
+}
+.admin-sidebar li.active > a,
+.admin-sidebar a:hover,
+.admin-sidebar .submenu-item.active > a {
+    background: #e2efda;
+    color: #215967;
+    border-left: 3px solid #3b82f6;
+}
+.admin-sidebar .menu-category > .category-header {
+    padding: 0.85rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #215967;
+    cursor: pointer;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    user-select: none;
+}
+.admin-sidebar .category-header .collapse-icon {
+    margin-left: auto;
+    font-size: 1em;
+    transition: transform 0.2s;
+}
+.admin-sidebar .category-header.open .collapse-icon {
+    transform: rotate(180deg);
+}
+.admin-sidebar .submenu {
+    background: #f8fafc;
+    padding-left: 0;
+    border-left: 2px solid #e5e7eb;
+    display: none;
+}
+.admin-sidebar .submenu.open { display: block; }
+.admin-sidebar .submenu-item a {
+    padding: 0.7rem 2.5rem;
+    font-size: 0.97rem;
+    color: #215967;
+    border-left: 3px solid transparent;
+}
+.admin-sidebar .submenu-item.active > a,
+.admin-sidebar .submenu-item a:hover {
+    background: #e2efda;
+    color: #2563eb;
+    border-left: 3px solid #3b82f6;
+}
+.admin-sidebar i {
+    font-size: 1.15em;
+    min-width: 20px;
+    text-align: center;
+}
+.sidebar-toggle {
+    display: none;
+}
+@media (max-width: 900px) {
+    .admin-sidebar {
+        width: 60px;
+        padding-top: 0;
     }
-    // Initial state
-    setSidebarCollapsed(localStorage.getItem('sidebar-collapsed') === '1');
-
-    toggle.addEventListener('click', function(e) {
-        e.stopPropagation();
-        var isCollapsed = sidebar.classList.contains('collapsed');
-        // On mobile, toggle open/close instead of collapse
-        if (window.innerWidth <= 600) {
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            } else {
-                sidebar.classList.add('open');
-            }
-        } else {
-            setSidebarCollapsed(!isCollapsed);
-        }
-    });
-
-    // Allow expanding sidebar by clicking the sidebar header when collapsed (desktop only)
-    sidebar.querySelector('.sidebar-header').addEventListener('click', function(e) {
-        if (window.innerWidth > 600 && sidebar.classList.contains('collapsed')) {
-            setSidebarCollapsed(false);
-        }
-    });
-
-    // Hide sidebar on mobile when clicking outside
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 600 && sidebar.classList.contains('open')) {
-            if (!sidebar.contains(e.target) && e.target !== toggle) {
-                sidebar.classList.remove('open');
-            }
-        }
-    });
-
+    .sidebar-header { display: none; }
+    .admin-sidebar a, .admin-sidebar .category-header {
+        padding: 0.85rem 0.7rem;
+        font-size: 0;
+    }
+    .admin-sidebar a .menu-text, .admin-sidebar a .category-text {
+        display: none;
+    }
+    .admin-sidebar i {
+        margin-right: 0;
+        font-size: 1.3em;
+    }
+    .sidebar-toggle {
+        display: block;
+        position: fixed;
+        top: 12px;
+        left: 12px;
+        background: #fff;
+        color: #215967;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        z-index: 300;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    }
+}
+@media (max-width: 600px) {
+    .admin-sidebar {
+        left: -260px;
+        width: 220px;
+        transition: left 0.2s;
+    }
+    .admin-sidebar.open {
+        left: 0;
+    }
+}
+</style>
+<button class="sidebar-toggle" id="sidebarToggle">
+    <i class="fas fa-bars"></i>
+</button>
+<aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+        <i class="fas fa-comments"></i> School CRM
+    </div>
+    <ul class="sidebar-menu">
+        <?php foreach ($sidebarItems as $item): ?>
+            <?php if (isset($item['items'])): // Category with subitems ?>
+                <li class="menu-category">
+                    <div class="category-header<?= (isset($item['open']) && $item['open']) ? ' open' : '' ?>" data-toggle="collapse" data-target="#<?= $item['id'] ?>">
+                        <i class="fas fa-<?= $item['icon'] ?> category-icon"></i>
+                        <span class="category-text"><?= $item['title'] ?></span>
+                        <i class="fas fa-chevron-down collapse-icon"></i>
+                    </div>
+                    <ul class="submenu" id="<?= $item['id'] ?>"<?php
+                        $active = false;
+                        foreach ($item['items'] as $subitem) {
+                            if (basename($_SERVER['PHP_SELF']) == $subitem['link']) {
+                                $active = true;
+                                break;
+                            }
+                        }
+                        echo $active ? ' style="display:block"' : '';
+                    ?>>
+                        <?php foreach ($item['items'] as $subitem): ?>
+                            <li class="submenu-item <?= basename($_SERVER['PHP_SELF']) == $subitem['link'] ? 'active' : '' ?>">
+                                <a href="<?= $subitem['link'] ?>">
+                                    <i class="fas fa-<?= $subitem['icon'] ?>"></i>
+                                    <span class="menu-text"><?= $subitem['title'] ?></span>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </li>
+            <?php else: // Single menu item ?>
+                <li class="menu-item <?= basename($_SERVER['PHP_SELF']) == $item['link'] ? 'active' : '' ?>">
+                    <a href="<?= $item['link'] ?>" class="menu-link">
+                        <i class="fas fa-<?= $item['icon'] ?> menu-icon"></i>
+                        <span class="menu-text"><?= $item['title'] ?></span>
+                    </a>
+                </li>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </ul>
+</aside>
+<script>
+// ERPNext/Frappe inspired sidebar JS
+(function() {
     // Submenu toggle
-    document.querySelectorAll('.sidebar-parent').forEach(function(parent) {
-        parent.addEventListener('click', function(e) {
-            e.preventDefault();
-            var submenu = parent.nextElementSibling;
-            if (submenu && submenu.classList.contains('submenu')) {
-                submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+    var headers = document.querySelectorAll('.category-header');
+    headers.forEach(function(header) {
+        header.addEventListener('click', function(e) {
+            var targetId = header.getAttribute('data-target');
+            var submenu = document.getElementById(targetId.replace('#',''));
+            var icon = header.querySelector('.collapse-icon');
+            // Close all submenus except this one
+            document.querySelectorAll('.submenu').forEach(function(sm) {
+                if (sm !== submenu) {
+                    sm.classList.remove('open');
+                    sm.style.display = 'none';
+                }
+            });
+            document.querySelectorAll('.collapse-icon').forEach(function(ic) {
+                if (ic !== icon) ic.classList.remove('fa-chevron-up');
+                if (ic !== icon) ic.classList.add('fa-chevron-down');
+            });
+            if (submenu) {
+                var isOpen = submenu.classList.contains('open');
+                if (isOpen) {
+                    submenu.classList.remove('open');
+                    submenu.style.display = 'none';
+                    if(icon) { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); }
+                } else {
+                    submenu.classList.add('open');
+                    submenu.style.display = 'block';
+                    if(icon) { icon.classList.add('fa-chevron-up'); icon.classList.remove('fa-chevron-down'); }
+                }
             }
         });
     });
-
-    // Adjust main content margin dynamically
-    function adjustMainMargin() {
-        if (window.innerWidth <= 600) {
-            if (sidebar.classList.contains('open')) {
-                main.style.marginLeft = sidebar.offsetWidth + 'px';
-            } else {
-                main.style.marginLeft = '0';
+    // On page load, ensure only submenu with .submenu-item.active is open
+    document.querySelectorAll('.submenu').forEach(function(sm) {
+        var active = sm.querySelector('.submenu-item.active');
+        if (active) {
+            sm.classList.add('open');
+            sm.style.display = 'block';
+            var chevron = sm.parentElement.querySelector('.collapse-icon');
+            if (chevron) {
+                chevron.classList.add('fa-chevron-up');
+                chevron.classList.remove('fa-chevron-down');
             }
-        } else if (sidebar.classList.contains('collapsed')) {
-            main.style.marginLeft = '60px';
         } else {
-            main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
+            sm.classList.remove('open');
+            sm.style.display = 'none';
         }
-    }
-
-    // Update margin on sidebar toggle
-    toggle.addEventListener('click', function() {
-        adjustMainMargin();
     });
-
-    // Update margin on window resize
-    window.addEventListener('resize', adjustMainMargin);
-
-    // Initial adjustment
-    adjustMainMargin();
-});
+    // Sidebar hamburger toggle for mobile/tablet
+    var sidebar = document.getElementById('adminSidebar');
+    var sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebar && sidebarToggle) {
+        sidebarToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            sidebar.classList.toggle('open');
+        });
+    }
+    // Close sidebar on outside click (mobile)
+    document.addEventListener('click', function(e) {
+        if (window.innerWidth <= 600 && sidebar && sidebar.classList.contains('open')) {
+            if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
+                sidebar.classList.remove('open');
+            }
+        }
+    });
+})();
 </script>
