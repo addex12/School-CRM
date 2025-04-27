@@ -59,141 +59,28 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: #217dbb;
         }
         .users-table {
-            width: 100%;
+            width: 80%; /* Reduce table width */
+            margin: 0 auto; /* Center the table */
             border-collapse: collapse;
         }
+
         .users-table th, .users-table td {
-            padding: 12px 16px;
+            padding: 10px; /* Reduce padding for smaller screens */
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
-        }
-        .users-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #34495e;
-        }
-        .users-table tr:hover {
-            background: #f4f8fb;
-        }
-        .user-actions a {
-            margin-right: 8px;
-            color: #3498db;
-            text-decoration: none;
-            font-size: 1.1em;
-        }
-        .user-actions a:last-child {
-            margin-right: 0;
-        }
-        /* Ensure the admin-main content aligns properly with the sidebar */
-        .admin-main {
-            margin-left: var(--sidebar-width, 240px); /* Use CSS variable for sidebar width */
-            transition: margin-left 0.2s ease; /* Smooth transition for sidebar toggle */
+            font-size: 0.9rem; /* Adjust font size for better compatibility */
         }
 
-        .admin-sidebar.collapsed ~ .admin-main {
-            margin-left: var(--sidebar-collapsed-width, 60px); /* Adjust margin when sidebar is collapsed */
-        }
-
-        /* Define CSS variables for sidebar sizes */
-        :root {
-            --sidebar-width: 240px; /* Default sidebar width */
-            --sidebar-collapsed-width: 60px; /* Collapsed sidebar width */
-        }
-
-        /* Adjust the page title alignment */
-        .admin-header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-            text-align: left; /* Align title to the left */
-            padding-left: 1rem; /* Add padding to align with content */
-        }
-
-        /* Ensure all content is flexible and resizable */
-        .content {
-            padding: 1.5rem; /* Add padding for better spacing */
-            overflow-x: auto; /* Prevent content from hiding under the sidebar */
-        }
-
-        /* Responsive adjustments for smaller screens */
         @media (max-width: 600px) {
-            body {
-                font-size: 0.85rem; /* Further reduce font size for smaller screens */
-                text-align: center; /* Center content on smaller screens */
-                display: flex; /* Use flexbox for centering */
-                flex-direction: column; /* Stack elements vertically */
-                align-items: center; /* Center align items horizontally */
-                justify-content: center; /* Center align items vertically */
-            }
-
-            .admin-header h1 {
-                font-size: 0.9rem; /* Adjust title font size */
-                text-align: center; /* Center title */
-            }
-
-            .users-header h2 {
-                font-size: 1rem; /* Adjust header font size */
-                text-align: center; /* Center header */
+            .users-table {
+                width: 100%; /* Make table take full width on smaller screens */
+                font-size: 0.8rem; /* Further reduce font size */
             }
 
             .users-table th, .users-table td {
-                font-size: 0.75rem; /* Reduce table font size */
+                padding: 8px; /* Further reduce padding */
+                word-wrap: break-word; /* Allow text to wrap within cells */
             }
-
-            .users-header .btn {
-                padding: 0.5rem 1rem; /* Adjust button padding */
-                font-size: 0.85rem; /* Adjust button font size */
-                display: inline-block; /* Ensure button is centered */
-            }
-
-            .erpnext-search-bar {
-                font-size: 0.85rem; /* Adjust search bar font size */
-                padding: 0.4rem; /* Adjust padding for better spacing */
-                margin: 0 auto; /* Center search bar */
-                display: block; /* Ensure it takes full width */
-            }
-
-            .content {
-                padding: 0.8rem; /* Adjust padding for better spacing */
-                text-align: center; /* Center content */
-            }
-
-            .users-table {
-                font-size: 0.8rem; /* Adjust table font size */
-            }
-
-            .users-container {
-                margin: 0 auto; /* Center the container */
-                max-width: 90%; /* Limit the width for better alignment */
-                text-align: center; /* Center text inside the container */
-            }
-        }
-
-        /* General responsive adjustments */
-        body {
-            font-size: 1rem; /* Base font size */
-            line-height: 1.5; /* Improve readability */
-        }
-
-        .admin-main {
-            padding: 1rem; /* Add padding for better spacing */
-        }
-
-        .erpnext-card {
-            padding: 1.5rem; /* Adjust padding for better spacing */
-        }
-
-        .users-header h2 {
-            font-size: 1.3rem; /* Adjust font size for better responsiveness */
-        }
-
-        .users-table {
-            width: 100%; /* Ensure table takes full width */
-            table-layout: auto; /* Allow flexible column widths */
-        }
-
-        .users-table th, .users-table td {
-            word-wrap: break-word; /* Allow text to wrap within cells */
         }
     </style>
 </head>
