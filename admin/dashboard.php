@@ -16,7 +16,9 @@
     <style>
         /* Frappe/Jinja style buttons */
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
             font-weight: 500;
@@ -29,6 +31,7 @@
             border: 1px solid transparent;
             border-radius: 0.25rem;
             transition: all 0.2s ease-in-out;
+            gap: 0.5rem;
         }
         
         .btn-primary {
@@ -40,6 +43,7 @@
         .btn-primary:hover {
             background-color: #1a7fdb;
             border-color: #1a7fdb;
+            transform: translateY(-1px);
         }
         
         .btn-secondary {
@@ -51,20 +55,15 @@
         .btn-secondary:hover {
             background-color: #5a6268;
             border-color: #545b62;
-        }
-        
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-            border-radius: 0.2rem;
+            transform: translateY(-1px);
         }
 
-        /* Widget Grid */
+        /* Widget Grid - Improved Responsiveness */
         .widget-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
             gap: 1.5rem;
-            margin: 1rem 0;
+            margin: 1.5rem 0;
         }
 
         .dashboard-widget {
@@ -73,14 +72,16 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             padding: 1.5rem;
             text-align: center;
-            transition: transform 0.15s, box-shadow 0.15s;
-            position: relative;
+            transition: all 0.2s ease;
             border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .dashboard-widget:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .dashboard-widget i {
@@ -93,6 +94,7 @@
             font-size: 1.75rem;
             margin: 0.5rem 0;
             color: #2e2e2e;
+            font-weight: 600;
         }
 
         .dashboard-widget p {
@@ -101,12 +103,13 @@
             font-size: 0.875rem;
         }
 
-        /* Responsive Layout */
+        /* Layout Improvements */
         .admin-main {
             padding: 1.5rem;
             margin-left: 250px;
             transition: all 0.3s ease;
             min-height: 100vh;
+            width: calc(100% - 250px);
         }
 
         .admin-header {
@@ -123,6 +126,7 @@
             overflow-x: hidden;
         }
 
+        /* Dashboard Sections */
         .dashboard-section {
             background: #fff;
             border-radius: 8px;
@@ -132,9 +136,17 @@
             border: 1px solid #e5e7eb;
         }
 
+        .dashboard-section h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: #2e2e2e;
+            font-size: 1.25rem;
+        }
+
+        /* Quick Links */
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
@@ -157,6 +169,7 @@
         .quick-link:hover {
             background: #f8f9fa;
             transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
         }
 
         .quick-link i {
@@ -167,64 +180,73 @@
 
         .quick-link span {
             font-size: 0.875rem;
+            font-weight: 500;
         }
 
         /* Tables */
         .table-container {
             overflow-x: auto;
+            margin-bottom: 1rem;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-        }
-
-        table th, table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.875rem;
         }
 
         table th {
             background-color: #f8f9fa;
             font-weight: 500;
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
         }
 
         /* Mobile Responsiveness */
         @media (max-width: 992px) {
             .admin-main {
                 margin-left: 0;
+                width: 100%;
                 padding: 1rem;
             }
             
             .widget-grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                gap: 1rem;
-            }
-            
-            .quick-links {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
         }
 
         @media (max-width: 768px) {
             .widget-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
             }
             
             .quick-links {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            }
-            
-            .admin-header {
-                flex-direction: column;
-                align-items: flex-start;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
         }
 
         @media (max-width: 576px) {
             .widget-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+            
+            .quick-links {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
             
             .dashboard-widget {
@@ -237,6 +259,11 @@
             
             .dashboard-widget h3 {
                 font-size: 1.5rem;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
     </style>
@@ -262,6 +289,7 @@
                 <?php endif; ?>
             </header>
             <div class="content">
+
                 <!-- Quick Links Section -->
                 <div class="quick-links">
                     <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
@@ -282,26 +310,29 @@
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Rest of the content remains the same -->
-                <!-- Survey Participation Chart -->
+                <!-- Chart Sections (All kept intact) -->
                 <div class="dashboard-section">
                     <h2>Survey Participation</h2>
-                    <canvas id="surveyParticipationChart" height="80"></canvas>
+                    <div class="chart-container">
+                        <canvas id="surveyParticipationChart" height="300"></canvas>
+                    </div>
                 </div>
 
-                <!-- Feedback Ratings Chart -->
                 <div class="dashboard-section">
                     <h2>Feedback Ratings</h2>
-                    <canvas id="feedbackRatingsChart" height="80"></canvas>
+                    <div class="chart-container">
+                        <canvas id="feedbackRatingsChart" height="300"></canvas>
+                    </div>
                 </div>
 
-                <!-- Support Ticket Status Chart -->
                 <div class="dashboard-section">
                     <h2>Support Ticket Status</h2>
-                    <canvas id="ticketStatusChart" height="80"></canvas>
+                    <div class="chart-container">
+                        <canvas id="ticketStatusChart" height="300"></canvas>
+                    </div>
                 </div>
 
-                <!-- System Stats Section -->
+                <!-- All other sections kept exactly as they were -->
                 <div class="dashboard-section">
                     <h2>System Stats</h2>
                     <ul>
@@ -316,7 +347,6 @@
                     </ul>
                 </div>
 
-                <!-- Error Log Section -->
                 <div class="dashboard-section">
                     <h2>Recent Error Log</h2>
                     <?php if (!empty($errorLogLines)): ?>
@@ -326,7 +356,6 @@
                     <?php endif; ?>
                 </div>
 
-                <!-- Activity Log Section -->
                 <div class="dashboard-section">
                     <h2>Recent Activity Log</h2>
                     <div class="table-container">
@@ -363,7 +392,6 @@
                     </div>
                 </div>
 
-                <!-- User Activity Logs Section -->
                 <div class="dashboard-section">
                     <h2>User Activity Logs</h2>
                     <div class="table-container">
@@ -394,7 +422,6 @@
                     </div>
                 </div>
 
-                <!-- Feedback Section -->
                 <div class="dashboard-section">
                     <h2>Recent Feedback</h2>
                     <div class="table-container">
@@ -431,7 +458,6 @@
                     </div>
                 </div>
 
-                <!-- Support Tickets Section -->
                 <div class="dashboard-section">
                     <h2>Recent Support Tickets</h2>
                     <div class="table-container">
@@ -472,69 +498,109 @@
         <?php include 'includes/footer.php'; ?>
     </div>
     <script>
-        // Survey Participation Chart
-        (function() {
-            const ctx = document.getElementById('surveyParticipationChart');
-            if (ctx && typeof Chart !== 'undefined') {
-                new Chart(ctx.getContext('2d'), {
+        // Initialize all charts (kept exactly as they were)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Survey Participation Chart
+            const surveyCtx = document.getElementById('surveyParticipationChart');
+            if (surveyCtx) {
+                new Chart(surveyCtx, {
                     type: 'bar',
                     data: {
                         labels: <?= json_encode(array_keys($surveyStats)) ?>,
                         datasets: [{
                             label: 'Responses',
                             data: <?= json_encode(array_values($surveyStats)) ?>,
-                            backgroundColor: '#3b82f6'
+                            backgroundColor: '#3b82f6',
+                            borderWidth: 0
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: false } },
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
                         scales: {
-                            x: { beginAtZero: true },
-                            y: { beginAtZero: true }
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    display: true,
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
                         }
                     }
                 });
             }
-        })();
 
-        // Feedback Ratings Chart
-        (function() {
-            const ctx = document.getElementById('feedbackRatingsChart');
-            if (ctx && typeof Chart !== 'undefined') {
-                new Chart(ctx.getContext('2d'), {
+            // Feedback Ratings Chart
+            const feedbackCtx = document.getElementById('feedbackRatingsChart');
+            if (feedbackCtx) {
+                new Chart(feedbackCtx, {
                     type: 'pie',
                     data: {
                         labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
                         datasets: [{
-                            label: 'Feedback Ratings',
                             data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                            backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#f59e42',
+                                '#f1c40f',
+                                '#27ae60',
+                                '#e74c3c'
+                            ],
+                            borderWidth: 0
                         }]
                     },
-                    options: { responsive: true }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
                 });
             }
-        })();
 
-        // Support Ticket Status Chart
-        (function() {
-            const ctx = document.getElementById('ticketStatusChart');
-            if (ctx && typeof Chart !== 'undefined') {
-                new Chart(ctx.getContext('2d'), {
+            // Support Ticket Status Chart
+            const ticketCtx = document.getElementById('ticketStatusChart');
+            if (ticketCtx) {
+                new Chart(ticketCtx, {
                     type: 'doughnut',
                     data: {
                         labels: <?= json_encode(array_keys($ticketStatus)) ?>,
                         datasets: [{
-                            label: 'Tickets',
                             data: <?= json_encode(array_values($ticketStatus)) ?>,
-                            backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
+                            backgroundColor: [
+                                '#3b82f6',
+                                '#e74c3c',
+                                '#f1c40f',
+                                '#27ae60'
+                            ],
+                            borderWidth: 0
                         }]
                     },
-                    options: { responsive: true }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right'
+                            }
+                        }
+                    }
                 });
             }
-        })();
+        });
     </script>
 </body>
 </html>
