@@ -658,15 +658,7 @@ try {
                     <canvas id="monthlyChart"></canvas>
                 </div>
 
-                <div class="dashboard-section">
-                    <h2>System Health</h2>
-                    <ul>
-                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version'] ?? 'Unknown') ?></li>
-                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software'] ?? 'Unknown') ?></li>
-                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status'] ?? 'Unknown') ?></li>
-                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time'] ?? 'Unknown') ?></li>
-                    </ul>
-                </div>
+
             </div>
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
