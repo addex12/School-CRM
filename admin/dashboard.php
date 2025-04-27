@@ -197,50 +197,276 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+        }
+
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            width: 250px;
+            background-color: #343a40;
+            color: #fff;
+            padding: 1rem;
+            position: fixed;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .admin-sidebar a {
+            color: #adb5bd;
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .admin-sidebar a:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+
+        /* Main Content */
+        .admin-main {
+            margin-left: 250px;
+            padding: 1rem;
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .admin-sidebar {
+                width: 200px;
+            }
+
+            .admin-main {
+                margin-left: 200px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .admin-sidebar {
+                position: absolute;
+                width: 100%;
+                height: auto;
+            }
+
+            .admin-main {
+                margin-left: 0;
+                padding-top: 200px;
+            }
+        }
+
+        /* Header */
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .admin-header h1 {
+            font-size: 1.5rem;
+            color: #343a40;
+        }
+
+        .admin-header .btn {
+            background-color: #007bff;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .admin-header .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .quick-link {
+            flex: 1 1 calc(25% - 1rem);
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-align: center;
+            padding: 1rem;
+            text-decoration: none;
+            color: #343a40;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .quick-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .quick-link i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #007bff;
+        }
+
+        @media (max-width: 768px) {
+            .quick-link {
+                flex: 1 1 calc(50% - 1rem);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .quick-link {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Widgets */
+        .widget-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-widget {
+            flex: 1 1 calc(33.333% - 1rem);
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            text-align: center;
+            padding: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .dashboard-widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-widget i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .widget-blue {
+            color: #007bff;
+        }
+
+        .widget-green {
+            color: #28a745;
+        }
+
+        .widget-red {
+            color: #dc3545;
+        }
+
+        .widget-yellow {
+            color: #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-widget {
+                flex: 1 1 calc(50% - 1rem);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-widget {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Charts */
+        .dashboard-section {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: #343a40;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+
+        table th, table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #dee2e6;
+        }
+
+        table th {
+            background-color: #f8f9fa;
+        }
+
+        table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="../assets/js/dashboard.js" defer></script>
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php
-        $ADMIN_UNREAD_MESSAGES = $unreadMessagesCount;
-        include __DIR__ . '/includes/admin_sidebar.php';
-        ?>
+        <div class="admin-sidebar">
+            <!-- Sidebar content -->
+            <h2>Admin Panel</h2>
+            <a href="dashboard.php">Dashboard</a>
+            <a href="users.php">Users</a>
+            <a href="surveys.php">Surveys</a>
+            <a href="feedback.php">Feedback</a>
+            <a href="support_tickets.php">Support Tickets</a>
+            <a href="events.php">Events</a>
+        </div>
         <div class="admin-main">
-            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
-                <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
                 <?php if ($unreadMessagesCount > 0): ?>
-                    <a href="messages.php" class="erpnext-btn btn-secondary" style="position:relative;">
-                        <i class="fas fa-envelope"></i>
-                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
-                            <?= $unreadMessagesCount ?>
-                        </span>
-                        New Messages
-                    </a>
+                    <button class="btn">
+                        <i class="fas fa-envelope"></i> <?= $unreadMessagesCount ?> New Messages
+                    </button>
                 <?php endif; ?>
             </header>
             <div class="content">
-
-                <!-- Quick Links Section -->
+                <!-- Quick Links -->
                 <div class="quick-links">
                     <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                    <!--<a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
-                    <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
-                    <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
-                    <a href="curriculums.php" class="quick-link"><i class="fas fa-list"></i><span>Curriculums</span></a>
-                    <a href="sections.php" class="quick-link"><i class="fas fa-th-large"></i><span>Sections</span></a>
-                    <a href="subjects.php" class="quick-link"><i class="fas fa-book"></i><span>Subjects</span></a>
-                    <a href="grading_scales.php" class="quick-link"><i class="fas fa-chart-line"></i><span>Grading Scales</span></a>
-                    <a href="grades.php" class="quick-link"><i class="fas fa-file-alt"></i><span>Grades</span></a> -->
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                    <a href="events.php" class="quick-link"><i class="fas fa-calendar-plus"></i><span>Add Event</span></a>
                 </div>
 
-                <!-- Widgets Section -->
+                <!-- Widgets -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
                         <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
@@ -251,189 +477,21 @@ try {
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Survey Participation Chart -->
+                <!-- Charts -->
                 <div class="dashboard-section">
                     <h2>Survey Participation</h2>
-                    <canvas id="surveyParticipationChart" height="80"></canvas>
+                    <canvas id="surveyParticipationChart"></canvas>
                 </div>
-
-                <!-- Feedback Ratings Chart -->
                 <div class="dashboard-section">
                     <h2>Feedback Ratings</h2>
-                    <canvas id="feedbackRatingsChart" height="80"></canvas>
+                    <canvas id="feedbackRatingsChart"></canvas>
                 </div>
-
-                <!-- Support Ticket Status Chart -->
                 <div class="dashboard-section">
                     <h2>Support Ticket Status</h2>
-                    <canvas id="ticketStatusChart" height="80"></canvas>
-                </div>
-
-                <!-- System Stats Section -->
-                <div class="dashboard-section">
-                    <h2>System Stats</h2>
-                    <ul>
-                        <li>PHP Version: <?= phpversion() ?></li>
-                        <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
-                        <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
-                        <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
-                    </ul>
-                </div>
-
-                <!-- Error Log Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Error Log</h2>
-                    <?php if (!empty($errorLogLines)): ?>
-                        <pre class="error-log"><?= htmlspecialchars(implode("\n", $errorLogLines)) ?></pre>
-                    <?php else: ?>
-                        <p>No recent errors found or error.log not readable.</p>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Activity Log Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Activity Log</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Activity Type</th>
-                                    <th>Description</th>
-                                    <th>IP Address</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($activityLog)): ?>
-                                    <?php foreach ($activityLog as $log): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($log['id']) ?></td>
-                                            <td><?= htmlspecialchars($log['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($log['activity_type']) ?></td>
-                                            <td><?= htmlspecialchars($log['description']) ?></td>
-                                            <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                            <td><?= htmlspecialchars($log['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No recent activity found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- User Activity Logs Section -->
-                <div class="dashboard-section">
-                    <h2>User Activity Logs</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Action</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($activityLogs)): ?>
-                                    <?php foreach ($activityLogs as $log): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($log['timestamp']) ?></td>
-                                            <td><?= htmlspecialchars($log['action']) ?></td>
-                                            <td><?= htmlspecialchars($log['details']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="3">No activity logs found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Feedback Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Feedback</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Message</th>
-                                    <th>Rating</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($feedback)): ?>
-                                    <?php foreach ($feedback as $item): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($item['id']) ?></td>
-                                            <td><?= htmlspecialchars($item['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($item['subject']) ?></td>
-                                            <td><?= htmlspecialchars($item['message']) ?></td>
-                                            <td><?= htmlspecialchars($item['rating']) ?></td>
-                                            <td><?= htmlspecialchars($item['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No feedback found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Support Tickets Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Support Tickets</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Status</th>
-                                    <th>Priority</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($tickets)): ?>
-                                    <?php foreach ($tickets as $ticket): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($ticket['id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['status']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['priority']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No tickets found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                    <canvas id="ticketStatusChart"></canvas>
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
     <script>
         // Survey Participation Chart
