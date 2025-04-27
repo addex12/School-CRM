@@ -293,15 +293,13 @@ try {
 
         .dashboard-section {
             background: #fff;
-            border-radius: 12px;
-            /* Increase border radius */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            /* Enhance shadow */
-            padding: 1rem;
-            /* Adjust padding */
-            margin-bottom: 1.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            /* Add hover effect */
+            border-radius: 12px; /* Increase border radius */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
+            padding: 1rem; /* Adjust padding */
+            margin-bottom: 1rem; /* Reduce margin to save space */
+            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
+            height: auto; /* Fit height to content */
+            overflow: hidden; /* Prevent overflow issues */
         }
 
         .dashboard-section:hover {
@@ -321,14 +319,16 @@ try {
 
         .dashboard-widgets-and-links {
             display: grid;
-            grid-template-columns: 2fr 1fr; /* Widgets take more space than Quick Links */
+            grid-template-columns: 2fr 1fr;
+            /* Widgets take more space than Quick Links */
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
         .widget-grid {
             display: auto-fit;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Smaller widget boxes */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            /* Smaller widget boxes */
             gap: 0.5rem;
         }
 
@@ -338,14 +338,18 @@ try {
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            border-radius: 6px; /* Smaller border radius */
+            border-radius: 6px;
+            /* Smaller border radius */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            min-height: 80px; /* Allow dynamic height */
-            height: auto; /* Adjust height based on content */
-            word-wrap: break-word; /* Ensure text wraps within the widget */
+            min-height: 80px;
+            /* Allow dynamic height */
+            height: auto;
+            /* Adjust height based on content */
+            word-wrap: break-word;
+            /* Ensure text wraps within the widget */
         }
 
         .dashboard-widget:hover {
@@ -354,29 +358,36 @@ try {
         }
 
         .dashboard-widget i {
-            font-size: 1.2rem; /* Smaller icon size */
+            font-size: 1.2rem;
+            /* Smaller icon size */
             margin-bottom: 0.25rem;
             color: #5e64ff;
         }
 
         .dashboard-widget h3 {
-            font-size: 0.9rem; /* Smaller font size */
+            font-size: 0.9rem;
+            /* Smaller font size */
             margin: 0;
             color: #2c3e50;
         }
 
         .dashboard-widget p {
-            font-size: 0.7rem; /* Smaller font size */
+            font-size: 0.7rem;
+            /* Smaller font size */
             color: #7f8c8d;
-            margin: 0.25rem 0 0; /* Add spacing between text and other elements */
+            margin: 0.25rem 0 0;
+            /* Add spacing between text and other elements */
             text-align: center;
-            line-height: 1.2; /* Improve readability */
+            line-height: 1.2;
+            /* Improve readability */
         }
 
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Compact grid layout */
-            gap: 0; /* Remove gap between links */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            /* Compact grid layout */
+            gap: 0;
+            /* Remove gap between links */
         }
 
         .quick-link {
@@ -385,15 +396,19 @@ try {
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            font-size: 0.75rem; /* Smaller font size */
+            font-size: 0.75rem;
+            /* Smaller font size */
             background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
-            border-radius: 6px; /* Smaller border radius */
+            border-radius: 6px;
+            /* Smaller border radius */
             color: #34495e;
             text-decoration: none;
             transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-            height: 80px; /* Reduced height */
+            height: 80px;
+            /* Reduced height */
             text-align: center;
-            border: 1px solid #e0e6ed; /* Add border to separate links visually */
+            border: 1px solid #e0e6ed;
+            /* Add border to separate links visually */
         }
 
         .quick-link:hover {
@@ -403,7 +418,8 @@ try {
         }
 
         .quick-link i {
-            font-size: 1.2rem; /* Smaller icon size */
+            font-size: 1.2rem;
+            /* Smaller icon size */
             margin-bottom: 0.25rem;
         }
 
@@ -413,7 +429,8 @@ try {
             }
 
             .dashboard-widgets-and-links {
-                grid-template-columns: 1fr; /* Stack widgets and links vertically */
+                grid-template-columns: 1fr;
+                /* Stack widgets and links vertically */
             }
         }
 
@@ -427,6 +444,11 @@ try {
                 flex: 1 1 100%;
                 /* Stack widgets vertically */
             }
+        }
+
+        .admin-header {
+            text-align: center; /* Center align the title */
+            margin-bottom: 1rem;
         }
     </style>
     <script>
