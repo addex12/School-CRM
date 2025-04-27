@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -258,6 +259,7 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -268,297 +270,337 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- Add GSAP for animations -->
     <style>
-    .admin-dashboard {
-        display: flex;
-        min-height: 100vh;
-        background: linear-gradient(135deg, #f4f6fa, #e8ebf3); /* Add gradient background */
-        overflow-x: hidden;
-    }
-    .admin-main {
-        flex: 1;
-        padding: 2rem 2.5rem;
-        margin-left: 240px;
-        transition: margin-left 0.2s, background-color 0.3s ease-in-out;
-        background-color: #ffffff; /* Add subtle background color */
-    }
-    .admin-sidebar.collapsed ~ .admin-main {
-        margin-left: 60px;
-    }
-    .dashboard-section {
-        background: #fff;
-        border-radius: 12px; /* Increase border radius */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
-        padding: 1rem; /* Adjust padding */
-        margin-bottom: 1.5rem;
-        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-    }
-    .dashboard-section:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    }
-    .dashboard-section h2 {
-        font-size: 1.4rem; /* Increase font size */
-        color: #2c3e50;
-        margin-bottom: 1rem;
-        text-transform: uppercase; /* Add text transformation */
-        letter-spacing: 0.5px;
-    }
-    .quick-links {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Compact grid layout */
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-    .quick-link {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 0.5rem;
-        font-size: 0.875rem;
-        background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
-        border-radius: 8px;
-        color: #34495e;
-        text-decoration: none;
-        transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-        height: 100px; /* Fixed height for uniformity */
-        text-align: center;
-    }
-    .quick-link:hover {
-        background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transform: translateY(-3px);
-    }
-    .quick-link i {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-    .announcements {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Compact grid layout */
-        gap: 0.5rem;
-    }
-    .announcement-box {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        padding: 0.5rem;
-        font-size: 0.875rem;
-        color: #34495e;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .announcement-box:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .announcement-box strong {
-        display: block;
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-        color: #2c3e50;
-    }
-    .widget-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Compact grid layout */
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
-    .dashboard-widget {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 0.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        background: linear-gradient(135deg, #ffffff, #f9f9f9);
-        height: 100px; /* Fixed height for uniformity */
-    }
-    .dashboard-widget:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .dashboard-widget i {
-        font-size: 1.5rem; /* Adjust icon size */
-        margin-bottom: 0.25rem;
-        color: #5e64ff;
-    }
-    .dashboard-widget h3 {
-        font-size: 1rem; /* Adjust font size */
-        margin: 0;
-        color: #2c3e50;
-    }
-    .dashboard-widget p {
-        font-size: 0.75rem; /* Adjust font size */
-        color: #7f8c8d;
-    }
-    @media (max-width: 900px) {
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f4f6fa, #e8ebf3);
+            /* Add gradient background */
+            overflow-x: hidden;
+        }
+
         .admin-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            margin-left: 240px;
+            transition: margin-left 0.2s, background-color 0.3s ease-in-out;
+            background-color: #ffffff;
+            /* Add subtle background color */
+        }
+
+        .admin-sidebar.collapsed~.admin-main {
             margin-left: 60px;
         }
-    }
-    @media (max-width: 600px) {
-        .admin-main {
-            margin-left: 0;
+
+        .dashboard-section {
+            background: #fff;
+            border-radius: 12px;
+            /* Increase border radius */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            /* Enhance shadow */
             padding: 1rem;
+            /* Adjust padding */
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* Add hover effect */
         }
+
+        .dashboard-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.4rem;
+            /* Increase font size */
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            /* Add text transformation */
+            letter-spacing: 0.5px;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            /* Compact grid layout */
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
+            border-radius: 8px;
+            color: #34495e;
+            text-decoration: none;
+            transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+            height: 100px;
+            /* Fixed height for uniformity */
+            text-align: center;
+        }
+
+        .quick-link:hover {
+            background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .quick-link i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .announcements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            /* Compact grid layout */
+            gap: 0.5rem;
+        }
+
+        .announcement-box {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem;
+            font-size: 0.875rem;
+            color: #34495e;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .announcement-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .announcement-box strong {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: #2c3e50;
+        }
+
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            /* Compact grid layout */
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
         .dashboard-widget {
-            flex: 1 1 100%; /* Stack widgets vertically */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(135deg, #ffffff, #f9f9f9);
+            height: 100px;
+            /* Fixed height for uniformity */
         }
-    }
+
+        .dashboard-widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-widget i {
+            font-size: 1.5rem;
+            /* Adjust icon size */
+            margin-bottom: 0.25rem;
+            color: #5e64ff;
+        }
+
+        .dashboard-widget h3 {
+            font-size: 1rem;
+            /* Adjust font size */
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .dashboard-widget p {
+            font-size: 0.75rem;
+            /* Adjust font size */
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 900px) {
+            .admin-main {
+                margin-left: 60px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .admin-main {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .dashboard-widget {
+                flex: 1 1 100%;
+                /* Stack widgets vertically */
+            }
+        }
     </style>
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Add GSAP animations for widgets
-        gsap.from(".dashboard-widget", {
-            opacity: 0,
-            y: 50,
-            duration: 0.8,
-            stagger: 0.2
-        });
+        document.addEventListener("DOMContentLoaded", function() {
+            // Add GSAP animations for widgets
+            gsap.from(".dashboard-widget", {
+                opacity: 0,
+                y: 50,
+                duration: 0.8,
+                stagger: 0.2
+            });
 
-        // Add GSAP animations for sections
-        gsap.from(".dashboard-section", {
-            opacity: 0,
-            y: 50,
-            duration: 0.8,
-            stagger: 0.3
-        });
+            // Add GSAP animations for sections
+            gsap.from(".dashboard-section", {
+                opacity: 0,
+                y: 50,
+                duration: 0.8,
+                stagger: 0.3
+            });
 
-        // Survey Participation Chart
-        const surveyCtx = document.getElementById('surveyChart').getContext('2d');
-        new Chart(surveyCtx, {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode(array_keys($surveyStats)) ?>,
-                datasets: [{
-                    label: 'Survey Responses',
-                    data: <?= json_encode(array_values($surveyStats)) ?>,
-                    backgroundColor: '#5e64ff',
-                    borderColor: '#34495e',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+            // Survey Participation Chart
+            const surveyCtx = document.getElementById('surveyChart').getContext('2d');
+            new Chart(surveyCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($surveyStats)) ?>,
+                    datasets: [{
+                        label: 'Survey Responses',
+                        data: <?= json_encode(array_values($surveyStats)) ?>,
+                        backgroundColor: '#5e64ff',
+                        borderColor: '#34495e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        // Feedback Ratings Chart
-        const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
-        new Chart(feedbackCtx, {
-            type: 'pie',
-            data: {
-                labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
-                datasets: [{
-                    label: 'Feedback Ratings',
-                    data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                    backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
+            // Feedback Ratings Chart
+            const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
+            new Chart(feedbackCtx, {
+                type: 'pie',
+                data: {
+                    labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
+                    datasets: [{
+                        label: 'Feedback Ratings',
+                        data: <?= json_encode(array_values($feedbackRatings)) ?>,
+                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
 
-        // Support Ticket Status Chart
-        const ticketCtx = document.getElementById('ticketChart').getContext('2d');
-        new Chart(ticketCtx, {
-            type: 'doughnut',
-            data: {
-                labels: <?= json_encode(array_keys($ticketStatus)) ?>,
-                datasets: [{
-                    label: 'Ticket Status',
-                    data: <?= json_encode(array_values($ticketStatus)) ?>,
-                    backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#2ecc71']
-                }]
-            },
-            options: {
-                responsive: true
-            }
-        });
+            // Support Ticket Status Chart
+            const ticketCtx = document.getElementById('ticketChart').getContext('2d');
+            new Chart(ticketCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: <?= json_encode(array_keys($ticketStatus)) ?>,
+                    datasets: [{
+                        label: 'Ticket Status',
+                        data: <?= json_encode(array_values($ticketStatus)) ?>,
+                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#2ecc71']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
 
-        // System Health Line Chart (Example)
-        const systemHealthCtx = document.getElementById('systemHealthChart').getContext('2d');
-        new Chart(systemHealthCtx, {
-            type: 'line',
-            data: {
-                labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
-                datasets: [{
-                    label: 'System Health Metrics',
-                    data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
-                    backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                    borderColor: '#5e64ff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+            // System Health Line Chart (Example)
+            const systemHealthCtx = document.getElementById('systemHealthChart').getContext('2d');
+            new Chart(systemHealthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
+                    datasets: [{
+                        label: 'System Health Metrics',
+                        data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
+                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                        borderColor: '#5e64ff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        // User Role Distribution Chart
-        const roleCtx = document.getElementById('roleChart').getContext('2d');
-        new Chart(roleCtx, {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode(array_keys($userRoleDistribution)) ?>,
-                datasets: [{
-                    label: 'User Roles',
-                    data: <?= json_encode(array_values($userRoleDistribution)) ?>,
-                    backgroundColor: '#5e64ff',
-                    borderColor: '#34495e',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+            // User Role Distribution Chart
+            const roleCtx = document.getElementById('roleChart').getContext('2d');
+            new Chart(roleCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($userRoleDistribution)) ?>,
+                    datasets: [{
+                        label: 'User Roles',
+                        data: <?= json_encode(array_values($userRoleDistribution)) ?>,
+                        backgroundColor: '#5e64ff',
+                        borderColor: '#34495e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
-        });
+            });
 
-        // Monthly New Users Chart
-        const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-        new Chart(monthlyCtx, {
-            type: 'line',
-            data: {
-                labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
-                datasets: [{
-                    label: 'New Users',
-                    data: <?= json_encode(array_values($monthlyNewUsers)) ?>,
-                    backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                    borderColor: '#5e64ff',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+            // Monthly New Users Chart
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
+                    datasets: [{
+                        label: 'New Users',
+                        data: <?= json_encode(array_values($monthlyNewUsers)) ?>,
+                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                        borderColor: '#5e64ff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
+            });
         });
-    });
     </script>
 </head>
+
 <body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
@@ -590,7 +632,8 @@ try {
                         <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                         <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
                         <a href="events.php" class="quick-link"><i class="fas fa-calendar-alt"></i><span>Events</span></a>
-                        <a href="knowledgebase.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
+                        <a href="knowledge_base.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
+                        <a href="announcements.php" class="quick-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
                     </div>
                 </div>
 
@@ -652,6 +695,7 @@ try {
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
 </body>
+
 </html>
 <?php
 // Flush output buffer
