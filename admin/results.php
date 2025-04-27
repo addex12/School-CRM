@@ -189,19 +189,19 @@ $chart_json = json_encode($chart_data);
         /* ERPNext card and button styling */
         .erpnext-card {
             background: #fff;
-            border-radius: 8px; /* Reduced border radius */
-            box-shadow: 0 2px 6px rgba(44,62,80,0.05); /* Slightly lighter shadow */
-            padding: 1.5rem 1rem; /* Reduced padding */
-            margin: 1.5rem 0; /* Reduced margin */
+            border-radius: 6px; /* Reduced border radius */
+            box-shadow: 0 1px 4px rgba(44,62,80,0.05); /* Lighter shadow */
+            padding: 1rem; /* Smaller padding */
+            margin: 1rem 0; /* Smaller margin */
         }
         .erpnext-btn {
             background: #3498db;
             color: #fff;
             border: none;
-            padding: 0.4rem 0.8rem; /* Smaller button size */
-            border-radius: 4px; /* Reduced border radius */
+            padding: 0.3rem 0.6rem; /* Smaller button size */
+            border-radius: 3px; /* Reduced border radius */
             font-weight: 500;
-            font-size: 0.85rem; /* Smaller font size */
+            font-size: 0.8rem; /* Smaller font size */
             transition: background 0.18s;
             text-decoration: none;
             cursor: pointer;
@@ -237,55 +237,59 @@ $chart_json = json_encode($chart_data);
         }
         .chart-container {
             background: white;
-            border-radius: 8px; /* Reduced border radius */
-            padding: 15px; /* Reduced padding */
-            margin-bottom: 20px; /* Reduced margin */
-            box-shadow: 0 3px 5px rgba(0,0,0,0.05); /* Slightly lighter shadow */
+            border-radius: 6px; /* Reduced border radius */
+            padding: 10px; /* Smaller padding */
+            margin-bottom: 15px; /* Smaller margin */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Lighter shadow */
         }
         .chart-title {
             margin-top: 0;
             color: #2c3e50;
-            font-size: 1rem; /* Smaller font size */
-            padding-bottom: 8px; /* Reduced padding */
+            font-size: 0.9rem; /* Smaller font size */
+            padding-bottom: 6px; /* Reduced padding */
             border-bottom: 1px solid #eee;
         }
         .response-table th, .response-table td {
-            padding: 8px 10px; /* Reduced padding */
+            padding: 6px 8px; /* Smaller padding */
         }
         .response-table th {
-            font-size: 0.9rem; /* Smaller font size */
+            font-size: 0.85rem; /* Smaller font size */
         }
         .response-table td {
-            font-size: 0.85rem; /* Smaller font size */
+            font-size: 0.8rem; /* Smaller font size */
         }
         .response-table tr:hover {
             background-color: #f8f9fa;
         }
         .badge {
-            font-size: 0.7em; /* Smaller badge size */
-            padding: 0.3em 0.5em; /* Reduced padding */
+            font-size: 0.65em; /* Smaller badge size */
+            padding: 0.25em 0.4em; /* Reduced padding */
         }
         .pagination .page-link {
-            padding: 0.4rem 0.6rem; /* Smaller pagination buttons */
-            font-size: 0.85rem; /* Smaller font size */
+            padding: 0.3rem 0.5rem; /* Smaller pagination buttons */
+            font-size: 0.8rem; /* Smaller font size */
         }
         .filter-form {
             background: white;
-            padding: 15px; /* Reduced padding */
-            border-radius: 8px; /* Reduced border radius */
-            box-shadow: 0 3px 5px rgba(0,0,0,0.05); /* Slightly lighter shadow */
-            margin-bottom: 20px; /* Reduced margin */
+            padding: 10px; /* Smaller padding */
+            border-radius: 6px; /* Reduced border radius */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Lighter shadow */
+            margin-bottom: 15px; /* Smaller margin */
         }
         .filter-form .form-group label {
-            font-size: 0.85rem; /* Smaller label font size */
+            font-size: 0.8rem; /* Smaller label font size */
         }
         .filter-form .form-control {
-            font-size: 0.85rem; /* Smaller input font size */
-            padding: 0.4rem 0.6rem; /* Reduced padding */
+            font-size: 0.8rem; /* Smaller input font size */
+            padding: 0.3rem 0.5rem; /* Reduced padding */
         }
         .filter-form .btn {
-            font-size: 0.85rem; /* Smaller button font size */
-            padding: 0.4rem 0.8rem; /* Reduced padding */
+            font-size: 0.8rem; /* Smaller button font size */
+            padding: 0.3rem 0.6rem; /* Reduced padding */
+        }
+        .header-actions .dropdown-toggle i,
+        .header-actions a i {
+            font-size: 0.85rem; /* Smaller icon size */
         }
     </style>
 </head>
