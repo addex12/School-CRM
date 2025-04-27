@@ -230,6 +230,7 @@ try {
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 2rem;
             margin: 0 auto; /* Center the grid horizontally */
+            padding: 1rem; /* Add padding for better spacing */
         }
 
         .dashboard-widget {
@@ -241,6 +242,29 @@ try {
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
             margin: 0 auto; /* Center the widget horizontally */
+            max-width: 100%; /* Ensure responsiveness */
+        }
+
+        .dashboard-widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(44,62,80,0.15);
+        }
+
+        .erpnext-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .erpnext-btn:hover {
+            background-color: #0056b3;
         }
 
         @media (max-width: 600px) {
@@ -252,6 +276,22 @@ try {
             .dashboard-widget {
                 width: 95%; /* Adjust widget width for small screens */
                 margin: 0 auto; /* Ensure proper alignment on small screens */
+            }
+
+            .admin-main {
+                padding: 1rem; /* Add padding to prevent content from being hidden under the sidebar */
+            }
+        }
+
+        .admin-main {
+            padding: 2rem; /* Add padding to ensure content is not hidden under the sidebar */
+            margin-left: 250px; /* Adjust margin to account for the sidebar width */
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        @media (max-width: 768px) {
+            .admin-main {
+                margin-left: 0; /* Remove margin for smaller screens */
             }
         }
     </style>
