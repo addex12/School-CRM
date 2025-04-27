@@ -88,6 +88,7 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
             "color" => "green",
             "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
         ],
+        // Ensure no duplicate widgets are added
     ];
 } else {
     error_log("Dashboard configuration file not found or unreadable.");
