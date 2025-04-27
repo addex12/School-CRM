@@ -509,172 +509,35 @@ $chart_json = json_encode($chart_data);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> 
    <script>
-        // Pass PHP data to JavaScript
-        const chartData = <?= $chart_json ?>;
-        
-        // Initialize charts when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            // Summary chart - Response trend over time
-            if (chartData.total_responses > 0) {
-                const ctx = document.getElementById('summaryChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                        datasets: [{
-                            label: 'Responses',
-                            data: [
-                                Math.floor(chartData.total_responses * 0.2),
-                                Math.floor(chartData.total_responses * 0.4),
-                                Math.floor(chartData.total_responses * 0.7),
-                                chartData.total_responses
-                            ],
-                            backgroundColor: 'rgba(67, 97, 238, 0.1)',
-                            borderColor: 'rgba(67, 97, 238, 1)',
-                            borderWidth: 2,
-                            tension: 0.3,
-                            fill: true,
-                            pointBackgroundColor: 'rgba(67, 97, 238, 1)',
-                            pointRadius: 4,
-                            pointHoverRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'Response Trend Over Time',
-                                font: { size: 16 }
-                            },
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => `Responses: ${ctx.raw}`
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: {
-                                    display: true,
-                                    text: 'Number of Responses',
-                                    font: { weight: 'bold' }
-                                },
-                                grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                }
-                            },
-                            x: {
-                                title: {
-                                    display: true,
-                                    text: 'Time Period',
-                                    font: { weight: 'bold' }
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+    // Pass PHP data to JavaScript
+    const chartData = <?= $chart_json ?>;
 
-            // Field-specific charts
-            chartData.fields.forEach(field => {
-                const fieldAnalytics = chartData.analytics[field.id] || [];
-                const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
-
-                if (fieldAnalytics.length > 0) {
-                    const labels = fieldAnalytics.map(item => item.field_value);
-                    const data = fieldAnalytics.map(item => item.count);
-
-                    if (labels.length > 0 && data.length > 0) {
-                        // Automatically determine chart type based on field type
-                        let chartType = 'bar';
-                        if (field.field_type === 'radio' || field.field_type === 'select' || field.field_type === 'rating') {
-                            chartType = 'doughnut';
-                        } else if (field.field_type === 'number') {
-                            chartType = 'line';
-                        }
-
-                        new Chart(ctx, {
-                            type: chartType,
-                            data: {
-                                labels: labels,
-                                datasets: [{
-                                    label: 'Responses',
-                                    data: data,
-                                    backgroundColor: chartType === 'doughnut' ? [
-                                        '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0',
-                                        '#560bad', '#7209b7', '#b5179e', '#f72585',
-                                        '#3a0ca3', '#480ca8'
-                                    ] : '#4895ef',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: field.field_label,
-                                        font: { size: 14 }
-                                    },
-                                    legend: { display: chartType === 'doughnut' },
-                                    datalabels: {
-                                        anchor: 'end',
-                                        align: 'end',
-                                        formatter: value => value !== null ? value : '',
-                                        color: '#4361ee',
-                                        font: { weight: 'bold' }
-                                    }
-                                },
-                                scales: chartType === 'doughnut' ? {} : {
-                                    y: {
-                                        beginAtZero: true,
-                                        grid: {
-                                            color: 'rgba(0, 0, 0, 0.05)'
-                                        }
-                                    },
-                                    x: {
-                                        grid: {
-                                            display: false
-                                        }
-                                    }
-                                }
-                            },
-                            plugins: [ChartDataLabels]
-                        });
-                    } else {
-                        ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
-                    }
-                } else {
-                    ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
-                }
-            });
-
-            // Additional analysis: Pie chart for overall response distribution
-            const overallCtx = document.getElementById('overallChart').getContext('2d');
-            const overallLabels = chartData.fields.map(field => field.field_label);
-            const overallData = chartData.fields.map(field => {
+    // Initialize charts when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        // Summary chart - Response trend over time
+        if (chartData.total_responses > 0) {
+            const ctx = document.getElementById('summaryChart').getContext('2d');
+            const labels = chartData.fields.map(field => field.field_label);
+            const data = chartData.fields.map(field => {
                 const fieldAnalytics = chartData.analytics[field.id] || [];
                 return fieldAnalytics.reduce((sum, item) => sum + item.count, 0);
             });
 
-            new Chart(overallCtx, {
-                type: 'pie',
+            new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: overallLabels,
+                    labels: labels,
                     datasets: [{
-                        data: overallData,
-                        backgroundColor: [
-                            '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0',
-                            '#560bad', '#7209b7', '#b5179e', '#f72585',
-                            '#3a0ca3', '#480ca8'
-                        ],
-                        borderWidth: 1
+                        label: 'Responses',
+                        data: data,
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: 'rgba(67, 97, 238, 1)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
@@ -682,67 +545,146 @@ $chart_json = json_encode($chart_data);
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Overall Response Distribution',
+                            text: 'Response Trend Over Time',
                             font: { size: 16 }
                         },
-                        legend: { display: true },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: ctx => `${ctx.label}: ${ctx.raw}`
+                                label: ctx => `Responses: ${ctx.raw}`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Responses',
+                                font: { weight: 'bold' }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Questions',
+                                font: { weight: 'bold' }
+                            },
+                            grid: {
+                                display: false
                             }
                         }
                     }
                 }
             });
-        });
+        }
 
-        // PDF Export functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            var exportBtn = document.getElementById('export-pdf');
-            if (exportBtn) {
-                exportBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    exportResultsToPDF();
-                });
-            }
-        });
+        // Field-specific charts
+        chartData.fields.forEach(field => {
+            const fieldAnalytics = chartData.analytics[field.id] || [];
+            const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
 
-        function exportResultsToPDF() {
-            // Select the main content to export (adjust selector as needed)
-            var content = document.querySelector('.admin-main');
-            if (!content) return;
+            if (fieldAnalytics.length > 0) {
+                const labels = fieldAnalytics.map(item => item.field_value);
+                const data = fieldAnalytics.map(item => item.count);
 
-            // Hide export dropdown for PDF
-            var dropdown = document.querySelector('.dropdown');
-            if (dropdown) dropdown.style.display = 'none';
-
-            html2canvas(content, {scale: 2}).then(function(canvas) {
-                var imgData = canvas.toDataURL('image/png');
-                var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
-                var pageWidth = pdf.internal.pageSize.getWidth();
-                var pageHeight = pdf.internal.pageSize.getHeight();
-                var imgWidth = pageWidth - 40;
-                var imgHeight = canvas.height * imgWidth / canvas.width;
-
-                var position = 20;
-                if (imgHeight < pageHeight - 40) {
-                    pdf.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
-                } else {
-                    // Multi-page
-                    let heightLeft = imgHeight;
-                    let y = position;
-                    while (heightLeft > 0) {
-                        pdf.addImage(imgData, 'PNG', 20, y, imgWidth, imgHeight);
-                        heightLeft -= (pageHeight - 40);
-                        if (heightLeft > 0) {
-                            pdf.addPage();
-                            y = 0;
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Responses',
+                            data: data,
+                            backgroundColor: '#4895ef',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: field.field_label,
+                                font: { size: 14 }
+                            },
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `${ctx.label}: ${ctx.raw}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
                         }
                     }
-                }
-                pdf.save('survey_results.pdf');
-                if (dropdown) dropdown.style.display = '';
+                });
+            } else {
+                ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
+            }
+        });
+    });
+
+    // PDF Export functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        var exportBtn = document.getElementById('export-pdf');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                exportResultsToPDF();
             });
         }
-    </script>
-    <script src="../assets/js/results-export.js"></script>
+    });
+
+    function exportResultsToPDF() {
+        // Select the main content to export (adjust selector as needed)
+        var content = document.querySelector('.admin-main');
+        if (!content) return;
+
+        // Hide export dropdown for PDF
+        var dropdown = document.querySelector('.dropdown');
+        if (dropdown) dropdown.style.display = 'none';
+
+        html2canvas(content, {scale: 2}).then(function(canvas) {
+            var imgData = canvas.toDataURL('image/png');
+            var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
+            var pageWidth = pdf.internal.pageSize.getWidth();
+            var pageHeight = pdf.internal.pageSize.getHeight();
+            var imgWidth = pageWidth - 40;
+            var imgHeight = canvas.height * imgWidth / canvas.width;
+
+            var position = 20;
+            if (imgHeight < pageHeight - 40) {
+                pdf.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
+            } else {
+                // Multi-page
+                let heightLeft = imgHeight;
+                let y = position;
+                while (heightLeft > 0) {
+                    pdf.addImage(imgData, 'PNG', 20, y, imgWidth, imgHeight);
+                    heightLeft -= (pageHeight - 40);
+                    if (heightLeft > 0) {
+                        pdf.addPage();
+                        y = 0;
+                    }
+                }
+            }
+            pdf.save('survey_results.pdf');
+            if (dropdown) dropdown.style.display = '';
+        });
+    }
+</script>
+<script src="../assets/js/results-export.js"></script>
