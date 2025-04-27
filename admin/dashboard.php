@@ -105,6 +105,25 @@ foreach ($widgets as &$widget) {
     }
 }
 
+// Fetch counts for notifications
+$newMessagesCount = 0;
+$newTicketsCount = 0;
+$newSurveyResponsesCount = 0;
+
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE is_read = 0 AND receiver_id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $newMessagesCount = $stmt->fetchColumn() ?: 0;
+
+    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status = 'open'");
+    $newTicketsCount = $stmt->fetchColumn() ?: 0;
+
+    $stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses WHERE is_new = 1");
+    $newSurveyResponsesCount = $stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {
+    error_log("Notification Error: " . $e->getMessage());
+}
+
 // Fetch unread messages from users to admin
 $unreadMessagesCount = 0;
 try {
@@ -450,6 +469,29 @@ try {
             text-align: center; /* Center align the title */
             margin-bottom: 1rem;
         }
+
+        .notification-bar {
+            background: #f39c12;
+            color: #fff;
+            padding: 10px 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .notification-bar a {
+            color: #fff;
+            text-decoration: underline;
+            margin: 0 10px;
+        }
+
+        .notification-bar a:hover {
+            color: #34495e;
+        }
     </style>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -606,6 +648,11 @@ try {
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
+            <!-- Notification Bar -->
+            <div class="notification-bar" id="notificationBar">
+                <!-- Content will be dynamically updated -->
+            </div>
+
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
@@ -660,6 +707,32 @@ try {
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const newMessagesCount = <?= $newMessagesCount ?>;
+            const newTicketsCount = <?= $newTicketsCount ?>;
+            const newSurveyResponsesCount = <?= $newSurveyResponsesCount ?>;
+            const notificationBar = document.getElementById('notificationBar');
+
+            let notifications = [];
+
+            if (newMessagesCount > 0) {
+                notifications.push(`<a href="messages.php">${newMessagesCount} new message(s)</a>`);
+            }
+            if (newTicketsCount > 0) {
+                notifications.push(`<a href="support_tickets.php">${newTicketsCount} new support ticket(s)</a>`);
+            }
+            if (newSurveyResponsesCount > 0) {
+                notifications.push(`<a href="surveys.php">${newSurveyResponsesCount} new survey response(s)</a>`);
+            }
+
+            if (notifications.length > 0) {
+                notificationBar.innerHTML = notifications.join(' | ');
+                notificationBar.style.display = 'block';
+            }
+        });
+    </script>
 </body>
 
 </html>
