@@ -298,7 +298,7 @@ try {
             padding: 1rem; /* Adjust padding */
             margin-bottom: 1rem; /* Reduce margin to save space */
             transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-            height: auto; /* Fit height to content */
+            height: fit-content; /* Fit height to content */
             overflow: hidden; /* Prevent overflow issues */
         }
 
