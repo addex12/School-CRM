@@ -113,6 +113,7 @@ $current = basename($_SERVER['PHP_SELF']);
 }
 .sidebar-toggle {
     display: none;
+    color: #222d32
 }
 @media (max-width: 900px) {
     .admin-sidebar {
