@@ -33,6 +33,9 @@ if (isLoggedIn()) {
     exit();
 }
 
+// Initialize error variable
+$error = null;
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
@@ -114,6 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Login error: " . $e->getMessage());
         $error = "An error occurred. Please try again later.";
     }
+} else {
+    $error = null; // Ensure no error is displayed on first load
 }
 
 // Ensure `$user` is checked before accessing its properties
@@ -472,7 +477,7 @@ if (isset($user) && is_array($user)) {
                 <p>Please sign in to continue to your account</p>
             </div>
             
-            <?php if (isset($error)): ?>
+            <?php if ($error): ?>
                 <div class="error-message">
                     <i class="fas fa-exclamation-circle"></i>
                     <span><?php echo htmlspecialchars($error); ?></span>
