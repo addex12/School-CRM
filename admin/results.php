@@ -308,7 +308,6 @@ $chart_json = json_encode($chart_data);
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv"></i> CSV</a></li>
                             <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF</a></li>
-                            <li><a class="dropdown-item" href="export_json.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-code"></i> JSON</a></li>
                         </ul>
                     </div>
                     <a href="surveys.php" class="erpnext-btn erpnext-btn-secondary">
