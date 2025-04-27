@@ -13,6 +13,9 @@
     flex-direction: column;
     visibility: visible; /* Ensure sidebar is visible */
 }
+.admin-sidebar.collapsed {
+    width: 60px;
+}
 .admin-main {
     margin-left: 240px; /* Adjust margin to account for sidebar width */
     transition: margin-left 0.2s;
@@ -20,6 +23,20 @@
 .admin-sidebar.collapsed ~ .admin-main,
 body .admin-sidebar.collapsed + .admin-main {
     margin-left: 60px;
+}
+@media (max-width: 900px) {
+    .admin-sidebar {
+        width: 200px;
+    }
+    .admin-sidebar.collapsed {
+        width: 60px;
+    }
+    .admin-main {
+        margin-left: 200px;
+    }
+    .admin-sidebar.collapsed ~ .admin-main {
+        margin-left: 60px;
+    }
 }
 @media (max-width: 600px) {
     .admin-sidebar {
