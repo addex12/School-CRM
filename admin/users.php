@@ -113,14 +113,17 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         @media (max-width: 600px) {
             body {
                 font-size: 0.85rem; /* Further reduce font size for smaller screens */
+                text-align: center; /* Center content on smaller screens */
             }
 
             .admin-header h1 {
                 font-size: 0.9rem; /* Adjust title font size */
+                text-align: center; /* Center title */
             }
 
             .users-header h2 {
                 font-size: 1rem; /* Adjust header font size */
+                text-align: center; /* Center header */
             }
 
             .users-table th, .users-table td {
@@ -130,15 +133,19 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .users-header .btn {
                 padding: 0.5rem 1rem; /* Adjust button padding */
                 font-size: 0.85rem; /* Adjust button font size */
+                display: inline-block; /* Ensure button is centered */
             }
 
             .erpnext-search-bar {
                 font-size: 0.85rem; /* Adjust search bar font size */
                 padding: 0.4rem; /* Adjust padding for better spacing */
+                margin: 0 auto; /* Center search bar */
+                display: block; /* Ensure it takes full width */
             }
 
             .content {
                 padding: 0.8rem; /* Adjust padding for better spacing */
+                text-align: center; /* Center content */
             }
 
             .users-table {
