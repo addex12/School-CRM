@@ -357,6 +357,43 @@ try {
         margin-bottom: 0.25rem;
         color: #2c3e50;
     }
+    .widget-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Compact grid layout */
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    .dashboard-widget {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: linear-gradient(135deg, #ffffff, #f9f9f9);
+        height: 100px; /* Fixed height for uniformity */
+    }
+    .dashboard-widget:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .dashboard-widget i {
+        font-size: 1.5rem; /* Adjust icon size */
+        margin-bottom: 0.25rem;
+        color: #5e64ff;
+    }
+    .dashboard-widget h3 {
+        font-size: 1rem; /* Adjust font size */
+        margin: 0;
+        color: #2c3e50;
+    }
+    .dashboard-widget p {
+        font-size: 0.75rem; /* Adjust font size */
+        color: #7f8c8d;
+    }
     @media (max-width: 900px) {
         .admin-main {
             margin-left: 60px;
@@ -530,6 +567,20 @@ try {
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
+                <!-- Dashboard Widgets Section -->
+                <div class="dashboard-section">
+                    <h2>Dashboard Widgets</h2>
+                    <div class="widget-grid">
+                        <?php foreach ($widgets as $widget): ?>
+                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
+                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
+                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
+                                <p><?= htmlspecialchars($widget['title']) ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
                 <!-- Quick Links Section -->
                 <div class="dashboard-section">
                     <h2>Quick Links</h2>
@@ -585,20 +636,6 @@ try {
                 <div class="dashboard-section">
                     <h2>Monthly New Users</h2>
                     <canvas id="monthlyChart"></canvas>
-                </div>
-
-                <!-- Widgets Section -->
-                <div class="dashboard-section">
-                    <h2>Dashboard Widgets</h2>
-                    <div class="widget-grid">
-                        <?php foreach ($widgets as $widget): ?>
-                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
-                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                                <p><?= htmlspecialchars($widget['title']) ?></p>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
                 </div>
 
                 <div class="dashboard-section">
