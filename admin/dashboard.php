@@ -286,17 +286,19 @@ try {
         }
 
         .admin-header .btn {
-            background-color: #007bff;
+            background-color: #5e64ff;
             color: #fff;
-            padding: 0.5rem 1rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .admin-header .btn:hover {
-            background-color: #0056b3;
+            background-color: #4a52d4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         /* Quick Links */
@@ -313,7 +315,7 @@ try {
             border: 1px solid #dee2e6;
             border-radius: 4px;
             text-align: center;
-            padding: 1rem;
+            padding: 0.75rem;
             text-decoration: none;
             color: #343a40;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -325,9 +327,9 @@ try {
         }
 
         .quick-link i {
-            font-size: 2rem;
+            font-size: 0.875rem;
             margin-bottom: 0.5rem;
-            color: #007bff;
+            color: #5e64ff;
         }
 
         @media (max-width: 768px) {
@@ -356,7 +358,7 @@ try {
             border: 1px solid #dee2e6;
             border-radius: 4px;
             text-align: center;
-            padding: 1rem;
+            padding: 0.75rem;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
@@ -366,12 +368,12 @@ try {
         }
 
         .dashboard-widget i {
-            font-size: 2rem;
+            font-size: 0.875rem;
             margin-bottom: 0.5rem;
         }
 
         .widget-blue {
-            color: #007bff;
+            color: #5e64ff;
         }
 
         .widget-green {
@@ -379,7 +381,7 @@ try {
         }
 
         .widget-red {
-            color: #dc3545;
+            color: #ff5858;
         }
 
         .widget-yellow {
@@ -505,7 +507,7 @@ try {
                         datasets: [{
                             label: 'Responses',
                             data: <?= json_encode(array_values($surveyStats)) ?>,
-                            backgroundColor: '#3b82f6'
+                            backgroundColor: '#5e64ff'
                         }]
                     },
                     options: {
@@ -531,7 +533,7 @@ try {
                         datasets: [{
                             label: 'Feedback Ratings',
                             data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                            backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
+                            backgroundColor: ['#5e64ff', '#f59e42', '#f1c40f', '#28a745', '#ff5858']
                         }]
                     },
                     options: { responsive: true }
@@ -550,7 +552,7 @@ try {
                         datasets: [{
                             label: 'Tickets',
                             data: <?= json_encode(array_values($ticketStatus)) ?>,
-                            backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
+                            backgroundColor: ['#5e64ff', '#ff5858', '#f1c40f', '#28a745']
                         }]
                     },
                     options: { responsive: true }
