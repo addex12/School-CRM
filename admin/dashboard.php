@@ -283,8 +283,11 @@ try {
             padding: 2rem 2.5rem;
             margin-left: 240px;
             transition: margin-left 0.2s, background-color 0.3s ease-in-out;
-            background-color: #ffffff;
-            /* Add subtle background color */
+            background-color: #ffffff; /* Add subtle background color */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center align all contents */
+            justify-content: flex-start; /* Align contents to the top */
         }
 
         .admin-sidebar.collapsed~.admin-main {
