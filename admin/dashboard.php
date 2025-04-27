@@ -445,6 +445,9 @@ try {
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
                             <h3><?= htmlspecialchars($widget['count']) ?></h3>
                             <p><?= htmlspecialchars($widget['title']) ?></p>
+                            <a href="<?= htmlspecialchars($widget['url']) ?>">View Details</a>
+                            <a href="<?= htmlspecialchars($widget['url']) ?>">View All</a>
+                            <a href="<?= htmlspecialchars($widget['url']) ?>">View More</a>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -456,7 +459,7 @@ try {
                 </div>
 
                 <!-- Feedback Ratings Chart -->
-                <div class="dashboard-section">
+                < class="dashboard-section">
                     <h2>Feedback Ratings</h2>
                     <canvas id="feedbackRatingsChart" height="80"></canvas>
                 </div>
@@ -474,6 +477,25 @@ try {
                         <li>PHP Version: <?= phpversion() ?></li>
                         <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
                         <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
+                        <li>Database Name: <?= htmlspecialchars(DB_NAME ?? 'N/A') ?></li>
+                        <li>Database User: <?= htmlspecialchars(DB_USER ?? 'N/A') ?></li>
+                        <li>Database Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_VERSION) ?? 'N/A') ?></li>
+                        <li>Database Table Count: <?= htmlspecialchars($pdo->query('SHOW TABLES')->rowCount()) ?></li>
+                        <li>Database Engine: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_DRIVER_NAME)) ?></li>
+                        <li>Database Collation: <?= htmlspecialchars($pdo->query("SELECT @@collation_database")->fetchColumn()) ?></li>
+                        <li>Database Charset: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_DEFAULT_FETCH_MODE)) ?></li>
+                        <li>Database Prefix: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_CASE)) ?></li>
+                        <li>Database Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_VERSION)) ?></li>
+                        <li>Database Host: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_CONNECTION_STATUS)) ?></li>
+                        <!-- Removed invalid PDO attribute for Database Port -->
+                        <!-- Removed invalid PDO attribute for Database Socket -->
+                        <li>Database Driver: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_DRIVER_NAME)) ?></li>
+                        <!-- Removed invalid PDO attribute for Database Driver Version -->
+                        <li>Database Driver Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_CLIENT_VERSION)) ?></li>
+                        <li>Database Driver Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_INFO)) ?></li>
+                        <li>Database Driver Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_INFO)) ?></li>
+                        <li>Database Driver Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_INFO)) ?></li>
+                        <li>Database Driver Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_INFO)) ?></li>        
                         <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
                     </ul>
                 </div>
