@@ -109,6 +109,19 @@ a:hover {
     border-radius: 4px;
 }
 
+.message-form button[type="submit"]:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #666;
+}
+
+.message-form button[type="submit"]:not(:disabled) {
+    flex: 1;
+    padding: 10px 20px;
+    background: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
 
 .unread-badge {
     background: #dc3545;
@@ -291,46 +304,18 @@ nav a.active {
 }
 
 .table {
-    width: 80%; /* Reduce table width */
-    margin: 0 auto; /* Center the table */
+    width: 100%;
     border-collapse: collapse;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    background: white;
 }
 
 .table th, .table td {
-    padding: 12px; /* Adjust padding */
     border: 1px solid #ddd;
-    text-align: left;
-    font-size: 0.9rem; /* Adjust font size */
+    padding: 8px;
 }
 
 .table th {
-    background: #4e79a7;
-    color: white;
-    text-align: center; /* Center align table headers */
-}
-
-@media (max-width: 768px) {
-    .table {
-        width: 100%; /* Make table take full width on smaller screens */
-        font-size: 0.8rem; /* Reduce font size for smaller screens */
-    }
-
-    .table th, .table td {
-        padding: 8px; /* Reduce padding for smaller screens */
-        word-wrap: break-word; /* Allow text to wrap within cells */
-    }
-}
-
-@media (max-width: 480px) {
-    .table {
-        font-size: 0.75rem; /* Further reduce font size for very small screens */
-    }
-
-    .table th, .table td {
-        padding: 6px; /* Further reduce padding */
-    }
+    background-color: #f2f2f2;
+    text-align: left;
 }
 
 /* Chart Cards */
@@ -357,6 +342,27 @@ nav a.active {
     margin-right: 0;
     min-height: 400px;
     clear: both;
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    background: white;
+}
+
+.table th {
+    background: #4e79a7;
+    color: white;
+    padding: 15px;
+    text-align: left;
+}
+
+.table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
 }
 
 /* Export Dropdown */
