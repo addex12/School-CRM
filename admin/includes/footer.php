@@ -15,49 +15,49 @@
         width: 100%;
         background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
         color: #f5f6fa;
-        padding: 18px 30px 14px 30px;
+        padding: 16px 20px;
         display: flex;
         align-items: center;
         border-top: 1px solid #374150;
-        font-size: 13px;
+        font-size: 12px;
         z-index: 100;
         box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
-        min-height: 56px;
+        min-height: 50px;
     }
     .footer-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        gap: 30px;
+        gap: 20px;
         flex-wrap: wrap;
     }
     .footer-section {
         flex: 1 1 0;
         min-width: 0;
-        padding: 0 10px;
+        padding: 0 8px;
         display: flex;
         flex-direction: column;
         gap: 2px;
     }
     .footer-main-info {
-        max-width: 220px;
+        max-width: 200px;
         font-weight: 500;
     }
     .footer-main-info h4 {
         margin: 0 0 3px 0;
-        font-size: 15px;
+        font-size: 14px;
         color: #f1c40f;
         letter-spacing: 0.5px;
     }
     .footer-main-info p {
         margin: 0;
-        font-size: 12px;
+        font-size: 11px;
         color: #bfc9d1;
     }
     .quick-link-list {
         display: flex;
-        gap: 18px;
+        gap: 12px;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -66,10 +66,10 @@
     .footer-link {
         color: #f5f6fa;
         text-decoration: none;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 500;
         transition: color 0.2s;
-        padding: 6px 14px;
+        padding: 5px 10px;
         border-radius: 4px;
         background: #2563eb;
         margin-right: 4px;
@@ -85,31 +85,31 @@
     .developer-info {
         text-align: right;
         flex-shrink: 0;
-        min-width: 160px;
+        min-width: 140px;
     }
     .social-links {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         margin-top: 2px;
     }
     .social-link {
         color: #f5f6fa;
-        font-size: 17px;
+        font-size: 16px;
         transition: color 0.2s, transform 0.2s;
         background: #007bfc;
         border-radius: 50%;
-        padding: 4px 7px 2px 7px;
+        padding: 4px 6px;
         display: inline-block;
     }
     .social-link:hover {
         color: #f1c40f;
         background: #215967;
-        transform: scale(1.15);
+        transform: scale(1.1);
     }
     @media (max-width: 900px) {
         .footer-content {
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             align-items: flex-start;
         }
         .developer-info {
@@ -119,23 +119,23 @@
     @media (max-width: 600px) {
         .admin-footer {
             padding: 10px 8px;
-            font-size: 12px;
+            font-size: 11px;
         }
         .footer-main-info {
             max-width: 100%;
         }
         .footer-section {
-            padding: 0 2px;
+            padding: 0 4px;
         }
         .quick-link-list {
-            gap: 10px;
-        }
-        .social-links {
             gap: 8px;
         }
+        .social-links {
+            gap: 6px;
+        }
         .footer-link {
-            padding: 5px 10px;
-            font-size: 11px;
+            padding: 4px 8px;
+            font-size: 10px;
         }
     }
 </style>
@@ -166,7 +166,7 @@
                     <i class="fab fa-github"></i>
                 </a>
             </div>
-            <p style="margin: 6px 0 0 0; font-size:11px; color:#bfc9d1;">
+            <p style="margin: 6px 0 0 0; font-size:10px; color:#bfc9d1;">
                 Developed by Adugna Gizaw
             </p>
         </div>
