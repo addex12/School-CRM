@@ -4,65 +4,45 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize charts
     const chartCanvas = document.getElementById('surveyChart');
     if (chartCanvas) {
-        try {
-            const chartData = JSON.parse(chartCanvas.getAttribute('data-chart'));
-            const labels = chartData.map(item => item.category);
-            const data = chartData.map(item => item.survey_count);
+        const chartData = JSON.parse(chartCanvas.getAttribute('data-chart'));
+        const labels = chartData.map(item => item.category);
+        const data = chartData.map(item => item.survey_count);
 
-            new Chart(chartCanvas, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Survey Count',
-                        data: data,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: true }
-                    },
-                    maintainAspectRatio: false // Ensure charts adjust dynamically
+        new Chart(chartCanvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Survey Count',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true }
                 }
-            });
-        } catch (error) {
-            console.error('Error initializing chart:', error);
-        }
+            }
+        });
     }
 
     // Refresh widgets dynamically
     const refreshWidgets = async () => {
         const widgets = document.querySelectorAll('.dashboard-widget');
         widgets.forEach(async widget => {
+            const query = widget.getAttribute('data-query');
             try {
-                const query = widget.getAttribute('data-query');
-                if (!query) {
-                    console.warn('Widget missing data-query attribute:', widget);
-                    return;
-                }
-
                 const response = await fetch('/api/widget-data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query }),
                 });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch widget data: ${response.statusText}`);
-                }
-
                 const data = await response.json();
-                const countElement = widget.querySelector('h3');
-                if (countElement) {
-                    countElement.textContent = data.count || 'Error';
-                } else {
-                    console.warn('Widget missing count element:', widget);
-                }
+                widget.querySelector('h3').textContent = data.count || 'Error';
             } catch (error) {
                 console.error('Error refreshing widget:', error);
             }
@@ -81,33 +61,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Adjust sidebar and content dynamically
-    const adjustLayout = () => {
-        const sidebar = document.querySelector('.admin-sidebar');
-        const mainContent = document.querySelector('.admin-main');
-        if (window.innerWidth <= 992) {
-            sidebar.style.position = 'absolute';
-            mainContent.style.marginLeft = '0';
-            mainContent.style.padding = '1rem';
-        } else {
-            sidebar.style.position = 'relative';
-            mainContent.style.marginLeft = '250px';
-            mainContent.style.padding = '2rem';
-        }
-    };
-
-    // Call adjustLayout on load and resize
-    adjustLayout();
-    window.addEventListener('resize', adjustLayout);
-
     // Load widget counts dynamically
     document.querySelectorAll('.dashboard-widget').forEach(widget => {
         const query = widget.dataset.query;
-        if (!query) {
-            console.warn('Widget missing data-query attribute:', widget);
-            return;
-        }
-
         fetch(`../api/widget_data.php?query=${encodeURIComponent(query)}`)
             .then(response => {
                 if (!response.ok) {
@@ -116,30 +72,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                const countElement = widget.querySelector('.widget-count');
-                if (countElement) {
-                    countElement.textContent = data.count || 0;
-                } else {
-                    console.warn('Widget missing count element:', widget);
-                }
+                widget.querySelector('.widget-count').textContent = data.count || 0;
             })
             .catch(error => {
                 console.error('Error loading widget data:', error);
-                const countElement = widget.querySelector('.widget-count');
-                if (countElement) {
-                    countElement.textContent = 'Error';
-                }
+                widget.querySelector('.widget-count').textContent = 'Error';
             });
     });
 
     // Load section table data dynamically
     document.querySelectorAll('.table').forEach(table => {
         const query = table.dataset.query;
-        if (!query) {
-            console.warn('Table missing data-query attribute:', table);
-            return;
-        }
-
         fetch(`../api/section_data.php?query=${encodeURIComponent(query)}`)
             .then(response => {
                 if (!response.ok) {
@@ -170,15 +113,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 tbody.innerHTML = '<tr><td colspan="100%">Error loading data</td></tr>';
             });
     });
-
     // Load recent activity data dynamically
     document.querySelectorAll('.recent-activity').forEach(table => {
         const query = table.dataset.query;
-        if (!query) {
-            console.warn('Recent activity table missing data-query attribute:', table);
-            return;
-        }
-
         fetch(`../api/recent_activity.php?query=${encodeURIComponent(query)}`)
             .then(response => {
                 if (!response.ok) {
