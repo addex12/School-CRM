@@ -276,6 +276,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             flex-direction: column; /* Stack cards vertically */
             align-items: center; /* Center align the cards */
             gap: 1.5rem; /* Add spacing between cards */
+            margin: 0 auto; /* Center the grid horizontally */
         }
 
         .erpnext-card {
@@ -285,11 +286,18 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             background: white;
             border-radius: 8px;
+            margin: 0 auto; /* Center the card horizontally */
         }
 
         @media (max-width: 768px) {
             .erpnext-card {
                 width: 100%; /* Make cards take full width on smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .erpnext-card {
+                width: 95%; /* Slightly reduce width for very small screens */
             }
         }
     </style>
