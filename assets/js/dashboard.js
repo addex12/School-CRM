@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: true }
-                }
+                },
+                maintainAspectRatio: false // Ensure charts adjust dynamically
             }
         });
     }
@@ -60,6 +61,25 @@ document.addEventListener('DOMContentLoaded', function () {
             section.classList.toggle('collapsed');
         });
     });
+
+    // Adjust sidebar and content dynamically
+    const adjustLayout = () => {
+        const sidebar = document.querySelector('.admin-sidebar');
+        const mainContent = document.querySelector('.admin-main');
+        if (window.innerWidth <= 992) {
+            sidebar.style.position = 'absolute';
+            mainContent.style.marginLeft = '0';
+            mainContent.style.padding = '1rem';
+        } else {
+            sidebar.style.position = 'relative';
+            mainContent.style.marginLeft = '250px';
+            mainContent.style.padding = '2rem';
+        }
+    };
+
+    // Call adjustLayout on load and resize
+    adjustLayout();
+    window.addEventListener('resize', adjustLayout);
 
     // Load widget counts dynamically
     document.querySelectorAll('.dashboard-widget').forEach(widget => {
@@ -113,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tbody.innerHTML = '<tr><td colspan="100%">Error loading data</td></tr>';
             });
     });
+
     // Load recent activity data dynamically
     document.querySelectorAll('.recent-activity').forEach(table => {
         const query = table.dataset.query;

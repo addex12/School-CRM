@@ -261,8 +261,9 @@ try {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 2rem;
-            margin-bottom: 2.5rem;
+            margin: 0 auto; /* Center the grid horizontally */
         }
+
         .dashboard-widget {
             background: #fff;
             border-radius: 12px;
@@ -271,7 +272,9 @@ try {
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
+            margin: 0 auto; /* Center the widget horizontally */
         }
+
         .dashboard-widget i {
             font-size: 2.2rem;
             margin-bottom: 0.7rem;
@@ -386,11 +389,12 @@ try {
                 padding: 8px 6px;
             }
             .widget-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
+                grid-template-columns: 1fr; /* Stack widgets vertically on small screens */
+                gap: 1rem; /* Reduce gap between widgets */
             }
-            .dashboard-section h2 {
-                font-size: 1.1rem;
+
+            .dashboard-widget {
+                width: 95%; /* Adjust widget width for small screens */
             }
         }
     </style>
@@ -431,6 +435,7 @@ try {
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                    <a href="events.php" class="quick-link"><i class="fas fa-calendar-plus"></i><span>Add Event</span></a>
                 </div>
 
                 <!-- Widgets Section -->
