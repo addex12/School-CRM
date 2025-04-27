@@ -1,9 +1,43 @@
+<?php
+require_once '../includes/auth.php';
+requireAdmin();
+require_once '../includes/config.php';
+
+$pageTitle = "Dashboard";
+
+// Fetch data for charts
+$totalUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$totalTeachers = $pdo->query("SELECT COUNT(*) FROM teachers")->fetchColumn();
+$totalStudents = $pdo->query("SELECT COUNT(*) FROM students")->fetchColumn();
+$totalSurveys = $pdo->query("SELECT COUNT(*) FROM surveys")->fetchColumn();
+
+$monthlySalesData = $pdo->query("
+    SELECT MONTHNAME(created_at) AS month, SUM(amount) AS total
+    FROM sales
+    WHERE YEAR(created_at) = YEAR(CURDATE())
+    GROUP BY MONTH(created_at)
+    ORDER BY MONTH(created_at)
+")->fetchAll(PDO::FETCH_ASSOC);
+
+$expenseDistribution = $pdo->query("
+    SELECT category, SUM(amount) AS total
+    FROM expenses
+    GROUP BY category
+")->fetchAll(PDO::FETCH_ASSOC);
+
+$quarterlyRevenue = $pdo->query("
+    SELECT CONCAT('Q', QUARTER(created_at)) AS quarter, SUM(amount) AS total
+    FROM sales
+    WHERE YEAR(created_at) = YEAR(CURDATE())
+    GROUP BY QUARTER(created_at)
+")->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Admin Panel</title>
+    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -23,9 +57,6 @@
             margin-left: 240px;
             transition: margin-left 0.2s;
         }
-        .admin-main.collapsed {
-            margin-left: 60px;
-        }
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -35,18 +66,6 @@
         .dashboard-header h1 {
             font-size: 1.5rem;
             color: #34495e;
-        }
-        .dashboard-header .btn-primary {
-            background: #2e8bff;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: box-shadow 0.2s;
-        }
-        .dashboard-header .btn-primary:hover {
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         .cards-container {
             display: grid;
@@ -58,10 +77,7 @@
             border: 1px solid #e0e0e0;
             border-radius: 4px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 0.75rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 1rem;
             text-align: center;
         }
         .card h3 {
@@ -99,23 +115,27 @@
         <div class="admin-main">
             <div class="dashboard-header">
                 <h1>Dashboard</h1>
-                <button class="btn-primary"><i class="fas fa-plus"></i> Add New</button>
             </div>
             <div class="cards-container">
                 <div class="card">
                     <i class="fas fa-users fa-2x" style="color: #2e8bff;"></i>
                     <h3>Total Users</h3>
-                    <p>1,234</p>
+                    <p><?= $totalUsers ?></p>
                 </div>
                 <div class="card">
-                    <i class="fas fa-chart-line fa-2x" style="color: #2e8bff;"></i>
-                    <h3>Monthly Sales</h3>
-                    <p>$12,345</p>
+                    <i class="fas fa-chalkboard-teacher fa-2x" style="color: #2e8bff;"></i>
+                    <h3>Total Teachers</h3>
+                    <p><?= $totalTeachers ?></p>
                 </div>
                 <div class="card">
-                    <i class="fas fa-wallet fa-2x" style="color: #2e8bff;"></i>
-                    <h3>Expenses</h3>
-                    <p>$4,567</p>
+                    <i class="fas fa-user-graduate fa-2x" style="color: #2e8bff;"></i>
+                    <h3>Total Students</h3>
+                    <p><?= $totalStudents ?></p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-poll fa-2x" style="color: #2e8bff;"></i>
+                    <h3>Total Surveys</h3>
+                    <p><?= $totalSurveys ?></p>
                 </div>
             </div>
             <div class="chart-container">
@@ -133,49 +153,36 @@
         </div>
     </div>
     <script>
-        // Mock data for charts
         const barChartData = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            labels: <?= json_encode(array_column($monthlySalesData, 'month')) ?>,
             datasets: [{
                 label: 'Sales ($)',
-                data: [1200, 1500, 1800, 2000, 2200, 2500, 2700, 3000, 3200, 3500, 3700, 4000],
+                data: <?= json_encode(array_column($monthlySalesData, 'total')) ?>,
                 backgroundColor: '#2e8bff'
             }]
         };
 
         const pieChartData = {
-            labels: ['Marketing', 'Operations', 'Development', 'Other'],
+            labels: <?= json_encode(array_column($expenseDistribution, 'category')) ?>,
             datasets: [{
-                data: [40, 30, 20, 10],
+                data: <?= json_encode(array_column($expenseDistribution, 'total')) ?>,
                 backgroundColor: ['#2e8bff', '#ff6384', '#ffcd56', '#4bc0c0']
             }]
         };
 
         const lineChartData = {
-            labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+            labels: <?= json_encode(array_column($quarterlyRevenue, 'quarter')) ?>,
             datasets: [{
                 label: 'Revenue ($)',
-                data: [5000, 7000, 8000, 10000],
+                data: <?= json_encode(array_column($quarterlyRevenue, 'total')) ?>,
                 borderColor: '#2e8bff',
                 fill: false
             }]
         };
 
-        // Render charts
-        const barChart = new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: barChartData
-        });
-
-        const pieChart = new Chart(document.getElementById('pieChart'), {
-            type: 'pie',
-            data: pieChartData
-        });
-
-        const lineChart = new Chart(document.getElementById('lineChart'), {
-            type: 'line',
-            data: lineChartData
-        });
+        new Chart(document.getElementById('barChart'), { type: 'bar', data: barChartData });
+        new Chart(document.getElementById('pieChart'), { type: 'pie', data: pieChartData });
+        new Chart(document.getElementById('lineChart'), { type: 'line', data: lineChartData });
     </script>
 </body>
 </html>
