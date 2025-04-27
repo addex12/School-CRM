@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -25,56 +24,75 @@ if (!isset($pdo) || !$pdo) {
 }
 
 // School CRM Dashboard widgets (revamped)
-$widgets = [
-    [
-        "title" => "Total Users",
-        "icon" => "fa-users",
-        "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM users"
-    ],
-    [
-        "title" => "Students",
-        "icon" => "fa-user-graduate",
-        "color" => "purple",
-        "query" => "SELECT COUNT(*) FROM students"
-    ],
-    [
-        "title" => "Teachers",
-        "icon" => "fa-chalkboard-teacher",
-        "color" => "teal",
-        "query" => "SELECT COUNT(*) FROM teachers"
-    ],
-    [
-        "title" => "Parents",
-        "icon" => "fa-user-friends",
-        "color" => "yellow",
-        "query" => "SELECT COUNT(*) FROM parents"
-    ],
-    [
-        "title" => "Active Surveys",
-        "icon" => "fa-poll",
-        "color" => "green",
-        "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
-    ],
-    [
-        "title" => "Feedback",
-        "icon" => "fa-comments",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM feedback"
-    ],
-    [
-        "title" => "Open Tickets",
-        "icon" => "fa-ticket-alt",
-        "color" => "red",
-        "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
-    ],
-    [
-        "title" => "Messages",
-        "icon" => "fa-envelope",
-        "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM messages"
-    ]
-];
+$dashboardConfigPath = realpath(__DIR__ . '/../config/dashboard.json');
+if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
+    $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
+    $widgets = $dashboardConfig['widgets'] ?? [
+        [
+            "title" => "Total Users",
+            "icon" => "fa-users",
+            "color" => "blue",
+            "query" => "SELECT COUNT(*) FROM users"
+        ],
+        [
+            "title" => "Active Users",
+            "icon" => "fa-user-check",
+            "color" => "green",
+            "query" => "SELECT COUNT(*) FROM users WHERE status = 'active'"
+        ],
+        [
+            "title" => "Inactive Users",
+            "icon" => "fa-user-times",
+            "color" => "red",
+            "query" => "SELECT COUNT(*) FROM users WHERE status = 'inactive'"
+        ],
+        [
+            "title" => "Total Courses",
+            "icon" => "fa-book",
+            "color" => "purple",
+            "query" => "SELECT COUNT(*) FROM courses"
+        ],
+        [
+            "title" => "Enrolled Students",
+            "icon" => "fa-user-graduate",
+            "color" => "orange",
+            "query" => "SELECT COUNT(*) FROM course_enrollments"
+        ],
+        [
+            "title" => "New Feedback",
+            "icon" => "fa-comments",
+            "color" => "teal",
+            "query" => "SELECT COUNT(*) FROM feedback WHERE is_read = 0"
+        ],
+        [
+            "title" => "Open Tickets",
+            "icon" => "fa-ticket-alt",
+            "color" => "red",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
+        ],
+        [
+            "title" => "In Progress Tickets",
+            "icon" => "fa-spinner",
+            "color" => "blue",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'in_progress'"
+        ],
+        [
+            "title" => "On Hold Tickets",
+            "icon" => "fa-pause-circle",
+            "color" => "yellow",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'on_hold'"
+        ],
+        [
+            "title" => "Resolved Tickets",
+            "icon" => "fa-check-circle",
+            "color" => "green",
+            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
+        ],
+    ];
+} else {
+    error_log("Dashboard configuration file not found or unreadable.");
+    $widgets = [];
+}
 
 foreach ($widgets as &$widget) {
     try {
@@ -193,7 +211,6 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -201,37 +218,32 @@ try {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/regular.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/solid.min.css">
+    <link rel="stylesheet" href="../assets/css/fontawesome.min.css">
+    <link rel="stylesheet" href="../assets/css/brands.min.css">
+    <link rel="stylesheet" href="../assets/css/solid.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/iframe-resizer/js/iframeResizer.min.js" defer></script> <!-- Updated auto-resizer JS -->
     <style>
         .admin-dashboard {
             display: flex;
             min-height: 100vh;
             background: #f4f6fa;
         }
-
         .admin-main {
             flex: 1;
             padding: 2rem 2.5rem;
         }
-
         .users-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-
         .users-header h2 {
             margin: 0;
             font-size: 1.5rem;
             color: #34495e;
         }
-
         .users-header .btn {
             background: #3498db;
             color: #fff;
@@ -242,82 +254,53 @@ try {
             transition: background 0.18s;
             text-decoration: none;
         }
-
         .users-header .btn:hover {
             background: #217dbb;
         }
-
         .widget-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 2rem;
             margin-bottom: 2.5rem;
         }
-
         .dashboard-widget {
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
             padding: 2rem 1.5rem;
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
         }
-
         .dashboard-widget i {
             font-size: 2.2rem;
             margin-bottom: 0.7rem;
             color: #f1c40f;
         }
-
-        .widget-blue {
-            border-top: 4px solid #3498db;
-        }
-
-        .widget-green {
-            border-top: 4px solid #27ae60;
-        }
-
-        .widget-orange {
-            border-top: 4px solid #f39c12;
-        }
-
-        .widget-red {
-            border-top: 4px solid #e74c3c;
-        }
-
-        .widget-purple {
-            border-top: 4px solid #8e44ad;
-        }
-
-        .widget-teal {
-            border-top: 4px solid #16a085;
-        }
-
-        .widget-yellow {
-            border-top: 4px solid #f1c40f;
-        }
-
+        .widget-blue { border-top: 4px solid #3498db; }
+        .widget-green { border-top: 4px solid #27ae60; }
+        .widget-orange { border-top: 4px solid #f39c12; }
+        .widget-red { border-top: 4px solid #e74c3c; }
+        .widget-purple { border-top: 4px solid #8e44ad; }
+        .widget-teal { border-top: 4px solid #16a085; }
+        .widget-yellow { border-top: 4px solid #f1c40f; }
         .dashboard-widget h3 {
             font-size: 2.1rem;
             margin: 0.5rem 0 0.2rem 0;
             color: #2c3e50;
         }
-
         .dashboard-widget p {
             color: #7f8c8d;
             font-size: 1.1rem;
             margin: 0;
         }
-
         .dashboard-section {
             margin-bottom: 2.5rem;
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
             padding: 2rem 1.5rem;
         }
-
         .dashboard-section h2 {
             font-size: 1.3rem;
             color: #34495e;
@@ -325,34 +308,27 @@ try {
             border-bottom: 1px solid #f0f2f5;
             padding-bottom: 0.5rem;
         }
-
         .table-container {
             overflow-x: auto;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
         }
-
-        th,
-        td {
+        th, td {
             padding: 12px 16px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
         }
-
         th {
             background: #f8f9fa;
             font-weight: 600;
             color: #34495e;
         }
-
         tr:hover {
             background: #f4f8fb;
         }
-
         .dashboard-section pre.error-log {
             background: #222;
             color: #f1c40f;
@@ -362,78 +338,63 @@ try {
             max-height: 300px;
             overflow-y: auto;
         }
-
         .quick-links {
             display: flex;
             gap: 1.5rem;
             flex-wrap: wrap;
             margin-bottom: 2rem;
         }
-
         .quick-link {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
             padding: 1.2rem 1.5rem;
             text-align: center;
             min-width: 140px;
             transition: box-shadow 0.15s;
         }
-
         .quick-link:hover {
-            box-shadow: 0 4px 16px rgba(44, 62, 80, 0.13);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
         }
-
         .quick-link i {
             font-size: 1.7rem;
             margin-bottom: 0.5rem;
             color: #3498db;
         }
-
         .quick-link span {
             display: block;
             margin-top: 0.3rem;
             color: #34495e;
             font-weight: 500;
         }
-
         @media (max-width: 900px) {
             .widget-grid {
                 grid-template-columns: 1fr;
             }
-
             .dashboard-section {
                 padding: 1rem 0.5rem;
             }
         }
-
         @media (max-width: 600px) {
             .admin-main {
                 padding: 10px 2px 80px;
             }
-
-            .dashboard-widget,
-            .dashboard-section {
+            .dashboard-widget, .dashboard-section {
                 padding: 1rem 0.5rem;
             }
-
-            th,
-            td {
+            th, td {
                 padding: 8px 6px;
             }
-
             .widget-grid {
                 grid-template-columns: 1fr;
                 gap: 1rem;
             }
-
             .dashboard-section h2 {
                 font-size: 1.1rem;
             }
         }
     </style>
 </head>
-
 <body>
     <div class="admin-dashboard">
         <?php
@@ -470,6 +431,7 @@ try {
                     <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                    <a href="events.php" class="quick-link"><i class="fas fa-calendar-plus"></i><span>Add Event</span></a>
                 </div>
 
                 <!-- Widgets Section -->
@@ -684,18 +646,10 @@ try {
                     },
                     options: {
                         responsive: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
+                        plugins: { legend: { display: false } },
                         scales: {
-                            x: {
-                                beginAtZero: true
-                            },
-                            y: {
-                                beginAtZero: true
-                            }
+                            x: { beginAtZero: true },
+                            y: { beginAtZero: true }
                         }
                     }
                 });
@@ -716,9 +670,7 @@ try {
                             backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
                         }]
                     },
-                    options: {
-                        responsive: true
-                    }
+                    options: { responsive: true }
                 });
             }
         })();
@@ -737,15 +689,12 @@ try {
                             backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
                         }]
                     },
-                    options: {
-                        responsive: true
-                    }
+                    options: { responsive: true }
                 });
             }
         })();
     </script>
 </body>
-
 </html>
 <?php
 // Flush output buffer
