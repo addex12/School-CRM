@@ -371,7 +371,7 @@ try {
         .quick-links {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Compact grid layout */
-            gap: 0.5rem;
+            gap: 0; /* Remove gap between links */
         }
 
         .quick-link {
@@ -388,6 +388,7 @@ try {
             transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
             height: 80px; /* Reduced height */
             text-align: center;
+            border: 1px solid #e0e6ed; /* Add border to separate links visually */
         }
 
         .quick-link:hover {
