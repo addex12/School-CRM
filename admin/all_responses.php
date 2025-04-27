@@ -15,34 +15,14 @@ $allSurveys = $surveyStmt->fetchAll(PDO::FETCH_ASSOC);
 // Get optional survey filter from GET
 $filter_survey_id = filter_input(INPUT_GET, 'survey_id', FILTER_VALIDATE_INT);
 
-// Prepare date filter and parameters
 $whereClause = "1=1";
 $params = [];
-$date_filter = '';
 $survey_filter = '';
 
 if ($filter_survey_id) {
     $whereClause .= " AND sr.survey_id = ?";
     $params[] = $filter_survey_id;
     $survey_filter = "&survey_id=" . urlencode($filter_survey_id);
-}
-
-if (!empty($_GET['start_date'])) {
-    $start_date = $_GET['start_date'];
-    if (DateTime::createFromFormat('Y-m-d', $start_date) !== false) {
-        $whereClause .= " AND sr.submitted_at >= ?";
-        $params[] = $start_date;
-        $date_filter .= "&start_date=" . urlencode($start_date);
-    }
-}
-
-if (!empty($_GET['end_date'])) {
-    $end_date = $_GET['end_date'];
-    if (DateTime::createFromFormat('Y-m-d', $end_date) !== false) {
-        $whereClause .= " AND sr.submitted_at <= ?";
-        $params[] = $end_date . ' 23:59:59';
-        $date_filter .= "&end_date=" . urlencode($end_date);
-    }
 }
 
 // Pagination setup
@@ -158,10 +138,10 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="filter-section">
                 <form method="GET" class="filter-form">
                     <div class="row">
-                        <div class="col-md-4">
-                            <label for="survey_id">Survey</label>
+                        <div class="col-md-10">
+                            <label for="survey_id">Filter by Survey</label>
                             <select name="survey_id" id="survey_id" class="form-control">
-                                <option value="">All</option>
+                                <option value="">All Surveys</option>
                                 <?php foreach ($allSurveys as $surveyOption): ?>
                                     <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($filter_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($surveyOption['title']) ?>
@@ -169,17 +149,8 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label for="start_date">From</label>
-                            <input type="date" name="start_date" id="start_date" class="form-control" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>" />
-                        </div>
-                        <div class="col-md-3">
-                            <label for="end_date">To</label>
-                            <input type="date" name="end_date" id="end_date" class="form-control" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>" />
-                        </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <button type="submit" class="btn">Search</button>
-                            <a href="all_responses.php" class="btn btn-secondary ml-2">Reset</a>
                         </div>
                     </div>
                 </form>
@@ -209,7 +180,13 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="bi bi-eye"></i> View
                                         </a>
                                         <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-primary">
-                                          <i class="bi bi-arrow-left"></i> Results
+                                            <i class="bi bi-arrow-left"></i> Results
+                                        </a>
+                                        <a href="edit_survey.php?id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <a href="delete_survey.php?id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this survey?');">
+                                            <i class="bi bi-trash"></i> Delete
                                         </a>
                                     </td>
                                 </tr>
@@ -223,7 +200,7 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                     <ul class="pagination justify-content-center">
                         <?php if ($page > 1): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?= $page - 1 ?><?= $date_filter ?><?= $survey_filter ?>">
+                                <a class="page-link" href="?page=<?= $page - 1 ?><?= $survey_filter ?>">
                                     <i class="fas fa-chevron-left"></i> Previous
                                 </a>
                             </li>
@@ -234,7 +211,7 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                         $end_page = min($total_pages, $page + 2);
 
                         if ($start_page > 1) {
-                            echo '<li class="page-item"><a class="page-link" href="?page=1' . $date_filter . $survey_filter . '">1</a></li>';
+                            echo '<li class="page-item"><a class="page-link" href="?page=1' . $survey_filter . '">1</a></li>';
                             if ($start_page > 2) {
                                 echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                             }
@@ -242,7 +219,7 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
 
                         for ($i = $start_page; $i <= $end_page; $i++): ?>
                             <li class="page-item <?= $i == $page ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?><?= $date_filter ?><?= $survey_filter ?>">
+                                <a class="page-link" href="?page=<?= $i ?><?= $survey_filter ?>">
                                     <?= $i ?>
                                 </a>
                             </li>
@@ -252,13 +229,13 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                             if ($end_page < $total_pages - 1) {
                                 echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                             }
-                            echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . $date_filter . $survey_filter . '">' . $total_pages . '</a></li>';
+                            echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . $survey_filter . '">' . $total_pages . '</a></li>';
                         }
                         ?>
 
                         <?php if ($page < $total_pages): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?= $page + 1 ?><?= $date_filter ?><?= $survey_filter ?>">
+                                <a class="page-link" href="?page=<?= $page + 1 ?><?= $survey_filter ?>">
                                     Next <i class="fas fa-chevron-right"></i>
                                 </a>
                             </li>
