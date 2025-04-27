@@ -259,489 +259,177 @@ try {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title><?= htmlspecialchars($pageTitle) ?></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- Add GSAP for animations -->
     <style>
+        body {
+            font-family: "Inter", Arial, sans-serif;
+            margin: 0;
+            background: #f4f6fa;
+        }
         .admin-dashboard {
             display: flex;
-            flex-direction: column; /* Stack sidebar and main content vertically on small screens */
             min-height: 100vh;
-            background: linear-gradient(135deg, #f4f6fa, #e8ebf3);
-            overflow-x: hidden;
         }
-
-        .admin-sidebar {
-            width: 240px;
-            transition: transform 0.3s ease-in-out;
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 2; /* Ensure sidebar is above main content */
-            background-color: #2c3e50;
+        .main-content {
+            margin-left: 240px;
+            padding: 1rem;
+            flex: 1;
         }
-
-        @media (max-width: 900px) {
-            .admin-sidebar {
-                transform: translateX(-100%); /* Hide sidebar by default */
-            }
-
-            .admin-sidebar.active {
-                transform: translateX(0); /* Show sidebar when active */
-            }
-
-            .admin-main {
-                margin-left: 0; /* Remove margin for smaller screens */
-                padding: 1rem; /* Adjust padding for better fit */
-            }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
         }
-
-        @media (max-width: 600px) {
-            .admin-dashboard {
-                flex-direction: column; /* Stack sidebar and main content */
-            }
-
-            .admin-sidebar {
-                width: 100%; /* Sidebar takes full width on small screens */
-                height: auto; /* Adjust height for stacking */
-                position: relative; /* Ensure proper stacking */
-                transform: translateX(0); /* Always visible */
-            }
-
-            .admin-main {
-                margin-left: 0;
-                padding: 1rem;
-            }
+        .header h1 {
+            font-size: 1.5rem;
+            color: #34495e;
         }
-
-        .toggle-sidebar {
-            display: none; /* Hide toggle button by default */
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            z-index: 3; /* Ensure toggle button is above everything */
-            background: #2c3e50;
+        .header .btn-primary {
+            background: #2e8bff;
             color: #fff;
             border: none;
-            padding: 0.5rem;
+            padding: 0.5rem 1rem;
             border-radius: 4px;
             cursor: pointer;
+            transition: box-shadow 0.2s;
         }
-
-        @media (max-width: 900px) {
-            .toggle-sidebar {
-                display: block; /* Show toggle button on smaller screens */
-            }
+        .header .btn-primary:hover {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-
-        .admin-main {
-            flex: 1;
-            padding: 2rem 2.5rem;
-            margin-left: 240px;
-            transition: margin-left 0.2s, background-color 0.3s ease-in-out;
-            background-color: #ffffff; /* Add subtle background color */
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center align all contents */
-            justify-content: flex-start; /* Align contents to the top */
-            z-index: 1; /* Ensure it is above the sidebar */
-            position: relative; /* Ensure proper stacking context */
-        }
-        @media (max-width: 900px) {
-            .admin-main {
-                margin-left: 60px; /* Adjust margin for smaller screens */
-            }
-        }
-        @media (max-width: 600px) {
-            .admin-main {
-                margin-left: 0; /* Remove margin for very small screens */
-                padding: 1rem; /* Adjust padding for better fit */
-            }
-            .admin-sidebar {
-                z-index: 0; /* Ensure sidebar does not overlap content */
-            }
-        }
-
-        .dashboard-section {
-            background: #fff;
-            border-radius: 12px; /* Increase border radius */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
-            padding: 1rem; /* Adjust padding */
-            margin-bottom: 1rem; /* Reduce margin to save space */
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-            height: fit-content; /* Fit height to content */
-            overflow: hidden; /* Prevent overflow issues */
-        }
-
-        .dashboard-section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        .dashboard-section h2 {
-            font-size: 1.4rem;
-            /* Increase font size */
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            /* Add text transformation */
-            letter-spacing: 0.5px;
-        }
-
-        .dashboard-widgets-and-links {
+        .cards {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            /* Widgets take more space than Quick Links */
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1rem;
-            margin-bottom: 1.5rem;
         }
-
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Ensure consistent card size */
-            gap: 1rem; /* Add uniform spacing between cards */
-            align-items: stretch; /* Ensure all cards align properly */
+        .card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-
-        .dashboard-widget {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem; /* Adjust padding for better spacing */
-            border-radius: 8px; /* Slightly increase border radius */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhance shadow for better visual appeal */
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            height: 100%; /* Ensure cards stretch uniformly */
-            word-wrap: break-word; /* Ensure text wraps within the widget */
-        }
-
-        .dashboard-widget:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhance hover effect */
-        }
-
-        .dashboard-widget i {
-            font-size: 1.5rem; /* Slightly increase icon size */
-            margin-bottom: 0.5rem;
-            color: #5e64ff;
-        }
-
-        .dashboard-widget h3 {
-            font-size: 1rem; /* Adjust font size */
-            margin: 0;
-            color: #2c3e50;
-        }
-
-        .dashboard-widget p {
-            font-size: 0.8rem; /* Adjust font size */
-            color: #7f8c8d;
-            margin: 0.5rem 0 0; /* Add spacing between text and other elements */
-            text-align: center;
-            line-height: 1.4; /* Improve readability */
-        }
-
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            /* Compact grid layout */
-            gap: 0;
-            /* Remove gap between links */
-        }
-
-        .quick-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem;
-            font-size: 0.75rem;
-            /* Smaller font size */
-            background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
-            border-radius: 6px;
-            /* Smaller border radius */
-            color: #34495e;
-            text-decoration: none;
-            transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-            height: 80px;
-            /* Reduced height */
-            text-align: center;
-            border: 1px solid #e0e6ed;
-            /* Add border to separate links visually */
-        }
-
-        .quick-link:hover {
-            background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transform: translateY(-3px);
-        }
-
-        .quick-link i {
+        .card h3 {
             font-size: 1.2rem;
-            /* Smaller icon size */
-            margin-bottom: 0.25rem;
+            color: #34495e;
+            margin-bottom: 0.5rem;
         }
-
-        @media (max-width: 900px) {
-            .admin-main {
-                margin-left: 60px; /* Adjust margin for smaller screens */
-            }
-
-            .dashboard-widgets-and-links {
-                grid-template-columns: 1fr;
-                /* Stack widgets and links vertically */
-            }
+        .chart-container {
+            position: relative;
+            height: 300px;
         }
-
-        @media (max-width: 600px) {
-            .admin-main {
-                margin-left: 0; /* Remove margin for very small screens */
-                padding: 1rem; /* Adjust padding for better fit */
-            }
-
-            .dashboard-widget {
-                flex: 1 1 100%;
-                /* Stack widgets vertically */
-            }
+        .summary-bar {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #757575;
         }
-
-        .admin-header {
-            text-align: center; /* Center align the title */
-            margin-bottom: 1rem;
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+            }
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Add GSAP animations for widgets
-            gsap.from(".dashboard-widget", {
-                opacity: 0,
-                y: 50,
-                duration: 0.8,
-                stagger: 0.2
-            });
-
-            // Add GSAP animations for sections
-            gsap.from(".dashboard-section", {
-                opacity: 0,
-                y: 50,
-                duration: 0.8,
-                stagger: 0.3
-            });
-
-            // Survey Participation Chart
-            const surveyCtx = document.getElementById('surveyChart').getContext('2d');
-            new Chart(surveyCtx, {
-                type: 'bar',
-                data: {
-                    labels: <?= json_encode(array_keys($surveyStats)) ?>,
-                    datasets: [{
-                        label: 'Survey Responses',
-                        data: <?= json_encode(array_values($surveyStats)) ?>,
-                        backgroundColor: '#5e64ff',
-                        borderColor: '#34495e',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Feedback Ratings Chart
-            const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
-            new Chart(feedbackCtx, {
-                type: 'pie',
-                data: {
-                    labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
-                    datasets: [{
-                        label: 'Feedback Ratings',
-                        data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-
-            // Support Ticket Status Chart
-            const ticketCtx = document.getElementById('ticketChart').getContext('2d');
-            new Chart(ticketCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: <?= json_encode(array_keys($ticketStatus)) ?>,
-                    datasets: [{
-                        label: 'Ticket Status',
-                        data: <?= json_encode(array_values($ticketStatus)) ?>,
-                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#2ecc71']
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-
-            // System Health Line Chart (Example)
-            const systemHealthCtx = document.getElementById('systemHealthChart').getContext('2d');
-            new Chart(systemHealthCtx, {
-                type: 'line',
-                data: {
-                    labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
-                    datasets: [{
-                        label: 'System Health Metrics',
-                        data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
-                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                        borderColor: '#5e64ff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // User Role Distribution Chart
-            const roleCtx = document.getElementById('roleChart').getContext('2d');
-            new Chart(roleCtx, {
-                type: 'bar',
-                data: {
-                    labels: <?= json_encode(array_keys($userRoleDistribution)) ?>,
-                    datasets: [{
-                        label: 'User Roles',
-                        data: <?= json_encode(array_values($userRoleDistribution)) ?>,
-                        backgroundColor: '#5e64ff',
-                        borderColor: '#34495e',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Monthly New Users Chart
-            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-            new Chart(monthlyCtx, {
-                type: 'line',
-                data: {
-                    labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
-                    datasets: [{
-                        label: 'New Users',
-                        data: <?= json_encode(array_values($monthlyNewUsers)) ?>,
-                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                        borderColor: '#5e64ff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        });
-    </script>
 </head>
-
 <body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
+        <div class="main-content">
+            <div class="header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="content">
-                <!-- Dashboard Widgets and Quick Links Section -->
-                <div class="dashboard-widgets-and-links">
-                    <div class="widget-grid">
-                        <?php foreach ($widgets as $widget): ?>
-                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
-                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                                <p><?= htmlspecialchars($widget['title']) ?></p>
-                            </div>
-                        <?php endforeach; ?>
+                <button class="btn-primary">Add New</button>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h3>Monthly Sales</h3>
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
                     </div>
-                    <div class="quick-links">
-                        <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                        <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
-                        <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
-                        <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                        <a href="events.php" class="quick-link"><i class="fas fa-calendar-alt"></i><span>Events</span></a>
-                        <a href="knowledge_base.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
-                        <a href="announcements.php" class="quick-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
+                    <div class="summary-bar">Total Sales: $12,000</div>
+                </div>
+                <div class="card">
+                    <h3>Expense Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="pieChart"></canvas>
                     </div>
+                    <div class="summary-bar">Total Expenses: $8,000</div>
                 </div>
-
-                <!-- Charts Section -->
-                <div class="dashboard-section">
-                    <h2>Survey Participation</h2>
-                    <canvas id="surveyChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>Feedback Ratings</h2>
-                    <canvas id="feedbackChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>Support Ticket Status</h2>
-                    <canvas id="ticketChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>System Health Metrics</h2>
-                    <canvas id="systemHealthChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>User Role Distribution</h2>
-                    <canvas id="roleChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>Monthly New Users</h2>
-                    <canvas id="monthlyChart"></canvas>
-                </div>
-
-                <div class="dashboard-section">
-                    <h2>System Health</h2>
-                    <ul>
-                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version'] ?? 'Unknown') ?></li>
-                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software'] ?? 'Unknown') ?></li>
-                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status'] ?? 'Unknown') ?></li>
-                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time'] ?? 'Unknown') ?></li>
-                    </ul>
+                <div class="card">
+                    <h3>Quarterly Revenue</h3>
+                    <div class="chart-container">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                    <div class="summary-bar">Total Revenue: $36,000</div>
                 </div>
             </div>
         </div>
-        <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-</body>
+    <script>
+        // Bar Chart: Monthly Sales
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Sales ($)',
+                    data: [2000, 3000, 2500, 4000, 3500, 2000],
+                    backgroundColor: '#2e8bff',
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
 
+        // Pie Chart: Expense Distribution
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Marketing', 'Operations', 'R&D'],
+                datasets: [{
+                    data: [3000, 4000, 1000],
+                    backgroundColor: ['#2e8bff', '#e74c3c', '#f1c40f']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+
+        // Line Chart: Quarterly Revenue
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: [8000, 9000, 11000, 12000],
+                    borderColor: '#2e8bff',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
 </html>
 <?php
 // Flush output buffer
