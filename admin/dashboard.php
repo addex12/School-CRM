@@ -382,68 +382,286 @@ try {
                     <p><?= $totalUsers ?></p>
                 </div>
                 <div class="card">
-                    <i class="fas fa-chalkboard-teacher fa-2x" style="color: #2e8bff;"></i>
-                    <h3>Total Teachers</h3>
-                    <p><?= $totalTeachers ?></p>
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            /* Compact grid layout */
+            gap: 0;
+            /* Remove gap between links */
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            font-size: 0.75rem;
+            /* Smaller font size */
+            background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
+            border-radius: 6px;
+            /* Smaller border radius */
+            color: #34495e;
+            text-decoration: none;
+            transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+            height: 80px;
+            /* Reduced height */
+            text-align: center;
+            border: 1px solid #e0e6ed;
+            /* Add border to separate links visually */
+        }
+
+        .quick-link:hover {
+            background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .quick-link i {
+            font-size: 1.2rem;
+            /* Smaller icon size */
+            margin-bottom: 0.25rem;
+        }
+
+        @media (max-width: 900px) {
+            .admin-main {
+                margin-left: 60px;
+            }
+
+            .dashboard-widgets-and-links {
+                grid-template-columns: 1fr;
+                /* Stack widgets and links vertically */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .admin-main {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .dashboard-widget {
+                flex: 1 1 100%;
+                /* Stack widgets vertically */
+            }
+        }
+
+        .admin-header {
+            text-align: center; /* Center align the title */
+            margin-bottom: 1rem;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Add GSAP animations for widgets
+            gsap.from(".dashboard-widget", {
+                opacity: 0,
+                y: 50,
+                duration: 0.8,
+                stagger: 0.2
+            });
+
+            // Add GSAP animations for sections
+            gsap.from(".dashboard-section", {
+                opacity: 0,
+                y: 50,
+                duration: 0.8,
+                stagger: 0.3
+            });
+
+            // Survey Participation Chart
+            const surveyCtx = document.getElementById('surveyChart').getContext('2d');
+            new Chart(surveyCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($surveyStats)) ?>,
+                    datasets: [{
+                        label: 'Survey Responses',
+                        data: <?= json_encode(array_values($surveyStats)) ?>,
+                        backgroundColor: '#5e64ff',
+                        borderColor: '#34495e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Feedback Ratings Chart
+            const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
+            new Chart(feedbackCtx, {
+                type: 'pie',
+                data: {
+                    labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
+                    datasets: [{
+                        label: 'Feedback Ratings',
+                        data: <?= json_encode(array_values($feedbackRatings)) ?>,
+                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+
+            // Support Ticket Status Chart
+            const ticketCtx = document.getElementById('ticketChart').getContext('2d');
+            new Chart(ticketCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: <?= json_encode(array_keys($ticketStatus)) ?>,
+                    datasets: [{
+                        label: 'Ticket Status',
+                        data: <?= json_encode(array_values($ticketStatus)) ?>,
+                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#2ecc71']
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+
+            // System Health Line Chart (Example)
+            const systemHealthCtx = document.getElementById('systemHealthChart').getContext('2d');
+            new Chart(systemHealthCtx, {
+                type: 'line',
+                data: {
+                    labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
+                    datasets: [{
+                        label: 'System Health Metrics',
+                        data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
+                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                        borderColor: '#5e64ff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // User Role Distribution Chart
+            const roleCtx = document.getElementById('roleChart').getContext('2d');
+            new Chart(roleCtx, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode(array_keys($userRoleDistribution)) ?>,
+                    datasets: [{
+                        label: 'User Roles',
+                        data: <?= json_encode(array_values($userRoleDistribution)) ?>,
+                        backgroundColor: '#5e64ff',
+                        borderColor: '#34495e',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Monthly New Users Chart
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
+                    datasets: [{
+                        label: 'New Users',
+                        data: <?= json_encode(array_values($monthlyNewUsers)) ?>,
+                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                        borderColor: '#5e64ff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div class="admin-dashboard">
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <div class="admin-main">
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+            </header>
+            <div class="content">
+                <!-- Dashboard Widgets and Quick Links Section -->
+                <div class="dashboard-widgets-and-links">
+                    <div class="widget-grid">
+                        <?php foreach ($widgets as $widget): ?>
+                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
+                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
+                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
+                                <p><?= htmlspecialchars($widget['title']) ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="quick-links">
+                        <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
+                        <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
+                        <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
+                        <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                        <a href="events.php" class="quick-link"><i class="fas fa-calendar-alt"></i><span>Events</span></a>
+                        <a href="knowledge_base.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
+                        <a href="announcements.php" class="quick-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
+                    </div>
                 </div>
-                <div class="card">
-                    <i class="fas fa-user-graduate fa-2x" style="color: #2e8bff;"></i>
-                    <h3>Total Students</h3>
-                    <p><?= $totalStudents ?></p>
+
+                <!-- Charts Section -->
+                <div class="dashboard-section">
+                    <h2>Survey Participation</h2>
+                    <canvas id="surveyChart"></canvas>
                 </div>
-                <div class="card">
-                    <i class="fas fa-poll fa-2x" style="color: #2e8bff;"></i>
-                    <h3>Total Surveys</h3>
-                    <p><?= $totalSurveys ?></p>
+                <div class="dashboard-section">
+                    <h2>Feedback Ratings</h2>
+                    <canvas id="feedbackChart"></canvas>
                 </div>
-            </div>
-            <div class="chart-container">
-                <h3>Monthly Sales Data</h3>
-                <canvas id="barChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>Expense Distribution</h3>
-                <canvas id="pieChart"></canvas>
-            </div>
-            <div class="chart-container">
-                <h3>Quarterly Revenue Trends</h3>
-                <canvas id="lineChart"></canvas>
+                <div class="dashboard-section">
+                    <h2>Support Ticket Status</h2>
+                    <canvas id="ticketChart"></canvas>
+                </div>
+
+                <div class="dashboard-section">
+                    <h2>User Role Distribution</h2>
+                    <canvas id="roleChart"></canvas>
+                </div>
+                <div class="dashboard-section">
+                    <h2>Monthly New Users</h2>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+
+
             </div>
         </div>
+        <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-    <script>
-        const barChartData = {
-            labels: <?= json_encode(array_column($monthlySalesData, 'month')) ?>,
-            datasets: [{
-                label: 'Sales ($)',
-                data: <?= json_encode(array_column($monthlySalesData, 'total')) ?>,
-                backgroundColor: '#2e8bff'
-            }]
-        };
-
-        const pieChartData = {
-            labels: <?= json_encode(array_column($expenseDistribution, 'category')) ?>,
-            datasets: [{
-                data: <?= json_encode(array_column($expenseDistribution, 'total')) ?>,
-                backgroundColor: ['#2e8bff', '#ff6384', '#ffcd56', '#4bc0c0']
-            }]
-        };
-
-        const lineChartData = {
-            labels: <?= json_encode(array_column($quarterlyRevenue, 'quarter')) ?>,
-            datasets: [{
-                label: 'Revenue ($)',
-                data: <?= json_encode(array_column($quarterlyRevenue, 'total')) ?>,
-                borderColor: '#2e8bff',
-                fill: false
-            }]
-        };
-
-        new Chart(document.getElementById('barChart'), { type: 'bar', data: barChartData });
-        new Chart(document.getElementById('pieChart'), { type: 'pie', data: pieChartData });
-        new Chart(document.getElementById('lineChart'), { type: 'line', data: lineChartData });
-    </script>
 </body>
+
 </html>
 <?php
 // Flush output buffer
