@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -23,7 +24,7 @@ if (!isset($pdo) || !$pdo) {
     error_log("Database connection established successfully.");
 }
 
-// Add more widgets for dashboard revamp
+// School CRM Dashboard widgets (revamped)
 $widgets = [
     [
         "title" => "Total Users",
@@ -32,23 +33,23 @@ $widgets = [
         "query" => "SELECT COUNT(*) FROM users"
     ],
     [
-        "title" => "Total Students",
+        "title" => "Students",
         "icon" => "fa-user-graduate",
         "color" => "purple",
         "query" => "SELECT COUNT(*) FROM students"
     ],
     [
-        "title" => "Total Teachers",
+        "title" => "Teachers",
         "icon" => "fa-chalkboard-teacher",
         "color" => "teal",
         "query" => "SELECT COUNT(*) FROM teachers"
     ],
-    /**[
-        "title" => "Total Classes",
-        "icon" => "fa-school",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM classes"
-    ],**/
+    [
+        "title" => "Parents",
+        "icon" => "fa-user-friends",
+        "color" => "yellow",
+        "query" => "SELECT COUNT(*) FROM parents"
+    ],
     [
         "title" => "Active Surveys",
         "icon" => "fa-poll",
@@ -56,9 +57,9 @@ $widgets = [
         "query" => "SELECT COUNT(*) FROM surveys WHERE is_active = 1"
     ],
     [
-        "title" => "Feedback Received",
+        "title" => "Feedback",
         "icon" => "fa-comments",
-        "color" => "yellow",
+        "color" => "orange",
         "query" => "SELECT COUNT(*) FROM feedback"
     ],
     [
@@ -67,33 +68,12 @@ $widgets = [
         "color" => "red",
         "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
     ],
-    /**[
-        "title" => "Number of Classes",
-        "icon" => "fa-school",
-        "color" => "orange",
-        "query" => "SELECT COUNT(*) FROM classes"
-    ],**/
-    /**[
-        "title" => "Number of Sections",
-        "icon" => "fa-th-large",
-        "color" => "teal",
-        "query" => "SELECT COUNT(*) FROM sections"
-    ],
-    // Add widget for total curriculums
     [
-        "title" => "Total Curriculums",
-        "icon" => "fa-list",
+        "title" => "Messages",
+        "icon" => "fa-envelope",
         "color" => "blue",
-        "query" => "SELECT COUNT(*) FROM curriculums"
-    ]**/
-    
-    // Add widget for curriculum-grade/class mappings
-    /**[
-      /**  "title" => "Curriculum-Grade/Class Mappings",
-        "icon" => "fa-layer-group",
-        "color" => "purple",
-        "query" => "SELECT COUNT(*) FROM curriculum_grades"
-    ]**/
+        "query" => "SELECT COUNT(*) FROM messages"
+    ]
 ];
 
 foreach ($widgets as &$widget) {
@@ -106,10 +86,21 @@ foreach ($widgets as &$widget) {
     }
 }
 
+// Fetch unread messages from users to admin
+$unreadMessagesCount = 0;
+try {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE is_read = 0 AND receiver_id = ? AND sender_id IN (SELECT id FROM users WHERE role_id != 0)");
+    $stmt->execute([$_SESSION['user_id']]);
+    $unreadMessagesCount = $stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {
+    $unreadMessagesCount = 0;
+    error_log("Unread Messages Error: " . $e->getMessage());
+}
+
 // Fetch recent activity log
 $activityLog = [];
 try {
-    $stmt = $pdo->query("SELECT * FROM activity_log ORDER BY created_at DESC LIMIT 10");
+    $stmt = $pdo->query("SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10");
     $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Activity Log Error: " . $e->getMessage());
@@ -135,72 +126,74 @@ try {
 
 // Error log viewer: read last 20 lines of error.log
 $errorLogLines = [];
-$errorLogPath = realpath(__DIR__ . '/../error.log');
+$errorLogPath = realpath(__DIR__ . '/../error_log');
 if ($errorLogPath && is_readable($errorLogPath)) {
     $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     $errorLogLines = array_slice($lines, -20);
 }
 
-// Fetch grade distribution for chart
-$gradeChartData = [];
-try {
-    $stmt = $pdo->query("SELECT grade_letter, COUNT(*) as count FROM grades GROUP BY grade_letter ORDER BY grade_letter");
-    $gradeChartData = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-} catch (Exception $e) {
-    $gradeChartData = [];
+// Parse activity logs for the table
+$activityLogs = [];
+$logFilePath = realpath(__DIR__ . '/../logs/user_activity.log'); // Assuming logs are stored in this file
+if ($logFilePath && is_readable($logFilePath)) {
+    $lines = file($logFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        preg_match('/\[(.*?)\] (.*?): (.*)/', $line, $matches);
+        if (count($matches) === 4) {
+            $activityLogs[] = [
+                'timestamp' => $matches[1],
+                'action' => $matches[2],
+                'details' => $matches[3]
+            ];
+        }
+    }
 }
 
-// Fetch grade distribution by class
-$gradeByClass = [];
+// Limit the number of logs displayed
+$activityLogs = array_slice($activityLogs, -20);
+
+// Fetch survey participation stats for chart
+$surveyStats = [];
 try {
-    $stmt = $pdo->query("SELECT c.class_name, g.grade_letter, COUNT(*) as count
-        FROM grades g
-        LEFT JOIN students s ON g.student_id = s.id
-        LEFT JOIN classes c ON s.class_id = c.id
-        GROUP BY c.class_name, g.grade_letter
-        ORDER BY c.class_name, g.grade_letter");
+    $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
+        FROM surveys s
+        LEFT JOIN survey_responses sr ON s.id = sr.survey_id
+        GROUP BY s.id
+        ORDER BY responses DESC
+        LIMIT 7");
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $gradeByClass[$row['class_name']][$row['grade_letter']] = $row['count'];
+        $surveyStats[$row['title']] = $row['responses'];
     }
 } catch (Exception $e) {
-    $gradeByClass = [];
+    $surveyStats = [];
 }
 
-// Fetch grade distribution by section
-$gradeBySection = [];
+// Fetch feedback rating distribution for chart
+$feedbackRatings = [];
 try {
-    $stmt = $pdo->query("SELECT sec.section_name, g.grade_letter, COUNT(*) as count
-        FROM grades g
-        LEFT JOIN sections sec ON g.section_id = sec.id
-        GROUP BY sec.section_name, g.grade_letter
-        ORDER BY sec.section_name, g.grade_letter");
+    $stmt = $pdo->query("SELECT rating, COUNT(*) as count FROM feedback GROUP BY rating ORDER BY rating");
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $gradeBySection[$row['section_name']][$row['grade_letter']] = $row['count'];
+        $feedbackRatings[$row['rating']] = $row['count'];
     }
 } catch (Exception $e) {
-    $gradeBySection = [];
+    $feedbackRatings = [];
 }
 
-// Fetch grade distribution by level/grade
-$gradeByLevel = [];
+// Fetch support ticket status distribution for chart
+$ticketStatus = [];
 try {
-    $stmt = $pdo->query("SELECT lv.level_name, g.grade_letter, COUNT(*) as count
-        FROM grades g
-        LEFT JOIN students s ON g.student_id = s.id
-        LEFT JOIN classes c ON s.class_id = c.id
-        LEFT JOIN class_levels lv ON c.class_level_id = lv.id
-        GROUP BY lv.level_name, g.grade_letter
-        ORDER BY lv.level_name, g.grade_letter");
+    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM support_tickets GROUP BY status");
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $gradeByLevel[$row['level_name']][$row['grade_letter']] = $row['count'];
+        $ticketStatus[$row['status']] = $row['count'];
     }
 } catch (Exception $e) {
-    $gradeByLevel = [];
+    $ticketStatus = [];
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -208,66 +201,258 @@ try {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/regular.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/solid.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/iframe-resizer/js/iframeResizer.min.js" defer></script> <!-- Updated auto-resizer JS -->
     <style>
-        /* Ensure proper alignment of main content */
-.admin-main {
-    transition: margin-left 0.2s;
-    margin-left: 260px; /* Default sidebar width */
-    padding: 2rem;
-    overflow-x: hidden;
-}
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: #f4f6fa;
+        }
 
-@media (max-width: 900px) {
-    .admin-main {
-        margin-left: 60px; /* Collapsed sidebar width */
-    }
-}
+        .admin-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+        }
 
-@media (max-width: 600px) {
-    .admin-main {
-        margin-left: 0; /* Sidebar hidden */
-    }
-}
+        .users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .users-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+        }
+
+        .users-header .btn {
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background 0.18s;
+            text-decoration: none;
+        }
+
+        .users-header .btn:hover {
+            background: #217dbb;
+        }
+
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .dashboard-widget {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+        }
+
+        .dashboard-widget i {
+            font-size: 2.2rem;
+            margin-bottom: 0.7rem;
+            color: #f1c40f;
+        }
+
+        .widget-blue {
+            border-top: 4px solid #3498db;
+        }
+
+        .widget-green {
+            border-top: 4px solid #27ae60;
+        }
+
+        .widget-orange {
+            border-top: 4px solid #f39c12;
+        }
+
+        .widget-red {
+            border-top: 4px solid #e74c3c;
+        }
+
+        .widget-purple {
+            border-top: 4px solid #8e44ad;
+        }
+
+        .widget-teal {
+            border-top: 4px solid #16a085;
+        }
+
+        .widget-yellow {
+            border-top: 4px solid #f1c40f;
+        }
+
+        .dashboard-widget h3 {
+            font-size: 2.1rem;
+            margin: 0.5rem 0 0.2rem 0;
+            color: #2c3e50;
+        }
+
+        .dashboard-widget p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .dashboard-section {
+            margin-bottom: 2.5rem;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            padding: 2rem 1.5rem;
+        }
+
+        .dashboard-section h2 {
+            font-size: 1.3rem;
+            color: #34495e;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid #f0f2f5;
+            padding-bottom: 0.5rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0f2f5;
+            text-align: left;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        tr:hover {
+            background: #f4f8fb;
+        }
+
+        .dashboard-section pre.error-log {
+            background: #222;
+            color: #f1c40f;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .quick-links {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .quick-link {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            padding: 1.2rem 1.5rem;
+            text-align: center;
+            min-width: 140px;
+            transition: box-shadow 0.15s;
+        }
+
+        .quick-link:hover {
+            box-shadow: 0 4px 16px rgba(44, 62, 80, 0.13);
+        }
+
+        .quick-link i {
+            font-size: 1.7rem;
+            margin-bottom: 0.5rem;
+            color: #3498db;
+        }
+
+        .quick-link span {
+            display: block;
+            margin-top: 0.3rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        @media (max-width: 900px) {
+            .widget-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-section {
+                padding: 1rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .admin-main {
+                padding: 10px 2px 80px;
+            }
+
+            .dashboard-widget,
+            .dashboard-section {
+                padding: 1rem 0.5rem;
+            }
+
+            th,
+            td {
+                padding: 8px 6px;
+            }
+
+            .widget-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .dashboard-section h2 {
+                font-size: 1.1rem;
+            }
+        }
     </style>
-    <script>
-        (function() {
-            const sidebar = document.querySelector('.admin-sidebar');
-            const mainContent = document.querySelector('.admin-main');
-            const sidebarToggle = document.getElementById('sidebarToggle');
-
-            // Adjust content margin dynamically
-            function adjustContentMargin() {
-                if (window.innerWidth > 600) {
-                    mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '60px';
-                } else {
-                    mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
-                }
-            }
-
-            // Toggle sidebar and adjust content margin
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('open');
-                    adjustContentMargin();
-                });
-            }
-
-            // Adjust on window resize
-            window.addEventListener('resize', adjustContentMargin);
-
-            // Initial adjustment
-            adjustContentMargin();
-        })();
-    </script>
 </head>
+
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php
+        // Make unreadMessagesCount available to sidebar
+        $ADMIN_UNREAD_MESSAGES = $unreadMessagesCount;
+        include __DIR__ . '/includes/admin_sidebar.php';
+        ?>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
+                <?php if ($unreadMessagesCount > 0): ?>
+                    <a href="messages.php" class="erpnext-btn btn-secondary" style="position:relative;">
+                        <i class="fas fa-envelope"></i>
+                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
+                            <?= $unreadMessagesCount ?>
+                        </span>
+                        New Messages
+                    </a>
+                <?php endif; ?>
             </header>
             <div class="content">
 
@@ -298,30 +483,24 @@ try {
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Grade Scale Chart -->
-               <!-- <div class="dashboard-section">
-                    <h2>Grade Scale Distribution (All Students)</h2>
-                    <canvas id="gradeScaleChart" height="80"></canvas>
-                </div> -->
+                <!-- Survey Participation Chart -->
+                <div class="dashboard-section">
+                    <h2>Survey Participation</h2>
+                    <canvas id="surveyParticipationChart" height="80"></canvas>
+                </div>
 
-                 <!--Grade Distribution by Class -->
-                <!--<div class="dashboard-section">
-                    <h2>Grade Distribution by Class</h2>
-                    <canvas id="gradeByClassChart" height="100"></canvas>
-                </div> -->
+                <!-- Feedback Ratings Chart -->
+                <div class="dashboard-section">
+                    <h2>Feedback Ratings</h2>
+                    <canvas id="feedbackRatingsChart" height="80"></canvas>
+                </div>
 
-                <!-- Grade Distribution by Section -->
-                <!--<div class="dashboard-section">
-                    <h2>Grade Distribution by Section</h2>
-                    <canvas id="gradeBySectionChart" height="100"></canvas>
-                </div> -->
+                <!-- Support Ticket Status Chart -->
+                <div class="dashboard-section">
+                    <h2>Support Ticket Status</h2>
+                    <canvas id="ticketStatusChart" height="80"></canvas>
+                </div>
 
-                <!-- Grade Distribution by Level/Grade -->
-               <!-- <div class="dashboard-section">
-                    <h2>Grade Distribution by Level/Grade</h2>
-                    <canvas id="gradeByLevelChart" height="100"></canvas>
-                </div> -->
-                    
                 <!-- System Stats Section -->
                 <div class="dashboard-section">
                     <h2>System Stats</h2>
@@ -373,6 +552,37 @@ try {
                                 <?php else: ?>
                                     <tr>
                                         <td colspan="6">No recent activity found.</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- User Activity Logs Section -->
+                <div class="dashboard-section">
+                    <h2>User Activity Logs</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (!empty($activityLogs)): ?>
+                                    <?php foreach ($activityLogs as $log): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($log['timestamp']) ?></td>
+                                            <td><?= htmlspecialchars($log['action']) ?></td>
+                                            <td><?= htmlspecialchars($log['details']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3">No activity logs found.</td>
                                     </tr>
                                 <?php endif; ?>
                             </tbody>
@@ -458,67 +668,84 @@ try {
         <?php include 'includes/footer.php'; ?>
     </div>
     <script>
-        // Grade Scale Chart
-        const gradeScaleCtx = document.getElementById('gradeScaleChart').getContext('2d');
-        new Chart(gradeScaleCtx, {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode(array_keys($gradeChartData)) ?>,
-                datasets: [{
-                    label: 'Number of Students',
-                    data: <?= json_encode(array_values($gradeChartData)) ?>,
-                    backgroundColor: '#3498db'
-                }]
-            },
-            options: { responsive: true, plugins: { legend: { display: false } } }
-        });
+        // Survey Participation Chart
+        (function() {
+            const ctx = document.getElementById('surveyParticipationChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: <?= json_encode(array_keys($surveyStats)) ?>,
+                        datasets: [{
+                            label: 'Responses',
+                            data: <?= json_encode(array_values($surveyStats)) ?>,
+                            backgroundColor: '#3b82f6'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        })();
 
-        // Grade By Class Chart
-        const gradeByClassData = <?= json_encode($gradeByClass) ?>;
-        const classLabels = Object.keys(gradeByClassData);
-        const gradeLetters = [...new Set([].concat(...Object.values(gradeByClassData).map(Object.keys)))];
-        const datasetsByClass = gradeLetters.map(letter => ({
-            label: letter,
-            data: classLabels.map(cls => gradeByClassData[cls][letter] ?? 0),
-            backgroundColor: '#' + Math.floor(Math.random()*16777215).toString(16)
-        }));
-        new Chart(document.getElementById('gradeByClassChart').getContext('2d'), {
-            type: 'bar',
-            data: { labels: classLabels, datasets: datasetsByClass },
-            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
-        });
+        // Feedback Ratings Chart
+        (function() {
+            const ctx = document.getElementById('feedbackRatingsChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
+                        datasets: [{
+                            label: 'Feedback Ratings',
+                            data: <?= json_encode(array_values($feedbackRatings)) ?>,
+                            backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            }
+        })();
 
-        // Grade By Section Chart
-        const gradeBySectionData = <?= json_encode($gradeBySection) ?>;
-        const sectionLabels = Object.keys(gradeBySectionData);
-        const gradeLettersSection = [...new Set([].concat(...Object.values(gradeBySectionData).map(Object.keys)))];
-        const datasetsBySection = gradeLettersSection.map(letter => ({
-            label: letter,
-            data: sectionLabels.map(sec => gradeBySectionData[sec][letter] ?? 0),
-            backgroundColor: '#' + Math.floor(Math.random()*16777215).toString(16)
-        }));
-        new Chart(document.getElementById('gradeBySectionChart').getContext('2d'), {
-            type: 'bar',
-            data: { labels: sectionLabels, datasets: datasetsBySection },
-            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
-        });
-
-        // Grade By Level Chart
-        const gradeByLevelData = <?= json_encode($gradeByLevel) ?>;
-        const levelLabels = Object.keys(gradeByLevelData);
-        const gradeLettersLevel = [...new Set([].concat(...Object.values(gradeByLevelData).map(Object.keys)))];
-        const datasetsByLevel = gradeLettersLevel.map(letter => ({
-            label: letter,
-            data: levelLabels.map(lv => gradeByLevelData[lv][letter] ?? 0),
-            backgroundColor: '#' + Math.floor(Math.random()*16777215).toString(16)
-        }));
-        new Chart(document.getElementById('gradeByLevelChart').getContext('2d'), {
-            type: 'bar',
-            data: { labels: levelLabels, datasets: datasetsByLevel },
-            options: { responsive: true, plugins: { legend: { position: 'top' } }, scales: { x: { stacked: true }, y: { stacked: true } } }
-        });
+        // Support Ticket Status Chart
+        (function() {
+            const ctx = document.getElementById('ticketStatusChart');
+            if (ctx && typeof Chart !== 'undefined') {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: <?= json_encode(array_keys($ticketStatus)) ?>,
+                        datasets: [{
+                            label: 'Tickets',
+                            data: <?= json_encode(array_values($ticketStatus)) ?>,
+                            backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            }
+        })();
     </script>
 </body>
+
 </html>
 <?php
 // Flush output buffer

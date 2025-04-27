@@ -48,178 +48,45 @@ try {
     <title>View Reports - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .reports-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
+        .admin-main {
+            margin-left: 260px;
+            padding: 2rem;
+            transition: margin-left 0.2s;
         }
-        .reports-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .reports-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .reports-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .reports-table th, .reports-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
-        }
-        .reports-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #34495e;
-        }
-        .reports-table tr:hover {
-            background: #f4f8fb;
-        }
+
         @media (max-width: 900px) {
-            .reports-container {
-                padding: 1rem 0.5rem;
-            }
-            .reports-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
+            .admin-main {
+                margin-left: 60px;
             }
         }
+
         @media (max-width: 600px) {
-            .reports-table th, .reports-table td {
-                padding: 8px 6px;
+            .admin-main {
+                margin-left: 0;
             }
+        }
+
+        .content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.07);
+            padding: 1.5rem;
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
                 <h1>View Reports</h1>
             </header>
             <div class="content">
-                <section class="dashboard-section">
-                    <h2>Audit Log Summary</h2>
-                    <table><thead><tr><th>Action</th><th>Count</th></tr></thead><tbody>
-                        <?php foreach ($auditSummary as $row): ?>
-                        <tr><td><?= htmlspecialchars($row['action']) ?></td><td><?= htmlspecialchars($row['count']) ?></td></tr>
-                        <?php endforeach; ?>
-                    </tbody></table>
-                    <h3>Recent Activity</h3>
-                    <table><thead><tr><th>User</th><th>Action</th><th>Details</th><th>Time</th></tr></thead><tbody>
-                        <?php foreach ($recentAudit as $log): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($log['username'] ?? 'System') ?></td>
-                            <td><?= htmlspecialchars($log['action']) ?></td>
-                            <td><?= htmlspecialchars($log['details'] ?? 'N/A') ?></td>
-                            <td><?= htmlspecialchars($log['created_at']) ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody></table>
-                </section>
-                <section class="dashboard-section">
-                    <h2>Survey Reports</h2>
-                    <p>Total Surveys: <?= htmlspecialchars($surveyCount) ?> | Total Responses: <?= htmlspecialchars($surveyResponseCount) ?></p>
-                    <h3>Recent Surveys</h3>
-                    <table><thead><tr><th>Title</th><th>Created At</th></tr></thead><tbody>
-                        <?php foreach ($recentSurveys as $survey): ?>
-                        <tr><td><?= htmlspecialchars($survey['title']) ?></td><td><?= htmlspecialchars($survey['created_at']) ?></td></tr>
-                        <?php endforeach; ?>
-                    </tbody></table>
-                </section>
-                <section class="dashboard-section">
-                    <h2>Feedback Summary</h2>
-                    <p>Total Feedback: <?= htmlspecialchars($feedbackCount) ?> | Average Rating: <?= number_format($avgRating,1) ?></p>
-                    <h3>Recent Feedback</h3>
-                    <table><thead><tr><th>User</th><th>Subject</th><th>Message</th><th>Rating</th><th>Time</th></tr></thead><tbody>
-                        <?php foreach ($recentFeedback as $fb): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($fb['username'] ?? 'Unknown') ?></td>
-                            <td><?= htmlspecialchars($fb['subject']) ?></td>
-                            <td><?= htmlspecialchars($fb['message']) ?></td>
-                            <td><?= htmlspecialchars($fb['rating']) ?></td>
-                            <td><?= htmlspecialchars($fb['created_at']) ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody></table>
-                </section>
-                <section class="dashboard-section">
-                    <h2>Support Ticket Summary</h2>
-                    <p>Total Tickets: <?= htmlspecialchars($ticketCount) ?> | Open: <?= htmlspecialchars($openTickets) ?> | Closed: <?= htmlspecialchars($closedTickets) ?></p>
-                    <h3>Recent Tickets</h3>
-                    <table><thead><tr><th>User</th><th>Subject</th><th>Status</th><th>Created At</th></tr></thead><tbody>
-                        <?php foreach ($recentTickets as $ticket): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($ticket['username'] ?? 'Unknown') ?></td>
-                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
-                            <td><?= htmlspecialchars($ticket['status']) ?></td>
-                            <td><?= htmlspecialchars($ticket['created_at']) ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody></table>
-                </section>
-                <?php if (!empty($attendanceSummary)): ?>
-                <section class="dashboard-section">
-                    <h2>Attendance Summary</h2>
-                    <table><thead><tr><th>Status</th><th>Count</th></tr></thead><tbody>
-                        <?php foreach ($attendanceSummary as $row): ?>
-                        <tr><td><?= htmlspecialchars($row['status']) ?></td><td><?= htmlspecialchars($row['count']) ?></td></tr>
-                        <?php endforeach; ?>
-                    </tbody></table>
-                </section>
-                <?php endif; ?>
-                <div class="reports-container">
-                    <div class="reports-header">
-                        <h2>Audit Log (Last 50)</h2>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="reports-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Action</th>
-                                    <th>Details</th>
-                                    <th>IP Address</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($recentAudit)): ?>
-                                    <?php foreach ($recentAudit as $report): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($report['id']) ?></td>
-                                            <td><?= htmlspecialchars($report['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($report['action']) ?></td>
-                                            <td><?= htmlspecialchars($report['details']) ?></td>
-                                            <td><?= htmlspecialchars($report['ip_address']) ?></td>
-                                            <td><?= htmlspecialchars($report['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No reports found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <p>Report details will be displayed here.</p>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
 </body>
 </html>
