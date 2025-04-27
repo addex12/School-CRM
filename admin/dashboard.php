@@ -105,7 +105,7 @@ foreach ($widgets as &$widget) {
     }
 }
 
-// Fetch counts for recent notifications
+// Fetch counts for notifications
 $newMessages = [];
 $newTickets = [];
 $newSurveyResponses = [];
@@ -328,23 +328,23 @@ try {
         .notification-icon .badge {
             position: absolute;
             top: -5px;
-            right: -10px;
+            right: -5px;
             background: #e74c3c;
             color: #fff;
-            font-size: 0.8rem;
-            padding: 2px 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
             border-radius: 50%;
+            padding: 2px 6px;
         }
 
         .notification-dropdown {
             position: absolute;
             top: 40px;
             right: 0;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 300px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
             display: none;
             z-index: 1000;
         }
@@ -358,34 +358,40 @@ try {
             padding: 10px;
             background: #f39c12;
             color: #fff;
-            font-size: 1rem;
             border-radius: 8px 8px 0 0;
+            font-size: 1rem;
         }
 
-        .notification-item {
+        .notification-dropdown ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .notification-dropdown ul li {
             padding: 10px;
             border-bottom: 1px solid #f1f1f1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
-        .notification-item:last-child {
+        .notification-dropdown ul li:last-child {
             border-bottom: none;
         }
 
-        .notification-item a {
+        .notification-dropdown ul li a {
             text-decoration: none;
             color: #34495e;
             font-size: 0.9rem;
         }
 
-        .notification-item a:hover {
-            text-decoration: underline;
+        .notification-dropdown ul li a:hover {
+            color: #f39c12;
         }
 
-        .notification-item span {
-            font-size: 0.8rem;
+        .notification-dropdown ul li small {
+            display: block;
+            font-size: 0.75rem;
             color: #7f8c8d;
         }
     </style>
@@ -545,9 +551,9 @@ try {
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <!-- Notification Bell -->
-            <div style="position: relative;">
+            <div style="position: relative; text-align: right; padding: 10px;">
                 <i class="fas fa-bell notification-icon" id="notificationBell">
-                    <?php
+                    <?php 
                     $totalNotifications = count($newMessages) + count($newTickets) + count($newSurveyResponses);
                     if ($totalNotifications > 0): ?>
                         <span class="badge"><?= $totalNotifications ?></span>
@@ -555,30 +561,47 @@ try {
                 </i>
                 <div class="notification-dropdown" id="notificationDropdown">
                     <h4>Notifications</h4>
-                    <?php if ($totalNotifications > 0): ?>
-                        <?php foreach ($newMessages as $message): ?>
-                            <div class="notification-item">
-                                <a href="messages.php?id=<?= $message['id'] ?>">New Message: <?= htmlspecialchars($message['subject']) ?></a>
-                                <span><?= date('M j, Y', strtotime($message['created_at'])) ?></span>
-                            </div>
-                        <?php endforeach; ?>
-                        <?php foreach ($newTickets as $ticket): ?>
-                            <div class="notification-item">
-                                <a href="support_tickets.php?id=<?= $ticket['id'] ?>">New Ticket: <?= htmlspecialchars($ticket['title']) ?></a>
-                                <span><?= date('M j, Y', strtotime($ticket['created_at'])) ?></span>
-                            </div>
-                        <?php endforeach; ?>
-                        <?php foreach ($newSurveyResponses as $response): ?>
-                            <div class="notification-item">
-                                <a href="surveys.php?id=<?= $response['survey_id'] ?>">New Survey Response</a>
-                                <span><?= date('M j, Y', strtotime($response['created_at'])) ?></span>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="notification-item">
-                            <span>No new notifications</span>
-                        </div>
-                    <?php endif; ?>
+                    <ul>
+                        <?php if (!empty($newMessages)): ?>
+                            <li><strong>New Messages</strong></li>
+                            <?php foreach ($newMessages as $message): ?>
+                                <li>
+                                    <a href="messages.php?id=<?= $message['id'] ?>">
+                                        <?= htmlspecialchars($message['subject']) ?>
+                                    </a>
+                                    <small><?= date('M j, Y g:i A', strtotime($message['created_at'])) ?></small>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <?php if (!empty($newTickets)): ?>
+                            <li><strong>New Support Tickets</strong></li>
+                            <?php foreach ($newTickets as $ticket): ?>
+                                <li>
+                                    <a href="support_tickets.php?id=<?= $ticket['id'] ?>">
+                                        <?= htmlspecialchars($ticket['title']) ?>
+                                    </a>
+                                    <small><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></small>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <?php if (!empty($newSurveyResponses)): ?>
+                            <li><strong>New Survey Responses</strong></li>
+                            <?php foreach ($newSurveyResponses as $response): ?>
+                                <li>
+                                    <a href="surveys.php?id=<?= $response['survey_id'] ?>">
+                                        Survey Response #<?= $response['id'] ?>
+                                    </a>
+                                    <small><?= date('M j, Y g:i A', strtotime($response['created_at'])) ?></small>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+
+                        <?php if ($totalNotifications === 0): ?>
+                            <li>No new notifications</li>
+                        <?php endif; ?>
+                    </ul>
                 </div>
             </div>
 
@@ -639,16 +662,16 @@ try {
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const notificationBell = document.getElementById('notificationBell');
-            const notificationDropdown = document.getElementById('notificationDropdown');
+            const bell = document.getElementById('notificationBell');
+            const dropdown = document.getElementById('notificationDropdown');
 
-            notificationBell.addEventListener('click', function () {
-                notificationDropdown.classList.toggle('active');
+            bell.addEventListener('click', function () {
+                dropdown.classList.toggle('active');
             });
 
             document.addEventListener('click', function (e) {
-                if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
-                    notificationDropdown.classList.remove('active');
+                if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
                 }
             });
         });
