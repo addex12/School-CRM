@@ -120,6 +120,10 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             body {
                 font-size: 0.85rem; /* Further reduce font size for smaller screens */
                 text-align: center; /* Center content on smaller screens */
+                display: flex; /* Use flexbox for centering */
+                flex-direction: column; /* Stack elements vertically */
+                align-items: center; /* Center align items horizontally */
+                justify-content: center; /* Center align items vertically */
             }
 
             .admin-header h1 {
@@ -161,6 +165,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .users-container {
                 margin: 0 auto; /* Center the container */
                 max-width: 90%; /* Limit the width for better alignment */
+                text-align: center; /* Center text inside the container */
             }
         }
 
