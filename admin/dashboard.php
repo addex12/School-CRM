@@ -579,10 +579,7 @@ try {
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h1><?= htmlspecialchars($pageTitle) ?></h1>
-                    <?php include __DIR__ . '/includes/notifications.php'; ?>
-                </div>
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
                 <!-- Dashboard Widgets and Quick Links Section -->
