@@ -2,6 +2,17 @@
 // Always use an absolute path for includes to avoid path issues
 require_once __DIR__ . '/../includes/auth.php';
 requireLogin();
+
+// Fetch site logo and name from settings
+try {
+    $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name')");
+    $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
+    $siteName = $settings['site_name'] ?? 'School CRM';
+} catch (Exception $e) {
+    $siteLogo = 'assets/images/default-logo.png';
+    $siteName = 'School CRM';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +28,10 @@ requireLogin();
 <body>
     <header class="main-header">
         <div class="header-content">
-            <h1 class="logo">Survey System</h1>
+            <div class="header-logo">
+                <img src="<?php echo htmlspecialchars($siteLogo); ?>" alt="Site Logo" style="height: 40px;">
+                <span><?php echo htmlspecialchars($siteName); ?></span>
+            </div>
             <nav class="main-nav">
                 <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Dashboard

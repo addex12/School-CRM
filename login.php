@@ -140,8 +140,8 @@ if (isset($user) && is_array($user)) {
 
 // Fetch site logo and name from settings
 try {
-    $stmt = $pdo->query("SELECT site_logo, site_name FROM settings LIMIT 1");
-    $settings = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name')");
+    $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
     $siteName = $settings['site_name'] ?? 'School CRM';
 } catch (Exception $e) {
