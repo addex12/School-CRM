@@ -49,9 +49,9 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     background: none;
     border: none;
     color: #fff;
-    font-size: 1.5rem; /* Increased font size for better visibility */
+    font-size: 1rem; /* Increased font size for better visibility */
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 5px;
     padding: 0.4rem 0.6rem; /* Smaller padding */
     position: fixed; /* Ensure it stays visible */
     top: 10px; /* Adjust position */
