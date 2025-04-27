@@ -86,6 +86,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         /* Responsive adjustments for smaller screens */
         @media (max-width: 600px) {
+            .admin-header h1 {
+                font-size: 1.2rem; /* Adjust title font size for smaller screens */
+                text-align: center; /* Center align the title */
+            }
+
             .users-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -116,43 +121,37 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .user-actions a {
                 font-size: 1rem; /* Adjust icon size */
             }
+
+            .content {
+                padding: 1rem; /* Add padding for better spacing */
+            }
         }
+
+        /* General responsive adjustments */
+        body {
+            font-size: 1rem; /* Base font size */
+            line-height: 1.5; /* Improve readability */
+        }
+
+        .admin-main {
+            padding: 1rem; /* Add padding for better spacing */
+        }
+
         .erpnext-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
+            padding: 1.5rem; /* Adjust padding for better spacing */
         }
-        .erpnext-btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-block;
+
+        .users-header h2 {
+            font-size: 1.3rem; /* Adjust font size for better responsiveness */
         }
-        .erpnext-btn-primary {
-            background: #3498db;
+
+        .users-table {
+            width: 100%; /* Ensure table takes full width */
+            table-layout: auto; /* Allow flexible column widths */
         }
-        .erpnext-btn-primary:hover {
-            background: #217dbb;
-        }
-        .erpnext-form-group {
-            margin-bottom: 1.5rem;
-        }
-        .erpnext-search-bar {
-            width: 100%;
-            max-width: 350px;
-            padding: 0.5rem 1rem;
-            border: 1px solid #dbe4ea;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
+
+        .users-table th, .users-table td {
+            word-wrap: break-word; /* Allow text to wrap within cells */
         }
     </style>
 </head>
