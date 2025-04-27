@@ -217,14 +217,6 @@ try {
     error_log("Announcements Error: " . $e->getMessage());
 }
 
-// Fetch system health status
-$systemHealth = [
-    'php_version' => phpversion(),
-    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'N/A',
-    'database_status' => $pdo ? 'Connected' : 'Disconnected',
-    'current_time' => date('Y-m-d H:i:s'),
-];
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -309,16 +301,16 @@ $systemHealth = [
                     </div>
                 </div>
 
-                <!-- Additional Sections -->
+                <!-- Recent Announcements Section -->
                 <div class="dashboard-section">
                     <h2>Recent Announcements</h2>
                     <ul>
                         <?php if (!empty($announcements)): ?>
                             <?php foreach ($announcements as $announcement): ?>
                                 <li>
-                                    <strong><?= htmlspecialchars($announcement['title']) ?>:</strong>
-                                    <?= htmlspecialchars($announcement['message']) ?>
-                                    <small>(<?= htmlspecialchars($announcement['created_at']) ?>)</small>
+                                    <strong><?= htmlspecialchars($announcement['title'] ?? 'No Title') ?>:</strong>
+                                    <?= htmlspecialchars($announcement['content'] ?? 'No Content') ?>
+                                    <small>(<?= htmlspecialchars($announcement['created_at'] ?? 'Unknown Date') ?>)</small>
                                 </li>
                             <?php endforeach; ?>
                         <?php else: ?>
