@@ -326,10 +326,10 @@ try {
         }
 
         .widget-grid {
-            display: auto-fit;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            /* Smaller widget boxes */
-            gap: 0.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Ensure consistent card size */
+            gap: 1rem; /* Add uniform spacing between cards */
+            align-items: stretch; /* Ensure all cards align properly */
         }
 
         .dashboard-widget {
@@ -337,49 +337,39 @@ try {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 0.5rem;
-            border-radius: 6px;
-            /* Smaller border radius */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem; /* Adjust padding for better spacing */
+            border-radius: 8px; /* Slightly increase border radius */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhance shadow for better visual appeal */
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            min-height: 80px;
-            /* Allow dynamic height */
-            height: auto;
-            /* Adjust height based on content */
-            word-wrap: break-word;
-            /* Ensure text wraps within the widget */
+            height: 100%; /* Ensure cards stretch uniformly */
+            word-wrap: break-word; /* Ensure text wraps within the widget */
         }
 
         .dashboard-widget:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhance hover effect */
         }
 
         .dashboard-widget i {
-            font-size: 1.2rem;
-            /* Smaller icon size */
-            margin-bottom: 0.25rem;
+            font-size: 1.5rem; /* Slightly increase icon size */
+            margin-bottom: 0.5rem;
             color: #5e64ff;
         }
 
         .dashboard-widget h3 {
-            font-size: 0.9rem;
-            /* Smaller font size */
+            font-size: 1rem; /* Adjust font size */
             margin: 0;
             color: #2c3e50;
         }
 
         .dashboard-widget p {
-            font-size: 0.7rem;
-            /* Smaller font size */
+            font-size: 0.8rem; /* Adjust font size */
             color: #7f8c8d;
-            margin: 0.25rem 0 0;
-            /* Add spacing between text and other elements */
+            margin: 0.5rem 0 0; /* Add spacing between text and other elements */
             text-align: center;
-            line-height: 1.2;
-            /* Improve readability */
+            line-height: 1.4; /* Improve readability */
         }
 
         .quick-links {
