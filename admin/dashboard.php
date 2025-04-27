@@ -261,9 +261,8 @@ try {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 2rem;
-            margin: 0 auto; /* Center the grid horizontally */
+            margin-bottom: 2.5rem;
         }
-
         .dashboard-widget {
             background: #fff;
             border-radius: 12px;
@@ -272,9 +271,7 @@ try {
             text-align: center;
             transition: transform 0.15s, box-shadow 0.15s;
             position: relative;
-            margin: 0 auto; /* Center the widget horizontally */
         }
-
         .dashboard-widget i {
             font-size: 2.2rem;
             margin-bottom: 0.7rem;
@@ -389,12 +386,11 @@ try {
                 padding: 8px 6px;
             }
             .widget-grid {
-                grid-template-columns: 1fr; /* Stack widgets vertically on small screens */
-                gap: 1rem; /* Reduce gap between widgets */
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
-
-            .dashboard-widget {
-                width: 95%; /* Adjust widget width for small screens */
+            .dashboard-section h2 {
+                font-size: 1.1rem;
             }
         }
     </style>
