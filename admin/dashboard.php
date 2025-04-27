@@ -207,8 +207,25 @@ try {
 } catch (Exception $e) {
     $ticketStatus = [];
 }
-?>
 
+// Fetch recent announcements
+$announcements = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC LIMIT 5");
+    $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Announcements Error: " . $e->getMessage());
+}
+
+// Fetch system health status
+$systemHealth = [
+    'php_version' => phpversion(),
+    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'N/A',
+    'database_status' => $pdo ? 'Connected' : 'Disconnected',
+    'current_time' => date('Y-m-d H:i:s'),
+];
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -403,8 +420,8 @@ try {
         include __DIR__ . '/includes/admin_sidebar.php';
         ?>
         <div class="admin-main">
-            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
-                <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
                 <?php if ($unreadMessagesCount > 0): ?>
                     <a href="messages.php" class="erpnext-btn btn-secondary" style="position:relative;">
                         <i class="fas fa-envelope"></i>
@@ -463,14 +480,32 @@ try {
                     <canvas id="ticketStatusChart" height="80"></canvas>
                 </div>
 
-                <!-- System Stats Section -->
+                <!-- Recent Announcements Section -->
                 <div class="dashboard-section">
-                    <h2>System Stats</h2>
+                    <h2>Recent Announcements</h2>
                     <ul>
-                        <li>PHP Version: <?= phpversion() ?></li>
-                        <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
-                        <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
-                        <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
+                        <?php if (!empty($announcements)): ?>
+                            <?php foreach ($announcements as $announcement): ?>
+                                <li>
+                                    <strong><?= htmlspecialchars($announcement['title']) ?>:</strong>
+                                    <?= htmlspecialchars($announcement['message']) ?>
+                                    <small>(<?= htmlspecialchars($announcement['created_at']) ?>)</small>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li>No recent announcements found.</li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+
+                <!-- System Health Section -->
+                <div class="dashboard-section">
+                    <h2>System Health</h2>
+                    <ul>
+                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version']) ?></li>
+                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software']) ?></li>
+                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status']) ?></li>
+                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time']) ?></li>
                     </ul>
                 </div>
 

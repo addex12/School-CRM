@@ -162,10 +162,12 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 }
 .admin-main {
     margin-left: 240px;
+    padding: 20px;
     transition: margin-left 0.2s;
+    background: #f4f6fa;
+    min-height: 100vh;
 }
-.admin-sidebar.collapsed ~ .admin-main,
-body .admin-sidebar.collapsed + .admin-main {
+.admin-sidebar.collapsed ~ .admin-main {
     margin-left: 60px;
 }
 </style>
@@ -292,28 +294,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Adjust main content margin dynamically
     function adjustMainMargin() {
+        const main = document.querySelector('.admin-main');
         if (window.innerWidth <= 600) {
-            if (sidebar.classList.contains('open')) {
-                main.style.marginLeft = sidebar.offsetWidth + 'px';
-            } else {
-                main.style.marginLeft = '0';
-            }
-        } else if (sidebar.classList.contains('collapsed')) {
+            main.style.marginLeft = '0';
+        } else if (document.getElementById('adminSidebar').classList.contains('collapsed')) {
             main.style.marginLeft = '60px';
         } else {
-            main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
+            main.style.marginLeft = '240px';
         }
     }
-
-    // Update margin on sidebar toggle
-    toggle.addEventListener('click', function() {
-        adjustMainMargin();
-    });
-
-    // Update margin on window resize
     window.addEventListener('resize', adjustMainMargin);
-
-    // Initial adjustment
     adjustMainMargin();
 });
 </script>

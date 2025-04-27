@@ -9,20 +9,14 @@
 ?>
 <style>
     .admin-footer {
-        position: relative;
+        position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
-        color: #f5f6fa;
-        padding: 18px 30px 14px 30px;
-        display: flex;
-        align-items: center;
-        border-top: 1px solid #374150;
-        font-size: 13px;
         z-index: 100;
-        box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
-        min-height: 56px;
+    }
+    .admin-main {
+        padding-bottom: 60px; /* Ensure footer does not overlap content */
     }
     .footer-content {
         display: flex;
@@ -139,7 +133,6 @@
         }
     }
 </style>
-
 <footer class="admin-footer">
     <div class="footer-content">
         <div class="footer-section footer-main-info">
