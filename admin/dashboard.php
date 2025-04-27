@@ -323,6 +323,91 @@ $systemHealth = [
         }
     }
     </style>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Survey Participation Chart
+        const surveyCtx = document.getElementById('surveyChart').getContext('2d');
+        new Chart(surveyCtx, {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode(array_keys($surveyStats)) ?>,
+                datasets: [{
+                    label: 'Survey Responses',
+                    data: <?= json_encode(array_values($surveyStats)) ?>,
+                    backgroundColor: '#5e64ff',
+                    borderColor: '#34495e',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Feedback Ratings Chart
+        const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
+        new Chart(feedbackCtx, {
+            type: 'pie',
+            data: {
+                labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
+                datasets: [{
+                    label: 'Feedback Ratings',
+                    data: <?= json_encode(array_values($feedbackRatings)) ?>,
+                    backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Support Ticket Status Chart
+        const ticketCtx = document.getElementById('ticketChart').getContext('2d');
+        new Chart(ticketCtx, {
+            type: 'doughnut',
+            data: {
+                labels: <?= json_encode(array_keys($ticketStatus)) ?>,
+                datasets: [{
+                    label: 'Ticket Status',
+                    data: <?= json_encode(array_values($ticketStatus)) ?>,
+                    backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#2ecc71']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // System Health Line Chart (Example)
+        const systemHealthCtx = document.getElementById('systemHealthChart').getContext('2d');
+        new Chart(systemHealthCtx, {
+            type: 'line',
+            data: {
+                labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
+                datasets: [{
+                    label: 'System Health Metrics',
+                    data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
+                    backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                    borderColor: '#5e64ff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+    </script>
 </head>
 <body>
     <div class="admin-dashboard">
@@ -332,6 +417,23 @@ $systemHealth = [
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
+                <!-- Charts Section -->
+                <div class="dashboard-section">
+                    <h2>Survey Participation</h2>
+                    <canvas id="surveyChart"></canvas>
+                </div>
+                <div class="dashboard-section">
+                    <h2>Feedback Ratings</h2>
+                    <canvas id="feedbackChart"></canvas>
+                </div>
+                <div class="dashboard-section">
+                    <h2>Support Ticket Status</h2>
+                    <canvas id="ticketChart"></canvas>
+                </div>
+                <div class="dashboard-section">
+                    <h2>System Health Metrics</h2>
+                    <canvas id="systemHealthChart"></canvas>
+                </div>
                 <!-- Quick Links Section -->
                 <div class="dashboard-section">
                     <h2>Quick Links</h2>
