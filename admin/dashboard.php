@@ -211,6 +211,7 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -226,198 +227,37 @@ try {
     <style>
         .admin-dashboard {
             display: flex;
-            min-height: 100vh;
-            background: #f4f6fa;
+            min-height: 100vh; /* Ensure the dashboard takes the full height of the viewport */
+            background: #f4f6f9;
         }
+
         .admin-main {
-            flex: 1;
+            flex: 1; /* Allow the main content to expand and fill available space */
+            margin-left: 240px; /* Account for the sidebar width */
             padding: 2rem 2.5rem;
-        }
-        .users-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .users-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .users-header .btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-        }
-        .users-header .btn:hover {
-            background: #217dbb;
-        }
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2rem;
-            margin: 0 auto; /* Center the grid horizontally */
+            transition: margin-left 0.2s;
         }
 
-        .dashboard-widget {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            text-align: center;
-            transition: transform 0.15s, box-shadow 0.15s;
-            position: relative;
-            margin: 0 auto; /* Center the widget horizontally */
-        }
-
-        .dashboard-widget i {
-            font-size: 2.2rem;
-            margin-bottom: 0.7rem;
-            color: #f1c40f;
-        }
-        .widget-blue { border-top: 4px solid #3498db; }
-        .widget-green { border-top: 4px solid #27ae60; }
-        .widget-orange { border-top: 4px solid #f39c12; }
-        .widget-red { border-top: 4px solid #e74c3c; }
-        .widget-purple { border-top: 4px solid #8e44ad; }
-        .widget-teal { border-top: 4px solid #16a085; }
-        .widget-yellow { border-top: 4px solid #f1c40f; }
-        .dashboard-widget h3 {
-            font-size: 2.1rem;
-            margin: 0.5rem 0 0.2rem 0;
-            color: #2c3e50;
-        }
-        .dashboard-widget p {
-            color: #7f8c8d;
-            font-size: 1.1rem;
-            margin: 0;
-        }
-        .dashboard-section {
-            margin-bottom: 2.5rem;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-        }
-        .dashboard-section h2 {
-            font-size: 1.3rem;
-            color: #34495e;
-            margin-bottom: 1.2rem;
-            border-bottom: 1px solid #f0f2f5;
-            padding-bottom: 0.5rem;
-        }
-        .table-container {
-            overflow-x: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-        }
-        th, td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
-        }
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #34495e;
-        }
-        tr:hover {
-            background: #f4f8fb;
-        }
-        .dashboard-section pre.error-log {
-            background: #222;
-            color: #f1c40f;
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .quick-links {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        .quick-link {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.2rem 1.5rem;
-            text-align: center;
-            min-width: 140px;
-            transition: box-shadow 0.15s;
-        }
-        .quick-link:hover {
-            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
-        }
-        .quick-link i {
-            font-size: 1.7rem;
-            margin-bottom: 0.5rem;
-            color: #3498db;
-        }
-        .quick-link span {
-            display: block;
-            margin-top: 0.3rem;
-            color: #34495e;
-            font-weight: 500;
-        }
         @media (max-width: 900px) {
-            .widget-grid {
-                grid-template-columns: 1fr;
-            }
-            .dashboard-section {
-                padding: 1rem 0.5rem;
+            .admin-main {
+                margin-left: 60px; /* Adjust for collapsed sidebar on smaller screens */
             }
         }
+
         @media (max-width: 600px) {
             .admin-main {
-                padding: 10px 2px 80px;
-            }
-            .dashboard-widget, .dashboard-section {
-                padding: 1rem 0.5rem;
-            }
-            th, td {
-                padding: 8px 6px;
-            }
-            .widget-grid {
-                grid-template-columns: 1fr; /* Stack widgets vertically on small screens */
-                gap: 1rem; /* Reduce gap between widgets */
-            }
-
-            .dashboard-widget {
-                width: 95%; /* Adjust widget width for small screens */
+                margin-left: 0; /* No margin for mobile view */
             }
         }
     </style>
 </head>
+
 <body>
     <div class="admin-dashboard">
-        <?php
-        // Make unreadMessagesCount available to sidebar
-        $ADMIN_UNREAD_MESSAGES = $unreadMessagesCount;
-        include __DIR__ . '/includes/admin_sidebar.php';
-        ?>
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
-                <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
-                <?php if ($unreadMessagesCount > 0): ?>
-                    <a href="messages.php" class="erpnext-btn btn-secondary" style="position:relative;">
-                        <i class="fas fa-envelope"></i>
-                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
-                            <?= $unreadMessagesCount ?>
-                        </span>
-                        New Messages
-                    </a>
-                <?php endif; ?>
+            <header class="admin-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
 
@@ -631,7 +471,7 @@ try {
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
+        <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
     <script>
         // Survey Participation Chart
@@ -699,6 +539,7 @@ try {
         })();
     </script>
 </body>
+
 </html>
 <?php
 // Flush output buffer
