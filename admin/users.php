@@ -26,63 +26,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/add_users.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .users-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
-        }
-        .users-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .users-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .users-header .btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-        }
-        .users-header .btn:hover {
-            background: #217dbb;
-        }
-        .users-table {
-            width: 80%; /* Reduce table width */
-            margin: 0 auto; /* Center the table */
-            border-collapse: collapse;
-        }
-
-        .users-table th, .users-table td {
-            padding: 10px; /* Reduce padding for smaller screens */
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
-            font-size: 0.9rem; /* Adjust font size for better compatibility */
-        }
-
-        @media (max-width: 600px) {
-            .users-table {
-                width: 100%; /* Make table take full width on smaller screens */
-                font-size: 0.8rem; /* Further reduce font size */
-            }
-
-            .users-table th, .users-table td {
-                padding: 8px; /* Further reduce padding */
-                word-wrap: break-word; /* Allow text to wrap within cells */
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="admin-dashboard">
