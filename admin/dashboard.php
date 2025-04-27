@@ -105,176 +105,24 @@ foreach ($widgets as &$widget) {
     }
 }
 
-// Fetch counts for notifications
-$newMessagesCount = 0;
-$newTicketsCount = 0;
-$newSurveyResponsesCount = 0;
+// Fetch counts for recent notifications
+$newMessages = [];
+$newTickets = [];
+$newSurveyResponses = [];
 
 try {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE is_read = 0 AND receiver_id = ?");
+    $stmt = $pdo->prepare("SELECT id, subject, created_at FROM messages WHERE is_read = 0 AND receiver_id = ? ORDER BY created_at DESC LIMIT 5");
     $stmt->execute([$_SESSION['user_id']]);
-    $newMessagesCount = $stmt->fetchColumn() ?: 0;
+    $newMessages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status = 'open'");
-    $newTicketsCount = $stmt->fetchColumn() ?: 0;
+    $stmt = $pdo->query("SELECT id, title, created_at FROM support_tickets WHERE status = 'open' ORDER BY created_at DESC LIMIT 5");
+    $newTickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses WHERE is_new = 1");
-    $newSurveyResponsesCount = $stmt->fetchColumn() ?: 0;
+    $stmt = $pdo->query("SELECT id, survey_id, created_at FROM survey_responses WHERE is_new = 1 ORDER BY created_at DESC LIMIT 5");
+    $newSurveyResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
     error_log("Notification Error: " . $e->getMessage());
 }
-
-// Fetch unread messages from users to admin
-$unreadMessagesCount = 0;
-try {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE is_read = 0 AND receiver_id = ? AND sender_id IN (SELECT id FROM users WHERE role_id != 0)");
-    $stmt->execute([$_SESSION['user_id']]);
-    $unreadMessagesCount = $stmt->fetchColumn() ?: 0;
-} catch (Exception $e) {
-    $unreadMessagesCount = 0;
-    error_log("Unread Messages Error: " . $e->getMessage());
-}
-
-// Fetch recent activity log
-$activityLog = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10");
-    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Activity Log Error: " . $e->getMessage());
-}
-
-// Fetch recent feedback
-$feedback = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 5");
-    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Feedback Error: " . $e->getMessage());
-}
-
-// Fetch recent support tickets
-$tickets = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM support_tickets ORDER BY created_at DESC LIMIT 5");
-    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Tickets Error: " . $e->getMessage());
-}
-
-// Error log viewer: read last 20 lines of error.log
-$errorLogLines = [];
-$errorLogPath = realpath(__DIR__ . '/../error_log');
-if ($errorLogPath && is_readable($errorLogPath)) {
-    $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    $errorLogLines = array_slice($lines, -20);
-}
-
-// Parse activity logs for the table
-$activityLogs = [];
-$logFilePath = realpath(__DIR__ . '/../logs/user_activity.log'); // Assuming logs are stored in this file
-if ($logFilePath && is_readable($logFilePath)) {
-    $lines = file($logFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        preg_match('/\[(.*?)\] (.*?): (.*)/', $line, $matches);
-        if (count($matches) === 4) {
-            $activityLogs[] = [
-                'timestamp' => $matches[1],
-                'action' => $matches[2],
-                'details' => $matches[3]
-            ];
-        }
-    }
-}
-
-// Limit the number of logs displayed
-$activityLogs = array_slice($activityLogs, -20);
-
-// Fetch survey participation stats for chart
-$surveyStats = [];
-try {
-    $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
-        FROM surveys s
-        LEFT JOIN survey_responses sr ON s.id = sr.survey_id
-        GROUP BY s.id
-        ORDER BY responses DESC
-        LIMIT 7");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $surveyStats[$row['title']] = $row['responses'];
-    }
-} catch (Exception $e) {
-    $surveyStats = [];
-}
-
-// Fetch feedback rating distribution for chart
-$feedbackRatings = [];
-try {
-    $stmt = $pdo->query("SELECT rating, COUNT(*) as count FROM feedback GROUP BY rating ORDER BY rating");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $feedbackRatings[$row['rating']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $feedbackRatings = [];
-}
-
-// Fetch support ticket status distribution for chart
-$ticketStatus = [];
-try {
-    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM support_tickets GROUP BY status");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $ticketStatus[$row['status']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $ticketStatus = [];
-}
-
-// Fetch recent announcements
-$announcements = [];
-try {
-    $stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC LIMIT 5");
-    $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-    error_log("Announcements Error: " . $e->getMessage());
-}
-
-// Fetch system health status
-$systemHealth = [
-    'php_version' => phpversion() ?? 'Unknown',
-    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
-    'database_status' => isset($pdo) && $pdo ? 'Connected' : 'Disconnected',
-    'current_time' => date('Y-m-d H:i:s') ?? 'Unknown',
-];
-
-// Fetch user role distribution for chart
-$userRoleDistribution = [];
-try {
-    $stmt = $pdo->query("SELECT roles.name, COUNT(users.id) as count 
-                         FROM roles 
-                         LEFT JOIN users ON roles.id = users.role_id 
-                         GROUP BY roles.id");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $userRoleDistribution[$row['name']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $userRoleDistribution = [];
-    error_log("User Role Distribution Error: " . $e->getMessage());
-}
-
-// Fetch monthly new users for chart
-$monthlyNewUsers = [];
-try {
-    $stmt = $pdo->query("SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count 
-                         FROM users 
-                         GROUP BY month 
-                         ORDER BY month ASC");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $monthlyNewUsers[$row['month']] = $row['count'];
-    }
-} catch (Exception $e) {
-    $monthlyNewUsers = [];
-    error_log("Monthly New Users Error: " . $e->getMessage());
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -470,27 +318,75 @@ try {
             margin-bottom: 1rem;
         }
 
-        .notification-bar {
-            background: #f39c12;
+        .notification-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #f39c12;
+        }
+
+        .notification-icon .badge {
+            position: absolute;
+            top: -5px;
+            right: -10px;
+            background: #e74c3c;
             color: #fff;
-            padding: 10px 15px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 50%;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 300px;
             display: none;
-            position: sticky;
-            top: 0;
             z-index: 1000;
         }
 
-        .notification-bar a {
-            color: #fff;
-            text-decoration: underline;
-            margin: 0 10px;
+        .notification-dropdown.active {
+            display: block;
         }
 
-        .notification-bar a:hover {
+        .notification-dropdown h4 {
+            margin: 0;
+            padding: 10px;
+            background: #f39c12;
+            color: #fff;
+            font-size: 1rem;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .notification-item {
+            padding: 10px;
+            border-bottom: 1px solid #f1f1f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item a {
+            text-decoration: none;
             color: #34495e;
+            font-size: 0.9rem;
+        }
+
+        .notification-item a:hover {
+            text-decoration: underline;
+        }
+
+        .notification-item span {
+            font-size: 0.8rem;
+            color: #7f8c8d;
         }
     </style>
     <script>
@@ -648,9 +544,42 @@ try {
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <!-- Notification Bar -->
-            <div class="notification-bar" id="notificationBar">
-                <!-- Content will be dynamically updated -->
+            <!-- Notification Bell -->
+            <div style="position: relative;">
+                <i class="fas fa-bell notification-icon" id="notificationBell">
+                    <?php
+                    $totalNotifications = count($newMessages) + count($newTickets) + count($newSurveyResponses);
+                    if ($totalNotifications > 0): ?>
+                        <span class="badge"><?= $totalNotifications ?></span>
+                    <?php endif; ?>
+                </i>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <h4>Notifications</h4>
+                    <?php if ($totalNotifications > 0): ?>
+                        <?php foreach ($newMessages as $message): ?>
+                            <div class="notification-item">
+                                <a href="messages.php?id=<?= $message['id'] ?>">New Message: <?= htmlspecialchars($message['subject']) ?></a>
+                                <span><?= date('M j, Y', strtotime($message['created_at'])) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php foreach ($newTickets as $ticket): ?>
+                            <div class="notification-item">
+                                <a href="support_tickets.php?id=<?= $ticket['id'] ?>">New Ticket: <?= htmlspecialchars($ticket['title']) ?></a>
+                                <span><?= date('M j, Y', strtotime($ticket['created_at'])) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php foreach ($newSurveyResponses as $response): ?>
+                            <div class="notification-item">
+                                <a href="surveys.php?id=<?= $response['survey_id'] ?>">New Survey Response</a>
+                                <span><?= date('M j, Y', strtotime($response['created_at'])) ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="notification-item">
+                            <span>No new notifications</span>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
 
             <header class="admin-header">
@@ -710,27 +639,18 @@ try {
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const newMessagesCount = <?= $newMessagesCount ?>;
-            const newTicketsCount = <?= $newTicketsCount ?>;
-            const newSurveyResponsesCount = <?= $newSurveyResponsesCount ?>;
-            const notificationBar = document.getElementById('notificationBar');
+            const notificationBell = document.getElementById('notificationBell');
+            const notificationDropdown = document.getElementById('notificationDropdown');
 
-            let notifications = [];
+            notificationBell.addEventListener('click', function () {
+                notificationDropdown.classList.toggle('active');
+            });
 
-            if (newMessagesCount > 0) {
-                notifications.push(`<a href="messages.php">${newMessagesCount} new message(s)</a>`);
-            }
-            if (newTicketsCount > 0) {
-                notifications.push(`<a href="support_tickets.php">${newTicketsCount} new support ticket(s)</a>`);
-            }
-            if (newSurveyResponsesCount > 0) {
-                notifications.push(`<a href="surveys.php">${newSurveyResponsesCount} new survey response(s)</a>`);
-            }
-
-            if (notifications.length > 0) {
-                notificationBar.innerHTML = notifications.join(' | ');
-                notificationBar.style.display = 'block';
-            }
+            document.addEventListener('click', function (e) {
+                if (!notificationBell.contains(e.target) && !notificationDropdown.contains(e.target)) {
+                    notificationDropdown.classList.remove('active');
+                }
+            });
         });
     </script>
 </body>
