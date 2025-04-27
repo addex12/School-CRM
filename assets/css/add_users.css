@@ -12,18 +12,7 @@
     font-weight: 600;
     margin-bottom: 1.2rem;
 }
-.admin-header {
-    background: #fff;
-    padding: 24px 15px;
-    margin-bottom: 50px; /* Increased margin to prevent overlap */
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.07);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: static !important; /* Override fixed positioning */
-    height: auto !important;
-}
+
 .erpnext-btn {
     display: inline-block;
     padding: 10px 22px;
