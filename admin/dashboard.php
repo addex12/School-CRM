@@ -217,6 +217,14 @@ try {
     error_log("Announcements Error: " . $e->getMessage());
 }
 
+// Fetch system health status
+$systemHealth = [
+    'php_version' => phpversion() ?? 'Unknown',
+    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+    'database_status' => isset($pdo) && $pdo ? 'Connected' : 'Disconnected',
+    'current_time' => date('Y-m-d H:i:s') ?? 'Unknown',
+];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -322,10 +330,10 @@ try {
                 <div class="dashboard-section">
                     <h2>System Health</h2>
                     <ul>
-                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version']) ?></li>
-                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software']) ?></li>
-                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status']) ?></li>
-                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time']) ?></li>
+                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version'] ?? 'Unknown') ?></li>
+                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software'] ?? 'Unknown') ?></li>
+                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status'] ?? 'Unknown') ?></li>
+                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time'] ?? 'Unknown') ?></li>
                     </ul>
                 </div>
             </div>
