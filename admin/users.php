@@ -25,6 +25,62 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Mobile-friendly adjustments */
+        .admin-dashboard {
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-main {
+            padding: 1rem;
+        }
+        .users-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .users-header h2 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .users-header .erpnext-btn {
+            align-self: flex-start;
+        }
+        .erpnext-search-bar {
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+        .table-responsive {
+            overflow-x: auto;
+        }
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .users-table th, .users-table td {
+            padding: 0.5rem;
+            text-align: left;
+        }
+        .users-table th {
+            background-color: #f8f9fa;
+        }
+        .user-actions a {
+            margin-right: 0.5rem;
+        }
+        @media (max-width: 768px) {
+            .users-table th, .users-table td {
+                font-size: 0.8rem;
+                padding: 0.3rem;
+            }
+            .users-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
