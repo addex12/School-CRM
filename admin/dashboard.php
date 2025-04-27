@@ -272,7 +272,7 @@ try {
     <style>
         .admin-dashboard {
             display: flex;
-            flex-direction: column; /* Stack sidebar and main content vertically on small screens */
+            flex-direction: row; /* Default layout for larger screens */
             min-height: 100vh;
             background: linear-gradient(135deg, #f4f6fa, #e8ebf3);
             overflow-x: hidden;
@@ -312,360 +312,44 @@ try {
             .admin-sidebar {
                 width: 100%; /* Sidebar takes full width on small screens */
                 height: auto; /* Adjust height for stacking */
-                position: relative; /* Ensure proper stacking */
-                transform: translateX(0); /* Always visible */
+                position: absolute; /* Ensure proper stacking */
+                transform: translateX(-100%); /* Hide sidebar by default */
+            }
+
+            .admin-sidebar.active {
+                transform: translateX(0); /* Show sidebar when active */
             }
 
             .admin-main {
                 margin-left: 0;
                 padding: 1rem;
             }
-        }
 
-        .toggle-sidebar {
-            display: none; /* Hide toggle button by default */
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            z-index: 3; /* Ensure toggle button is above everything */
-            background: #2c3e50;
-            color: #fff;
-            border: none;
-            padding: 0.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        @media (max-width: 900px) {
             .toggle-sidebar {
-                display: block; /* Show toggle button on smaller screens */
+                display: block; /* Show toggle button on small screens */
+                position: fixed;
+                top: 1rem;
+                left: 1rem;
+                z-index: 3; /* Ensure toggle button is above everything */
+                background: #2c3e50;
+                color: #fff;
+                border: none;
+                padding: 0.5rem;
+                border-radius: 4px;
+                cursor: pointer;
             }
-        }
-
-        .admin-main {
-            flex: 1;
-            padding: 2rem 2.5rem;
-            margin-left: 240px;
-            transition: margin-left 0.2s, background-color 0.3s ease-in-out;
-            background-color: #ffffff; /* Add subtle background color */
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Center align all contents */
-            justify-content: flex-start; /* Align contents to the top */
-            z-index: 1; /* Ensure it is above the sidebar */
-            position: relative; /* Ensure proper stacking context */
-        }
-        @media (max-width: 900px) {
-            .admin-main {
-                margin-left: 60px; /* Adjust margin for smaller screens */
-            }
-        }
-        @media (max-width: 600px) {
-            .admin-main {
-                margin-left: 0; /* Remove margin for very small screens */
-                padding: 1rem; /* Adjust padding for better fit */
-            }
-            .admin-sidebar {
-                z-index: 0; /* Ensure sidebar does not overlap content */
-            }
-        }
-
-        .dashboard-section {
-            background: #fff;
-            border-radius: 12px; /* Increase border radius */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
-            padding: 1rem; /* Adjust padding */
-            margin-bottom: 1rem; /* Reduce margin to save space */
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-            height: fit-content; /* Fit height to content */
-            overflow: hidden; /* Prevent overflow issues */
-        }
-
-        .dashboard-section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        .dashboard-section h2 {
-            font-size: 1.4rem;
-            /* Increase font size */
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            /* Add text transformation */
-            letter-spacing: 0.5px;
-        }
-
-        .dashboard-widgets-and-links {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            /* Widgets take more space than Quick Links */
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Ensure consistent card size */
-            gap: 1rem; /* Add uniform spacing between cards */
-            align-items: stretch; /* Ensure all cards align properly */
-        }
-
-        .dashboard-widget {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem; /* Adjust padding for better spacing */
-            border-radius: 8px; /* Slightly increase border radius */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhance shadow for better visual appeal */
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            height: 100%; /* Ensure cards stretch uniformly */
-            word-wrap: break-word; /* Ensure text wraps within the widget */
-        }
-
-        .dashboard-widget:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhance hover effect */
-        }
-
-        .dashboard-widget i {
-            font-size: 1.5rem; /* Slightly increase icon size */
-            margin-bottom: 0.5rem;
-            color: #5e64ff;
-        }
-
-        .dashboard-widget h3 {
-            font-size: 1rem; /* Adjust font size */
-            margin: 0;
-            color: #2c3e50;
-        }
-
-        .dashboard-widget p {
-            font-size: 0.8rem; /* Adjust font size */
-            color: #7f8c8d;
-            margin: 0.5rem 0 0; /* Add spacing between text and other elements */
-            text-align: center;
-            line-height: 1.4; /* Improve readability */
-        }
-
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            /* Compact grid layout */
-            gap: 0;
-            /* Remove gap between links */
-        }
-
-        .quick-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem;
-            font-size: 0.75rem;
-            /* Smaller font size */
-            background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
-            border-radius: 6px;
-            /* Smaller border radius */
-            color: #34495e;
-            text-decoration: none;
-            transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-            height: 80px;
-            /* Reduced height */
-            text-align: center;
-            border: 1px solid #e0e6ed;
-            /* Add border to separate links visually */
-        }
-
-        .quick-link:hover {
-            background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transform: translateY(-3px);
-        }
-
-        .quick-link i {
-            font-size: 1.2rem;
-            /* Smaller icon size */
-            margin-bottom: 0.25rem;
-        }
-
-        @media (max-width: 900px) {
-            .admin-main {
-                margin-left: 60px; /* Adjust margin for smaller screens */
-            }
-
-            .dashboard-widgets-and-links {
-                grid-template-columns: 1fr;
-                /* Stack widgets and links vertically */
-            }
-        }
-
-        @media (max-width: 600px) {
-            .admin-main {
-                margin-left: 0; /* Remove margin for very small screens */
-                padding: 1rem; /* Adjust padding for better fit */
-            }
-
-            .dashboard-widget {
-                flex: 1 1 100%;
-                /* Stack widgets vertically */
-            }
-        }
-
-        .admin-header {
-            text-align: center; /* Center align the title */
-            margin-bottom: 1rem;
         }
     </style>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Add GSAP animations for widgets
-            gsap.from(".dashboard-widget", {
-                opacity: 0,
-                y: 50,
-                duration: 0.8,
-                stagger: 0.2
-            });
+            const toggleButton = document.createElement("button");
+            toggleButton.classList.add("toggle-sidebar");
+            toggleButton.textContent = "☰";
+            document.body.appendChild(toggleButton);
 
-            // Add GSAP animations for sections
-            gsap.from(".dashboard-section", {
-                opacity: 0,
-                y: 50,
-                duration: 0.8,
-                stagger: 0.3
-            });
-
-            // Survey Participation Chart
-            const surveyCtx = document.getElementById('surveyChart').getContext('2d');
-            new Chart(surveyCtx, {
-                type: 'bar',
-                data: {
-                    labels: <?= json_encode(array_keys($surveyStats)) ?>,
-                    datasets: [{
-                        label: 'Survey Responses',
-                        data: <?= json_encode(array_values($surveyStats)) ?>,
-                        backgroundColor: '#5e64ff',
-                        borderColor: '#34495e',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Feedback Ratings Chart
-            const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
-            new Chart(feedbackCtx, {
-                type: 'pie',
-                data: {
-                    labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
-                    datasets: [{
-                        label: 'Feedback Ratings',
-                        data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-
-            // Support Ticket Status Chart
-            const ticketCtx = document.getElementById('ticketChart').getContext('2d');
-            new Chart(ticketCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: <?= json_encode(array_keys($ticketStatus)) ?>,
-                    datasets: [{
-                        label: 'Ticket Status',
-                        data: <?= json_encode(array_values($ticketStatus)) ?>,
-                        backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#2ecc71']
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-
-            // System Health Line Chart (Example)
-            const systemHealthCtx = document.getElementById('systemHealthChart').getContext('2d');
-            new Chart(systemHealthCtx, {
-                type: 'line',
-                data: {
-                    labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
-                    datasets: [{
-                        label: 'System Health Metrics',
-                        data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
-                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                        borderColor: '#5e64ff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // User Role Distribution Chart
-            const roleCtx = document.getElementById('roleChart').getContext('2d');
-            new Chart(roleCtx, {
-                type: 'bar',
-                data: {
-                    labels: <?= json_encode(array_keys($userRoleDistribution)) ?>,
-                    datasets: [{
-                        label: 'User Roles',
-                        data: <?= json_encode(array_values($userRoleDistribution)) ?>,
-                        backgroundColor: '#5e64ff',
-                        borderColor: '#34495e',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Monthly New Users Chart
-            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-            new Chart(monthlyCtx, {
-                type: 'line',
-                data: {
-                    labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
-                    datasets: [{
-                        label: 'New Users',
-                        data: <?= json_encode(array_values($monthlyNewUsers)) ?>,
-                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                        borderColor: '#5e64ff',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
+            const sidebar = document.querySelector(".admin-sidebar");
+            toggleButton.addEventListener("click", function() {
+                sidebar.classList.toggle("active");
             });
         });
     </script>
