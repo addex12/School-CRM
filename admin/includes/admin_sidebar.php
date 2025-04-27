@@ -55,7 +55,7 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     padding: 0.4rem 0.6rem; /* Smaller padding */
     position: fixed; /* Ensure it stays visible */
     top: 10px; /* Adjust position */
-    left: 15px; /* Adjust position */
+    left: 55px; /* Adjust position */
     z-index: 300; /* Ensure it is above other elements */
 }
 .admin-sidebar ul {
@@ -126,7 +126,7 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
         transition: left 0.2s, width 0.2s;
     }
     .admin-sidebar.collapsed {
-        width: 90px;
+        width: 80px;
     }
     .admin-main {
         margin-left: 200px;
