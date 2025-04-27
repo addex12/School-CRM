@@ -645,10 +645,7 @@ try {
                     <h2>Support Ticket Status</h2>
                     <canvas id="ticketChart"></canvas>
                 </div>
-                <div class="dashboard-section">
-                    <h2>System Health Metrics</h2>
-                    <canvas id="systemHealthChart"></canvas>
-                </div>
+
                 <div class="dashboard-section">
                     <h2>User Role Distribution</h2>
                     <canvas id="roleChart"></canvas>
