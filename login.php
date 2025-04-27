@@ -137,6 +137,17 @@ if (isset($user) && is_array($user)) {
 } else {
     $error = "Invalid username or password.";
 }
+
+// Fetch site logo and name from settings
+try {
+    $stmt = $pdo->query("SELECT site_logo, site_name FROM settings LIMIT 1");
+    $settings = $stmt->fetch(PDO::FETCH_ASSOC);
+    $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
+    $siteName = $settings['site_name'] ?? 'School CRM';
+} catch (Exception $e) {
+    $siteLogo = 'assets/images/default-logo.png';
+    $siteName = 'School CRM';
+}
 ?>
 
 <!DOCTYPE html>
@@ -235,14 +246,8 @@ if (isset($user) && is_array($user)) {
             margin-bottom: 2rem;
         }
         
-        .logo i {
-            font-size: 2rem;
-            color: var(--primary);
-        }
-        
-        .logo h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
+        .logo img {
+            height: 50px;
         }
         
         .welcome-text {
@@ -468,8 +473,8 @@ if (isset($user) && is_array($user)) {
         
         <div class="login-right">
             <div class="logo">
-                <i class="fas fa-graduation-cap"></i>
-                <h1>School CRM</h1>
+                <img src="<?php echo htmlspecialchars($siteLogo); ?>" alt="Site Logo" style="height: 50px;">
+                <h1><?php echo htmlspecialchars($siteName); ?></h1>
             </div>
             
             <div class="welcome-text">
