@@ -319,12 +319,59 @@ try {
             letter-spacing: 0.5px;
         }
 
+        .dashboard-widgets-and-links {
+            display: grid;
+            grid-template-columns: 2fr 1fr; /* Widgets take more space than Quick Links */
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Smaller widget boxes */
+            gap: 0.5rem;
+        }
+
+        .dashboard-widget {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            border-radius: 6px; /* Smaller border radius */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(135deg, #ffffff, #f9f9f9);
+            height: 80px; /* Reduced height */
+        }
+
+        .dashboard-widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-widget i {
+            font-size: 1.2rem; /* Smaller icon size */
+            margin-bottom: 0.25rem;
+            color: #5e64ff;
+        }
+
+        .dashboard-widget h3 {
+            font-size: 0.9rem; /* Smaller font size */
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .dashboard-widget p {
+            font-size: 0.7rem; /* Smaller font size */
+            color: #7f8c8d;
+        }
+
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            /* Compact grid layout */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Compact grid layout */
             gap: 0.5rem;
-            margin-top: 1rem;
         }
 
         .quick-link {
@@ -333,14 +380,13 @@ try {
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            font-size: 0.875rem;
+            font-size: 0.75rem; /* Smaller font size */
             background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
-            border-radius: 8px;
+            border-radius: 6px; /* Smaller border radius */
             color: #34495e;
             text-decoration: none;
             transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-            height: 100px;
-            /* Fixed height for uniformity */
+            height: 80px; /* Reduced height */
             text-align: center;
         }
 
@@ -351,90 +397,17 @@ try {
         }
 
         .quick-link i {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .announcements {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            /* Compact grid layout */
-            gap: 0.5rem;
-        }
-
-        .announcement-box {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            padding: 0.5rem;
-            font-size: 0.875rem;
-            color: #34495e;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .announcement-box:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .announcement-box strong {
-            display: block;
-            font-size: 1rem;
+            font-size: 1.2rem; /* Smaller icon size */
             margin-bottom: 0.25rem;
-            color: #2c3e50;
-        }
-
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            /* Compact grid layout */
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .dashboard-widget {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            height: 100px;
-            /* Fixed height for uniformity */
-        }
-
-        .dashboard-widget:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .dashboard-widget i {
-            font-size: 1.5rem;
-            /* Adjust icon size */
-            margin-bottom: 0.25rem;
-            color: #5e64ff;
-        }
-
-        .dashboard-widget h3 {
-            font-size: 1rem;
-            /* Adjust font size */
-            margin: 0;
-            color: #2c3e50;
-        }
-
-        .dashboard-widget p {
-            font-size: 0.75rem;
-            /* Adjust font size */
-            color: #7f8c8d;
         }
 
         @media (max-width: 900px) {
             .admin-main {
                 margin-left: 60px;
+            }
+
+            .dashboard-widgets-and-links {
+                grid-template-columns: 1fr; /* Stack widgets and links vertically */
             }
         }
 
@@ -609,9 +582,8 @@ try {
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <!-- Dashboard Widgets Section -->
-                <div class="dashboard-section">
-                    <h2>Dashboard Widgets</h2>
+                <!-- Dashboard Widgets and Quick Links Section -->
+                <div class="dashboard-widgets-and-links">
                     <div class="widget-grid">
                         <?php foreach ($widgets as $widget): ?>
                             <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
@@ -621,11 +593,6 @@ try {
                             </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
-
-                <!-- Quick Links Section -->
-                <div class="dashboard-section">
-                    <h2>Quick Links</h2>
                     <div class="quick-links">
                         <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
                         <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
@@ -634,24 +601,6 @@ try {
                         <a href="events.php" class="quick-link"><i class="fas fa-calendar-alt"></i><span>Events</span></a>
                         <a href="knowledge_base.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
                         <a href="announcements.php" class="quick-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
-                    </div>
-                </div>
-
-                <!-- Announcements Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Announcements</h2>
-                    <div class="announcements">
-                        <?php if (!empty($announcements)): ?>
-                            <?php foreach ($announcements as $announcement): ?>
-                                <div class="announcement-box">
-                                    <strong><?= htmlspecialchars($announcement['title'] ?? 'No Title') ?></strong>
-                                    <?= htmlspecialchars($announcement['content'] ?? 'No Content') ?>
-                                    <small>(<?= htmlspecialchars($announcement['created_at'] ?? 'Unknown Date') ?>)</small>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="announcement-box">No recent announcements found.</div>
-                        <?php endif; ?>
                     </div>
                 </div>
 
