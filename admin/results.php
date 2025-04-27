@@ -586,163 +586,52 @@ $chart_json = json_encode($chart_data);
         chartData.fields.forEach(field => {
             const fieldAnalytics = chartData.analytics[field.id] || [];
             const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
-            
+
             if (fieldAnalytics.length > 0) {
-                switch(field.field_type) {
-                    case 'radio':
-                    case 'select':
-                    case 'rating':
-                        // Pie/Doughnut chart for single-select questions
-                        new Chart(ctx, {
-                            type: 'doughnut',
-                            data: {
-                                labels: fieldAnalytics.map(item => item.field_value),
-                                datasets: [{
-                                    data: fieldAnalytics.map(item => item.count),
-                                    backgroundColor: [
-                                        '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0', 
-                                        '#560bad', '#7209b7', '#b5179e', '#f72585',
-                                        '#3a0ca3', '#480ca8'
-                                    ],
-                                    borderWidth: 1
-                                }]
+                // Ensure "Yes" and "No" responses are always included
+                const labels = ['Yes', 'No'];
+                const data = [0, 0]; // Default counts for "Yes" and "No"
+
+                fieldAnalytics.forEach(item => {
+                    if (item.field_value === 'Yes') {
+                        data[0] = item.count;
+                    } else if (item.field_value === 'No') {
+                        data[1] = item.count;
+                    }
+                });
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: ['#4361ee', '#f72585'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '60%',
+                        plugins: {
+                            title: {
+                                display: true,
+                                text: field.field_label,
+                                font: { size: 14 }
                             },
-                            options: {
-                                responsive: true,
-                                cutout: '60%',
-                                plugins: {
-                                    font: { size: 14 }
-                                },
-                                legend: { display: false },
-                                datalabels: {
-                                    anchor: 'end',
-                                    align: 'end',
-                                    formatter: value => value,
-                                    color: '#4361ee',
-                                    font: { weight: 'bold' }
-                                }
-                            },
-                            plugins: [ChartDataLabels]
-                        });
-                        break;
-                        
-                    case 'number':
-                        // Add logic for handling 'number' field type here
-                        // Histogram for numeric responses
-                        const numericValues = fieldAnalytics
-                            .filter(item => !isNaN(parseFloat(item.field_value)))
-                            .map(item => parseFloat(item.field_value));
-                        
-                        if (numericValues.length > 0) {
-                            const min = Math.min(...numericValues);
-                            const max = Math.max(...numericValues);
-                            const binCount = Math.min(10, Math.ceil(Math.sqrt(numericValues.length)));
-                            const binSize = (max - min) / binCount;
-                            
-                            const bins = Array(binCount).fill(0);
-                            const labels = [];
-                            
-                            for (let i = 0; i < binCount; i++) {
-                                const binStart = min + i * binSize;
-                                const binEnd = binStart + binSize;
-                                labels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
-                                
-                                bins[i] = numericValues.filter(val => 
-                                    val >= binStart && (i === binCount - 1 ? val <= binEnd : val < binEnd)
-                                ).length;
-                            }
-                            
-                            new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: labels,
-                                    datasets: [{
-                                        label: 'Frequency',
-                                        data: bins,
-                                        backgroundColor: '#4361ee',
-                                        borderWidth: 0,
-                                        borderRadius: 4
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        title: {
-                                            display: true,
-                                            text: `${field.field_label} Distribution`,
-                                            font: { size: 14 }
-                                        },
-                                        legend: { display: false }
-                                    },
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            title: { 
-                                                display: true, 
-                                                text: 'Count',
-                                                font: { weight: 'bold' }
-                                            },
-                                            grid: {
-                                                color: 'rgba(0, 0, 0, 0.05)'
-                                            }
-                                        },
-                                        x: {
-                                            title: { 
-                                                display: true, 
-                                                text: 'Value Range',
-                                                font: { weight: 'bold' }
-                                            },
-                                            grid: {
-                                                display: false
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                        break;
-                        
-                    // Default bar chart for other types
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: fieldAnalytics.map(item => `Option ${item.field_value}`),
-                            datasets: [{
-                                label: 'Responses',
-                                data: fieldAnalytics.map(item => item.count),
-                                backgroundColor: '#4895ef',
-                                borderWidth: 0,
-                                borderRadius: 4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                title: {
-                                    display: true,
-                                    text: field.field_label,
-                                    font: { size: 14 }
-                                },
-                                legend: { display: false }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)'
-                                    }
-                                },
-                                x: {
-                                    grid: {
-                                        display: false
-                                    }
-                                }
+                            legend: { display: true },
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'end',
+                                formatter: value => value,
+                                color: '#4361ee',
+                                font: { weight: 'bold' }
                             }
                         }
-                    });
-                }
+                    },
+                    plugins: [ChartDataLabels]
+                });
             } else {
-                // No data available for this field
                 ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
             }
         });
