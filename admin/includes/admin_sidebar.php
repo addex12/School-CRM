@@ -161,6 +161,8 @@ $current = basename($_SERVER['PHP_SELF']);
 .admin-main {
     transition: margin-left 0.2s;
     margin-left: 260px; /* Default sidebar width */
+    padding: 2rem;
+    overflow-x: hidden;
 }
 
 @media (max-width: 900px) {
@@ -227,78 +229,32 @@ $current = basename($_SERVER['PHP_SELF']);
     </ul>
 </aside>
 <script>
-// ERPNext/Frappe inspired sidebar JS
 (function() {
-    // Submenu toggle
-    var headers = document.querySelectorAll('.category-header');
-    headers.forEach(function(header) {
-        header.addEventListener('click', function(e) {
-            var targetId = header.getAttribute('data-target');
-            var submenu = document.getElementById(targetId.replace('#',''));
-            var icon = header.querySelector('.collapse-icon');
-            // Close all submenus except this one
-            document.querySelectorAll('.submenu').forEach(function(sm) {
-                if (sm !== submenu) {
-                    sm.classList.remove('open');
-                    sm.style.display = 'none';
-                }
-            });
-            document.querySelectorAll('.collapse-icon').forEach(function(ic) {
-                if (ic !== icon) ic.classList.remove('fa-chevron-up');
-                if (ic !== icon) ic.classList.add('fa-chevron-down');
-            });
-            if (submenu) {
-                var isOpen = submenu.classList.contains('open');
-                if (isOpen) {
-                    submenu.classList.remove('open');
-                    submenu.style.display = 'none';
-                    if(icon) { icon.classList.remove('fa-chevron-up'); icon.classList.add('fa-chevron-down'); }
-                } else {
-                    submenu.classList.add('open');
-                    submenu.style.display = 'block';
-                    if(icon) { icon.classList.add('fa-chevron-up'); icon.classList.remove('fa-chevron-down'); }
-                }
-            }
-        });
-    });
-    // On page load, ensure only submenu with .submenu-item.active is open
-    document.querySelectorAll('.submenu').forEach(function(sm) {
-        var active = sm.querySelector('.submenu-item.active');
-        if (active) {
-            sm.classList.add('open');
-            sm.style.display = 'block';
-            var chevron = sm.parentElement.querySelector('.collapse-icon');
-            if (chevron) {
-                chevron.classList.add('fa-chevron-up');
-                chevron.classList.remove('fa-chevron-down');
-            }
-        } else {
-            sm.classList.remove('open');
-            sm.style.display = 'none';
-        }
-    });
-    // Sidebar hamburger toggle for mobile/tablet
     var sidebar = document.getElementById('adminSidebar');
     var mainContent = document.querySelector('.admin-main');
     var sidebarToggle = document.getElementById('sidebarToggle');
-    if (sidebar && sidebarToggle) {
-        sidebarToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
+
+    // Adjust content margin dynamically
+    function adjustContentMargin() {
+        if (window.innerWidth > 600) {
+            mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '60px';
+        } else {
+            mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
+        }
+    }
+
+    // Toggle sidebar and adjust content margin
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
             sidebar.classList.toggle('open');
-            if (window.innerWidth > 600) {
-                mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '60px';
-            } else {
-                mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
-            }
+            adjustContentMargin();
         });
     }
-    // Close sidebar on outside click (mobile)
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 600 && sidebar && sidebar.classList.contains('open')) {
-            if (!sidebar.contains(e.target) && e.target !== sidebarToggle) {
-                sidebar.classList.remove('open');
-            }
-        }
-    });
+
+    // Adjust on window resize
+    window.addEventListener('resize', adjustContentMargin);
+
+    // Initial adjustment
+    adjustContentMargin();
 })();
 </script>

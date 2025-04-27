@@ -211,139 +211,25 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
     <style>
-        /* ERPNext Button Styling */
-        .erpnext-btn {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            border-radius: 4px;
-            text-decoration: none;
-            transition: background 0.2s, box-shadow 0.2s;
-        }
+        /* Ensure proper alignment of main content */
+.admin-main {
+    transition: margin-left 0.2s;
+    margin-left: 260px; /* Default sidebar width */
+    padding: 2rem;
+    overflow-x: hidden;
+}
 
-        .erpnext-btn-primary {
-            background-color: #5e64ff;
-            color: #fff;
-            border: none;
-        }
+@media (max-width: 900px) {
+    .admin-main {
+        margin-left: 60px; /* Collapsed sidebar width */
+    }
+}
 
-        .erpnext-btn-primary:hover {
-            background-color: #4b52d9;
-            box-shadow: 0 2px 6px rgba(94, 100, 255, 0.4);
-        }
-
-        .erpnext-btn-secondary {
-            background-color: #f0f4f7;
-            color: #34495e;
-            border: 1px solid #dfe4ea;
-        }
-
-        .erpnext-btn-secondary:hover {
-            background-color: #e6ebf0;
-        }
-
-        .erpnext-btn-danger {
-            background-color: #ff5858;
-            color: #fff;
-            border: none;
-        }
-
-        .erpnext-btn-danger:hover {
-            background-color: #e74c3c;
-            box-shadow: 0 2px 6px rgba(255, 88, 88, 0.4);
-        }
-
-        /* ERPNext Card Styling */
-        .erpnext-card {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 0.75rem;
-            transition: box-shadow 0.2s;
-        }
-
-        .erpnext-card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Icon Sizing */
-        .icon-small {
-            font-size: 0.875rem;
-        }
-
-        /* Sidebar & Layout Adjustments */
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
-            background: #f4f6fa;
-        }
-
-        .admin-sidebar {
-            width: 260px;
-            flex-shrink: 0;
-            transition: width 0.2s;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            z-index: 1000;
-            background: #f5f7fa;
-            overflow-y: auto;
-        }
-
-        .admin-main {
-            flex: 1;
-            padding: 2rem;
-            margin-left: 260px; /* Match sidebar width */
-            transition: margin-left 0.2s;
-            overflow-x: hidden;
-        }
-
-        @media (max-width: 900px) {
-            .admin-sidebar {
-                width: 60px;
-            }
-
-            .admin-main {
-                margin-left: 60px;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .admin-sidebar {
-                position: absolute;
-                left: -260px;
-                width: 260px;
-            }
-
-            .admin-sidebar.open {
-                left: 0;
-            }
-
-            .admin-main {
-                margin-left: 0;
-            }
-        }
-
-        /* Ensure footer and header alignment */
-        .admin-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .content {
-            margin-top: 1rem;
-        }
-
-        /* Fix for empty content area */
-        .admin-main .content {
-            min-height: calc(100vh - 100px); /* Adjust based on header/footer height */
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 1rem;
-        }
+@media (max-width: 600px) {
+    .admin-main {
+        margin-left: 0; /* Sidebar hidden */
+    }
+}
     </style>
     <script>
         (function() {
