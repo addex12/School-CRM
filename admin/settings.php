@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
-            $targetFile = $uploadDir . 'logo.png'; // Always save as logo.png
+            $fileName = basename($_FILES['site_logo']['name']);
+            $targetFile = $uploadDir . $fileName;
             if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $targetFile)) {
                 $_POST['settings']['site_logo'] = $targetFile;
             } else {
