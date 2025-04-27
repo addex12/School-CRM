@@ -84,75 +84,68 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         .user-actions a:last-child {
             margin-right: 0;
         }
+        /* Ensure the admin-main content aligns properly with the sidebar */
+        .admin-main {
+            margin-left: 240px; /* Match the width of the sidebar */
+            transition: margin-left 0.2s ease; /* Smooth transition for sidebar toggle */
+        }
+
+        .admin-sidebar.collapsed ~ .admin-main {
+            margin-left: 60px; /* Adjust margin when sidebar is collapsed */
+        }
+
+        /* Adjust the page title alignment */
+        .admin-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #34495e;
+            text-align: left; /* Align title to the left */
+            padding-left: 1rem; /* Add padding to align with content */
+        }
+
+        /* Ensure all content is flexible and resizable */
+        .content {
+            padding: 1.5rem; /* Add padding for better spacing */
+            overflow-x: auto; /* Prevent content from hiding under the sidebar */
+        }
+
         /* Responsive adjustments for smaller screens */
         @media (max-width: 600px) {
-            .users-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
+            .admin-main {
+                margin-left: 0; /* Remove margin for smaller screens */
             }
 
-            .erpnext-search-bar {
-                width: 100%; /* Ensure search bar takes full width */
+            .admin-header h1 {
+                font-size: 1.2rem; /* Adjust title font size */
+                text-align: center; /* Center align the title */
             }
 
-            .table-responsive {
-                overflow-x: auto; /* Enable horizontal scrolling for tables */
-            }
-
-            .users-table th, .users-table td {
-                font-size: 0.85rem; /* Reduce font size for smaller screens */
-                padding: 8px; /* Adjust padding */
-            }
-
-            .users-table th {
-                white-space: nowrap; /* Prevent header text wrapping */
-            }
-
-            .users-table td {
-                white-space: nowrap; /* Prevent cell text wrapping */
-            }
-
-            .user-actions a {
-                font-size: 1rem; /* Adjust icon size */
+            .content {
+                padding: 1rem; /* Adjust padding for smaller screens */
             }
         }
+
+        /* General responsive adjustments */
+        body {
+            font-size: 1rem; /* Base font size */
+            line-height: 1.5; /* Improve readability */
+        }
+
         .erpnext-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
+            padding: 1.5rem; /* Adjust padding for better spacing */
         }
-        .erpnext-btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-block;
+
+        .users-header h2 {
+            font-size: 1.3rem; /* Adjust font size for better responsiveness */
         }
-        .erpnext-btn-primary {
-            background: #3498db;
+
+        .users-table {
+            width: 100%; /* Ensure table takes full width */
+            table-layout: auto; /* Allow flexible column widths */
         }
-        .erpnext-btn-primary:hover {
-            background: #217dbb;
-        }
-        .erpnext-form-group {
-            margin-bottom: 1.5rem;
-        }
-        .erpnext-search-bar {
-            width: 100%;
-            max-width: 350px;
-            padding: 0.5rem 1rem;
-            border: 1px solid #dbe4ea;
-            border-radius: 6px;
-            margin-bottom: 1.5rem;
-            font-size: 1rem;
+
+        .users-table th, .users-table td {
+            word-wrap: break-word; /* Allow text to wrap within cells */
         }
     </style>
 </head>
