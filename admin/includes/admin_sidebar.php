@@ -48,7 +48,7 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 .admin-sidebar .sidebar-toggle {
     background: none;
     border: none;
-    color: #fff;
+    color: #000; /* Change color to black */
     font-size: 1rem; /* Increased font size for better visibility */
     cursor: pointer;
     margin-left: 5px;
