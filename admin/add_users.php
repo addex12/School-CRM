@@ -272,7 +272,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
     <style>
         .users-table {
-            width: 80%; /* Reduce table width */
+            width: 90%; /* Adjust table width for better responsiveness */
             margin: 0 auto; /* Center the table */
             border-collapse: collapse;
             background: white;
@@ -280,7 +280,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
 
         .users-table th, .users-table td {
-            padding: 12px; /* Adjust padding */
+            padding: 10px; /* Adjust padding for better spacing */
             border: 1px solid #ddd;
             text-align: left;
             font-size: 0.9rem; /* Adjust font size */
@@ -295,7 +295,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         @media (max-width: 768px) {
             .users-table {
                 width: 100%; /* Make table take full width on smaller screens */
-                font-size: 0.8rem; /* Reduce font size for smaller screens */
+                font-size: 0.85rem; /* Slightly reduce font size for smaller screens */
             }
 
             .users-table th, .users-table td {
@@ -306,7 +306,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
         @media (max-width: 480px) {
             .users-table {
-                font-size: 0.75rem; /* Further reduce font size for very small screens */
+                font-size: 0.8rem; /* Further reduce font size for very small screens */
             }
 
             .users-table th, .users-table td {
