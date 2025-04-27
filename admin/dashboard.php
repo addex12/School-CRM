@@ -263,245 +263,278 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ERPNext-Style Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script> <!-- Add GSAP for animations -->
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+
         .admin-dashboard {
             display: flex;
-            flex-direction: row; /* Default layout for larger screens */
             min-height: 100vh;
-            background: linear-gradient(135deg, #f4f6fa, #e8ebf3);
-            overflow-x: hidden;
         }
 
         .admin-sidebar {
             width: 240px;
-            transition: transform 0.3s ease-in-out;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 1rem;
             position: fixed;
-            left: 0;
             top: 0;
             bottom: 0;
-            z-index: 2; /* Ensure sidebar is above main content */
-            background-color: #2c3e50;
+            overflow-y: auto;
+        }
+
+        .admin-sidebar h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .admin-sidebar a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            margin: 0.5rem 0;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+
+        .admin-sidebar a:hover {
+            background-color: #34495e;
         }
 
         .admin-main {
             flex: 1;
-            margin-left: 240px; /* Default margin for larger screens */
+            margin-left: 240px;
             padding: 2rem;
-            transition: margin-left 0.3s ease-in-out;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
             .admin-sidebar {
-                transform: translateX(-100%); /* Hide sidebar by default */
+                position: absolute;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
             }
 
             .admin-sidebar.active {
-                transform: translateX(0); /* Show sidebar when active */
-            }
-
-            .admin-main {
-                margin-left: 0; /* Remove margin for smaller screens */
-                padding: 1rem; /* Adjust padding for better fit */
-            }
-        }
-
-        @media (max-width: 600px) {
-            .admin-dashboard {
-                flex-direction: column; /* Stack sidebar and main content */
-            }
-
-            .admin-sidebar {
-                width: 100%; /* Sidebar takes full width on small screens */
-                height: auto; /* Adjust height for stacking */
-                position: absolute; /* Ensure proper stacking */
-                transform: translateX(-100%); /* Hide sidebar by default */
-            }
-
-            .admin-sidebar.active {
-                transform: translateX(0); /* Show sidebar when active */
+                transform: translateX(0);
             }
 
             .admin-main {
                 margin-left: 0;
-                padding: 1rem;
             }
 
             .toggle-sidebar {
-                display: block; /* Show toggle button on small screens */
+                display: block;
                 position: fixed;
                 top: 1rem;
                 left: 1rem;
-                z-index: 3; /* Ensure toggle button is above everything */
                 background: #2c3e50;
                 color: #fff;
                 border: none;
                 padding: 0.5rem;
                 border-radius: 4px;
                 cursor: pointer;
+                z-index: 3;
             }
         }
 
-        /* Button Styling */
-        .quick-link {
+        .dashboard-header {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            padding: 0.5rem;
-            font-size: 0.875rem; /* Smaller font size */
-            background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
-            border-radius: 6px;
-            color: #34495e;
-            text-decoration: none;
-            transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-            height: 80px;
-            text-align: center;
-            border: 1px solid #e0e6ed;
+            margin-bottom: 2rem;
         }
 
-        .quick-link:hover {
-            background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transform: translateY(-3px);
-        }
-
-        .quick-link i {
-            font-size: 0.875rem; /* Smaller icon size */
-            margin-bottom: 0.25rem;
-        }
-
-        /* Card Styling */
-        .dashboard-widget {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.75rem; /* Compact padding */
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            height: 100%;
-            word-wrap: break-word;
-        }
-
-        .dashboard-widget:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .dashboard-widget i {
-            font-size: 0.875rem; /* Smaller icon size */
-            margin-bottom: 0.5rem;
-            color: #5e64ff;
-        }
-
-        .dashboard-widget h3 {
-            font-size: 1rem;
-            margin: 0;
+        .dashboard-header h1 {
+            font-size: 1.5rem;
             color: #2c3e50;
         }
 
-        .dashboard-widget p {
-            font-size: 0.8rem;
-            color: #7f8c8d;
-            margin: 0.5rem 0 0;
+        .btn-primary {
+            background-color: #2e8bff;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .dashboard-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            line-height: 1.4;
+        }
+
+        .dashboard-card h3 {
+            font-size: 1rem;
+            margin: 0.5rem 0;
+            color: #2c3e50;
+        }
+
+        .dashboard-card p {
+            font-size: 0.875rem;
+            color: #757575;
+        }
+
+        .dashboard-card i {
+            font-size: 1.5rem;
+            color: #2e8bff;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-container {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+
+        .chart-container h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
         }
     </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const toggleButton = document.createElement("button");
-            toggleButton.classList.add("toggle-sidebar");
-            toggleButton.textContent = "☰";
-            document.body.appendChild(toggleButton);
-
-            const sidebar = document.querySelector(".admin-sidebar");
-            toggleButton.addEventListener("click", function() {
-                sidebar.classList.toggle("active");
-                document.querySelector(".admin-main").style.marginLeft = sidebar.classList.contains("active") ? "240px" : "0";
-            });
-        });
-    </script>
 </head>
 
 <body>
+    <button class="toggle-sidebar">☰</button>
     <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <div class="admin-sidebar">
+            <h2>Admin Panel</h2>
+            <a href="#">Dashboard</a>
+            <a href="#">Users</a>
+            <a href="#">Reports</a>
+            <a href="#">Settings</a>
+        </div>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="content">
-                <!-- Dashboard Widgets and Quick Links Section -->
-                <div class="dashboard-widgets-and-links">
-                    <div class="widget-grid">
-                        <?php foreach ($widgets as $widget): ?>
-                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
-                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                                <p><?= htmlspecialchars($widget['title']) ?></p>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="quick-links">
-                        <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                        <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
-                        <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
-                        <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                        <a href="events.php" class="quick-link"><i class="fas fa-calendar-alt"></i><span>Events</span></a>
-                        <a href="knowledge_base.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
-                        <a href="announcements.php" class="quick-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
-                    </div>
+            <div class="dashboard-header">
+                <h1>Admin Dashboard</h1>
+                <button class="btn-primary">Add New</button>
+            </div>
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <i class="fas fa-users"></i>
+                    <h3>150</h3>
+                    <p>Total Users</p>
                 </div>
-
-                <!-- Charts Section -->
-                <div class="dashboard-section">
-                    <h2>Survey Participation</h2>
-                    <canvas id="surveyChart"></canvas>
+                <div class="dashboard-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>$12,000</h3>
+                    <p>Monthly Revenue</p>
                 </div>
-                <div class="dashboard-section">
-                    <h2>Feedback Ratings</h2>
-                    <canvas id="feedbackChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>Support Ticket Status</h2>
-                    <canvas id="ticketChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>System Health Metrics</h2>
-                    <canvas id="systemHealthChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>User Role Distribution</h2>
-                    <canvas id="roleChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>Monthly New Users</h2>
-                    <canvas id="monthlyChart"></canvas>
-                </div>
-
-                <div class="dashboard-section">
-                    <h2>System Health</h2>
-                    <ul>
-                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version'] ?? 'Unknown') ?></li>
-                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software'] ?? 'Unknown') ?></li>
-                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status'] ?? 'Unknown') ?></li>
-                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time'] ?? 'Unknown') ?></li>
-                    </ul>
+                <div class="dashboard-card">
+                    <i class="fas fa-ticket-alt"></i>
+                    <h3>25</h3>
+                    <p>Open Tickets</p>
                 </div>
             </div>
+            <div class="chart-container">
+                <h3>Monthly Sales</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Expense Distribution</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3>Quarterly Revenue</h3>
+                <canvas id="lineChart"></canvas>
+            </div>
         </div>
-        <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
+    <script>
+        document.querySelector('.toggle-sidebar').addEventListener('click', function () {
+            document.querySelector('.admin-sidebar').classList.toggle('active');
+        });
+
+        // Bar Chart
+        const barCtx = document.getElementById('barChart').getContext('2d');
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Sales ($)',
+                    data: [1200, 1900, 3000, 5000, 2000, 3000],
+                    backgroundColor: '#2e8bff',
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Pie Chart
+        const pieCtx = document.getElementById('pieChart').getContext('2d');
+        new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Marketing', 'Operations', 'Development'],
+                datasets: [{
+                    data: [40, 30, 30],
+                    backgroundColor: ['#2e8bff', '#e0e0e0', '#ff5858']
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Line Chart
+        const lineCtx = document.getElementById('lineChart').getContext('2d');
+        new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: [5000, 10000, 15000, 20000],
+                    borderColor: '#2e8bff',
+                    backgroundColor: 'rgba(46, 139, 255, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>
