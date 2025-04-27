@@ -186,43 +186,22 @@ $chart_json = json_encode($chart_data);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="../assets/css/add_users.css">
     <style>
-        /* Modern, clean styling */
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-        }
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #4361ee;
-            margin-bottom: 5px;
-        }
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.9rem;
-        }
         /* ERPNext card and button styling */
         .erpnext-card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
+            border-radius: 8px; /* Reduced border radius */
+            box-shadow: 0 2px 6px rgba(44,62,80,0.05); /* Slightly lighter shadow */
+            padding: 1.5rem 1rem; /* Reduced padding */
+            margin: 1.5rem 0; /* Reduced margin */
         }
         .erpnext-btn {
             background: #3498db;
             color: #fff;
             border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
+            padding: 0.4rem 0.8rem; /* Smaller button size */
+            border-radius: 4px; /* Reduced border radius */
             font-weight: 500;
+            font-size: 0.85rem; /* Smaller font size */
             transition: background 0.18s;
             text-decoration: none;
             cursor: pointer;
@@ -258,76 +237,55 @@ $chart_json = json_encode($chart_data);
         }
         .chart-container {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: 8px; /* Reduced border radius */
+            padding: 15px; /* Reduced padding */
+            margin-bottom: 20px; /* Reduced margin */
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05); /* Slightly lighter shadow */
         }
         .chart-title {
             margin-top: 0;
             color: #2c3e50;
-            font-size: 1.2rem;
-            padding-bottom: 10px;
+            font-size: 1rem; /* Smaller font size */
+            padding-bottom: 8px; /* Reduced padding */
             border-bottom: 1px solid #eee;
         }
-        .response-table {
-            width: 100%;
-            border-collapse: collapse;
+        .response-table th, .response-table td {
+            padding: 8px 10px; /* Reduced padding */
         }
         .response-table th {
-            background: #f8f9fa;
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 600;
+            font-size: 0.9rem; /* Smaller font size */
         }
         .response-table td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #eee;
+            font-size: 0.85rem; /* Smaller font size */
         }
         .response-table tr:hover {
             background-color: #f8f9fa;
         }
         .badge {
-            display: inline-block;
-            padding: 0.35em 0.65em;
-            font-size: 0.75em;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: 0.25rem;
+            font-size: 0.7em; /* Smaller badge size */
+            padding: 0.3em 0.5em; /* Reduced padding */
         }
-        .badge-primary {
-            background-color: #4361ee;
-            color: white;
-        }
-        .pagination {
-            display: flex;
-            padding-left: 0;
-            list-style: none;
-            border-radius: 0.25rem;
-        }
-        .page-item.active .page-link {
-            background-color: #4361ee;
-            border-color: #4361ee;
-        }
-        .page-link {
-            position: relative;
-            display: block;
-            padding: 0.5rem 0.75rem;
-            margin-left: -1px;
-            line-height: 1.25;
-            color: #4361ee;
-            background-color: #fff;
-            border: 1px solid #dee2e6;
+        .pagination .page-link {
+            padding: 0.4rem 0.6rem; /* Smaller pagination buttons */
+            font-size: 0.85rem; /* Smaller font size */
         }
         .filter-form {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
+            padding: 15px; /* Reduced padding */
+            border-radius: 8px; /* Reduced border radius */
+            box-shadow: 0 3px 5px rgba(0,0,0,0.05); /* Slightly lighter shadow */
+            margin-bottom: 20px; /* Reduced margin */
+        }
+        .filter-form .form-group label {
+            font-size: 0.85rem; /* Smaller label font size */
+        }
+        .filter-form .form-control {
+            font-size: 0.85rem; /* Smaller input font size */
+            padding: 0.4rem 0.6rem; /* Reduced padding */
+        }
+        .filter-form .btn {
+            font-size: 0.85rem; /* Smaller button font size */
+            padding: 0.4rem 0.8rem; /* Reduced padding */
         }
     </style>
 </head>
