@@ -112,27 +112,37 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         /* Responsive adjustments for smaller screens */
         @media (max-width: 600px) {
             body {
-                font-size: 0.9rem; /* Reduce font size for smaller screens */
+                font-size: 0.85rem; /* Further reduce font size for smaller screens */
             }
 
             .admin-header h1 {
-                font-size: 1rem; /* Adjust title font size */
+                font-size: 0.9rem; /* Adjust title font size */
             }
 
             .users-header h2 {
-                font-size: 1.1rem; /* Adjust header font size */
+                font-size: 1rem; /* Adjust header font size */
             }
 
             .users-table th, .users-table td {
-                font-size: 0.8rem; /* Reduce table font size */
+                font-size: 0.75rem; /* Reduce table font size */
+            }
+
+            .users-header .btn {
+                padding: 0.5rem 1rem; /* Adjust button padding */
+                font-size: 0.85rem; /* Adjust button font size */
             }
 
             .erpnext-search-bar {
-                font-size: 0.9rem; /* Adjust search bar font size */
+                font-size: 0.85rem; /* Adjust search bar font size */
+                padding: 0.4rem; /* Adjust padding for better spacing */
             }
 
             .content {
-                padding: 1rem; /* Adjust padding for better spacing */
+                padding: 0.8rem; /* Adjust padding for better spacing */
+            }
+
+            .users-table {
+                font-size: 0.8rem; /* Adjust table font size */
             }
         }
 
