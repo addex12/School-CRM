@@ -290,6 +290,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
 
         @media (max-width: 768px) {
+            flex: 1 1 100%; /* Allow cards to take full width on smaller screens */
             .erpnext-card {
                 width: 100%; /* Make cards take full width on smaller screens */
             }
