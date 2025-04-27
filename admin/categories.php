@@ -104,8 +104,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
                             <label for="description">Description</label>
                             <textarea name="description" id="description" class="form-control" rows="3"></textarea>
                         </div>
-                        <button type="submit" name="add_category" class="btn btn-primary">
-                            <i class="fa fa-plus"></i> Add Category
+                        <button type="submit" name="add_category" class="btn btn-primary btn-sm">
+                            <i class="fa fa-plus fa-sm"></i> Add Category
                         </button>
                     </form>
                 </section>
@@ -132,13 +132,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
                                             <td><?= htmlspecialchars($category['description'] ?? 'N/A') ?></td>
                                             <td><?= date('M j, Y g:i A', strtotime($category['created_at'])) ?></td>
                                             <td>
-                                                <button class="btn btn-secondary" onclick="editCategory(<?= $category['id'] ?>, '<?= htmlspecialchars($category['name']) ?>', '<?= htmlspecialchars($category['description']) ?>')">
-                                                    <i class="fa fa-edit"></i> Edit
+                                                <button class="btn btn-secondary btn-sm" onclick="editCategory(<?= $category['id'] ?>, '<?= htmlspecialchars($category['name']) ?>', '<?= htmlspecialchars($category['description']) ?>')">
+                                                    <i class="fa fa-edit fa-sm"></i> Edit
                                                 </button>
                                                 <form method="POST" style="display:inline;">
                                                     <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
-                                                    <button type="submit" name="delete_category" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">
-                                                        <i class="fa fa-trash"></i> Delete
+                                                    <button type="submit" name="delete_category" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this category?')">
+                                                        <i class="fa fa-trash fa-sm"></i> Delete
                                                     </button>
                                                 </form>
                                             </td>
@@ -170,8 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
                     <label for="editDescription">Description</label>
                     <textarea name="description" id="editDescription" class="form-control" rows="3"></textarea>
                 </div>
-                <button type="submit" name="edit_category" class="btn btn-primary">
-                    <i class="fa fa-save"></i> Save Changes
+                <button type="submit" name="edit_category" class="btn btn-primary btn-sm">
+                    <i class="fa fa-save fa-sm"></i> Save Changes
                 </button>
             </form>
         </div>
@@ -194,20 +194,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
         .card {
             background: #fff;
             border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border: none;
-            border-radius: 4px;
-            font-size: 14px;
+            border-radius: 3px;
+            font-size: 12px;
             cursor: pointer;
         }
 
@@ -224,6 +224,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
         .btn-danger {
             background-color: #dc3545;
             color: #fff;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        .fa-sm {
+            font-size: 0.875em;
         }
 
         .table-responsive {
@@ -245,16 +254,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
         .modal-content {
             background-color: #fefefe;
             margin: 15% auto;
-            padding: 20px;
+            padding: 15px;
             border: 1px solid #888;
             width: 50%;
-            border-radius: 8px;
+            border-radius: 6px;
         }
 
         .close {
             color: #aaa;
             float: right;
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
         }
 
@@ -267,27 +276,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
 
         @media (max-width: 900px) {
             .form-section, .table-section {
-                padding: 12px !important;
-                margin: 10px 0 !important;
+                padding: 10px !important;
+                margin: 8px 0 !important;
             }
         }
 
         @media (max-width: 600px) {
             .form-section, .table-section {
-                padding: 8px !important;
-                margin: 6px 0 !important;
+                padding: 6px !important;
+                margin: 4px 0 !important;
             }
             .form-actions {
                 flex-direction: column !important;
-                gap: 10px !important;
+                gap: 8px !important;
             }
             .admin-header {
                 flex-direction: column !important;
                 align-items: flex-start !important;
-                gap: 8px !important;
+                gap: 6px !important;
             }
             .page-title, h1, h2 {
-                font-size: 1.2rem !important;
+                font-size: 1rem !important;
             }
             .table-responsive, .table {
                 display: block;
@@ -296,10 +305,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
             }
             th, td {
                 white-space: nowrap;
-                font-size: 0.95em;
+                font-size: 0.85em;
             }
             .modal-content {
-                width: 95% !important;
+                width: 90% !important;
                 min-width: 0 !important;
             }
         }

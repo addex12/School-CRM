@@ -82,67 +82,69 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" />
     <style>
-        .response-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .response-table th, .response-table td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #eee;
-            text-align: left;
-        }
-        .response-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-        }
-        .response-table tr:hover {
-            background-color: #f8f9fa;
-        }
-        .filter-form {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-        }
-        .btn {
-            padding: 6px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            color: white;
-            background-color: #4361ee;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-secondary {
-            background-color: #6c757d;
-        }
-        .pagination {
-            display: flex;
-            padding-left: 0;
-            list-style: none;
-            border-radius: 0.25rem;
-        }
-        .page-item.active .page-link {
-            background-color: #4361ee;
-            border-color: #4361ee;
-            color: white;
-        }
-        .page-link {
-            position: relative;
-            display: block;
-            padding: 0.5rem 0.75rem;
-            margin-left: -1px;
-            line-height: 1.25;
-            color: #4361ee;
-            background-color: #fff;
-            border: 1px solid #dee2e6;
-            text-decoration: none;
-        }
-        .page-link:hover {
-            background-color: #e9ecef;
-            color: #4361ee;
-        }
+    .response-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .response-table th, .response-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+    }
+    .response-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+    }
+    .response-table tr:hover {
+        background-color: #f8f9fa;
+    }
+    .filter-form {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .btn {
+        padding: 4px 8px;
+        border-radius: 3px;
+        text-decoration: none;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+    .pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+        border-radius: 0.25rem;
+    }
+    .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+    }
+    .page-link {
+        position: relative;
+        display: block;
+        padding: 0.4rem 0.6rem;
+        margin-left: -1px;
+        line-height: 1.25;
+        color: #007bff;
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    .page-link:hover {
+        background-color: #e9ecef;
+        color: #007bff;
+    }
     </style>
 </head>
 <body>
@@ -157,9 +159,9 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                 <form method="GET" class="filter-form">
                     <div class="row">
                         <div class="col-md-4">
-                            <label for="survey_id">Filter by Survey</label>
+                            <label for="survey_id">Survey</label>
                             <select name="survey_id" id="survey_id" class="form-control">
-                                <option value="">All Surveys</option>
+                                <option value="">All</option>
                                 <?php foreach ($allSurveys as $surveyOption): ?>
                                     <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($filter_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($surveyOption['title']) ?>
@@ -168,15 +170,15 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label for="start_date">From Date</label>
+                            <label for="start_date">From</label>
                             <input type="date" name="start_date" id="start_date" class="form-control" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>" />
                         </div>
                         <div class="col-md-3">
-                            <label for="end_date">To Date</label>
+                            <label for="end_date">To</label>
                             <input type="date" name="end_date" id="end_date" class="form-control" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>" />
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn">Filter</button>
+                            <button type="submit" class="btn">Search</button>
                             <a href="all_responses.php" class="btn btn-secondary ml-2">Reset</a>
                         </div>
                     </div>
@@ -204,10 +206,10 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                     <td>
                                         <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i> View
+                                            <i class="bi bi-eye"></i> View
                                         </a>
-                                        <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-primary">
-                                          <i class="bi bi-arrow-left"></i> Detail Results
+                                        <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-primary">
+                                          <i class="bi bi-arrow-left"></i> Results
                                         </a>
                                     </td>
                                 </tr>
