@@ -157,6 +157,27 @@ $current = basename($_SERVER['PHP_SELF']);
         left: 0;
     }
 }
+/* Adjust main content to account for sidebar */
+.admin-main {
+    transition: margin-left 0.2s;
+    margin-left: 260px; /* Default sidebar width */
+}
+
+@media (max-width: 900px) {
+    .admin-main {
+        margin-left: 60px; /* Collapsed sidebar width */
+    }
+}
+
+@media (max-width: 600px) {
+    .admin-main {
+        margin-left: 0; /* Sidebar hidden */
+    }
+}
+
+.admin-sidebar.open + .admin-main {
+    margin-left: 260px; /* Sidebar open on mobile */
+}
 </style>
 <button class="sidebar-toggle" id="sidebarToggle">
     <i class="fas fa-bars"></i>
@@ -258,11 +279,17 @@ $current = basename($_SERVER['PHP_SELF']);
     });
     // Sidebar hamburger toggle for mobile/tablet
     var sidebar = document.getElementById('adminSidebar');
+    var mainContent = document.querySelector('.admin-main');
     var sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebar && sidebarToggle) {
         sidebarToggle.addEventListener('click', function(e) {
             e.stopPropagation();
             sidebar.classList.toggle('open');
+            if (window.innerWidth > 600) {
+                mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '60px';
+            } else {
+                mainContent.style.marginLeft = sidebar.classList.contains('open') ? '260px' : '0';
+            }
         });
     }
     // Close sidebar on outside click (mobile)
