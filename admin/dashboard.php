@@ -272,246 +272,310 @@ try {
     <style>
         .admin-dashboard {
             display: flex;
-            min-height: 100vh;lumn; /* Stack sidebar and main content vertically on small screens */
+            flex-direction: column; /* Stack sidebar and main content vertically on small screens */
+            min-height: 100vh;
             background: linear-gradient(135deg, #f4f6fa, #e8ebf3);
-            /* Add gradient background */35deg, #f4f6fa, #e8ebf3);
             overflow-x: hidden;
         }
 
-        .admin-main {r {
-            flex: 1;40px;
-            padding: 2rem 2.5rem; 0.3s ease-in-out;
+        .admin-sidebar {
+            width: 240px;
+            transition: transform 0.3s ease-in-out;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 2; /* Ensure sidebar is above main content */
+            background-color: #2c3e50;
+        }
+
+        @media (max-width: 900px) {
+            .admin-sidebar {
+                transform: translateX(-100%); /* Hide sidebar by default */
+            }
+
+            .admin-sidebar.active {
+                transform: translateX(0); /* Show sidebar when active */
+            }
+
+            .admin-main {
+                margin-left: 0; /* Remove margin for smaller screens */
+                padding: 1rem; /* Adjust padding for better fit */
+            }
+        }
+
+        @media (max-width: 600px) {
+            .admin-dashboard {
+                flex-direction: column; /* Stack sidebar and main content */
+            }
+
+            .admin-sidebar {
+                width: 100%; /* Sidebar takes full width on small screens */
+                height: auto; /* Adjust height for stacking */
+                position: relative; /* Ensure proper stacking */
+                transform: translateX(0); /* Always visible */
+            }
+
+            .admin-main {
+                margin-left: 0;
+                padding: 1rem;
+            }
+        }
+
+        .toggle-sidebar {
+            display: none; /* Hide toggle button by default */
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 3; /* Ensure toggle button is above everything */
+            background: #2c3e50;
+            color: #fff;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 900px) {
+            .toggle-sidebar {
+                display: block; /* Show toggle button on smaller screens */
+            }
+        }
+
+        .admin-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
             margin-left: 240px;
             transition: margin-left 0.2s, background-color 0.3s ease-in-out;
             background-color: #ffffff; /* Add subtle background color */
             display: flex;
-            flex-direction: column;idebar is above main content */
+            flex-direction: column;
             align-items: center; /* Center align all contents */
             justify-content: flex-start; /* Align contents to the top */
             z-index: 1; /* Ensure it is above the sidebar */
             position: relative; /* Ensure proper stacking context */
-        }   .admin-sidebar {
-        @media (max-width: 900px) {eX(-100%); /* Hide sidebar by default */
+        }
+        @media (max-width: 900px) {
             .admin-main {
                 margin-left: 60px; /* Adjust margin for smaller screens */
-            }admin-sidebar.active {
-        }       transform: translateX(0); /* Show sidebar when active */
+            }
+        }
         @media (max-width: 600px) {
             .admin-main {
                 margin-left: 0; /* Remove margin for very small screens */
-                padding: 1rem; /* Adjust padding for better fit */ns */
-            }   padding: 1rem; /* Adjust padding for better fit */
+                padding: 1rem; /* Adjust padding for better fit */
+            }
             .admin-sidebar {
                 z-index: 0; /* Ensure sidebar does not overlap content */
             }
-        }media (max-width: 600px) {
-            .admin-dashboard {
-        .dashboard-section {on: column; /* Stack sidebar and main content */
+        }
+
+        .dashboard-section {
             background: #fff;
             border-radius: 12px; /* Increase border radius */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
-            padding: 1rem; /* Adjust padding */ull width on small screens */
+            padding: 1rem; /* Adjust padding */
             margin-bottom: 1rem; /* Reduce margin to save space */
             transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-            height: fit-content; /* Fit height to content */*/
+            height: fit-content; /* Fit height to content */
             overflow: hidden; /* Prevent overflow issues */
         }
-            .admin-main {
+
         .dashboard-section:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         .dashboard-section h2 {
-            font-size: 1.4rem;Hide toggle button by default */
+            font-size: 1.4rem;
             /* Increase font size */
             color: #2c3e50;
             margin-bottom: 1rem;
-            text-transform: uppercase;le button is above everything */
+            text-transform: uppercase;
             /* Add text transformation */
             letter-spacing: 0.5px;
-        }   border: none;
-            padding: 0.5rem;
+        }
+
         .dashboard-widgets-and-links {
-            display: grid;r;
+            display: grid;
             grid-template-columns: 2fr 1fr;
             /* Widgets take more space than Quick Links */
-            gap: 1rem;dth: 900px) {
+            gap: 1rem;
             margin-bottom: 1.5rem;
-        }       display: block; /* Show toggle button on smaller screens */
-            }
+        }
+
         .widget-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Ensure consistent card size */
             gap: 1rem; /* Add uniform spacing between cards */
             align-items: stretch; /* Ensure all cards align properly */
-        }   margin-left: 240px;
-            transition: margin-left 0.2s, background-color 0.3s ease-in-out;
-        .dashboard-widget {r: #ffffff; /* Add subtle background color */
+        }
+
+        .dashboard-widget {
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center align all contents */
-            justify-content: center;art; /* Align contents to the top */
+            align-items: center;
+            justify-content: center;
             padding: 0.75rem; /* Adjust padding for better spacing */
             border-radius: 8px; /* Slightly increase border radius */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhance shadow for better visual appeal */
-            text-align: center;x) {
+            text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: linear-gradient(135deg, #ffffff, #f9f9f9);reens */
+            background: linear-gradient(135deg, #ffffff, #f9f9f9);
             height: 100%; /* Ensure cards stretch uniformly */
             word-wrap: break-word; /* Ensure text wraps within the widget */
-        }media (max-width: 600px) {
-            .admin-main {
-        .dashboard-widget:hover {* Remove margin for very small screens */
-            transform: translateY(-5px); padding for better fit */
+        }
+
+        .dashboard-widget:hover {
+            transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Enhance hover effect */
-        }   .admin-sidebar {
-                z-index: 0; /* Ensure sidebar does not overlap content */
+        }
+
         .dashboard-widget i {
             font-size: 1.5rem; /* Slightly increase icon size */
             margin-bottom: 0.5rem;
-            color: #5e64ff;{
-        }   background: #fff;
-            border-radius: 12px; /* Increase border radius */
-        .dashboard-widget h3 {12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
+            color: #5e64ff;
+        }
+
+        .dashboard-widget h3 {
             font-size: 1rem; /* Adjust font size */
-            margin: 0;tom: 1rem; /* Reduce margin to save space */
-            color: #2c3e50;nsform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-        }   height: fit-content; /* Fit height to content */
-            overflow: hidden; /* Prevent overflow issues */
+            margin: 0;
+            color: #2c3e50;
+        }
+
         .dashboard-widget p {
             font-size: 0.8rem; /* Adjust font size */
-            color: #7f8c8d;hover {
+            color: #7f8c8d;
             margin: 0.5rem 0 0; /* Add spacing between text and other elements */
-            text-align: center;6px rgba(0, 0, 0, 0.15);
+            text-align: center;
             line-height: 1.4; /* Improve readability */
         }
-        .dashboard-section h2 {
-        .quick-links { 1.4rem;
-            display: grid;nt size */
+
+        .quick-links {
+            display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             /* Compact grid layout */
-            gap: 0;ansform: uppercase;
+            gap: 0;
             /* Remove gap between links */
-        }   letter-spacing: 0.5px;
         }
+
         .quick-link {
-            display: flex;-and-links {
+            display: flex;
             flex-direction: column;
-            align-items: center;s: 2fr 1fr;
-            justify-content: center;ce than Quick Links */
+            align-items: center;
+            justify-content: center;
             padding: 0.5rem;
-            font-size: 0.75rem;em;
+            font-size: 0.75rem;
             /* Smaller font size */
             background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
             border-radius: 6px;
             /* Smaller border radius */
-            color: #34495e;olumns: repeat(auto-fit, minmax(120px, 1fr)); /* Ensure consistent card size */
-            text-decoration: none;orm spacing between cards */
+            color: #34495e;
+            text-decoration: none;
             transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
             height: 80px;
             /* Reduced height */
             text-align: center;
             border: 1px solid #e0e6ed;
             /* Add border to separate links visually */
-        }   align-items: center;
-            justify-content: center;
-        .quick-link:hover {m; /* Adjust padding for better spacing */
-            background: linear-gradient(135deg, #e0e6ed, #cfd8e3); */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Enhance shadow for better visual appeal */
+        }
+
+        .quick-link:hover {
+            background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transform: translateY(-3px);
-        }   transition: transform 0.3s ease, box-shadow 0.3s ease;
-            background: linear-gradient(135deg, #ffffff, #f9f9f9);
-        .quick-link i {%; /* Ensure cards stretch uniformly */
-            font-size: 1.2rem;ord; /* Ensure text wraps within the widget */
+        }
+
+        .quick-link i {
+            font-size: 1.2rem;
             /* Smaller icon size */
             margin-bottom: 0.25rem;
-        }dashboard-widget:hover {
-            transform: translateY(-5px);
-        @media (max-width: 900px) {rgba(0, 0, 0, 0.15); /* Enhance hover effect */
+        }
+
+        @media (max-width: 900px) {
             .admin-main {
-                margin-left: 60px;
-            }board-widget i {
-            font-size: 1.5rem; /* Slightly increase icon size */
+                margin-left: 60px; /* Adjust margin for smaller screens */
+            }
+
             .dashboard-widgets-and-links {
                 grid-template-columns: 1fr;
                 /* Stack widgets and links vertically */
             }
-        }dashboard-widget h3 {
-            font-size: 1rem; /* Adjust font size */
+        }
+
         @media (max-width: 600px) {
-            .admin-main {0;
-                margin-left: 0;
-                padding: 1rem;
-            }board-widget p {
-            font-size: 0.8rem; /* Adjust font size */
+            .admin-main {
+                margin-left: 0; /* Remove margin for very small screens */
+                padding: 1rem; /* Adjust padding for better fit */
+            }
+
             .dashboard-widget {
-                flex: 1 1 100%; /* Add spacing between text and other elements */
+                flex: 1 1 100%;
                 /* Stack widgets vertically */
-            }ine-height: 1.4; /* Improve readability */
+            }
         }
 
         .admin-header {
             text-align: center; /* Center align the title */
-            margin-bottom: 1rem;s: repeat(auto-fit, minmax(100px, 1fr));
-        }   /* Compact grid layout */
-    </style>gap: 0;
-    <script>/* Remove gap between links */
+            margin-bottom: 1rem;
+        }
+    </style>
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Add GSAP animations for widgets
             gsap.from(".dashboard-widget", {
                 opacity: 0,
-                y: 50,tion: column;
-                duration: 0.8,r;
-                stagger: 0.2 center;
-            });ding: 0.5rem;
-            font-size: 0.75rem;
-            // Add GSAP animations for sections
-            gsap.from(".dashboard-section", {g, #f0f4f7, #dfe6ed);
-                opacity: 0,6px;
-                y: 50, border radius */
+                y: 50,
                 duration: 0.8,
-                stagger: 0.3 none;
-            });nsition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-            height: 80px;
+                stagger: 0.2
+            });
+
+            // Add GSAP animations for sections
+            gsap.from(".dashboard-section", {
+                opacity: 0,
+                y: 50,
+                duration: 0.8,
+                stagger: 0.3
+            });
+
             // Survey Participation Chart
             const surveyCtx = document.getElementById('surveyChart').getContext('2d');
-            new Chart(surveyCtx, {6ed;
-                type: 'bar', separate links visually */
+            new Chart(surveyCtx, {
+                type: 'bar',
                 data: {
                     labels: <?= json_encode(array_keys($surveyStats)) ?>,
                     datasets: [{
-                        label: 'Survey Responses',0e6ed, #cfd8e3);
+                        label: 'Survey Responses',
                         data: <?= json_encode(array_values($surveyStats)) ?>,
                         backgroundColor: '#5e64ff',
                         borderColor: '#34495e',
                         borderWidth: 1
-                    }]{
-                },ize: 1.2rem;
-                options: {n size */
+                    }]
+                },
+                options: {
                     responsive: true,
                     scales: {
                         y: {
                             beginAtZero: true
                         }
-                    }n-left: 60px; /* Adjust margin for smaller screens */
+                    }
                 }
             });
-            .dashboard-widgets-and-links {
-            // Feedback Ratings Chart: 1fr;
+
+            // Feedback Ratings Chart
             const feedbackCtx = document.getElementById('feedbackChart').getContext('2d');
             new Chart(feedbackCtx, {
                 type: 'pie',
                 data: {
                     labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
                     datasets: [{
-                        label: 'Feedback Ratings',or very small screens */
+                        label: 'Feedback Ratings',
                         data: <?= json_encode(array_values($feedbackRatings)) ?>,
                         backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
                     }]
-                },oard-widget {
-                options: {100%;
-                    responsive: truetically */
+                },
+                options: {
+                    responsive: true
                 }
             });
 
@@ -521,100 +585,94 @@ try {
                 type: 'doughnut',
                 data: {
                     labels: <?= json_encode(array_keys($ticketStatus)) ?>,
-                    datasets: [{r("DOMContentLoaded", function() {
+                    datasets: [{
                         label: 'Ticket Status',
                         data: <?= json_encode(array_values($ticketStatus)) ?>,
                         backgroundColor: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#2ecc71']
                     }]
-                },ration: 0.8,
-                options: {.2
+                },
+                options: {
                     responsive: true
                 }
-            });Add GSAP animations for sections
-            gsap.from(".dashboard-section", {
+            });
+
             // System Health Line Chart (Example)
             const systemHealthCtx = document.getElementById('systemHealthChart').getContext('2d');
             new Chart(systemHealthCtx, {
                 type: 'line',
                 data: {
                     labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
-                    datasets: [{ion Chart
-                        label: 'System Health Metrics',surveyChart').getContext('2d');
+                    datasets: [{
+                        label: 'System Health Metrics',
                         data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
                         backgroundColor: 'rgba(94, 100, 255, 0.2)',
                         borderColor: '#5e64ff',
-                        borderWidth: 2ncode(array_keys($surveyStats)) ?>,
-                    }]tasets: [{
-                },      label: 'Survey Responses',
-                options: {ta: <?= json_encode(array_values($surveyStats)) ?>,
-                    responsive: true,or: '#5e64ff',
-                    scales: {rColor: '#34495e',
-                        y: {erWidth: 1
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
                             beginAtZero: true
                         }
-                    }ns: {
-                }   responsive: true,
-            });     scales: {
-                        y: {
-            // User Role Distribution Chartue
+                    }
+                }
+            });
+
+            // User Role Distribution Chart
             const roleCtx = document.getElementById('roleChart').getContext('2d');
             new Chart(roleCtx, {
                 type: 'bar',
                 data: {
                     labels: <?= json_encode(array_keys($userRoleDistribution)) ?>,
-                    datasets: [{Chart
-                        label: 'User Roles',ElementById('feedbackChart').getContext('2d');
+                    datasets: [{
+                        label: 'User Roles',
                         data: <?= json_encode(array_values($userRoleDistribution)) ?>,
                         backgroundColor: '#5e64ff',
                         borderColor: '#34495e',
-                        borderWidth: 1ncode(array_keys($feedbackRatings)) ?>,
-                    }]tasets: [{
-                },      label: 'Feedback Ratings',
-                options: {ta: <?= json_encode(array_values($feedbackRatings)) ?>,
-                    responsive: true,or: ['#5e64ff', '#f0f4f7', '#ff5858', '#34495e', '#f39c12']
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }nsive: true
-                    }
-                }
-            });
-            // Support Ticket Status Chart
-            // Monthly New Users Chart.getElementById('ticketChart').getContext('2d');
-            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
-            new Chart(monthlyCtx, {
-                type: 'line',
-                data: {els: <?= json_encode(array_keys($ticketStatus)) ?>,
-                    labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
-                    datasets: [{Ticket Status',
-                        label: 'New Users',de(array_values($ticketStatus)) ?>,
-                        data: <?= json_encode(array_values($monthlyNewUsers)) ?>,5e', '#2ecc71']
-                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                        borderColor: '#5e64ff',
-                        borderWidth: 2
-                    }]sponsive: true
+                        borderWidth: 1
+                    }]
                 },
                 options: {
                     responsive: true,
-                    scales: {Line Chart (Example)
-                        y: {thCtx = document.getElementById('systemHealthChart').getContext('2d');
+                    scales: {
+                        y: {
                             beginAtZero: true
-                        }ne',
-                    } {
-                }   labels: ['PHP Version', 'Server Software', 'Database Status', 'Current Time'],
-            });     datasets: [{
-        });             label: 'System Health Metrics',
-           data: [<?= json_encode($systemHealth['php_version']) ?>, <?= json_encode($systemHealth['server_software']) ?>, <?= json_encode($systemHealth['database_status']) ?>, <?= json_encode($systemHealth['current_time']) ?>],
-        function toggleSidebar() {                 backgroundColor: 'rgba(94, 100, 255, 0.2)',
-            const sidebar = document.querySelector('.admin-sidebar');                        borderColor: '#5e64ff',
-            sidebar.classList.toggle('active');                  borderWidth: 2
-        }
+                        }
+                    }
+                }
+            });
+
+            // Monthly New Users Chart
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
+                    datasets: [{
+                        label: 'New Users',
+                        data: <?= json_encode(array_values($monthlyNewUsers)) ?>,
+                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                        borderColor: '#5e64ff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
     </script>
 </head>
 
 <body>
-    <div class="admin-dashboard">   y: {
-        <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>AtZero: true
+    <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
@@ -625,71 +683,7 @@ try {
                 <div class="dashboard-widgets-and-links">
                     <div class="widget-grid">
                         <?php foreach ($widgets as $widget): ?>
-                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">: <?= json_encode(array_keys($userRoleDistribution)) ?>,
-                                <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                                <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                                <p><?= htmlspecialchars($widget['title']) ?></p>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="quick-links">
-                        <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                        <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
-                        <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>sponsive: true,
-                        <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>                    scales: {
-                        <a href="events.php" class="quick-link"><i class="fas fa-calendar-alt"></i><span>Events</span></a>
-                        <a href="knowledge_base.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
-                        <a href="announcements.php" class="quick-link"><i class="fas fa-bullhorn"></i><span>Announcements</span></a>
-                    </div>
-                </div>
-
-                <!-- Charts Section -->
-                <div class="dashboard-section">
-                    <h2>Survey Participation</h2>hlyCtx = document.getElementById('monthlyChart').getContext('2d');
-                    <canvas id="surveyChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>Feedback Ratings</h2>bels: <?= json_encode(array_keys($monthlyNewUsers)) ?>,
-                    <canvas id="feedbackChart"></canvas>
-                </div>
-                <div class="dashboard-section">monthlyNewUsers)) ?>,
-                    <h2>Support Ticket Status</h2>  backgroundColor: 'rgba(94, 100, 255, 0.2)',
-                    <canvas id="ticketChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>System Health Metrics</h2>
-                    <canvas id="systemHealthChart"></canvas>
-                </div>
-                <div class="dashboard-section">
-                    <h2>User Role Distribution</h2>  y: {
-                    <canvas id="roleChart"></canvas>                            beginAtZero: true
-                </div>
-                <div class="dashboard-section">
-                    <h2>Monthly New Users</h2>
-                    <canvas id="monthlyChart"></canvas>
-                </div>
-
-                <div class="dashboard-section">
-                    <h2>System Health</h2>
-                    <ul>
-                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version'] ?? 'Unknown') ?></li>min-dashboard">
-                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software'] ?? 'Unknown') ?></li>include __DIR__ . '/includes/admin_sidebar.php'; ?>
-                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status'] ?? 'Unknown') ?></li>
-                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time'] ?? 'Unknown') ?></li>  <header class="admin-header">
-                    </ul>         <h1><?= htmlspecialchars($pageTitle) ?></h1>
-                </div>            </header>
-            </div>     <div class="content">
-        </div>           <!-- Dashboard Widgets and Quick Links Section -->
-        <?php include __DIR__ . '/includes/footer.php'; ?>lass="dashboard-widgets-and-links">
-    </div>     <div class="widget-grid">
-</body>                      <?php foreach ($widgets as $widget): ?>
-
-
-
-
-
-
-?>ob_end_flush();// Flush output buffer<?php</html>                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
+                            <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
                                 <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
                                 <h3><?= htmlspecialchars($widget['count']) ?></h3>
                                 <p><?= htmlspecialchars($widget['title']) ?></p>
