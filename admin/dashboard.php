@@ -286,7 +286,7 @@ try {
             background-color: #ffffff; /* Add subtle background color */
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center align all contents */
+            align-items: right; /* Center align all contents */
             justify-content: flex-start; /* Align contents to the top */
         }
 
