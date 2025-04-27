@@ -86,12 +86,18 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
         /* Ensure the admin-main content aligns properly with the sidebar */
         .admin-main {
-            margin-left: 240px; /* Match the width of the sidebar */
+            margin-left: var(--sidebar-width, 240px); /* Use CSS variable for sidebar width */
             transition: margin-left 0.2s ease; /* Smooth transition for sidebar toggle */
         }
 
         .admin-sidebar.collapsed ~ .admin-main {
-            margin-left: 60px; /* Adjust margin when sidebar is collapsed */
+            margin-left: var(--sidebar-collapsed-width, 60px); /* Adjust margin when sidebar is collapsed */
+        }
+
+        /* Define CSS variables for sidebar sizes */
+        :root {
+            --sidebar-width: 240px; /* Default sidebar width */
+            --sidebar-collapsed-width: 60px; /* Collapsed sidebar width */
         }
 
         /* Adjust the page title alignment */
@@ -150,6 +156,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             .users-table {
                 font-size: 0.8rem; /* Adjust table font size */
+            }
+
+            .users-container {
+                margin: 0 auto; /* Center the container */
+                max-width: 90%; /* Limit the width for better alignment */
             }
         }
 
