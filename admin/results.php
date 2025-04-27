@@ -513,7 +513,7 @@ $chart_json = json_encode($chart_data);
         const chartData = <?= $chart_json ?>;
         
         // Initialize charts when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Summary chart - Response trend over time
             if (chartData.total_responses > 0) {
                 const ctx = document.getElementById('summaryChart').getContext('2d');
@@ -557,8 +557,8 @@ $chart_json = json_encode($chart_data);
                         scales: {
                             y: {
                                 beginAtZero: true,
-                                title: { 
-                                    display: true, 
+                                title: {
+                                    display: true,
                                     text: 'Number of Responses',
                                     font: { weight: 'bold' }
                                 },
@@ -567,8 +567,8 @@ $chart_json = json_encode($chart_data);
                                 }
                             },
                             x: {
-                                title: { 
-                                    display: true, 
+                                title: {
+                                    display: true,
                                     text: 'Time Period',
                                     font: { weight: 'bold' }
                                 },
@@ -578,64 +578,124 @@ $chart_json = json_encode($chart_data);
                             }
                         }
                     }
-                }); // Ensure this matches the opening parenthesis or brace earlier in the code
-            }
-        }); // Close the outer function or block properly
-
-        // Field-specific charts
-        chartData.fields.forEach(field => {
-            const fieldAnalytics = chartData.analytics[field.id] || [];
-            const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
-
-            if (fieldAnalytics.length > 0) {
-                // Ensure "Yes" and "No" responses are always included
-                const labels = ['Yes', 'No'];
-                const data = [0, 0]; // Default counts for "Yes" and "No"
-
-                fieldAnalytics.forEach(item => {
-                    if (item.field_value === 'Yes') {
-                        data[0] = item.count;
-                    } else if (item.field_value === 'No') {
-                        data[1] = item.count;
-                    }
                 });
+            }
 
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: ['#4361ee', '#f72585'],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        cutout: '60%',
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: field.field_label,
-                                font: { size: 14 }
+            // Field-specific charts
+            chartData.fields.forEach(field => {
+                const fieldAnalytics = chartData.analytics[field.id] || [];
+                const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
+
+                if (fieldAnalytics.length > 0) {
+                    const labels = fieldAnalytics.map(item => item.field_value);
+                    const data = fieldAnalytics.map(item => item.count);
+
+                    if (labels.length > 0 && data.length > 0) {
+                        // Automatically determine chart type based on field type
+                        let chartType = 'bar';
+                        if (field.field_type === 'radio' || field.field_type === 'select' || field.field_type === 'rating') {
+                            chartType = 'doughnut';
+                        } else if (field.field_type === 'number') {
+                            chartType = 'line';
+                        }
+
+                        new Chart(ctx, {
+                            type: chartType,
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Responses',
+                                    data: data,
+                                    backgroundColor: chartType === 'doughnut' ? [
+                                        '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0',
+                                        '#560bad', '#7209b7', '#b5179e', '#f72585',
+                                        '#3a0ca3', '#480ca8'
+                                    ] : '#4895ef',
+                                    borderWidth: 1
+                                }]
                             },
-                            legend: { display: true },
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'end',
-                                formatter: value => value,
-                                color: '#4361ee',
-                                font: { weight: 'bold' }
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    title: {
+                                        display: true,
+                                        text: field.field_label,
+                                        font: { size: 14 }
+                                    },
+                                    legend: { display: chartType === 'doughnut' },
+                                    datalabels: {
+                                        anchor: 'end',
+                                        align: 'end',
+                                        formatter: value => value !== null ? value : '',
+                                        color: '#4361ee',
+                                        font: { weight: 'bold' }
+                                    }
+                                },
+                                scales: chartType === 'doughnut' ? {} : {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)'
+                                        }
+                                    },
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: [ChartDataLabels]
+                        });
+                    } else {
+                        ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
+                    }
+                } else {
+                    ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
+                }
+            });
+
+            // Additional analysis: Pie chart for overall response distribution
+            const overallCtx = document.getElementById('overallChart').getContext('2d');
+            const overallLabels = chartData.fields.map(field => field.field_label);
+            const overallData = chartData.fields.map(field => {
+                const fieldAnalytics = chartData.analytics[field.id] || [];
+                return fieldAnalytics.reduce((sum, item) => sum + item.count, 0);
+            });
+
+            new Chart(overallCtx, {
+                type: 'pie',
+                data: {
+                    labels: overallLabels,
+                    datasets: [{
+                        data: overallData,
+                        backgroundColor: [
+                            '#4361ee', '#3f37c9', '#4895ef', '#4cc9f0',
+                            '#560bad', '#7209b7', '#b5179e', '#f72585',
+                            '#3a0ca3', '#480ca8'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Overall Response Distribution',
+                            font: { size: 16 }
+                        },
+                        legend: { display: true },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.label}: ${ctx.raw}`
                             }
                         }
-                    },
-                    plugins: [ChartDataLabels]
-                });
-            } else {
-                ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
-            }
+                    }
+                }
+            });
         });
-        
+
         // PDF Export functionality
         document.addEventListener('DOMContentLoaded', function() {
             var exportBtn = document.getElementById('export-pdf');
