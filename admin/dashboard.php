@@ -288,6 +288,8 @@ try {
             flex-direction: column;
             align-items: center; /* Center align all contents */
             justify-content: flex-start; /* Align contents to the top */
+            z-index: 1; /* Ensure it is above the sidebar */
+            position: relative; /* Ensure proper stacking context */
         }
         @media (max-width: 900px) {
             .admin-main {
@@ -298,6 +300,9 @@ try {
             .admin-main {
                 margin-left: 0; /* Remove margin for very small screens */
                 padding: 1rem; /* Adjust padding for better fit */
+            }
+            .admin-sidebar {
+                z-index: 0; /* Ensure sidebar does not overlap content */
             }
         }
 
