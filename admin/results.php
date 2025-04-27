@@ -438,7 +438,7 @@ $chart_json = json_encode($chart_data);
                                         
                                         <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                         <td>
-                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="erpnext-btn erpnext-btn-info btn-sm">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
                                         </td>
