@@ -105,24 +105,157 @@ foreach ($widgets as &$widget) {
     }
 }
 
-// Fetch counts for notifications
-$newMessages = [];
-$newTickets = [];
-$newSurveyResponses = [];
-
+// Fetch unread messages from users to admin
+$unreadMessagesCount = 0;
 try {
-    $stmt = $pdo->prepare("SELECT id, subject, created_at FROM messages WHERE is_read = 0 AND receiver_id = ? ORDER BY created_at DESC LIMIT 5");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE is_read = 0 AND receiver_id = ? AND sender_id IN (SELECT id FROM users WHERE role_id != 0)");
     $stmt->execute([$_SESSION['user_id']]);
-    $newMessages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $stmt = $pdo->query("SELECT id, title, created_at FROM support_tickets WHERE status = 'open' ORDER BY created_at DESC LIMIT 5");
-    $newTickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $stmt = $pdo->query("SELECT id, survey_id, created_at FROM survey_responses WHERE is_new = 1 ORDER BY created_at DESC LIMIT 5");
-    $newSurveyResponses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $unreadMessagesCount = $stmt->fetchColumn() ?: 0;
 } catch (Exception $e) {
-    error_log("Notification Error: " . $e->getMessage());
+    $unreadMessagesCount = 0;
+    error_log("Unread Messages Error: " . $e->getMessage());
 }
+
+// Fetch recent activity log
+$activityLog = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10");
+    $activityLog = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Activity Log Error: " . $e->getMessage());
+}
+
+// Fetch recent feedback
+$feedback = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 5");
+    $feedback = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Feedback Error: " . $e->getMessage());
+}
+
+// Fetch recent support tickets
+$tickets = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM support_tickets ORDER BY created_at DESC LIMIT 5");
+    $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Tickets Error: " . $e->getMessage());
+}
+
+// Error log viewer: read last 20 lines of error.log
+$errorLogLines = [];
+$errorLogPath = realpath(__DIR__ . '/../error_log');
+if ($errorLogPath && is_readable($errorLogPath)) {
+    $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $errorLogLines = array_slice($lines, -20);
+}
+
+// Parse activity logs for the table
+$activityLogs = [];
+$logFilePath = realpath(__DIR__ . '/../logs/user_activity.log'); // Assuming logs are stored in this file
+if ($logFilePath && is_readable($logFilePath)) {
+    $lines = file($logFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        preg_match('/\[(.*?)\] (.*?): (.*)/', $line, $matches);
+        if (count($matches) === 4) {
+            $activityLogs[] = [
+                'timestamp' => $matches[1],
+                'action' => $matches[2],
+                'details' => $matches[3]
+            ];
+        }
+    }
+}
+
+// Limit the number of logs displayed
+$activityLogs = array_slice($activityLogs, -20);
+
+// Fetch survey participation stats for chart
+$surveyStats = [];
+try {
+    $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
+        FROM surveys s
+        LEFT JOIN survey_responses sr ON s.id = sr.survey_id
+        GROUP BY s.id
+        ORDER BY responses DESC
+        LIMIT 7");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $surveyStats[$row['title']] = $row['responses'];
+    }
+} catch (Exception $e) {
+    $surveyStats = [];
+}
+
+// Fetch feedback rating distribution for chart
+$feedbackRatings = [];
+try {
+    $stmt = $pdo->query("SELECT rating, COUNT(*) as count FROM feedback GROUP BY rating ORDER BY rating");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $feedbackRatings[$row['rating']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $feedbackRatings = [];
+}
+
+// Fetch support ticket status distribution for chart
+$ticketStatus = [];
+try {
+    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM support_tickets GROUP BY status");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $ticketStatus[$row['status']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $ticketStatus = [];
+}
+
+// Fetch recent announcements
+$announcements = [];
+try {
+    $stmt = $pdo->query("SELECT * FROM announcements ORDER BY created_at DESC LIMIT 5");
+    $announcements = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    error_log("Announcements Error: " . $e->getMessage());
+}
+
+// Fetch system health status
+$systemHealth = [
+    'php_version' => phpversion() ?? 'Unknown',
+    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+    'database_status' => isset($pdo) && $pdo ? 'Connected' : 'Disconnected',
+    'current_time' => date('Y-m-d H:i:s') ?? 'Unknown',
+];
+
+// Fetch user role distribution for chart
+$userRoleDistribution = [];
+try {
+    $stmt = $pdo->query("SELECT roles.name, COUNT(users.id) as count 
+                         FROM roles 
+                         LEFT JOIN users ON roles.id = users.role_id 
+                         GROUP BY roles.id");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $userRoleDistribution[$row['name']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $userRoleDistribution = [];
+    error_log("User Role Distribution Error: " . $e->getMessage());
+}
+
+// Fetch monthly new users for chart
+$monthlyNewUsers = [];
+try {
+    $stmt = $pdo->query("SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count 
+                         FROM users 
+                         GROUP BY month 
+                         ORDER BY month ASC");
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $monthlyNewUsers[$row['month']] = $row['count'];
+    }
+} catch (Exception $e) {
+    $monthlyNewUsers = [];
+    error_log("Monthly New Users Error: " . $e->getMessage());
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -160,13 +293,15 @@ try {
 
         .dashboard-section {
             background: #fff;
-            border-radius: 12px; /* Increase border radius */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
-            padding: 1rem; /* Adjust padding */
-            margin-bottom: 1rem; /* Reduce margin to save space */
-            transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-            height: fit-content; /* Fit height to content */
-            overflow: hidden; /* Prevent overflow issues */
+            border-radius: 12px;
+            /* Increase border radius */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            /* Enhance shadow */
+            padding: 1rem;
+            /* Adjust padding */
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            /* Add hover effect */
         }
 
         .dashboard-section:hover {
@@ -186,16 +321,14 @@ try {
 
         .dashboard-widgets-and-links {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            /* Widgets take more space than Quick Links */
+            grid-template-columns: 2fr 1fr; /* Widgets take more space than Quick Links */
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
         .widget-grid {
             display: auto-fit;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            /* Smaller widget boxes */
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Smaller widget boxes */
             gap: 0.5rem;
         }
 
@@ -205,18 +338,12 @@ try {
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            border-radius: 6px;
-            /* Smaller border radius */
+            border-radius: 6px; /* Smaller border radius */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             background: linear-gradient(135deg, #ffffff, #f9f9f9);
-            min-height: 80px;
-            /* Allow dynamic height */
-            height: auto;
-            /* Adjust height based on content */
-            word-wrap: break-word;
-            /* Ensure text wraps within the widget */
+            height: 80px; /* Reduced height */
         }
 
         .dashboard-widget:hover {
@@ -225,36 +352,26 @@ try {
         }
 
         .dashboard-widget i {
-            font-size: 1.2rem;
-            /* Smaller icon size */
+            font-size: 1.2rem; /* Smaller icon size */
             margin-bottom: 0.25rem;
             color: #5e64ff;
         }
 
         .dashboard-widget h3 {
-            font-size: 0.9rem;
-            /* Smaller font size */
+            font-size: 0.9rem; /* Smaller font size */
             margin: 0;
             color: #2c3e50;
         }
 
         .dashboard-widget p {
-            font-size: 0.7rem;
-            /* Smaller font size */
+            font-size: 0.7rem; /* Smaller font size */
             color: #7f8c8d;
-            margin: 0.25rem 0 0;
-            /* Add spacing between text and other elements */
-            text-align: center;
-            line-height: 1.2;
-            /* Improve readability */
         }
 
         .quick-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            /* Compact grid layout */
-            gap: 0;
-            /* Remove gap between links */
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); /* Compact grid layout */
+            gap: 0.5rem;
         }
 
         .quick-link {
@@ -263,19 +380,14 @@ try {
             align-items: center;
             justify-content: center;
             padding: 0.5rem;
-            font-size: 0.75rem;
-            /* Smaller font size */
+            font-size: 0.75rem; /* Smaller font size */
             background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
-            border-radius: 6px;
-            /* Smaller border radius */
+            border-radius: 6px; /* Smaller border radius */
             color: #34495e;
             text-decoration: none;
             transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-            height: 80px;
-            /* Reduced height */
+            height: 80px; /* Reduced height */
             text-align: center;
-            border: 1px solid #e0e6ed;
-            /* Add border to separate links visually */
         }
 
         .quick-link:hover {
@@ -285,8 +397,7 @@ try {
         }
 
         .quick-link i {
-            font-size: 1.2rem;
-            /* Smaller icon size */
+            font-size: 1.2rem; /* Smaller icon size */
             margin-bottom: 0.25rem;
         }
 
@@ -296,8 +407,7 @@ try {
             }
 
             .dashboard-widgets-and-links {
-                grid-template-columns: 1fr;
-                /* Stack widgets and links vertically */
+                grid-template-columns: 1fr; /* Stack widgets and links vertically */
             }
         }
 
@@ -311,88 +421,6 @@ try {
                 flex: 1 1 100%;
                 /* Stack widgets vertically */
             }
-        }
-
-        .admin-header {
-            text-align: center; /* Center align the title */
-            margin-bottom: 1rem;
-        }
-
-        .notification-icon {
-            position: relative;
-            cursor: pointer;
-            font-size: 1.5rem;
-            color: #f39c12;
-        }
-
-        .notification-icon .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #e74c3c;
-            color: #fff;
-            font-size: 0.75rem;
-            font-weight: bold;
-            border-radius: 50%;
-            padding: 2px 6px;
-        }
-
-        .notification-dropdown {
-            position: absolute;
-            top: 40px;
-            right: 0;
-            width: 300px;
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            display: none;
-            z-index: 1000;
-        }
-
-        .notification-dropdown.active {
-            display: block;
-        }
-
-        .notification-dropdown h4 {
-            margin: 0;
-            padding: 10px;
-            background: #f39c12;
-            color: #fff;
-            border-radius: 8px 8px 0 0;
-            font-size: 1rem;
-        }
-
-        .notification-dropdown ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .notification-dropdown ul li {
-            padding: 10px;
-            border-bottom: 1px solid #f1f1f1;
-        }
-
-        .notification-dropdown ul li:last-child {
-            border-bottom: none;
-        }
-
-        .notification-dropdown ul li a {
-            text-decoration: none;
-            color: #34495e;
-            font-size: 0.9rem;
-        }
-
-        .notification-dropdown ul li a:hover {
-            color: #f39c12;
-        }
-
-        .notification-dropdown ul li small {
-            display: block;
-            font-size: 0.75rem;
-            color: #7f8c8d;
         }
     </style>
     <script>
@@ -550,61 +578,6 @@ try {
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <!-- Notification Bell -->
-            <div style="position: relative; text-align: right; padding: 10px;">
-                <i class="fas fa-bell notification-icon" id="notificationBell">
-                    <?php 
-                    $totalNotifications = count($newMessages) + count($newTickets) + count($newSurveyResponses);
-                    if ($totalNotifications > 0): ?>
-                        <span class="badge"><?= $totalNotifications ?></span>
-                    <?php endif; ?>
-                </i>
-                <div class="notification-dropdown" id="notificationDropdown">
-                    <h4>Notifications</h4>
-                    <ul>
-                        <?php if (!empty($newMessages)): ?>
-                            <li><strong>New Messages</strong></li>
-                            <?php foreach ($newMessages as $message): ?>
-                                <li>
-                                    <a href="messages.php?id=<?= $message['id'] ?>">
-                                        <?= htmlspecialchars($message['subject']) ?>
-                                    </a>
-                                    <small><?= date('M j, Y g:i A', strtotime($message['created_at'])) ?></small>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-
-                        <?php if (!empty($newTickets)): ?>
-                            <li><strong>New Support Tickets</strong></li>
-                            <?php foreach ($newTickets as $ticket): ?>
-                                <li>
-                                    <a href="support_tickets.php?id=<?= $ticket['id'] ?>">
-                                        <?= htmlspecialchars($ticket['title']) ?>
-                                    </a>
-                                    <small><?= date('M j, Y g:i A', strtotime($ticket['created_at'])) ?></small>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-
-                        <?php if (!empty($newSurveyResponses)): ?>
-                            <li><strong>New Survey Responses</strong></li>
-                            <?php foreach ($newSurveyResponses as $response): ?>
-                                <li>
-                                    <a href="surveys.php?id=<?= $response['survey_id'] ?>">
-                                        Survey Response #<?= $response['id'] ?>
-                                    </a>
-                                    <small><?= date('M j, Y g:i A', strtotime($response['created_at'])) ?></small>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-
-                        <?php if ($totalNotifications === 0): ?>
-                            <li>No new notifications</li>
-                        <?php endif; ?>
-                    </ul>
-                </div>
-            </div>
-
             <header class="admin-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
@@ -644,7 +617,10 @@ try {
                     <h2>Support Ticket Status</h2>
                     <canvas id="ticketChart"></canvas>
                 </div>
-
+                <div class="dashboard-section">
+                    <h2>System Health Metrics</h2>
+                    <canvas id="systemHealthChart"></canvas>
+                </div>
                 <div class="dashboard-section">
                     <h2>User Role Distribution</h2>
                     <canvas id="roleChart"></canvas>
@@ -654,28 +630,19 @@ try {
                     <canvas id="monthlyChart"></canvas>
                 </div>
 
-
+                <div class="dashboard-section">
+                    <h2>System Health</h2>
+                    <ul>
+                        <li>PHP Version: <?= htmlspecialchars($systemHealth['php_version'] ?? 'Unknown') ?></li>
+                        <li>Server Software: <?= htmlspecialchars($systemHealth['server_software'] ?? 'Unknown') ?></li>
+                        <li>Database Status: <?= htmlspecialchars($systemHealth['database_status'] ?? 'Unknown') ?></li>
+                        <li>Current Time: <?= htmlspecialchars($systemHealth['current_time'] ?? 'Unknown') ?></li>
+                    </ul>
+                </div>
             </div>
         </div>
         <?php include __DIR__ . '/includes/footer.php'; ?>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const bell = document.getElementById('notificationBell');
-            const dropdown = document.getElementById('notificationDropdown');
-
-            bell.addEventListener('click', function () {
-                dropdown.classList.toggle('active');
-            });
-
-            document.addEventListener('click', function (e) {
-                if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.classList.remove('active');
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>
