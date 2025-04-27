@@ -284,12 +284,18 @@ try {
             width: 260px;
             flex-shrink: 0;
             transition: width 0.2s;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 1000;
+            background: #f5f7fa;
         }
 
         .admin-main {
             flex: 1;
             padding: 2rem;
-            margin-left: 260px;
+            margin-left: 260px; /* Match sidebar width */
             transition: margin-left 0.2s;
         }
 
@@ -319,17 +325,13 @@ try {
             }
         }
 
-        /* Responsive Grid for Cards */
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
+        /* Ensure footer and header alignment */
+        .admin-header {
+            margin-bottom: 1.5rem;
         }
 
-        @media (max-width: 600px) {
-            .widget-grid {
-                grid-template-columns: 1fr;
-            }
+        .content {
+            margin-top: 1rem;
         }
     </style>
 </head>
