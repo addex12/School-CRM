@@ -303,16 +303,26 @@ try {
         text-transform: uppercase; /* Add text transformation */
         letter-spacing: 0.5px;
     }
+    .quick-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Compact grid layout */
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
     .quick-link {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        padding: 0.5rem 1rem; /* Adjust padding */
-        font-size: 1rem; /* Adjust font size */
-        background: linear-gradient(135deg, #f0f4f7, #dfe6ed); /* Add gradient */
+        justify-content: center;
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        background: linear-gradient(135deg, #f0f4f7, #dfe6ed);
         border-radius: 8px;
         color: #34495e;
         text-decoration: none;
         transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+        height: 100px; /* Fixed height for uniformity */
+        text-align: center;
     }
     .quick-link:hover {
         background: linear-gradient(135deg, #e0e6ed, #cfd8e3);
@@ -320,43 +330,32 @@ try {
         transform: translateY(-3px);
     }
     .quick-link i {
-        font-size: 1.2rem; /* Adjust icon size */
-        margin-right: 0.75rem;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
     }
-    .dashboard-widget {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-        border-radius: 12px; /* Increase border radius */
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhance shadow */
-        text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add hover effect */
-        background: linear-gradient(135deg, #ffffff, #f9f9f9); /* Add gradient */
-    }
-    .dashboard-widget:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-    }
-    .dashboard-widget i {
-        font-size: 2rem; /* Increase icon size */
-        margin-bottom: 0.75rem;
-        color: #5e64ff; /* Add consistent color */
-    }
-    .dashboard-widget h3 {
-        font-size: 1.5rem; /* Adjust font size */
-        margin: 0;
-        color: #2c3e50;
-    }
-    .dashboard-widget p {
-        font-size: 1rem; /* Adjust font size */
-        color: #7f8c8d;
-    }
-    .widget-grid {
+    .announcements {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Responsive grid */
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Compact grid layout */
+        gap: 0.5rem;
+    }
+    .announcement-box {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        color: #34495e;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .announcement-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .announcement-box strong {
+        display: block;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+        color: #2c3e50;
     }
     @media (max-width: 900px) {
         .admin-main {
@@ -531,6 +530,37 @@ try {
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
+                <!-- Quick Links Section -->
+                <div class="dashboard-section">
+                    <h2>Quick Links</h2>
+                    <div class="quick-links">
+                        <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
+                        <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
+                        <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
+                        <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                        <a href="events.php" class="quick-link"><i class="fas fa-calendar-alt"></i><span>Events</span></a>
+                        <a href="knowledgebase.php" class="quick-link"><i class="fas fa-book"></i><span>Knowledgebase</span></a>
+                    </div>
+                </div>
+
+                <!-- Announcements Section -->
+                <div class="dashboard-section">
+                    <h2>Recent Announcements</h2>
+                    <div class="announcements">
+                        <?php if (!empty($announcements)): ?>
+                            <?php foreach ($announcements as $announcement): ?>
+                                <div class="announcement-box">
+                                    <strong><?= htmlspecialchars($announcement['title'] ?? 'No Title') ?></strong>
+                                    <?= htmlspecialchars($announcement['content'] ?? 'No Content') ?>
+                                    <small>(<?= htmlspecialchars($announcement['created_at'] ?? 'Unknown Date') ?>)</small>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="announcement-box">No recent announcements found.</div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
                 <!-- Charts Section -->
                 <div class="dashboard-section">
                     <h2>Survey Participation</h2>
@@ -556,16 +586,6 @@ try {
                     <h2>Monthly New Users</h2>
                     <canvas id="monthlyChart"></canvas>
                 </div>
-                <!-- Quick Links Section -->
-                <div class="dashboard-section">
-                    <h2>Quick Links</h2>
-                    <div class="quick-links">
-                        <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                        <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
-                        <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
-                        <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                    </div>
-                </div>
 
                 <!-- Widgets Section -->
                 <div class="dashboard-section">
@@ -579,24 +599,6 @@ try {
                             </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
-
-                <!-- Recent Announcements Section -->
-                <div class="dashboard-section">
-                    <h2>Recent Announcements</h2>
-                    <ul>
-                        <?php if (!empty($announcements)): ?>
-                            <?php foreach ($announcements as $announcement): ?>
-                                <li>
-                                    <strong><?= htmlspecialchars($announcement['title'] ?? 'No Title') ?>:</strong>
-                                    <?= htmlspecialchars($announcement['content'] ?? 'No Content') ?>
-                                    <small>(<?= htmlspecialchars($announcement['created_at'] ?? 'Unknown Date') ?>)</small>
-                                </li>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <li>No recent announcements found.</li>
-                        <?php endif; ?>
-                    </ul>
                 </div>
 
                 <div class="dashboard-section">
