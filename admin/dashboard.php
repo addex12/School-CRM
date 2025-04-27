@@ -1,3 +1,129 @@
+<?php
+ob_start();
+require_once '../includes/auth.php';
+requireAdmin();
+require_once '../includes/config.php';
+require_once '../includes/functions.php';
+require_once '../includes/db.php';
+$pageTitle = "Admin Dashboard";
+
+// Enhanced database analysis
+$stats = [];
+try {
+    // Get table counts
+    $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($tables as $table) {
+        $stats['tables'][$table] = $pdo->query("SELECT COUNT(*) FROM $table")->fetchColumn();
+    }
+
+    // Get user growth data
+    $stats['user_growth'] = $pdo->query("
+        SELECT DATE(created_at) as date, COUNT(*) as count 
+        FROM users 
+        GROUP BY DATE(created_at) 
+        ORDER BY date
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get activity trends
+    $stats['activity_trends'] = $pdo->query("
+        SELECT activity_type, COUNT(*) as count 
+        FROM activity_logs 
+        GROUP BY activity_type 
+        ORDER BY count DESC
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get feedback distribution
+    $stats['feedback_distribution'] = $pdo->query("
+        SELECT rating, COUNT(*) as count 
+        FROM feedback 
+        GROUP BY rating 
+        ORDER BY rating
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get ticket status distribution
+    $stats['ticket_status'] = $pdo->query("
+        SELECT status, COUNT(*) as count 
+        FROM support_tickets 
+        GROUP BY status
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get course enrollment data
+    $stats['course_enrollments'] = $pdo->query("
+        SELECT c.title, COUNT(e.id) as enrollments 
+        FROM courses c 
+        LEFT JOIN course_enrollments e ON c.id = e.course_id 
+        GROUP BY c.id 
+        ORDER BY enrollments DESC 
+        LIMIT 10
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    // Get system performance metrics
+    $stats['performance'] = [
+        'php_version' => phpversion(),
+        'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'N/A',
+        'db_version' => $pdo->getAttribute(PDO::ATTR_SERVER_VERSION),
+        'server_load' => sys_getloadavg()[0] ?? 'N/A',
+        'memory_usage' => memory_get_usage(true),
+        'memory_peak' => memory_get_peak_usage(true)
+    ];
+
+} catch (Exception $e) {
+    error_log("Database analysis error: " . $e->getMessage());
+}
+
+// Original widget configuration with enhancements
+$dashboardConfigPath = realpath(__DIR__ . '/../config/dashboard.json');
+$widgets = [];
+if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
+    $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
+    $widgets = $dashboardConfig['widgets'] ?? [];
+}
+
+// Default widgets if config not found
+if (empty($widgets)) {
+    $widgets = [
+        ["title" => "Total Users", "icon" => "fa-users", "color" => "blue", "query" => "SELECT COUNT(*) FROM users"],
+        ["title" => "Active Users", "icon" => "fa-user-check", "color" => "green", "query" => "SELECT COUNT(*) FROM users WHERE status = 'active'"],
+        ["title" => "Inactive Users", "icon" => "fa-user-times", "color" => "red", "query" => "SELECT COUNT(*) FROM users WHERE status = 'inactive'"],
+        ["title" => "Total Courses", "icon" => "fa-book", "color" => "purple", "query" => "SELECT COUNT(*) FROM courses"],
+        ["title" => "Enrolled Students", "icon" => "fa-user-graduate", "color" => "orange", "query" => "SELECT COUNT(*) FROM course_enrollments"],
+        ["title" => "New Feedback", "icon" => "fa-comments", "color" => "teal", "query" => "SELECT COUNT(*) FROM feedback WHERE is_read = 0"],
+        ["title" => "Open Tickets", "icon" => "fa-ticket-alt", "color" => "red", "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"],
+        ["title" => "In Progress Tickets", "icon" => "fa-spinner", "color" => "blue", "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'in_progress'"],
+        ["title" => "On Hold Tickets", "icon" => "fa-pause-circle", "color" => "yellow", "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'on_hold'"],
+        ["title" => "Resolved Tickets", "icon" => "fa-check-circle", "color" => "green", "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"],
+        ["title" => "Daily Active Users", "icon" => "fa-chart-line", "color" => "indigo", "query" => "SELECT COUNT(DISTINCT user_id) FROM activity_logs WHERE DATE(created_at) = CURDATE()"],
+        ["title" => "System Load", "icon" => "fa-server", "color" => "gray", "query" => "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) as size FROM information_schema.tables WHERE table_schema = DATABASE()"]
+    ];
+}
+
+// Process widgets
+foreach ($widgets as &$widget) {
+    try {
+        $stmt = $pdo->query($widget['query']);
+        $widget['count'] = $stmt->fetchColumn() ?? 0;
+    } catch (Exception $e) {
+        $widget['count'] = "Error";
+        error_log("Widget Error: " . $e->getMessage());
+    }
+}
+
+// Fetch recent data
+$recentData = [
+    'activity' => $pdo->query("SELECT * FROM activity_logs ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC),
+    'feedback' => $pdo->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC),
+    'tickets' => $pdo->query("SELECT * FROM support_tickets ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC),
+    'users' => $pdo->query("SELECT * FROM users ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC)
+];
+
+// Error log
+$errorLogLines = [];
+$errorLogPath = realpath(__DIR__ . '/../error_log');
+if ($errorLogPath && is_readable($errorLogPath)) {
+    $lines = file($errorLogPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $errorLogLines = array_slice($lines, -20);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,206 +133,159 @@
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../assets/css/fontawesome.min.css">
-    <link rel="stylesheet" href="../assets/css/brands.min.css">
-    <link rel="stylesheet" href="../assets/css/solid.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="../assets/js/dashboard.js" defer></script>
-    <script src="../assets/js/jquery.min.js"></script>
     <style>
-        /* Frappe/Jinja style buttons */
+        :root {
+            --primary: #5e64ff;
+            --primary-light: #8a90ff;
+            --secondary: #f0f4f7;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #fd7e14;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --white: #ffffff;
+            --sidebar-width: 250px;
+        }
+
+        /* Frappe/Jinja Button Styles */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.5rem 1rem;
+            padding: 0.375rem 0.75rem;
             font-size: 0.875rem;
             font-weight: 500;
             line-height: 1.5;
-            text-align: center;
-            text-decoration: none;
-            white-space: nowrap;
-            vertical-align: middle;
-            cursor: pointer;
-            border: 1px solid transparent;
             border-radius: 0.25rem;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            border: 1px solid transparent;
             gap: 0.5rem;
         }
         
         .btn-primary {
-            color: #fff;
-            background-color: #2490ef;
-            border-color: #2490ef;
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
         
         .btn-primary:hover {
-            background-color: #1a7fdb;
-            border-color: #1a7fdb;
+            background-color: var(--primary-light);
             transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .btn-secondary {
-            color: #fff;
-            background-color: #6c757d;
-            border-color: #6c757d;
+            background-color: var(--secondary);
+            color: var(--dark);
+            border-color: var(--gray-light);
         }
         
         .btn-secondary:hover {
-            background-color: #5a6268;
-            border-color: #545b62;
+            background-color: var(--gray-light);
             transform: translateY(-1px);
         }
-
-        /* Widget Grid - Improved Responsiveness */
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1.5rem;
-            margin: 1.5rem 0;
+        
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
         }
 
-        .dashboard-widget {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.2s ease;
-            border: 1px solid #e5e7eb;
+        /* Dashboard Layout */
+        .admin-dashboard {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .dashboard-widget:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .dashboard-widget i {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: #2490ef;
-        }
-
-        .dashboard-widget h3 {
-            font-size: 1.75rem;
-            margin: 0.5rem 0;
-            color: #2e2e2e;
-            font-weight: 600;
-        }
-
-        .dashboard-widget p {
-            margin: 0;
-            color: #6c757d;
-            font-size: 0.875rem;
-        }
-
-        /* Layout Improvements */
-        .admin-main {
-            padding: 1.5rem;
-            margin-left: 250px;
-            transition: all 0.3s ease;
             min-height: 100vh;
-            width: calc(100% - 250px);
         }
-
+        
+        .admin-main {
+            flex: 1;
+            padding: 1.5rem;
+            margin-left: var(--sidebar-width);
+            transition: all 0.3s;
+            background-color: #f9fafb;
+            min-width: 0;
+        }
+        
         .admin-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             margin-bottom: 1.5rem;
             flex-wrap: wrap;
             gap: 1rem;
         }
-
+        
         .content {
-            max-width: 100%;
-            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Widget Grid */
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .dashboard-widget {
+            background: var(--white);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            border: 1px solid var(--gray-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .dashboard-widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-widget i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .dashboard-widget h3 {
+            font-size: 1.75rem;
+            margin: 0.5rem 0;
+            color: var(--dark);
+        }
+        
+        .dashboard-widget p {
+            margin: 0;
+            color: var(--gray);
+            font-size: 0.875rem;
         }
 
         /* Dashboard Sections */
         .dashboard-section {
-            background: #fff;
-            border-radius: 8px;
+            background: var(--white);
+            border-radius: 0.5rem;
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--gray-light);
         }
-
+        
         .dashboard-section h2 {
             margin-top: 0;
             margin-bottom: 1.5rem;
-            color: #2e2e2e;
             font-size: 1.25rem;
-        }
-
-        /* Quick Links */
-        .quick-links {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .quick-link {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            background: #fff;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #2e2e2e;
-            transition: all 0.2s ease;
-            border: 1px solid #e5e7eb;
-            text-align: center;
-        }
-
-        .quick-link:hover {
-            background: #f8f9fa;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .quick-link i {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #2490ef;
-        }
-
-        .quick-link span {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        /* Tables */
-        .table-container {
-            overflow-x: auto;
-            margin-bottom: 1rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-        }
-
-        table th {
-            background-color: #f8f9fa;
-            font-weight: 500;
-            text-align: left;
-            padding: 0.75rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #e5e7eb;
-            vertical-align: top;
+            color: var(--dark);
         }
 
         /* Charts */
@@ -214,21 +293,93 @@
             position: relative;
             height: 300px;
             width: 100%;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        /* Mobile Responsiveness */
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        
+        .table th, .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .table th {
+            background-color: var(--secondary);
+            font-weight: 500;
+        }
+
+        /* Quick Links */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: var(--white);
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--dark);
+            transition: all 0.2s;
+            border: 1px solid var(--gray-light);
+            text-align: center;
+        }
+        
+        .quick-link:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .quick-link i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .quick-link span {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Responsive Adjustments */
         @media (max-width: 992px) {
             .admin-main {
                 margin-left: 0;
-                width: 100%;
                 padding: 1rem;
             }
             
             .widget-grid {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
+            
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
         }
-
+        
         @media (max-width: 768px) {
             .widget-grid {
                 grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -239,7 +390,7 @@
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             }
         }
-
+        
         @media (max-width: 576px) {
             .widget-grid {
                 grid-template-columns: 1fr 1fr;
@@ -271,38 +422,43 @@
 <body>
     <div class="admin-dashboard">
         <?php
-        // Make unreadMessagesCount available to sidebar
         $ADMIN_UNREAD_MESSAGES = $unreadMessagesCount;
         include __DIR__ . '/includes/admin_sidebar.php';
         ?>
         <div class="admin-main">
             <header class="admin-header">
-                <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
-                <?php if ($unreadMessagesCount > 0): ?>
-                    <a href="messages.php" class="btn btn-primary" style="position:relative;">
-                        <i class="fas fa-envelope"></i>
-                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.75em;font-weight:600;">
-                            <?= $unreadMessagesCount ?>
-                        </span>
-                        New Messages
-                    </a>
-                <?php endif; ?>
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <div class="d-flex gap-2">
+                    <?php if ($unreadMessagesCount > 0): ?>
+                        <a href="messages.php" class="btn btn-primary" style="position:relative;">
+                            <i class="fas fa-envelope"></i>
+                            <span class="badge"><?= $unreadMessagesCount ?></span>
+                            Messages
+                        </a>
+                    <?php endif; ?>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                </div>
             </header>
+            
             <div class="content">
-
-                <!-- Quick Links Section -->
+                <!-- Quick Links -->
                 <div class="quick-links">
-                    <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                    <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
+                    <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Users</span></a>
+                    <a href="courses.php" class="quick-link"><i class="fas fa-book"></i><span>Courses</span></a>
+                    <a href="enrollments.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Enrollments</span></a>
                     <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
-                    <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                    <a href="events.php" class="quick-link"><i class="fas fa-calendar-plus"></i><span>Add Event</span></a>
+                    <a href="tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Tickets</span></a>
+                    <a href="reports.php" class="quick-link"><i class="fas fa-chart-bar"></i><span>Reports</span></a>
+                    <a href="settings.php" class="quick-link"><i class="fas fa-cog"></i><span>Settings</span></a>
                 </div>
 
-                <!-- Widgets Section -->
+                <!-- Widget Grid -->
                 <div class="widget-grid">
                     <?php foreach ($widgets as $widget): ?>
-                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
+                        <div class="dashboard-widget">
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
                             <h3><?= htmlspecialchars($widget['count']) ?></h3>
                             <p><?= htmlspecialchars($widget['title']) ?></p>
@@ -310,301 +466,346 @@
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Chart Sections (All kept intact) -->
-                <div class="dashboard-section">
-                    <h2>Survey Participation</h2>
-                    <div class="chart-container">
-                        <canvas id="surveyParticipationChart" height="300"></canvas>
+                <!-- Chart Row 1 -->
+                <div class="chart-row">
+                    <div class="dashboard-section">
+                        <h2>User Growth</h2>
+                        <div class="chart-container">
+                            <canvas id="userGrowthChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-section">
+                        <h2>Activity Distribution</h2>
+                        <div class="chart-container">
+                            <canvas id="activityDistributionChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <div class="dashboard-section">
-                    <h2>Feedback Ratings</h2>
-                    <div class="chart-container">
-                        <canvas id="feedbackRatingsChart" height="300"></canvas>
+                <!-- Chart Row 2 -->
+                <div class="chart-row">
+                    <div class="dashboard-section">
+                        <h2>Feedback Ratings</h2>
+                        <div class="chart-container">
+                            <canvas id="feedbackRatingsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-section">
+                        <h2>Ticket Status</h2>
+                        <div class="chart-container">
+                            <canvas id="ticketStatusChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <div class="dashboard-section">
-                    <h2>Support Ticket Status</h2>
-                    <div class="chart-container">
-                        <canvas id="ticketStatusChart" height="300"></canvas>
+                <!-- Chart Row 3 -->
+                <div class="chart-row">
+                    <div class="dashboard-section">
+                        <h2>Course Enrollments</h2>
+                        <div class="chart-container">
+                            <canvas id="courseEnrollmentChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-section">
+                        <h2>System Performance</h2>
+                        <div class="chart-container">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
                     </div>
                 </div>
 
-                <!-- All other sections kept exactly as they were -->
+                <!-- Recent Activity -->
                 <div class="dashboard-section">
-                    <h2>System Stats</h2>
-                    <ul>
-                        <li>PHP Version: <?= phpversion() ?></li>
-                        <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
-                        <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
-                        <li>Database Name: <?= htmlspecialchars(DB_NAME ?? 'N/A') ?></li>
-                        <li>Database User: <?= htmlspecialchars(DB_USER ?? 'N/A') ?></li>
-                        <li>Database Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_VERSION) ?? 'N/A') ?></li>
-                        <li>Database Table Count: <?= htmlspecialchars($pdo->query('SHOW TABLES')->rowCount()) ?></li>
-                        <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
-                    </ul>
-                </div>
-
-                <div class="dashboard-section">
-                    <h2>Recent Error Log</h2>
-                    <?php if (!empty($errorLogLines)): ?>
-                        <pre class="error-log"><?= htmlspecialchars(implode("\n", $errorLogLines)) ?></pre>
-                    <?php else: ?>
-                        <p>No recent errors found or error.log not readable.</p>
-                    <?php endif; ?>
-                </div>
-
-                <div class="dashboard-section">
-                    <h2>Recent Activity Log</h2>
-                    <div class="table-container">
-                        <table>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0">Recent Activity</h2>
+                        <a href="activity.php" class="btn btn-sm btn-secondary">View All</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Activity Type</th>
-                                    <th>Description</th>
-                                    <th>IP Address</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($activityLog)): ?>
-                                    <?php foreach ($activityLog as $log): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($log['id']) ?></td>
-                                            <td><?= htmlspecialchars($log['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($log['activity_type']) ?></td>
-                                            <td><?= htmlspecialchars($log['description']) ?></td>
-                                            <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                            <td><?= htmlspecialchars($log['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No recent activity found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="dashboard-section">
-                    <h2>User Activity Logs</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Timestamp</th>
-                                    <th>Action</th>
+                                    <th>User</th>
+                                    <th>Activity</th>
                                     <th>Details</th>
+                                    <th>Time</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($activityLogs)): ?>
-                                    <?php foreach ($activityLogs as $log): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($log['timestamp']) ?></td>
-                                            <td><?= htmlspecialchars($log['action']) ?></td>
-                                            <td><?= htmlspecialchars($log['details']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="3">No activity logs found.</td>
-                                    </tr>
-                                <?php endif; ?>
+                                <?php foreach ($recentData['activity'] as $activity): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($activity['user_id']) ?></td>
+                                    <td><?= htmlspecialchars($activity['activity_type']) ?></td>
+                                    <td><?= htmlspecialchars(substr($activity['description'], 0, 50)) ?>...</td>
+                                    <td><?= htmlspecialchars($activity['created_at']) ?></td>
+                                </tr>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <div class="dashboard-section">
-                    <h2>Recent Feedback</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Message</th>
-                                    <th>Rating</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($feedback)): ?>
-                                    <?php foreach ($feedback as $item): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($item['id']) ?></td>
-                                            <td><?= htmlspecialchars($item['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($item['subject']) ?></td>
-                                            <td><?= htmlspecialchars($item['message']) ?></td>
-                                            <td><?= htmlspecialchars($item['rating']) ?></td>
-                                            <td><?= htmlspecialchars($item['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                <!-- Recent Tickets & Feedback -->
+                <div class="chart-row">
+                    <div class="dashboard-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="mb-0">Recent Tickets</h2>
+                            <a href="tickets.php" class="btn btn-sm btn-secondary">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td colspan="6">No feedback found.</td>
+                                        <th>ID</th>
+                                        <th>Subject</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($recentData['tickets'] as $ticket): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($ticket['id']) ?></td>
+                                        <td><?= htmlspecialchars(substr($ticket['subject'], 0, 30)) ?>...</td>
+                                        <td><span class="badge"><?= htmlspecialchars($ticket['status']) ?></span></td>
+                                        <td><?= htmlspecialchars($ticket['created_at']) ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="dashboard-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="mb-0">Recent Feedback</h2>
+                            <a href="feedback.php" class="btn btn-sm btn-secondary">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Rating</th>
+                                        <th>Comment</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($recentData['feedback'] as $feedback): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($feedback['user_id']) ?></td>
+                                        <td><?= str_repeat('★', $feedback['rating']) . str_repeat('☆', 5 - $feedback['rating']) ?></td>
+                                        <td><?= htmlspecialchars(substr($feedback['message'], 0, 30)) ?>...</td>
+                                        <td><?= htmlspecialchars($feedback['created_at']) ?></td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
+                <!-- System Info -->
                 <div class="dashboard-section">
-                    <h2>Recent Support Tickets</h2>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Subject</th>
-                                    <th>Status</th>
-                                    <th>Priority</th>
-                                    <th>Created At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($tickets)): ?>
-                                    <?php foreach ($tickets as $ticket): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($ticket['id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['user_id']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['subject']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['status']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['priority']) ?></td>
-                                            <td><?= htmlspecialchars($ticket['created_at']) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="6">No tickets found.</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                    <h2>System Information</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>Server</h3>
+                            <ul>
+                                <li>PHP Version: <?= $stats['performance']['php_version'] ?></li>
+                                <li>Server Software: <?= $stats['performance']['server_software'] ?></li>
+                                <li>Server Load: <?= round($stats['performance']['server_load'], 2) ?></li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Database</h3>
+                            <ul>
+                                <li>Version: <?= $stats['performance']['db_version'] ?></li>
+                                <li>Size: <?= $pdo->query("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) as size FROM information_schema.tables WHERE table_schema = DATABASE()")->fetchColumn() ?> MB</li>
+                                <li>Tables: <?= count($stats['tables']) ?></li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <?php include 'includes/footer.php'; ?>
     </div>
+
     <script>
-        // Initialize all charts (kept exactly as they were)
-        document.addEventListener('DOMContentLoaded', function() {
-            // Survey Participation Chart
-            const surveyCtx = document.getElementById('surveyParticipationChart');
-            if (surveyCtx) {
-                new Chart(surveyCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: <?= json_encode(array_keys($surveyStats)) ?>,
-                        datasets: [{
-                            label: 'Responses',
-                            data: <?= json_encode(array_values($surveyStats)) ?>,
-                            backgroundColor: '#3b82f6',
-                            borderWidth: 0
-                        }]
+        // User Growth Chart
+        const userGrowthCtx = document.getElementById('userGrowthChart');
+        if (userGrowthCtx) {
+            const labels = <?= json_encode(array_column($stats['user_growth'], 'date')) ?>;
+            const data = <?= json_encode(array_column($stats['user_growth'], 'count')) ?>;
+            
+            new Chart(userGrowthCtx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'New Users',
+                        data: data,
+                        borderColor: '#5e64ff',
+                        backgroundColor: 'rgba(94, 100, 255, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    display: true,
-                                    drawBorder: false
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
+                    scales: {
+                        y: { beginAtZero: true }
                     }
-                });
-            }
+                }
+            });
+        }
 
-            // Feedback Ratings Chart
-            const feedbackCtx = document.getElementById('feedbackRatingsChart');
-            if (feedbackCtx) {
-                new Chart(feedbackCtx, {
-                    type: 'pie',
-                    data: {
-                        labels: <?= json_encode(array_keys($feedbackRatings)) ?>,
-                        datasets: [{
-                            data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                            backgroundColor: [
-                                '#3b82f6',
-                                '#f59e42',
-                                '#f1c40f',
-                                '#27ae60',
-                                '#e74c3c'
-                            ],
-                            borderWidth: 0
-                        }]
+        // Activity Distribution Chart
+        const activityDistCtx = document.getElementById('activityDistributionChart');
+        if (activityDistCtx) {
+            const labels = <?= json_encode(array_column($stats['activity_trends'], 'activity_type')) ?>;
+            const data = <?= json_encode(array_column($stats['activity_trends'], 'count')) ?>;
+            
+            new Chart(activityDistCtx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Activities',
+                        data: data,
+                        backgroundColor: '#5e64ff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right'
-                            }
-                        }
+                    scales: {
+                        y: { beginAtZero: true }
                     }
-                });
-            }
+                }
+            });
+        }
 
-            // Support Ticket Status Chart
-            const ticketCtx = document.getElementById('ticketStatusChart');
-            if (ticketCtx) {
-                new Chart(ticketCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: <?= json_encode(array_keys($ticketStatus)) ?>,
-                        datasets: [{
-                            data: <?= json_encode(array_values($ticketStatus)) ?>,
-                            backgroundColor: [
-                                '#3b82f6',
-                                '#e74c3c',
-                                '#f1c40f',
-                                '#27ae60'
-                            ],
-                            borderWidth: 0
-                        }]
+        // Feedback Ratings Chart
+        const feedbackRatingsCtx = document.getElementById('feedbackRatingsChart');
+        if (feedbackRatingsCtx) {
+            const labels = <?= json_encode(array_column($stats['feedback_distribution'], 'rating')) ?>;
+            const data = <?= json_encode(array_column($stats['feedback_distribution'], 'count')) ?>;
+            
+            new Chart(feedbackRatingsCtx, {
+                type: 'pie',
+                data: {
+                    labels: labels.map(r => `${r} Stars`),
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Ticket Status Chart
+        const ticketStatusCtx = document.getElementById('ticketStatusChart');
+        if (ticketStatusCtx) {
+            const labels = <?= json_encode(array_column($stats['ticket_status'], 'status')) ?>;
+            const data = <?= json_encode(array_column($stats['ticket_status'], 'count')) ?>;
+            
+            new Chart(ticketStatusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#5e64ff', '#ff6384', '#ffce56', '#4bc0c0'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Course Enrollment Chart
+        const courseEnrollmentCtx = document.getElementById('courseEnrollmentChart');
+        if (courseEnrollmentCtx) {
+            const labels = <?= json_encode(array_column($stats['course_enrollments'], 'title')) ?>;
+            const data = <?= json_encode(array_column($stats['course_enrollments'], 'enrollments')) ?>;
+            
+            new Chart(courseEnrollmentCtx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Enrollments',
+                        data: data,
+                        backgroundColor: '#5e64ff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right'
-                            }
+                    scales: {
+                        x: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+
+        // Performance Chart
+        const performanceCtx = document.getElementById('performanceChart');
+        if (performanceCtx) {
+            new Chart(performanceCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['CPU Load', 'Memory Usage', 'DB Queries', 'Response Time'],
+                    datasets: [{
+                        label: 'Performance',
+                        data: [0.7, 0.5, 0.8, 0.9],
+                        backgroundColor: 'rgba(94, 100, 255, 0.2)',
+                        borderColor: '#5e64ff',
+                        pointBackgroundColor: '#5e64ff',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { display: true },
+                            suggestedMin: 0,
+                            suggestedMax: 1
                         }
                     }
-                });
-            }
-        });
+                }
+            });
+        }
     </script>
 </body>
 </html>
 <?php
-// Flush output buffer
 ob_end_flush();
 ?>
