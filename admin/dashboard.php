@@ -47,24 +47,6 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
             "query" => "SELECT COUNT(*) FROM users WHERE status = 'inactive'"
         ],
         [
-            "title" => "Total Courses",
-            "icon" => "fa-book",
-            "color" => "purple",
-            "query" => "SELECT COUNT(*) FROM courses"
-        ],
-        [
-            "title" => "Enrolled Students",
-            "icon" => "fa-user-graduate",
-            "color" => "orange",
-            "query" => "SELECT COUNT(*) FROM course_enrollments"
-        ],
-        [
-            "title" => "New Feedback",
-            "icon" => "fa-comments",
-            "color" => "teal",
-            "query" => "SELECT COUNT(*) FROM feedback WHERE is_read = 0"
-        ],
-        [
             "title" => "Open Tickets",
             "icon" => "fa-ticket-alt",
             "color" => "red",
@@ -87,8 +69,7 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
             "icon" => "fa-check-circle",
             "color" => "green",
             "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
-        ],
-        // Ensure no duplicate widgets are added
+        ]
     ];
 } else {
     error_log("Dashboard configuration file not found or unreadable.");
