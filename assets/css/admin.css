@@ -113,12 +113,12 @@ body, html {
 }
 
 table {
-    width: 80%; /* Reduce table width */
-    margin: 0 auto; /* Center the table */
+    width: 100%;
     border-collapse: collapse;
     background: #fff;
     border-radius: 10px;
     overflow: hidden;
+    margin-bottom: 0;
     font-size: 1em;
     box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
 }
@@ -133,29 +133,17 @@ th {
     background: #f7fafd;
     color: #3498db;
     font-weight: 700;
-    text-align: center; /* Center align table headers */
+    font-size: 1.05em;
+    border-bottom: 2px solid #eaf6ff;
 }
 
-@media (max-width: 768px) {
-    table {
-        width: 100%; /* Make table take full width on smaller screens */
-        font-size: 0.9rem; /* Reduce font size for smaller screens */
-    }
-
-    th, td {
-        padding: 10px; /* Reduce padding for smaller screens */
-        word-wrap: break-word; /* Allow text to wrap within cells */
-    }
+tr:last-child td {
+    border-bottom: none;
 }
 
-@media (max-width: 480px) {
-    table {
-        font-size: 0.8rem; /* Further reduce font size for very small screens */
-    }
-
-    th, td {
-        padding: 8px; /* Further reduce padding */
-    }
+tr:hover {
+    background: #f4f8fb;
+    transition: background 0.2s;
 }
 
 @media (max-width: 900px) {
@@ -170,32 +158,6 @@ th {
     .widget-grid {
         grid-template-columns: 1fr 1fr;
         gap: 20px;
-    }
-    .admin-main, .container, .content {
-        margin-left: 0 !important;
-        padding: 10px 5px 80px !important;
-    }
-    .form-section, .table-section, .card, .dashboard-section {
-        padding: 12px !important;
-        margin: 10px 0 !important;
-    }
-    .widget-grid, .form-grid, .meta-grid, .grid-2, .grid-3 {
-        grid-template-columns: 1fr !important;
-        gap: 10px !important;
-    }
-    .admin-header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 8px !important;
-    }
-    .table-responsive, .response-table, .users-table, .audit-log-table, .report-table, .table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-    }
-    th, td {
-        white-space: nowrap;
-        font-size: 0.95em;
     }
 }
 
@@ -213,35 +175,6 @@ th {
     }
     th, td {
         padding: 15px 6px 6px;
-    }
-    .admin-main, .container, .content {
-        padding: 5px 2px 80px !important;
-    }
-    .form-section, .table-section, .card, .dashboard-section {
-        padding: 8px !important;
-        margin: 6px 0 !important;
-    }
-    .form-actions, .header-actions {
-        flex-direction: column !important;
-        gap: 10px !important;
-        align-items: stretch !important;
-    }
-    .admin-header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 8px !important;
-    }
-    .page-title, h1, h2 {
-        font-size: 1.2rem !important;
-    }
-    .table-responsive, .response-table, .users-table, .audit-log-table, .report-table, .table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-    }
-    th, td {
-        white-space: nowrap;
-        font-size: 0.95em;
     }
 }
 /* Survey Results Specific Styles */
