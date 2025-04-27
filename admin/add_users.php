@@ -270,6 +270,50 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <link rel="stylesheet" href="../assets/css/add_users.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
+        .users-table {
+            width: 80%; /* Reduce table width */
+            margin: 0 auto; /* Center the table */
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .users-table th, .users-table td {
+            padding: 12px; /* Adjust padding */
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 0.9rem; /* Adjust font size */
+        }
+
+        .users-table th {
+            background: #4e79a7;
+            color: white;
+            text-align: center; /* Center align table headers */
+        }
+
+        @media (max-width: 768px) {
+            .users-table {
+                width: 100%; /* Make table take full width on smaller screens */
+                font-size: 0.8rem; /* Reduce font size for smaller screens */
+            }
+
+            .users-table th, .users-table td {
+                padding: 8px; /* Reduce padding for smaller screens */
+                word-wrap: break-word; /* Allow text to wrap within cells */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .users-table {
+                font-size: 0.75rem; /* Further reduce font size for very small screens */
+            }
+
+            .users-table th, .users-table td {
+                padding: 6px; /* Further reduce padding */
+            }
+        }
+    </style>
 </head>
 
 <body>
