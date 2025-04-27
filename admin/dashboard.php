@@ -224,6 +224,37 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
     <script src="../assets/js/jquery.min.js"></script>
+    <style>
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2rem;
+            margin: 0 auto; /* Center the grid horizontally */
+        }
+
+        .dashboard-widget {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+            position: relative;
+            margin: 0 auto; /* Center the widget horizontally */
+        }
+
+        @media (max-width: 600px) {
+            .widget-grid {
+                grid-template-columns: 1fr; /* Stack widgets vertically on small screens */
+                gap: 1rem; /* Reduce gap between widgets */
+            }
+
+            .dashboard-widget {
+                width: 95%; /* Adjust widget width for small screens */
+                margin: 0 auto; /* Ensure proper alignment on small screens */
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-dashboard">
