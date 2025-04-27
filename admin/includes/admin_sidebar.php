@@ -34,8 +34,8 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     width: 90px;
 }
 .admin-sidebar .sidebar-header {
-    padding: 1.2rem 1.5rem;
-    font-size: 1.2rem;
+    padding: 1rem 1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #fff;
     background: #1976d2;
