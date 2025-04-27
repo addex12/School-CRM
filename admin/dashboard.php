@@ -380,6 +380,7 @@ try {
         }
         @media (max-width: 600px) {
             .admin-main {
+                flex: 1;
                 padding: 10px 2px 80px;
             }
             .dashboard-widget, .dashboard-section {
@@ -474,6 +475,10 @@ try {
                         <li>PHP Version: <?= phpversion() ?></li>
                         <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
                         <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
+                        <li>Database Name: <?= htmlspecialchars(DB_NAME ?? 'N/A') ?></li>
+                        <li>Database User: <?= htmlspecialchars(DB_USER ?? 'N/A') ?></li>
+                        <li>Database Version: <?= htmlspecialchars($pdo->getAttribute(PDO::ATTR_SERVER_VERSION) ?? 'N/A') ?></li>
+                        <li>Database Table Count: <?= htmlspecialchars($pdo->query('SHOW TABLES')->rowCount()) ?></li>
                         <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
                     </ul>
                 </div>
