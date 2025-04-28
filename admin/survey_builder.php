@@ -365,6 +365,13 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             Activate survey
                         </label>
                     </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="is_public"
+                                <?= isset($survey['is_public']) && $survey['is_public'] ? 'checked' : '' ?>>
+                            Make survey public
+                        </label>
+                    </div>
                     <h3 style="color:#215967;">Survey Questions</h3>
                     <div id="questions-container">
                         <?php if (isset($survey['questions'])): ?>
