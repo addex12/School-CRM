@@ -165,7 +165,7 @@ try {
                             <p><?= htmlspecialchars($survey['description']) ?></p>
 
                             <div class="survey-meta">
-                                <p><strong>Target Roles:</strong> <?= htmlspecialchars($survey['target_roles'] ? $survey['target_roles'] : 'All') ?></p>
+                                <p><strong>Target Roles:</strong> <?= htmlspecialchars($survey['target_roles'] ?? $survey['target_roles'] : '') ?></p>
                                 <p><strong>Deadline:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
                                 <p><strong>Time Left:</strong> <span class="time-left"><?= $daysLeft ?> days</span></p>
                             </div>
@@ -178,7 +178,7 @@ try {
                                 <div class="survey-status status-pending">
                                     <i class="fas fa-exclamation-circle"></i> Pending
                                 </div>
-                                <a href="survey_response.php?id=<?= $survey['id'] ?>&is_public=1" class="erpnext-btn"><?= $survey['target_roles'] ? 0 : 1 ?></a>
+                                <a href="survey_response.php?id=<?= $survey['id'] ?> class="erpnext-btn"><?= $survey['target_roles'] ? 0 : 1 ?></a>
                                     Take Survey
                                 </a>
                             <?php endif; ?>
