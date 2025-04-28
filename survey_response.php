@@ -8,6 +8,9 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/config.php';
 
+// Get the survey ID from the query parameters
+$survey_id = $_GET['id'] ?? 0;
+
 // Check if the database connection is successful
 if (!$db) {
     die("Database connection failed.");
