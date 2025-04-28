@@ -22,7 +22,9 @@ try {
     $user = [];
 }
 
-if (!$user) {
+// Ensure `$user` is populated with default values if the query returns no results
+if (!$user || !is_array($user)) {
+    error_log("User data not found for user_id: " . $_SESSION['user_id']);
     $user = [
         'first_name' => '',
         'last_name' => '',
