@@ -6,6 +6,7 @@ error_reporting(E_ALL);
 
 // Include the database connection file
 require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/config.php';
 
 // Check if the database connection is successful
 if (!$db) {
