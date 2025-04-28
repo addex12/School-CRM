@@ -14,7 +14,7 @@ $pageTitle = "Profile";
 
 // Fetch user profile data
 try {
-    $stmt = $pdo->prepare("SELECT username, email, first_name, last_name, role_id FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT username, email, first_name, last_name, role_id, profile_picture FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -37,6 +37,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Error updating profile: " . $e->getMessage());
         $_SESSION['error'] = "Failed to update profile. Please try again later.";
     }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) {
+    $uploadDir = '../uploads/profile_pictures/';
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $file = $_FILES['profile_picture'];
+    $fileName = basename($file['name']);
+    $targetFilePath = $uploadDir . $fileName;
+    $fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
+
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif'];
+    if (in_array($fileType, $allowedTypes)) {
+        if (move_uploaded_file($file['tmp_name'], $targetFilePath)) {
+            try {
+                $stmt = $pdo->prepare("UPDATE users SET profile_picture = ? WHERE id = ?");
+                $stmt->execute([$fileName, $_SESSION['user_id']]);
+                $_SESSION['success'] = "Profile picture updated successfully.";
+            } catch (PDOException $e) {
+                error_log("Error updating profile picture: " . $e->getMessage());
+                $_SESSION['error'] = "Failed to update profile picture. Please try again later.";
+            }
+        } else {
+            $_SESSION['error'] = "Failed to upload the profile picture. Please try again.";
+        }
+    } else {
+        $_SESSION['error'] = "Invalid file type. Only JPG, JPEG, PNG, and GIF files are allowed.";
+    }
+    header("Location: profile.php");
+    exit();
 }
 ?>
 
@@ -118,7 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <?php include '../includes/header.php'; ?>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
@@ -136,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <?php unset($_SESSION['error']); ?>
                 <?php endif; ?>
-                <form method="POST" action="">
+                <form method="POST" action="" enctype="multipart/form-data">
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" class="form-control" value="<?= htmlspecialchars($user['username'] ?? '') ?>" disabled>
@@ -152,6 +183,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" class="form-control" value="<?= htmlspecialchars($user['email'] ?? '') ?>">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile_picture">Profile Picture</label>
+                        <input type="file" id="profile_picture" name="profile_picture" class="form-control">
+                        <?php if (!empty($user['profile_picture'])): ?>
+                            <div style="margin-top: 1rem;">
+                                <img src="../uploads/profile_pictures/<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <button type="submit" class="btn btn-primary">Update Profile</button>
                 </form>
