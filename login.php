@@ -112,6 +112,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } else {
             $error = "Invalid username or password.";
+            // Clear any existing session data to prevent confusion
+            session_unset();
+            session_destroy();
         }
     } catch (PDOException $e) {
         error_log("Login error: " . $e->getMessage());
@@ -248,15 +251,6 @@ try {
         
         .logo img {
             height: 50px;
-        }
-
-        .logo h1 {
-            font-size: 2rem; /* Increase font size */
-            font-weight: 700; /* Make it bold */
-            font-family: 'Inter', sans-serif; /* Use a clean font */
-            color: var(--primary); /* Use the primary color */
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
-            margin: 0; /* Remove extra margin */
         }
         
         .welcome-text {
