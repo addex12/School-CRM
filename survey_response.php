@@ -13,42 +13,27 @@ require_once __DIR__ . '/includes/config.php';
 
 // Get the survey ID from the query parameters
 $survey_id = $_GET['id'] ?? 0;
-$is_public = $_GET['is_public'] ?? 0;
 
 // Validate survey access and get survey details
 try {
-    $role_id = $_SESSION['role_id'] ?? null; // Handle cases where role_id is not set
     $stmt = $pdo->prepare("
         SELECT s.id, s.title, s.description, s.is_anonymous,
                sf.id AS field_id, sf.field_type, sf.field_label, 
                sf.field_options, sf.is_required, sf.display_order
         FROM surveys s
         JOIN survey_fields sf ON s.id = sf.survey_id
-        LEFT JOIN survey_roles sr ON s.id = sr.survey_id
-        WHERE s.id = ? 
-          AND (s.is_public = 1 OR sr.role_id = ?)
+        WHERE s.id = :survey_id
+          AND s.is_public = 1
           AND s.is_active = 1
-          AND s.starts_at <= NOW() 
-          AND s.ends_at >= NOW()
+          AND (s.starts_at IS NULL OR s.starts_at <= NOW())
+          AND (s.ends_at IS NULL OR s.ends_at >= NOW())
         ORDER BY sf.display_order
     ");
-    $stmt->execute([$survey_id, $is_public ? null : $role_id]);
+    $stmt->execute([':survey_id' => $survey_id]);
     $survey_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    if (empty($survey_data)) {
-        // Debugging: Check if the survey exists and is public
-        $debug_stmt = $pdo->prepare("
-            SELECT * FROM surveys 
-            WHERE id = :survey_id
-        ");
-        $debug_stmt->execute([':survey_id' => $survey_id]);
-        $debug_survey = $debug_stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($debug_survey) {
-            die("Survey exists but does not meet the conditions: " . json_encode($debug_survey));
-        } else {
-            die("Survey not found.");
-        }
+    if (empty($survey_data)) {
+        die("Survey not found or not available.");
     }
 } catch (Exception $e) {
     error_log("Error validating survey access: " . $e->getMessage());
@@ -58,7 +43,7 @@ try {
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $db->beginTransaction();
+        $pdo->beginTransaction();
 
         // Collect all answers for JSON storage
         $answers = [];
@@ -75,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Insert survey response with JSON answers
-        $stmt = $db->prepare("
+        $stmt = $pdo->prepare("
             INSERT INTO survey_responses 
             (survey_id, user_id, submitted_at, answers) 
             VALUES (:survey_id, NULL, NOW(), :answers)
@@ -84,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':survey_id' => $survey_id,
             ':answers' => json_encode($answers, JSON_UNESCAPED_UNICODE)
         ]);
-        $response_id = $db->lastInsertId();
+        $response_id = $pdo->lastInsertId();
 
         // Insert individual answers into response_data
         foreach ($survey_data as $question) {
@@ -94,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $values = is_array($value) ? $value : [$value];
                 foreach ($values as $val) {
                     if ($val !== "" && $val !== null) {
-                        $stmt = $db->prepare("
+                        $stmt = $pdo->prepare("
                             INSERT INTO response_data 
                             (response_id, survey_id, field_id, field_value) 
                             VALUES (:response_id, :survey_id, :field_id, :field_value)
@@ -110,12 +95,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $db->commit();
+        $pdo->commit();
         echo "Thank you for completing the survey!";
         exit();
 
     } catch (Exception $e) {
-        $db->rollBack();
+        $pdo->rollBack();
         error_log("Error saving survey response: " . $e->getMessage());
         die("An error occurred while submitting the survey.");
     }
