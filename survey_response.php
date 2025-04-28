@@ -141,9 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        // Redirect to a thank you page or display a success message
-        echo "Thank you for completing the survey!";
-
+        // Store the success message in the sessionthe survey!";
+        $_SESSION['success'] = "Thank you for completing the survey!";
         header("Location: survey.php");
         exit();
 
@@ -278,7 +277,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php break; 
                         case 'textarea': ?>
                             <textarea name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?>></textarea>
-                            <?php break; 
+                            <?php break;  
                         case 'radio': ?>
                             <ul class="options-list">
                                 <?php foreach ($question['options'] as $option): ?>
@@ -320,4 +319,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </body>
 </html>
+
 <?php require_once __DIR__ . '/footer.php'; ?>
