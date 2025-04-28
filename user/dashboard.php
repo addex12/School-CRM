@@ -65,7 +65,7 @@ try {
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         ORDER BY s.ends_at ASC
-        LIMIT 3
+        LIMIT 10
     ");
     $stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]);
     $recentSurveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
