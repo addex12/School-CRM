@@ -62,69 +62,125 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" />
     <style>
-    .response-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .response-table th, .response-table td {
-        padding: 8px 12px;
-        border-bottom: 1px solid #eee;
-        text-align: left;
-    }
-    .response-table th {
-        background: #f8f9fa;
-        font-weight: 600;
-    }
-    .response-table tr:hover {
-        background-color: #f8f9fa;
-    }
-    .filter-form {
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-    }
-    .btn {
-        padding: 4px 8px;
-        border-radius: 3px;
-        text-decoration: none;
-        color: white;
-        background-color: #007bff;
-        border: none;
-        cursor: pointer;
-        font-size: 0.9rem;
-    }
-    .btn-secondary {
-        background-color: #6c757d;
-    }
-    .pagination {
-        display: flex;
-        padding-left: 0;
-        list-style: none;
-        border-radius: 0.25rem;
-    }
-    .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-    }
-    .page-link {
-        position: relative;
-        display: block;
-        padding: 0.4rem 0.6rem;
-        margin-left: -1px;
-        line-height: 1.25;
-        color: #007bff;
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        text-decoration: none;
-        font-size: 0.9rem;
-    }
-    .page-link:hover {
-        background-color: #e9ecef;
-        color: #007bff;
-    }
+        .response-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .response-table th, .response-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+        .response-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .response-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        .filter-form {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .erpnext-btn {
+            background: #007bfc;
+            color: #fff;
+            border: 1px solid #007bfc;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .erpnext-btn:hover {
+            background: #0056b3;
+        }
+        .erpnext-btn-secondary {
+            background: #6c757d;
+            color: #fff;
+            border: 1px solid #6c757d;
+        }
+        .erpnext-btn-secondary:hover {
+            background: #5a6268;
+        }
+        .pagination {
+            display: flex;
+            padding-left: 0;
+            list-style: none;
+            border-radius: 0.25rem;
+        }
+        .page-item.active .page-link {
+            background-color: #007bfc;
+            border-color: #007bfc;
+            color: white;
+        }
+        .page-link {
+            position: relative;
+            display: block;
+            padding: 0.4rem 0.6rem;
+            margin-left: -1px;
+            line-height: 1.25;
+            color: #007bfc;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .page-link:hover {
+            background-color: #e9ecef;
+            color: #007bfc;
+        }
+        .card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .card-body {
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+        .btn-outline-primary {
+            color: #007bfc;
+            border: 1px solid #007bfc;
+        }
+        .btn-outline-primary:hover {
+            background: #007bfc;
+            color: #fff;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #fff;
+            border: 1px solid #ffc107;
+        }
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: #fff;
+            border: 1px solid #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -150,49 +206,52 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
                             </select>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn">Search</button>
+                            <button type="submit" class="erpnext-btn">Search</button>
                         </div>
                     </div>
                 </form>
             </div>
 
             <?php if ($total_responses > 0): ?>
-                <div class="table-responsive">
-                    <table class="response-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Survey</th>
-                                <th>Respondent</th>
-                                <th>Submitted At</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($responses as $index => $response): ?>
+                <div class="card">
+                    <div class="card-header">Survey Responses</div>
+                    <div class="card-body">
+                        <table class="response-table">
+                            <thead>
                                 <tr>
-                                    <td><?= $index + 1 + $offset ?></td>
-                                    <td><?= htmlspecialchars($response['survey_title']) ?></td>
-                                    <td>Anonymous</td>
-                                    <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
-                                    <td>
-                                        <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-eye"></i> View
-                                        </a>
-                                        <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-primary">
-                                            <i class="bi bi-arrow-left"></i> Results
-                                        </a>
-                                        <a href="edit_survey.php?id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-warning">
-                                            <i class="bi bi-pencil"></i> Edit
-                                        </a>
-                                        <a href="delete_survey.php?id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this survey?');">
-                                            <i class="bi bi-trash"></i> Delete
-                                        </a>
-                                    </td>
+                                    <th>#</th>
+                                    <th>Survey</th>
+                                    <th>Respondent</th>
+                                    <th>Submitted At</th>
+                                    <th>Actions</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($responses as $index => $response): ?>
+                                    <tr>
+                                        <td><?= $index + 1 + $offset ?></td>
+                                        <td><?= htmlspecialchars($response['survey_title']) ?></td>
+                                        <td>Anonymous</td>
+                                        <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                                        <td>
+                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i> View
+                                            </a>
+                                            <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-arrow-left"></i> Results
+                                            </a>
+                                            <a href="edit_survey.php?id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-warning">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </a>
+                                            <a href="delete_survey.php?id=<?= $response['survey_id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this survey?');">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Pagination -->
