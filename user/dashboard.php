@@ -59,10 +59,9 @@ try {
                (SELECT COUNT(*) FROM survey_responses r 
                 WHERE r.survey_id = s.id AND r.user_id = ?) as completed
         FROM surveys s
-        JOIN survey_roles sr ON s.id = sr.survey_id
-        WHERE sr.role_id = ?
+        LEFT JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE (sr.role_id = ? OR s.is_public = 1)
           AND s.is_active = 1
-          AND s.is_public = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         ORDER BY s.ends_at ASC
