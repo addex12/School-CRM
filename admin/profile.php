@@ -216,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
                     <?php if (!empty($user['profile_picture'])): ?>
                         <img src="../uploads/profile_pictures/<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile Picture">
                     <?php else: ?>
-                        <img src="../assets/images/default-profile.png" alt="Default Profile Picture">
+                        <img src="../assets/images/default.png" alt="Default Profile Picture">
                     <?php endif; ?>
                     <h1><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h1>
                 </div>
