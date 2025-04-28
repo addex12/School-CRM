@@ -178,7 +178,7 @@ try {
                                 <div class="survey-status status-pending">
                                     <i class="fas fa-exclamation-circle"></i> Pending
                                 </div>
-                                <a href="survey_response.php?id=<?= $survey['id'] ?> class="erpnext-btn"><?= $survey['target_roles'] ? 0 : 1 ?></a>
+                                <a href="survey_response.php?id=<?= $survey['id'] ?>&is_public=<?= $survey['target_roles'] ? 0 : 1 ?>" class="erpnext-btn">
                                     Take Survey
                                 </a>
                             <?php endif; ?>
