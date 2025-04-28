@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $pdo->rollBack();
         error_log("Error saving survey response: " . $e->getMessage());
-        die("An error occurred while submitting the survey. Please try again later.");
+        die("An error occurred while submitting the survey. Please try again later. Debug Info: " . $e->getMessage());
     }
 }
 
