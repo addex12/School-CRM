@@ -8,7 +8,7 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/includes/db.php';
 
 // Check if the database connection is successful
-if (!$conn) {
+if (!$db) {
     die("Database connection failed.");
 }
 
