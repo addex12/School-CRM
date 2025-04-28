@@ -1,4 +1,6 @@
 <?php
+ob_start(); // Start output buffering
+
 // Enable error reporting for debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -141,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo->commit();
-        // Store the success message in the sessionthe survey!";
+        // Store the success message in the session
         $_SESSION['success'] = "Thank you for completing the survey!";
         header("Location: survey.php");
         exit();
@@ -320,4 +322,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 </html>
 
-<?php require_once __DIR__ . '/footer.php'; ?>
+<?php require_once __DIR__ . '/footer.php';
+ob_end_flush(); // Flush the output buffer
+?>
