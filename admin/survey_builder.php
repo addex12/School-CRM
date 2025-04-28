@@ -74,6 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_POST['required'] ?? []
     );
 
+    if (isset($_POST['is_public'])) {
+        $survey_data['is_public'] = 1;
+    } else {
+        $survey_data['is_public'] = 0;
+    }
+
     try {
         $pdo->beginTransaction();
         
