@@ -4,9 +4,21 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Start the session
+session_start();
+
 // Include the database connection file
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/public_header.php';
+
+// Display the success message if it exists
+if (isset($_SESSION['success'])): ?>
+    <div class="alert alert-success" style="margin: 20px auto; max-width: 800px; padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
+        <?= htmlspecialchars($_SESSION['success']); ?>
+    </div>
+    <?php unset($_SESSION['success']); ?>
+<?php endif;
+
 // Fetch all public surveys
 try {
     $stmt = $pdo->prepare("
@@ -78,13 +90,6 @@ try {
     </style>
 </head>
 <body>
-    <?php if (isset($_SESSION['success'])): ?>
-        <div class="alert alert-success" style="margin: 20px auto; max-width: 800px; padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
-            <?= htmlspecialchars($_SESSION['success']); ?>
-        </div>
-        <?php unset($_SESSION['success']); ?>
-    <?php endif; ?>
-
     <div class="survey-list-container">
         <h1>Available Surveys</h1>
         <?php if (!empty($surveys)): ?>
