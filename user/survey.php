@@ -24,6 +24,7 @@ try {
         JOIN roles r ON sr.role_id = r.id
         WHERE sr.role_id = ? 
           AND s.is_active = 1
+          OR s.is_public = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         GROUP BY s.id
