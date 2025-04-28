@@ -418,6 +418,11 @@ try {
                         </span>
                         New Messages
                     </a>
+                    <h1 style="margin:0;">Admin Dashboard</h1>
+                <div class="profile-menu" style="position: relative;">
+                    <a href="profile.php" class="erpnext-btn btn-secondary" style="position:relative;">
+                        <i class="fas fa-user-circle"></i> My Profile
+                    </a>
                 <?php endif; ?>
             </header>
             <div class="content">
