@@ -5,7 +5,9 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Include the database connection file
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . 'includes/auth.php';
+require_once __DIR__ . 'includes/config.php';
+require_once __DIR__ . 'includes/db.php';
 
 // Check if the database connection is successful
 if (!$conn) {
