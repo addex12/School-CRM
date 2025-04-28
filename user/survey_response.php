@@ -11,6 +11,7 @@ require_once '../includes/auth.php';
 requireLogin();
 
 $survey_id = $_GET['id'] ?? 0;
+$is_public = $_GET['is_public'] ?? 0;
 
 // Validate survey access and get survey details
 try {
@@ -22,13 +23,13 @@ try {
         JOIN survey_fields sf ON s.id = sf.survey_id
         LEFT JOIN survey_roles sr ON s.id = sr.survey_id
         WHERE s.id = ? 
-          AND (s.is_public = 1 OR sr.role_id is NULL)
+          AND (s.is_public = 1 OR sr.role_id = ?)
           AND s.is_active = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         ORDER BY sf.display_order
     ");
-    $stmt->execute([$survey_id, $_SESSION['role_id'] ?? null]);
+    $stmt->execute([$survey_id, $is_public ? null : $_SESSION['role_id']]);
     $survey_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     if (empty($survey_data)) {
@@ -42,7 +43,7 @@ try {
         $stmt = $pdo->prepare("
             SELECT COUNT(*) 
             FROM survey_responses 
-            WHERE survey_id = ? AND user_id = ? OR (is_public = 1 AND role_id is NULL)
+            WHERE survey_id = ? AND user_id = ?
         ");
         $stmt->execute([$survey_id, $_SESSION['user_id']]);
         if ($stmt->fetchColumn() > 0) {
