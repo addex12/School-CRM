@@ -21,20 +21,15 @@ try {
                sf.field_options, sf.is_required, sf.display_order
         FROM surveys s
         JOIN survey_fields sf ON s.id = sf.survey_id
-        WHERE s.id = ? 
+        WHERE s.id = :survey_id
           AND s.is_public = 1
           AND s.is_active = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         ORDER BY sf.display_order
     ");
-    if (!$stmt) {
-        throw new Exception("Failed to prepare statement: " . $conn->error);
-    }
-    $stmt->bind_param("i", $survey_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $survey_data = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->execute([':survey_id' => $survey_id]);
+    $survey_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($survey_data)) {
         die("Survey not found or not available.");
@@ -47,7 +42,7 @@ try {
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $conn->begin_transaction();
+        $db->beginTransaction();
 
         // Collect all answers for JSON storage
         $answers = [];
@@ -64,15 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Insert survey response with JSON answers
-        $stmt = $conn->prepare("
+        $stmt = $db->prepare("
             INSERT INTO survey_responses 
             (survey_id, user_id, submitted_at, answers) 
-            VALUES (?, NULL, NOW(), ?)
+            VALUES (:survey_id, NULL, NOW(), :answers)
         ");
-        $json_answers = json_encode($answers, JSON_UNESCAPED_UNICODE);
-        $stmt->bind_param("is", $survey_id, $json_answers);
-        $stmt->execute();
-        $response_id = $conn->insert_id;
+        $stmt->execute([
+            ':survey_id' => $survey_id,
+            ':answers' => json_encode($answers, JSON_UNESCAPED_UNICODE)
+        ]);
+        $response_id = $db->lastInsertId();
 
         // Insert individual answers into response_data
         foreach ($survey_data as $question) {
@@ -82,24 +78,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $values = is_array($value) ? $value : [$value];
                 foreach ($values as $val) {
                     if ($val !== "" && $val !== null) {
-                        $stmt = $conn->prepare("
+                        $stmt = $db->prepare("
                             INSERT INTO response_data 
                             (response_id, survey_id, field_id, field_value) 
-                            VALUES (?, ?, ?, ?)
+                            VALUES (:response_id, :survey_id, :field_id, :field_value)
                         ");
-                        $stmt->bind_param("iiis", $response_id, $survey_id, $field_id, $val);
-                        $stmt->execute();
+                        $stmt->execute([
+                            ':response_id' => $response_id,
+                            ':survey_id' => $survey_id,
+                            ':field_id' => $field_id,
+                            ':field_value' => $val
+                        ]);
                     }
                 }
             }
         }
 
-        $conn->commit();
+        $db->commit();
         echo "Thank you for completing the survey!";
         exit();
 
     } catch (Exception $e) {
-        $conn->rollback();
+        $db->rollBack();
         error_log("Error saving survey response: " . $e->getMessage());
         die("An error occurred while submitting the survey.");
     }
