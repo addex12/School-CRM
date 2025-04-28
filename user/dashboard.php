@@ -274,6 +274,9 @@ try {
                     <h3>Pending Surveys</h3>
                     <div class="stat-value"><?= $pendingSurveys ?></div>
                     <p>Surveys awaiting your response</p>
+                    <a href="survey_response.php?id=<?= $survey['id'] ?>" class="erpnext-btn">
+                                    Take Survey
+                                </a>
                 </div>
             </div>
             <div class="quick-actions">
@@ -312,9 +315,7 @@ try {
                             <?php else: ?>
                                 <div class="survey-status status-pending">
                                     <i class="fas fa-exclamation-circle"></i> Pending
-                                    <a href="survey_response.php?id=<?= $survey['id'] ?>" class="erpnext-btn">
-                                    Take Survey
-                                </a>
+
                                 </div>
 
                             <?php endif; ?>
