@@ -213,10 +213,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
         <div class="admin-main">
             <div class="profile-container">
                 <div class="profile-header">
-                    <?php if (!empty($user['avatar'])): ?>
+                    <?php if (!empty($user['avatar']) && file_exists("../uploads/profile_pictures/" . $user['avatar'])): ?>
                         <img src="../uploads/profile_pictures/<?= htmlspecialchars($user['avatar']) ?>" alt="Profile Picture">
                     <?php else: ?>
-                        <img src="../assets/images/default.png" alt="Default Profile Picture">
+                        <img src="../assets/images/default-profile.png" alt="Default Profile Picture">
                     <?php endif; ?>
                     <h1><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h1>
                 </div>
