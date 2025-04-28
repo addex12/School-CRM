@@ -49,7 +49,7 @@ if (!function_exists('getCurrentUser')) {
 
 if (!function_exists('requireAdmin')) {
     function requireAdmin() {
-        if (!isset($_SESSION['role_id']) || intval($_SESSION['role_id']) !== 1) {
+        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             $_SESSION['error'] = "Access denied. Admins only.";
             header("Location: ../error.php");
             exit();
