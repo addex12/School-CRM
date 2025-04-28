@@ -22,9 +22,16 @@ try {
     $user = [];
 }
 
-// Ensure `$user` is populated with default values if the query returns no results
+// Debugging: Log the user ID being used for the query
+if (!isset($_SESSION['user_id'])) {
+    error_log("User ID is not set in the session.");
+} else {
+    error_log("Fetching profile data for user_id: " . $_SESSION['user_id']);
+}
+
+// Ensure the query fetches data correctly
 if (!$user || !is_array($user)) {
-    error_log("User data not found for user_id: " . $_SESSION['user_id']);
+    error_log("No user data found for user_id: " . $_SESSION['user_id']);
     $user = [
         'first_name' => '',
         'last_name' => '',
@@ -32,6 +39,8 @@ if (!$user || !is_array($user)) {
         'email' => '',
         'profile_picture' => ''
     ];
+} else {
+    error_log("User data successfully fetched for user_id: " . $_SESSION['user_id']);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
