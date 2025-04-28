@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'category_id' => $_POST['category_id'] ?? null,
         'status' => $_POST['status'] ?? null,
         'is_active' => isset($_POST['is_active']) ? 1 : 0,
+        'is_public' => isset($_POST['is_public']) ? 1 : 0,
         'is_anonymous' => isset($_POST['is_anonymous']) ? 1 : 0,
         'starts_at' => date('Y-m-d H:i:s', strtotime($_POST['starts_at'] ?? '+1 day')),
         'ends_at' => date('Y-m-d H:i:s', strtotime($_POST['ends_at'] ?? '+1 month'))
@@ -155,7 +156,7 @@ function updateSurvey($pdo, $survey_data, $survey_id) {
     $stmt = $pdo->prepare("
         UPDATE surveys 
         SET title = ?, description = ?, category_id = ?, status = ?, 
-            is_active = ?, is_anonymous = ?, starts_at = ?, ends_at = ?
+            is_active = ?, is_public = ?, is_anonymous = ?, starts_at = ?, ends_at = ?
         WHERE id = ?
     ");
     $stmt->execute(array_merge(
