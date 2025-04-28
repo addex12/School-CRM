@@ -48,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
+        // Fix: Ensure `$user` is properly checked and handle cases where the query returns no results
         if ($user && password_verify($password, $user['password'])) {
             if ($user['active'] != 1) {
                 $error = "Your account is not active. Please contact the administrator.";
@@ -96,22 +97,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $token = bin2hex(random_bytes(32));
                     $expiry = time() + (30 * 24 * 60 * 60); // 30 days
                     setcookie('remember_token', $token, $expiry, '/');
-                    
+
                     // Store token in database
                     $pdo->prepare("UPDATE users SET remember_token = ?, token_expiry = ? WHERE id = ?")
                         ->execute([$token, date('Y-m-d H:i:s', $expiry), $user['id']]);
                 }
 
                 // Redirect based on role and active status
-                if ($user['role_id'] == 1 && $user['active'] == 1) { 
+                if ($user['role_id'] == 1 && $user['active'] == 1) {
                     header("Location: " . BASE_URL . "/admin/dashboard.php");
-                } else { 
+                } else {
                     header("Location: " . BASE_URL . "/user/dashboard.php");
                 }
                 exit();
             }
-        } else {
-
+        }
+        
+        // If login fails, set error message 
+        else {
             $error = "Invalid username or password.";
             // Clear any existing session data to prevent confusion
             session_unset();
