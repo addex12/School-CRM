@@ -27,15 +27,27 @@ try {
         WHERE s.id = :survey_id
           AND s.is_public = 1
           AND s.is_active = 1
-          AND s.starts_at <= NOW() 
-          AND s.ends_at >= NOW()
+          AND (s.starts_at IS NULL OR s.starts_at <= NOW())
+          AND (s.ends_at IS NULL OR s.ends_at >= NOW())
         ORDER BY sf.display_order
     ");
     $stmt->execute([':survey_id' => $survey_id]);
     $survey_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($survey_data)) {
-        die("Survey not found or not available.");
+        // Debugging: Check if the survey exists and is public
+        $debug_stmt = $db->prepare("
+            SELECT * FROM surveys 
+            WHERE id = :survey_id
+        ");
+        $debug_stmt->execute([':survey_id' => $survey_id]);
+        $debug_survey = $debug_stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($debug_survey) {
+            die("Survey exists but does not meet the conditions: " . json_encode($debug_survey));
+        } else {
+            die("Survey not found.");
+        }
     }
 } catch (Exception $e) {
     error_log("Error validating survey access: " . $e->getMessage());
