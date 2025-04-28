@@ -1,4 +1,5 @@
 <?php
+ob_start(); // Start output buffering
 // Ensure no output before this point
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
@@ -78,3 +79,65 @@ if (!function_exists('setUserSession')) {
         }
     }
 }
+if (!function_exists('logout')) {
+    function logout() {
+        session_unset();
+        session_destroy();
+        header("Location: ../login.php");
+        exit();
+    }
+}
+if (!function_exists('isCsrfTokenValid')) {
+    function isCsrfTokenValid($token): bool {
+        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    }
+}
+if (!function_exists('generateCsrfToken')) {
+    function generateCsrfToken(): string {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
+    }
+}
+if (!function_exists('validateCsrfToken')) {
+    function validateCsrfToken($token): bool {
+        return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+    }
+}
+if (!function_exists('safe_json_decode')) {
+    function safe_json_decode($json): array {
+        return $json ? json_decode($json, true) : [];
+    }
+}
+if (!function_exists('getCurrentUserRole')) {
+    function getCurrentUserRole(): ?string {
+        return isset($_SESSION['role_id']) ? $_SESSION['role_id'] : null;
+    }
+}
+if (!function_exists('getCurrentUserId')) {
+    function getCurrentUserId(): ?int {
+        return isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+    }
+}
+if (!function_exists('getCurrentUserName')) {
+    function getCurrentUserName(): ?string {
+        return isset($_SESSION['username']) ? $_SESSION['username'] : null;
+    }
+}
+if (!function_exists('getCurrentUserEmail')) {
+    function getCurrentUserEmail(): ?string {
+        return isset($_SESSION['email']) ? $_SESSION['email'] : null;
+    }
+}
+if (!function_exists('getCurrentUserFullName')) {
+    function getCurrentUserFullName(): ?string {
+        return isset($_SESSION['full_name']) ? $_SESSION['full_name'] : null;
+    }
+}
+if (!function_exists('getCurrentUserProfilePicture')) {
+    function getCurrentUserProfilePicture(): ?string {
+        return isset($_SESSION['profile_picture']) ? $_SESSION['profile_picture'] : null;
+    }
+}
+ ob_end_flush(); // End output buffering and flush the output
