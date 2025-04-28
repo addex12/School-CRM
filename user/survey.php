@@ -14,7 +14,21 @@ $pageTitle = "Available Surveys";
 
 try {
     // Get surveys available for the user's role
-    $stmt = $pdo->prepare("\n    SELECT s.id, s.title, s.description, s.starts_at, s.ends_at, \n           GROUP_CONCAT(DISTINCT r.role_name) AS target_roles,\n           (SELECT COUNT(*) FROM survey_responses sr \n            WHERE sr.survey_id = s.id AND sr.user_id = ?) AS responded\n    FROM surveys s\n    LEFT JOIN survey_roles sr ON s.id = sr.survey_id\n    LEFT JOIN roles r ON sr.role_id = r.id\n    WHERE (sr.role_id = ? OR s.is_public = 1)\n      AND s.is_active = 1\n      AND s.starts_at <= NOW() \n      AND s.ends_at >= NOW()\n    GROUP BY s.id\n    ORDER BY s.ends_at ASC\n");
+    $stmt = $pdo->prepare("
+    SELECT s.id, s.title, s.description, s.starts_at, s.ends_at, 
+           GROUP_CONCAT(DISTINCT r.role_name) AS target_roles,
+           (SELECT COUNT(*) FROM survey_responses sr 
+            WHERE sr.survey_id = s.id AND sr.user_id = ?) AS responded
+    FROM surveys s
+    LEFT JOIN survey_roles sr ON s.id = sr.survey_id
+    LEFT JOIN roles r ON sr.role_id = r.id
+    WHERE (sr.role_id = ? OR s.is_public = 1)
+      AND s.is_active = 1
+      AND s.starts_at <= NOW() 
+      AND s.ends_at >= NOW()
+    GROUP BY s.id
+    ORDER BY s.ends_at ASC
+");
     $stmt->execute([$_SESSION['user_id'], $_SESSION['role_id']]);
     $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
