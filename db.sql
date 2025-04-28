@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 27, 2025 at 11:45 PM
+-- Generation Time: Apr 29, 2025 at 04:51 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
--- PHP Version: 8.3.19
+-- PHP Version: 8.3.20
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -294,7 +294,50 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `details`, `ip_address`, `c
 (226, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:00:55'),
 (227, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:11:18'),
 (228, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:18:50'),
-(229, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:30:36');
+(229, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:30:36'),
+(230, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:35:49'),
+(231, 4473, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 14:36:35'),
+(232, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:37:17'),
+(233, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:44:07'),
+(234, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:54:17'),
+(235, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 15:20:26'),
+(236, 4, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 16:55:44'),
+(237, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 16:55:50'),
+(238, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 16:56:41'),
+(239, 4, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 16:57:38'),
+(240, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 16:58:11'),
+(241, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 17:07:24'),
+(242, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 17:50:20'),
+(243, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:06:42'),
+(244, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:27:32'),
+(245, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:43:15'),
+(246, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:46:01'),
+(247, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:55:42'),
+(248, 4473, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:06:38'),
+(249, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:06:52'),
+(250, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:07:15'),
+(251, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:07:18'),
+(252, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:15:59'),
+(253, 4458, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:16:11'),
+(254, 4458, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:52:59'),
+(255, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:53:02'),
+(256, 4473, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:53:06'),
+(257, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:53:10'),
+(258, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:53:28'),
+(259, 4458, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:53:37'),
+(260, 4458, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:58:00'),
+(261, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:58:05'),
+(262, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 20:03:36'),
+(263, 4, 'login', 'User logged in', '196.190.62.58', '2025-04-28 13:17:30'),
+(264, 4472, 'login', 'User logged in', '196.190.62.58', '2025-04-28 13:32:34'),
+(265, 4472, 'logout', 'User logged out', '196.190.62.58', '2025-04-28 14:19:04'),
+(266, 4472, 'login', 'User logged in', '196.190.62.58', '2025-04-28 14:19:08'),
+(267, 4472, 'logout', 'User logged out', '196.190.62.58', '2025-04-28 14:32:16'),
+(268, 4458, 'login', 'User logged in', '196.190.62.58', '2025-04-28 14:32:23'),
+(269, 4472, 'login', 'User logged in', '196.190.62.58', '2025-04-28 17:41:56'),
+(270, 4, 'login', 'User logged in', '196.190.62.58', '2025-04-28 17:48:27'),
+(271, 4472, 'logout', 'User logged out', '196.190.62.58', '2025-04-28 18:07:46'),
+(272, 4458, 'login', 'User logged in', '196.190.62.58', '2025-04-28 18:07:54');
 
 -- --------------------------------------------------------
 
@@ -354,7 +397,9 @@ INSERT INTO `feedback` (`id`, `user_id`, `subject`, `message`, `rating`, `admin_
 (0, 4470, 'Fee Request', 'great', 4, NULL, NULL, 'open', NULL, '2025-04-24 11:41:39'),
 (0, 4472, 'Other', 'Great', 4, NULL, NULL, 'open', NULL, '2025-04-24 23:09:40'),
 (0, 4458, 'Other', 'Good job', 4, NULL, NULL, 'open', NULL, '2025-04-25 00:26:03'),
-(0, 4473, 'Other', 'Great', 5, NULL, NULL, 'open', NULL, '2025-04-26 20:46:21');
+(0, 4473, 'Other', 'Great', 5, NULL, NULL, 'open', NULL, '2025-04-26 20:46:21'),
+(0, 4458, 'Other', 'Other ratings', 1, NULL, NULL, 'open', NULL, '2025-04-27 19:47:23'),
+(0, 4458, 'Other', 'Other ratings', 1, NULL, NULL, 'open', NULL, '2025-04-27 19:49:47');
 
 -- --------------------------------------------------------
 
@@ -471,7 +516,9 @@ INSERT INTO `messages` (`id`, `sender_id`, `receiver_id`, `subject`, `content`, 
 (30, 4, 4472, NULL, 'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn', '2025-04-27 05:35:10', 1, 0, 0, '2025-04-27 05:35:10'),
 (31, 4, 4472, NULL, 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', '2025-04-27 05:35:23', 1, 0, 0, '2025-04-27 05:35:23'),
 (32, 4472, 4, NULL, 'hi', '2025-04-27 08:21:59', 1, 0, 0, '2025-04-27 08:21:59'),
-(33, 4, 4472, NULL, 'Hello', '2025-04-27 22:11:23', 0, 0, 0, '2025-04-27 22:11:23');
+(33, 4, 4472, NULL, 'Hello', '2025-04-27 22:11:23', 0, 0, 0, '2025-04-27 22:11:23'),
+(34, 4472, 5, NULL, 'Hi', '2025-04-28 02:58:06', 0, 0, 0, '2025-04-28 02:58:06'),
+(35, 4473, 4, NULL, 'Hello', '2025-04-28 04:46:18', 0, 0, 0, '2025-04-28 04:46:18');
 
 -- --------------------------------------------------------
 
@@ -578,6 +625,33 @@ CREATE TABLE `response_data` (
   `field_id` int(11) NOT NULL,
   `field_value` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `response_data`
+--
+
+INSERT INTO `response_data` (`id`, `response_id`, `survey_id`, `field_id`, `field_value`) VALUES
+(5, 4, 3, 3, '5'),
+(6, 4, 3, 4, 'Yes'),
+(7, 5, 3, 3, '4'),
+(8, 5, 3, 4, 'No'),
+(9, 6, 5, 18, 'Very Supported'),
+(10, 6, 5, 19, 'Yes'),
+(11, 6, 5, 20, 'Student Engagement'),
+(12, 7, 5, 18, 'Very Supported'),
+(13, 7, 5, 19, 'No response'),
+(14, 7, 5, 20, 'Workload/Time Management'),
+(15, 8, 5, 18, 'Very Unsupported'),
+(16, 8, 5, 19, 'Shdhdjd'),
+(17, 8, 5, 20, 'Workload/Time Management'),
+(18, 9, 5, 18, 'Very Supported'),
+(19, 9, 5, 19, ' Lots of tools'),
+(20, 9, 5, 20, 'Student Engagement'),
+(21, 10, 5, 18, 'Neutral'),
+(22, 10, 5, 19, 'Lots of tools'),
+(23, 10, 5, 20, 'Classroom Behavior'),
+(26, 12, 7, 38, 'Sometimes'),
+(27, 12, 7, 39, 'None');
 
 -- --------------------------------------------------------
 
@@ -752,7 +826,8 @@ INSERT INTO `support_tickets` (`id`, `user_id`, `ticket_number`, `subject`, `mes
 (1, 65, 'TKT-67FD9BC48CF6B', 'Greetings', 'Hello', 'medium', 'resolved', NULL, '2025-04-14 13:35:32'),
 (2, 4458, 'TICKET-680ACA2C11699', 'I need Support', 'Help needed', 'medium', 'open', NULL, '2025-04-24 23:33:00'),
 (3, 4472, 'TICKET-680ACA308C129', 'Request for a clarification', 'Rff', 'medium', 'open', NULL, '2025-04-24 23:33:04'),
-(5, 4472, 'TICKET-680D476B4713A', 'Other', 'Hello Support needed', 'high', 'in_progress', NULL, '2025-04-26 20:51:55');
+(5, 4472, 'TICKET-680D476B4713A', 'Other', 'Hello Support needed', 'high', 'in_progress', NULL, '2025-04-26 20:51:55'),
+(6, 4472, 'TICKET-680E61EE0CC64', 'Billing Inquiry', 'Hello', 'medium', 'open', NULL, '2025-04-27 16:57:18');
 
 -- --------------------------------------------------------
 
@@ -771,6 +846,7 @@ CREATE TABLE `surveys` (
   `ends_at` datetime NOT NULL,
   `is_anonymous` tinyint(1) DEFAULT 0,
   `is_active` tinyint(1) DEFAULT 1,
+  `is_public` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -778,8 +854,13 @@ CREATE TABLE `surveys` (
 -- Dumping data for table `surveys`
 --
 
-INSERT INTO `surveys` (`id`, `title`, `description`, `category_id`, `status`, `created_by`, `starts_at`, `ends_at`, `is_anonymous`, `is_active`, `created_at`) VALUES
-(3, 'Teachers Survey', 'This is survey for teachers', 2, 2, 4, '2025-04-24 14:50:00', '2025-05-24 15:50:00', 1, 1, '2025-04-24 15:52:57');
+INSERT INTO `surveys` (`id`, `title`, `description`, `category_id`, `status`, `created_by`, `starts_at`, `ends_at`, `is_anonymous`, `is_active`, `is_public`, `created_at`) VALUES
+(3, 'Teachers Survey', 'This is survey for teachers', 2, 2, 4, '2025-04-24 14:50:00', '2025-05-24 15:50:00', 1, 1, 0, '2025-04-24 15:52:57'),
+(4, 'Survey For Parents', 'This is a survey for all Parents', 2, 2, 4, '2025-04-28 19:34:00', '2025-05-27 19:34:00', 0, 1, 0, '2025-04-27 19:43:38'),
+(5, 'Teachers Survey', 'Surveys for Teachers', 2, 2, 4, '2025-04-27 19:44:00', '2025-05-27 19:44:00', 1, 1, 0, '2025-04-27 19:46:43'),
+(6, 'Public Survey', 'This is Publicly Available survey', 1, 2, 4, '2025-04-28 08:30:00', '2025-05-28 13:30:00', 0, 1, 1, '2025-04-28 13:32:09'),
+(7, 'Survey For All', 'Public Survey', 1, 2, 4, '2025-04-28 06:32:00', '2025-05-28 18:32:00', 0, 1, 1, '2025-04-28 18:33:30'),
+(8, 'Public Survey1', 'Public Survey2', 1, 2, 4, '2025-04-28 06:38:00', '2025-05-28 18:38:00', 1, 1, 1, '2025-04-28 18:40:05');
 
 -- --------------------------------------------------------
 
@@ -842,7 +923,22 @@ CREATE TABLE `survey_fields` (
 
 INSERT INTO `survey_fields` (`id`, `survey_id`, `field_type`, `field_label`, `field_name`, `field_options`, `is_required`, `display_order`) VALUES
 (3, 3, 'rating', 'On a scale of 1-5, how satisfied are you with your current teaching workload?', '', NULL, 1, 0),
-(4, 3, 'radio', 'Do you feel you have adequate planning time during the school day?', '', '[\"Yes\",\"No\"]', 1, 1);
+(4, 3, 'radio', 'Do you feel you have adequate planning time during the school day?', '', '[\"Yes\",\"No\"]', 1, 1),
+(10, 4, 'radio', 'How satisfied are you with the school’s communication about your child’s progress?', '', '[\"Very Satisfied\",\"Satisfied\",\"Neutral\",\"Dissatisfied\",\"Very Dissatisfied\"]', 1, 0),
+(11, 4, 'textarea', '2. Open-Ended Question  What improvements would you suggest to enhance your child’s learning experience at school?', '', '[]', 1, 1),
+(12, 4, 'checkbox', 'Which method do you prefer for receiving updates about school events?', '', '[\"Email\",\"Mobile App Notifications\",\"Text Messages\",\"Printed Newsletters\",\"Phone Calls\"]', 1, 2),
+(13, 4, 'radio', 'Have you attended a parent-teacher conference this academic year?', '', '[\"Yes\",\"No\"]', 1, 3),
+(14, 4, 'select', 'Rank the following school priorities in order of importance (1 = Most Important, 5 = Least Important):', '', '[\"Academic Support\",\"Social-Emotional Learning\",\"Extracurricular Opportunities\",\"Safety and Discipline\",\"Technology Integration\"]', 0, 4),
+(18, 5, 'radio', 'How supported do you feel by school leadership in your teaching role?', '', '[\"Very Supported\",\"Supported\",\"Neutral\",\"Unsupported\",\"Very Unsupported\"]', 1, 0),
+(19, 5, 'textarea', 'What resources or tools would help you be more effective in the classroom?', '', '[]', 1, 1),
+(20, 5, 'radio', 'What is your biggest challenge this academic year?', '', '[\"Student Engagement\",\"Workload\\/Time Management\",\"Classroom Behavior\",\"Lack of Resources\",\"Parent Communication\"]', 0, 2),
+(33, 6, 'radio', 'On a scale of 1-5, how satisfied are you with your current teaching workload?', '', '[\"1\",\"2\",\"3\",\"4\",\"5\"]', 1, 0),
+(34, 6, 'radio', 'Class Assessments are Crucial to measure Students Performance', '', '[\"Strongly Agree\",\"Agree\",\"Disagree\",\"Strongly Disagree\"]', 1, 1),
+(35, 6, 'radio', 'How supported do you feel by school leadership in your teaching role?', '', '[\"Very Supportive\",\"Somehow Supportive\"]', 1, 2),
+(38, 7, 'radio', 'How often do you feel stressed due to work-related tasks?', '', '[\"Always\",\"Sometimes\",\"Never\"]', 1, 0),
+(39, 7, 'textarea', 'What is your biggest challenge this academic year?', '', '[]', 0, 1),
+(42, 8, 'radio', 'How supported do you feel by school leadership in your teaching role?', '', '[\"Great\",\"Good\",\"Fair\"]', 1, 0),
+(43, 8, 'radio', 'Rank the following school priorities in order of importance (1 = Most Important, 5 = Least Important):', '', '[\"1\",\"2\",\"3\",\"4\",\"5\"]', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -874,6 +970,21 @@ CREATE TABLE `survey_responses` (
   `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `survey_responses`
+--
+
+INSERT INTO `survey_responses` (`id`, `survey_id`, `user_id`, `submitted_at`, `answers`) VALUES
+(4, 3, 4472, '2025-04-27 19:07:28', '{\"3\":\"5\",\"4\":\"Yes\"}'),
+(5, 3, 4458, '2025-04-27 19:16:30', '{\"3\":\"4\",\"4\":\"No\"}'),
+(6, 5, 4458, '2025-04-27 19:54:41', '{\"18\":\"Very Supported\",\"19\":\"Yes\",\"20\":\"Student Engagement\"}'),
+(7, 5, 4458, '2025-04-27 19:55:05', '{\"18\":\"Very Supported\",\"19\":\"No response\",\"20\":\"Workload\\/Time Management\"}'),
+(8, 5, 4458, '2025-04-27 19:55:18', '{\"18\":\"Very Unsupported\",\"19\":\"Shdhdjd\",\"20\":\"Workload\\/Time Management\"}'),
+(9, 5, 4458, '2025-04-27 19:57:24', '{\"18\":\"Very Supported\",\"19\":\" Lots of tools\",\"20\":\"Student Engagement\"}'),
+(10, 5, 4472, '2025-04-27 19:58:21', '{\"18\":\"Neutral\",\"19\":\"Lots of tools\",\"20\":\"Classroom Behavior\"}'),
+(11, 6, 4458, '2025-04-28 18:23:51', '{\"29\":\"3\",\"30\":\"Agree\"}'),
+(12, 7, 4458, '2025-04-28 18:34:13', '{\"38\":\"Sometimes\",\"39\":\"None\"}');
+
 -- --------------------------------------------------------
 
 --
@@ -891,7 +1002,9 @@ CREATE TABLE `survey_roles` (
 --
 
 INSERT INTO `survey_roles` (`id`, `survey_id`, `role_id`) VALUES
-(2, 3, 2);
+(2, 3, 2),
+(6, 4, 3),
+(8, 5, 2);
 
 -- --------------------------------------------------------
 
@@ -1060,7 +1173,7 @@ CREATE TABLE `users` (
   `remember_token` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+ --------------------------------------------------------
 
 --
 -- Table structure for table `user_activity`
@@ -1353,7 +1466,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=230;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=273;
 
 --
 -- AUTO_INCREMENT for table `events`
@@ -1383,7 +1496,7 @@ ALTER TABLE `knowledge_base`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `parents`
@@ -1407,7 +1520,7 @@ ALTER TABLE `persistent_tracking`
 -- AUTO_INCREMENT for table `response_data`
 --
 ALTER TABLE `response_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1431,13 +1544,13 @@ ALTER TABLE `student_parents`
 -- AUTO_INCREMENT for table `support_tickets`
 --
 ALTER TABLE `support_tickets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `surveys`
 --
 ALTER TABLE `surveys`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `survey_categories`
@@ -1449,19 +1562,19 @@ ALTER TABLE `survey_categories`
 -- AUTO_INCREMENT for table `survey_fields`
 --
 ALTER TABLE `survey_fields`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `survey_roles`
 --
 ALTER TABLE `survey_roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `system_settings`
@@ -1600,6 +1713,8 @@ ALTER TABLE `survey_responses`
 -- Constraints for table `survey_roles`
 --
 ALTER TABLE `survey_roles`
+  ADD CONSTRAINT `fk_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_survey_id` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_survey_roles_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_survey_roles_survey` FOREIGN KEY (`survey_id`) REFERENCES `surveys` (`id`) ON DELETE CASCADE;
 
