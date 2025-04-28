@@ -1,4 +1,5 @@
-# 🏫 Custom School CRM
+# 🏫 School CRM System
+
 ![DeepScan grade](https://deepscan.io/api/teams/26555/projects/29184/branches/938393/badge/grade.svg)
 ![GitHub stars](https://img.shields.io/github/stars/addex12/School-CRM.png)
 ![GitHub last commit](https://img.shields.io/github/last-commit/addex12/School-CRM.png)
@@ -6,60 +7,57 @@
 ![GitHub issues](https://img.shields.io/github/issues/addex12/School-CRM.png)
 ![GitHub releases](https://img.shields.io/github/releases/addex12/School-CRM.png)
 ![GitHub license](https://img.shields.io/github/license/addex12/School-CRM.png)
-![GitHub size](https://img.shields.io/github/size/addex12/School-CRM.png)
-![GitHub forks](https://img.shields.io/github/forks/addex12/School-CRM.png)
-![GitHub watchers](https://img.shields.io/github/watchers/addex12/School-CRM.png)
-![GitHub open issues](https://img.shields.io/github/issues-pr/addex12/School-CRM.png)
-![GitHub closed issues](https://img.shields.io/github/issues-closed/addex12/School-CRM.png)
-![GitHub open PRs](https://img.shields.io/github/issues-pr-closed/addex12/School-CRM.png)
-   
-A web-based system for schools to create, manage, and analyze parent surveys with admin dashboards, automated exports (PDF/Excel), and email integration.
+
+A web-based system designed for schools to manage surveys, users, and analytics efficiently. This CRM system includes admin dashboards, automated exports, email integration, and more.
 
 ---
 
 ## ✨ Features
-- **Admin Dashboard**: Manage surveys, categories, users, and results.
-- **Survey Builder**: Drag-and-drop form builder for custom surveys.
-- **Role-Based Access**: Admins, teachers, parents, and students.
+
+- **Admin Dashboard**: Manage surveys, users, categories, and results.
+- **Survey Builder**: Drag-and-drop interface for creating custom surveys.
+- **Role-Based Access**: Separate roles for admins, teachers, parents, and students.
 - **Analytics**: Visual charts for survey responses.
-- **Export Tools**: Generate PDF/Excel/CSV reports.
-- **Email Integration**: Send test emails and notifications.
+- **Export Tools**: Generate reports in PDF, Excel, or CSV formats.
+- **Email Integration**: Send notifications and test emails.
+- **Audit Logs**: Track system activities and changes.
 
 ---
 
 ## 🛠️ Installation
 
 ### Requirements
+
 - PHP 7.4+ (`mbstring`, `gd`, `zip`, `dom` extensions)
 - MySQL 5.7+
 - Web server (Apache/Nginx)
 
 ### Steps
+
 1. **Clone the Repository**:
    ```bash
    git clone https://github.com/addex12/School-CRM.git
    cd School-CRM
+   ```
 
-
-2. **Database Setup**: 
+2. **Database Setup**:
    - Create a MySQL database.
    - Update `config.php` with database credentials.
-   - Run `db.sql` to create the database schema.
-   
+   - Import the `db.sql` file to set up the database schema.
 
 3. **Configure PHP**:
-   - Ensure `php.ini` has the following extensions enabled:
+   - Ensure the following extensions are enabled in `php.ini`:
      ```ini
      extension=mbstring
      extension=gd
      extension=zip
      ```
 
-4. **Manual Dependencies**:
-   - Place `phpmailer/`, `mpdf/`, and `phpoffice/` folders in `vendor/` (already included).
+4. **Dependencies**:
+   - Place `PHPMailer/`, `mPDF/`, and `PhpSpreadsheet/` in the `vendor/` directory (already included).
 
-5. **Web Server**:
-   - Point your server to the project root (e.g., `htdocs/survey/`).
+5. **Web Server Configuration**:
+   - Point your server to the project root (e.g., `/opt/lampp/htdocs/School-CRM`).
 
 ---
 
@@ -67,18 +65,18 @@ A web-based system for schools to create, manage, and analyze parent surveys wit
 
 ### Admin Access
 
-- **Login**: Visit `/login.php` → Use admin credentials.
+- **Login**: Visit `/login.php` and use admin credentials.
 - **Dashboard**:
   - Create surveys with drag-and-drop fields.
-  - Assign surveys to roles (parents/teachers/students).
-  - View real-time response charts.
-  - Export results to PDF/Excel/CSV.
+  - Assign surveys to specific roles (parents, teachers, students).
+  - View real-time response analytics.
+  - Export results to PDF, Excel, or CSV.
 
-### Parent/User Access
+### User Access
 
-- **Survey Link**: Share `/user/survey.php?id=SURVEY_ID`.
-- **Submit Responses**: Fill out assigned surveys.
-- **Completion Tracking**: View completed surveys in `/user/dashboard.php`.
+- **Survey Links**: Share `/user/survey.php?id=SURVEY_ID`.
+- **Submit Responses**: Users can fill out assigned surveys.
+- **Track Progress**: View completed surveys in `/user/dashboard.php`.
 
 ---
 
@@ -104,7 +102,7 @@ A web-based system for schools to create, manage, and analyze parent surveys wit
 ## 📂 Directory Structure
 
 ```
-survey/
+School-CRM/
 ├── admin/            # Admin panels
 ├── assets/           # CSS/JS/Images
 ├── includes/         # Config, DB, auth
@@ -118,7 +116,7 @@ survey/
 
 ## 📜 License
 
-MIT License. See LICENSE for details.
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -132,13 +130,9 @@ MIT License. See LICENSE for details.
 ## 📞 Contact
 
 - Email: gizawadugna@gmail.com
-- LinkedIn: https://www.linkedin.com/in/eleganceict
+- LinkedIn: [Adugna Gizaw](https://www.linkedin.com/in/eleganceict)
 
-## Developer
-
-<div class="badge-base LI-profile-badge" data-locale="en_US" data-size="medium" data-theme="dark" data-type="VERTICAL" data-vanity="eleganceict" data-version="v1">
-    <a class="badge-base__link LI-simple-link" href="https://et.linkedin.com/in/eleganceict?trk=profile-badge">Adugna Gizaw</a>
-</div>
+---
 
 
 

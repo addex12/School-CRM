@@ -1060,18 +1060,6 @@ CREATE TABLE `users` (
   `remember_token` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `first_name`, `last_name`, `role_id`, `last_active`, `online`, `active`, `created_at`, `last_login`, `avatar`, `tracking_token`, `remember_token`) VALUES
-(4, 'administrator', '$2y$10$NzdfGBS05PUk3gh0C9Cmfu6WL1bvexg4Xin/5hItCo2GcoMoOKTbO', 'adugna.gizaw@flipperschools.com', 'Admin', 'System', 1, '2025-04-27 23:30:36', 1, 1, '2025-03-24 16:50:31', '2025-04-27 13:30:36', 'admin_avatar.jpg', NULL, NULL),
-(5, 'efream', '$2y$10$MVeN3l2MkGpfz7fvjOPGEORMcLh0zArHGtACBXvp7e2Vi14QH/Ldm', 'efreamdc@gmail.com', 'Efream', 'Yohannes', 1, '2025-04-25 07:00:56', 1, 1, '2025-03-25 11:47:11', '2025-04-24 21:00:56', 'avatar_5_7aa6215a045431e8.jpg', NULL, NULL),
-(4458, 'ibrahim', '$2y$10$Djik3HGaTGfUIie2ZE4xq.FXCjQZs85AnoDnLRUc9z1FfNDRCNJle', 'ibrahimkebede@gmail.com', NULL, NULL, 2, '2025-04-27 09:36:38', 0, 1, '2025-04-23 15:50:30', '2025-04-26 23:36:38', 'avatar_4458_81c187c8c7f31937.jpg', NULL, NULL),
-(4471, 'adugna', '$2y$10$qkVyRXmdutRbn73CKiAqJuUg8Ix.RBoE4EPjgcs/s.RqaNX5o5PCa', 'gizawadugna@gmail.com', NULL, NULL, 5, NULL, 0, 0, '2025-04-24 14:06:37', NULL, 'default.jpg', '928cf2c1d1a3f7b2da4ec1c34dbc5acb3780fefab512c53152f50b7ac5c58fc8', NULL),
-(4472, 'Adugna1', '$2y$10$Yw1HI7aDDyJoN9wzudDugONHcSFAgc71IwW6dbEAVTGvcLgqqW51m', 'gizawadugna1@gmail.com', NULL, NULL, 3, '2025-04-27 08:17:13', 1, 1, '2025-04-24 18:23:15', '2025-04-26 21:18:50', 'avatar_4472_8c40dc58f6c9380a.jpg', NULL, NULL),
-(4473, 'Adugna2', '$2y$10$5fZoAhWy5xV81OhEnUGmUu7NZfZnxNcKYo7hPLhPesighyB/MMu1q', 'gizawadugna2@gmail.com', NULL, NULL, 5, '2025-04-27 07:28:21', 1, 1, '2025-04-26 20:39:52', '2025-04-26 21:28:21', 'default.jpg', '8644cfe1c5717a7c3c2c826acb49f4406ccbff3a2bf5abfa024caf73d113ed1f', NULL);
-
 -- --------------------------------------------------------
 
 --
