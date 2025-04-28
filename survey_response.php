@@ -14,7 +14,7 @@ if (!$db) {
 
 // Validate survey access and get survey details
 try {
-    $stmt = $conn->prepare("
+    $stmt = $db->prepare("
         SELECT s.id, s.title, s.description, s.is_anonymous,
                sf.id AS field_id, sf.field_type, sf.field_label, 
                sf.field_options, sf.is_required, sf.display_order
