@@ -136,7 +136,8 @@ if (isset($user) && is_array($user)) {
     $pdo->prepare("UPDATE users SET tracking_token = ? WHERE id = ?")
         ->execute([$trackingToken, $user['id']]);
 } else {
-    $error = "Invalid username or password.";
+    // If user is not logged in, set default values
+    $user = null;
 }
 
 // Fetch site logo and name from settings
