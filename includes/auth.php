@@ -21,10 +21,8 @@ if (!function_exists('isLoggedIn')) {
 if (!function_exists('requireLogin')) {
     function requireLogin() {
         if (!isLoggedIn()) {
-            if (basename($_SERVER['PHP_SELF']) !== 'login.php') { // Prevent redirect loop
-                header("Location: ../login.php");
-                exit();
-            }
+            header("Location: ../login.php");
+            exit();
         }
     }
 }
@@ -51,12 +49,10 @@ if (!function_exists('getCurrentUser')) {
 
 if (!function_exists('requireAdmin')) {
     function requireAdmin() {
-        if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            if (basename($_SERVER['PHP_SELF']) !== 'error.php') { // Prevent redirect loop
-                $_SESSION['error'] = "Access denied. Admins only.";
-                header("Location: ../error.php");
-                exit();
-            }
+        if (!isset($_SESSION['role_id']) || intval($_SESSION['role_id']) !== 1) {
+            $_SESSION['error'] = "Access denied. Admins only.";
+            header("Location: ../error.php");
+            exit();
         }
     }
 }
@@ -73,7 +69,6 @@ if (!function_exists('setUserSession')) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
-                $_SESSION['user_role'] = $user['role_id'] === 1 ? 'admin' : 'user'; // Map role_id to user_role
                 return true;
             }
             return false;
