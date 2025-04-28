@@ -271,7 +271,6 @@ try {
                     <div class="stat-percentage"><?= round(($availableSurveys / ($availableSurveys + $completedSurveys + $pendingSurveys)) * 100, 2) ?>% of total surveys</div>
                     </div>
                 
-                </div>
                 <div class="stat-card completed">
                     <h3>Completed Surveys</h3>
                     <div class="stat-value"><?= $completedSurveys ?></div>
