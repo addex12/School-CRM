@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
     if (in_array($fileType, $allowedTypes)) {
         if (move_uploaded_file($file['tmp_name'], $targetFilePath)) {
             try {
-                $stmt = $pdo->prepare("UPDATE users SET profile_picture = ? WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE users SET avatar = ? WHERE id = ?");
                 $stmt->execute([$fileName, $_SESSION['user_id']]);
                 $_SESSION['success'] = "Profile picture updated successfully.";
             } catch (PDOException $e) {
@@ -213,8 +213,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
         <div class="admin-main">
             <div class="profile-container">
                 <div class="profile-header">
-                    <?php if (!empty($user['profile_picture'])): ?>
-                        <img src="../uploads/profile_pictures/<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile Picture">
+                    <?php if (!empty($user['avatar'])): ?>
+                        <img src="../uploads/profile_pictures/<?= htmlspecialchars($user['avatar']) ?>" alt="Profile Picture">
                     <?php else: ?>
                         <img src="../assets/images/default.png" alt="Default Profile Picture">
                     <?php endif; ?>
