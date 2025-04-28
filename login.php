@@ -111,6 +111,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
         } else {
+            session_unset();
+            session_destroy();
             $error = "Invalid username or password.";
             // Clear any existing session data to prevent confusion
             session_unset();
