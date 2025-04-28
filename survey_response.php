@@ -145,47 +145,138 @@ foreach ($survey_data as $row) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($survey['title']) ?> - Survey</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .survey-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .survey-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .survey-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .question-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #36414c;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d8dd;
+            border-radius: 4px;
+            background: #f5f7fa;
+            color: #36414c;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            background: #fff;
+        }
+        .form-check {
+            margin-bottom: 8px;
+        }
+        .form-check-label {
+            margin-left: 5px;
+        }
+        .btn-submit {
+            background: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-submit:hover {
+            background: #0056b3;
+        }
+        .anonymous-notice {
+            background: #e7f5fe;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            font-size: 14px;
+        }
+        .options-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .options-list li {
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="survey-container">
-        <h1><?= htmlspecialchars($survey['title']) ?></h1>
-        <p><?= htmlspecialchars($survey['description']) ?></p>
+        <h1 class="survey-title"><?= htmlspecialchars($survey['title']) ?></h1>
+        <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
         
         <form method="POST">
+            <?php if ($survey['is_anonymous']): ?>
+                <div class="anonymous-notice">
+                    <i class="fas fa-user-secret"></i> This survey is anonymous. Your responses will not be linked to your identity.
+                </div>
+            <?php endif; ?>
+            
             <?php foreach ($survey['questions'] as $question): ?>
-                <div>
-                    <label>
+                <div class="question-group">
+                    <label class="form-label">
                         <?= htmlspecialchars($question['label']) ?>
                         <?php if ($question['required']): ?>
-                            <span>*</span>
+                            <span class="text-danger">*</span>
                         <?php endif; ?>
                     </label>
                     
                     <?php switch ($question['type']):
                         case 'text': ?>
-                            <input type="text" name="field_<?= $question['id'] ?>" required>
+                            <input type="text" name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?>>
                             <?php break; 
                         case 'textarea': ?>
-                            <textarea name="field_<?= $question['id'] ?>" required></textarea>
+                            <textarea name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?>></textarea>
                             <?php break; 
                         case 'radio': ?>
-                            <?php foreach ($question['options'] as $option): ?>
-                                <label>
-                                    <input type="radio" name="field_<?= $question['id'] ?>" value="<?= htmlspecialchars($option) ?>" required>
-                                    <?= htmlspecialchars($option) ?>
-                                </label>
-                            <?php endforeach; ?>
+                            <ul class="options-list">
+                                <?php foreach ($question['options'] as $option): ?>
+                                    <li class="form-check">
+                                        <input type="radio" name="field_<?= $question['id'] ?>" value="<?= htmlspecialchars($option) ?>" <?= $question['required'] ? 'required' : '' ?>>
+                                        <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
                             <?php break; 
                         case 'checkbox': ?>
-                            <?php foreach ($question['options'] as $option): ?>
-                                <label>
-                                    <input type="checkbox" name="field_<?= $question['id'] ?>[]" value="<?= htmlspecialchars($option) ?>">
-                                    <?= htmlspecialchars($option) ?>
-                                </label>
-                            <?php endforeach; ?>
+                            <ul class="options-list">
+                                <?php foreach ($question['options'] as $option): ?>
+                                    <li class="form-check">
+                                        <input type="checkbox" name="field_<?= $question['id'] ?>[]" value="<?= htmlspecialchars($option) ?>">
+                                        <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
                             <?php break; 
                         case 'select': ?>
-                            <select name="field_<?= $question['id'] ?>" required>
+                            <select name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?>>
                                 <option value="">-- Select --</option>
                                 <?php foreach ($question['options'] as $option): ?>
                                     <option value="<?= htmlspecialchars($option) ?>"><?= htmlspecialchars($option) ?></option>
@@ -196,8 +287,13 @@ foreach ($survey_data as $row) {
                 </div>
             <?php endforeach; ?>
             
-            <button type="submit">Submit</button>
+            <div class="text-center">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i> Submit Survey
+                </button>
+            </div>
         </form>
     </div>
 </body>
 </html>
+<?php require_once __DIR__ . '/footer.php'; ?>
