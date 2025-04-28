@@ -142,8 +142,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $pdo->commit();
         // Redirect to a thank you page or display a success message
-        header("Location: survey.php");
         echo "Thank you for completing the survey!";
+
+        header("Location: survey.php");
         exit();
 
     } catch (Exception $e) {
