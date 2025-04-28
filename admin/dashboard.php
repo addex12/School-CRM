@@ -173,15 +173,9 @@ $activityLogs = array_slice($activityLogs, -20);
 // Fetch survey participation stats for chart
 $surveyStats = [];
 try {
-    $stmt = $pdo->query("SELECT s.title, COUNT(sr.id) as responses
-        FROM surveys s
-        LEFT JOIN survey_responses sr ON s.id = sr.survey_id
-        GROUP BY s.id
-        ORDER BY responses DESC
-        LIMIT 7");
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $surveyStats[$row['title']] = $row['responses'];
-    }
+    $stmt = $pdo->prepare("\n    SELECT COUNT(DISTINCT s.id)\n    FROM surveys s\n    LEFT JOIN survey_roles sr ON s.id = sr.survey_id\n    WHERE (s.is_public = 1 OR sr.role_id = ?)\n      AND s.is_active = 1\n      AND s.starts_at <= NOW() \n      AND s.ends_at >= NOW()\n");
+    $stmt->execute([$_SESSION['role_id'] ?? null]);
+    $surveyStats = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 } catch (Exception $e) {
     $surveyStats = [];
 }
