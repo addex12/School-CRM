@@ -78,6 +78,13 @@ try {
     </style>
 </head>
 <body>
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success" style="margin: 20px auto; max-width: 800px; padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 4px;">
+            <?= htmlspecialchars($_SESSION['success']); ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
     <div class="survey-list-container">
         <h1>Available Surveys</h1>
         <?php if (!empty($surveys)): ?>
