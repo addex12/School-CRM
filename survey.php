@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 // Include the database connection file
 require_once __DIR__ . '/includes/db.php';
-
+require_once __DIR__ . '/includes/public_header.php';
 // Fetch all public surveys
 try {
     $stmt = $pdo->prepare("

@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $pdo->rollBack();
         error_log("Error saving survey response: " . $e->getMessage());
-        die("An error occurred while submitting the survey.");
+        die("An error occurred while submitting the survey. Please try again later.");
     }
 }
 
@@ -228,6 +228,8 @@ foreach ($survey_data as $row) {
     </style>
 </head>
 <body>
+<?php require_once __DIR__ . '/includes/public_header.php'; ?>
+
     <div class="survey-container">
         <h1 class="survey-title"><?= htmlspecialchars($survey['title']) ?></h1>
         <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
