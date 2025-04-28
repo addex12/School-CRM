@@ -313,7 +313,7 @@ try {
                                 <div class="survey-status status-pending">
                                     <i class="fas fa-exclamation-circle"></i> Pending
                                 </div>
-                                <a href="survey_response.php?id=<?= $survey['id'] ?>" class="erpnext-btn btn">
+                                <a href="survey_response.php?id=<?= $survey['id'] ?>" class="erpnext-btn">
                                     Take Survey
                                 </a>
                             <?php endif; ?>
