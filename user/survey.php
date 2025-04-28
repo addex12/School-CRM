@@ -18,12 +18,13 @@ try {
         SELECT s.id, s.title, s.description, s.starts_at, s.ends_at, 
                GROUP_CONCAT(DISTINCT r.role_name) AS target_roles,
                (SELECT COUNT(*) FROM survey_responses sr 
-                WHERE sr.survey_id = s.id AND sr.user_id = ?) AS responded
+                WHERE sr.survey_id = s.id AND sr.user_id = ? AND sr.is_public = 1) AS responded
         FROM surveys s
         JOIN survey_roles sr ON s.id = sr.survey_id
         JOIN roles r ON sr.role_id = r.id
         WHERE sr.role_id = ? 
           AND s.is_active = 1
+          AND s.is_public = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         GROUP BY s.id
