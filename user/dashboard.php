@@ -22,6 +22,7 @@ try {
         WHERE sr.role_id = ?
           AND s.is_active = 1
           AND s.is_public = 1
+          OR (s.is_public = 1 AND sr.role_id IS NULL)
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
     ");
