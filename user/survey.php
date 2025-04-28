@@ -22,7 +22,7 @@ try {
     FROM surveys s
     LEFT JOIN survey_roles sr ON s.id = sr.survey_id
     LEFT JOIN roles r ON sr.role_id = r.id
-    WHERE (sr.role_id = ? OR (s.is_public = 1 AND s.role_id IS NULL))
+    WHERE (sr.role_id = ? OR s.is_public = 1)
       AND s.is_active = 1
       AND s.starts_at <= NOW() 
       AND s.ends_at >= NOW()
