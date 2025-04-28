@@ -111,8 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
         } else {
-            session_unset();
-            session_destroy();
+
             $error = "Invalid username or password.";
             // Clear any existing session data to prevent confusion
             session_unset();
@@ -123,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "An error occurred. Please try again later.";
     }
 } else {
-    $error = null; // Ensure no error is displayed on first load
+    $error = null; // Clear error on page load
 }
 
 // Ensure `$user` is checked before accessing its properties
