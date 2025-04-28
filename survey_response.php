@@ -71,18 +71,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $answers[$field_id] = is_array($value) ? $value : (string)$value;
         }
 
+        // If the survey is not anonymous, validate and collect the email
+        $email = null;
+        if (!$survey['is_anonymous']) {
+            $email = $_POST['email'] ?? null;
+            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                throw new Exception("A valid email address is required for this survey.");
+            }
+        }
+
         // Determine user_id for public surveys
         $user_id = $_SESSION['user_id'] ?? 0; // Use 0 for anonymous/public users
 
-        // Insert survey response with JSON answers
+        // Insert survey response with JSON answers and email
         $stmt = $pdo->prepare("
             INSERT INTO survey_responses 
-            (survey_id, user_id, submitted_at, answers) 
-            VALUES (:survey_id, :user_id, NOW(), :answers)
+            (survey_id, user_id, email, submitted_at, answers) 
+            VALUES (:survey_id, :user_id, :email, NOW(), :answers)
         ");
         $stmt->execute([
             ':survey_id' => $survey_id,
             ':user_id' => $user_id,
+            ':email' => $email,
             ':answers' => json_encode($answers, JSON_UNESCAPED_UNICODE)
         ]);
         $response_id = $pdo->lastInsertId();
@@ -242,6 +252,11 @@ foreach ($survey_data as $row) {
             <?php if ($survey['is_anonymous']): ?>
                 <div class="anonymous-notice">
                     <i class="fas fa-user-secret"></i> This survey is anonymous. Your responses will not be linked to your identity.
+                </div>
+            <?php else: ?>
+                <div class="question-group">
+                    <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                    <input type="email" name="email" class="form-control" required>
                 </div>
             <?php endif; ?>
             
