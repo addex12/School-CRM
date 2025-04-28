@@ -265,6 +265,11 @@ try {
                     <h3>Available Surveys</h3>
                     <div class="stat-value"><?= $availableSurveys ?></div>
                     <p>Surveys you can take</p>
+                    <div class="stat-percentage"><?= round(($availableSurveys / ($availableSurveys + $completedSurveys + $pendingSurveys)) * 100, 2) ?>% of total surveys</div>
+                    </div>
+                                <a href="survey_response.php?id=<?= $survey['id'] ?>&is_public=<?= $survey['target_roles'] ? 0 : 1 ?>" class="erpnext-btn">
+                                    Take Survey
+                                </a>                   
                 </div>
                 <div class="stat-card completed">
                     <h3>Completed Surveys</h3>
