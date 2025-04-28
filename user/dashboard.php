@@ -412,11 +412,11 @@ try {
             <?php endif; ?>
 
             <!-- Popup Modal -->
-            <div id="popupModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,62,80,0.18);z-index:9999;">
+            <div id="popupModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(44,62,80,0.18);z-index:9999;overflow-y:auto;">
                 <div style="background:#fff;max-width:480px;margin:7% auto;padding:28px 22px 18px 22px;border-radius:10px;box-shadow:0 2px 16px rgba(0,0,0,0.13);position:relative;">
                     <span onclick="closePopup()" style="position:absolute;top:10px;right:18px;font-size:1.5em;color:#888;cursor:pointer;">&times;</span>
                     <h3 id="popupTitle" style="color:#215967;margin-top:0;"></h3>
-                    <div id="popupContent" style="font-size:1em;color:#36414c;"></div>
+                    <div id="popupContent" style="font-size:1em;color:#36414c;max-height:70vh;overflow-y:auto;"></div>
                 </div>
             </div>
         </div>
