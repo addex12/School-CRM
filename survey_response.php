@@ -71,14 +71,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $answers[$field_id] = is_array($value) ? $value : (string)$value;
         }
 
+        // Determine user_id for public surveys
+        $user_id = $_SESSION['user_id'] ?? 0; // Use 0 for anonymous/public users
+
         // Insert survey response with JSON answers
         $stmt = $pdo->prepare("
             INSERT INTO survey_responses 
             (survey_id, user_id, submitted_at, answers) 
-            VALUES (:survey_id, NULL, NOW(), :answers)
+            VALUES (:survey_id, :user_id, NOW(), :answers)
         ");
         $stmt->execute([
             ':survey_id' => $survey_id,
+            ':user_id' => $user_id,
             ':answers' => json_encode($answers, JSON_UNESCAPED_UNICODE)
         ]);
         $response_id = $pdo->lastInsertId();
