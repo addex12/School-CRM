@@ -13,14 +13,8 @@ require_once '../includes/config.php';
 $pageTitle = "Manage Surveys";
 
 // Fetch all surveys with category and status
-$stmt = $pdo->query("
-    SELECT s.*, u.username AS creator, c.name AS category, st.label AS status_label
-    FROM surveys s
-    LEFT JOIN users u ON s.created_by = u.id
-    LEFT JOIN survey_categories c ON s.category_id = c.id
-    LEFT JOIN survey_statuses st ON s.status = st.id
-    ORDER BY s.created_at DESC
-");
+$stmt = $pdo->prepare("\n    SELECT id, title, description, is_anonymous, starts_at, ends_at\n    FROM surveys\n    WHERE is_active = 1\n      AND (is_public = 1 OR id IN (\n          SELECT survey_id FROM survey_roles WHERE role_id = ?\n      ))\n      AND starts_at <= NOW()\n      AND ends_at >= NOW()\n    ORDER BY starts_at DESC\n");
+$stmt->execute([$_SESSION['role_id'] ?? null]);
 $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>

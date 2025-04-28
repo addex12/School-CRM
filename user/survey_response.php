@@ -20,15 +20,15 @@ try {
                sf.field_options, sf.is_required, sf.display_order
         FROM surveys s
         JOIN survey_fields sf ON s.id = sf.survey_id
-        JOIN survey_roles sr ON s.id = sr.survey_id
+        LEFT JOIN survey_roles sr ON s.id = sr.survey_id
         WHERE s.id = ? 
-          AND sr.role_id = ?
+          AND (s.is_public = 1 OR sr.role_id = ?)
           AND s.is_active = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         ORDER BY sf.display_order
     ");
-    $stmt->execute([$survey_id, $_SESSION['role_id']]);
+    $stmt->execute([$survey_id, $_SESSION['role_id'] ?? null]);
     $survey_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     if (empty($survey_data)) {
