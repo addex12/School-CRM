@@ -408,10 +408,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                     <?php endif; ?>
 
                     <div class="form-actions" style="display: flex; justify-content: center; gap: 20px;">
-                    <a href="edit_survey.php?id=<?= $survey['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                        <a href="results.php?survey_id=<?= $survey['id'] ?>" class="erpnext-btn erpnext-btn-primary">
-                            <i class="fas fa-chart-bar"></i> View
-                        </a>
+                    <a href="results.php?survey_id=<?= $survey['id'] ?>" title="Results"><i class="fas fa-chart-bar"></i></a>
                     </div>
                 </div>
             </div>
