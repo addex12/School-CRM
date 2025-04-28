@@ -1,8 +1,16 @@
 <?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Include the database connection file
 require_once __DIR__ . '/includes/db.php';
 
-$survey_id = $_GET['id'] ?? 0;
+// Check if the database connection is successful
+if (!$conn) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
 
 // Validate survey access and get survey details
 try {
@@ -19,6 +27,9 @@ try {
           AND s.ends_at >= NOW()
         ORDER BY sf.display_order
     ");
+    if (!$stmt) {
+        throw new Exception("Failed to prepare statement: " . $conn->error);
+    }
     $stmt->bind_param("i", $survey_id);
     $stmt->execute();
     $result = $stmt->get_result();
