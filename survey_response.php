@@ -9,7 +9,7 @@ require_once __DIR__ . '/includes/db.php';
 
 // Check if the database connection is successful
 if (!$conn) {
-    die("Database connection failed: " . mysqli_connect_error());
+    die("Database connection failed.");
 }
 
 // Validate survey access and get survey details
