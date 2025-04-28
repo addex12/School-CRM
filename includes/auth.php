@@ -69,6 +69,7 @@ if (!function_exists('setUserSession')) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['user_role'] = $user['role_id'] === 1 ? 'admin' : 'user'; // Map role_id to user_role
                 return true;
             }
             return false;
