@@ -42,7 +42,7 @@ try {
         $stmt = $pdo->prepare("
             SELECT COUNT(*) 
             FROM survey_responses 
-            WHERE survey_id = ? AND user_id = ? OR (is_public = 1 AND role_id = 'ALL')
+            WHERE survey_id = ? AND user_id = ? OR (is_public = 1 AND role_id is NULL)
         ");
         $stmt->execute([$survey_id, $_SESSION['user_id']]);
         if ($stmt->fetchColumn() > 0) {
