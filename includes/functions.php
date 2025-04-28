@@ -157,4 +157,23 @@ function formatBytes($bytes, $precision = 2) {
     $bytes /= pow(1024, $pow);
     return round($bytes, $precision) . ' ' . $units[$pow];
 }
+
+// Update the function to handle both role-based and public surveys
+function getAccessibleSurveys($userRoleId) {
+    global $pdo;
+
+    try {
+        $stmt = $pdo->prepare(
+            "SELECT DISTINCT s.*
+             FROM surveys s
+             LEFT JOIN survey_roles sr ON s.id = sr.survey_id
+             WHERE s.is_active = TRUE AND (s.is_public = 1 OR sr.role_id = ?)"
+        );
+        $stmt->execute([$userRoleId]);
+        return $stmt->fetchAll();
+    } catch (PDOException $e) {
+        error_log("Error fetching accessible surveys: " . $e->getMessage());
+        return [];
+    }
+}
 ?>

@@ -8,7 +8,7 @@ require_once '../includes/db.php';
 $pageTitle = "All Survey Responses";
 
 // Fetch all surveys for filter dropdown
-$surveyStmt = $pdo->prepare("SELECT id, title FROM surveys ORDER BY created_at DESC");
+$surveyStmt = $pdo->prepare("SELECT id, title FROM surveys WHERE is_active = TRUE OR is_public = 1 ORDER BY created_at DESC");
 $surveyStmt->execute();
 $allSurveys = $surveyStmt->fetchAll(PDO::FETCH_ASSOC);
 
