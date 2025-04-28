@@ -47,6 +47,25 @@ try {
             die("Survey not found.");
         }
     }
+
+    // Initialize the survey array
+    $survey = [
+        'id' => $survey_data[0]['id'],
+        'title' => $survey_data[0]['title'],
+        'description' => $survey_data[0]['description'],
+        'is_anonymous' => $survey_data[0]['is_anonymous'],
+        'questions' => []
+    ];
+
+    foreach ($survey_data as $row) {
+        $survey['questions'][] = [
+            'id' => $row['field_id'],
+            'type' => $row['field_type'],
+            'label' => $row['field_label'],
+            'options' => $row['field_options'] ? json_decode($row['field_options']) : [],
+            'required' => $row['is_required']
+        ];
+    }
 } catch (Exception $e) {
     error_log("Error validating survey access: " . $e->getMessage());
     die("An error occurred while loading the survey.");
@@ -59,13 +78,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Collect all answers for JSON storage
         $answers = [];
-        foreach ($survey_data as $question) {
-            $field_id = $question['field_id'];
+        foreach ($survey['questions'] as $question) {
+            $field_id = $question['id'];
             $value = $_POST['field_' . $field_id] ?? null;
 
             // Validate required fields
-            if ($question['is_required'] && (empty($value) && $value !== "0")) {
-                throw new Exception("Required question '{$question['field_label']}' was not answered");
+            if ($question['required'] && (empty($value) && $value !== "0")) {
+                throw new Exception("Required question '{$question['label']}' was not answered");
             }
 
             $answers[$field_id] = is_array($value) ? $value : (string)$value;
@@ -81,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Determine user_id for public surveys
-        $user_id = $_SESSION['user_id'] ?? 0; // Use 0 for anonymous/public users
+        $user_id = $_SESSION['user_id'] ?? null; // Use NULL for anonymous/public users
 
         // Insert survey response with JSON answers and email
         $stmt = $pdo->prepare("
@@ -98,8 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $response_id = $pdo->lastInsertId();
 
         // Insert individual answers into response_data
-        foreach ($survey_data as $question) {
-            $field_id = $question['field_id'];
+        foreach ($survey['questions'] as $question) {
+            $field_id = $question['id'];
             $value = $_POST['field_' . $field_id] ?? null;
             if (!empty($value) || $value === "0") {
                 $values = is_array($value) ? $value : [$value];
@@ -130,25 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Error saving survey response: " . $e->getMessage());
         die("An error occurred while submitting the survey. Please try again later. Debug Info: " . $e->getMessage());
     }
-}
-
-// Prepare survey data for display
-$survey = [
-    'id' => $survey_data[0]['id'],
-    'title' => $survey_data[0]['title'],
-    'description' => $survey_data[0]['description'],
-    'is_anonymous' => $survey_data[0]['is_anonymous'],
-    'questions' => []
-];
-
-foreach ($survey_data as $row) {
-    $survey['questions'][] = [
-        'id' => $row['field_id'],
-        'type' => $row['field_type'],
-        'label' => $row['field_label'],
-        'options' => $row['field_options'] ? json_decode($row['field_options']) : [],
-        'required' => $row['is_required']
-    ];
 }
 ?>
 
