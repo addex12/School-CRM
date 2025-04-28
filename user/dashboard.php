@@ -44,7 +44,7 @@ try {
         WHERE sr.role_id = ?
           AND s.is_active = 1
           AND s.is_public = 1
-          AND s.starts_at <= NOW()
+          OR s.starts_at <= NOW()
           AND s.ends_at >= NOW()
           AND r.id IS NULL
     ");
