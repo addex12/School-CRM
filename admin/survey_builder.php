@@ -141,8 +141,8 @@ function prepareQuestions($questions, $field_types, $options, $required) {
 function createSurvey($pdo, $survey_data) {
     $stmt = $pdo->prepare("
         INSERT INTO surveys 
-        (title, description, category_id, status, is_active, is_anonymous, starts_at, ends_at, created_at, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
+        (title, description, category_id, status, is_active, is_public, is_anonymous, starts_at, ends_at, created_at, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?, NOW(), ?)
     ");
     $stmt->execute(array_merge(
         array_values($survey_data),
