@@ -86,14 +86,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             padding: 2rem;
-            max-width: 600px;
+            max-width: 800px;
             margin: 2rem auto;
         }
-        .profile-container h1 {
-            font-size: 1.5rem;
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin-bottom: 2rem;
+        }
+        .profile-header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #0984e3;
+        }
+        .profile-header h1 {
+            font-size: 1.8rem;
             color: #34495e;
-            margin-bottom: 1.5rem;
-            text-align: center;
+            margin-top: 1rem;
         }
         .form-group {
             margin-bottom: 1.25rem;
@@ -147,6 +160,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        .password-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #dfe6e9;
+        }
     </style>
 </head>
 <body>
@@ -154,7 +172,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <div class="profile-container">
-                <h1>My Profile</h1>
+                <div class="profile-header">
+                    <?php if (!empty($user['profile_picture'])): ?>
+                        <img src="../uploads/profile_pictures/<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile Picture">
+                    <?php else: ?>
+                        <img src="../assets/images/default-profile.png" alt="Default Profile Picture">
+                    <?php endif; ?>
+                    <h1><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></h1>
+                </div>
                 <?php if (!empty($_SESSION['success'])): ?>
                     <div class="alert alert-success">
                         <?= htmlspecialchars($_SESSION['success']) ?>
@@ -168,6 +193,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
                     <?php unset($_SESSION['error']); ?>
                 <?php endif; ?>
                 <form method="POST" action="" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="profile_picture">Profile Picture</label>
+                        <input type="file" id="profile_picture" name="profile_picture" class="form-control">
+                    </div>
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" class="form-control" value="<?= htmlspecialchars($user['username'] ?? '') ?>" disabled>
@@ -184,17 +213,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" class="form-control" value="<?= htmlspecialchars($user['email'] ?? '') ?>">
                     </div>
-                    <div class="form-group">
-                        <label for="profile_picture">Profile Picture</label>
-                        <input type="file" id="profile_picture" name="profile_picture" class="form-control">
-                        <?php if (!empty($user['profile_picture'])): ?>
-                            <div style="margin-top: 1rem;">
-                                <img src="../uploads/profile_pictures/<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile Picture" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
-                            </div>
-                        <?php endif; ?>
-                    </div>
                     <button type="submit" class="btn btn-primary">Update Profile</button>
                 </form>
+
+                <div class="password-section">
+                    <h2>Change Password</h2>
+                    <form method="POST" action="change_password.php">
+                        <div class="form-group">
+                            <label for="current_password">Current Password</label>
+                            <input type="password" id="current_password" name="current_password" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new_password">New Password</label>
+                            <input type="password" id="new_password" name="new_password" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm New Password</label>
+                            <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
