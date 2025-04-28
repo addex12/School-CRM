@@ -27,8 +27,8 @@ try {
         WHERE s.id = :survey_id
           AND s.is_public = 1
           AND s.is_active = 1
-          AND (s.starts_at IS NULL OR s.starts_at <= NOW())
-          AND (s.ends_at IS NULL OR s.ends_at >= NOW())
+          AND s.starts_at <= NOW()
+          AND s.ends_at >= NOW()
         ORDER BY sf.display_order
     ");
     $stmt->execute([':survey_id' => $survey_id]);
