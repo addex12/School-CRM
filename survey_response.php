@@ -10,30 +10,27 @@ require_once __DIR__ . '/includes/config.php';
 
 // Get the survey ID from the query parameters
 $survey_id = $_GET['id'] ?? 0;
-
-// Check if the database connection is successful
-if (!$db) {
-    die("Database connection failed.");
-}
+$is_public = $_GET['is_public'] ?? 0;
 
 // Validate survey access and get survey details
 try {
-    $stmt = $db->prepare("
+    $stmt = $pdo->prepare("
         SELECT s.id, s.title, s.description, s.is_anonymous,
                sf.id AS field_id, sf.field_type, sf.field_label, 
                sf.field_options, sf.is_required, sf.display_order
         FROM surveys s
         JOIN survey_fields sf ON s.id = sf.survey_id
-        WHERE s.id = :survey_id
-          AND s.is_public = 1
+        LEFT JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE s.id = ? 
+          AND (s.is_public = 1 OR sr.role_id = ?)
           AND s.is_active = 1
-          AND s.starts_at <= NOW()
+          AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         ORDER BY sf.display_order
     ");
-    $stmt->execute([':survey_id' => $survey_id]);
+    $stmt->execute([$survey_id, $is_public ? null : $_SESSION['role_id']]);
     $survey_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
     if (empty($survey_data)) {
         // Debugging: Check if the survey exists and is public
         $debug_stmt = $db->prepare("
