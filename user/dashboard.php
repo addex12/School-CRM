@@ -274,9 +274,6 @@ try {
                     <h3>Pending Surveys</h3>
                     <div class="stat-value"><?= $pendingSurveys ?></div>
                     <p>Surveys awaiting your response</p>
-                    <a href="survey_response.php?id=<?= $survey['id'] ?>">
-                                    Take Survey
-                                </a>
                 </div>
             </div>
             <div class="quick-actions">
