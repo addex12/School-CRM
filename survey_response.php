@@ -4,6 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Start the session
+session_start();
+
 // Include the database connection file
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/config.php';
@@ -14,6 +17,7 @@ $is_public = $_GET['is_public'] ?? 0;
 
 // Validate survey access and get survey details
 try {
+    $role_id = $_SESSION['role_id'] ?? null; // Handle cases where role_id is not set
     $stmt = $pdo->prepare("
         SELECT s.id, s.title, s.description, s.is_anonymous,
                sf.id AS field_id, sf.field_type, sf.field_label, 
@@ -28,12 +32,12 @@ try {
           AND s.ends_at >= NOW()
         ORDER BY sf.display_order
     ");
-    $stmt->execute([$survey_id, $is_public ? null : $_SESSION['role_id']]);
+    $stmt->execute([$survey_id, $is_public ? null : $role_id]);
     $survey_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     if (empty($survey_data)) {
         // Debugging: Check if the survey exists and is public
-        $debug_stmt = $db->prepare("
+        $debug_stmt = $pdo->prepare("
             SELECT * FROM surveys 
             WHERE id = :survey_id
         ");
