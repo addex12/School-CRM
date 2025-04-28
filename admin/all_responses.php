@@ -153,8 +153,8 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #555;
         }
         .btn-sm {
-            padding: 4px 8px;
-            font-size: 12px;
+            padding: 2px 6px; /* Reduced padding for smaller buttons */
+            font-size: 12px; /* Smaller font size */
             border-radius: 3px;
         }
         .btn-outline-primary {
