@@ -21,8 +21,10 @@ if (!function_exists('isLoggedIn')) {
 if (!function_exists('requireLogin')) {
     function requireLogin() {
         if (!isLoggedIn()) {
-            header("Location: ../login.php");
-            exit();
+            if (basename($_SERVER['PHP_SELF']) !== 'login.php') { // Prevent redirect loop
+                header("Location: ../login.php");
+                exit();
+            }
         }
     }
 }
@@ -50,9 +52,11 @@ if (!function_exists('getCurrentUser')) {
 if (!function_exists('requireAdmin')) {
     function requireAdmin() {
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-            $_SESSION['error'] = "Access denied. Admins only.";
-            header("Location: ../error.php");
-            exit();
+            if (basename($_SERVER['PHP_SELF']) !== 'error.php') { // Prevent redirect loop
+                $_SESSION['error'] = "Access denied. Admins only.";
+                header("Location: ../error.php");
+                exit();
+            }
         }
     }
 }
