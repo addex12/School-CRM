@@ -22,6 +22,16 @@ try {
     $user = [];
 }
 
+if (!$user) {
+    $user = [
+        'first_name' => '',
+        'last_name' => '',
+        'username' => '',
+        'email' => '',
+        'profile_picture' => ''
+    ];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $firstName = $_POST['first_name'] ?? '';
     $lastName = $_POST['last_name'] ?? '';
@@ -237,6 +247,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['profile_picture'])) 
             </div>
         </div>
     </div>
-    <?php include '../includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
