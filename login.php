@@ -528,6 +528,92 @@ try {
     </div>
 
     <script>
+        // Enhanced Pre-Login Activity Tracking
+document.addEventListener('DOMContentLoaded', function() {
+    // Unique session ID for anonymous tracking (until login)
+    const sessionId = 'anon_' + Math.random().toString(36).substring(2, 15);
+    let startTime = new Date().toISOString();
+
+    // Track initial page load
+    trackActivity('page_visit', {
+        session_id: sessionId,
+        page: window.location.pathname,
+        referrer: document.referrer,
+        user_agent: navigator.userAgent,
+        screen_resolution: `${window.screen.width}x${window.screen.height}`,
+        ip_address: '<?php echo $_SERVER['REMOTE_ADDR'] ?? 'unknown'; ?>'
+    });
+
+    // Track form interactions
+    document.getElementById('username')?.addEventListener('input', (e) => {
+        trackActivity('form_input', {
+            session_id: sessionId,
+            field: 'username',
+            partial_input: e.target.value.substring(0, 3) + '...' // Privacy: log only first 3 chars
+        });
+    });
+
+    document.getElementById('login-btn')?.addEventListener('click', () => {
+        trackActivity('login_attempt', {
+            session_id: sessionId,
+            username: document.getElementById('username')?.value || '',
+            remember_me: document.getElementById('remember')?.checked || false
+        });
+    });
+
+    // Track mouse movements (heatmap)
+    document.addEventListener('mousemove', throttle((e) => {
+        trackActivity('mouse_move', {
+            session_id: sessionId,
+            x: e.clientX,
+            y: e.clientY,
+            page_x: e.pageX,
+            page_y: e.pageY
+        });
+    }, 1000));
+
+    // Helper: Throttle frequent events
+    function throttle(func, limit) {
+        let lastFunc;
+        let lastRan;
+        return function() {
+            const context = this;
+            const args = arguments;
+            if (!lastRan) {
+                func.apply(context, args);
+                lastRan = Date.now();
+            } else {
+                clearTimeout(lastFunc);
+                lastFunc = setTimeout(function() {
+                    if ((Date.now() - lastRan) >= limit) {
+                        func.apply(context, args);
+                        lastRan = Date.now();
+                    }
+                }, limit - (Date.now() - lastRan));
+            }
+        };
+    }
+
+    // Send data to server
+    function trackActivity(action, data) {
+        const payload = {
+            action,
+            ...data,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Use Beacon API if available (for page exits)
+        if (navigator.sendBeacon) {
+            navigator.sendBeacon('track_activity.php', JSON.stringify(payload));
+        } else {
+            fetch('track_activity.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        }
+    }
+});
         // Enhance form usability
         document.addEventListener('DOMContentLoaded', function() {
             // Focus on username field on page load
