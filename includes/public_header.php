@@ -12,24 +12,6 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 $site_name = $settings['site_name'] ?? 'School CRM';
 $site_logo = $settings['site_logo'] ?? '../uploads/default_logo.png';
 
-// Fetch public announcements
-$announcements_stmt = $pdo->query("
-    SELECT title, content 
-    FROM announcements 
-    WHERE is_public = 1 
-      AND start_date <= NOW() 
-      AND end_date >= NOW()
-    ORDER BY start_date DESC
-");
-$announcements = $announcements_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch public knowledge bases
-$knowledge_stmt = $pdo->query("
-    SELECT title, content 
-    FROM knowledge_base 
-    ORDER BY created_at DESC
-");
-$knowledge_bases = $knowledge_stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -99,30 +81,7 @@ $knowledge_bases = $knowledge_stmt->fetchAll(PDO::FETCH_ASSOC);
             <a href="../register.php"><i class="fas fa-user-plus"></i> Create Account</a>
         </div>
     </header>
-    <div class="public-content">
-        <h2>Public Announcements</h2>
-        <?php if (!empty($announcements)): ?>
-            <?php foreach ($announcements as $announcement): ?>
-                <div class="announcement">
-                    <h3><?= htmlspecialchars($announcement['title']) ?></h3>
-                    <p><?= nl2br(htmlspecialchars($announcement['content'])) ?></p>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>No public announcements available.</p>
-        <?php endif; ?>
-
-        <h2>Knowledge Base</h2>
-        <?php if (!empty($knowledge_bases)): ?>
-            <?php foreach ($knowledge_bases as $knowledge): ?>
-                <div class="knowledge-base">
-                    <h3><?= htmlspecialchars($knowledge['title']) ?></h3>
-                    <p><?= nl2br(htmlspecialchars($knowledge['content'])) ?></p>
-                </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>No knowledge base articles available.</p>
-        <?php endif; ?>
+   
     </div>
 </body>
 </html>
