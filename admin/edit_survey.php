@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare("
             UPDATE surveys 
             SET title = ?, description = ?, category_id = ?, 
-                starts_at = ?, ends_at = ?, is_active = ?, is_anonymous = ?
+                starts_at = ?, ends_at = ?, is_active = ?, is_public = ?, is_anonymous = ?
             WHERE id = ?
         ");
         $stmt->execute([
@@ -79,6 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['starts_at'],
             $_POST['ends_at'],
             isset($_POST['is_active']) ? 1 : 0,
+            isset($_POST['is_public']) ? 1 : 0,
             isset($_POST['is_anonymous']) ? 1 : 0,
             $survey_id
         ]);
@@ -337,6 +338,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label>
                         <input type="checkbox" name="is_anonymous" <?= $survey['is_anonymous'] ? 'checked' : ''; ?>>
                         Anonymous Responses
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" name="is_public" <?= $survey['is_public'] ? 'checked' : ''; ?>>
+                        Make Survey Public
                     </label>
                 </div>
                 <h2 style="color:#215967;">Survey Questions</h2>
