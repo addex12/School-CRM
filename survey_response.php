@@ -1,6 +1,16 @@
 <?php
+// Enable error reporting for debugging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Include the database connection file
 require_once __DIR__ . '/includes/db.php';
+
+// Check if the database connection is successful
+if (!$conn) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
 
 // Fetch survey responses for public surveys
 $sql = "SELECT sr.id, s.title AS survey_title, sr.submitted_at, sr.answers 
@@ -8,6 +18,10 @@ $sql = "SELECT sr.id, s.title AS survey_title, sr.submitted_at, sr.answers
         JOIN surveys s ON sr.survey_id = s.id
         WHERE s.is_public = 1";
 $result = $conn->query($sql);
+
+if (!$result) {
+    die("Query failed: " . $conn->error);
+}
 ?>
 
 <!DOCTYPE html>
