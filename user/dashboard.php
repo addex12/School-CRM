@@ -46,6 +46,7 @@ try {
         LEFT JOIN survey_responses r ON s.id = r.survey_id AND r.user_id = ?
         WHERE sr.role_id = ?
           AND s.is_active = 1
+          AND s.is_public = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
           AND r.id IS NULL
@@ -62,6 +63,7 @@ try {
         JOIN survey_roles sr ON s.id = sr.survey_id
         WHERE sr.role_id = ?
           AND s.is_active = 1
+          AND s.is_public = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
         ORDER BY s.ends_at ASC
