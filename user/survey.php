@@ -131,7 +131,7 @@ try {
                             <p><?= htmlspecialchars($survey['description']) ?></p>
                             
                             <div class="survey-meta">
-                                <p><strong>Target Roles:</strong> <?= htmlspecialchars($survey['target_roles']) ?></p>
+                                <p><strong>Target Roles:</strong> <?= htmlspecialchars($survey['target_roles'] ? $survey['target_roles'] : 'All') ?></p>
                                 <p><strong>Deadline:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
                                 <p><strong>Time Left:</strong> <span class="time-left"><?= $daysLeft ?> days</span></p>
                             </div>
