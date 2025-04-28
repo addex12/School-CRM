@@ -14,19 +14,16 @@ $pageTitle = "Dashboard";
 
 // Fetch survey statistics
 try {
+    // Total available surveys
     $stmt = $pdo->prepare("
-        SELECT s.id, s.title, s.description, s.is_anonymous,
-               sf.id AS field_id, sf.field_type, sf.field_label, 
-               sf.field_options, sf.is_required, sf.display_order
+        SELECT COUNT(DISTINCT s.id)
         FROM surveys s
-        JOIN survey_fields sf ON s.id = sf.survey_id
-        LEFT JOIN survey_roles sr ON s.id = sr.survey_id
-        WHERE s.id = ? 
-          AND (s.is_public = 1 OR sr.role_id = ?)
+        JOIN survey_roles sr ON s.id = sr.survey_id
+        WHERE sr.role_id = ?
           AND s.is_active = 1
+          AND s.is_public = 1
           AND s.starts_at <= NOW() 
           AND s.ends_at >= NOW()
-        ORDER BY sf.display_order
     ");
     $stmt->execute([$_SESSION['role_id']]);
     $availableSurveys = $stmt->fetchColumn();
