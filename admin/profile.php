@@ -14,12 +14,31 @@ $pageTitle = "Profile";
 
 // Fetch user profile data
 try {
-    $stmt = $pdo->prepare("SELECT username, email, first_name, last_name, role_id, profile_picture FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, username, email, first_name, last_name, avatar FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        error_log("No user data found for user_id: " . $_SESSION['user_id']);
+        $user = [
+            'id' => '',
+            'username' => '',
+            'email' => '',
+            'first_name' => '',
+            'last_name' => '',
+            'avatar' => 'default.jpg'
+        ];
+    }
 } catch (PDOException $e) {
     error_log("Error fetching profile data: " . $e->getMessage());
-    $user = [];
+    $user = [
+        'id' => '',
+        'username' => '',
+        'email' => '',
+        'first_name' => '',
+        'last_name' => '',
+        'avatar' => 'default.jpg'
+    ];
 }
 
 // Debugging: Log the user ID being used for the query
@@ -29,7 +48,7 @@ if (!isset($_SESSION['user_id'])) {
     error_log("Fetching profile data for user_id: " . $_SESSION['user_id']);
 }
 
-// Ensure the query fetches data correctly
+// Ensure the query fetches all required fields
 if (!$user || !is_array($user)) {
     error_log("No user data found for user_id: " . $_SESSION['user_id']);
     $user = [
