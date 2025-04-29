@@ -28,8 +28,8 @@ try {
 }
 
 // Check if user is already logged in
-if (isLoggedIn()) {
-    header("Location: " . BASE_URL . "index.php");
+if (function_exists('isLoggedIn') && isLoggedIn()) {
+    header("Location: " . BASE_URL . "/index.php");
     exit();
 }
 
@@ -449,7 +449,7 @@ try {
     <div class="login-container">
         <div class="login-left">
             <div class="illustration">
-                <img src="assets/images/login-illustration.svg" alt="School Illustration" aria-hidden="true">
+                <img src="assets/images/default-logo.png" alt="School Illustration" aria-hidden="true">
             </div>
             <div class="illustration-text">
                 <h3>School CRM</h3>
