@@ -473,6 +473,12 @@ try {
                 <!-- Widgets Section -->
                 <div class="adugna-widget-grid">
                     <?php foreach ($widgets as $widget): ?>
+                        <?php
+                        // Ensure 'count' key exists to avoid undefined index warning
+                        if (!isset($widget['count'])) {
+                            $widget['count'] = 0;
+                        }
+                        ?>
                         <div class="adugna-card adugna-card-<?= htmlspecialchars($widget['color']) ?>">
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
                             <div class="adugna-card-count"><?= htmlspecialchars($widget['count']) ?></div>
