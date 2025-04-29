@@ -1,8 +1,17 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
+
+// Start output buffering and error reporting
 ob_start();
-// Error reporting (remove in production)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
 // Include required files
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -92,6 +101,7 @@ function getUserRoleName($roleId) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Developer: Adugna Gizaw | Responsive, compact, ERPNext-inspired admin user page -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
@@ -99,19 +109,249 @@ function getUserRoleName($roleId) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/active_user.css">
+    <style>
+    /**
+     * Developer: Adugna Gizaw
+     * Custom adugna- styles for compact, ERPNext-inspired, responsive UI.
+     * Sidebar/footer styles are not touched.
+     */
+    .adugna-main {
+        padding: 0;
+        margin: 0;
+        min-height: 100vh;
+        background: #f7f9fb;
+        display: flex;
+        flex-direction: column;
+    }
+    .adugna-active-users-container {
+        max-width: 1100px;
+        margin: 32px auto 0 auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+        padding: 18px 18px 28px 18px;
+        transition: box-shadow 0.2s;
+    }
+    .adugna-active-users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+    .adugna-active-users-header h2 {
+        font-size: 1.25em;
+        color: #1976d2;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: 0.01em;
+    }
+    .adugna-active-count {
+        font-size: 0.98em;
+        color: #444;
+        margin-left: 12px;
+    }
+    .adugna-active-count i {
+        font-size: 1em;
+        margin-right: 2px;
+    }
+    .adugna-refresh-btn {
+        background: #e3eafc;
+        color: #1976d2;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 10px;
+        font-size: 0.95em;
+        margin-right: 8px;
+        cursor: pointer;
+        transition: background 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .adugna-refresh-btn i {
+        font-size: 1em;
+    }
+    .adugna-refresh-btn:hover {
+        background: #d0e2fa;
+    }
+    .adugna-bulk-actions-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f5f7fa;
+        border-radius: 6px;
+        padding: 6px 10px;
+        margin-bottom: 12px;
+        font-size: 0.97em;
+        box-shadow: 0 1px 4px rgba(25,118,210,0.04);
+    }
+    .adugna-bulk-actions-bar button,
+    .adugna-bulk-actions-bar select {
+        font-size: 0.97em;
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        color: #1976d2;
+        margin-right: 2px;
+        transition: background 0.15s;
+    }
+    .adugna-bulk-actions-bar button {
+        background: #e3eafc;
+        border: none;
+        color: #1976d2;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+    }
+    .adugna-bulk-actions-bar button:hover {
+        background: #d0e2fa;
+    }
+    .adugna-bulk-actions-bar i {
+        font-size: 0.95em;
+    }
+    .adugna-erpnext-search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+        align-items: center;
+    }
+    .adugna-erpnext-search-form input[type="text"] {
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid #d0d7de;
+        font-size: 0.97em;
+        width: 170px;
+    }
+    .adugna-erpnext-search-form label {
+        font-size: 0.97em;
+        color: #555;
+        margin-right: 8px;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+    .adugna-erpnext-search-form select {
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid #d0d7de;
+        font-size: 0.97em;
+        background: #fff;
+        color: #1976d2;
+    }
+    .adugna-search-btn {
+        background: #1976d2;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 12px;
+        font-size: 0.97em;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: background 0.15s;
+    }
+    .adugna-search-btn i {
+        font-size: 1em;
+    }
+    .adugna-search-btn:hover {
+        background: #145ea8;
+    }
+    .adugna-users-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        font-size: 0.97em;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 1px 6px rgba(25,118,210,0.04);
+    }
+    .adugna-users-table th, .adugna-users-table td {
+        padding: 7px 8px;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: left;
+        vertical-align: middle;
+    }
+    .adugna-users-table th {
+        background: #f5f7fa;
+        color: #1976d2;
+        font-weight: 600;
+        font-size: 0.98em;
+    }
+    .adugna-users-table td {
+        color: #333;
+    }
+    .adugna-users-table .select-col {
+        width: 32px;
+        text-align: center;
+    }
+    .adugna-users-table .crud-btn {
+        background: #e3eafc;
+        color: #1976d2;
+        border: none;
+        border-radius: 4px;
+        padding: 2px 7px;
+        font-size: 0.93em;
+        margin-right: 2px;
+        cursor: pointer;
+        transition: background 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+    }
+    .adugna-users-table .crud-btn i {
+        font-size: 0.93em;
+    }
+    .adugna-users-table .crud-btn:hover {
+        background: #d0e2fa;
+    }
+    .adugna-users-table .crud-btn.delete {
+        color: #e74c3c;
+        background: #fbeaea;
+    }
+    .adugna-users-table .crud-btn.delete:hover {
+        background: #f8d7da;
+    }
+    @media (max-width: 900px) {
+        .adugna-active-users-container {
+            margin: 12px 2vw 0 2vw;
+            padding: 10px 4px 18px 4px;
+        }
+        .adugna-users-table th, .adugna-users-table td {
+            padding: 5px 4px;
+            font-size: 0.95em;
+        }
+        .adugna-active-users-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .adugna-erpnext-search-form {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+    }
+    </style>
 </head>
 <body>
+    <!-- Main admin dashboard layout -->
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <div class="active-users-container">
-                <div class="active-users-header">
-                    <h2 style="font-size:1.45em; color:#1976d2; font-weight:600;">Active Users</h2>
+        <div class="adugna-main">
+            <div class="adugna-active-users-container">
+                <!-- Header: title, refresh, stats -->
+                <div class="adugna-active-users-header">
+                    <h2>Active Users</h2>
                     <div>
-                        <button class="refresh-btn" type="button">
-                            <i class="fas fa-sync-alt"></i> Refresh
+                        <button class="adugna-refresh-btn" type="button">
+                            <i class="fas fa-sync-alt"></i>
                         </button>
-                        <span class="active-count">
+                        <span class="adugna-active-count">
                             <i class="fas fa-users"></i>
                             <?= (int)$total_active ?> active,
                             <span style="color:#27ae60;"><i class="fas fa-circle"></i> <?= (int)$total_online ?> online</span>
@@ -119,13 +359,14 @@ function getUserRoleName($roleId) {
                     </div>
                 </div>
                 <?php if (!empty($error)): ?>
+                    <!-- Error message -->
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
-                <!-- Bulk Actions Bar -->
-                <div class="bulk-actions-bar" id="bulkActionsBar" style="display:none;">
+                <!-- Bulk Actions Bar (hidden by default, shown when users selected) -->
+                <div class="adugna-bulk-actions-bar" id="bulkActionsBar" style="display:none;">
                     <span id="selectedCount">0 selected</span>
-                    <button type="button" id="bulkDeleteBtn"><i class="fas fa-trash"></i> Delete</button>
+                    <button type="button" id="bulkDeleteBtn"><i class="fas fa-trash"></i></button>
                     <select id="bulkStatusSelect">
                         <option value="">Set Status...</option>
                         <option value="1">Set Active</option>
@@ -137,10 +378,11 @@ function getUserRoleName($roleId) {
                             <option value="<?= htmlspecialchars($id) ?>"><?= htmlspecialchars($name) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <button type="button" id="bulkExportBtn"><i class="fas fa-download"></i> Export</button>
+                    <button type="button" id="bulkExportBtn"><i class="fas fa-download"></i></button>
                 </div>
 
-                <form class="erpnext-search-form" id="userSearchForm" method="get" action="">
+                <!-- Search/filter form -->
+                <form class="adugna-erpnext-search-form" id="userSearchForm" method="get" action="">
                     <input type="text" name="search" id="searchInput" placeholder="Search username..." value="<?= htmlspecialchars($search) ?>">
                     <label>
                         <input type="checkbox" name="online" id="onlineInput" value="1" <?= $filter_online ? 'checked' : '' ?>>
@@ -154,16 +396,16 @@ function getUserRoleName($roleId) {
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <!-- Status filter dropdown -->
                     <select name="status" id="statusInput">
                         <option value="">All Statuses</option>
                         <option value="1" <?= $status_filter === '1' ? 'selected' : '' ?>>Active</option>
                         <option value="0" <?= $status_filter === '0' ? 'selected' : '' ?>>Inactive</option>
                     </select>
-                    <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search</button>
+                    <button type="submit" class="adugna-search-btn"><i class="fas fa-search"></i></button>
                 </form>
 
-                <table class="users-table" id="allUsersTable">
+                <!-- Users table -->
+                <table class="adugna-users-table" id="allUsersTable">
                     <thead>
                         <tr>
                             <th class="select-col"><input type="checkbox" id="selectAll"></th>
@@ -177,18 +419,23 @@ function getUserRoleName($roleId) {
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
+                        <!-- AJAX-loaded user rows -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-            <?php include __DIR__ . '/includes/footer.php'; ?>
+    <?php include __DIR__ . '/includes/footer.php'; ?>
 
-    <!-- Link the JS file for all row/bulk actions and AJAX -->
+    <!-- JS for all row/bulk actions and AJAX table -->
     <script src="../assets/js/active_users.js"></script>
     <script>
-    // Ensure edit/delete and bulk actions work after AJAX table reload
+    /**
+     * Developer: Adugna Gizaw
+     * Interactive logic for user table: AJAX, inline edit, bulk actions, and responsive UI.
+     */
     document.addEventListener('DOMContentLoaded', function() {
+        // Fetch and render users table via AJAX
         function fetchUsersTable() {
             const search = document.getElementById('searchInput').value;
             const online = document.getElementById('onlineInput').checked ? 1 : '';
@@ -209,11 +456,13 @@ function getUserRoleName($roleId) {
                 });
         }
 
+        // Get selected user IDs for bulk actions
         function getSelectedUserIds() {
             return Array.from(document.querySelectorAll('.row-select:checked'))
                 .map(cb => cb.closest('tr').getAttribute('data-id'));
         }
 
+        // Bind edit/delete actions for each row
         function bindRowActions() {
             document.querySelectorAll('.crud-btn.edit').forEach(function(btn) {
                 btn.onclick = function() {
@@ -238,7 +487,7 @@ function getUserRoleName($roleId) {
                     statusTd.querySelector('select').value = currentStatus;
                     actionsTd.innerHTML = '<button class="crud-btn save" type="button">Save</button> <button class="crud-btn cancel" type="button">Cancel</button>';
 
-                    // Re-bind save/cancel after replacing innerHTML
+                    // Save/cancel logic for inline edit
                     actionsTd.querySelector('.save').addEventListener('click', function() {
                         var newUsername = usernameTd.querySelector('input').value.trim();
                         var newRoleId = roleTd.querySelector('select').value;
@@ -293,31 +542,28 @@ function getUserRoleName($roleId) {
             });
         }
 
-        // Real-time search: trigger fetch on input, and prevent form submit from interfering
+        // Real-time search: debounce input for smoother UX
         const searchInput = document.getElementById('searchInput');
         const userSearchForm = document.getElementById('userSearchForm');
-
         let searchTimeout;
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(fetchUsersTable, 200); // debounce for smoother UX
+            searchTimeout = setTimeout(fetchUsersTable, 200);
         });
 
+        // Prevent default form submit, use AJAX
         userSearchForm.addEventListener('submit', function(e) {
             e.preventDefault();
             fetchUsersTable();
         });
 
-        document.querySelector('.refresh-btn').addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent default button action
-            fetchUsersTable();  // Reload table via AJAX
-        });
-
-        document.getElementById('userSearchForm').addEventListener('submit', function(e) {
+        // Refresh button reloads table via AJAX
+        document.querySelector('.adugna-refresh-btn').addEventListener('click', function(e) {
             e.preventDefault();
             fetchUsersTable();
         });
 
+        // Bulk actions: delete, status, role, export
         document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
             const ids = getSelectedUserIds();
             if (!ids.length) return alert('No users selected.');
@@ -365,14 +611,13 @@ function getUserRoleName($roleId) {
             window.location = 'ajax_active_users.php?' + params.toString();
         });
 
+        // Select all checkbox logic
         document.getElementById('selectAll').addEventListener('change', function() {
             document.querySelectorAll('.row-select').forEach(cb => cb.checked = this.checked);
         });
 
-        // Initial binding for edit/delete
+        // Initial binding and fetch
         bindRowActions();
-
-        // On page load, show all active users (default)
         fetchUsersTable();
     });
     </script>
