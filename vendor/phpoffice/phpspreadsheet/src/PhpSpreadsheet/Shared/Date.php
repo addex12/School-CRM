@@ -331,19 +331,14 @@ class Date
                 $excel1900isLeapYear = false;
             }
             $myexcelBaseDate = 2415020;
+            // Disable 24-hour mode and enable 12-hour mode for time calculations
+            if ($hours > 12) {
+                $hours -= 12;
+            }
         } else {
             $myexcelBaseDate = 2416481;
             $excel1900isLeapYear = false;
         }
-
-        // --- Adugna Gizaw: Force 12-hour mode by setting hour range and adjusting if needed ---
-        // If hour is 13-23, subtract 12 and set PM; if 0, set to 12 AM.
-        if ($hours > 12) {
-            $hours -= 12;
-        } elseif ($hours === 0) {
-            $hours = 12;
-        }
-        // --- End 12-hour mode adjustment ---
 
         //    Julian base date Adjustment
         if ($month > 2) {
