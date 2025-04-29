@@ -209,10 +209,12 @@ try {
             flex-direction: row;
             background: var(--adugna-light);
         }
-        /* Adugna Gizaw: Left section with gradient and announcements */
+        /* Adugna Gizaw: Left section with gradient, announcements, and school photo background */
         .adugna-login-left {
             flex: 1;
-            background: linear-gradient(135deg, var(--adugna-primary), var(--adugna-primary-dark));
+            background: 
+                linear-gradient(135deg, rgba(79,70,229,0.85), rgba(67,56,202,0.85)),
+                url('image.png') center center/cover no-repeat;
             color: #fff;
             padding: 2rem 1rem;
             display: flex;
