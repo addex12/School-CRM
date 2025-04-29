@@ -5,7 +5,8 @@ Email: gizawadugna@gmail.com
 LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
-* Sidebar toggle, submenu logic, compact ERPNext-inspired cards/buttons, adugna- prefix, responsive, interactive.
+* Sidebar toggle, submenu logic, compact ERPNext-inspired cards/buttons, and active page highlight.
+* All custom styles use adugna- prefix for patenting.
 */
 
 // Error reporting (remove in production)
@@ -107,7 +108,7 @@ function getUserRoleName($roleId) {
         LinkedIn: https://www.linkedin.com/in/eleganceict
         Twitter: https://twitter.com/eleganceict1
         GitHub: https://github.com/addex12
-        Purpose: Active Users page, all custom styles use adugna- prefix for patenting.
+        Purpose: Active Users page, responsive, interactive, adugna- prefix for all custom styles.
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -117,27 +118,16 @@ function getUserRoleName($roleId) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/active_user.css">
     <style>
-        /* Adugna Gizaw: Override/compact ERPNext-inspired styles for adugna- prefix */
-        .adugna-admin-dashboard { display: flex; min-height: 100vh; background: #f4f6f9; }
-        .adugna-admin-main { flex: 1; margin-left: 220px; padding: 2.2rem 1.2rem 1.2rem 1.2rem; transition: margin-left 0.3s; }
-        .adugna-card { background: #fff; border-radius: 6px; padding: 1.1rem 1.2rem; margin-bottom: 1.1rem; box-shadow: 0 1px 4px rgba(52,152,219,0.04); border: 1px solid #e3e6eb; max-width: 900px; }
-        .adugna-btn { font-size: 0.87rem; padding: 0.32rem 0.7rem; background: #3498db; color: #fff; border: none; border-radius: 4px; cursor: pointer; transition: background 0.18s; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 500; }
-        .adugna-btn.adugna-green { background: #27ae60; }
-        .adugna-btn.adugna-blue { background: #3498db; }
-        .adugna-btn.adugna-grey { background: #7f8c8d; }
-        .adugna-btn:hover { background: #217dbb; }
-        .adugna-btn.adugna-green:hover { background: #218838; }
-        .adugna-btn.adugna-grey:hover { background: #636e72; }
-        .adugna-progress-bar { width: 100%; background: #e0e0e0; border-radius: 6px; overflow: hidden; margin-top: 0.7rem; height: 7px; }
-        .adugna-progress-bar .adugna-progress { height: 100%; background: #3498db; width: 0; transition: width 0.3s; }
-        @media (max-width: 900px) {
-            .adugna-admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
-            .adugna-card { padding: 0.7rem; }
-        }
-        @media (max-width: 600px) {
-            .adugna-admin-main { margin-left: 0; padding: 0.3rem; }
-            .adugna-card { padding: 0.4rem; }
-        }
+        /* Adugna Gizaw: Override and extend with adugna- prefix for ERPNext-inspired, compact, responsive styles */
+        .adugna-sidebar { /* ...see admin.css... */ }
+        .adugna-admin-dashboard { /* ...see admin.css... */ }
+        .adugna-admin-main { /* ...see admin.css... */ }
+        .adugna-card { /* ...see admin.css... */ }
+        .adugna-btn { /* ...see admin.css... */ }
+        .adugna-admin-header { /* ...see admin.css... */ }
+        .adugna-admin-header h1 { /* ...see admin.css... */ }
+        .adugna-admin-tools-list { /* ...see admin.css... */ }
+        /* Responsive tweaks for adugna- prefixed classes are in admin.css */
     </style>
 </head>
 <body>
@@ -146,7 +136,7 @@ function getUserRoleName($roleId) {
         <i class="fas fa-bars"></i>
     </button>
     <div class="adugna-admin-dashboard">
-        <!-- Adugna Gizaw: Sidebar with submenu logic -->
+        <!-- Adugna Gizaw: Sidebar with submenu logic and adugna- prefix -->
         <nav class="adugna-sidebar" id="adugnaSidebar">
             <div class="adugna-logo">
                 <i class="fas fa-school"></i> School CRM
@@ -195,12 +185,17 @@ function getUserRoleName($roleId) {
                         <span class="adugna-icon"><i class="fas fa-users"></i></span> Active Users
                     </a>
                 </li>
+                <li>
+                    <a href="system_logs.php" class="adugna-sidebar-link" data-page="system_logs.php">
+                        <span class="adugna-icon"><i class="fas fa-file-alt"></i></span> System Logs
+                    </a>
+                </li>
             </ul>
         </nav>
         <div class="adugna-admin-main">
-            <div class="adugna-card">
+            <div class="adugna-card active-users-container">
                 <div class="active-users-header">
-                    <h2 style="font-size:1.45em; color:#1976d2; font-weight:600;">Active Users</h2>
+                    <h2 style="font-size:1.15em; color:#1976d2; font-weight:600;">Active Users</h2>
                     <div>
                         <button class="adugna-btn adugna-blue refresh-btn" type="button">
                             <i class="fas fa-sync-alt"></i> Refresh
