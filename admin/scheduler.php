@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_schedule'])) {
     $message = "Auto-clear schedule updated.";
 
     // Try to update CRON job after schedule change
-    $cronScript = __DIR__ . '/../create_clear_logs_cron.sh';
+    $cronScript = __DIR__ . '/create_clear_logs_cron.sh';
     if (file_exists($cronScript) && is_executable($cronScript)) {
         $output = [];
         $returnVar = 0;

@@ -65,7 +65,7 @@ switch ($schedule) {
 }
 
 // Update CRON job if called directly (e.g., after schedule change)
-$cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
+$cronScript = realpath(__DIR__ . '/create_clear_logs_cron.sh');
 if ($cronScript && is_executable($cronScript)) {
     exec("bash " . escapeshellarg($cronScript) . " >/dev/null 2>&1 &");
 } else {
