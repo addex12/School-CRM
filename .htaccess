@@ -2,7 +2,7 @@
 RewriteEngine On
 
 # Redirect typo domain to correct domain immediately (before any other rewrite)
-RewriteCond %{HTTP_HOST} ^crm\.flipperschools\.com$ [NC]
+RewriteCond %{HTTP_HOST} ^crm\.flipperschool\.com$ [NC]
 RewriteRule ^ https://crm.flipperschool.com%{REQUEST_URI} [L,R=301]
 
 # Force HTTPS for all requests (except already HTTPS)
