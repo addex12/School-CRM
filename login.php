@@ -455,7 +455,7 @@ try {
                 <?php $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png'; ?>
             </div>
             <div class="illustration-text">
-                <h3>Flipper International School Customer Relationship Management System</h3>RM</h3>
+                <h3>Flipper International School Customer Relationship Management System</h3>
                 <p>Comprehensive school management solution for administrators, teachers, and students</p>
             </div>
 
