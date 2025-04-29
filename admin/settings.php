@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
-            $fileName = basename($_FILES['site_logo']['name']);
+            $fileName = uniqid('logo_') . '_' . basename($_FILES['site_logo']['name']);
             $targetFile = $uploadDir . $fileName;
             if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $targetFile)) {
                 $_POST['settings']['site_logo'] = $targetFile;
@@ -29,7 +29,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
                 $_SESSION['error'] = "Failed to upload site logo.";
             }
         }
+        // Handle file upload for login background image
+        if (isset($_FILES['login_bg_image']) && $_FILES['login_bg_image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = '../uploads/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $fileName = uniqid('loginbg_') . '_' . basename($_FILES['login_bg_image']['name']);
+            $targetFile = $uploadDir . $fileName;
+            if (move_uploaded_file($_FILES['login_bg_image']['tmp_name'], $targetFile)) {
+                $_POST['settings']['login_bg_image'] = $targetFile;
+            } else {
+                $_SESSION['error'] = "Failed to upload login background image.";
+            }
+        }
 
+        // Save all settings to DB
         foreach ($_POST['settings'] as $key => $value) {
             $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?)
                 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
@@ -50,11 +65,12 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $settings[$row['setting_key']] = $row['setting_value'];
 }
 
-// Define settings fields for School CRM (add site logo, cards, etc.)
+// Add login background image to settings fields
 $settings_fields = [
     'general' => [
         'site_name' => ['label' => 'Site Name', 'type' => 'text'],
         'site_logo' => ['label' => 'Site Logo', 'type' => 'file'],
+        'login_bg_image' => ['label' => 'Login Background Image', 'type' => 'file'],
         'admin_email' => ['label' => 'Admin Email', 'type' => 'email'],
         'timezone' => ['label' => 'Timezone', 'type' => 'text'],
         'language' => ['label' => 'Default Language', 'type' => 'text'],
@@ -253,7 +269,13 @@ $settings_fields = [
                                     <?php elseif ($field['type'] === 'file'): ?>
                                         <input type="file" id="<?= $key ?>" name="<?= $key ?>">
                                         <?php if (!empty($settings[$key])): ?>
-                                            <p>Current Logo: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Site Logo" style="height: 50px;"></p>
+                                            <p>
+                                                <?php if ($key === 'site_logo'): ?>
+                                                    Current Logo: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Site Logo" style="height: 50px;">
+                                                <?php elseif ($key === 'login_bg_image'): ?>
+                                                    Current Background: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Login Background" style="height: 50px;">
+                                                <?php endif; ?>
+                                            </p>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <input type="<?= $field['type'] ?>" id="<?= $key ?>" name="settings[<?= $key ?>]"
