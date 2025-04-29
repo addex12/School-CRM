@@ -46,24 +46,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle profile update
     if (isset($_POST['update_profile'])) {
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+        handleProfileUpdate($pdo, $user);
+    }
 
-        if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
-            $_SESSION['error'] = "Username must be 3-30 characters (letters, numbers, underscores only).";
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $_SESSION['error'] = "Invalid email format.";
-        } else {
-            $avatar = handleAvatarUpload($user);
-            if ($avatar !== false) {
-                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
-                if ($stmt->execute([$username, $email, $avatar, $_SESSION['user_id']])) {
-                    $_SESSION['success'] = "Profile updated successfully!";
-                    header("Location: profile.php");
-                    exit();
-                } else {
-                    $_SESSION['error'] = "Failed to update profile.";
-                }
+    // Handle password change
+    if (isset($_POST['change_password'])) {
+        handleChangePassword($pdo, $user);
+    }
+}
+
+function handleProfileUpdate($pdo, $user) {
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+
+    if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
+        $_SESSION['error'] = "Username must be 3-30 characters (letters, numbers, underscores only).";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $_SESSION['error'] = "Invalid email format.";
+    } else {
+        $avatar = handleAvatarUpload($user);
+        if ($avatar !== false) {
+            $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
+            if ($stmt->execute([$username, $email, $avatar, $_SESSION['user_id']])) {
+                $_SESSION['success'] = "Profile updated successfully!";
+                header("Location: profile.php");
+                exit();
+            } else {
+                $_SESSION['error'] = "Failed to update profile.";
             }
         }
     }
@@ -115,6 +124,34 @@ function handleAvatarUpload($user) {
     return $avatar;
 }
 
+function handleChangePassword($pdo, $user) {
+    $currentPassword = $_POST['current_password'];
+    $newPassword = $_POST['new_password'];
+    $confirmPassword = $_POST['confirm_password'];
+
+    $stmt = $pdo->prepare("SELECT password FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $dbPassword = $stmt->fetchColumn();
+
+    if (!password_verify($currentPassword, $dbPassword)) {
+        $_SESSION['error'] = "Current password is incorrect.";
+    } elseif ($newPassword !== $confirmPassword) {
+        $_SESSION['error'] = "New passwords do not match.";
+    } elseif (strlen($newPassword) < 8 || !preg_match('/[A-Z]/', $newPassword) || !preg_match('/[0-9]/', $newPassword)) {
+        $_SESSION['error'] = "Password must be at least 8 characters with at least one number and one uppercase letter.";
+    } else {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+        if ($stmt->execute([$hashedPassword, $_SESSION['user_id']])) {
+            $_SESSION['success'] = "Password changed successfully!";
+            header("Location: profile.php");
+            exit();
+        } else {
+            $_SESSION['error'] = "Failed to change password.";
+        }
+    }
+}
+
 ?>
 
 <div class="profile-container">
@@ -139,5 +176,22 @@ function handleAvatarUpload($user) {
             <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif">
         </div>
         <button type="submit" name="update_profile">Update Profile</button>
+    </form>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+        <div>
+            <label for="current_password">Current Password:</label>
+            <input type="password" id="current_password" name="current_password" required>
+        </div>
+        <div>
+            <label for="new_password">New Password:</label>
+            <input type="password" id="new_password" name="new_password" required>
+        </div>
+        <div>
+            <label for="confirm_password">Confirm New Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+        </div>
+        <button type="submit" name="change_password">Change Password</button>
     </form>
 </div>
