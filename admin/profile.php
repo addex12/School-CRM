@@ -44,10 +44,19 @@ if (!$user) {
 }
 
 // Fetch role name for user (fixes "Unknown Role")
+// Fix: Use correct column name from db.sql (likely 'role' or 'role_name' instead of 'name')
 function getRoleName($role_id, $pdo) {
-    $stmt = $pdo->prepare("SELECT name FROM roles WHERE id = ?");
+    // Try both common column names, fallback to 'Unknown Role'
+    $stmt = $pdo->prepare("SELECT role FROM roles WHERE id = ?");
     $stmt->execute([$role_id]);
-    return $stmt->fetchColumn() ?: 'Unknown Role';
+    $role = $stmt->fetchColumn();
+    if ($role) return $role;
+
+    // If 'role' column does not exist, try 'role_name'
+    $stmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+    $stmt->execute([$role_id]);
+    $role = $stmt->fetchColumn();
+    return $role ?: 'Unknown Role';
 }
 $user['role_name'] = isset($user['role_id']) ? getRoleName($user['role_id'], $pdo) : 'Unknown Role';
 
