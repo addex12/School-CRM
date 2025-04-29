@@ -67,10 +67,8 @@ switch ($schedule) {
 // Update CRON job if called directly (e.g., after schedule change)
 $cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
 if ($cronScript && is_executable($cronScript)) {
-    // Run in background to avoid blocking web requests
     exec("bash " . escapeshellarg($cronScript) . " >/dev/null 2>&1 &");
 } else {
-    // Log a warning if the cron setup script is missing or not executable
     error_log("CRON setup script not found or not executable: " . ($cronScript ?: (__DIR__ . '/create_clear_logs_cron.sh')));
 }
 
@@ -79,9 +77,11 @@ $now = time();
 $lastClear = @file_get_contents($lastClearFile);
 $lastClearTs = $lastClear ? strtotime($lastClear) : 0;
 
-// Loop: clear logs for every missed interval until next clear is in the future
-while ($now >= $lastClearTs + $intervalSeconds) {
-    // Clear logs
+// Calculate next clear time
+$nextClearTs = $lastClearTs > 0 ? $lastClearTs + $intervalSeconds : $now + $intervalSeconds;
+
+// Only clear logs if the scheduled time has passed
+if ($now >= $nextClearTs) {
     foreach ($logTables as $table) {
         $pdo->exec("TRUNCATE TABLE `$table`");
     }
@@ -90,8 +90,10 @@ while ($now >= $lastClearTs + $intervalSeconds) {
             file_put_contents($file, '');
         }
     }
-    // Update last clear time
-    $lastClearTs += $intervalSeconds;
+    $lastClearTs = $now;
+    $nextClearTs = $lastClearTs + $intervalSeconds;
     file_put_contents($lastClearFile, date('Y-m-d H:i:s', $lastClearTs));
-    file_put_contents($nextClearFile, date('Y-m-d H:i:s', $lastClearTs + $intervalSeconds));
 }
+
+// Always update next clear time file for UI countdown
+file_put_contents($nextClearFile, date('Y-m-d H:i:s', $nextClearTs));
