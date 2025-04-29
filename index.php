@@ -24,18 +24,18 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// 6. Rate Limiting for Login (example, should be in login.php)
-if (!isset($_SESSION['login_attempts'])) {
-    $_SESSION['login_attempts'] = 0;
-    $_SESSION['last_login_attempt'] = time();
-}
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    if (time() - $_SESSION['last_login_attempt'] < 60 && $_SESSION['login_attempts'] > 5) {
-        die('Too many login attempts. Please wait a minute.');
-    }
-    $_SESSION['login_attempts']++;
-    $_SESSION['last_login_attempt'] = time();
-}
+// Remove rate limiting logic from here (should only be in login.php)
+// if (!isset($_SESSION['login_attempts'])) {
+//     $_SESSION['login_attempts'] = 0;
+//     $_SESSION['last_login_attempt'] = time();
+// }
+// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
+//     if (time() - $_SESSION['last_login_attempt'] < 60 && $_SESSION['login_attempts'] > 5) {
+//         die('Too many login attempts. Please wait a minute.');
+//     }
+//     $_SESSION['login_attempts']++;
+//     $_SESSION['last_login_attempt'] = time();
+// }
 
 // 7. Hide PHP errors from users
 ini_set('display_errors', 0);
