@@ -113,101 +113,142 @@ $settings_fields = [
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--
+        Developer: Adugna Gizaw
+        Email: gizawadugna@gmail.com
+        LinkedIn: https://www.linkedin.com/in/eleganceict
+        Twitter: https://twitter.com/eleganceict1
+        GitHub: https://github.com/addex12
+        Purpose: System Settings page for School CRM, all custom styles use adugna- prefix for patenting.
+    -->
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 1.2rem 0.5rem; }
-        .erp-card {
+        /* Adugna Gizaw: Color variables for consistent theming */
+        :root {
+            --adugna-primary: #4f46e5;
+            --adugna-primary-dark: #4338ca;
+            --adugna-secondary: #10b981;
+            --adugna-danger: #ef4444;
+            --adugna-light: #f9fafb;
+            --adugna-dark: #111827;
+            --adugna-gray: #6b7280;
+            --adugna-gray-light: #e5e7eb;
+            --adugna-card-radius: 0.5rem;
+            --adugna-transition: 0.15s cubic-bezier(.4,0,.2,1);
+        }
+        body {
+            background: var(--adugna-light);
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        }
+        /* Adugna Gizaw: Main content area */
+        .adugna-admin-main {
+            margin-left: 260px;
+            padding: 1.2rem 0.5rem;
+        }
+        /* Adugna Gizaw: Compact card style, ERPNext-inspired */
+        .adugna-card {
             background: #fff;
-            border-radius: 8px;
+            border-radius: var(--adugna-card-radius);
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.2rem 1.2rem;
+            padding: 1.1rem 1.1rem;
             margin-bottom: 1.2rem;
             max-width: 700px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--adugna-gray-light);
         }
-        .erp-card h2 {
-            color: #2563eb;
+        .adugna-card h2 {
+            color: var(--adugna-primary);
             font-weight: 600;
-            margin-bottom: 0.9rem;
-            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            font-size: 1.08rem;
             letter-spacing: 0.01em;
         }
-        .form-group {
-            margin-bottom: 1rem;
+        /* Adugna Gizaw: Form group styling */
+        .adugna-form-group {
+            margin-bottom: 0.85rem;
         }
-        label {
+        .adugna-form-group label {
             font-weight: 600;
-            color: #215967;
+            color: var(--adugna-dark);
             margin-bottom: 4px;
             display: block;
             font-size: 0.97em;
         }
-        input[type="text"], input[type="email"], input[type="number"], input[type="password"] {
+        .adugna-form-group input[type="text"],
+        .adugna-form-group input[type="email"],
+        .adugna-form-group input[type="number"],
+        .adugna-form-group input[type="password"],
+        .adugna-form-group select {
             width: 100%;
             padding: 7px 10px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--adugna-gray-light);
             border-radius: 4px;
             background: #f9fafb;
             font-size: 0.97em;
-            transition: border 0.2s;
+            transition: border var(--adugna-transition);
         }
-        input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, input[type="password"]:focus {
-            border: 1.5px solid #2563eb;
+        .adugna-form-group input[type="text"]:focus,
+        .adugna-form-group input[type="email"]:focus,
+        .adugna-form-group input[type="number"]:focus,
+        .adugna-form-group input[type="password"]:focus,
+        .adugna-form-group select:focus {
+            border: 1.5px solid var(--adugna-primary);
             outline: none;
             background: #fff;
         }
-        input[type="checkbox"] {
-            accent-color: #2563eb;
+        .adugna-form-group input[type="checkbox"] {
+            accent-color: var(--adugna-primary);
             margin-right: 4px;
             transform: scale(1.07);
         }
-        .erpnext-btn {
-            background: linear-gradient(90deg, #2563eb 0%, #215967 100%);
+        /* Adugna Gizaw: Compact button style, ERPNext-inspired */
+        .adugna-btn {
+            background: linear-gradient(90deg, var(--adugna-primary) 0%, var(--adugna-primary-dark) 100%);
             color: #fff;
             border: none;
             border-radius: 4px;
-            padding: 0.35rem 0.9rem;
+            padding: 0.32rem 0.85rem;
             font-size: 0.97em;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.18s, box-shadow 0.18s;
+            transition: background var(--adugna-transition), box-shadow var(--adugna-transition);
             margin-bottom: 0.7rem;
             box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             display: inline-flex;
             align-items: center;
-            gap: 0.4em;
+            gap: 0.35em;
         }
-        .erpnext-btn i {
+        .adugna-btn i {
             font-size: 0.97em;
         }
-        .erpnext-btn:hover, .erpnext-btn:focus {
-            background: linear-gradient(90deg, #215967 0%, #2563eb 100%);
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: linear-gradient(90deg, var(--adugna-primary-dark) 0%, var(--adugna-primary) 100%);
             box-shadow: 0 2px 8px rgba(44,62,80,0.12);
         }
-        .settings-section { margin-bottom: 1.5rem; }
-        .admin-header {
-            margin-bottom: 1.2rem;
-            border-bottom: 1.5px solid #e5e7eb;
+        .adugna-settings-section { margin-bottom: 1.3rem; }
+        /* Adugna Gizaw: Header styles */
+        .adugna-admin-header {
+            margin-bottom: 1.1rem;
+            border-bottom: 1.5px solid var(--adugna-gray-light);
             padding-bottom: 0.7rem;
         }
-        .admin-header h1 {
-            color: #2563eb;
+        .adugna-admin-header h1 {
+            color: var(--adugna-primary);
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: 1.23rem;
             letter-spacing: 0.01em;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 0.5em;
+            gap: 0.45em;
         }
-        .admin-header i {
-            font-size: 1.1em;
+        .adugna-admin-header i {
+            font-size: 1.07em;
         }
-        .admin-tools-list {
+        /* Adugna Gizaw: Admin tools list */
+        .adugna-admin-tools-list {
             list-style: none;
             padding: 0;
             margin: 0;
@@ -215,45 +256,47 @@ $settings_fields = [
             flex-wrap: wrap;
             gap: 0.5rem;
         }
-        .admin-tools-list li {
-            margin-bottom: 0.3rem;
+        .adugna-admin-tools-list li {
+            margin-bottom: 0.2rem;
         }
-        .admin-tools-list .erpnext-btn {
+        .adugna-admin-tools-list .adugna-btn {
             font-size: 0.95em;
-            padding: 0.3rem 0.7rem;
+            padding: 0.28rem 0.7rem;
             gap: 0.3em;
         }
-        .admin-tools-list i {
-            font-size: 0.95em;
+        .adugna-admin-tools-list i {
+            font-size: 0.93em;
         }
+        /* Adugna Gizaw: Responsive adjustments for all screens */
         @media (max-width: 900px) {
-            .admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
-            .erp-card { padding: 0.7rem; }
+            .adugna-admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
+            .adugna-card { padding: 0.7rem; }
         }
         @media (max-width: 600px) {
-            .admin-main { margin-left: 0; padding: 0.3rem; }
-            .erp-card { padding: 0.4rem; }
-            .admin-header h1 { font-size: 1rem; }
-            .erp-card h2 { font-size: 1em; }
+            .adugna-admin-main { margin-left: 0; padding: 0.3rem; }
+            .adugna-card { padding: 0.4rem; }
+            .adugna-admin-header h1 { font-size: 1rem; }
+            .adugna-card h2 { font-size: 1em; }
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
+        <div class="adugna-admin-main">
+            <header class="adugna-admin-header">
                 <h1><i class="fas fa-cogs"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
-            <div class="erp-card">
+            <div class="adugna-card">
                 <?php include 'includes/alerts.php'; ?>
+                <!-- Adugna Gizaw: Settings form, supports logo and login background image upload -->
                 <form method="POST" enctype="multipart/form-data" autocomplete="off">
                     <input type="hidden" name="update_settings" value="1">
                     <?php foreach ($settings_fields as $section => $fields): ?>
-                        <div class="settings-section">
+                        <div class="adugna-settings-section">
                             <h2><?= ucfirst($section) ?> Settings</h2>
                             <?php foreach ($fields as $key => $field): ?>
-                                <div class="form-group">
+                                <div class="adugna-form-group">
                                     <label for="<?= $key ?>"><?= $field['label'] ?></label>
                                     <?php if ($field['type'] === 'checkbox'): ?>
                                         <input type="checkbox" id="<?= $key ?>" name="settings[<?= $key ?>]" value="1"
@@ -269,11 +312,11 @@ $settings_fields = [
                                     <?php elseif ($field['type'] === 'file'): ?>
                                         <input type="file" id="<?= $key ?>" name="<?= $key ?>">
                                         <?php if (!empty($settings[$key])): ?>
-                                            <p>
+                                            <p style="margin:0.3em 0 0 0;">
                                                 <?php if ($key === 'site_logo'): ?>
-                                                    Current Logo: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Site Logo" style="height: 50px;">
+                                                    Current Logo: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Site Logo" style="height: 38px;">
                                                 <?php elseif ($key === 'login_bg_image'): ?>
-                                                    Current Background: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Login Background" style="height: 50px;">
+                                                    Current Background: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Login Background" style="height: 38px;">
                                                 <?php endif; ?>
                                             </p>
                                         <?php endif; ?>
@@ -285,18 +328,18 @@ $settings_fields = [
                             <?php endforeach; ?>
                         </div>
                     <?php endforeach; ?>
-                    <button type="submit" class="erpnext-btn"><i class="fas fa-save"></i> Save Settings</button>
+                    <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Save Settings</button>
                 </form>
             </div>
-            <div class="erp-card">
+            <div class="adugna-card">
                 <h2>Other Admin Tools</h2>
-                <ul class="admin-tools-list">
-                    <li><a href="user_roles.php" class="erpnext-btn"><i class="fas fa-user-tag"></i> Roles</a></li>
-                    <li><a href="manage_roles.php" class="erpnext-btn"><i class="fas fa-user-shield"></i> Permissions</a></li>
-                    <li><a href="user_permissions.php" class="erpnext-btn"><i class="fas fa-user-lock"></i> User Perms</a></li>
-                    <li><a href="backup.php" class="erpnext-btn"><i class="fas fa-database"></i> Backup</a></li>
-                    <li><a href="audit_log.php" class="erpnext-btn"><i class="fas fa-history"></i> Audit</a></li>
-                    <li><a href="system_logs.php" class="erpnext-btn"><i class="fas fa-file-alt"></i> Logs</a></li>
+                <ul class="adugna-admin-tools-list">
+                    <li><a href="user_roles.php" class="adugna-btn"><i class="fas fa-user-tag"></i> Roles</a></li>
+                    <li><a href="manage_roles.php" class="adugna-btn"><i class="fas fa-user-shield"></i> Permissions</a></li>
+                    <li><a href="user_permissions.php" class="adugna-btn"><i class="fas fa-user-lock"></i> User Perms</a></li>
+                    <li><a href="backup.php" class="adugna-btn"><i class="fas fa-database"></i> Backup</a></li>
+                    <li><a href="audit_log.php" class="adugna-btn"><i class="fas fa-history"></i> Audit</a></li>
+                    <li><a href="system_logs.php" class="adugna-btn"><i class="fas fa-file-alt"></i> Logs</a></li>
                 </ul>
             </div>
         </div>
