@@ -19,6 +19,7 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 requireLogin();
 
+$pageTitle = 'Profile';
 // CSRF Protection
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -300,10 +301,10 @@ function handleChangePassword($pdo, $user) {
         </div>
         <?php 
         // Use the same footer include as dashboard.php
-        include __DIR__ . '/includes/footer.php'; 
         ?>
     </div>
 </div>
+        include __DIR__ . '/includes/footer.php'; 
 
 <!-- Adugna ERPNext Custom Styles -->
 <style>
