@@ -140,15 +140,17 @@ if (isset($user) && is_array($user)) {
     $user = null;
 }
 
-// Fetch site logo and name from settings
-try {
-    $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name')");
-    $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-    $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
-    $siteName = $settings['site_name'] ?? 'School CRM';
-} catch (Exception $e) {
-    $siteLogo = 'assets/images/default-logo.png';
-    $siteName = 'School CRM';
+// Fetch site logo and login background image from settings
+$siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
+$siteName = $settings['site_name'] ?? 'School CRM';
+$loginBgImage = $settings['login_bg_image'] ?? '';
+// If the image path is relative, prepend the correct base path for web access
+if (!empty($loginBgImage) && strpos($loginBgImage, '../uploads/') === 0) {
+    $loginBgImageUrl = str_replace('../', '', $loginBgImage); // e.g. uploads/filename.png
+} elseif (!empty($loginBgImage)) {
+    $loginBgImageUrl = $loginBgImage;
+} else {
+    $loginBgImageUrl = 'image.png';
 }
 ?>
 <!DOCTYPE html>
@@ -212,9 +214,9 @@ try {
         /* Adugna Gizaw: Left section with gradient, announcements, and school photo background */
         .adugna-login-left {
             flex: 1;
-            background: 
+            background:
                 linear-gradient(135deg, rgba(79,70,229,0.85), rgba(67,56,202,0.85)),
-                url('image.png') center center/cover no-repeat;
+                url('<?= htmlspecialchars($loginBgImageUrl) ?>') center center/cover no-repeat;
             color: #fff;
             padding: 2rem 1rem;
             display: flex;
