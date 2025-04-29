@@ -27,11 +27,11 @@ if (file_exists($scheduleConfigFile)) {
     if (isset($config['interval'])) {
         $schedule = $config['interval'];
         if ($schedule === 'custom') {
-            $customValue = isset($config['custom_value']) && is_numeric($config['custom_value']) && $config['custom_value'] > 0
+            $customValue = (isset($config['custom_value']) && is_numeric($config['custom_value']) && $config['custom_value'] > 0)
                 ? (int)$config['custom_value'] : 1;
-            $customUnit = isset($config['custom_unit']) && in_array(strtolower($config['custom_unit']), [
+            $customUnit = (isset($config['custom_unit']) && in_array(strtolower($config['custom_unit']), [
                 'seconds','minutes','hours','days','weeks','months'
-            ]) ? strtolower($config['custom_unit']) : 'days';
+            ])) ? strtolower($config['custom_unit']) : 'days';
         }
     }
 }
@@ -60,7 +60,7 @@ switch ($schedule) {
             'weeks'   => 604800,
             'months'  => 2592000 // 30 days
         ];
-        $intervalSeconds = isset($unitSeconds[$customUnit]) ? $customValue * $unitSeconds[$customUnit] : 86400;
+        $intervalSeconds = (isset($unitSeconds[$customUnit]) ? $customValue * $unitSeconds[$customUnit] : 86400);
         if ($intervalSeconds < 1) $intervalSeconds = 86400;
         $shouldClear = ($now - $lastClearTs) >= $intervalSeconds;
         break;
