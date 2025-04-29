@@ -23,7 +23,7 @@ $logTables = [
 $logFiles = [
     'PHP Error Log' => __DIR__ . '/../error_log',
     'System Error Log' => __DIR__ . '/../logs/error.log',
-    'Raw Activity Log' => __DIR__ . '/../logs/raw_activity/log',
+    'Raw Activity Log' => __DIR__ . '/../logs/raw_activity.log',
     'User Activity Log' => __DIR__ . '/../logs/user_activity.log'
 ];
 
