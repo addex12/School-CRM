@@ -10,52 +10,24 @@ require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
 
-$pageTitle = "Add Teacher";
+$pageTitle = "Bulk Email Template";
 
-// Check if 'classes' table exists, if not, skip class fetching and show warning
-$classes = [];
-$class_table_exists = false;
-try {
-    $pdo->query("SELECT 1 FROM classes LIMIT 1");
-    $class_table_exists = true;
-} catch (PDOException $e) {
-    $class_table_exists = false;
-}
-
-// Only fetch classes if table exists
-if ($class_table_exists) {
-    $class_stmt = $pdo->query("SELECT id, class_name FROM classes ORDER BY class_name");
-    $classes = $class_stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Handle form submission
+// Handle form submission for creating/updating template
 $error = '';
+$success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_POST['user_id'] ?? '';
-    $class_id = $_POST['class_id'] ?? null;
+    $subject = trim($_POST['subject'] ?? '');
+    $placeholders = trim($_POST['placeholders'] ?? '');
+    $content = trim($_POST['content'] ?? '');
 
-    if (!$user_id) {
-        $error = "User selection is required.";
+    if (!$subject || !$content) {
+        $error = "Subject and content are required.";
     } else {
-        // Check if already exists
-        $check = $pdo->prepare("SELECT id FROM teachers WHERE user_id = ?");
-        $check->execute([$user_id]);
-        if ($check->fetch()) {
-            $error = "Teacher already exists.";
-        } else {
-            $insert = $pdo->prepare("INSERT INTO teachers (user_id, class_id) VALUES (?, ?)");
-            if ($insert->execute([$user_id, $class_id ?: null])) {
-                header("Location: teachers.php?msg=Teacher+added+successfully");
-                exit;
-            } else {
-                $error = "Failed to add teacher.";
-            }
-        }
+        // Save template logic here (e.g., to DB or file)
+        // For demonstration, just show success
+        $success = "Bulk email template saved successfully!";
     }
 }
-
-// If coming from teachers.php with user_id param, pre-select user
-$preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,7 +52,7 @@ $preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
             box-shadow: 0 2px 8px rgba(25,118,210,0.07);
             padding: 1.1rem 1.2rem 1.2rem 1.2rem;
             margin: 2rem auto;
-            max-width: 500px;
+            max-width: 540px;
             transition: box-shadow 0.2s, width 0.2s;
         }
         .adugna-card h2 {
@@ -101,13 +73,18 @@ $preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
             color: #444;
             font-weight: 500;
         }
-        .adugna-form-group select {
+        .adugna-form-group input,
+        .adugna-form-group textarea {
             padding: 4px 8px;
             border-radius: 4px;
             border: 1px solid #d0d7de;
             font-size: 0.97em;
             background: #f9fbfd;
             color: #222;
+        }
+        .adugna-form-group textarea {
+            min-height: 120px;
+            resize: vertical;
         }
         .adugna-btn {
             background: #1976d2;
@@ -147,8 +124,22 @@ $preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
             margin-bottom: 1em;
             font-size: 0.97em;
         }
+        .adugna-success-message {
+            background: #eafaf1;
+            color: #27ae60;
+            border: 1px solid #d4f5e9;
+            border-radius: 5px;
+            padding: 10px 18px;
+            margin-bottom: 1em;
+            font-size: 0.97em;
+        }
         @media (max-width: 600px) {
             .adugna-card { padding: 0.7rem; }
+        }
+        .adugna-placeholder-hint {
+            font-size: 0.93em;
+            color: #888;
+            margin-bottom: 0.5em;
         }
     </style>
 </head>
@@ -163,48 +154,32 @@ $preselect_user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : '';
                 <?php if ($error): ?>
                     <div class="adugna-error-message"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
-                <?php if (!$class_table_exists): ?>
-                    <div class="adugna-error-message">
-                        <b>Class table not found.</b> Please run the migration to create the <code>classes</code> table.<br>
-                        <span style="font-size:0.95em;">
-                            <b>Migration SQL:</b>
-                            <pre style="background:#f5f7fa;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.93em;">
-ALTER TABLE teachers ADD COLUMN class_id INT NULL;
-CREATE TABLE classes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    class_name VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-                            </pre>
-                            <b>How to apply:</b> Place the above SQL in a migration file in your <code>migrations/</code> folder and run it.
-                        </span>
-                    </div>
+                <?php if ($success): ?>
+                    <div class="adugna-success-message"><?= htmlspecialchars($success) ?></div>
                 <?php endif; ?>
                 <form method="post" autocomplete="off">
                     <div class="adugna-form-group">
-                        <label for="user_id">Select Teacher User</label>
-                        <select name="user_id" id="user_id" required>
-                            <option value="">-- Select --</option>
-                            <?php foreach ($users as $user): ?>
-                                <option value="<?= $user['id'] ?>" <?= ($preselect_user_id == $user['id']) ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($user['username']) ?> (<?= htmlspecialchars($user['email']) ?>)
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label for="subject">Email Subject</label>
+                        <input type="text" name="subject" id="subject" required placeholder="Enter email subject" value="<?= htmlspecialchars($_POST['subject'] ?? '') ?>">
                     </div>
                     <div class="adugna-form-group">
-                        <label for="class_id">Assign to Class (optional)</label>
-                        <select name="class_id" id="class_id" <?= !$class_table_exists ? 'disabled' : '' ?>>
-                            <option value="">-- None --</option>
-                            <?php foreach ($classes as $class): ?>
-                                <option value="<?= $class['id'] ?>"><?= htmlspecialchars($class['class_name']) ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label for="placeholders">Available Placeholders</label>
+                        <input type="text" name="placeholders" id="placeholders" placeholder="e.g. {name}, {email}, {date}" value="<?= htmlspecialchars($_POST['placeholders'] ?? '') ?>">
+                        <div class="adugna-placeholder-hint">
+                            Separate placeholders with commas. Use these in your content as <code>{placeholder}</code>.
+                        </div>
+                    </div>
+                    <div class="adugna-form-group">
+                        <label for="content">Email Content</label>
+                        <textarea name="content" id="content" required placeholder="Write your email content here..."><?= htmlspecialchars($_POST['content'] ?? '') ?></textarea>
+                        <div class="adugna-placeholder-hint">
+                            Example: Hello <code>{name}</code>, your email is <code>{email}</code>.
+                        </div>
                     </div>
                     <button type="submit" class="adugna-btn">
-                        <i class="fas fa-user-plus"></i> Add Teacher
+                        <i class="fas fa-save"></i> Save Template
                     </button>
-                    <a href="teachers.php" class="adugna-btn adugna-btn-secondary" style="margin-left:10px;">
+                    <a href="dashboard.php" class="adugna-btn adugna-btn-secondary" style="margin-left:10px;">
                         <i class="fas fa-times"></i> Cancel
                     </a>
                 </form>
