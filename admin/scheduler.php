@@ -12,7 +12,7 @@ ini_set('display_errors', 1);
 
 require_once '../includes/config.php';
 // ...existing code for authentication...
-
+$pageTitle = 'System Log Scheduler';
 $logTables = [
     'activity_logs',
     'audit_logs',
