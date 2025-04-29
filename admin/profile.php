@@ -162,7 +162,121 @@ function handleChangePassword($pdo, $user) {
 
 ?>
 
-<?php include_once 'includes/admin_sidebar.php'; ?>
+<div class="admin-dashboard" style="display:flex;min-height:100vh;background:#f4f6fa;">
+    <?php include_once 'includes/admin_sidebar.php'; ?>
+    <div class="admin-main" style="flex:1;padding:2rem 2.5rem;">
+        <div class="main-content-container">
+            <div class="profile-main-container">
+                <div class="adugna-profile-header">
+                    <div class="adugna-profile-avatar">
+                        <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
+                             alt="Profile Picture"
+                             onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
+                    </div>
+                    <div class="adugna-profile-info">
+                        <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
+                        <div class="card-text">Email: <?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
+                        <span class="adugna-badge">Role: <?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                        <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
+                    </div>
+                </div>
+
+                <?php if (isset($_SESSION['success'])): ?>
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php unset($_SESSION['success']); ?>
+                <?php endif; ?>
+
+                <?php if (isset($_SESSION['error'])): ?>
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <?php unset($_SESSION['error']); ?>
+                <?php endif; ?>
+
+                <div class="adugna-profile-forms-row">
+                    <div class="adugna-profile-form-card adugna-card">
+                        <div class="adugna-card-header">
+                            <i class="fas fa-user-edit" style="font-size:1.1em;color:#2e86c1;"></i>
+                            <span>Profile Information</span>
+                        </div>
+                        <div class="adugna-card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                <input type="hidden" name="update_profile" value="1">
+                                <div class="mb-3">
+                                    <label for="username" class="adugna-form-label form-label">Username:</label>
+                                    <input type="text" id="username" name="username" 
+                                           class="adugna-input form-control form-control-sm"
+                                           value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
+                                           required
+                                           pattern="[a-zA-Z0-9_]{3,30}"
+                                           title="3-30 characters (letters, numbers, underscores)">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="adugna-form-label form-label">Email:</label>
+                                    <input type="email" id="email" name="email" 
+                                           class="adugna-input form-control form-control-sm"
+                                           value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
+                                           required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="avatar" class="adugna-form-label form-label">Profile Picture:</label>
+                                    <input type="file" id="avatar" name="avatar" 
+                                           class="adugna-input form-control form-control-sm"
+                                           accept="image/jpeg,image/png,image/gif">
+                                    <small class="adugna-form-text">Max 2MB (JPG, PNG, GIF only)</small>
+                                </div>
+                                <button type="submit" class="adugna-btn adugna-btn-primary btn-sm w-100">
+                                    <i class="fas fa-save" style="font-size:0.95em;margin-right:5px;"></i>Update Profile
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="adugna-profile-form-card adugna-card">
+                        <div class="adugna-card-header bg-secondary">
+                            <i class="fas fa-key" style="font-size:1.1em;color:#34495e;"></i>
+                            <span>Change Password</span>
+                        </div>
+                        <div class="adugna-card-body">
+                            <form method="POST">
+                                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                                <input type="hidden" name="change_password" value="1">
+                                <div class="mb-3">
+                                    <label for="current_password" class="adugna-form-label form-label">Current Password:</label>
+                                    <input type="password" id="current_password" name="current_password" 
+                                           class="adugna-input form-control form-control-sm" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="new_password" class="adugna-form-label form-label">New Password:</label>
+                                    <input type="password" id="new_password" name="new_password" 
+                                           class="adugna-input form-control form-control-sm"
+                                           required
+                                           pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
+                                           title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
+                                    <small class="adugna-form-text">Minimum 8 characters with at least one number and uppercase letter</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirm_password" class="adugna-form-label form-label">Confirm New Password:</label>
+                                    <input type="password" id="confirm_password" name="confirm_password" 
+                                           class="adugna-input form-control form-control-sm" required>
+                                </div>
+                                <button type="submit" class="adugna-btn adugna-btn-secondary btn-sm w-100">
+                                    <i class="fas fa-sync-alt" style="font-size:0.95em;margin-right:5px;"></i>Change Password
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php include_once 'includes/footer.php'; ?>
+    </div>
+</div>
 
 <!-- Adugna ERPNext Custom Styles -->
 <style>
@@ -349,115 +463,3 @@ function handleChangePassword($pdo, $user) {
     }
 }
 </style>
-
-<div class="main-content-container">
-    <div class="profile-main-container">
-        <div class="adugna-profile-header">
-            <div class="adugna-profile-avatar">
-                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
-                     alt="Profile Picture"
-                     onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
-            </div>
-            <div class="adugna-profile-info">
-                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
-                <div class="card-text">Email: <?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
-                <span class="adugna-badge">Role: <?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
-                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
-            </div>
-        </div>
-
-        <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <?php unset($_SESSION['success']); ?>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <?php unset($_SESSION['error']); ?>
-        <?php endif; ?>
-
-        <div class="adugna-profile-forms-row">
-            <div class="adugna-profile-form-card adugna-card">
-                <div class="adugna-card-header">
-                    <i class="fas fa-user-edit" style="font-size:1.1em;color:#2e86c1;"></i>
-                    <span>Profile Information</span>
-                </div>
-                <div class="adugna-card-body">
-                    <form method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                        <input type="hidden" name="update_profile" value="1">
-                        <div class="mb-3">
-                            <label for="username" class="adugna-form-label form-label">Username:</label>
-                            <input type="text" id="username" name="username" 
-                                   class="adugna-input form-control form-control-sm"
-                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
-                                   required
-                                   pattern="[a-zA-Z0-9_]{3,30}"
-                                   title="3-30 characters (letters, numbers, underscores)">
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="adugna-form-label form-label">Email:</label>
-                            <input type="email" id="email" name="email" 
-                                   class="adugna-input form-control form-control-sm"
-                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
-                                   required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="avatar" class="adugna-form-label form-label">Profile Picture:</label>
-                            <input type="file" id="avatar" name="avatar" 
-                                   class="adugna-input form-control form-control-sm"
-                                   accept="image/jpeg,image/png,image/gif">
-                            <small class="adugna-form-text">Max 2MB (JPG, PNG, GIF only)</small>
-                        </div>
-                        <button type="submit" class="adugna-btn adugna-btn-primary btn-sm w-100">
-                            <i class="fas fa-save" style="font-size:0.95em;margin-right:5px;"></i>Update Profile
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <div class="adugna-profile-form-card adugna-card">
-                <div class="adugna-card-header bg-secondary">
-                    <i class="fas fa-key" style="font-size:1.1em;color:#34495e;"></i>
-                    <span>Change Password</span>
-                </div>
-                <div class="adugna-card-body">
-                    <form method="POST">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                        <input type="hidden" name="change_password" value="1">
-                        <div class="mb-3">
-                            <label for="current_password" class="adugna-form-label form-label">Current Password:</label>
-                            <input type="password" id="current_password" name="current_password" 
-                                   class="adugna-input form-control form-control-sm" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="new_password" class="adugna-form-label form-label">New Password:</label>
-                            <input type="password" id="new_password" name="new_password" 
-                                   class="adugna-input form-control form-control-sm"
-                                   required
-                                   pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
-                                   title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
-                            <small class="adugna-form-text">Minimum 8 characters with at least one number and uppercase letter</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="confirm_password" class="adugna-form-label form-label">Confirm New Password:</label>
-                            <input type="password" id="confirm_password" name="confirm_password" 
-                                   class="adugna-input form-control form-control-sm" required>
-                        </div>
-                        <button type="submit" class="adugna-btn adugna-btn-secondary btn-sm w-100">
-                            <i class="fas fa-sync-alt" style="font-size:0.95em;margin-right:5px;"></i>Change Password
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<?php include_once 'includes/footer.php'; ?>
