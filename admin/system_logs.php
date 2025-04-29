@@ -1,21 +1,39 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
-require_once '../includes/db.php';
 
 $pageTitle = "System Logs";
 
-// Fetch logs from the database
-$logs = [];
+// Check if the system_logs table exists before querying
+$tableExists = false;
 try {
-    $stmt = $pdo->query("SELECT id, log_level, message, created_at FROM system_logs ORDER BY created_at DESC LIMIT 100");
-    $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $pdo->query("SHOW TABLES LIKE 'system_logs'");
+    $tableExists = $stmt->rowCount() > 0;
 } catch (Exception $e) {
-    $_SESSION['error'] = "Failed to fetch system logs: " . $e->getMessage();
+    $tableExists = false;
+}
+
+$logs = [];
+$error = '';
+if ($tableExists) {
+    try {
+        $stmt = $pdo->query("SELECT * FROM system_logs ORDER BY created_at DESC LIMIT 100");
+        $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $error = "Failed to fetch system logs: " . $e->getMessage();
+    }
+} else {
+    $error = "System logs table does not exist. Please contact the administrator to create the 'system_logs' table.";
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,119 +43,105 @@ try {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .admin-dashboard {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .admin-main {
-            flex: 1;
-        }
-        .footer {
-            margin-top: auto;
-        }
-        .logs-container {
-            max-width: 1000px;
-            margin: 2rem auto;
+        .adugna-card {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 1.2rem 1.2rem;
+            margin-bottom: 1.2rem;
+            max-width: 900px;
+            border: 1px solid #e5e7eb;
         }
-        .logs-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1rem;
+        .adugna-card h2 {
+            color: #2563eb;
+            font-weight: 600;
+            margin-bottom: 0.9rem;
+            font-size: 1.1rem;
+            letter-spacing: 0.01em;
         }
-        .logs-header h1 {
-            font-size: 1.5rem;
-            color: #34495e;
-            margin: 0;
+        .adugna-table-container {
+            overflow-x: auto;
         }
-        .logs-header .btn {
-            font-size: 0.85rem;
-            padding: 0.3rem 0.6rem;
-        }
-        .table {
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1rem;
+            background: #fff;
         }
-        .table th, .table td {
-            padding: 10px;
-            border: 1px solid #ddd;
+        th, td {
+            padding: 8px 8px;
+            border-bottom: 1px solid #f0f2f5;
             text-align: left;
+            font-size: 0.93rem;
         }
-        .table th {
-            background: #f4f6f9;
-            color: #34495e;
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2563eb;
         }
-        .table tr:nth-child(even) {
-            background: #f9f9f9;
+        tr:hover {
+            background: #f4f8fb;
         }
-        .log-level {
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .log-level.error {
+        .alert-error {
+            background: #ffeaea;
             color: #e74c3c;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px 18px;
+            margin-bottom: 1em;
         }
-        .log-level.warning {
-            color: #f39c12;
+        @media (max-width: 900px) {
+            .adugna-card { padding: 0.7rem; }
         }
-        .log-level.info {
-            color: #3498db;
+        @media (max-width: 600px) {
+            .adugna-card { padding: 0.4rem; }
+            th, td { font-size: 0.85em; }
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <div class="adugna-main">
+            <header class="adugna-admin-header">
                 <h1><i class="fas fa-file-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
-            <div class="content">
-                <div class="logs-container">
-                    <div class="logs-header">
-                        <h1>System Logs</h1>
-                        <a href="dashboard.php" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-                    </div>
-                    <div>
-                        <?php if (!empty($logs)): ?>
-                            <table class="table">
-                                <thead>
+            <div class="adugna-card">
+                <h2>System Logs</h2>
+                <?php if ($error): ?>
+                    <div class="alert-error"><?= htmlspecialchars($error) ?></div>
+                <?php elseif (!empty($logs)): ?>
+                    <div class="adugna-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>User ID</th>
+                                    <th>Action</th>
+                                    <th>Description</th>
+                                    <th>IP Address</th>
+                                    <th>Created At</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($logs as $log): ?>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Log Level</th>
-                                        <th>Message</th>
-                                        <th>Timestamp</th>
+                                        <td><?= htmlspecialchars($log['id']) ?></td>
+                                        <td><?= htmlspecialchars($log['user_id']) ?></td>
+                                        <td><?= htmlspecialchars($log['action']) ?></td>
+                                        <td><?= htmlspecialchars($log['description']) ?></td>
+                                        <td><?= htmlspecialchars($log['ip_address']) ?></td>
+                                        <td><?= htmlspecialchars($log['created_at']) ?></td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($logs as $log): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($log['id']) ?></td>
-                                            <td class="log-level <?= strtolower($log['log_level']) ?>">
-                                                <?= htmlspecialchars($log['log_level']) ?>
-                                            </td>
-                                            <td><?= htmlspecialchars($log['message']) ?></td>
-                                            <td><?= htmlspecialchars(date('M j, Y g:i A', strtotime($log['created_at']))) ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        <?php else: ?>
-                            <p>No logs found.</p>
-                        <?php endif; ?>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
+                <?php else: ?>
+                    <p>No system logs found.</p>
+                <?php endif; ?>
             </div>
         </div>
-        <footer class="footer">
-            <?php include 'includes/footer.php'; ?>
-        </footer>
     </div>
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
