@@ -27,8 +27,7 @@ class Current
      */
     public static function today(): DateTime|float|int|string
     {
-        // Use Africa/Nairobi timezone for today()
-        $dti = new DateTimeImmutable('now', new \DateTimeZone('Africa/Nairobi'));
+        $dti = new DateTimeImmutable();
         $dateArray = Helpers::dateParse($dti->format('c'));
 
         return Helpers::dateParseSucceeded($dateArray) ? Helpers::returnIn3FormatsArray($dateArray, true) : ExcelError::VALUE();
@@ -53,10 +52,9 @@ class Current
      */
     public static function now(): DateTime|float|int|string
     {
-        // Use Africa/Nairobi timezone for now()
-        $dti = new DateTimeImmutable('now', new \DateTimeZone('Africa/Nairobi'));
+        $dti = new DateTimeImmutable();
         $dateArray = Helpers::dateParse($dti->format('c'));
 
-        return Helpers::dateParseSucceeded($dateArray) ? Helpers::returnIn3FormatsArray($dateArray, false) : ExcelError::VALUE();
+        return Helpers::dateParseSucceeded($dateArray) ? Helpers::returnIn3FormatsArray($dateArray) : ExcelError::VALUE();
     }
 }

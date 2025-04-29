@@ -150,9 +150,6 @@ try {
     $siteLogo = 'assets/images/default-logo.png';
     $siteName = 'School CRM';
 }
-
-// Set default timezone for login page
-date_default_timezone_set('Africa/Nairobi');
 ?>
 <!DOCTYPE html>
 <html lang="en">

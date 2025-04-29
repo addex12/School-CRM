@@ -109,9 +109,6 @@ $settings_fields = [
         'allow_user_registration' => ['label' => 'Allow User Registration', 'type' => 'checkbox'],
     ]
 ];
-
-// Set default timezone for admin pages
-date_default_timezone_set('Africa/Nairobi');
 ?>
 <!DOCTYPE html>
 <html lang="en">

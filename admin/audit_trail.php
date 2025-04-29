@@ -1,4 +1,6 @@
 <?php
+// Set timezone for audit trail
+date_default_timezone_set('Africa/Nairobi');
 require_once '../includes/auth.php';
 requireAdmin();
 $pageTitle = "Audit Trail";

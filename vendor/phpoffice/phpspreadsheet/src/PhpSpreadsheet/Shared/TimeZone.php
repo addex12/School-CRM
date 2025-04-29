@@ -10,7 +10,7 @@ class TimeZone
     /**
      * Default Timezone used for date/time conversions.
      */
-    protected static string $timezone = 'Africa/Nairobi'; // Set default to Africa/Nairobi
+    protected static string $timezone = 'Africa/Nairobi';
 
     /**
      * Validate a Timezone name.

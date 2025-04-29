@@ -1,4 +1,7 @@
 <?php
+// Set timezone for survey display
+date_default_timezone_set('Africa/Nairobi');
+
 // Enable error reporting for debugging
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -18,9 +21,6 @@ if (isset($_SESSION['success'])): ?>
     </div>
     <?php unset($_SESSION['success']); ?>
 <?php endif;
-
-// Set default timezone for survey page
-date_default_timezone_set('Africa/Nairobi');
 
 // Fetch all public surveys
 try {

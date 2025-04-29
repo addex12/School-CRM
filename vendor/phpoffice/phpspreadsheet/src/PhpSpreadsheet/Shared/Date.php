@@ -116,7 +116,7 @@ class Date
      */
     public static function getDefaultTimezone(): DateTimeZone
     {
-        return self::$defaultTimeZone ?? new DateTimeZone('UTC');
+        return self::$defaultTimeZone ?? new DateTimeZone('Africa/Nairobi');
     }
 
     /**
@@ -335,6 +335,15 @@ class Date
             $myexcelBaseDate = 2416481;
             $excel1900isLeapYear = false;
         }
+
+        // --- Adugna Gizaw: Force 12-hour mode by setting hour range and adjusting if needed ---
+        // If hour is 13-23, subtract 12 and set PM; if 0, set to 12 AM.
+        if ($hours > 12) {
+            $hours -= 12;
+        } elseif ($hours === 0) {
+            $hours = 12;
+        }
+        // --- End 12-hour mode adjustment ---
 
         //    Julian base date Adjustment
         if ($month > 2) {

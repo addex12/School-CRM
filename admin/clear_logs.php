@@ -1,7 +1,4 @@
 <?php
-// Set default timezone for log clearing
-date_default_timezone_set('Africa/Nairobi');
-
 require_once '../includes/config.php';
 
 $logTables = [

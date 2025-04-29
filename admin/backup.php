@@ -1,13 +1,13 @@
 <?php
+// Set timezone for backup/restore
+date_default_timezone_set('Africa/Nairobi');
+
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 requireAdmin();
 
 $pageTitle = "System Backup & Restore";
-
-// Set default timezone for backup/restore
-date_default_timezone_set('Africa/Nairobi');
 
 // Handle backup request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['backup_system'])) {

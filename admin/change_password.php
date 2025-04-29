@@ -6,7 +6,7 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-// Set default timezone for password change
+// Set timezone for change password page
 date_default_timezone_set('Africa/Nairobi');
 
 require_once '../includes/config.php';

@@ -1,4 +1,7 @@
 <?php
+// Set timezone for audit log
+date_default_timezone_set('Africa/Nairobi');
+
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
