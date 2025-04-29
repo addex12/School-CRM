@@ -504,7 +504,7 @@ try {
                     <label for="password">Password</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="password" name="password" show-password class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                        <input type="password" id="password" name="password" show="false" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
                     </div>
                 </div>
                 

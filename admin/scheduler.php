@@ -105,7 +105,7 @@ $lastClearTs = $lastClear ? strtotime($lastClear) : 0;
 $nextClear = @file_get_contents($nextClearFile);
 $nextClearTs = $nextClear ? strtotime($nextClear) : 0;
 
-// If next clear time is in the past, clear logs now and update times
+// If due, clear logs and update times (simulate cron)
 if ($now >= $nextClearTs) {
     foreach ($logTables as $table) {
         $pdo->exec("TRUNCATE TABLE `$table`");
@@ -115,13 +115,15 @@ if ($now >= $nextClearTs) {
             file_put_contents($file, '');
         }
     }
-    $lastClearTs =
-            . htmlspecialchars($cronScript)
-            . '</span>'
-            . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
-            . '</div>';
-    }
+    $lastClearTs = $now;
+    $nextClearTs = $lastClearTs + $intervalSeconds;
+    file_put_contents($lastClearFile, date('Y-m-d H:i:s', $lastClearTs));
+    $message .= '<div class="adugna-alert adugna-alert-success adugna-alert-dismissible">'
+        . '<span><i class="fa fa-check-circle"></i> Logs cleared automatically by scheduler.</span>'
+        . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
+        . '</div>';
 }
+file_put_contents($nextClearFile, date('Y-m-d H:i:s', $nextClearTs));
 
 try {
     // Use the existing $pdo connection
