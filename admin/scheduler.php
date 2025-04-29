@@ -59,21 +59,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_schedule'])) {
     file_put_contents($scheduleConfigFile, json_encode($configArr));
     $currentSchedule = $interval;
     $message = "Auto-clear schedule updated.";
-}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_cron'])) {
+    // Try to update CRON job after schedule change
     $cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
     if ($cronScript && is_executable($cronScript)) {
         $output = [];
         $returnVar = 0;
         exec("bash " . escapeshellarg($cronScript) . " 2>&1", $output, $returnVar);
         if ($returnVar === 0) {
-            $message = "CRON job setup successfully.<br>" . htmlspecialchars(implode("\n", $output));
+            $message .= "<br>CRON job setup successfully.<br>" . htmlspecialchars(implode("\n", $output));
         } else {
-            $error = "Failed to set up CRON job.<br>" . htmlspecialchars(implode("\n", $output));
+            $error .= "<br>Failed to set up CRON job.<br>" . htmlspecialchars(implode("\n", $output));
         }
     } else {
-        $error = "Cron setup script not found or not executable: $cronScript";
+        $error .= "<br>Cron setup script not found or not executable: " . htmlspecialchars($cronScript ?: (__DIR__ . '/create_clear_logs_cron.sh'));
     }
 }
 
