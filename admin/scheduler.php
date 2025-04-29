@@ -136,6 +136,9 @@ try {
 }
 
 $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
+
+// Calculate next system log clear time for display (fix undefined variable warning)
+$nextSystemClear = $nextClear ?? null;
 ?>
 <!DOCTYPE html>
 <html>
@@ -382,7 +385,6 @@ $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
                 <div class="adugna-note">
                     <strong>Next System Log Clear:</strong>
                     <?= $nextSystemClear ? htmlspecialchars($nextSystemClear) : 'Never' ?>
-
                 </div>
                 <div class="adugna-note">
                     <em>Note: Logs are also cleared automatically by the system CRON job based on the selected schedule.</em>
@@ -390,7 +392,7 @@ $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
             </div>
         </div>
     </div>
-            <?php include __DIR__ . '/includes/footer.php'; ?>
+    <?php include __DIR__ . '/includes/footer.php'; ?>
 
     <script>
         // Show custom schedule input if 'custom' is selected
