@@ -1,376 +1,247 @@
-/* Outstanding Modern Admin Dashboard Styles */
-body, html {
-    font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-    background: #f4f6f9;
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+* Outstanding, responsive, interactive admin dashboard styles with adugna- prefix for patenting.
+* Sidebar toggle, submenu logic, compact ERPNext-inspired cards/buttons, and active page highlight.
+*/
+
+/* Adugna Gizaw: Sidebar styles with adugna- prefix */
+.adugna-sidebar {
+    width: 220px;
+    background: #232f3e;
+    color: #fff;
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    transition: transform 0.3s;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+}
+.adugna-sidebar.adugna-closed {
+    transform: translateX(-100%);
+}
+.adugna-sidebar .adugna-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 1rem 1.2rem;
+    letter-spacing: 1px;
+    background: #1a222c;
+    margin-bottom: 0.5rem;
+}
+.adugna-sidebar ul {
+    list-style: none;
     margin: 0;
     padding: 0;
 }
+.adugna-sidebar li {
+    position: relative;
+}
+.adugna-sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 1.2rem;
+    color: #cfd8dc;
+    font-size: 0.93rem;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.adugna-sidebar a.adugna-active, .adugna-sidebar a:hover {
+    background: #1a222c;
+    color: #fff;
+    border-left: 3px solid #3498db;
+}
+.adugna-sidebar .adugna-icon {
+    font-size: 1rem;
+    margin-right: 0.7rem;
+    width: 1.2rem;
+    text-align: center;
+}
+.adugna-sidebar .adugna-submenu-toggle {
+    margin-left: auto;
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+}
+.adugna-sidebar .adugna-submenu {
+    display: none;
+    background: #25344a;
+}
+.adugna-sidebar .adugna-submenu.adugna-open {
+    display: block;
+}
+.adugna-sidebar .adugna-submenu a {
+    padding-left: 2.2rem;
+    font-size: 0.89rem;
+}
+.adugna-sidebar .adugna-submenu-toggle.adugna-rotated {
+    transform: rotate(90deg);
+}
+.adugna-sidebar-toggle-btn {
+    display: none;
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    background: #232f3e;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 2.2rem;
+    height: 2.2rem;
+    z-index: 200;
+    font-size: 1.2rem;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+}
 
-.admin-dashboard {
+/* Adugna Gizaw: Responsive layout for admin dashboard */
+.adugna-admin-dashboard {
     display: flex;
     min-height: 100vh;
     background: #f4f6f9;
-    flex-direction: column;
 }
-
-
-.admin-header {
-    background: #fff;
-    padding: 24px 15px;
-    margin-bottom: 50px; /* Increased margin to prevent overlap */
-    border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.07);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: static !important; /* Override fixed positioning */
-    height: auto !important;
+.adugna-admin-main {
+    flex: 1;
+    margin-left: 220px;
+    padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+    transition: margin-left 0.3s;
 }
-
-.admin-header h1 {
-    font-size: 2.2em;
-    color: #2d3a4b;
-    margin: 0;
-    letter-spacing: 1px;
-}
-
-.content {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 32px;
-    margin-top: 20px; /* Added margin to push content below header */
-}
-
-.widget-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 30px;
-    width: 100%;
-    margin-bottom: 32px;
-}
-
-.dashboard-widget {
-    background: linear-gradient(135deg, #fff 80%, #f4f6f9 100%);
-    border-radius: 16px;
-    padding: 20px 20px 24px 20px;
-    text-align: center;
-    box-shadow: 0 6px 32px rgba(44, 62, 80, 0.10);
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-    overflow: hidden;
-}
-.dashboard-widget:hover {
-    transform: translateY(-6px) scale(1.03);
-    box-shadow: 0 12px 40px rgba(44, 62, 80, 0.16);
-}
-.dashboard-widget i {
-    font-size: 2.8em;
-    margin-bottom: 12px;
-    color: #3498db;
-    background: #eaf6ff;
-    border-radius: 50%;
-    padding: 18px;
-    margin-top: 8px;
-    margin-bottom: 18px;
-    display: inline-block;
-}
-.widget-blue i { color: #3498db; background: #eaf6ff; }
-.widget-green i { color: #27ae60; background: #eafaf1; }
-.widget-orange i { color: #e67e22; background: #fff4e6; }
-.widget-red i { color: #e74c3c; background: #ffeaea; }
-
-.dashboard-widget h3 {
-    font-size: 2.1em;
-    margin: 0 0 8px 0;
-    color: #2d3a4b;
-    font-weight: 700;
-}
-.dashboard-widget p {
-    color: #7b8a97;
-    font-size: 1.1em;
-    margin: 0;
-    letter-spacing: 0.5px;
-}
-
-.dashboard-section {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
-
-.dashboard-section h2 {
-    margin-bottom: 18px;
-    color: #2d3a4b;
-    font-size: 1.4em;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-.table-container {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 0;
-    font-size: 1em;
-    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
-}
-
-th, td {
-    padding: 14px 12px;
-    text-align: left;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-th {
-    background: #f7fafd;
-    color: #3498db;
-    font-weight: 700;
-    font-size: 1.05em;
-    border-bottom: 2px solid #eaf6ff;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-tr:hover {
-    background: #f4f8fb;
-    transition: background 0.2s;
-}
-
 @media (max-width: 900px) {
-    .content {
-        flex-direction: column;
-        gap: 24px;
+    .adugna-admin-main {
+        margin-left: 0;
     }
-    .dashboard-section {
-        width: 100%;
-        margin-bottom: 24px;
+    .adugna-sidebar {
+        position: fixed;
+        height: 100vh;
+        z-index: 100;
     }
-    .widget-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-    }
-    .admin-main, .container, .content {
-        margin-left: 0 !important;
-        padding: 10px 5px 80px !important;
-    }
-    .form-section, .table-section, .card, .dashboard-section {
-        padding: 12px !important;
-        margin: 10px 0 !important;
-    }
-    .widget-grid, .form-grid, .meta-grid, .grid-2, .grid-3 {
-        grid-template-columns: 1fr !important;
-        gap: 10px !important;
-    }
-    .admin-header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 8px !important;
-    }
-    .table-responsive, .response-table, .users-table, .audit-log-table, .report-table, .table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-    }
-    th, td {
-        white-space: nowrap;
-        font-size: 0.95em;
+    .adugna-sidebar-toggle-btn {
+        display: flex;
     }
 }
 
-@media (max-width: 600px) {
-    .admin-header {
-        flex-direction: column;
-        padding: 16px 8px;
-    }
-    .widget-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    .dashboard-section {
-        padding: 16px 6px 10px 6px;
-    }
-    th, td {
-        padding: 15px 6px 6px;
-    }
-    .admin-main, .container, .content {
-        padding: 5px 2px 80px !important;
-    }
-    .form-section, .table-section, .card, .dashboard-section {
-        padding: 8px !important;
-        margin: 6px 0 !important;
-    }
-    .form-actions, .header-actions {
-        flex-direction: column !important;
-        gap: 10px !important;
-        align-items: stretch !important;
-    }
-    .admin-header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 8px !important;
-    }
-    .page-title, h1, h2 {
-        font-size: 1.2rem !important;
-    }
-    .table-responsive, .response-table, .users-table, .audit-log-table, .report-table, .table {
-        display: block;
-        width: 100%;
-        overflow-x: auto;
-    }
-    th, td {
-        white-space: nowrap;
-        font-size: 0.95em;
-    }
+/* Adugna Gizaw: Compact ERPNext-inspired card and button styles */
+.adugna-card {
+    background: #fff;
+    border-radius: 6px;
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
+    border: 1px solid #e3e6eb;
+    max-width: 900px;
 }
-/* Survey Results Specific Styles */
-.survey-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 20px;
+.adugna-card h2 {
+    font-size: 1.05rem;
+    color: #34495e;
+    margin: 0 0 0.4rem 0;
+    font-weight: 600;
 }
-
-.stat-card {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 24px;
-    font-weight: bold;
-    color: #2c3e50;
-}
-
-.stat-label {
-    font-size: 14px;
+.adugna-card p {
+    font-size: 0.89rem;
     color: #7f8c8d;
+    margin: 0 0 0.7rem 0;
 }
-
-.filter-form {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-
-.filter-form .form-group {
-    margin-bottom: 0;
-}
-
-.chart-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.chart-container {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    min-height: 300px;
-}
-
-.chart-card-wide {
-    grid-column: 1 / -1;
-}
-
-.word-cloud {
-    text-align: center;
-    padding: 20px;
-    min-height: 200px;
-}
-
-.response-table-section {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.pagination-container {
-    margin-top: 20px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .survey-stats {
-        grid-template-columns: 1fr 1fr;
-    }
-    
-    .filter-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .chart-section {
-        grid-template-columns: 1fr;
-    }
-}
-.active-users-count {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.1rem;
-    color: #555;
-}
-
-.status-badge {
+.adugna-btn {
+    font-size: 0.87rem;
+    padding: 0.32rem 0.7rem;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.18s;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 4px 8px;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    gap: 0.4rem;
+    font-weight: 500;
+}
+.adugna-btn.adugna-green {
+    background: #27ae60;
+}
+.adugna-btn.adugna-blue {
+    background: #3498db;
+}
+.adugna-btn.adugna-grey {
+    background: #7f8c8d;
+}
+.adugna-btn:hover {
+    background: #217dbb;
+}
+.adugna-btn.adugna-green:hover {
+    background: #218838;
+}
+.adugna-btn.adugna-grey:hover {
+    background: #636e72;
+}
+.adugna-progress-bar {
+    width: 100%;
+    background: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 0.7rem;
+    height: 7px;
+}
+.adugna-progress-bar .adugna-progress {
+    height: 100%;
+    background: #3498db;
+    width: 0;
+    transition: width 0.3s;
 }
 
-.status-badge.active {
-    color: #28a745;
-    background-color: rgba(40, 167, 69, 0.1);
+/* Adugna Gizaw: Header styles */
+.adugna-admin-header {
+    margin-bottom: 1.1rem;
+    border-bottom: 1.5px solid #e5e7eb;
+    padding-bottom: 0.7rem;
 }
-
-.status-badge i {
-    font-size: 0.6rem;
-}
-
-.refresh-controls {
+.adugna-admin-header h1 {
+    color: #3498db;
+    font-weight: 700;
+    font-size: 1.23rem;
+    letter-spacing: 0.01em;
+    margin: 0;
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
+    gap: 0.45em;
+}
+.adugna-admin-header i {
+    font-size: 1.07em;
 }
 
-.last-updated {
-    color: #666;
-    font-size: 0.9rem;
+/* Adugna Gizaw: Admin tools list */
+.adugna-admin-tools-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.adugna-admin-tools-list li {
+    margin-bottom: 0.2rem;
+}
+.adugna-admin-tools-list .adugna-btn {
+    font-size: 0.95em;
+    padding: 0.28rem 0.7rem;
+    gap: 0.3em;
+}
+.adugna-admin-tools-list i {
+    font-size: 0.93em;
 }
 
-.no-data-message {
-    text-align: center;
-    padding: 30px;
-    color: #666;
+/* Adugna Gizaw: Responsive adjustments for all screens */
+@media (max-width: 900px) {
+    .adugna-admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
+    .adugna-card { padding: 0.7rem; }
 }
-
-.no-data-message i {
-    font-size: 2rem;
-    margin-bottom: 10px;
-    color: #ccc;
+@media (max-width: 600px) {
+    .adugna-admin-main { margin-left: 0; padding: 0.3rem; }
+    .adugna-card { padding: 0.4rem; }
+    .adugna-admin-header h1 { font-size: 1rem; }
+    .adugna-card h2 { font-size: 1em; }
 }
