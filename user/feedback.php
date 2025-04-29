@@ -25,34 +25,39 @@ if (isset($_POST['user_reply_submit'], $_POST['feedback_id'])) {
         $stmt = $pdo->prepare("UPDATE feedback SET user_reply = ? WHERE id = ? AND user_id = ?");
         $stmt->execute([$user_reply, $feedback_id, $_SESSION['user_id']]);
         $success = "Your reply has been sent to the admin.";
+    } else {
+        $error = "Reply cannot be empty.";
     }
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['user_reply_submit'])) {
-    $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $rating = filter_input(INPUT_POST, 'rating', FILTER_VALIDATE_INT, [
-        'options' => ['min_range' => 1, 'max_range' => 5]
-    ]);
+    $subject = trim($_POST['subject'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+    $rating = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
 
-    try {
-        $stmt = $pdo->prepare("INSERT INTO feedback 
-                            (user_id, subject, message, rating) 
-                            VALUES (?, ?, ?, ?)");
-        $stmt->execute([$_SESSION['user_id'], $subject, $message, $rating]);
-        
-        // Send confirmation email
-        $user_email = $_SESSION['email'] ?? '';
-        sendEmail($user_email, "Feedback Received", "Thank you for your feedback!\n\nWe appreciate your input.");
-        
-        // Notify admins
-        $admin_subject = "New Feedback Submission";
-        $admin_body = "Rating: $rating/5\nSubject: $subject\nMessage: $message";
-        sendEmailToAdmins($admin_subject, $admin_body);
-        
-        $success = "Thank you for your feedback! We've sent a confirmation email.";
-    } catch (Exception $e) {
-        $error = "Error: " . $e->getMessage();
+    // Validation
+    if ($subject === '' || $message === '' || $rating < 1 || $rating > 5) {
+        $error = "Please fill in all required fields and provide a valid rating.";
+    } else {
+        try {
+            $stmt = $pdo->prepare("INSERT INTO feedback 
+                                (user_id, subject, message, rating) 
+                                VALUES (?, ?, ?, ?)");
+            $stmt->execute([$_SESSION['user_id'], $subject, $message, $rating]);
+            
+            // Send confirmation email
+            $user_email = $_SESSION['email'] ?? '';
+            sendEmail($user_email, "Feedback Received", "Thank you for your feedback!\n\nWe appreciate your input.");
+            
+            // Notify admins
+            $admin_subject = "New Feedback Submission";
+            $admin_body = "Rating: $rating/5\nSubject: $subject\nMessage: $message";
+            sendEmailToAdmins($admin_subject, $admin_body);
+            
+            $success = "Thank you for your feedback! We've sent a confirmation email.";
+        } catch (Exception $e) {
+            $error = "Error: " . $e->getMessage();
+        }
     }
 }
 
@@ -159,29 +164,40 @@ $feedback->execute([$_SESSION['user_id']]);
                 <h2 style="color:#007bff;">
                     <i class="fas fa-comment-alt"></i> Submit Feedback
                 </h2>
+
+                <!-- Notification messages -->
+                <?php if (!empty($error)): ?>
+                    <div style="background:#ffeaea;color:#e74c3c;border:1px solid #f5c6cb;padding:10px 18px;border-radius:4px;margin-bottom:18px;">
+                        <i class="fa fa-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
+                    </div>
+                <?php elseif (!empty($success)): ?>
+                    <div style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;padding:10px 18px;border-radius:4px;margin-bottom:18px;">
+                        <i class="fa fa-check-circle"></i> <?= htmlspecialchars($success) ?>
+                    </div>
+                <?php endif; ?>
                 
                 <!-- Feedback Form -->
                 <form method="POST">
                     <div class="form-group">
-                        <label class="erpnext-label" for="subject">Subject:</label>
+                        <label class="erpnext-label" for="subject">Subject: <span style="color:#e74c3c">*</span></label>
                         <select name="subject" id="subject" class="erpnext-input" required>
                             <option value="">Select subject...</option>
                             <?php foreach ($subjects as $subject): ?>
-                                <option value="<?= htmlspecialchars($subject) ?>"><?= htmlspecialchars($subject) ?></option>
+                                <option value="<?= htmlspecialchars($subject) ?>" <?= (isset($_POST['subject']) && $_POST['subject'] === $subject) ? 'selected' : '' ?>><?= htmlspecialchars($subject) ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label class="erpnext-label">Message:</label>
-                        <textarea name="message" rows="5" required class="erpnext-textarea"></textarea>
+                        <label class="erpnext-label">Message: <span style="color:#e74c3c">*</span></label>
+                        <textarea name="message" rows="5" required class="erpnext-textarea"><?= htmlspecialchars($_POST['message'] ?? '') ?></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label class="erpnext-label" for="rating">Rating:</label>
+                        <label class="erpnext-label" for="rating">Rating: <span style="color:#e74c3c">*</span></label>
                         <div class="star-rating" style="font-size:2em; color:gold;">
                             <?php for ($i = 5; $i >= 1; $i--): ?>
-                                <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;">
+                                <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;" <?= (isset($_POST['rating']) && (int)$_POST['rating'] === $i) ? 'checked' : '' ?>>
                                 <label for="star<?= $i ?>" style="cursor:pointer;">&#9733;</label>
                             <?php endfor; ?>
                         </div>
