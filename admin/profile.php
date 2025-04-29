@@ -173,12 +173,12 @@ function handleChangePassword($pdo, $user) {
 ?>
 
 <!-- Consistent layout and sidebar/footer styling as in admin/dashboard.php -->
-<div class="admin-dashboard" style="display:flex;min-height:100vh;background:#f4f6fa;">
+<div class="admin-dashboard">
     <?php 
     // Use the same sidebar include as dashboard.php
     include __DIR__ . '/includes/admin_sidebar.php'; 
     ?>
-    <div class="admin-main" style="flex:1;padding:2rem 2.5rem;">
+    <div class="admin-main">
         <div class="main-content-container">
             <div class="profile-main-container">
                 <div class="adugna-profile-header">
@@ -297,6 +297,29 @@ function handleChangePassword($pdo, $user) {
 
 <!-- Adugna ERPNext Custom Styles -->
 <style>
+/* --- Begin: Sidebar & Main Layout Styles (from dashboard.php) --- */
+.admin-dashboard {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6fa;
+}
+.admin-main {
+    flex: 1;
+    padding: 2rem 2.5rem;
+}
+@media (max-width: 900px) {
+    .admin-main {
+        padding: 1rem 0.5rem;
+    }
+}
+@media (max-width: 600px) {
+    .admin-main {
+        padding: 10px 2px 80px;
+    }
+}
+/* --- End: Sidebar & Main Layout Styles --- */
+
+/* --- Begin: Profile Page Styles (existing) --- */
 /* Adugna ERPNext Card Styling */
 .adugna-card {
     border-radius: 10px;
@@ -479,4 +502,5 @@ function handleChangePassword($pdo, $user) {
         min-width: 0;
     }
 }
+/* --- End: Profile Page Styles --- */
 </style>
