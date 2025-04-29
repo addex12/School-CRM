@@ -6,7 +6,7 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Redirect crm.flipperschool.com and crm.flipperschools.com to flipperschool.com/login.php
 RewriteCond %{HTTP_HOST} ^crm\.flipperschool\.com$ [NC,OR]
-RewriteCond %{HTTP_HOST} ^crm\.flipperschools\.com$ [NC]
+RewriteCond %{HTTP_HOST} ^crm\.flipperschool\.com$ [NC]
 RewriteRule ^ https://flipperschool.com/login.php [L,R=301]
 
 # Prevent directory listing
