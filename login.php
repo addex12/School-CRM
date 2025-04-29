@@ -159,7 +159,6 @@ $siteIcon = 'uploads/icon.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <!--
         Developer: Adugna Gizaw
@@ -174,7 +173,7 @@ $siteIcon = 'uploads/icon.png';
     <title>Login - School CRM</title>
     <!-- Favicon -->
     <link rel="icon" href="<?= htmlspecialchars($siteIcon) ?>" type="image/png">
-    <!-- Fonts and Icons -->
+<!-- Fonts and Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -224,16 +223,15 @@ $siteIcon = 'uploads/icon.png';
             align-items: center;
             padding: 2rem 1rem;
             min-width: 0;
-            /* Add background image to the right partition only */
+            /* Show only the background image, no blue overlay */
             background:
-                linear-gradient(135deg, rgba(79,70,229,0.85), rgba(67,56,202,0.85)),
                 url('<?= htmlspecialchars($loginBgImage) ?>') center center/cover no-repeat;
             position: relative;
         }
         /* Remove background from left partition */
         .adugna-login-left {
             flex: 1;
-            background: var(--adugna-primary);
+            background: none;
             color: #fff;
             padding: 2rem 1rem;
             display: flex;
@@ -489,7 +487,6 @@ $siteIcon = 'uploads/icon.png';
         }
     </style>
 </head>
-
 <body>
     <!--
         Adugna Gizaw: Main login container, split into left (info/announcements) and right (login form)
