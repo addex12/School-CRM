@@ -65,12 +65,13 @@ switch ($schedule) {
 }
 
 // Update CRON job if called directly (e.g., after schedule change)
-if (php_sapi_name() === 'cli' || isset($_SERVER['REQUEST_METHOD'])) {
-    $cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
-    if ($cronScript && is_executable($cronScript)) {
-        // Run in background to avoid blocking web requests
-        exec("bash " . escapeshellarg($cronScript) . " >/dev/null 2>&1 &");
-    }
+$cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
+if ($cronScript && is_executable($cronScript)) {
+    // Run in background to avoid blocking web requests
+    exec("bash " . escapeshellarg($cronScript) . " >/dev/null 2>&1 &");
+} else {
+    // Log a warning if the cron setup script is missing or not executable
+    error_log("CRON setup script not found or not executable: " . ($cronScript ?: (__DIR__ . '/create_clear_logs_cron.sh')));
 }
 
 // Get last clear time
