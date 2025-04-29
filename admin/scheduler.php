@@ -59,63 +59,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_schedule'])) {
     file_put_contents($scheduleConfigFile, json_encode($configArr));
     $currentSchedule = $interval;
     $message = "Auto-clear schedule updated.";
-
-    // Try to update CRON job after schedule change
-    $cronScript = __DIR__ . '/create_clear_logs_cron.sh';
-    if (file_exists($cronScript) && is_executable($cronScript)) {
-        $output = [];
-        $returnVar = 0;
-        exec("bash " . escapeshellarg($cronScript) . " 2>&1", $output, $returnVar);
-        if ($returnVar === 0) {
-            $message .= '<div class="adugna-alert adugna-alert-success adugna-alert-dismissible">'
-                . '<span><i class="fa fa-check-circle"></i> CRON job updated successfully.</span>'
-                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
-                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#2563eb;">'
-                . htmlspecialchars(implode("\n", $output))
-                . '</pre></div>';
-        } else {
-            $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
-                . '<span><i class="fa fa-exclamation-triangle"></i> Failed to set up CRON job.</span>'
-                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
-                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#e74c3c;">'
-                . htmlspecialchars(implode("\n", $output))
-                . '</pre></div>';
-        }
-    } else {
-        $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
-            . '<span><i class="fa fa-exclamation-triangle"></i> Cron setup script not found or not executable: '
-            . htmlspecialchars($cronScript)
-            . '</span>'
-            . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
-            . '</div>';
-    }
 }
 
-// Handle manual CRON setup/update button
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_cron'])) {
-    $cronScript = __DIR__ . '/create_clear_logs_cron.sh';
-    if (file_exists($cronScript) && is_executable($cronScript)) {
-        $output = [];
-        $returnVar = 0;
-        exec("bash " . escapeshellarg($cronScript) . " 2>&1", $output, $returnVar);
-        if ($returnVar === 0) {
-            $message .= '<div class="adugna-alert adugna-alert-success adugna-alert-dismissible">'
-                . '<span><i class="fa fa-check-circle"></i> CRON job updated successfully.</span>'
-                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
-                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#2563eb;">'
-                . htmlspecialchars(implode("\n", $output))
-                . '</pre></div>';
-        } else {
-            $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
-                . '<span><i class="fa fa-exclamation-triangle"></i> Failed to set up CRON job.</span>'
-                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
-                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#e74c3c;">'
-                . htmlspecialchars(implode("\n", $output))
-                . '</pre></div>';
+// Remove all CRON job logic and use a PHP-based scheduler (runs on page load)
+$lastClearFile = __DIR__ . '/last_log_clear.txt';
+$nextClearFile = __DIR__ . '/next_log_clear.txt';
+
+// Calculate interval in seconds
+$unitSeconds = [
+    'seconds' => 1,
+    'minutes' => 60,
+    'hours'   => 3600,
+    'days'    => 86400,
+    'weeks'   => 604800,
+    'months'  => 2592000 // 30 days
+];
+$schedule = $currentSchedule;
+switch ($schedule) {
+    case 'daily':
+        $intervalSeconds = 86400;
+        break;
+    case 'weekly':
+        $intervalSeconds = 604800;
+        break;
+    case 'monthly':
+        $intervalSeconds = 2592000;
+        break;
+    case 'custom':
+        $intervalSeconds = isset($unitSeconds[$customUnit]) ? $customValue * $unitSeconds[$customUnit] : 86400;
+        if ($intervalSeconds < 1) $intervalSeconds = 1;
+        break;
+    default:
+        $intervalSeconds = 86400;
+}
+
+$now = time();
+if (!file_exists($lastClearFile)) {
+    file_put_contents($lastClearFile, date('Y-m-d H:i:s', $now));
+}
+if (!file_exists($nextClearFile)) {
+    file_put_contents($nextClearFile, date('Y-m-d H:i:s', $now + $intervalSeconds));
+}
+$lastClear = @file_get_contents($lastClearFile);
+$lastClearTs = $lastClear ? strtotime($lastClear) : 0;
+$nextClear = @file_get_contents($nextClearFile);
+$nextClearTs = $nextClear ? strtotime($nextClear) : 0;
+
+// If next clear time is in the past, clear logs now and update times
+if ($now >= $nextClearTs) {
+    foreach ($logTables as $table) {
+        $pdo->exec("TRUNCATE TABLE `$table`");
+    }
+    foreach ($logFiles as $file) {
+        if (file_exists($file)) {
+            file_put_contents($file, '');
         }
-    } else {
-        $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
-            . '<span><i class="fa fa-exclamation-triangle"></i> Cron setup script not found or not executable: '
+    }
+    $lastClearTs =
             . htmlspecialchars($cronScript)
             . '</span>'
             . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
