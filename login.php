@@ -494,7 +494,7 @@ $siteIcon = 'uploads/icon.png';
     <!--
         Adugna Gizaw: Main login container, split into left (info/announcements) and right (login form)
     -->
-    <div class="adugna-login-container">
+    < class="adugna-login-container">
         <!-- Left: Illustration and Announcements -->
         <div class="adugna-login-left">
             <div class="adugna-illustration">
@@ -520,7 +520,7 @@ $siteIcon = 'uploads/icon.png';
                 </div>
             <?php endif; ?>
         </div>
-                    </div>
+        
         <!-- Right: Login Card -->
         <div class="adugna-login-right">
             <div class="adugna-card">
