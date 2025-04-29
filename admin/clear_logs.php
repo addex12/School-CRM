@@ -11,14 +11,15 @@ $logTables = [
 $logFiles = [
     __DIR__ . '/../error_log',
     __DIR__ . '/../logs/error.log',
-    __DIR__ . '/../logs/raw_activity.log',
+    __DIR__ . '/../logs/raw_activity/log',
     __DIR__ . '/../logs/user_activity.log'
 ];
 
 $scheduleConfigFile = __DIR__ . '/log_clear_schedule.json';
 $lastClearFile = __DIR__ . '/last_log_clear.txt';
+$nextClearFile = __DIR__ . '/next_log_clear.txt';
 
-// Determine schedule
+// Load schedule config
 $schedule = 'daily';
 $customValue = 1;
 $customUnit = 'days';
@@ -36,39 +37,47 @@ if (file_exists($scheduleConfigFile)) {
     }
 }
 
-$shouldClear = false;
+// Calculate interval in seconds
+$unitSeconds = [
+    'seconds' => 1,
+    'minutes' => 60,
+    'hours'   => 3600,
+    'days'    => 86400,
+    'weeks'   => 604800,
+    'months'  => 2592000 // 30 days
+];
+switch ($schedule) {
+    case 'daily':
+        $intervalSeconds = 86400;
+        break;
+    case 'weekly':
+        $intervalSeconds = 604800;
+        break;
+    case 'monthly':
+        $intervalSeconds = 2592000;
+        break;
+    case 'custom':
+        $intervalSeconds = isset($unitSeconds[$customUnit]) ? $customValue * $unitSeconds[$customUnit] : 86400;
+        if ($intervalSeconds < 1) $intervalSeconds = 86400;
+        break;
+    default:
+        $intervalSeconds = 86400;
+}
+
+// Get last clear time
 $now = time();
 $lastClear = @file_get_contents($lastClearFile);
 $lastClearTs = $lastClear ? strtotime($lastClear) : 0;
 
-switch ($schedule) {
-    case 'daily':
-        $shouldClear = ($now - $lastClearTs) >= 86400;
-        break;
-    case 'weekly':
-        $shouldClear = ($now - $lastClearTs) >= 604800;
-        break;
-    case 'monthly':
-        $shouldClear = ($now - $lastClearTs) >= 2592000;
-        break;
-    case 'custom':
-        $unitSeconds = [
-            'seconds' => 1,
-            'minutes' => 60,
-            'hours'   => 3600,
-            'days'    => 86400,
-            'weeks'   => 604800,
-            'months'  => 2592000 // 30 days
-        ];
-        $intervalSeconds = (isset($unitSeconds[$customUnit]) ? $customValue * $unitSeconds[$customUnit] : 86400);
-        if ($intervalSeconds < 1) $intervalSeconds = 86400;
-        $shouldClear = ($now - $lastClearTs) >= $intervalSeconds;
-        break;
-    default:
-        $shouldClear = true;
+// Calculate next scheduled clear time
+$nextClearTs = $lastClearTs > 0 ? $lastClearTs + $intervalSeconds : $now;
+if ($nextClearTs < $now) {
+    // If missed, set to now (immediate clear)
+    $nextClearTs = $now;
 }
 
-if ($shouldClear) {
+// Only clear logs if now >= next scheduled clear time
+if ($now >= $nextClearTs) {
     foreach ($logTables as $table) {
         $pdo->exec("TRUNCATE TABLE `$table`");
     }
@@ -77,5 +86,9 @@ if ($shouldClear) {
             file_put_contents($file, '');
         }
     }
-    file_put_contents($lastClearFile, date('Y-m-d H:i:s'));
+    // Update last clear and next clear times
+    $lastClearStr = date('Y-m-d H:i:s', $now);
+    $nextClearStr = date('Y-m-d H:i:s', $now + $intervalSeconds);
+    file_put_contents($lastClearFile, $lastClearStr);
+    file_put_contents($nextClearFile, $nextClearStr);
 }

@@ -64,15 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_schedule'])) {
 try {
     // Use the existing $pdo connection
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_logs'])) {
-        foreach ($logTables as $table) {
-            $pdo->exec("TRUNCATE TABLE `$table`");
-        }
-        foreach ($logFiles as $desc => $file) {
-            if (file_exists($file)) {
-                file_put_contents($file, '');
-            }
-        }
-        file_put_contents(__DIR__ . '/last_log_clear.txt', date('Y-m-d H:i:s'));
+        include __DIR__ . '/clear_logs.php';
         $message = "System logs and log files cleared successfully.";
     }
 } catch (Exception $e) {
