@@ -8,12 +8,17 @@
  */
 ?>
 <style>
-/* Adugna Admin Footer Styles */
+/**
+ * Adugna Gizaw: adugna-footer is always fixed at the bottom, content/screen aware, interactive.
+ * - Uses adugna- prefix for all custom styles.
+ * - Footer never overlaps content: add bottom padding to body/main if needed.
+ * - Responsive and visually outstanding.
+ */
 .adugna-footer {
-    position: relative;
-    bottom: 0;
+    position: fixed;
     left: 0;
-    width: 100%;
+    bottom: 0;
+    width: 100vw;
     background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
     color: #f5f6fa;
     padding: 12px 14px;
@@ -21,9 +26,10 @@
     align-items: center;
     border-top: 1px solid #374150;
     font-size: 12px;
-    z-index: 100;
+    z-index: 1000;
     box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
     min-height: 44px;
+    transition: background 0.2s;
 }
 .adugna-footer-content {
     display: flex;
@@ -69,7 +75,7 @@
     text-decoration: none;
     font-size: 10px;
     font-weight: 500;
-    transition: color 0.2s, background 0.2s;
+    transition: color 0.2s, background 0.2s, box-shadow 0.2s;
     padding: 4px 8px;
     border-radius: 4px;
     background: #2563eb;
@@ -78,10 +84,11 @@
     box-shadow: 0 1px 2px rgba(44,62,80,0.04);
     display: inline-block;
 }
-.adugna-footer-link:hover {
+.adugna-footer-link:hover, .adugna-footer-link:focus {
     color: #fff;
     background: #215967;
     text-decoration: none;
+    box-shadow: 0 2px 8px #1976d2;
 }
 .adugna-developer-info {
     text-align: right;
@@ -96,13 +103,13 @@
 .adugna-social-link {
     color: #f5f6fa;
     font-size: 13px;
-    transition: color 0.2s, transform 0.2s;
+    transition: color 0.2s, transform 0.2s, background 0.2s;
     background: #007bfc;
     border-radius: 50%;
     padding: 3px 5px;
     display: inline-block;
 }
-.adugna-social-link:hover {
+.adugna-social-link:hover, .adugna-social-link:focus {
     color: #f1c40f;
     background: #215967;
     transform: scale(1.08);
@@ -139,9 +146,15 @@
         font-size: 9px;
     }
 }
+/* Ensure page content is never hidden behind the fixed footer */
+body, .admin-dashboard, .adugna-main, .adugna-main-content {
+    padding-bottom: 60px !important;
+    box-sizing: border-box;
+}
 </style>
 
 <footer class="adugna-footer">
+    <!-- Adugna Gizaw: Responsive, fixed, interactive footer. Never overlaps content. -->
     <div class="adugna-footer-content">
         <div class="adugna-footer-section adugna-footer-main-info">
             <h4><?php echo $pageTitle ?? 'Admin Panel'; ?></h4>
