@@ -425,7 +425,6 @@ function getUserRoleName($roleId) {
             </div>
         </div>
     </div>
-    <?php include __DIR__ . '/includes/footer.php'; ?>
 
     <!-- JS for all row/bulk actions and AJAX table -->
     <script src="../assets/js/active_users.js"></script>
@@ -624,3 +623,4 @@ function getUserRoleName($roleId) {
 </body>
 </html>
 <?php ob_end_flush(); ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
