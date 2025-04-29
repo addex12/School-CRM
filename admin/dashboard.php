@@ -42,17 +42,13 @@ try {
     $stmt = $pdo->query("SELECT COUNT(*) FROM teachers");
     $totalTeachers = $stmt->fetchColumn() ?: 0;
 
-    // Total Classes
-    // Check if table exists before querying
-    $totalClasses = 0;
-    $classTableExists = $pdo->query("SHOW TABLES LIKE 'classes'")->rowCount() > 0;
-    if ($classTableExists) {
-        $stmt = $pdo->query("SELECT COUNT(*) FROM classes");
-        $totalClasses = $stmt->fetchColumn() ?: 0;
-    }
-
-    // Total Parents
-    $stmt = $pdo->query("SELECT COUNT(*) FROM parents");
+    // Total Parents (fix: count only unique parents with valid user and role_id=3)
+    $stmt = $pdo->query("
+        SELECT COUNT(DISTINCT p.user_id)
+        FROM parents p
+        INNER JOIN users u ON p.user_id = u.id
+        WHERE u.role_id = 3
+    ");
     $totalParents = $stmt->fetchColumn() ?: 0;
 
     // Ongoing Tickets (open, in_progress, on_hold)
@@ -75,7 +71,7 @@ try {
     $stmt = $pdo->query("SELECT COUNT(*) FROM users");
     $totalUsers = $stmt->fetchColumn() ?: 0;
 } catch (Exception $e) {
-    $totalStudents = $totalTeachers = $totalClasses = $totalParents = 0;
+    $totalStudents = $totalTeachers = $totalParents = 0;
     $ongoingTickets = $closedTickets = $completedSurveys = $activeSurveys = $totalUsers = 0;
 }
 
@@ -92,12 +88,6 @@ $widgets[] = [
     "icon" => "fa-chalkboard-teacher",
     "color" => "green",
     "count" => $totalTeachers
-];
-$widgets[] = [
-    "title" => "Total Classes",
-    "icon" => "fa-school",
-    "color" => "purple",
-    "count" => $totalClasses
 ];
 $widgets[] = [
     "title" => "Total Parents",
