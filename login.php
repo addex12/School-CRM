@@ -449,7 +449,7 @@ try {
     <div class="login-container">
         <div class="login-left">
             <div class="illustration">
-                <img src="assets/images/default-logo.png" alt="School Illustration" aria-hidden="true">
+          <?php  $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png'; ?>
             </div>
             <div class="illustration-text">
                 <h3>School CRM</h3>
