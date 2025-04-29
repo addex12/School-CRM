@@ -8,7 +8,7 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 RewriteCond %{HTTP_HOST} ^crm\.flipperschool\.com$ [NC,OR]
 RewriteCond %{HTTP_HOST} ^crm\.flipperschool\.com$ [NC]
-RewriteRule ^ https://flipperschool.com/login.php [L,R=301]
+RewriteRule ^ https://crm.flipperschool.com/login.php [L,R=301]
 
 # Prevent directory listing
 Options -Indexes
