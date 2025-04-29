@@ -58,7 +58,7 @@ switch ($schedule) {
         break;
     case 'custom':
         $intervalSeconds = isset($unitSeconds[$customUnit]) ? $customValue * $unitSeconds[$customUnit] : 86400;
-        if ($intervalSeconds < 1) $intervalSeconds = 86400;
+        if ($intervalSeconds < 1) $intervalSeconds = 1;
         break;
     default:
         $intervalSeconds = 86400;
@@ -69,15 +69,9 @@ $now = time();
 $lastClear = @file_get_contents($lastClearFile);
 $lastClearTs = $lastClear ? strtotime($lastClear) : 0;
 
-// Calculate next scheduled clear time
-$nextClearTs = $lastClearTs > 0 ? $lastClearTs + $intervalSeconds : $now;
-if ($nextClearTs < $now) {
-    // If missed, set to now (immediate clear)
-    $nextClearTs = $now;
-}
-
-// Only clear logs if now >= next scheduled clear time
-if ($now >= $nextClearTs) {
+// Loop: clear logs for every missed interval until next clear is in the future
+while ($now >= $lastClearTs + $intervalSeconds) {
+    // Clear logs
     foreach ($logTables as $table) {
         $pdo->exec("TRUNCATE TABLE `$table`");
     }
@@ -86,9 +80,8 @@ if ($now >= $nextClearTs) {
             file_put_contents($file, '');
         }
     }
-    // Update last clear and next clear times
-    $lastClearStr = date('Y-m-d H:i:s', $now);
-    $nextClearStr = date('Y-m-d H:i:s', $now + $intervalSeconds);
-    file_put_contents($lastClearFile, $lastClearStr);
-    file_put_contents($nextClearFile, $nextClearStr);
+    // Update last clear time
+    $lastClearTs += $intervalSeconds;
+    file_put_contents($lastClearFile, date('Y-m-d H:i:s', $lastClearTs));
+    file_put_contents($nextClearFile, date('Y-m-d H:i:s', $lastClearTs + $intervalSeconds));
 }
