@@ -154,8 +154,7 @@ function handleChangePassword($pdo, $user) {
 
 ?>
 
-<?php include_once '../includes/header.php'; ?>
-<?php include_once '../includes/sidebar.php'; ?>
+<?php include_once 'includes/admin_sidebar.php'; ?>
 
 <div class="main-content-container">
     <div class="profile-main-container">
@@ -261,4 +260,4 @@ function handleChangePassword($pdo, $user) {
     </div>
 </div>
 
-<?php include_once '../includes/footer.php'; ?>
+<?php include_once 'includes/footer.php'; ?>
