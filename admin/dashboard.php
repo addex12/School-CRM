@@ -1,13 +1,12 @@
 <?php
 /**
- * 
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
  * LinkedIn: https://www.linkedin.com/in/eleganceict
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-ob_start(); // Start output buffering
+ob_start();
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -47,81 +46,82 @@ try {
     // Total Parents
     $stmt = $pdo->query("SELECT COUNT(*) FROM parents");
     $totalParents = $stmt->fetchColumn() ?: 0;
-
-    // Ongoing Tickets (status = 'open' or 'in_progress')
-    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status IN ('open', 'in_progress')");
+    // Ongoing Tickets (open, in_progress, on_hold)
+    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status IN ('open', 'in_progress', 'on_hold')");
     $ongoingTickets = $stmt->fetchColumn() ?: 0;
-
-    // Closed Tickets (status = 'closed')
-    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status = 'closed'");
+    // Closed Tickets (resolved)
+    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'");
     $closedTickets = $stmt->fetchColumn() ?: 0;
-
-    // Completed Surveys (where ends_at < NOW())
+    // Completed Surveys (ends_at < NOW())
     $stmt = $pdo->query("SELECT COUNT(*) FROM surveys WHERE ends_at < NOW()");
     $completedSurveys = $stmt->fetchColumn() ?: 0;
-
-    // Active Surveys (where is_active = 1 and starts_at <= NOW() and ends_at >= NOW())
+    // Active Surveys (is_active = 1 and starts_at <= NOW() and ends_at >= NOW())
     $stmt = $pdo->query("SELECT COUNT(*) FROM surveys WHERE is_active = 1 AND starts_at <= NOW() AND ends_at >= NOW()");
     $activeSurveys = $stmt->fetchColumn() ?: 0;
+    // Total Users
+    $stmt = $pdo->query("SELECT COUNT(*) FROM users");
+    $totalUsers = $stmt->fetchColumn() ?: 0;
 } catch (Exception $e) {
     $totalStudents = $totalTeachers = $totalClasses = $totalParents = 0;
-    $ongoingTickets = $closedTickets = $completedSurveys = $activeSurveys = 0;
+    $ongoingTickets = $closedTickets = $completedSurveys = $activeSurveys = $totalUsers = 0;
 }
 
 // Remove duplicated "Resolved Tickets" card and add new cards
-$widgets = array_filter($widgets, function($w) {
-    return $w['title'] !== "Resolved Tickets" && $w['title'] !== "Completed Tickets";
-});
-array_unshift($widgets,
-    [
-        "title" => "Total Students",
-        "icon" => "fa-user-graduate",
-        "color" => "blue",
-        "count" => $totalStudents
-    ],
-    [
-        "title" => "Total Teachers",
-        "icon" => "fa-chalkboard-teacher",
-        "color" => "green",
-        "count" => $totalTeachers
-    ],
-    [
-        "title" => "Total Classes",
-        "icon" => "fa-school",
-        "color" => "purple",
-        "count" => $totalClasses
-    ],
-    [
-        "title" => "Total Parents",
-        "icon" => "fa-users",
-        "color" => "teal",
-        "count" => $totalParents
-    ],
-    [
-        "title" => "Ongoing Tickets",
-        "icon" => "fa-spinner",
-        "color" => "orange",
-        "count" => $ongoingTickets
-    ],
-    [
-        "title" => "Closed Tickets",
-        "icon" => "fa-check-circle",
-        "color" => "red",
-        "count" => $closedTickets
-    ],
-    [
-        "title" => "Completed Surveys",
-        "icon" => "fa-list-check",
-        "color" => "yellow",
-        "count" => $completedSurveys
-    ],
-    [
-        "title" => "Active Surveys",
-        "icon" => "fa-bullhorn",
-        "color" => "blue",
-        "count" => $activeSurveys
-    ]
-);
+$widgets = [];
+$widgets[] = [
+    "title" => "Total Students",
+    "icon" => "fa-user-graduate",
+    "color" => "blue",
+    "count" => $totalStudents
+];
+$widgets[] = [
+    "title" => "Total Teachers",
+    "icon" => "fa-chalkboard-teacher",
+    "color" => "green",
+    "count" => $totalTeachers
+];
+$widgets[] = [
+    "title" => "Total Classes",
+    "icon" => "fa-school",
+    "color" => "purple",
+    "count" => $totalClasses
+];
+$widgets[] = [
+    "title" => "Total Parents",
+    "icon" => "fa-users",
+    "color" => "teal",
+    "count" => $totalParents
+];
+$widgets[] = [
+    "title" => "Ongoing Tickets",
+    "icon" => "fa-spinner",
+    "color" => "orange",
+    "count" => $ongoingTickets
+];
+$widgets[] = [
+    "title" => "Closed Tickets",
+    "icon" => "fa-check-circle",
+    "color" => "red",
+    "count" => $closedTickets
+];
+$widgets[] = [
+    "title" => "Completed Surveys",
+    "icon" => "fa-list-check",
+    "color" => "yellow",
+    "count" => $completedSurveys
+];
+$widgets[] = [
+    "title" => "Active Surveys",
+    "icon" => "fa-bullhorn",
+    "color" => "blue",
+    "count" => $activeSurveys
+];
+$widgets[] = [
+    "title" => "Total Users",
+    "icon" => "fa-users",
+    "color" => "blue",
+    "count" => $totalUsers
+];
 
 // Fetch unread messages from users to admin
 $unreadMessagesCount = 0;
@@ -248,10 +248,42 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
     <style>
-        /* 
-         * Adugna custom styles for patenting (adugna- prefix)
-         * Inspired by ERPNext, compact, flexible, and interactive
-         */
+        /* Adugna patenting styles (adugna- prefix, ERPNext-inspired, compact, responsive) */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f6fa;
+        }
+        .adugna-dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #f4f6fa 60%, #e0e7ef 100%);
+            width: 100vw;
+            box-sizing: border-box;
+        }
+        .adugna-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
+            margin-left: 220px; /* Sidebar width */
+            transition: margin-left 0.2s;
+        }
+        @media (max-width: 900px) {
+            .adugna-main {
+                margin-left: 60px;
+                padding: 1rem 0.5rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .adugna-main {
+                margin-left: 0;
+                padding: 8px 1px 60px;
+            }
+        }
         .adugna-btn, .adugna-btn-secondary {
             display: inline-flex;
             align-items: center;
@@ -297,36 +329,37 @@ try {
             align-items: center;
             min-height: 120px;
             border-top: 3px solid #e5e7eb;
+            cursor: pointer;
         }
         .adugna-card:hover {
             transform: translateY(-2px) scale(1.025);
             box-shadow: 0 6px 24px rgba(44,62,80,0.13);
         }
         .adugna-card i {
-            font-size: 1.25rem;
-            margin-bottom: 0.3rem;
+            font-size: 1.15rem;
+            margin-bottom: 0.2rem;
             color: #2563eb;
             background: #f1f5f9;
             border-radius: 50%;
-            padding: 0.35em;
+            padding: 0.25em;
             box-shadow: 0 1px 4px rgba(44,62,80,0.07);
-            min-width: 32px;
-            min-height: 32px;
+            min-width: 28px;
+            min-height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .adugna-card .adugna-card-title {
-            font-size: 1.02rem;
+            font-size: 0.98rem;
             color: #34495e;
-            margin: 0.15rem 0 0.08rem 0;
+            margin: 0.12rem 0 0.06rem 0;
             font-weight: 600;
         }
         .adugna-card .adugna-card-count {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: #2563eb;
             font-weight: 700;
-            margin-bottom: 0.1rem;
+            margin-bottom: 0.08rem;
         }
         .adugna-card-blue { border-top: 3px solid #2563eb; }
         .adugna-card-green { border-top: 3px solid #22c55e; }
@@ -370,22 +403,6 @@ try {
             color: #34495e;
             font-weight: 500;
         }
-        .adugna-dashboard {
-            display: flex;
-            min-height: 100vh;
-            background: linear-gradient(120deg, #f4f6fa 60%, #e0e7ef 100%);
-            width: 100vw;
-            box-sizing: border-box;
-        }
-        .adugna-main {
-            flex: 1;
-            padding: 2rem 2.5rem;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            box-sizing: border-box;
-        }
         .adugna-header {
             display: flex;
             align-items: center;
@@ -408,7 +425,7 @@ try {
         }
         .adugna-widget-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
             width: 100%;
@@ -460,10 +477,6 @@ try {
             overflow-y: auto;
         }
         /* Outstanding, interactive hover effect for cards */
-        .adugna-card {
-            cursor: pointer;
-            transition: box-shadow 0.18s, transform 0.18s;
-        }
         .adugna-card:active {
             transform: scale(0.98);
             box-shadow: 0 1px 4px rgba(44,62,80,0.09);
@@ -540,12 +553,6 @@ try {
                 <!-- Widgets Section -->
                 <div class="adugna-widget-grid">
                     <?php foreach ($widgets as $widget): ?>
-                        <?php
-                        // Ensure 'count' key exists to avoid undefined index warning
-                        if (!isset($widget['count'])) {
-                            $widget['count'] = 0;
-                        }
-                        ?>
                         <div class="adugna-card adugna-card-<?= htmlspecialchars($widget['color']) ?>">
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
                             <div class="adugna-card-count"><?= htmlspecialchars($widget['count']) ?></div>
