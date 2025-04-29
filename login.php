@@ -151,19 +151,11 @@ try {
     $siteName = 'School CRM';
 }
 
-// Map image settings to their fixed filenames
-$imageFiles = [
-    'site_logo'   => 'uploads/logo.png',
-    'login_bg_image' => 'uploads/bg.png',
-    'site_banner' => 'uploads/banner.png',
-    'site_icon'   => 'uploads/icon.png'
-];
-
-// Use the fixed filenames for display
-$siteLogo = $imageFiles['site_logo'];
-$loginBgImage = $imageFiles['login_bg_image'];
-$siteBanner = $imageFiles['site_banner'];
-$siteIcon = $imageFiles['site_icon'];
+// Use fixed filenames for images as set in admin/settings.php
+$siteLogo = 'uploads/logo.png';
+$loginBgImage = 'uploads/bg.png';
+$siteBanner = 'uploads/banner.png';
+$siteIcon = 'uploads/icon.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -223,12 +215,25 @@ $siteIcon = $imageFiles['site_icon'];
             flex-direction: row;
             background: var(--adugna-light);
         }
-        /* Adugna Gizaw: Left section with gradient, announcements, and school photo background */
-        .adugna-login-left {
+        /* Adugna Gizaw: Right section with login card and background image */
+        .adugna-login-right {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+            min-width: 0;
+            /* Add background image to the right partition only */
             background:
                 linear-gradient(135deg, rgba(79,70,229,0.85), rgba(67,56,202,0.85)),
                 url('<?= htmlspecialchars($loginBgImage) ?>') center center/cover no-repeat;
+            position: relative;
+        }
+        /* Remove background from left partition */
+        .adugna-login-left {
+            flex: 1;
+            background: var(--adugna-primary);
             color: #fff;
             padding: 2rem 1rem;
             display: flex;
@@ -249,16 +254,6 @@ $siteIcon = $imageFiles['site_icon'];
             background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
             transform: rotate(30deg);
             z-index: 0;
-        }
-        /* Adugna Gizaw: Right section with login card */
-        .adugna-login-right {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1rem;
-            min-width: 0;
         }
         /* Adugna Gizaw: Compact card style for login form */
         .adugna-card {
@@ -503,7 +498,6 @@ $siteIcon = $imageFiles['site_icon'];
         <!-- Left: Illustration and Announcements -->
         <div class="adugna-login-left">
             <div class="adugna-illustration">
-                <!-- Adugna Gizaw: Site logo (can be replaced with SVG/PNG) -->
                 <img src="<?= htmlspecialchars($siteLogo) ?>" alt="Site Logo" style="height: 60px;">
             </div>
             <div class="adugna-illustration-text">
