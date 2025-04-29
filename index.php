@@ -1,4 +1,10 @@
 <?php
+// Redirect users coming from crm.flipperschools.com to the new login page
+if (isset($_SERVER['HTTP_HOST']) && strtolower($_SERVER['HTTP_HOST']) === 'crm.flipperschools.com') {
+    header('Location: https://flipperschool.com/login.php');
+    exit();
+}
+
 // Start the session
 session_start();
 
