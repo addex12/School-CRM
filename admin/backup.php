@@ -270,11 +270,18 @@ $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [
                 <?php if (!empty($_SESSION['error'])): ?>
                     <div class="adugna-alert-error"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
                 <?php endif; ?>
-                <form method="POST">
+                <form method="POST" id="adugna-backup-form">
                     <div class="adugna-card">
                         <div class="adugna-card-header"><i class="fas fa-download"></i> Create Backup</div>
                         <p style="margin-bottom:1em;">Click the button below to create a full system backup.</p>
-                        <button type="submit" name="backup_system" class="adugna-btn">
+                        <!-- Adugna Gizaw: Progress bar for real-time backup progress -->
+                        <div id="adugna-backup-progress-container" style="display:none;margin-bottom:1em;">
+                            <div style="background:#e3eafc;border-radius:4px;overflow:hidden;height:18px;">
+                                <div id="adugna-backup-progress-bar" style="width:0%;background:#1976d2;height:18px;color:#fff;text-align:center;font-size:0.93em;line-height:18px;transition:width 0.3s;">0%</div>
+                            </div>
+                            <div id="adugna-backup-progress-status" style="font-size:0.95em;color:#1976d2;margin-top:4px;"></div>
+                        </div>
+                        <button type="submit" name="backup_system" class="adugna-btn" id="adugna-backup-btn">
                             <i class="fas fa-download"></i> Backup Now
                         </button>
                     </div>
@@ -318,5 +325,50 @@ $backups = is_dir($backupDir) ? array_diff(scandir($backupDir), ['.', '..']) : [
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <script>
+    /**
+     * Adugna Gizaw: Real-time backup progress bar logic.
+     * - Shows animated progress bar and disables button during backup.
+     * - Simulates progress since PHP backup is synchronous; for real async, use AJAX/queue.
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('adugna-backup-form');
+        const btn = document.getElementById('adugna-backup-btn');
+        const progressContainer = document.getElementById('adugna-backup-progress-container');
+        const progressBar = document.getElementById('adugna-backup-progress-bar');
+        const progressStatus = document.getElementById('adugna-backup-progress-status');
+
+        if (form && btn && progressContainer && progressBar && progressStatus) {
+            form.addEventListener('submit', function(e) {
+                // Show progress bar and disable button
+                progressContainer.style.display = 'block';
+                progressBar.style.width = '0%';
+                progressBar.textContent = '0%';
+                progressStatus.textContent = 'Starting backup...';
+                btn.disabled = true;
+
+                // Simulate progress (since PHP is synchronous, this is for UX only)
+                let percent = 0;
+                let interval = setInterval(function() {
+                    percent += Math.floor(Math.random() * 10) + 5;
+                    if (percent > 95) percent = 95;
+                    progressBar.style.width = percent + '%';
+                    progressBar.textContent = percent + '%';
+                    progressStatus.textContent = 'Backing up system files...';
+                }, 350);
+
+                // On form submit, allow normal POST (page reloads on completion)
+                setTimeout(function() {
+                    clearInterval(interval);
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = '100%';
+                    progressStatus.textContent = 'Finalizing backup...';
+                }, 3500);
+
+                // Let the form submit as normal (PHP will reload page)
+            });
+        }
+    });
+    </script>
 </body>
 </html>
