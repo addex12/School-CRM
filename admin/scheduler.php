@@ -67,12 +67,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_schedule'])) {
         $returnVar = 0;
         exec("bash " . escapeshellarg($cronScript) . " 2>&1", $output, $returnVar);
         if ($returnVar === 0) {
-            $message .= "<br>CRON job setup successfully.<br>" . htmlspecialchars(implode("\n", $output));
+            $message .= '<div class="adugna-alert adugna-alert-success adugna-alert-dismissible">'
+                . '<span><i class="fa fa-check-circle"></i> CRON job updated successfully.</span>'
+                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
+                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#2563eb;">'
+                . htmlspecialchars(implode("\n", $output))
+                . '</pre></div>';
         } else {
-            $error .= "<br>Failed to set up CRON job.<br>" . htmlspecialchars(implode("\n", $output));
+            $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
+                . '<span><i class="fa fa-exclamation-triangle"></i> Failed to set up CRON job.</span>'
+                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
+                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#e74c3c;">'
+                . htmlspecialchars(implode("\n", $output))
+                . '</pre></div>';
         }
     } else {
-        $error .= "<br>Cron setup script not found or not executable: " . htmlspecialchars($cronScript);
+        $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
+            . '<span><i class="fa fa-exclamation-triangle"></i> Cron setup script not found or not executable: '
+            . htmlspecialchars($cronScript)
+            . '</span>'
+            . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
+            . '</div>';
     }
 }
 
@@ -84,12 +99,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_cron'])) {
         $returnVar = 0;
         exec("bash " . escapeshellarg($cronScript) . " 2>&1", $output, $returnVar);
         if ($returnVar === 0) {
-            $message .= "<br>CRON job setup successfully.<br>" . htmlspecialchars(implode("\n", $output));
+            $message .= '<div class="adugna-alert adugna-alert-success adugna-alert-dismissible">'
+                . '<span><i class="fa fa-check-circle"></i> CRON job updated successfully.</span>'
+                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
+                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#2563eb;">'
+                . htmlspecialchars(implode("\n", $output))
+                . '</pre></div>';
         } else {
-            $error .= "<br>Failed to set up CRON job.<br>" . htmlspecialchars(implode("\n", $output));
+            $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
+                . '<span><i class="fa fa-exclamation-triangle"></i> Failed to set up CRON job.</span>'
+                . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
+                . '<pre style="margin:0.5em 0 0 0;font-size:0.92em;background:#f8f9fa;border:none;color:#e74c3c;">'
+                . htmlspecialchars(implode("\n", $output))
+                . '</pre></div>';
         }
     } else {
-        $error .= "<br>Cron setup script not found or not executable: " . htmlspecialchars($cronScript);
+        $error .= '<div class="adugna-alert adugna-alert-danger adugna-alert-dismissible">'
+            . '<span><i class="fa fa-exclamation-triangle"></i> Cron setup script not found or not executable: '
+            . htmlspecialchars($cronScript)
+            . '</span>'
+            . '<button type="button" class="adugna-alert-close" onclick="this.parentElement.style.display=\'none\';">&times;</button>'
+            . '</div>';
     }
 }
 
@@ -190,6 +220,24 @@ $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
             background: #ffeaea;
             color: #e74c3c;
             border: 1px solid #f5c6cb;
+        }
+        .adugna-alert-dismissible {
+            position: relative;
+            padding-right: 2.5em;
+        }
+        .adugna-alert-close {
+            position: absolute;
+            top: 0.3em;
+            right: 0.7em;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.2em;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .adugna-alert-close:hover {
+            color: #e74c3c;
         }
         .adugna-list {
             list-style: none;
