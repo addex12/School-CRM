@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -79,54 +86,119 @@ if ($action === 'edit' && $id) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .dashboard-section {
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+
+        .adugna-main {
+            min-height: 100vh;
+            background: #f7f9fb;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+        .adugna-content-container {
+            max-width: 1100px;
+            margin: 32px auto 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 18px 18px 28px 18px;
+            transition: box-shadow 0.2s;
+        }
+        .adugna-header-title {
+            font-size: 1.35em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+        }
+        .adugna-card, .adugna-ann-form-section {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            margin-bottom: 2rem;
-            padding: 2rem 2.5rem;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+            padding: 1.1rem 1.2rem 1.2rem 1.2rem;
+            margin-bottom: 20px;
+            transition: box-shadow 0.2s, width 0.2s;
         }
-        .ann-header { font-size: 1.5rem; color: #215967; font-weight: 700; margin-bottom: 1.5rem; }
-        .erpnext-btn {
-            background: #f5f7fa;
-            color: #36414c;
-            border: 1px solid #d1d8dd;
+        .adugna-card-header, .adugna-ann-form-title {
+            font-size: 1.13em;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 10px;
+            letter-spacing: 0.01em;
+        }
+        .adugna-card-body {
+            font-size: 0.97em;
+            color: #444;
+        }
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
             border-radius: 4px;
-            padding: 8px 18px;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
+            padding: 4px 12px;
+            font-size: 0.97em;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
+            text-decoration: none;
         }
-        .erpnext-btn.btn-primary {
-            background: #007bfc;
+        .adugna-btn i {
+            font-size: 1em;
+        }
+        .adugna-btn:hover {
+            background: #145ea8;
+        }
+        .adugna-btn-secondary {
+            background: #e3eafc;
+            color: #1976d2;
+            border: 1px solid #b6d0f7;
+        }
+        .adugna-btn-secondary:hover {
+            background: #d0e2fa;
+        }
+        .adugna-btn-warning {
+            background: #ffc107;
             color: #fff;
-            border-color: #007bfc;
+            border: 1px solid #ffc107;
         }
-        .erpnext-btn.btn-primary:hover {
-            background: #0056b3;
+        .adugna-btn-warning:hover {
+            background: #e0a800;
+        }
+        .adugna-btn-danger {
+            background: #dc3545;
             color: #fff;
+            border: 1px solid #dc3545;
         }
-        .erpnext-btn.btn-secondary {
-            background: #f5f7fa;
-            color: #36414c;
-            border-color: #d1d8dd;
+        .adugna-btn-danger:hover {
+            background: #c82333;
         }
-        .erpnext-btn.btn-secondary:hover {
-            background: #e4e8ec;
+        .adugna-btn-sm {
+            padding: 2px 7px;
+            font-size: 0.93em;
+            border-radius: 3px;
         }
-        .erpnext-input {
+        .adugna-input {
             border: 1px solid #d1d8dd;
             border-radius: 4px;
-            padding: 8px 12px;
-            font-size: 15px;
+            padding: 7px 10px;
+            font-size: 0.97em;
             background: #f5f7fa;
             color: #36414c;
             width: 100%;
-            margin-bottom: 1em;
+            margin-bottom: 0.7em;
         }
-        .ann-card {
+        .adugna-ann-card {
             background: #f8f9fa;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(44,62,80,0.04);
@@ -134,39 +206,27 @@ if ($action === 'edit' && $id) {
             margin-bottom: 1.2rem;
             position: relative;
         }
-        .ann-card-title {
-            font-size: 1.18em;
+        .adugna-ann-card-title {
+            font-size: 1.08em;
             font-weight: 600;
             color: #215967;
             margin-bottom: 0.5em;
         }
-        .ann-card-content {
+        .adugna-ann-card-content {
             color: #36414c;
             margin-bottom: 0.7em;
         }
-        .ann-card-meta {
+        .adugna-ann-card-meta {
             font-size: 0.93em;
             color: #888;
             margin-bottom: 0.5em;
         }
-        .ann-card-actions {
+        .adugna-ann-card-actions {
             display: flex;
             gap: 0.5em;
         }
-        .ann-form-section {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.03);
-        }
-        .ann-form-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #215967;
-            margin-bottom: 1em;
-        }
-        .alert-success {
+        .adugna-ann-empty { color: #888; font-size: 1.1rem; }
+        .adugna-alert-success {
             background: #e2efda;
             color: #215967;
             border: 1px solid #b7e4c7;
@@ -174,7 +234,7 @@ if ($action === 'edit' && $id) {
             padding: 10px 18px;
             margin-bottom: 1em;
         }
-        .alert-error {
+        .adugna-alert-error {
             background: #ffeaea;
             color: #e74c3c;
             border: 1px solid #f5c6cb;
@@ -182,28 +242,44 @@ if ($action === 'edit' && $id) {
             padding: 10px 18px;
             margin-bottom: 1em;
         }
-        .ann-empty { color: #888; font-size: 1.1rem; }
+        @media (max-width: 1100px) {
+            .adugna-content-container {
+                max-width: 99vw;
+                margin: 18px 2vw 0 2vw;
+                padding: 10px 4px 18px 4px;
+            }
+        }
         @media (max-width: 900px) {
-            .admin-main, .dashboard-section { padding: 1rem 0.5rem; }
+            .adugna-card, .adugna-ann-form-section, .adugna-content-container {
+                padding: 0.7rem 0.5rem 1rem 0.5rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .adugna-card, .adugna-ann-form-section, .adugna-content-container {
+                padding: 0.5rem 0.2rem 0.7rem 0.2rem;
+            }
+            .adugna-header-title {
+                font-size: 1.1em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <div class="dashboard-section">
-                <div class="ann-header"><i class="fas fa-bullhorn"></i> Announcements</div>
+        <div class="adugna-main">
+            <div class="adugna-content-container">
+                <div class="adugna-header-title"><i class="fas fa-bullhorn"></i> Announcements</div>
                 <?php if ($message): ?>
-                    <div class="alert-success"><?= htmlspecialchars($message) ?></div>
+                    <div class="adugna-alert-success"><?= htmlspecialchars($message) ?></div>
                 <?php endif; ?>
                 <?php if ($error): ?>
-                    <div class="alert-error"><?= htmlspecialchars($error) ?></div>
+                    <div class="adugna-alert-error"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
 
                 <!-- Add/Edit Form -->
-                <div class="ann-form-section">
-                    <div class="ann-form-title">
+                <div class="adugna-ann-form-section">
+                    <div class="adugna-ann-form-title">
                         <?= $editAnnouncement ? 'Edit Announcement' : 'Add New Announcement' ?>
                     </div>
                     <form method="post" style="margin-bottom:0;">
@@ -211,8 +287,8 @@ if ($action === 'edit' && $id) {
                         <?php if ($editAnnouncement): ?>
                             <input type="hidden" name="id" value="<?= $editAnnouncement['id'] ?>">
                         <?php endif; ?>
-                        <input type="text" name="title" class="erpnext-input" placeholder="Title" value="<?= htmlspecialchars($editAnnouncement['title'] ?? '') ?>" required>
-                        <textarea name="content" class="erpnext-input" placeholder="Content" rows="5" required><?= htmlspecialchars($editAnnouncement['content'] ?? '') ?></textarea>
+                        <input type="text" name="title" class="adugna-input" placeholder="Title" value="<?= htmlspecialchars($editAnnouncement['title'] ?? '') ?>" required>
+                        <textarea name="content" class="adugna-input" placeholder="Content" rows="5" required><?= htmlspecialchars($editAnnouncement['content'] ?? '') ?></textarea>
                         <div style="display:flex;gap:1em;flex-wrap:wrap;">
                             <div>
                                 <label>Start Date & Time:</label>
@@ -221,13 +297,13 @@ if ($action === 'edit' && $id) {
                                     $defaultStart = $editAnnouncement['start_date'] ?? $now;
                                     $defaultEnd = $editAnnouncement['end_date'] ?? date('Y-m-d\TH:i', strtotime('+5 days'));
                                 ?>
-                                <input type="datetime-local" name="start_date" class="erpnext-input"
+                                <input type="datetime-local" name="start_date" class="adugna-input"
                                     value="<?= htmlspecialchars(str_replace(' ', 'T', $defaultStart)) ?>"
                                     min="<?= $now ?>" required>
                             </div>
                             <div>
                                 <label>End Date & Time:</label>
-                                <input type="datetime-local" name="end_date" class="erpnext-input"
+                                <input type="datetime-local" name="end_date" class="adugna-input"
                                     value="<?= htmlspecialchars(str_replace(' ', 'T', $defaultEnd)) ?>"
                                     min="<?= date('Y-m-d\TH:i', strtotime('+5 days')) ?>" required>
                             </div>
@@ -238,7 +314,7 @@ if ($action === 'edit' && $id) {
                         </div>
                         <div style="margin:1em 0;">
                             <label>Target Role (if not public):</label>
-                            <select name="target_roles[]" class="erpnext-input" style="min-width:180px;">
+                            <select name="target_roles[]" class="adugna-input" style="min-width:180px;">
                                 <option value="">-- Select Role --</option>
                                 <?php foreach ($roles as $role): ?>
                                     <option value="<?= $role['id'] ?>" <?= isset($editAnnouncement['target_roles']) && in_array($role['id'], $editAnnouncement['target_roles']) ? 'selected' : '' ?>>
@@ -248,9 +324,9 @@ if ($action === 'edit' && $id) {
                             </select>
                             <small style="color:#888;">Choose a role to target (leave blank for none).</small>
                         </div>
-                        <button type="submit" class="erpnext-btn btn-primary"><?= $editAnnouncement ? 'Update' : 'Add' ?> Announcement</button>
+                        <button type="submit" class="adugna-btn"><?= $editAnnouncement ? 'Update' : 'Add' ?> Announcement</button>
                         <?php if ($editAnnouncement): ?>
-                            <a href="announcements.php" class="erpnext-btn btn-secondary" style="margin-left:0.7em;">Cancel</a>
+                            <a href="announcements.php" class="adugna-btn adugna-btn-secondary" style="margin-left:0.7em;">Cancel</a>
                         <?php endif; ?>
                     </form>
                 </div>
@@ -258,21 +334,21 @@ if ($action === 'edit' && $id) {
                 <!-- Announcement List -->
                 <?php if (count($announcements) > 0): ?>
                     <?php foreach ($announcements as $ann): ?>
-                        <div class="ann-card">
-                            <div class="ann-card-title"><?= htmlspecialchars($ann['title']) ?>
+                        <div class="adugna-ann-card">
+                            <div class="adugna-ann-card-title"><?= htmlspecialchars($ann['title']) ?>
                                 <?php if ($ann['is_public']): ?>
                                     <span style="background:#007bfc;color:#fff;font-size:0.8em;padding:2px 8px;border-radius:4px;margin-left:8px;">Public</span>
                                 <?php endif; ?>
                             </div>
-                            <div class="ann-card-meta">
+                            <div class="adugna-ann-card-meta">
                                 <span>From: <?= date('M j, Y', strtotime($ann['start_date'])) ?></span>
                                 <span>To: <?= date('M j, Y', strtotime($ann['end_date'])) ?></span>
                                 <span style="margin-left:1em;">Last updated: <?= date('M j, Y g:i a', strtotime($ann['updated_at'])) ?></span>
                             </div>
-                            <div class="ann-card-content"><?= nl2br(htmlspecialchars(mb_strimwidth($ann['content'], 0, 300, '...'))) ?></div>
-                            <div class="ann-card-actions">
-                                <a href="announcements.php?action=edit&id=<?= $ann['id'] ?>" class="erpnext-btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                                <a href="announcements.php?action=delete&id=<?= $ann['id'] ?>" class="erpnext-btn btn-secondary btn-sm" onclick="return confirm('Delete this announcement?');"><i class="fas fa-trash"></i> Delete</a>
+                            <div class="adugna-ann-card-content"><?= nl2br(htmlspecialchars(mb_strimwidth($ann['content'], 0, 300, '...'))) ?></div>
+                            <div class="adugna-ann-card-actions">
+                                <a href="announcements.php?action=edit&id=<?= $ann['id'] ?>" class="adugna-btn adugna-btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                                <a href="announcements.php?action=delete&id=<?= $ann['id'] ?>" class="adugna-btn adugna-btn-secondary adugna-btn-sm" onclick="return confirm('Delete this announcement?');"><i class="fas fa-trash"></i> Delete</a>
                             </div>
                             <?php if (!$ann['is_public'] && !empty($ann['target_roles'])): ?>
                                 <div style="font-size:0.93em;color:#888;margin-top:0.5em;">
@@ -290,7 +366,7 @@ if ($action === 'edit' && $id) {
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="ann-empty">
+                    <div class="adugna-ann-empty">
                         No announcements yet.<br>
                         <span style="font-size:1.2em;">Start by adding your first announcement!</span>
                     </div>
