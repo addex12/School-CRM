@@ -272,7 +272,17 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         /**
          * Adugna Gizaw: Custom adugna- styles for compact, ERPNext-inspired, responsive UI.
          * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
          */
+        html {
+            font-size: 16px;
+        }
+        @media (max-width: 900px) {
+            html { font-size: 15px; }
+        }
+        @media (max-width: 600px) {
+            html { font-size: 14px; }
+        }
         .adugna-form-grid {
             flex: 1 1 100%;
             display: flex;
@@ -292,6 +302,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             display: flex;
             flex-direction: column;
             gap: 0.7rem;
+            transition: box-shadow 0.2s, width 0.2s;
         }
         .adugna-card h2 {
             font-size: 1.13em;
@@ -299,6 +310,9 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
             font-weight: 700;
             margin-bottom: 0.5em;
             letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         .adugna-form-group {
             margin-bottom: 0.7em;
@@ -442,7 +456,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 <div class="adugna-form-grid">
                     <!-- Adugna Gizaw: Single User Form Card -->
                     <div class="adugna-card">
-                        <h2><i class="fas fa-user-plus" style="font-size:1em;margin-right:4px;"></i>Create Single User</h2>
+                        <h2><i class="fas fa-user-plus" style="font-size:1em;"></i>Create Single User</h2>
                         <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                             <div class="adugna-form-group">
@@ -470,7 +484,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                     </div>
                     <!-- Adugna Gizaw: Bulk Import Card -->
                     <div class="adugna-card">
-                        <h2><i class="fas fa-users" style="font-size:1em;margin-right:4px;"></i>Bulk Import Users</h2>
+                        <h2><i class="fas fa-users" style="font-size:1em;"></i>Bulk Import Users</h2>
                         <div style="margin-bottom:1rem;">
                             <p>Download our CSV template to ensure proper formatting:</p>
                             <a href="download_template.php" class="adugna-btn adugna-btn-secondary">
