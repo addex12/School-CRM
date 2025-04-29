@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/includes/config.php';
+require_once '../includes/config.php';
 
 $logTables = [
     'activity_logs',
@@ -9,21 +9,27 @@ $logTables = [
 ];
 
 $logFiles = [
-    __DIR__ . '/error_log',
-    __DIR__ . '/logs/error.log',
-    __DIR__ . '/logs/raw_activity/log',
-    __DIR__ . '/logs/user_activity.log'
+    __DIR__ . '/../error_log',
+    __DIR__ . '/../logs/error.log',
+    __DIR__ . '/../logs/raw_activity/log',
+    __DIR__ . '/../logs/user_activity.log'
 ];
 
-$scheduleConfigFile = __DIR__ . '/admin/log_clear_schedule.json';
-$lastClearFile = __DIR__ . '/admin/last_log_clear.txt';
+$scheduleConfigFile = __DIR__ . '/log_clear_schedule.json';
+$lastClearFile = __DIR__ . '/last_log_clear.txt';
 
 // Determine schedule
 $schedule = 'daily';
+$customValue = 1;
+$customUnit = 'days';
 if (file_exists($scheduleConfigFile)) {
     $config = json_decode(file_get_contents($scheduleConfigFile), true);
     if (isset($config['interval'])) {
         $schedule = $config['interval'];
+        if ($schedule === 'custom') {
+            $customValue = isset($config['custom_value']) ? (int)$config['custom_value'] : 1;
+            $customUnit = isset($config['custom_unit']) ? strtolower($config['custom_unit']) : 'days';
+        }
     }
 }
 
@@ -44,9 +50,6 @@ switch ($schedule) {
         $shouldClear = ($now - $lastClearTs) >= 2592000;
         break;
     case 'custom':
-        // Support custom_value and custom_unit in config
-        $customValue = isset($config['custom_value']) ? (int)$config['custom_value'] : 1;
-        $customUnit = isset($config['custom_unit']) ? strtolower($config['custom_unit']) : 'days';
         $unitSeconds = [
             'seconds' => 1,
             'minutes' => 60,
@@ -63,21 +66,9 @@ switch ($schedule) {
 }
 
 if ($shouldClear) {
-    // DB
-    if (!isset($dsn)) {
-        $dsn = "mysql:host=localhost;dbname=flipperschool_parent_survey_system;charset=utf8mb4";
-    }
-    if (!isset($db_user)) {
-        $db_user = "root";
-    }
-    if (!isset($db_pass)) {
-        $db_pass = "";
-    }
-    $db = new PDO($dsn, $db_user, $db_pass);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+    // Use the existing $pdo connection
     foreach ($logTables as $table) {
-        $db->exec("TRUNCATE TABLE `$table`");
+        $pdo->exec("TRUNCATE TABLE `$table`");
     }
     foreach ($logFiles as $file) {
         if (file_exists($file)) {
