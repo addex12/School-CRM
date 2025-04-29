@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -154,22 +155,23 @@ try {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - School CRM</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- CSS -->
     <style>
         :root {
@@ -182,13 +184,13 @@ try {
             --gray: #6b7280;
             --gray-light: #e5e7eb;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--light);
@@ -198,13 +200,13 @@ try {
             display: flex;
             flex-direction: column;
         }
-        
+
         .login-container {
             display: flex;
             flex-grow: 1;
             min-height: 100vh;
         }
-        
+
         .login-left {
             flex: 1;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -218,7 +220,7 @@ try {
             position: relative;
             overflow: hidden;
         }
-        
+
         .login-left::before {
             content: '';
             position: absolute;
@@ -226,10 +228,10 @@ try {
             right: -50%;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             transform: rotate(30deg);
         }
-        
+
         .login-right {
             flex: 1;
             padding: 2rem;
@@ -240,51 +242,51 @@ try {
             margin: 0 auto;
             width: 100%;
         }
-        
+
         .logo {
             display: flex;
             align-items: center;
             gap: 0.75rem;
             margin-bottom: 2rem;
         }
-        
+
         .logo img {
             height: 50px;
         }
-        
+
         .welcome-text {
             margin-bottom: 2rem;
         }
-        
+
         .welcome-text h2 {
             font-size: 1.75rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
-        
+
         .welcome-text p {
             color: var(--gray);
         }
-        
+
         .login-form {
             width: 100%;
         }
-        
+
         .form-group {
             margin-bottom: 1.25rem;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
             color: var(--dark);
         }
-        
+
         .input-wrapper {
             position: relative;
         }
-        
+
         .input-wrapper i {
             position: absolute;
             left: 1rem;
@@ -292,7 +294,7 @@ try {
             transform: translateY(-50%);
             color: var(--gray);
         }
-        
+
         .form-control {
             width: 100%;
             padding: 0.75rem 1rem 0.75rem 2.5rem;
@@ -301,41 +303,41 @@ try {
             font-size: 1rem;
             transition: all 0.2s;
         }
-        
+
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
         }
-        
+
         .form-options {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-        
+
         .remember-me {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .remember-me input {
             width: 1rem;
             height: 1rem;
         }
-        
+
         .forgot-password {
             color: var(--primary);
             text-decoration: none;
             font-size: 0.875rem;
         }
-        
+
         .forgot-password:hover {
             text-decoration: underline;
         }
-        
+
         .btn {
             width: 100%;
             padding: 0.75rem;
@@ -350,32 +352,32 @@ try {
             justify-content: center;
             gap: 0.5rem;
         }
-        
+
         .btn-primary {
             background-color: var(--primary);
             color: white;
         }
-        
+
         .btn-primary:hover {
             background-color: var(--primary-dark);
         }
-        
+
         .login-footer {
             margin-top: 1.5rem;
             text-align: center;
             color: var(--gray);
         }
-        
+
         .login-footer a {
             color: var(--primary);
             text-decoration: none;
             font-weight: 500;
         }
-        
+
         .login-footer a:hover {
             text-decoration: underline;
         }
-        
+
         .error-message {
             background-color: rgba(239, 68, 68, 0.1);
             color: var(--danger);
@@ -386,73 +388,74 @@ try {
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .illustration {
             max-width: 100%;
             height: auto;
             margin-bottom: 2rem;
         }
-        
+
         .illustration img {
             max-width: 100%;
             height: auto;
         }
-        
+
         .illustration-text {
             margin-top: 1rem;
         }
-        
+
         .illustration-text h3 {
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .login-container {
                 flex-direction: column;
             }
-            
+
             .login-left {
                 padding: 1.5rem;
                 min-height: auto;
             }
-            
+
             .login-right {
                 padding: 1.5rem;
             }
-            
+
             .logo {
                 margin-bottom: 1.5rem;
             }
-            
+
             .welcome-text h2 {
                 font-size: 1.5rem;
             }
         }
-        
+
         @media (max-width: 480px) {
             .form-options {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.75rem;
             }
-            
+
             .forgot-password {
                 align-self: flex-end;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-left">
             <div class="illustration">
-          <?php  $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png'; ?>
+                <?php $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png'; ?>
             </div>
             <div class="illustration-text">
-                <h3>School CRM</h3>
+                <h3>Flipper International School Customer Relationship Management System</h3>RM</h3>
                 <p>Comprehensive school management solution for administrators, teachers, and students</p>
             </div>
 
@@ -472,25 +475,25 @@ try {
                 </div>
             <?php endif; ?>
         </div>
-        
+
         <div class="login-right">
             <div class="logo">
                 <img src="<?php echo htmlspecialchars($siteLogo); ?>" alt="Site Logo" style="height: 50px;">
                 <h1><?php echo htmlspecialchars($siteName); ?></h1>
             </div>
-            
+
             <div class="welcome-text">
                 <h2>Welcome Back!</h2>
                 <p>Please sign in to continue to your account</p>
             </div>
-            
+
             <?php if ($error): ?>
                 <div class="error-message">
                     <i class="fas fa-exclamation-circle"></i>
                     <span><?php echo htmlspecialchars($error); ?></span>
                 </div>
             <?php endif; ?>
-            
+
             <form method="POST" action="" class="login-form">
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -499,7 +502,7 @@ try {
                         <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required autocomplete="username">
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-wrapper" style="position:relative;">
@@ -510,7 +513,7 @@ try {
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="form-options">
                     <div class="remember-me">
                         <input type="checkbox" id="remember" name="remember">
@@ -518,13 +521,13 @@ try {
                     </div>
                     <a href="forgot_password.php" class="forgot-password">Forgot password?</a>
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary" id="login-btn">
                     <span>Sign In</span>
                     <i class="fas fa-arrow-right"></i>
                 </button>
             </form>
-            
+
             <div class="login-footer">
                 <p>Don't have an account? <a href="register.php">Create account</a></p>
             </div>
@@ -533,91 +536,93 @@ try {
 
     <script>
         // Enhanced Pre-Login Activity Tracking
-document.addEventListener('DOMContentLoaded', function() {
-    // Unique session ID for anonymous tracking (until login)
-    const sessionId = 'anon_' + Math.random().toString(36).substring(2, 15);
-    let startTime = new Date().toISOString();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Unique session ID for anonymous tracking (until login)
+            const sessionId = 'anon_' + Math.random().toString(36).substring(2, 15);
+            let startTime = new Date().toISOString();
 
-    // Track initial page load
-    trackActivity('page_visit', {
-        session_id: sessionId,
-        page: window.location.pathname,
-        referrer: document.referrer,
-        user_agent: navigator.userAgent,
-        screen_resolution: `${window.screen.width}x${window.screen.height}`,
-        ip_address: '<?php echo $_SERVER['REMOTE_ADDR'] ?? 'unknown'; ?>'
-    });
+            // Track initial page load
+            trackActivity('page_visit', {
+                session_id: sessionId,
+                page: window.location.pathname,
+                referrer: document.referrer,
+                user_agent: navigator.userAgent,
+                screen_resolution: `${window.screen.width}x${window.screen.height}`,
+                ip_address: '<?php echo $_SERVER['REMOTE_ADDR'] ?? 'unknown'; ?>'
+            });
 
-    // Track form interactions
-    document.getElementById('username')?.addEventListener('input', (e) => {
-        trackActivity('form_input', {
-            session_id: sessionId,
-            field: 'username',
-            partial_input: e.target.value.substring(0, 3) + '...' // Privacy: log only first 3 chars
-        });
-    });
+            // Track form interactions
+            document.getElementById('username')?.addEventListener('input', (e) => {
+                trackActivity('form_input', {
+                    session_id: sessionId,
+                    field: 'username',
+                    partial_input: e.target.value.substring(0, 3) + '...' // Privacy: log only first 3 chars
+                });
+            });
 
-    document.getElementById('login-btn')?.addEventListener('click', () => {
-        trackActivity('login_attempt', {
-            session_id: sessionId,
-            username: document.getElementById('username')?.value || '',
-            remember_me: document.getElementById('remember')?.checked || false
-        });
-    });
+            document.getElementById('login-btn')?.addEventListener('click', () => {
+                trackActivity('login_attempt', {
+                    session_id: sessionId,
+                    username: document.getElementById('username')?.value || '',
+                    remember_me: document.getElementById('remember')?.checked || false
+                });
+            });
 
-    // Track mouse movements (heatmap)
-    document.addEventListener('mousemove', throttle((e) => {
-        trackActivity('mouse_move', {
-            session_id: sessionId,
-            x: e.clientX,
-            y: e.clientY,
-            page_x: e.pageX,
-            page_y: e.pageY
-        });
-    }, 1000));
+            // Track mouse movements (heatmap)
+            document.addEventListener('mousemove', throttle((e) => {
+                trackActivity('mouse_move', {
+                    session_id: sessionId,
+                    x: e.clientX,
+                    y: e.clientY,
+                    page_x: e.pageX,
+                    page_y: e.pageY
+                });
+            }, 1000));
 
-    // Helper: Throttle frequent events
-    function throttle(func, limit) {
-        let lastFunc;
-        let lastRan;
-        return function() {
-            const context = this;
-            const args = arguments;
-            if (!lastRan) {
-                func.apply(context, args);
-                lastRan = Date.now();
-            } else {
-                clearTimeout(lastFunc);
-                lastFunc = setTimeout(function() {
-                    if ((Date.now() - lastRan) >= limit) {
+            // Helper: Throttle frequent events
+            function throttle(func, limit) {
+                let lastFunc;
+                let lastRan;
+                return function() {
+                    const context = this;
+                    const args = arguments;
+                    if (!lastRan) {
                         func.apply(context, args);
                         lastRan = Date.now();
+                    } else {
+                        clearTimeout(lastFunc);
+                        lastFunc = setTimeout(function() {
+                            if ((Date.now() - lastRan) >= limit) {
+                                func.apply(context, args);
+                                lastRan = Date.now();
+                            }
+                        }, limit - (Date.now() - lastRan));
                     }
-                }, limit - (Date.now() - lastRan));
+                };
             }
-        };
-    }
 
-    // Send data to server
-    function trackActivity(action, data) {
-        const payload = {
-            action,
-            ...data,
-            timestamp: new Date().toISOString()
-        };
-        
-        // Use Beacon API if available (for page exits)
-        if (navigator.sendBeacon) {
-            navigator.sendBeacon('track_activity.php', JSON.stringify(payload));
-        } else {
-            fetch('track_activity.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-        }
-    }
-});
+            // Send data to server
+            function trackActivity(action, data) {
+                const payload = {
+                    action,
+                    ...data,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Use Beacon API if available (for page exits)
+                if (navigator.sendBeacon) {
+                    navigator.sendBeacon('track_activity.php', JSON.stringify(payload));
+                } else {
+                    fetch('track_activity.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                }
+            }
+        });
         // Enhance form usability
         document.addEventListener('DOMContentLoaded', function() {
             // Focus on username field on page load
@@ -632,7 +637,9 @@ document.addEventListener('DOMContentLoaded', function() {
             function logToFile(data) {
                 fetch('log_activity.php', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(data)
                 });
             }
@@ -648,7 +655,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     logToFile(payload);
                     fetch('track_activity.php', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(payload)
                     });
                 }
@@ -709,193 +718,199 @@ document.addEventListener('DOMContentLoaded', function() {
                 logToFile(loginPayload);
                 fetch('track_activity.php', {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(loginPayload)
                 });
             });
             // --- End Activity Tracking on Login Button ---
         });
         document.addEventListener('DOMContentLoaded', function() {
-    // Enhanced activity tracking - always active
-    function sendActivity(action, details = {}) {
-        const payload = Object.assign({
-            action: action,
-            page: window.location.pathname,
-            timestamp: new Date().toISOString(),
-            userAgent: navigator.userAgent,
-            screenResolution: `${window.screen.width}x${window.screen.height}`,
-            viewportSize: `${window.innerWidth}x${window.innerHeight}`
-        }, details);
-        
-        // Send to both endpoints for redundancy
-        fetch('track_activity.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        }).catch(e => console.error('Tracking error:', e));
-        
-        fetch('log_activity.php', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        }).catch(e => console.error('Log error:', e));
-    }
+            // Enhanced activity tracking - always active
+            function sendActivity(action, details = {}) {
+                const payload = Object.assign({
+                    action: action,
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    screenResolution: `${window.screen.width}x${window.screen.height}`,
+                    viewportSize: `${window.innerWidth}x${window.innerHeight}`
+                }, details);
 
-    // Track initial page load
-    sendActivity('page_load', {
-        referrer: document.referrer,
-        cookiesEnabled: navigator.cookieEnabled,
-        localStorage: !!window.localStorage,
-        sessionStorage: !!window.sessionStorage
-    });
+                // Send to both endpoints for redundancy
+                fetch('track_activity.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                }).catch(e => console.error('Tracking error:', e));
 
-    // Track all clicks
-    document.addEventListener('click', function(e) {
-        const target = e.target;
-        sendActivity('click', {
-            tag: target.tagName,
-            id: target.id || null,
-            class: target.className || null,
-            text: (target.innerText || target.value || '').substring(0, 500),
-            value: target.value || null,
-            href: target.href || null,
-            x: e.clientX,
-            y: e.clientY
-        });
-    }, true); // Use capture phase to get all clicks
-
-    // Track form interactions
-    document.addEventListener('submit', function(e) {
-        const form = e.target;
-        const formData = {};
-        Array.from(form.elements).forEach(el => {
-            if (el.name) {
-                formData[el.name] = el.value || '';
+                fetch('log_activity.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                }).catch(e => console.error('Log error:', e));
             }
-        });
-        
-        sendActivity('form_submit', {
-            formId: form.id || null,
-            formClass: form.className || null,
-            formAction: form.action || null,
-            formMethod: form.method || 'GET',
-            formData: JSON.stringify(formData)
-        });
-    });
 
-    // Track input changes (with throttling)
-    const inputTracker = (function() {
-        const trackedInputs = new WeakMap();
-        return function(e) {
-            const target = e.target;
-            if ((target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') && 
-                !trackedInputs.has(target)) {
-                trackedInputs.set(target, true);
-                
-                const prevValue = target.value || '';
-                target.addEventListener('change', function() {
-                    sendActivity('input_change', {
-                        tag: target.tagName,
-                        id: target.id || null,
-                        class: target.className || null,
-                        name: target.name || null,
-                        type: target.type || null,
-                        previousValue: prevValue,
-                        newValue: target.value || ''
+            // Track initial page load
+            sendActivity('page_load', {
+                referrer: document.referrer,
+                cookiesEnabled: navigator.cookieEnabled,
+                localStorage: !!window.localStorage,
+                sessionStorage: !!window.sessionStorage
+            });
+
+            // Track all clicks
+            document.addEventListener('click', function(e) {
+                const target = e.target;
+                sendActivity('click', {
+                    tag: target.tagName,
+                    id: target.id || null,
+                    class: target.className || null,
+                    text: (target.innerText || target.value || '').substring(0, 500),
+                    value: target.value || null,
+                    href: target.href || null,
+                    x: e.clientX,
+                    y: e.clientY
+                });
+            }, true); // Use capture phase to get all clicks
+
+            // Track form interactions
+            document.addEventListener('submit', function(e) {
+                const form = e.target;
+                const formData = {};
+                Array.from(form.elements).forEach(el => {
+                    if (el.name) {
+                        formData[el.name] = el.value || '';
+                    }
+                });
+
+                sendActivity('form_submit', {
+                    formId: form.id || null,
+                    formClass: form.className || null,
+                    formAction: form.action || null,
+                    formMethod: form.method || 'GET',
+                    formData: JSON.stringify(formData)
+                });
+            });
+
+            // Track input changes (with throttling)
+            const inputTracker = (function() {
+                const trackedInputs = new WeakMap();
+                return function(e) {
+                    const target = e.target;
+                    if ((target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') &&
+                        !trackedInputs.has(target)) {
+                        trackedInputs.set(target, true);
+
+                        const prevValue = target.value || '';
+                        target.addEventListener('change', function() {
+                            sendActivity('input_change', {
+                                tag: target.tagName,
+                                id: target.id || null,
+                                class: target.className || null,
+                                name: target.name || null,
+                                type: target.type || null,
+                                previousValue: prevValue,
+                                newValue: target.value || ''
+                            });
+                        });
+                    }
+                };
+            })();
+
+            document.addEventListener('focus', inputTracker, true);
+
+            // Track copy, paste, cut
+            ['copy', 'paste', 'cut'].forEach(event => {
+                document.addEventListener(event, function(e) {
+                    const text = (event === 'paste') ?
+                        (e.clipboardData || window.clipboardData).getData('text') :
+                        window.getSelection().toString();
+
+                    sendActivity(event, {
+                        text: text.substring(0, 1000),
+                        targetId: e.target.id || null,
+                        targetClass: e.target.className || null
                     });
                 });
-            }
-        };
-    })();
-    
-    document.addEventListener('focus', inputTracker, true);
-
-    // Track copy, paste, cut
-    ['copy', 'paste', 'cut'].forEach(event => {
-        document.addEventListener(event, function(e) {
-            const text = (event === 'paste') ? 
-                (e.clipboardData || window.clipboardData).getData('text') :
-                window.getSelection().toString();
-                
-            sendActivity(event, {
-                text: text.substring(0, 1000),
-                targetId: e.target.id || null,
-                targetClass: e.target.className || null
             });
-        });
-    });
 
-    // Track tab/window visibility changes
-    document.addEventListener('visibilitychange', function() {
-        sendActivity('visibility_change', {
-            isVisible: !document.hidden,
-            timeHidden: document.hidden ? new Date().toISOString() : null
-        });
-    });
+            // Track tab/window visibility changes
+            document.addEventListener('visibilitychange', function() {
+                sendActivity('visibility_change', {
+                    isVisible: !document.hidden,
+                    timeHidden: document.hidden ? new Date().toISOString() : null
+                });
+            });
 
-    // Track beforeunload (page exit)
-    window.addEventListener('beforeunload', function() {
-        navigator.sendBeacon('track_activity.php', JSON.stringify({
-            action: 'page_exit',
-            page: window.location.pathname,
-            timestamp: new Date().toISOString()
-        }));
-    });
+            // Track beforeunload (page exit)
+            window.addEventListener('beforeunload', function() {
+                navigator.sendBeacon('track_activity.php', JSON.stringify({
+                    action: 'page_exit',
+                    page: window.location.pathname,
+                    timestamp: new Date().toISOString()
+                }));
+            });
 
-    // Detect password manager autofill
-    setInterval(function() {
-        document.querySelectorAll('input[type="password"]').forEach(pwd => {
-            if (pwd.value && !pwd.hasAttribute('data-tracked-autofill')) {
-                pwd.setAttribute('data-tracked-autofill', 'true');
-                sendActivity('password_autofill', {
-                    fieldId: pwd.id || null,
-                    fieldName: pwd.name || null
+            // Detect password manager autofill
+            setInterval(function() {
+                document.querySelectorAll('input[type="password"]').forEach(pwd => {
+                    if (pwd.value && !pwd.hasAttribute('data-tracked-autofill')) {
+                        pwd.setAttribute('data-tracked-autofill', 'true');
+                        sendActivity('password_autofill', {
+                            fieldId: pwd.id || null,
+                            fieldName: pwd.name || null
+                        });
+                    }
+                });
+            }, 1000);
+            // Password show/hide toggle
+            var passwordInput = document.getElementById('password');
+            var togglePassword = document.getElementById('togglePassword');
+            var togglePasswordIcon = document.getElementById('togglePasswordIcon');
+            if (passwordInput && togglePassword && togglePasswordIcon) {
+                togglePassword.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        togglePasswordIcon.classList.remove('fa-eye');
+                        togglePasswordIcon.classList.add('fa-eye-slash');
+                        togglePassword.setAttribute('aria-label', 'Hide password');
+                    } else {
+                        passwordInput.type = 'password';
+                        togglePasswordIcon.classList.remove('fa-eye-slash');
+                        togglePasswordIcon.classList.add('fa-eye');
+                        togglePassword.setAttribute('aria-label', 'Show password');
+                    }
                 });
             }
-        });
-    }, 1000);
-        // Password show/hide toggle
-        var passwordInput = document.getElementById('password');
-        var togglePassword = document.getElementById('togglePassword');
-        var togglePasswordIcon = document.getElementById('togglePasswordIcon');
-        if (passwordInput && togglePassword && togglePasswordIcon) {
-            togglePassword.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    togglePasswordIcon.classList.remove('fa-eye');
-                    togglePasswordIcon.classList.add('fa-eye-slash');
-                    togglePassword.setAttribute('aria-label', 'Hide password');
-                } else {
-                    passwordInput.type = 'password';
-                    togglePasswordIcon.classList.remove('fa-eye-slash');
-                    togglePasswordIcon.classList.add('fa-eye');
-                    togglePassword.setAttribute('aria-label', 'Show password');
+            // Track key events (with filtering for sensitive inputs)
+            document.addEventListener('keydown', function(e) {
+                const target = e.target;
+                const isSensitive = target.type === 'password' ||
+                    target.type === 'email' ||
+                    target.type === 'tel' ||
+                    target.type === 'number';
+
+                if (!isSensitive) {
+                    sendActivity('keydown', {
+                        key: e.key,
+                        code: e.code,
+                        targetTag: target.tagName,
+                        targetId: target.id || null
+                    });
                 }
             });
-        }
-    // Track key events (with filtering for sensitive inputs)
-    document.addEventListener('keydown', function(e) {
-        const target = e.target;
-        const isSensitive = target.type === 'password' || 
-                          target.type === 'email' || 
-                          target.type === 'tel' || 
-                          target.type === 'number';
-        
-        if (!isSensitive) {
-            sendActivity('keydown', {
-                key: e.key,
-                code: e.code,
-                targetTag: target.tagName,
-                targetId: target.id || null
-            });
-        }
-    });
-});
+        });
     </script>
 </body>
+
 </html>
 
 
 <script src="/includes/activity-tracker.js"></script>
-
