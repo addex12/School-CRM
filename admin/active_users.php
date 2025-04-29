@@ -5,8 +5,8 @@ Email: gizawadugna@gmail.com
 LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
+* Sidebar toggle, submenu logic, compact ERPNext-inspired cards/buttons, and active page highlight.
 * All custom styles use adugna- prefix for patenting.
-* Compact ERPNext-inspired cards/buttons, outstanding sidebar, and responsive layout.
 */
 
 // Error reporting (remove in production)
@@ -108,14 +108,27 @@ function getUserRoleName($roleId) {
         LinkedIn: https://www.linkedin.com/in/eleganceict
         Twitter: https://twitter.com/eleganceict1
         GitHub: https://github.com/addex12
-        Purpose: Active Users page, visually outstanding, interactive, and fully responsive.
+        Purpose: Active Users page, responsive, interactive, adugna- prefix for all custom styles.
     -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-    <!-- Adugna Gizaw: Use only style.css for all admin styling and layout -->
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/active_user.css">
+    <style>
+        /* Adugna Gizaw: Override and extend with adugna- prefix for ERPNext-inspired, compact, responsive styles */
+        .adugna-sidebar { /* ...see admin.css... */ }
+        .adugna-admin-dashboard { /* ...see admin.css... */ }
+        .adugna-admin-main { /* ...see admin.css... */ }
+        .adugna-card { /* ...see admin.css... */ }
+        .adugna-btn { /* ...see admin.css... */ }
+        .adugna-admin-header { /* ...see admin.css... */ }
+        .adugna-admin-header h1 { /* ...see admin.css... */ }
+        .adugna-admin-tools-list { /* ...see admin.css... */ }
+        /* Responsive tweaks for adugna- prefixed classes are in admin.css */
+    </style>
 </head>
 <body>
     <!-- Adugna Gizaw: Sidebar toggle button for mobile -->
@@ -180,9 +193,19 @@ function getUserRoleName($roleId) {
             </ul>
         </nav>
         <div class="adugna-admin-main">
-            <div class="adugna-card" style="margin-top:2rem;">
-                <div class="adugna-admin-header">
-                    <h1><i class="fas fa-users"></i> Active Users</h1>
+            <div class="adugna-card active-users-container">
+                <div class="active-users-header">
+                    <h2 style="font-size:1.15em; color:#1976d2; font-weight:600;">Active Users</h2>
+                    <div>
+                        <button class="adugna-btn adugna-blue refresh-btn" type="button">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <span class="active-count">
+                            <i class="fas fa-users"></i>
+                            <?= (int)$total_active ?> active,
+                            <span style="color:#27ae60;"><i class="fas fa-circle"></i> <?= (int)$total_online ?> online</span>
+                        </span>
+                    </div>
                 </div>
                 <?php if (!empty($error)): ?>
                     <div style="color: red; margin-bottom: 1em;"><?= htmlspecialchars($error) ?></div>
