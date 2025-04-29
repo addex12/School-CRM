@@ -854,7 +854,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }, 1000);
-
+        // Password show/hide toggle
+        var passwordInput = document.getElementById('password');
+        var togglePassword = document.getElementById('togglePassword');
+        var togglePasswordIcon = document.getElementById('togglePasswordIcon');
+        if (passwordInput && togglePassword && togglePasswordIcon) {
+            togglePassword.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePasswordIcon.classList.remove('fa-eye');
+                    togglePasswordIcon.classList.add('fa-eye-slash');
+                    togglePassword.setAttribute('aria-label', 'Hide password');
+                } else {
+                    passwordInput.type = 'password';
+                    togglePasswordIcon.classList.remove('fa-eye-slash');
+                    togglePasswordIcon.classList.add('fa-eye');
+                    togglePassword.setAttribute('aria-label', 'Show password');
+                }
+            });
+        }
     // Track key events (with filtering for sensitive inputs)
     document.addEventListener('keydown', function(e) {
         const target = e.target;
