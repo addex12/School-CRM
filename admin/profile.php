@@ -299,14 +299,13 @@ function handleChangePassword($pdo, $user) {
                 </div>
             </div>
         </div>
-        <?php 
-        // Use the same footer include as dashboard.php
-        ?>
+
     </div>
 </div>
+<?php 
         include __DIR__ . '/includes/footer.php'; 
-
-<!-- Adugna ERPNext Custom Styles -->
+        ?>
+<!-- Adugna Custom Styles -->
 <style>
 /* --- Begin: Sidebar & Main Layout Styles (from dashboard.php) --- */
 .admin-dashboard {
