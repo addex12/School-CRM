@@ -221,24 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
             align-items: center;
             gap: 0.5em;
         }
-        .adugna-contact-tooltip {
-            display: none;
-            position: absolute;
-            left: 110%;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #2563eb;
-            color: #fff;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.92em;
-            white-space: nowrap;
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.09);
-        }
-        .adugna-contact-item:hover .adugna-contact-tooltip {
-            display: block;
-        }
         @media (max-width: 900px) {
             .messaging-container {
                 flex-direction: column;
@@ -278,8 +260,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                 <span>
                     <strong>How to chat with an admin:</strong>
                     <ul style="margin:0.5em 0 0 1.2em;padding:0;">
-                        <li>Hover over an online admin to see "Click to chat with me".</li>
-                        <li>Click an admin to start a chat. Your conversation will appear on the right.</li>
+                        <li>You can Click on one of an online admin to chat with".</li>
                         <li>Use the <i class="fa fa-trash-alt"></i> button to clear the chat.</li>
                         <li>Unread message counts are shown in red badges.</li>
                     </ul>
@@ -301,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                             $initials = strtoupper(substr($user['username'], 0, 2));
                             $isSelected = ($selectedUserId && $selectedUserId == $user['id']);
                         ?>
-                            <li data-user-id="<?= $user['id'] ?>" class="adugna-contact-item<?= $isSelected ? ' selected' : '' ?>" tabindex="0">
+                            <li data-user-id="<?= $user['id'] ?>" class="adugna-contact-item<?= $isSelected ? ' selected' : '' ?>" tabindex="0" style="position:relative;">
                                 <span class="adugna-avatar"><?= htmlspecialchars($initials) ?></span>
                                 <span>
                                     <span class="adugna-online-dot"></span>
@@ -310,7 +291,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                                 <?php if (isset($unreadCounts[$user['id']])): ?>
                                     <span class="adugna-unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                 <?php endif; ?>
-                                <span class="adugna-contact-tooltip"><i class="fa fa-hand-pointer"></i> Click to chat with me</span>
+                                <!-- Hover tooltip for chat -->
+                                <span class="adugna-contact-tooltip" style="display:none;position:absolute;left:110%;top:50%;transform:translateY(-50%);background:#2563eb;color:#fff;padding:4px 10px;border-radius:4px;font-size:0.92em;white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(44,62,80,0.09);">
+                                    <i class="fa fa-hand-pointer"></i> Click to chat with me
+                                </span>
                             </li>
                         <?php endforeach; ?>
                         <?php if (empty($users)): ?>
@@ -373,6 +357,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                     });
                 });
             }
+
+            // Show "Click to chat with me" tooltip on hover for online admins
+            document.querySelectorAll('.adugna-contact-item').forEach(function(item) {
+                item.addEventListener('mouseenter', function() {
+                    var tooltip = item.querySelector('.adugna-contact-tooltip');
+                    if (tooltip) tooltip.style.display = 'block';
+                });
+                item.addEventListener('mouseleave', function() {
+                    var tooltip = item.querySelector('.adugna-contact-tooltip');
+                    if (tooltip) tooltip.style.display = 'none';
+                });
+                // For accessibility: show tooltip on focus, hide on blur
+                item.addEventListener('focus', function() {
+                    var tooltip = item.querySelector('.adugna-contact-tooltip');
+                    if (tooltip) tooltip.style.display = 'block';
+                });
+                item.addEventListener('blur', function() {
+                    var tooltip = item.querySelector('.adugna-contact-tooltip');
+                    if (tooltip) tooltip.style.display = 'none';
+                });
+            });
         });
 
         document.addEventListener('DOMContentLoaded', function () {
