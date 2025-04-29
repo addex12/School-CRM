@@ -37,27 +37,40 @@ try {
     // Total Students
     $stmt = $pdo->query("SELECT COUNT(*) FROM students");
     $totalStudents = $stmt->fetchColumn() ?: 0;
+
     // Total Teachers
     $stmt = $pdo->query("SELECT COUNT(*) FROM teachers");
     $totalTeachers = $stmt->fetchColumn() ?: 0;
+
     // Total Classes
-    $stmt = $pdo->query("SELECT COUNT(*) FROM classes");
-    $totalClasses = $stmt->fetchColumn() ?: 0;
+    // Check if table exists before querying
+    $totalClasses = 0;
+    $classTableExists = $pdo->query("SHOW TABLES LIKE 'classes'")->rowCount() > 0;
+    if ($classTableExists) {
+        $stmt = $pdo->query("SELECT COUNT(*) FROM classes");
+        $totalClasses = $stmt->fetchColumn() ?: 0;
+    }
+
     // Total Parents
     $stmt = $pdo->query("SELECT COUNT(*) FROM parents");
     $totalParents = $stmt->fetchColumn() ?: 0;
+
     // Ongoing Tickets (open, in_progress, on_hold)
     $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status IN ('open', 'in_progress', 'on_hold')");
     $ongoingTickets = $stmt->fetchColumn() ?: 0;
+
     // Closed Tickets (resolved)
     $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'");
     $closedTickets = $stmt->fetchColumn() ?: 0;
+
     // Completed Surveys (ends_at < NOW())
     $stmt = $pdo->query("SELECT COUNT(*) FROM surveys WHERE ends_at < NOW()");
     $completedSurveys = $stmt->fetchColumn() ?: 0;
+
     // Active Surveys (is_active = 1 and starts_at <= NOW() and ends_at >= NOW())
     $stmt = $pdo->query("SELECT COUNT(*) FROM surveys WHERE is_active = 1 AND starts_at <= NOW() AND ends_at >= NOW()");
     $activeSurveys = $stmt->fetchColumn() ?: 0;
+
     // Total Users
     $stmt = $pdo->query("SELECT COUNT(*) FROM users");
     $totalUsers = $stmt->fetchColumn() ?: 0;
