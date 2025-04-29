@@ -71,14 +71,38 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css" />
     <style>
         /**
-         * Adugna Gizaw: Custom adugna- styles for compact, ERPNext-inspired, responsive UI.
+         * Adugna Gizaw: adugna- styles for compact, ERPNext-inspired, responsive UI.
          * Sidebar/footer styles are not touched.
          * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
          */
         html { font-size: 16px; }
         @media (max-width: 900px) { html { font-size: 15px; } }
         @media (max-width: 600px) { html { font-size: 14px; } }
 
+        .adugna-main {
+            min-height: 100vh;
+            background: #f7f9fb;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+        .adugna-content-container {
+            max-width: 1100px;
+            margin: 32px auto 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 18px 18px 28px 18px;
+            transition: box-shadow 0.2s;
+        }
+        .adugna-header-title {
+            font-size: 1.35em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+        }
         .adugna-card {
             background: #fff;
             border-radius: 8px;
@@ -238,8 +262,15 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
             align-items: center;
             gap: 8px;
         }
+        @media (max-width: 1100px) {
+            .adugna-content-container {
+                max-width: 99vw;
+                margin: 18px 2vw 0 2vw;
+                padding: 10px 4px 18px 4px;
+            }
+        }
         @media (max-width: 900px) {
-            .adugna-card, .adugna-filter-form {
+            .adugna-card, .adugna-filter-form, .adugna-content-container {
                 padding: 0.7rem 0.5rem 1rem 0.5rem;
             }
             .adugna-response-table th, .adugna-response-table td {
@@ -248,143 +279,147 @@ $responses = $response_stmt->fetchAll(PDO::FETCH_ASSOC);
             }
         }
         @media (max-width: 600px) {
-            .adugna-card, .adugna-filter-form {
+            .adugna-card, .adugna-filter-form, .adugna-content-container {
                 padding: 0.5rem 0.2rem 0.7rem 0.2rem;
             }
             .adugna-response-table th, .adugna-response-table td {
                 padding: 4px 2px;
                 font-size: 0.93em;
             }
+            .adugna-header-title {
+                font-size: 1.1em;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Adugna Gizaw: Main admin dashboard layout -->
+    <!-- Adugna Gizaw: Main admin dashboard layout, content and screen size aware -->
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-
-            <!-- Adugna Gizaw: Filter form for survey selection -->
-            <div class="adugna-filter-section">
-                <form method="GET" class="adugna-filter-form">
-                    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
-                        <div>
-                            <label for="survey_id">Filter by Survey</label>
-                            <select name="survey_id" id="survey_id">
-                                <option value="">All Surveys</option>
-                                <?php foreach ($allSurveys as $surveyOption): ?>
-                                    <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($filter_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($surveyOption['title']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+        <div class="adugna-main">
+            <div class="adugna-content-container">
+                <header class="adugna-header-title">
+                    <?= htmlspecialchars($pageTitle) ?>
+                </header>
+                <!-- Adugna Gizaw: Filter form for survey selection -->
+                <div class="adugna-filter-section">
+                    <form method="GET" class="adugna-filter-form">
+                        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+                            <div>
+                                <label for="survey_id">Filter by Survey</label>
+                                <select name="survey_id" id="survey_id">
+                                    <option value="">All Surveys</option>
+                                    <?php foreach ($allSurveys as $surveyOption): ?>
+                                        <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($filter_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
+                                            <?= htmlspecialchars($surveyOption['title']) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div>
+                                <button type="submit" class="adugna-btn"><i class="fas fa-search"></i> Search</button>
+                            </div>
                         </div>
-                        <div>
-                            <button type="submit" class="adugna-btn"><i class="fas fa-search"></i> Search</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
 
-            <?php if ($total_responses > 0): ?>
-                <!-- Adugna Gizaw: Card for survey responses table -->
-                <div class="adugna-card">
-                    <div class="adugna-card-header">Survey Responses</div>
-                    <div class="adugna-card-body">
-                        <table class="adugna-response-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Survey</th>
-                                    <th>Respondent</th>
-                                    <th>Submitted At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($responses as $index => $response): ?>
+                <?php if ($total_responses > 0): ?>
+                    <!-- Adugna Gizaw: Card for survey responses table -->
+                    <div class="adugna-card">
+                        <div class="adugna-card-header">Survey Responses</div>
+                        <div class="adugna-card-body">
+                            <table class="adugna-response-table">
+                                <thead>
                                     <tr>
-                                        <td><?= $index + 1 + $offset ?></td>
-                                        <td><?= htmlspecialchars($response['survey_title']) ?></td>
-                                        <td>Anonymous</td>
-                                        <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
-                                        <td>
-                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="adugna-btn adugna-btn-sm adugna-btn-secondary">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="adugna-btn adugna-btn-sm">
-                                                <i class="bi bi-arrow-left"></i>
-                                            </a>
-                                            <a href="edit_survey.php?id=<?= $response['survey_id'] ?>" class="adugna-btn adugna-btn-sm adugna-btn-warning">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <a href="delete_survey.php?id=<?= $response['survey_id'] ?>" class="adugna-btn adugna-btn-sm adugna-btn-danger" onclick="return confirm('Are you sure you want to delete this survey?');">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
-                                        </td>
+                                        <th>#</th>
+                                        <th>Survey</th>
+                                        <th>Respondent</th>
+                                        <th>Submitted At</th>
+                                        <th>Actions</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($responses as $index => $response): ?>
+                                        <tr>
+                                            <td><?= $index + 1 + $offset ?></td>
+                                            <td><?= htmlspecialchars($response['survey_title']) ?></td>
+                                            <td>Anonymous</td>
+                                            <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
+                                            <td>
+                                                <a href="response_view.php?id=<?= $response['id'] ?>" class="adugna-btn adugna-btn-sm adugna-btn-secondary" title="View">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="adugna-btn adugna-btn-sm" title="Results">
+                                                    <i class="bi bi-arrow-left"></i>
+                                                </a>
+                                                <a href="edit_survey.php?id=<?= $response['survey_id'] ?>" class="adugna-btn adugna-btn-sm adugna-btn-warning" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="delete_survey.php?id=<?= $response['survey_id'] ?>" class="adugna-btn adugna-btn-sm adugna-btn-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this survey?');">
+                                                    <i class="bi bi-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Adugna Gizaw: Pagination for survey responses -->
-                <nav class="mt-4">
-                    <ul class="adugna-pagination" style="justify-content:center;">
-                        <?php if ($page > 1): ?>
-                            <li class="adugna-page-item">
-                                <a class="adugna-page-link" href="?page=<?= $page - 1 ?><?= $survey_filter ?>">
-                                    <i class="fas fa-chevron-left"></i> Prev
-                                </a>
-                            </li>
-                        <?php endif; ?>
+                    <!-- Adugna Gizaw: Pagination for survey responses -->
+                    <nav class="mt-4">
+                        <ul class="adugna-pagination" style="justify-content:center;">
+                            <?php if ($page > 1): ?>
+                                <li class="adugna-page-item">
+                                    <a class="adugna-page-link" href="?page=<?= $page - 1 ?><?= $survey_filter ?>">
+                                        <i class="fas fa-chevron-left"></i> Prev
+                                    </a>
+                                </li>
+                            <?php endif; ?>
 
-                        <?php
-                        $start_page = max(1, $page - 2);
-                        $end_page = min($total_pages, $page + 2);
+                            <?php
+                            $start_page = max(1, $page - 2);
+                            $end_page = min($total_pages, $page + 2);
 
-                        if ($start_page > 1) {
-                            echo '<li class="adugna-page-item"><a class="adugna-page-link" href="?page=1' . $survey_filter . '">1</a></li>';
-                            if ($start_page > 2) {
-                                echo '<li class="adugna-page-item disabled"><span class="adugna-page-link">...</span></li>';
+                            if ($start_page > 1) {
+                                echo '<li class="adugna-page-item"><a class="adugna-page-link" href="?page=1' . $survey_filter . '">1</a></li>';
+                                if ($start_page > 2) {
+                                    echo '<li class="adugna-page-item disabled"><span class="adugna-page-link">...</span></li>';
+                                }
                             }
-                        }
 
-                        for ($i = $start_page; $i <= $end_page; $i++): ?>
-                            <li class="adugna-page-item <?= $i == $page ? 'active' : '' ?>">
-                                <a class="adugna-page-link" href="?page=<?= $i ?><?= $survey_filter ?>">
-                                    <?= $i ?>
-                                </a>
-                            </li>
-                        <?php endfor;
+                            for ($i = $start_page; $i <= $end_page; $i++): ?>
+                                <li class="adugna-page-item <?= $i == $page ? 'active' : '' ?>">
+                                    <a class="adugna-page-link" href="?page=<?= $i ?><?= $survey_filter ?>">
+                                        <?= $i ?>
+                                    </a>
+                                </li>
+                            <?php endfor;
 
-                        if ($end_page < $total_pages) {
-                            if ($end_page < $total_pages - 1) {
-                                echo '<li class="adugna-page-item disabled"><span class="adugna-page-link">...</span></li>';
+                            if ($end_page < $total_pages) {
+                                if ($end_page < $total_pages - 1) {
+                                    echo '<li class="adugna-page-item disabled"><span class="adugna-page-link">...</span></li>';
+                                }
+                                echo '<li class="adugna-page-item"><a class="adugna-page-link" href="?page=' . $total_pages . $survey_filter . '">' . $total_pages . '</a></li>';
                             }
-                            echo '<li class="adugna-page-item"><a class="adugna-page-link" href="?page=' . $total_pages . $survey_filter . '">' . $total_pages . '</a></li>';
-                        }
-                        ?>
+                            ?>
 
-                        <?php if ($page < $total_pages): ?>
-                            <li class="adugna-page-item">
-                                <a class="adugna-page-link" href="?page=<?= $page + 1 ?><?= $survey_filter ?>">
-                                    Next <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        <?php endif; ?>
-                    </ul>
-                </nav>
-            <?php else: ?>
-                <!-- Adugna Gizaw: Info alert if no responses found -->
-                <div class="adugna-alert-info">
-                    <i class="fas fa-info-circle"></i> No survey responses found.
-                </div>
-            <?php endif; ?>
+                            <?php if ($page < $total_pages): ?>
+                                <li class="adugna-page-item">
+                                    <a class="adugna-page-link" href="?page=<?= $page + 1 ?><?= $survey_filter ?>">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                <?php else: ?>
+                    <!-- Adugna Gizaw: Info alert if no responses found -->
+                    <div class="adugna-alert-info">
+                        <i class="fas fa-info-circle"></i> No survey responses found.
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </body>
