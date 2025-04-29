@@ -1,4 +1,13 @@
 <?php
+// --- Security Features Start ---
+// 1. Force HTTPS
+if (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] === 'off') {
+    $redirect = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    header('HTTP/1.1 301 Moved Permanently');
+    header('Location: ' . $redirect);
+    exit();
+}
+
 // 2. Set Secure Headers
 header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
 header('X-Frame-Options: SAMEORIGIN');
@@ -24,18 +33,18 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Remove rate limiting logic from here (should only be in login.php)
-// if (!isset($_SESSION['login_attempts'])) {
-//     $_SESSION['login_attempts'] = 0;
-//     $_SESSION['last_login_attempt'] = time();
-// }
-// if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-//     if (time() - $_SESSION['last_login_attempt'] < 60 && $_SESSION['login_attempts'] > 5) {
-//         die('Too many login attempts. Please wait a minute.');
-//     }
-//     $_SESSION['login_attempts']++;
-//     $_SESSION['last_login_attempt'] = time();
-// }
+// 6. Rate Limiting for Login (example, should be in login.php)
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+    $_SESSION['last_login_attempt'] = time();
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
+    if (time() - $_SESSION['last_login_attempt'] < 60 && $_SESSION['login_attempts'] > 5) {
+        die('Too many login attempts. Please wait a minute.');
+    }
+    $_SESSION['login_attempts']++;
+    $_SESSION['last_login_attempt'] = time();
+}
 
 // 7. Hide PHP errors from users
 ini_set('display_errors', 0);
@@ -62,12 +71,14 @@ function require_role($role_id) {
 }
 // --- Security Features End ---
 
-// Redirect users coming from crm.flipperschools.com (typo) to the correct CRM domain
+// Redirect users coming from crm.flipperschools.com (typo) or crm.flipperschool.com to the new login page
 if (
     isset($_SERVER['HTTP_HOST']) &&
-    strtolower($_SERVER['HTTP_HOST']) === 'crm.flipperschool.com'
+    (
+        strtolower($_SERVER['HTTP_HOST']) === 'crm.flipperschool.com'
+    )
 ) {
-    header('Location: https://crm.flipperschool.com' . $_SERVER['REQUEST_URI']);
+    header('Location: https://crm.flipperschool.com/login.php');
     exit();
 }
 

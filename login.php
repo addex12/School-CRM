@@ -874,6 +874,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </body>
 </html>
 
-
-<script src="../includes/activity-tracker.js"></script>
-
