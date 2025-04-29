@@ -62,13 +62,10 @@ function require_role($role_id) {
 }
 // --- Security Features End ---
 
-// Redirect users coming from crm.flipperschools.com (typo) or crm.flipperschool.com to the new login page
+// Redirect users coming from crm.flipperschools.com (typo) to the new login page
 if (
     isset($_SERVER['HTTP_HOST']) &&
-    (
-        strtolower($_SERVER['HTTP_HOST']) === 'crm.flipperschool.com' ||
-        strtolower($_SERVER['HTTP_HOST']) === 'crm.flipperschools.com' // typo with extra 's'
-    )
+    strtolower($_SERVER['HTTP_HOST']) === 'crm.flipperschool.com' // typo with extra 's'
 ) {
     header('Location: https://flipperschool.com/login.php');
     exit();
