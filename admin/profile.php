@@ -200,7 +200,7 @@ function handleChangePassword($pdo, $user) {
                         <div class="mb-3">
                             <label for="username" class="form-label">Username:</label>
                             <input type="text" id="username" name="username" 
-                                   class="erpnext-input"
+                                   class="erpnext-input form-control form-control-sm"
                                    value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
                                    required
                                    pattern="[a-zA-Z0-9_]{3,30}"
@@ -209,18 +209,18 @@ function handleChangePassword($pdo, $user) {
                         <div class="mb-3">
                             <label for="email" class="form-label">Email:</label>
                             <input type="email" id="email" name="email" 
-                                   class="erpnext-input"
+                                   class="erpnext-input form-control form-control-sm"
                                    value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
                                    required>
                         </div>
                         <div class="mb-3">
                             <label for="avatar" class="form-label">Profile Picture:</label>
                             <input type="file" id="avatar" name="avatar" 
-                                   class="erpnext-input"
+                                   class="erpnext-input form-control form-control-sm"
                                    accept="image/jpeg,image/png,image/gif">
                             <small class="form-text text-muted">Max 2MB (JPG, PNG, GIF only)</small>
                         </div>
-                        <button type="submit" class="erpnext-btn btn-primary w-100">Update Profile</button>
+                        <button type="submit" class="erpnext-btn btn-primary btn-sm w-100">Update Profile</button>
                     </form>
                 </div>
             </div>
@@ -236,12 +236,12 @@ function handleChangePassword($pdo, $user) {
                         <div class="mb-3">
                             <label for="current_password" class="form-label">Current Password:</label>
                             <input type="password" id="current_password" name="current_password" 
-                                   class="erpnext-input" required>
+                                   class="erpnext-input form-control form-control-sm" required>
                         </div>
                         <div class="mb-3">
                             <label for="new_password" class="form-label">New Password:</label>
                             <input type="password" id="new_password" name="new_password" 
-                                   class="erpnext-input"
+                                   class="erpnext-input form-control form-control-sm"
                                    required
                                    pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
                                    title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
@@ -250,9 +250,9 @@ function handleChangePassword($pdo, $user) {
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label">Confirm New Password:</label>
                             <input type="password" id="confirm_password" name="confirm_password" 
-                                   class="erpnext-input" required>
+                                   class="erpnext-input form-control form-control-sm" required>
                         </div>
-                        <button type="submit" class="erpnext-btn btn-secondary w-100">Change Password</button>
+                        <button type="submit" class="erpnext-btn btn-secondary btn-sm w-100">Change Password</button>
                     </form>
                 </div>
             </div>
