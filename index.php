@@ -34,6 +34,9 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 // 6. Rate Limiting for Login (example, should be in login.php)
+// This block should only be active on login.php, not here.
+// Remove or comment out the following block to avoid interfering with other pages.
+/*
 if (!isset($_SESSION['login_attempts'])) {
     $_SESSION['login_attempts'] = 0;
     $_SESSION['last_login_attempt'] = time();
@@ -45,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $_SESSION['login_attempts']++;
     $_SESSION['last_login_attempt'] = time();
 }
+*/
 
 // 7. Hide PHP errors from users
 ini_set('display_errors', 0);
