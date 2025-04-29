@@ -520,6 +520,7 @@ $siteIcon = 'uploads/icon.png';
                 </div>
             <?php endif; ?>
         </div>
+                    </div>
         <!-- Right: Login Card -->
         <div class="adugna-login-right">
             <div class="adugna-card">
