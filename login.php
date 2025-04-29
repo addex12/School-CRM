@@ -140,19 +140,15 @@ if (isset($user) && is_array($user)) {
     $user = null;
 }
 
-// Fetch settings from DB if not already available
-if (!isset($settings)) {
-    require_once __DIR__ . '/includes/config.php';
-    $settings = [];
-    try {
-        $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings");
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $settings[$row['setting_key']] = $row['setting_value'];
-        }
-    } catch (Exception $e) {
-        // fallback: allow registration if settings table is missing
-        $settings['allow_user_registration'] = '1';
-    }
+// Fetch site logo and name from settings
+try {
+    $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name')");
+    $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
+    $siteName = $settings['site_name'] ?? 'School CRM';
+} catch (Exception $e) {
+    $siteLogo = 'assets/images/default-logo.png';
+    $siteName = 'School CRM';
 }
 
 // Always define $allowRegistration to avoid undefined variable warning
@@ -160,6 +156,12 @@ $allowRegistration = true;
 if (isset($settings['allow_user_registration']) && $settings['allow_user_registration'] == '0') {
     $allowRegistration = false;
 }
+
+// Use fixed filenames for images as set in admin/settings.php
+$siteLogo = 'uploads/logo.png';
+$loginBgImage = 'uploads/bg.png';
+$siteBanner = 'uploads/banner.png';
+$siteIcon = 'uploads/icon.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
