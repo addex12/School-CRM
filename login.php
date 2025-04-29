@@ -502,9 +502,12 @@ try {
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <div class="input-wrapper">
+                    <div class="input-wrapper" style="position:relative;">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="password" name="password" show="false" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
+                        <button type="button" id="togglePassword" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#6b7280; font-size:1.1em;" tabindex="-1" aria-label="Show password">
+                            <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                        </button>
                     </div>
                 </div>
                 
