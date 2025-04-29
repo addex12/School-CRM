@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 29, 2025 at 04:51 AM
+-- Generation Time: Apr 30, 2025 at 02:01 AM
 -- Server version: 10.6.21-MariaDB-cll-lve
 -- PHP Version: 8.3.20
 
@@ -65,14 +65,6 @@ CREATE TABLE `announcements` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `announcements`
---
-
-INSERT INTO `announcements` (`id`, `title`, `content`, `created_by`, `target_roles`, `start_date`, `end_date`, `is_public`, `created_at`, `updated_at`) VALUES
-(2, 'Staff Meeting & Professional Development Workshop', 'Dear Faculty Members,\r\n\r\nPlease be reminded of our mandatory staff meeting this Thursday immediately after classes. Agenda includes:\r\n\r\n    Review of term-end assessment procedures\r\n\r\n    New curriculum implementation updates\r\n\r\n    Classroom technology training\r\n\r\nFollowing the meeting, there will be a professional development workshop on \"Innovative Teaching Strategies for Diverse Learners\" conducted by Dr. Sarah Johnson from the Ministry of Education.\r\n\r\nKindly bring your laptops and review the pre-workshop materials shared via the staff portal. Light refreshments will be provided.', 4, '2', '2025-04-24 00:00:00', '2025-05-10 00:00:00', 0, '2025-04-24 19:54:22', '2025-04-25 06:06:13'),
-(3, 'Flipper International Schools', '\"Nurturing Global Leaders with Local Values\"', 4, '', '2025-04-25 12:12:00', '2025-04-30 12:12:00', 1, '2025-04-25 00:14:00', '2025-04-25 10:19:58');
-
 -- --------------------------------------------------------
 
 --
@@ -88,256 +80,6 @@ CREATE TABLE `audit_logs` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `audit_logs`
---
-
-INSERT INTO `audit_logs` (`id`, `user_id`, `action`, `details`, `ip_address`, `created_at`) VALUES
-(26, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-23 23:19:52'),
-(27, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-23 23:45:38'),
-(28, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 08:28:46'),
-(29, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:12:06'),
-(30, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:14:59'),
-(31, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 10:15:02'),
-(32, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:15:20'),
-(33, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:32:33'),
-(34, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 10:38:37'),
-(35, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:38:44'),
-(36, NULL, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 10:39:03'),
-(37, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:39:08'),
-(38, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 10:39:30'),
-(39, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:39:38'),
-(40, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:39:49'),
-(41, NULL, 'login', 'User logged in', '196.189.144.197', '2025-04-24 10:43:57'),
-(42, NULL, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 10:44:06'),
-(43, 4458, 'login', 'User logged in', '196.189.144.197', '2025-04-24 10:44:24'),
-(44, NULL, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 10:47:03'),
-(45, 4458, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 10:47:18'),
-(46, NULL, 'login', 'User logged in', '196.189.144.197', '2025-04-24 10:47:25'),
-(47, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 10:47:37'),
-(48, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 11:00:56'),
-(49, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:03:03'),
-(52, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:16:23'),
-(53, NULL, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:38:24'),
-(54, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 11:54:51'),
-(55, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 12:15:33'),
-(56, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 12:27:41'),
-(57, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 12:35:36'),
-(58, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 13:02:22'),
-(59, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 13:05:32'),
-(60, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 13:06:05'),
-(61, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 13:41:43'),
-(62, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 13:50:14'),
-(63, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 14:02:49'),
-(64, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 14:34:51'),
-(65, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 14:50:35'),
-(66, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 15:23:23'),
-(67, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 15:29:00'),
-(68, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 15:55:17'),
-(69, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 15:55:25'),
-(70, 5, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 16:04:35'),
-(71, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 16:04:48'),
-(72, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 16:39:05'),
-(73, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 16:47:59'),
-(74, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 17:02:35'),
-(75, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 17:03:32'),
-(76, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 17:11:53'),
-(77, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 17:15:37'),
-(78, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 17:23:13'),
-(79, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 17:46:57'),
-(80, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 17:48:48'),
-(81, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 18:09:17'),
-(82, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 18:17:54'),
-(83, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 18:24:04'),
-(84, 4, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 18:29:31'),
-(85, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 18:29:47'),
-(86, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 19:20:19'),
-(87, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 19:24:05'),
-(88, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 19:24:09'),
-(89, 4, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 19:34:24'),
-(90, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 19:34:28'),
-(91, 4, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 19:42:19'),
-(92, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 19:42:23'),
-(93, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 19:55:11'),
-(94, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 19:55:44'),
-(95, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 19:57:36'),
-(96, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 19:57:39'),
-(97, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 20:00:20'),
-(98, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 20:00:23'),
-(99, 4472, 'login', 'User logged in', '196.190.62.232', '2025-04-24 20:01:30'),
-(100, 4472, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 20:01:40'),
-(101, 4472, 'login', 'User logged in', '196.190.62.232', '2025-04-24 20:01:46'),
-(102, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 20:04:17'),
-(103, 5, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 20:09:55'),
-(104, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 20:10:00'),
-(105, 5, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 20:14:39'),
-(106, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 20:14:58'),
-(107, 4, 'login', 'User logged in', '196.189.144.197', '2025-04-24 20:17:34'),
-(108, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 20:21:25'),
-(109, 5, 'login', 'User logged in', '196.190.62.232', '2025-04-24 21:00:56'),
-(110, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 21:23:19'),
-(111, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-24 22:05:54'),
-(112, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 22:24:05'),
-(113, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 22:24:25'),
-(114, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 22:28:01'),
-(115, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 22:28:09'),
-(116, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-24 22:34:48'),
-(117, 4472, 'login', 'User logged in', '196.190.62.232', '2025-04-24 22:34:52'),
-(118, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 22:55:30'),
-(119, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 22:55:45'),
-(120, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 23:03:38'),
-(121, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 23:03:44'),
-(122, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-24 23:04:43'),
-(123, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 23:11:08'),
-(124, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 23:11:12'),
-(125, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-24 23:11:26'),
-(126, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-24 23:13:37'),
-(127, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 00:05:39'),
-(128, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-25 00:05:51'),
-(129, 4472, 'login', 'User logged in', '196.190.62.232', '2025-04-25 00:20:09'),
-(130, 4458, 'login', 'User logged in', '196.189.144.197', '2025-04-25 00:20:27'),
-(131, 4458, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 00:43:21'),
-(132, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 00:43:27'),
-(133, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 00:55:06'),
-(134, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 00:55:15'),
-(135, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 00:56:49'),
-(136, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 00:57:10'),
-(137, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:09:27'),
-(138, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:09:30'),
-(139, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:09:34'),
-(140, 4472, 'logout', 'User logged out', '196.190.62.232', '2025-04-25 01:10:46'),
-(141, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:12:49'),
-(142, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:13:23'),
-(143, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-25 01:19:33'),
-(144, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:24:10'),
-(145, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:24:28'),
-(146, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:24:31'),
-(147, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:24:41'),
-(148, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:26:12'),
-(149, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:26:16'),
-(150, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:26:19'),
-(151, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:26:36'),
-(152, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:26:44'),
-(153, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:29:30'),
-(154, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:29:34'),
-(155, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:32:32'),
-(156, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:32:36'),
-(157, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:32:48'),
-(158, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:32:52'),
-(159, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:34:21'),
-(160, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:34:25'),
-(161, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:35:46'),
-(162, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:35:50'),
-(163, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:36:29'),
-(164, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:37:04'),
-(165, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:37:36'),
-(166, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:54:51'),
-(167, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:55:13'),
-(168, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:55:28'),
-(169, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:56:24'),
-(170, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:56:29'),
-(171, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 01:57:36'),
-(172, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 01:57:41'),
-(173, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 02:01:42'),
-(174, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 02:07:50'),
-(175, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 02:13:55'),
-(176, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 02:14:00'),
-(177, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 02:15:05'),
-(178, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 02:15:08'),
-(179, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 02:19:11'),
-(180, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 02:19:16'),
-(181, 4472, 'logout', 'User logged out', '196.189.144.197', '2025-04-25 02:25:56'),
-(182, 4472, 'login', 'User logged in', '196.189.144.197', '2025-04-25 02:28:52'),
-(183, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-26 16:46:14'),
-(184, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-26 19:21:37'),
-(185, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-26 19:26:05'),
-(186, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:35:14'),
-(187, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:36:12'),
-(188, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:36:52'),
-(189, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-26 20:37:22'),
-(190, 4458, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:37:37'),
-(191, 4458, 'logout', 'User logged out', '196.191.223.155', '2025-04-26 20:38:02'),
-(192, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:40:03'),
-(193, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-26 20:40:05'),
-(194, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:41:37'),
-(195, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:49:13'),
-(196, 4473, 'logout', 'User logged out', '196.191.223.155', '2025-04-26 20:49:40'),
-(197, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:49:48'),
-(198, 4458, 'login', 'User logged in', '196.191.223.155', '2025-04-26 20:50:02'),
-(199, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-26 21:10:49'),
-(200, 4458, 'login', 'User logged in', '196.191.223.155', '2025-04-26 21:11:01'),
-(201, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-26 21:18:40'),
-(202, 4472, 'login', 'User logged in', '196.190.62.232', '2025-04-26 21:18:50'),
-(203, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-26 21:20:02'),
-(204, 4458, 'logout', 'User logged out', '196.191.223.155', '2025-04-26 21:27:39'),
-(205, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-26 21:28:21'),
-(206, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-26 22:33:08'),
-(207, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-26 23:22:49'),
-(208, 4458, 'login', 'User logged in', '196.190.62.232', '2025-04-26 23:36:38'),
-(209, 4, 'logout', 'User logged out', '196.190.62.232', '2025-04-27 00:06:59'),
-(210, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-27 00:07:03'),
-(211, 4, 'logout', 'User logged out', '196.190.62.232', '2025-04-27 00:07:07'),
-(212, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-27 00:11:23'),
-(213, 4458, 'logout', 'User logged out', '196.190.62.232', '2025-04-27 00:15:07'),
-(214, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 06:32:16'),
-(215, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-27 06:42:23'),
-(216, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-27 06:43:27'),
-(217, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 10:02:11'),
-(218, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-27 10:18:43'),
-(219, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-27 11:39:47'),
-(220, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 11:58:45'),
-(221, 4, 'login', 'User logged in', '196.190.62.232', '2025-04-27 12:09:26'),
-(222, 4, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 12:10:40'),
-(223, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 12:10:47'),
-(224, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 12:24:22'),
-(225, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 12:48:37'),
-(226, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:00:55'),
-(227, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:11:18'),
-(228, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:18:50'),
-(229, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 13:30:36'),
-(230, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:35:49'),
-(231, 4473, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 14:36:35'),
-(232, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:37:17'),
-(233, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:44:07'),
-(234, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 14:54:17'),
-(235, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 15:20:26'),
-(236, 4, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 16:55:44'),
-(237, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 16:55:50'),
-(238, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 16:56:41'),
-(239, 4, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 16:57:38'),
-(240, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 16:58:11'),
-(241, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 17:07:24'),
-(242, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 17:50:20'),
-(243, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:06:42'),
-(244, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:27:32'),
-(245, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:43:15'),
-(246, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:46:01'),
-(247, 4, 'login', 'User logged in', '196.191.223.155', '2025-04-27 18:55:42'),
-(248, 4473, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:06:38'),
-(249, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:06:52'),
-(250, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:07:15'),
-(251, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:07:18'),
-(252, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:15:59'),
-(253, 4458, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:16:11'),
-(254, 4458, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:52:59'),
-(255, 4473, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:53:02'),
-(256, 4473, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:53:06'),
-(257, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:53:10'),
-(258, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:53:28'),
-(259, 4458, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:53:37'),
-(260, 4458, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 19:58:00'),
-(261, 4472, 'login', 'User logged in', '196.191.223.155', '2025-04-27 19:58:05'),
-(262, 4472, 'logout', 'User logged out', '196.191.223.155', '2025-04-27 20:03:36'),
-(263, 4, 'login', 'User logged in', '196.190.62.58', '2025-04-28 13:17:30'),
-(264, 4472, 'login', 'User logged in', '196.190.62.58', '2025-04-28 13:32:34'),
-(265, 4472, 'logout', 'User logged out', '196.190.62.58', '2025-04-28 14:19:04'),
-(266, 4472, 'login', 'User logged in', '196.190.62.58', '2025-04-28 14:19:08'),
-(267, 4472, 'logout', 'User logged out', '196.190.62.58', '2025-04-28 14:32:16'),
-(268, 4458, 'login', 'User logged in', '196.190.62.58', '2025-04-28 14:32:23'),
-(269, 4472, 'login', 'User logged in', '196.190.62.58', '2025-04-28 17:41:56'),
-(270, 4, 'login', 'User logged in', '196.190.62.58', '2025-04-28 17:48:27'),
-(271, 4472, 'logout', 'User logged out', '196.190.62.58', '2025-04-28 18:07:46'),
-(272, 4458, 'login', 'User logged in', '196.190.62.58', '2025-04-28 18:07:54');
 
 -- --------------------------------------------------------
 
@@ -354,13 +96,6 @@ CREATE TABLE `events` (
   `end_date` datetime NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `events`
---
-
-INSERT INTO `events` (`id`, `user_id`, `title`, `description`, `start_date`, `end_date`, `created_at`) VALUES
-(5, 4, 'For Students Only', 'Club Ceremony', '2025-04-28 00:00:00', '2025-05-01 00:00:00', '2025-04-26 23:36:27');
 
 -- --------------------------------------------------------
 
@@ -381,25 +116,6 @@ CREATE TABLE `feedback` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
---
--- Dumping data for table `feedback`
---
-
-INSERT INTO `feedback` (`id`, `user_id`, `subject`, `message`, `rating`, `admin_reply`, `user_reply`, `status`, `admin_notes`, `created_at`) VALUES
-(1, 65, 'Good Job', 'great', 5, 'Thank you', 'You\'re Welcome', 'open', NULL, '2025-04-14 13:30:19'),
-(3, 65, 'I feel Good', 'Great job again', 1, NULL, NULL, 'open', NULL, '2025-04-15 03:14:52'),
-(4, 65, 'Academic Progress', 'Great progress', 5, NULL, NULL, 'open', NULL, '2025-04-15 03:29:58'),
-(5, 5, 'Cafeteria/Food Services', 'Delicious', 3, NULL, NULL, 'open', NULL, '2025-04-15 03:30:48'),
-(6, 65, 'Let&#39;s Check', '4 stars', 4, 'Okay', NULL, 'open', NULL, '2025-04-15 03:43:00'),
-(8, 65, 'Cafeteria/Food Services', 'check', 2, NULL, NULL, 'open', NULL, '2025-04-15 03:54:34'),
-(9, 65, 'Discipline and Safety', 'test again', 3, NULL, NULL, 'open', NULL, '2025-04-15 03:56:39'),
-(0, 4470, 'Fee Request', 'great', 4, NULL, NULL, 'open', NULL, '2025-04-24 11:39:00'),
-(0, 4470, 'Fee Request', 'great', 4, NULL, NULL, 'open', NULL, '2025-04-24 11:41:39'),
-(0, 4472, 'Other', 'Great', 4, NULL, NULL, 'open', NULL, '2025-04-24 23:09:40'),
-(0, 4458, 'Other', 'Good job', 4, NULL, NULL, 'open', NULL, '2025-04-25 00:26:03'),
-(0, 4473, 'Other', 'Great', 5, NULL, NULL, 'open', NULL, '2025-04-26 20:46:21'),
-(0, 4458, 'Other', 'Other ratings', 1, NULL, NULL, 'open', NULL, '2025-04-27 19:47:23'),
-(0, 4458, 'Other', 'Other ratings', 1, NULL, NULL, 'open', NULL, '2025-04-27 19:49:47');
 
 -- --------------------------------------------------------
 
@@ -454,15 +170,6 @@ CREATE TABLE `knowledge_base` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `knowledge_base`
---
-
-INSERT INTO `knowledge_base` (`id`, `title`, `content`, `created_at`, `updated_at`) VALUES
-(1, 'what should do students in a school', '🎓 Academically:\r\n1.Attend classes regularly – Be present and punctual.\r\n\r\n2.Pay attention in class – Focus, take notes, and engage in discussions.\r\n\r\n3.Complete assignments – On time and to the best of their ability.\r\n\r\n4.Study consistently – Don’t wait until the last minute.\r\n\r\n5.Ask questions – If something’s unclear, speak up!\r\n\r\n6.Prepare for exams – Review material and practice regularly.\r\n\r\n7.Work on projects – Collaborate with classmates when needed.\r\n\r\n🧠 Personally and Socially:\r\n1.Attend classes regularly – Be present and punctual.\r\n\r\n2.Pay attention in class – Focus, take notes, and engage in discussions.\r\n\r\n3.Complete assignments – On time and to the best of their ability.\r\n\r\n4.Study consistently – Don’t wait until the last minute.\r\n\r\n5.Ask questions – If something’s unclear, speak up!\r\n\r\n6.Prepare for exams – Review material and practice regularly.\r\n\r\n7.Work on projects – Collaborate with classmates when needed.\r\n💬 Emotionally and Mentally:\r\n1.Take care of mental health – Talk to counselors or trusted adults if needed.\r\n\r\n2.Build confidence – Set goals and celebrate achievements.\r\n\r\n3.Stay curious – Learn beyond the classroom too.', '2025-04-25 05:11:52', '2025-04-25 05:11:52');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `messages`
 --
 
@@ -478,47 +185,6 @@ CREATE TABLE `messages` (
   `deleted_by_receiver` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `messages`
---
-
-INSERT INTO `messages` (`id`, `sender_id`, `receiver_id`, `subject`, `content`, `sent_at`, `is_read`, `deleted_by_sender`, `deleted_by_receiver`, `created_at`) VALUES
-(1, 4, 4458, NULL, 'hi', '2025-04-25 03:20:41', 1, 0, 0, '2025-04-25 03:20:41'),
-(2, 4, 4458, NULL, 'hi', '2025-04-25 03:36:21', 1, 0, 0, '2025-04-25 03:36:21'),
-(3, 4, 4458, NULL, 'mmmmmm', '2025-04-25 04:05:18', 1, 0, 0, '2025-04-25 07:19:08'),
-(4, 4, 4458, NULL, 'hello', '2025-04-25 04:22:02', 1, 0, 0, '2025-04-25 04:22:02'),
-(5, 4, 4471, NULL, 'hello', '2025-04-25 04:22:02', 0, 0, 0, '2025-04-25 04:22:02'),
-(6, 4, 4458, NULL, 'hello', '2025-04-25 04:24:28', 1, 1, 0, '2025-04-25 04:24:28'),
-(7, 4, 4472, NULL, 'hello', '2025-04-25 04:24:28', 1, 0, 0, '2025-04-25 04:24:28'),
-(8, 4, 4471, NULL, 'hello', '2025-04-25 04:24:28', 0, 0, 0, '2025-04-25 04:24:28'),
-(9, 4472, 4, NULL, 'Hello', '2025-04-25 04:33:34', 1, 0, 0, '2025-04-25 04:33:34'),
-(10, 4472, 4, NULL, 'Helllllòoooooooo', '2025-04-25 04:54:34', 1, 0, 0, '2025-04-25 04:54:34'),
-(11, 4472, 5, NULL, 'hello', '2025-04-25 07:11:48', 0, 0, 0, '2025-04-25 07:11:48'),
-(12, 4472, 4, NULL, 'hey', '2025-04-25 07:12:21', 1, 0, 0, '2025-04-25 07:12:21'),
-(13, 4472, 4, NULL, 'uuuuuuuuuuuuuuuuuuuuuu', '2025-04-25 07:15:01', 1, 0, 0, '2025-04-25 07:15:01'),
-(14, 4472, 4, NULL, 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii', '2025-04-25 07:15:15', 1, 0, 0, '2025-04-25 07:15:15'),
-(15, 4472, 4, NULL, 'haluuuuuuuuuuuuuuuuu', '2025-04-25 07:25:17', 1, 0, 0, '2025-04-25 07:25:17'),
-(16, 4472, 5, NULL, 'Hey', '2025-04-25 08:24:58', 0, 0, 0, '2025-04-25 08:24:58'),
-(17, 4472, 5, NULL, 'Hey', '2025-04-25 08:26:23', 0, 0, 0, '2025-04-25 08:26:23'),
-(18, 4472, 5, NULL, 'Ttt', '2025-04-25 08:26:35', 0, 0, 0, '2025-04-25 08:26:35'),
-(19, 4472, 5, NULL, 'Rrr', '2025-04-25 08:39:17', 0, 0, 0, '2025-04-25 08:39:17'),
-(20, 4472, 4, NULL, 'Helloo', '2025-04-25 08:57:39', 1, 0, 0, '2025-04-25 08:57:39'),
-(21, 4472, 4, NULL, 'Hi', '2025-04-25 09:06:09', 1, 0, 0, '2025-04-25 09:06:09'),
-(22, 4458, 5, NULL, 'Hey There', '2025-04-25 09:50:52', 0, 0, 0, '2025-04-25 09:50:52'),
-(23, 4458, 5, NULL, 'h', '2025-04-25 09:51:18', 0, 0, 0, '2025-04-25 09:51:18'),
-(24, 4458, 5, NULL, 'hello', '2025-04-25 09:51:22', 0, 0, 0, '2025-04-25 09:51:22'),
-(25, 4458, 5, NULL, 'test again', '2025-04-25 09:51:27', 0, 0, 0, '2025-04-25 09:51:27'),
-(26, 4458, 4, NULL, 'hi', '2025-04-25 09:52:52', 1, 0, 0, '2025-04-25 09:52:52'),
-(27, 4458, 4, NULL, 'Hi', '2025-04-25 10:21:28', 1, 0, 0, '2025-04-25 10:21:28'),
-(28, 4472, 4, NULL, 'Hello', '2025-04-25 10:44:04', 1, 0, 0, '2025-04-25 10:44:04'),
-(29, 4, 4472, NULL, 'hi', '2025-04-27 05:28:36', 1, 0, 0, '2025-04-27 05:28:36'),
-(30, 4, 4472, NULL, 'nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn', '2025-04-27 05:35:10', 1, 0, 0, '2025-04-27 05:35:10'),
-(31, 4, 4472, NULL, 'mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm', '2025-04-27 05:35:23', 1, 0, 0, '2025-04-27 05:35:23'),
-(32, 4472, 4, NULL, 'hi', '2025-04-27 08:21:59', 1, 0, 0, '2025-04-27 08:21:59'),
-(33, 4, 4472, NULL, 'Hello', '2025-04-27 22:11:23', 0, 0, 0, '2025-04-27 22:11:23'),
-(34, 4472, 5, NULL, 'Hi', '2025-04-28 02:58:06', 0, 0, 0, '2025-04-28 02:58:06'),
-(35, 4473, 4, NULL, 'Hello', '2025-04-28 04:46:18', 0, 0, 0, '2025-04-28 04:46:18');
 
 -- --------------------------------------------------------
 
@@ -651,7 +317,30 @@ INSERT INTO `response_data` (`id`, `response_id`, `survey_id`, `field_id`, `fiel
 (22, 10, 5, 19, 'Lots of tools'),
 (23, 10, 5, 20, 'Classroom Behavior'),
 (26, 12, 7, 38, 'Sometimes'),
-(27, 12, 7, 39, 'None');
+(27, 12, 7, 39, 'None'),
+(28, 16, 8, 42, 'Good'),
+(29, 16, 8, 43, '2'),
+(30, 17, 8, 42, 'Good'),
+(31, 17, 8, 43, '2'),
+(32, 18, 8, 42, 'Great'),
+(33, 18, 8, 43, '1'),
+(34, 19, 8, 42, 'Fair'),
+(35, 19, 8, 43, '5'),
+(36, 20, 6, 33, '1'),
+(37, 20, 6, 34, 'Strongly Agree'),
+(38, 20, 6, 35, 'Somehow Supportive'),
+(39, 21, 6, 33, '1'),
+(40, 21, 6, 34, 'Strongly Agree'),
+(41, 21, 6, 35, 'Somehow Supportive'),
+(42, 22, 6, 33, '2'),
+(43, 22, 6, 34, 'Strongly Agree'),
+(44, 22, 6, 35, 'Very Supportive'),
+(45, 23, 8, 42, 'Good'),
+(46, 23, 8, 43, '2'),
+(47, 24, 7, 38, 'Always'),
+(48, 24, 7, 39, 'no challenge'),
+(49, 25, 7, 38, 'Sometimes'),
+(50, 25, 7, 39, 'aaaaaaaaaaaa');
 
 -- --------------------------------------------------------
 
@@ -778,14 +467,6 @@ CREATE TABLE `students` (
   `status` varchar(50) DEFAULT 'active',
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `students`
---
-
-INSERT INTO `students` (`id`, `user_id`, `class_id`, `section_id`, `enrollment_no`, `date_of_birth`, `gender`, `address`, `status`, `created_at`) VALUES
-(3, 5, 12, 3, 'STU001', '2010-05-15', 'Male', '123 Student Street, Addis Ababa', 'active', '2025-04-23 05:23:51'),
-(497, 4458, NULL, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 01:50:30');
 
 -- --------------------------------------------------------
 
@@ -965,7 +646,8 @@ CREATE TABLE `survey_logic` (
 CREATE TABLE `survey_responses` (
   `id` int(11) NOT NULL,
   `survey_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -974,16 +656,26 @@ CREATE TABLE `survey_responses` (
 -- Dumping data for table `survey_responses`
 --
 
-INSERT INTO `survey_responses` (`id`, `survey_id`, `user_id`, `submitted_at`, `answers`) VALUES
-(4, 3, 4472, '2025-04-27 19:07:28', '{\"3\":\"5\",\"4\":\"Yes\"}'),
-(5, 3, 4458, '2025-04-27 19:16:30', '{\"3\":\"4\",\"4\":\"No\"}'),
-(6, 5, 4458, '2025-04-27 19:54:41', '{\"18\":\"Very Supported\",\"19\":\"Yes\",\"20\":\"Student Engagement\"}'),
-(7, 5, 4458, '2025-04-27 19:55:05', '{\"18\":\"Very Supported\",\"19\":\"No response\",\"20\":\"Workload\\/Time Management\"}'),
-(8, 5, 4458, '2025-04-27 19:55:18', '{\"18\":\"Very Unsupported\",\"19\":\"Shdhdjd\",\"20\":\"Workload\\/Time Management\"}'),
-(9, 5, 4458, '2025-04-27 19:57:24', '{\"18\":\"Very Supported\",\"19\":\" Lots of tools\",\"20\":\"Student Engagement\"}'),
-(10, 5, 4472, '2025-04-27 19:58:21', '{\"18\":\"Neutral\",\"19\":\"Lots of tools\",\"20\":\"Classroom Behavior\"}'),
-(11, 6, 4458, '2025-04-28 18:23:51', '{\"29\":\"3\",\"30\":\"Agree\"}'),
-(12, 7, 4458, '2025-04-28 18:34:13', '{\"38\":\"Sometimes\",\"39\":\"None\"}');
+INSERT INTO `survey_responses` (`id`, `survey_id`, `user_id`, `email`, `submitted_at`, `answers`) VALUES
+(4, 3, 4472, NULL, '2025-04-27 19:07:28', '{\"3\":\"5\",\"4\":\"Yes\"}'),
+(5, 3, 4458, NULL, '2025-04-27 19:16:30', '{\"3\":\"4\",\"4\":\"No\"}'),
+(6, 5, 4458, NULL, '2025-04-27 19:54:41', '{\"18\":\"Very Supported\",\"19\":\"Yes\",\"20\":\"Student Engagement\"}'),
+(7, 5, 4458, NULL, '2025-04-27 19:55:05', '{\"18\":\"Very Supported\",\"19\":\"No response\",\"20\":\"Workload\\/Time Management\"}'),
+(8, 5, 4458, NULL, '2025-04-27 19:55:18', '{\"18\":\"Very Unsupported\",\"19\":\"Shdhdjd\",\"20\":\"Workload\\/Time Management\"}'),
+(9, 5, 4458, NULL, '2025-04-27 19:57:24', '{\"18\":\"Very Supported\",\"19\":\" Lots of tools\",\"20\":\"Student Engagement\"}'),
+(10, 5, 4472, NULL, '2025-04-27 19:58:21', '{\"18\":\"Neutral\",\"19\":\"Lots of tools\",\"20\":\"Classroom Behavior\"}'),
+(11, 6, 4458, NULL, '2025-04-28 18:23:51', '{\"29\":\"3\",\"30\":\"Agree\"}'),
+(12, 7, 4458, NULL, '2025-04-28 18:34:13', '{\"38\":\"Sometimes\",\"39\":\"None\"}'),
+(16, 8, NULL, NULL, '2025-04-28 19:54:00', '{\"42\":\"Good\",\"43\":\"2\"}'),
+(17, 8, NULL, NULL, '2025-04-28 19:54:55', '{\"42\":\"Good\",\"43\":\"2\"}'),
+(18, 8, NULL, NULL, '2025-04-28 19:55:25', '{\"42\":\"Great\",\"43\":\"1\"}'),
+(19, 8, NULL, NULL, '2025-04-28 20:01:23', '{\"42\":\"Fair\",\"43\":\"5\"}'),
+(20, 6, NULL, 'gizawadugna@gmail.com', '2025-04-28 20:07:55', '{\"33\":\"1\",\"34\":\"Strongly Agree\",\"35\":\"Somehow Supportive\"}'),
+(21, 6, NULL, 'gizawadugna@gmail.com', '2025-04-28 20:08:23', '{\"33\":\"1\",\"34\":\"Strongly Agree\",\"35\":\"Somehow Supportive\"}'),
+(22, 6, NULL, 'adugna.gsr-1468-17@aau.edu.et', '2025-04-28 20:09:06', '{\"33\":\"2\",\"34\":\"Strongly Agree\",\"35\":\"Very Supportive\"}'),
+(23, 8, NULL, NULL, '2025-04-28 20:09:42', '{\"42\":\"Good\",\"43\":\"2\"}'),
+(24, 7, NULL, 'adugna.gsr-1468-17@aau.edu.et', '2025-04-28 20:13:25', '{\"38\":\"Always\",\"39\":\"no challenge\"}'),
+(25, 7, NULL, 'gizawadugna@gmail.com', '2025-04-28 20:16:59', '{\"38\":\"Sometimes\",\"39\":\"aaaaaaaaaaaa\"}');
 
 -- --------------------------------------------------------
 
@@ -1094,26 +786,6 @@ CREATE TABLE `teachers` (
   `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `teachers`
---
-
-INSERT INTO `teachers` (`id`, `user_id`, `qualification`, `subject_specialization`, `date_of_birth`, `gender`, `address`, `status`, `created_at`) VALUES
-(460, 4458, NULL, NULL, NULL, NULL, NULL, 'active', '2025-04-24 18:34:34');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `teacher_subjects`
---
-
-CREATE TABLE `teacher_subjects` (
-  `id` int(11) NOT NULL,
-  `teacher_id` int(11) NOT NULL,
-  `class_subject_id` int(11) NOT NULL,
-  `section_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 -- --------------------------------------------------------
 
 --
@@ -1173,7 +845,7 @@ CREATE TABLE `users` (
   `remember_token` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
- --------------------------------------------------------
+-- --------------------------------------------------------
 
 --
 -- Table structure for table `user_activity`
@@ -1394,15 +1066,6 @@ ALTER TABLE `teachers`
   ADD UNIQUE KEY `user_id` (`user_id`);
 
 --
--- Indexes for table `teacher_subjects`
---
-ALTER TABLE `teacher_subjects`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `teacher_id` (`teacher_id`),
-  ADD KEY `class_subject_id` (`class_subject_id`),
-  ADD KEY `section_id` (`section_id`);
-
---
 -- Indexes for table `ticket_replies`
 --
 ALTER TABLE `ticket_replies`
@@ -1466,7 +1129,7 @@ ALTER TABLE `announcements`
 -- AUTO_INCREMENT for table `audit_logs`
 --
 ALTER TABLE `audit_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=273;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=295;
 
 --
 -- AUTO_INCREMENT for table `events`
@@ -1520,7 +1183,7 @@ ALTER TABLE `persistent_tracking`
 -- AUTO_INCREMENT for table `response_data`
 --
 ALTER TABLE `response_data`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `roles`
@@ -1568,7 +1231,7 @@ ALTER TABLE `survey_fields`
 -- AUTO_INCREMENT for table `survey_responses`
 --
 ALTER TABLE `survey_responses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `survey_roles`
@@ -1589,12 +1252,6 @@ ALTER TABLE `teachers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=461;
 
 --
--- AUTO_INCREMENT for table `teacher_subjects`
---
-ALTER TABLE `teacher_subjects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-
---
 -- AUTO_INCREMENT for table `ticket_replies`
 --
 ALTER TABLE `ticket_replies`
@@ -1610,7 +1267,7 @@ ALTER TABLE `transcripts`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4474;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user_activity`
@@ -1723,14 +1380,6 @@ ALTER TABLE `survey_roles`
 --
 ALTER TABLE `teachers`
   ADD CONSTRAINT `teachers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `teacher_subjects`
---
-ALTER TABLE `teacher_subjects`
-  ADD CONSTRAINT `fk_teacher_subjects_class_subjects` FOREIGN KEY (`class_subject_id`) REFERENCES `class_subjects` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_teacher_subjects_sections` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `fk_teacher_subjects_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `ticket_replies`
