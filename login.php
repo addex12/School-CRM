@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -152,389 +151,453 @@ try {
     $siteName = 'School CRM';
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <!--
+        Developer: Adugna Gizaw
+        Email: gizawadugna@gmail.com
+        LinkedIn: https://www.linkedin.com/in/eleganceict
+        Twitter: https://twitter.com/eleganceict1
+        GitHub: https://github.com/addex12
+        Purpose: Login page for School CRM, styled with adugna- prefix for all custom styles.
+    -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - School CRM</title>
-
     <!-- Favicon -->
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
-
-    <!-- Fonts -->
+    <!-- Fonts and Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- CSS -->
+    <!--
+        Custom Styles: All classes and variables are prefixed with adugna- for patenting.
+        Styles are compact, ERPNext-inspired, and fully responsive.
+    -->
     <style>
+        /* Adugna Gizaw: Color variables for consistent theming */
         :root {
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary: #10b981;
-            --danger: #ef4444;
-            --light: #f9fafb;
-            --dark: #111827;
-            --gray: #6b7280;
-            --gray-light: #e5e7eb;
+            --adugna-primary: #4f46e5;
+            --adugna-primary-dark: #4338ca;
+            --adugna-secondary: #10b981;
+            --adugna-danger: #ef4444;
+            --adugna-light: #f9fafb;
+            --adugna-dark: #111827;
+            --adugna-gray: #6b7280;
+            --adugna-gray-light: #e5e7eb;
+            --adugna-card-radius: 0.5rem;
+            --adugna-transition: 0.15s cubic-bezier(.4,0,.2,1);
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Adugna Gizaw: Reset and base styles */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            line-height: 1.5;
+            background: var(--adugna-light);
+            color: var(--adugna-dark);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
-
-        .login-container {
+        /* Adugna Gizaw: Responsive flex container for login page */
+        .adugna-login-container {
             display: flex;
             flex-grow: 1;
             min-height: 100vh;
+            flex-direction: row;
+            background: var(--adugna-light);
         }
-
-        .login-left {
+        /* Adugna Gizaw: Left section with gradient and announcements */
+        .adugna-login-left {
             flex: 1;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 2rem;
+            background: linear-gradient(135deg, var(--adugna-primary), var(--adugna-primary-dark));
+            color: #fff;
+            padding: 2rem 1rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             position: relative;
-            overflow: hidden;
+            min-width: 0;
         }
-
-        .login-left::before {
+        .adugna-login-left::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -50%;
+            top: -40%;
+            right: -40%;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
             transform: rotate(30deg);
+            z-index: 0;
         }
-
-        .login-right {
+        /* Adugna Gizaw: Right section with login card */
+        .adugna-login-right {
             flex: 1;
-            padding: 2rem;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            max-width: 500px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .logo {
-            display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
+            padding: 2rem 1rem;
+            min-width: 0;
         }
-
-        .logo img {
-            height: 50px;
-        }
-
-        .welcome-text {
-            margin-bottom: 2rem;
-        }
-
-        .welcome-text h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-text p {
-            color: var(--gray);
-        }
-
-        .login-form {
+        /* Adugna Gizaw: Compact card style for login form */
+        .adugna-card {
+            background: #fff;
+            border-radius: var(--adugna-card-radius);
+            box-shadow: 0 2px 12px rgba(79,70,229,0.08), 0 1.5px 4px rgba(0,0,0,0.03);
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
             width: 100%;
-        }
-
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        .input-wrapper {
+            max-width: 370px;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
             position: relative;
         }
-
-        .input-wrapper i {
+        /* Adugna Gizaw: Logo and site name */
+        .adugna-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .adugna-logo img {
+            height: 38px;
+            width: auto;
+        }
+        .adugna-logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--adugna-primary);
+            letter-spacing: 0.01em;
+        }
+        /* Adugna Gizaw: Welcome text */
+        .adugna-welcome-text {
+            margin-bottom: 0.5rem;
+        }
+        .adugna-welcome-text h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            color: var(--adugna-dark);
+        }
+        .adugna-welcome-text p {
+            color: var(--adugna-gray);
+            font-size: 0.97rem;
+        }
+        /* Adugna Gizaw: Form styles */
+        .adugna-login-form { width: 100%; }
+        .adugna-form-group { margin-bottom: 0.85rem; }
+        .adugna-form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+            color: var(--adugna-dark);
+            font-size: 0.98rem;
+        }
+        .adugna-input-wrapper {
+            position: relative;
+        }
+        .adugna-input-wrapper i {
             position: absolute;
-            left: 1rem;
+            left: 0.7rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
+            color: var(--adugna-gray);
+            font-size: 1em;
         }
-
-        .form-control {
+        .adugna-form-control {
             width: 100%;
-            padding: 0.75rem 1rem 0.75rem 2.5rem;
-            border: 1px solid var(--gray-light);
-            border-radius: 0.375rem;
-            font-size: 1rem;
-            transition: all 0.2s;
+            padding: 0.55rem 0.9rem 0.55rem 2.1rem;
+            border: 1px solid var(--adugna-gray-light);
+            border-radius: 0.35rem;
+            font-size: 0.98rem;
+            transition: border-color var(--adugna-transition);
+            background: #f8fafc;
         }
-
-        .form-control:focus {
+        .adugna-form-control:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            border-color: var(--adugna-primary);
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(79,70,229,0.09);
         }
-
-        .form-options {
+        /* Adugna Gizaw: Options row (remember me, forgot password) */
+        .adugna-form-options {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.1rem;
+            font-size: 0.93rem;
         }
-
-        .remember-me {
+        .adugna-remember-me {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.35rem;
         }
-
-        .remember-me input {
-            width: 1rem;
-            height: 1rem;
+        .adugna-remember-me input {
+            width: 0.95rem;
+            height: 0.95rem;
+            accent-color: var(--adugna-primary);
         }
-
-        .forgot-password {
-            color: var(--primary);
+        .adugna-forgot-password {
+            color: var(--adugna-primary);
             text-decoration: none;
-            font-size: 0.875rem;
+            font-size: 0.93rem;
+            transition: color var(--adugna-transition);
         }
-
-        .forgot-password:hover {
+        .adugna-forgot-password:hover {
+            color: var(--adugna-primary-dark);
             text-decoration: underline;
         }
-
-        .btn {
+        /* Adugna Gizaw: Compact button style, ERPNext-inspired */
+        .adugna-btn {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.58rem 0;
             border: none;
-            border-radius: 0.375rem;
-            font-size: 1rem;
-            font-weight: 500;
+            border-radius: 0.35rem;
+            font-size: 1.01rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            background: var(--adugna-primary);
+            color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            transition: background var(--adugna-transition), box-shadow var(--adugna-transition);
+            box-shadow: 0 1.5px 4px rgba(79,70,229,0.07);
         }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: var(--adugna-primary-dark);
         }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
+        .adugna-btn i {
+            font-size: 1em;
+            margin-left: 0.1em;
         }
-
-        .login-footer {
-            margin-top: 1.5rem;
-            text-align: center;
-            color: var(--gray);
-        }
-
-        .login-footer a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .login-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .error-message {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
+        /* Adugna Gizaw: Error message style */
+        .adugna-error-message {
+            background: rgba(239,68,68,0.09);
+            color: var(--adugna-danger);
+            padding: 0.6rem 0.9rem;
+            border-radius: 0.35rem;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            font-size: 0.97rem;
         }
-
-        .illustration {
+        /* Adugna Gizaw: Footer style */
+        .adugna-login-footer {
+            margin-top: 0.7rem;
+            text-align: center;
+            color: var(--adugna-gray);
+            font-size: 0.95rem;
+        }
+        .adugna-login-footer a {
+            color: var(--adugna-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--adugna-transition);
+        }
+        .adugna-login-footer a:hover {
+            color: var(--adugna-primary-dark);
+            text-decoration: underline;
+        }
+        /* Adugna Gizaw: Illustration styles */
+        .adugna-illustration {
+            max-width: 100%;
+            margin-bottom: 1.2rem;
+            z-index: 1;
+        }
+        .adugna-illustration img {
             max-width: 100%;
             height: auto;
-            margin-bottom: 2rem;
         }
-
-        .illustration img {
-            max-width: 100%;
-            height: auto;
+        .adugna-illustration-text {
+            margin-top: 0.5rem;
+            z-index: 1;
         }
-
-        .illustration-text {
-            margin-top: 1rem;
+        .adugna-illustration-text h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: #fff;
         }
-
-        .illustration-text h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+        .adugna-illustration-text p {
+            font-size: 0.97rem;
+            color: #e0e7ff;
         }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
-            }
-
-            .login-left {
-                padding: 1.5rem;
-                min-height: auto;
-            }
-
-            .login-right {
-                padding: 1.5rem;
-            }
-
-            .logo {
-                margin-bottom: 1.5rem;
-            }
-
-            .welcome-text h2 {
-                font-size: 1.5rem;
-            }
+        /* Adugna Gizaw: Announcements card */
+        .adugna-public-announcements {
+            max-width: 370px;
+            margin: 1.5rem auto 0 auto;
+            background: rgba(255,255,255,0.13);
+            border-radius: 0.5rem;
+            padding: 1.1rem 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            color: #fff;
+            z-index: 1;
         }
-
-        @media (max-width: 480px) {
-            .form-options {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.75rem;
-            }
-
-            .forgot-password {
-                align-self: flex-end;
-            }
+        .adugna-public-announcements h3 {
+            color: #fff;
+            margin-bottom: 0.7rem;
+            text-align: center;
+            font-size: 1.05rem;
+        }
+        .adugna-public-announcements strong {
+            color: #ffeb3b;
+            font-size: 0.98rem;
+        }
+        .adugna-public-announcements span {
+            color: #f0f0f0;
+            font-size: 0.93em;
+        }
+        .adugna-public-announcements div {
+            margin-top: 0.3em;
+            color: #fff;
+            font-size: 0.97em;
+        }
+        /* Adugna Gizaw: Responsive adjustments for all screens */
+        @media (max-width: 1024px) {
+            .adugna-login-container { flex-direction: column; }
+            .adugna-login-left, .adugna-login-right { min-height: auto; }
+            .adugna-login-left { padding: 1.2rem 0.7rem; }
+            .adugna-login-right { padding: 1.2rem 0.7rem; }
+        }
+        @media (max-width: 600px) {
+            .adugna-card, .adugna-public-announcements { max-width: 98vw; }
+            .adugna-login-left, .adugna-login-right { padding: 0.7rem 0.2rem; }
+            .adugna-logo img { height: 32px; }
+            .adugna-logo h1 { font-size: 1.05rem; }
+        }
+        @media (max-width: 400px) {
+            .adugna-card, .adugna-public-announcements { padding: 1rem 0.3rem; }
         }
     </style>
 </head>
 
 <body>
-    <div class="login-container">
-        <div class="login-left">
-            <div class="illustration">
+    <!--
+        Adugna Gizaw: Main login container, split into left (info/announcements) and right (login form)
+    -->
+    <div class="adugna-login-container">
+        <!-- Left: Illustration and Announcements -->
+        <div class="adugna-login-left">
+            <div class="adugna-illustration">
+                <!-- Adugna Gizaw: Site logo (can be replaced with SVG/PNG) -->
                 <?php $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png'; ?>
+                <img src="<?php echo htmlspecialchars($siteLogo); ?>" alt="Site Logo" style="height: 60px;">
             </div>
-            <div class="illustration-text">
+            <div class="adugna-illustration-text">
                 <h3>Flipper International School Customer Relationship Management System</h3>
                 <p>Comprehensive school management solution for administrators, teachers, and students</p>
             </div>
-
-            <!-- Public Announcements -->
+            <!-- Adugna Gizaw: Public Announcements Card -->
             <?php if (!empty($announcements)): ?>
-                <div class="public-announcements" style="max-width: 400px; margin: 2rem auto 0 auto; background: rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); color: white;">
-                    <h3 style="color: #fff; margin-bottom: 1rem; text-align: center;">
-                        <i class="fas fa-bullhorn"></i> Announcements
+                <div class="adugna-public-announcements">
+                    <h3>
+                        <i class="fas fa-bullhorn" style="font-size:1em;"></i> Announcements
                     </h3>
                     <?php foreach ($announcements as $ann): ?>
-                        <div style="margin-bottom: 1.2rem;">
-                            <strong style="color: #ffeb3b;"><?php echo htmlspecialchars($ann['title']); ?></strong><br>
-                            <span style="color: #f0f0f0; font-size: 0.95em;"><?php echo date('M j, Y g:i A', strtotime($ann['created_at'])); ?></span>
-                            <div style="margin-top: 0.5em; color: #ffffff;"><?php echo nl2br(htmlspecialchars($ann['content'])); ?></div>
+                        <div style="margin-bottom: 1.1rem;">
+                            <strong><?php echo htmlspecialchars($ann['title']); ?></strong><br>
+                            <span><?php echo date('M j, Y g:i A', strtotime($ann['created_at'])); ?></span>
+                            <div><?php echo nl2br(htmlspecialchars($ann['content'])); ?></div>
                         </div>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
         </div>
-
-        <div class="login-right">
-            <div class="logo">
-                <img src="<?php echo htmlspecialchars($siteLogo); ?>" alt="Site Logo" style="height: 50px;">
-                <h1><?php echo htmlspecialchars($siteName); ?></h1>
-            </div>
-
-            <div class="welcome-text">
-                <h2>Welcome Back!</h2>
-                <p>Please sign in to continue to your account</p>
-            </div>
-
-            <?php if ($error): ?>
-                <div class="error-message">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span><?php echo htmlspecialchars($error); ?></span>
+        <!-- Right: Login Card -->
+        <div class="adugna-login-right">
+            <div class="adugna-card">
+                <!-- Adugna Gizaw: Logo and site name -->
+                <div class="adugna-logo">
+                    <img src="<?php echo htmlspecialchars($siteLogo); ?>" alt="Site Logo">
+                    <h1><?php echo htmlspecialchars($siteName); ?></h1>
                 </div>
-            <?php endif; ?>
-
-            <form method="POST" action="" class="login-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required autocomplete="username">
+                <!-- Adugna Gizaw: Welcome text -->
+                <div class="adugna-welcome-text">
+                    <h2>Welcome Back!</h2>
+                    <p>Please sign in to continue to your account</p>
+                </div>
+                <!-- Adugna Gizaw: Error message if login fails -->
+                <?php if ($error): ?>
+                    <div class="adugna-error-message">
+                        <i class="fas fa-exclamation-circle" style="font-size:1em;"></i>
+                        <span><?php echo htmlspecialchars($error); ?></span>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-wrapper" style="position:relative;">
-                        <i class="fas fa-lock"></i>
-                        <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required autocomplete="current-password">
-                        <button type="button" id="togglePassword" style="position:absolute; right:1rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#6b7280; font-size:1.1em;" tabindex="-1" aria-label="Show password">
-                            <i class="fas fa-eye" id="togglePasswordIcon"></i>
-                        </button>
+                <?php endif; ?>
+                <!-- Adugna Gizaw: Login form -->
+                <form method="POST" action="" class="adugna-login-form">
+                    <div class="adugna-form-group">
+                        <label for="username">Username</label>
+                        <div class="adugna-input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" name="username" class="adugna-form-control" placeholder="Enter your username" required autocomplete="username">
+                        </div>
                     </div>
-                </div>
-
-                <div class="form-options">
-                    <div class="remember-me">
-                        <input type="checkbox" id="remember" name="remember">
-                        <label for="remember">Remember me</label>
+                    <div class="adugna-form-group">
+                        <label for="password">Password</label>
+                        <div class="adugna-input-wrapper" style="position:relative;">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" class="adugna-form-control" placeholder="Enter your password" required autocomplete="current-password">
+                            <button type="button" id="togglePassword" style="position:absolute; right:0.7rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#6b7280; font-size:1em;" tabindex="-1" aria-label="Show password">
+                                <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
                     </div>
-                    <a href="forgot_password.php" class="forgot-password">Forgot password?</a>
+                    <div class="adugna-form-options">
+                        <div class="adugna-remember-me">
+                            <input type="checkbox" id="remember" name="remember">
+                            <label for="remember" style="margin-bottom:0;">Remember me</label>
+                        </div>
+                        <a href="forgot_password.php" class="adugna-forgot-password">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="adugna-btn" id="login-btn">
+                        <span>Sign In</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+                <!-- Adugna Gizaw: Footer with registration link -->
+                <div class="adugna-login-footer">
+                    <p>Don't have an account? <a href="register.php">Create account</a></p>
                 </div>
-
-                <button type="submit" class="btn btn-primary" id="login-btn">
-                    <span>Sign In</span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </form>
-
-            <div class="login-footer">
-                <p>Don't have an account? <a href="register.php">Create account</a></p>
             </div>
         </div>
     </div>
-
+    <!--
+        Adugna Gizaw: Interactive scripts for activity tracking and UI enhancements.
+        All code is commented for clarity.
+    -->
     <script>
+        // Adugna Gizaw: Password show/hide toggle for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            var passwordInput = document.getElementById('password');
+            var togglePassword = document.getElementById('togglePassword');
+            var togglePasswordIcon = document.getElementById('togglePasswordIcon');
+            if (passwordInput && togglePassword && togglePasswordIcon) {
+                togglePassword.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        togglePasswordIcon.classList.remove('fa-eye');
+                        togglePasswordIcon.classList.add('fa-eye-slash');
+                        togglePassword.setAttribute('aria-label', 'Hide password');
+                    } else {
+                        passwordInput.type = 'password';
+                        togglePasswordIcon.classList.remove('fa-eye-slash');
+                        togglePasswordIcon.classList.add('fa-eye');
+                        togglePassword.setAttribute('aria-label', 'Show password');
+                    }
+                });
+            }
+            // Adugna Gizaw: Focus username on load for accessibility
+            document.getElementById('username')?.focus();
+        });
         // Enhanced Pre-Login Activity Tracking
         document.addEventListener('DOMContentLoaded', function() {
             // Unique session ID for anonymous tracking (until login)
@@ -598,7 +661,7 @@ try {
                             }
                         }, limit - (Date.now() - lastRan));
                     }
-                };
+                }
             }
 
             // Send data to server
@@ -869,48 +932,7 @@ try {
                     }
                 });
             }, 1000);
-            // Password show/hide toggle
-            var passwordInput = document.getElementById('password');
-            var togglePassword = document.getElementById('togglePassword');
-            var togglePasswordIcon = document.getElementById('togglePasswordIcon');
-            if (passwordInput && togglePassword && togglePasswordIcon) {
-                togglePassword.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        togglePasswordIcon.classList.remove('fa-eye');
-                        togglePasswordIcon.classList.add('fa-eye-slash');
-                        togglePassword.setAttribute('aria-label', 'Hide password');
-                    } else {
-                        passwordInput.type = 'password';
-                        togglePasswordIcon.classList.remove('fa-eye-slash');
-                        togglePasswordIcon.classList.add('fa-eye');
-                        togglePassword.setAttribute('aria-label', 'Show password');
-                    }
-                });
-            }
-            // Track key events (with filtering for sensitive inputs)
-            document.addEventListener('keydown', function(e) {
-                const target = e.target;
-                const isSensitive = target.type === 'password' ||
-                    target.type === 'email' ||
-                    target.type === 'tel' ||
-                    target.type === 'number';
-
-                if (!isSensitive) {
-                    sendActivity('keydown', {
-                        key: e.key,
-                        code: e.code,
-                        targetTag: target.tagName,
-                        targetId: target.id || null
-                    });
-                }
-            });
         });
     </script>
 </body>
-
 </html>
-
-
-<script src="/includes/activity-tracker.js"></script>
