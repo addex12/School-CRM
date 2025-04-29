@@ -159,7 +159,6 @@ $siteIcon = 'uploads/icon.png';
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <!--
         Developer: Adugna Gizaw
@@ -215,25 +214,10 @@ $siteIcon = 'uploads/icon.png';
             flex-direction: row;
             background: var(--adugna-light);
         }
-        /* Adugna Gizaw: Right section with login card and background image */
-        .adugna-login-right {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 2rem 1rem;
-            min-width: 0;
-            /* Add background image to the right partition only */
-            background:
-                linear-gradient(135deg, rgba(79,70,229,0.85), rgba(67,56,202,0.85)),
-                url('<?= htmlspecialchars($loginBgImage) ?>') center center/cover no-repeat;
-            position: relative;
-        }
-        /* Remove background from left partition */
+        /* Adugna Gizaw: Left section with gradient and announcements */
         .adugna-login-left {
             flex: 1;
-            background: var(--adugna-primary);
+            background: linear-gradient(135deg, var(--adugna-primary), var(--adugna-primary-dark));
             color: #fff;
             padding: 2rem 1rem;
             display: flex;
@@ -254,6 +238,19 @@ $siteIcon = 'uploads/icon.png';
             background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
             transform: rotate(30deg);
             z-index: 0;
+        }
+        /* Adugna Gizaw: Right section with login card and background image only (no blue overlay) */
+        .adugna-login-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+            min-width: 0;
+            background:
+                url('<?= htmlspecialchars($loginBgImage) ?>') center center/cover no-repeat;
+            position: relative;
         }
         /* Adugna Gizaw: Compact card style for login form */
         .adugna-card {
@@ -489,12 +486,11 @@ $siteIcon = 'uploads/icon.png';
         }
     </style>
 </head>
-
 <body>
     <!--
         Adugna Gizaw: Main login container, split into left (info/announcements) and right (login form)
     -->
-    < class="adugna-login-container">
+    <div class="adugna-login-container">
         <!-- Left: Illustration and Announcements -->
         <div class="adugna-login-left">
             <div class="adugna-illustration">
@@ -520,7 +516,6 @@ $siteIcon = 'uploads/icon.png';
                 </div>
             <?php endif; ?>
         </div>
-        
         <!-- Right: Login Card -->
         <div class="adugna-login-right">
             <div class="adugna-card">
