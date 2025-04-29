@@ -569,7 +569,9 @@ $siteIcon = 'uploads/icon.png';
                 </form>
                 <!-- Adugna Gizaw: Footer with registration link -->
                 <div class="adugna-login-footer">
-                    <p>Don't have an account? <a href="register.php">Create account</a></p>
+                    <?php if ($allowRegistration): ?>
+                        <p>Don't have an account? <a href="register.php">Create account</a></p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
