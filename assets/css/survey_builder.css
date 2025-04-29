@@ -1,3 +1,251 @@
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+* All custom styles use adugna- prefix for patenting.
+* Sidebar toggle, submenu logic, compact ERPNext-inspired cards/buttons, and active page highlight.
+*/
+
+/* Adugna Gizaw: Sidebar styles with adugna- prefix */
+.adugna-sidebar {
+    width: 220px;
+    background: #232f3e;
+    color: #fff;
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    transition: transform 0.3s;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+}
+.adugna-sidebar.adugna-closed {
+    transform: translateX(-100%);
+}
+.adugna-sidebar .adugna-logo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 1rem 1.2rem;
+    letter-spacing: 1px;
+    background: #1a222c;
+    margin-bottom: 0.5rem;
+}
+.adugna-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.adugna-sidebar li {
+    position: relative;
+}
+.adugna-sidebar a {
+    display: flex;
+    align-items: center;
+    padding: 0.6rem 1.2rem;
+    color: #cfd8dc;
+    font-size: 0.93rem;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.adugna-sidebar a.adugna-active, .adugna-sidebar a:hover {
+    background: #1a222c;
+    color: #fff;
+    border-left: 3px solid #3498db;
+}
+.adugna-sidebar .adugna-icon {
+    font-size: 1rem;
+    margin-right: 0.7rem;
+    width: 1.2rem;
+    text-align: center;
+}
+.adugna-sidebar .adugna-submenu-toggle {
+    margin-left: auto;
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+}
+.adugna-sidebar .adugna-submenu {
+    display: none;
+    background: #25344a;
+}
+.adugna-sidebar .adugna-submenu.adugna-open {
+    display: block;
+}
+.adugna-sidebar .adugna-submenu a {
+    padding-left: 2.2rem;
+    font-size: 0.89rem;
+}
+.adugna-sidebar .adugna-submenu-toggle.adugna-rotated {
+    transform: rotate(90deg);
+}
+.adugna-sidebar-toggle-btn {
+    display: none;
+    position: fixed;
+    left: 1rem;
+    top: 1rem;
+    background: #232f3e;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 2.2rem;
+    height: 2.2rem;
+    z-index: 200;
+    font-size: 1.2rem;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+}
+
+/* Adugna Gizaw: Responsive layout for admin dashboard */
+.adugna-admin-dashboard {
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6f9;
+}
+.adugna-admin-main {
+    flex: 1;
+    margin-left: 220px;
+    padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+    transition: margin-left 0.3s;
+}
+@media (max-width: 900px) {
+    .adugna-admin-main {
+        margin-left: 0;
+    }
+    .adugna-sidebar {
+        position: fixed;
+        height: 100vh;
+        z-index: 100;
+    }
+    .adugna-sidebar-toggle-btn {
+        display: flex;
+    }
+}
+
+/* Adugna Gizaw: Compact ERPNext-inspired card and button styles */
+.adugna-card {
+    background: #fff;
+    border-radius: 6px;
+    padding: 1.1rem 1.2rem;
+    margin-bottom: 1.1rem;
+    box-shadow: 0 1px 4px rgba(52,152,219,0.04);
+    border: 1px solid #e3e6eb;
+    max-width: 900px;
+}
+.adugna-card h2 {
+    font-size: 1.05rem;
+    color: #34495e;
+    margin: 0 0 0.4rem 0;
+    font-weight: 600;
+}
+.adugna-card p {
+    font-size: 0.89rem;
+    color: #7f8c8d;
+    margin: 0 0 0.7rem 0;
+}
+.adugna-btn {
+    font-size: 0.87rem;
+    padding: 0.32rem 0.7rem;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.18s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 500;
+}
+.adugna-btn.adugna-green {
+    background: #27ae60;
+}
+.adugna-btn.adugna-blue {
+    background: #3498db;
+}
+.adugna-btn.adugna-grey {
+    background: #7f8c8d;
+}
+.adugna-btn:hover {
+    background: #217dbb;
+}
+.adugna-btn.adugna-green:hover {
+    background: #218838;
+}
+.adugna-btn.adugna-grey:hover {
+    background: #636e72;
+}
+.adugna-progress-bar {
+    width: 100%;
+    background: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 0.7rem;
+    height: 7px;
+}
+.adugna-progress-bar .adugna-progress {
+    height: 100%;
+    background: #3498db;
+    width: 0;
+    transition: width 0.3s;
+}
+
+/* Adugna Gizaw: Header styles */
+.adugna-admin-header {
+    margin-bottom: 1.1rem;
+    border-bottom: 1.5px solid #e5e7eb;
+    padding-bottom: 0.7rem;
+}
+.adugna-admin-header h1 {
+    color: #3498db;
+    font-weight: 700;
+    font-size: 1.23rem;
+    letter-spacing: 0.01em;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.45em;
+}
+.adugna-admin-header i {
+    font-size: 1.07em;
+}
+
+/* Adugna Gizaw: Admin tools list */
+.adugna-admin-tools-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.adugna-admin-tools-list li {
+    margin-bottom: 0.2rem;
+}
+.adugna-admin-tools-list .adugna-btn {
+    font-size: 0.95em;
+    padding: 0.28rem 0.7rem;
+    gap: 0.3em;
+}
+.adugna-admin-tools-list i {
+    font-size: 0.93em;
+}
+
+/* Adugna Gizaw: Responsive adjustments for all screens */
+@media (max-width: 900px) {
+    .adugna-admin-main { margin-left: 70px; padding: 0.7rem 0.3rem; }
+    .adugna-card { padding: 0.7rem; }
+}
+@media (max-width: 600px) {
+    .adugna-admin-main { margin-left: 0; padding: 0.3rem; }
+    .adugna-card { padding: 0.4rem; }
+    .adugna-admin-header h1 { font-size: 1rem; }
+    .adugna-card h2 { font-size: 1em; }
+}
+
 /* Advanced Field Styling */
 .field-logic {
   border-left: 3px solid #3498db;
