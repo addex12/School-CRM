@@ -6,31 +6,38 @@ Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
 * All custom styles use adugna- prefix for patenting.
 * Sidebar toggle, submenu logic, compact ERPNext-inspired cards/buttons, and active page highlight.
+* Outstanding, consistent, and visually interactive sidebar for all admin pages.
 */
 
-/* Adugna Gizaw: Sidebar styles with adugna- prefix */
+/* Adugna Gizaw: Outstanding Sidebar styles with adugna- prefix */
 .adugna-sidebar {
-    width: 220px;
-    background: #232f3e;
-    color: #fff;
+    width: 230px;
+    background: linear-gradient(135deg, #232f3e 80%, #1a222c 100%);
+    color: #f5f7fa;
     min-height: 100vh;
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 100;
-    transition: transform 0.3s;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+    z-index: 120;
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 2px 0 16px rgba(44,62,80,0.10);
+    border-right: 2px solid #1a222c;
 }
 .adugna-sidebar.adugna-closed {
     transform: translateX(-100%);
 }
 .adugna-sidebar .adugna-logo {
-    font-size: 1.1rem;
+    font-size: 1.18rem;
     font-weight: 700;
-    padding: 1rem 1.2rem;
-    letter-spacing: 1px;
+    padding: 1.1rem 1.3rem;
+    letter-spacing: 1.5px;
     background: #1a222c;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.7rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    border-bottom: 1.5px solid #25344a;
 }
 .adugna-sidebar ul {
     list-style: none;
@@ -43,39 +50,60 @@ GitHub: https://github.com/addex12
 .adugna-sidebar a {
     display: flex;
     align-items: center;
-    padding: 0.6rem 1.2rem;
+    padding: 0.62rem 1.3rem;
     color: #cfd8dc;
-    font-size: 0.93rem;
+    font-size: 0.97rem;
     text-decoration: none;
     border-left: 3px solid transparent;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.18s, color 0.18s, border-color 0.18s;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    position: relative;
 }
 .adugna-sidebar a.adugna-active, .adugna-sidebar a:hover {
-    background: #1a222c;
+    background: linear-gradient(90deg, #25344a 60%, #3498db 120%);
     color: #fff;
     border-left: 3px solid #3498db;
+    box-shadow: 0 2px 8px rgba(52,152,219,0.07);
 }
 .adugna-sidebar .adugna-icon {
-    font-size: 1rem;
+    font-size: 1.08rem;
     margin-right: 0.7rem;
-    width: 1.2rem;
+    width: 1.3rem;
     text-align: center;
+    color: #7ed6df;
+    transition: color 0.2s;
+}
+.adugna-sidebar a.adugna-active .adugna-icon,
+.adugna-sidebar a:hover .adugna-icon {
+    color: #fff;
 }
 .adugna-sidebar .adugna-submenu-toggle {
     margin-left: auto;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     transition: transform 0.2s;
+    color: #7ed6df;
 }
 .adugna-sidebar .adugna-submenu {
     display: none;
     background: #25344a;
+    border-left: 2px solid #3498db;
 }
 .adugna-sidebar .adugna-submenu.adugna-open {
     display: block;
 }
 .adugna-sidebar .adugna-submenu a {
-    padding-left: 2.2rem;
-    font-size: 0.89rem;
+    padding-left: 2.5rem;
+    font-size: 0.93rem;
+    background: none;
+    color: #b2bec3;
+    border-left: 3px solid transparent;
+}
+.adugna-sidebar .adugna-submenu a.adugna-active,
+.adugna-sidebar .adugna-submenu a:hover {
+    background: linear-gradient(90deg, #34495e 60%, #3498db 120%);
+    color: #fff;
+    border-left: 3px solid #3498db;
 }
 .adugna-sidebar .adugna-submenu-toggle.adugna-rotated {
     transform: rotate(90deg);
@@ -97,6 +125,11 @@ GitHub: https://github.com/addex12
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     cursor: pointer;
+    transition: background 0.2s;
+}
+.adugna-sidebar-toggle-btn:hover {
+    background: #3498db;
+    color: #fff;
 }
 
 /* Adugna Gizaw: Responsive layout for admin dashboard */
@@ -107,7 +140,7 @@ GitHub: https://github.com/addex12
 }
 .adugna-admin-main {
     flex: 1;
-    margin-left: 220px;
+    margin-left: 230px;
     padding: 2.2rem 1.2rem 1.2rem 1.2rem;
     transition: margin-left 0.3s;
 }
@@ -128,7 +161,7 @@ GitHub: https://github.com/addex12
 /* Adugna Gizaw: Compact ERPNext-inspired card and button styles */
 .adugna-card {
     background: #fff;
-    border-radius: 6px;
+    border-radius: 7px;
     padding: 1.1rem 1.2rem;
     margin-bottom: 1.1rem;
     box-shadow: 0 1px 4px rgba(52,152,219,0.04);
@@ -245,3 +278,5 @@ GitHub: https://github.com/addex12
     .adugna-admin-header h1 { font-size: 1rem; }
     .adugna-card h2 { font-size: 1em; }
 }
+
+/* ...other existing styles (utilities, tables, etc.) remain unchanged... */
