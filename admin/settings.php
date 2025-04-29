@@ -19,27 +19,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
+        // Always overwrite the image if a new file is uploaded
         // Handle logo.png
         if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
             $targetFile = $uploadDir . 'logo.png';
+            // Remove old file if exists
+            if (file_exists($targetFile)) {
+                unlink($targetFile);
+            }
             move_uploaded_file($_FILES['site_logo']['tmp_name'], $targetFile);
             $_POST['settings']['site_logo'] = $targetFile;
         }
         // Handle bg.png
         if (isset($_FILES['login_bg_image']) && $_FILES['login_bg_image']['error'] === UPLOAD_ERR_OK) {
             $targetFile = $uploadDir . 'bg.png';
+            if (file_exists($targetFile)) {
+                unlink($targetFile);
+            }
             move_uploaded_file($_FILES['login_bg_image']['tmp_name'], $targetFile);
             $_POST['settings']['login_bg_image'] = $targetFile;
         }
         // Handle banner.png
         if (isset($_FILES['site_banner']) && $_FILES['site_banner']['error'] === UPLOAD_ERR_OK) {
             $targetFile = $uploadDir . 'banner.png';
+            if (file_exists($targetFile)) {
+                unlink($targetFile);
+            }
             move_uploaded_file($_FILES['site_banner']['tmp_name'], $targetFile);
             $_POST['settings']['site_banner'] = $targetFile;
         }
         // Handle icon.png
         if (isset($_FILES['site_icon']) && $_FILES['site_icon']['error'] === UPLOAD_ERR_OK) {
             $targetFile = $uploadDir . 'icon.png';
+            if (file_exists($targetFile)) {
+                unlink($targetFile);
+            }
             move_uploaded_file($_FILES['site_icon']['tmp_name'], $targetFile);
             $_POST['settings']['site_icon'] = $targetFile;
         }
@@ -50,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
                 ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
             $stmt->execute([$key, $value]);
         }
+        // Force browser to reload images by appending a query string (cache busting)
+        clearstatcache(true, $uploadDir . 'logo.png');
+        clearstatcache(true, $uploadDir . 'bg.png');
+        clearstatcache(true, $uploadDir . 'banner.png');
+        clearstatcache(true, $uploadDir . 'icon.png');
+
         $_SESSION['success'] = "Settings updated successfully!";
         header("Location: settings.php");
         exit();
