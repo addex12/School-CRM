@@ -13,6 +13,7 @@
  * - Uses adugna- prefix for all custom styles.
  * - Footer never overlaps content: add bottom padding to body/main if needed.
  * - Responsive and visually outstanding.
+ * - Footer is aware of adugna-sidebar state (collapsed/expanded).
  */
 .adugna-footer {
     position: fixed;
@@ -29,8 +30,21 @@
     z-index: 1000;
     box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
     min-height: 44px;
-    transition: background 0.2s;
+    transition: background 0.2s, left 0.25s, width 0.25s;
 }
+
+/* Sidebar-aware footer: shift right if sidebar is expanded on desktop */
+@media (min-width: 901px) {
+    body:not(.adugna-sidebar-collapsed) .adugna-footer {
+        left: 240px; /* match sidebar width */
+        width: calc(100vw - 240px);
+    }
+    body.adugna-sidebar-collapsed .adugna-footer {
+        left: 0;
+        width: 100vw;
+    }
+}
+
 .adugna-footer-content {
     display: flex;
     justify-content: space-between;
@@ -115,6 +129,10 @@
     transform: scale(1.08);
 }
 @media (max-width: 900px) {
+    .adugna-footer {
+        left: 0 !important;
+        width: 100vw !important;
+    }
     .adugna-footer-content {
         flex-direction: column;
         gap: 6px;
@@ -154,7 +172,7 @@ body, .admin-dashboard, .adugna-main, .adugna-main-content {
 </style>
 
 <footer class="adugna-footer">
-    <!-- Adugna Gizaw: Responsive, fixed, interactive footer. Never overlaps content. -->
+    <!-- Adugna Gizaw: Responsive, fixed, interactive footer. Never overlaps content. Sidebar-aware. -->
     <div class="adugna-footer-content">
         <div class="adugna-footer-section adugna-footer-main-info">
             <h4><?php echo $pageTitle ?? 'Admin Panel'; ?></h4>
@@ -185,3 +203,34 @@ body, .admin-dashboard, .adugna-main, .adugna-main-content {
         </div>
     </div>
 </footer>
+<script>
+/**
+ * Adugna Gizaw: Make footer aware of adugna-sidebar state (collapsed/expanded).
+ * Adds/removes .adugna-sidebar-collapsed on body based on sidebar state.
+ */
+(function() {
+    // Detect sidebar and toggle class on body for footer awareness
+    function updateFooterSidebarState() {
+        var sidebar = document.getElementById('adugnaSidebar');
+        if (!sidebar) return;
+        if (sidebar.classList.contains('adugna-collapsed')) {
+            document.body.classList.add('adugna-sidebar-collapsed');
+        } else {
+            document.body.classList.remove('adugna-sidebar-collapsed');
+        }
+    }
+    // Listen for sidebar toggle button
+    var sidebarToggle = document.getElementById('adugnaSidebarToggle');
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            setTimeout(updateFooterSidebarState, 260); // match sidebar transition
+        });
+    }
+    // Also update on window resize (sidebar may auto-collapse)
+    window.addEventListener('resize', function() {
+        setTimeout(updateFooterSidebarState, 100);
+    });
+    // Initial check
+    document.addEventListener('DOMContentLoaded', updateFooterSidebarState);
+})();
+</script>
