@@ -584,6 +584,7 @@ try {
                     <a href="surveys.php" class="adugna-quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="adugna-quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="adugna-quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                    <a href="scheduler.php" class="adugna-quick-link"><i class="fa fa-clock"></i> Log Scheduler</a>
                 </div>
 
                 <!-- Widgets Section -->
