@@ -15,33 +15,33 @@ $pageTitle = "System Settings";
 // Handle settings update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
-        // Handle file upload for site logo
-        if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = '../uploads/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-            $fileName = uniqid('logo_') . '_' . basename($_FILES['site_logo']['name']);
-            $targetFile = $uploadDir . $fileName;
-            if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $targetFile)) {
-                $_POST['settings']['site_logo'] = $targetFile;
-            } else {
-                $_SESSION['error'] = "Failed to upload site logo.";
-            }
+        $uploadDir = '../uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
         }
-        // Handle file upload for login background image
+        // Handle logo.png
+        if (isset($_FILES['site_logo']) && $_FILES['site_logo']['error'] === UPLOAD_ERR_OK) {
+            $targetFile = $uploadDir . 'logo.png';
+            move_uploaded_file($_FILES['site_logo']['tmp_name'], $targetFile);
+            $_POST['settings']['site_logo'] = $targetFile;
+        }
+        // Handle bg.png
         if (isset($_FILES['login_bg_image']) && $_FILES['login_bg_image']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = '../uploads/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-            $fileName = uniqid('loginbg_') . '_' . basename($_FILES['login_bg_image']['name']);
-            $targetFile = $uploadDir . $fileName;
-            if (move_uploaded_file($_FILES['login_bg_image']['tmp_name'], $targetFile)) {
-                $_POST['settings']['login_bg_image'] = $targetFile;
-            } else {
-                $_SESSION['error'] = "Failed to upload login background image.";
-            }
+            $targetFile = $uploadDir . 'bg.png';
+            move_uploaded_file($_FILES['login_bg_image']['tmp_name'], $targetFile);
+            $_POST['settings']['login_bg_image'] = $targetFile;
+        }
+        // Handle banner.png
+        if (isset($_FILES['site_banner']) && $_FILES['site_banner']['error'] === UPLOAD_ERR_OK) {
+            $targetFile = $uploadDir . 'banner.png';
+            move_uploaded_file($_FILES['site_banner']['tmp_name'], $targetFile);
+            $_POST['settings']['site_banner'] = $targetFile;
+        }
+        // Handle icon.png
+        if (isset($_FILES['site_icon']) && $_FILES['site_icon']['error'] === UPLOAD_ERR_OK) {
+            $targetFile = $uploadDir . 'icon.png';
+            move_uploaded_file($_FILES['site_icon']['tmp_name'], $targetFile);
+            $_POST['settings']['site_icon'] = $targetFile;
         }
 
         // Save all settings to DB
@@ -65,12 +65,14 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $settings[$row['setting_key']] = $row['setting_value'];
 }
 
-// Add login background image to settings fields
+// Add all image fields with fixed names
 $settings_fields = [
     'general' => [
         'site_name' => ['label' => 'Site Name', 'type' => 'text'],
-        'site_logo' => ['label' => 'Site Logo', 'type' => 'file'],
-        'login_bg_image' => ['label' => 'Login Background Image', 'type' => 'file'],
+        'site_logo' => ['label' => 'Site Logo (logo.png)', 'type' => 'file'],
+        'site_banner' => ['label' => 'Site Banner (banner.png)', 'type' => 'file'],
+        'site_icon' => ['label' => 'Site Icon (icon.png)', 'type' => 'file'],
+        'login_bg_image' => ['label' => 'Login Background (bg.png)', 'type' => 'file'],
         'admin_email' => ['label' => 'Admin Email', 'type' => 'email'],
         'timezone' => ['label' => 'Timezone', 'type' => 'text'],
         'language' => ['label' => 'Default Language', 'type' => 'text'],
@@ -289,7 +291,7 @@ $settings_fields = [
             </header>
             <div class="adugna-card">
                 <?php include 'includes/alerts.php'; ?>
-                <!-- Adugna Gizaw: Settings form, supports logo and login background image upload -->
+                <!-- Adugna Gizaw: Settings form, supports logo, banner, icon, and login background image upload -->
                 <form method="POST" enctype="multipart/form-data" autocomplete="off">
                     <input type="hidden" name="update_settings" value="1">
                     <?php foreach ($settings_fields as $section => $fields): ?>
@@ -311,12 +313,23 @@ $settings_fields = [
                                         </select>
                                     <?php elseif ($field['type'] === 'file'): ?>
                                         <input type="file" id="<?= $key ?>" name="<?= $key ?>">
-                                        <?php if (!empty($settings[$key])): ?>
+                                        <?php
+                                        // Show preview for each image type
+                                        $imgPath = '';
+                                        if ($key === 'site_logo') $imgPath = '../uploads/logo.png';
+                                        if ($key === 'site_banner') $imgPath = '../uploads/banner.png';
+                                        if ($key === 'site_icon') $imgPath = '../uploads/icon.png';
+                                        if ($key === 'login_bg_image') $imgPath = '../uploads/bg.png';
+                                        if (file_exists($imgPath)): ?>
                                             <p style="margin:0.3em 0 0 0;">
                                                 <?php if ($key === 'site_logo'): ?>
-                                                    Current Logo: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Site Logo" style="height: 38px;">
+                                                    Current Logo: <img src="<?= $imgPath ?>" alt="Site Logo" style="height: 38px;">
+                                                <?php elseif ($key === 'site_banner'): ?>
+                                                    Current Banner: <img src="<?= $imgPath ?>" alt="Site Banner" style="height: 38px;">
+                                                <?php elseif ($key === 'site_icon'): ?>
+                                                    Current Icon: <img src="<?= $imgPath ?>" alt="Site Icon" style="height: 24px;">
                                                 <?php elseif ($key === 'login_bg_image'): ?>
-                                                    Current Background: <img src="<?= htmlspecialchars($settings[$key]) ?>" alt="Login Background" style="height: 38px;">
+                                                    Current Background: <img src="<?= $imgPath ?>" alt="Login Background" style="height: 38px;">
                                                 <?php endif; ?>
                                             </p>
                                         <?php endif; ?>

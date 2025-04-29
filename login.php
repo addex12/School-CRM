@@ -140,18 +140,30 @@ if (isset($user) && is_array($user)) {
     $user = null;
 }
 
-// Fetch site logo and login background image from settings
-$siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
-$siteName = $settings['site_name'] ?? 'School CRM';
-$loginBgImage = $settings['login_bg_image'] ?? '';
-// If the image path is relative, prepend the correct base path for web access
-if (!empty($loginBgImage) && strpos($loginBgImage, '../uploads/') === 0) {
-    $loginBgImageUrl = str_replace('../', '', $loginBgImage); // e.g. uploads/filename.png
-} elseif (!empty($loginBgImage)) {
-    $loginBgImageUrl = $loginBgImage;
-} else {
-    $loginBgImageUrl = 'image.png';
+// Fetch site logo and name from settings
+try {
+    $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name')");
+    $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
+    $siteName = $settings['site_name'] ?? 'School CRM';
+} catch (Exception $e) {
+    $siteLogo = 'assets/images/default-logo.png';
+    $siteName = 'School CRM';
 }
+
+// Map image settings to their fixed filenames
+$imageFiles = [
+    'site_logo'   => 'uploads/logo.png',
+    'login_bg_image' => 'uploads/bg.png',
+    'site_banner' => 'uploads/banner.png',
+    'site_icon'   => 'uploads/icon.png'
+];
+
+// Use the fixed filenames for display
+$siteLogo = $imageFiles['site_logo'];
+$loginBgImage = $imageFiles['login_bg_image'];
+$siteBanner = $imageFiles['site_banner'];
+$siteIcon = $imageFiles['site_icon'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -169,7 +181,7 @@ if (!empty($loginBgImage) && strpos($loginBgImage, '../uploads/') === 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - School CRM</title>
     <!-- Favicon -->
-    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="<?= htmlspecialchars($siteIcon) ?>" type="image/png">
     <!-- Fonts and Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -216,7 +228,7 @@ if (!empty($loginBgImage) && strpos($loginBgImage, '../uploads/') === 0) {
             flex: 1;
             background:
                 linear-gradient(135deg, rgba(79,70,229,0.85), rgba(67,56,202,0.85)),
-                url('<?= htmlspecialchars($loginBgImageUrl) ?>') center center/cover no-repeat;
+                url('<?= htmlspecialchars($loginBgImage) ?>') center center/cover no-repeat;
             color: #fff;
             padding: 2rem 1rem;
             display: flex;
@@ -492,8 +504,7 @@ if (!empty($loginBgImage) && strpos($loginBgImage, '../uploads/') === 0) {
         <div class="adugna-login-left">
             <div class="adugna-illustration">
                 <!-- Adugna Gizaw: Site logo (can be replaced with SVG/PNG) -->
-                <?php $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png'; ?>
-                <img src="<?php echo htmlspecialchars($siteLogo); ?>" alt="Site Logo" style="height: 60px;">
+                <img src="<?= htmlspecialchars($siteLogo) ?>" alt="Site Logo" style="height: 60px;">
             </div>
             <div class="adugna-illustration-text">
                 <h3>Flipper International School Customer Relationship Management System</h3>
