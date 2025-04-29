@@ -1,4 +1,12 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
+
 // Error reporting - consider logging to file in production
 error_reporting(E_ALL);
 ini_set('display_errors', 0); // Don't display errors to users
@@ -160,43 +168,68 @@ function handleChangePassword($pdo, $user) {
 <style>
 /* Adugna ERPNext Card Styling */
 .adugna-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(44,62,80,0.09), 0 1.5px 4px rgba(44,62,80,0.04);
     border: 1px solid #e2e2e2;
-    background: #fff;
-    margin-bottom: 24px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f4f6fa 100%);
+    margin-bottom: 28px;
     padding: 0;
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+.adugna-card:hover {
+    box-shadow: 0 8px 32px rgba(44,62,80,0.13), 0 2px 8px rgba(44,62,80,0.07);
+    transform: translateY(-2px) scale(1.01);
 }
 .adugna-card-header {
     background: #f8fafc;
     border-bottom: 1px solid #e2e2e2;
-    padding: 12px 18px;
-    font-size: 1rem;
-    font-weight: 600;
+    padding: 14px 22px;
+    font-size: 1.07rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #2e86c1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.adugna-card-header.bg-secondary {
+    background: #eaf2fb;
+    color: #34495e;
 }
 .adugna-card-body {
-    padding: 18px;
+    padding: 22px 22px 18px 22px;
+    background: transparent;
 }
 .adugna-profile-avatar img {
-    width: 64px;
-    height: 64px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
     border: 2px solid #e2e2e2;
     object-fit: cover;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    background: #fff;
+    transition: box-shadow 0.2s;
+}
+.adugna-profile-avatar img:hover {
+    box-shadow: 0 4px 16px rgba(44,62,80,0.13);
 }
 .adugna-btn {
-    font-size: 0.92rem;
-    padding: 0.35rem 1.1rem;
+    font-size: 0.90rem;
+    padding: 0.32rem 1rem;
     border-radius: 4px;
     border: none;
-    transition: background 0.2s;
+    transition: background 0.2s, box-shadow 0.2s;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(44,62,80,0.04);
 }
 .adugna-btn-primary {
-    background: #2e86c1;
+    background: linear-gradient(90deg, #2e86c1 60%, #3498db 100%);
     color: #fff;
 }
 .adugna-btn-primary:hover {
     background: #1b4f72;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.09);
 }
 .adugna-btn-secondary {
     background: #f4f6f7;
@@ -205,44 +238,89 @@ function handleChangePassword($pdo, $user) {
 }
 .adugna-btn-secondary:hover {
     background: #d6dbdf;
+    color: #1b4f72;
 }
 .adugna-form-label {
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: 0.93rem;
+    font-weight: 600;
+    color: #2e86c1;
+    letter-spacing: 0.01em;
 }
 .adugna-input {
-    font-size: 0.92rem;
-    padding: 0.35rem 0.7rem;
+    font-size: 0.91rem;
+    padding: 0.32rem 0.7rem;
     border-radius: 4px;
     border: 1px solid #d6dbdf;
+    background: #f8fafc;
+    transition: border 0.18s;
+}
+.adugna-input:focus {
+    border: 1.5px solid #2e86c1;
+    outline: none;
+    background: #fff;
 }
 .adugna-badge {
-    font-size: 0.85rem;
-    padding: 0.2em 0.7em;
+    font-size: 0.82rem;
+    padding: 0.18em 0.65em;
     border-radius: 12px;
     background: #eaf2fb;
     color: #2e86c1;
     margin-left: 0.5em;
+    font-weight: 600;
+    letter-spacing: 0.01em;
 }
 .adugna-profile-header {
     display: flex;
     align-items: center;
     gap: 18px;
     margin-bottom: 18px;
+    background: linear-gradient(90deg, #eaf2fb 60%, #f8fafc 100%);
+    border-radius: 8px;
+    padding: 18px 22px;
+    box-shadow: 0 1.5px 4px rgba(44,62,80,0.04);
 }
 .adugna-profile-info h3 {
-    font-size: 1.15rem;
+    font-size: 1.13rem;
     margin-bottom: 0.2em;
+    color: #2e86c1;
+    font-weight: 700;
+}
+.adugna-profile-info .card-text {
+    font-size: 0.97rem;
+    color: #34495e;
+}
+.adugna-profile-info .text-muted {
+    font-size: 0.91rem;
+    color: #7f8c8d !important;
 }
 .adugna-profile-forms-row {
     display: flex;
-    gap: 24px;
+    gap: 28px;
     flex-wrap: wrap;
+    margin-top: 10px;
 }
 .adugna-profile-form-card {
     flex: 1 1 320px;
     min-width: 320px;
     max-width: 420px;
+    transition: box-shadow 0.2s;
+}
+.adugna-profile-form-card:hover {
+    box-shadow: 0 6px 24px rgba(44,62,80,0.11);
+}
+.adugna-form-text {
+    font-size: 0.83rem;
+    color: #7f8c8d;
+}
+.alert {
+    border-radius: 6px;
+    font-size: 0.96rem;
+    padding: 0.7em 1.2em;
+    margin-bottom: 1.1em;
+    box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+}
+.btn-close {
+    font-size: 0.8rem !important;
 }
 @media (max-width: 900px) {
     .adugna-profile-forms-row {
@@ -251,6 +329,23 @@ function handleChangePassword($pdo, $user) {
     }
     .adugna-profile-form-card {
         max-width: 100%;
+    }
+    .adugna-profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px 10px;
+    }
+}
+@media (max-width: 600px) {
+    .adugna-profile-header {
+        padding: 10px 4px;
+    }
+    .adugna-card-body {
+        padding: 12px 6px 10px 6px;
+    }
+    .adugna-profile-form-card {
+        min-width: 0;
     }
 }
 </style>
@@ -267,22 +362,22 @@ function handleChangePassword($pdo, $user) {
                 <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
                 <div class="card-text">Email: <?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
                 <span class="adugna-badge">Role: <?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
-                <div class="text-muted mt-2" style="font-size:0.92rem;">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
+                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
             </div>
         </div>
 
         <?php if (isset($_SESSION['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert" style="font-size:0.95rem;">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size:0.8rem;"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <?php unset($_SESSION['success']); ?>
         <?php endif; ?>
 
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="font-size:0.95rem;">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="font-size:0.8rem;"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
@@ -290,7 +385,8 @@ function handleChangePassword($pdo, $user) {
         <div class="adugna-profile-forms-row">
             <div class="adugna-profile-form-card adugna-card">
                 <div class="adugna-card-header">
-                    <h5 class="mb-0" style="font-size:1rem;">Profile Information</h5>
+                    <i class="fas fa-user-edit" style="font-size:1.1em;color:#2e86c1;"></i>
+                    <span>Profile Information</span>
                 </div>
                 <div class="adugna-card-body">
                     <form method="POST" enctype="multipart/form-data">
@@ -317,16 +413,19 @@ function handleChangePassword($pdo, $user) {
                             <input type="file" id="avatar" name="avatar" 
                                    class="adugna-input form-control form-control-sm"
                                    accept="image/jpeg,image/png,image/gif">
-                            <small class="form-text text-muted" style="font-size:0.85rem;">Max 2MB (JPG, PNG, GIF only)</small>
+                            <small class="adugna-form-text">Max 2MB (JPG, PNG, GIF only)</small>
                         </div>
-                        <button type="submit" class="adugna-btn adugna-btn-primary btn-sm w-100">Update Profile</button>
+                        <button type="submit" class="adugna-btn adugna-btn-primary btn-sm w-100">
+                            <i class="fas fa-save" style="font-size:0.95em;margin-right:5px;"></i>Update Profile
+                        </button>
                     </form>
                 </div>
             </div>
 
             <div class="adugna-profile-form-card adugna-card">
                 <div class="adugna-card-header bg-secondary">
-                    <h5 class="mb-0" style="font-size:1rem;">Change Password</h5>
+                    <i class="fas fa-key" style="font-size:1.1em;color:#34495e;"></i>
+                    <span>Change Password</span>
                 </div>
                 <div class="adugna-card-body">
                     <form method="POST">
@@ -344,14 +443,16 @@ function handleChangePassword($pdo, $user) {
                                    required
                                    pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
                                    title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
-                            <small class="form-text text-muted" style="font-size:0.85rem;">Minimum 8 characters with at least one number and uppercase letter</small>
+                            <small class="adugna-form-text">Minimum 8 characters with at least one number and uppercase letter</small>
                         </div>
                         <div class="mb-3">
                             <label for="confirm_password" class="adugna-form-label form-label">Confirm New Password:</label>
                             <input type="password" id="confirm_password" name="confirm_password" 
                                    class="adugna-input form-control form-control-sm" required>
                         </div>
-                        <button type="submit" class="adugna-btn adugna-btn-secondary btn-sm w-100">Change Password</button>
+                        <button type="submit" class="adugna-btn adugna-btn-secondary btn-sm w-100">
+                            <i class="fas fa-sync-alt" style="font-size:0.95em;margin-right:5px;"></i>Change Password
+                        </button>
                     </form>
                 </div>
             </div>
