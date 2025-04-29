@@ -248,6 +248,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                 font-size: 0.93rem;
             }
         }
+        .adugna-contact-tooltip {
+            display: none;
+            position: absolute;
+            left: 110%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #2563eb;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.92em;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.09);
+        }
+        .adugna-contact-item:hover .adugna-contact-tooltip,
+        .adugna-contact-item:focus .adugna-contact-tooltip {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -261,7 +280,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                     <strong>How to chat with an admin:</strong>
                     <ul style="margin:0.5em 0 0 1.2em;padding:0;">
                         <li>You can Click on one of an online admin to chat with".</li>
-                        <li>Use the <i class="fa fa-trash-alt"></i> button to clear the chat.</li>
                         <li>Unread message counts are shown in red badges.</li>
                     </ul>
                 </span>
@@ -291,8 +309,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                                 <?php if (isset($unreadCounts[$user['id']])): ?>
                                     <span class="adugna-unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                 <?php endif; ?>
-                                <!-- Hover tooltip for chat -->
-                                <span class="adugna-contact-tooltip" style="display:none;position:absolute;left:110%;top:50%;transform:translateY(-50%);background:#2563eb;color:#fff;padding:4px 10px;border-radius:4px;font-size:0.92em;white-space:nowrap;z-index:10;box-shadow:0 2px 8px rgba(44,62,80,0.09);">
+                                <!-- Hover tooltip for chat (not a button, just a hover text) -->
+                                <span class="adugna-contact-tooltip">
                                     <i class="fa fa-hand-pointer"></i> Click to chat with me
                                 </span>
                             </li>
