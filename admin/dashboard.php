@@ -1,5 +1,6 @@
 <?php
 /**
+ * 
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
  * LinkedIn: https://www.linkedin.com/in/eleganceict
@@ -32,7 +33,7 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
     $widgets = [];
 }
 
-// Always add these custom amazing cards (replace duplicated/old ones)
+// Fetch new amazing cards data
 try {
     // Total Students
     $stmt = $pdo->query("SELECT COUNT(*) FROM students");
@@ -46,13 +47,30 @@ try {
     // Total Parents
     $stmt = $pdo->query("SELECT COUNT(*) FROM parents");
     $totalParents = $stmt->fetchColumn() ?: 0;
+
+    // Ongoing Tickets (status = 'open' or 'in_progress')
+    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status IN ('open', 'in_progress')");
+    $ongoingTickets = $stmt->fetchColumn() ?: 0;
+
+    // Closed Tickets (status = 'closed')
+    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status = 'closed'");
+    $closedTickets = $stmt->fetchColumn() ?: 0;
+
+    // Completed Surveys (where ends_at < NOW())
+    $stmt = $pdo->query("SELECT COUNT(*) FROM surveys WHERE ends_at < NOW()");
+    $completedSurveys = $stmt->fetchColumn() ?: 0;
+
+    // Active Surveys (where is_active = 1 and starts_at <= NOW() and ends_at >= NOW())
+    $stmt = $pdo->query("SELECT COUNT(*) FROM surveys WHERE is_active = 1 AND starts_at <= NOW() AND ends_at >= NOW()");
+    $activeSurveys = $stmt->fetchColumn() ?: 0;
 } catch (Exception $e) {
     $totalStudents = $totalTeachers = $totalClasses = $totalParents = 0;
+    $ongoingTickets = $closedTickets = $completedSurveys = $activeSurveys = 0;
 }
 
 // Remove duplicated "Resolved Tickets" card and add new cards
 $widgets = array_filter($widgets, function($w) {
-    return $w['title'] !== "Resolved Tickets";
+    return $w['title'] !== "Resolved Tickets" && $w['title'] !== "Completed Tickets";
 });
 array_unshift($widgets,
     [
@@ -78,6 +96,30 @@ array_unshift($widgets,
         "icon" => "fa-users",
         "color" => "teal",
         "count" => $totalParents
+    ],
+    [
+        "title" => "Ongoing Tickets",
+        "icon" => "fa-spinner",
+        "color" => "orange",
+        "count" => $ongoingTickets
+    ],
+    [
+        "title" => "Closed Tickets",
+        "icon" => "fa-check-circle",
+        "color" => "red",
+        "count" => $closedTickets
+    ],
+    [
+        "title" => "Completed Surveys",
+        "icon" => "fa-list-check",
+        "color" => "yellow",
+        "count" => $completedSurveys
+    ],
+    [
+        "title" => "Active Surveys",
+        "icon" => "fa-bullhorn",
+        "color" => "blue",
+        "count" => $activeSurveys
     ]
 );
 
@@ -206,27 +248,31 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
     <style>
-        /* Adugna custom styles for patenting */
+        /* 
+         * Adugna custom styles for patenting (adugna- prefix)
+         * Inspired by ERPNext, compact, flexible, and interactive
+         */
         .adugna-btn, .adugna-btn-secondary {
             display: inline-flex;
             align-items: center;
-            gap: 0.3em;
-            font-size: 0.95rem;
-            padding: 0.45rem 1rem;
-            border-radius: 6px;
+            gap: 0.2em;
+            font-size: 0.88rem;
+            padding: 0.35rem 0.8rem;
+            border-radius: 5px;
             border: none;
             cursor: pointer;
             font-weight: 500;
             transition: background 0.18s, box-shadow 0.18s;
             box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             text-decoration: none;
+            min-height: 32px;
         }
         .adugna-btn {
-            background: #2563eb;
+            background: linear-gradient(90deg, #2563eb 60%, #1741a6 100%);
             color: #fff;
         }
         .adugna-btn:hover {
-            background: #1741a6;
+            background: linear-gradient(90deg, #1741a6 60%, #2563eb 100%);
         }
         .adugna-btn-secondary {
             background: #f1f5f9;
@@ -239,9 +285,9 @@ try {
         }
         .adugna-card {
             background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 2px 12px rgba(44,62,80,0.09);
-            padding: 1.5rem 1.2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(44,62,80,0.09);
+            padding: 1.1rem 0.8rem;
             text-align: center;
             transition: transform 0.13s, box-shadow 0.13s;
             position: relative;
@@ -249,56 +295,63 @@ try {
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 120px;
+            border-top: 3px solid #e5e7eb;
         }
         .adugna-card:hover {
-            transform: translateY(-2px) scale(1.03);
+            transform: translateY(-2px) scale(1.025);
             box-shadow: 0 6px 24px rgba(44,62,80,0.13);
         }
         .adugna-card i {
-            font-size: 1.6rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.25rem;
+            margin-bottom: 0.3rem;
             color: #2563eb;
             background: #f1f5f9;
             border-radius: 50%;
-            padding: 0.5em;
+            padding: 0.35em;
             box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+            min-width: 32px;
+            min-height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .adugna-card .adugna-card-title {
-            font-size: 1.1rem;
+            font-size: 1.02rem;
             color: #34495e;
-            margin: 0.2rem 0 0.1rem 0;
+            margin: 0.15rem 0 0.08rem 0;
             font-weight: 600;
         }
         .adugna-card .adugna-card-count {
-            font-size: 2.2rem;
+            font-size: 1.5rem;
             color: #2563eb;
             font-weight: 700;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.1rem;
         }
-        .adugna-card-blue { border-top: 4px solid #2563eb; }
-        .adugna-card-green { border-top: 4px solid #22c55e; }
-        .adugna-card-orange { border-top: 4px solid #f59e42; }
-        .adugna-card-red { border-top: 4px solid #e74c3c; }
-        .adugna-card-purple { border-top: 4px solid #8e44ad; }
-        .adugna-card-teal { border-top: 4px solid #14b8a6; }
-        .adugna-card-yellow { border-top: 4px solid #f1c40f; }
-        .adugna-card:not(:last-child) { margin-bottom: 0.5rem; }
+        .adugna-card-blue { border-top: 3px solid #2563eb; }
+        .adugna-card-green { border-top: 3px solid #22c55e; }
+        .adugna-card-orange { border-top: 3px solid #f59e42; }
+        .adugna-card-red { border-top: 3px solid #e74c3c; }
+        .adugna-card-purple { border-top: 3px solid #8e44ad; }
+        .adugna-card-teal { border-top: 3px solid #14b8a6; }
+        .adugna-card-yellow { border-top: 3px solid #f1c40f; }
+        .adugna-card:not(:last-child) { margin-bottom: 0.4rem; }
         .adugna-quick-links {
             display: flex;
-            gap: 1.2rem;
+            gap: 0.7rem;
             flex-wrap: wrap;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             justify-content: flex-start;
         }
         .adugna-quick-link {
             background: #fff;
-            border-radius: 8px;
+            border-radius: 7px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 0.8rem 1.1rem;
+            padding: 0.6rem 0.8rem;
             text-align: center;
-            min-width: 110px;
+            min-width: 90px;
             transition: box-shadow 0.15s, transform 0.13s;
-            font-size: 0.97rem;
+            font-size: 0.92rem;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -308,12 +361,12 @@ try {
             transform: translateY(-2px) scale(1.04);
         }
         .adugna-quick-link i {
-            font-size: 1.2rem;
-            margin-bottom: 0.2rem;
+            font-size: 1rem;
+            margin-bottom: 0.12rem;
             color: #2563eb;
         }
         .adugna-quick-link span {
-            margin-top: 0.1rem;
+            margin-top: 0.05rem;
             color: #34495e;
             font-weight: 500;
         }
@@ -321,6 +374,8 @@ try {
             display: flex;
             min-height: 100vh;
             background: linear-gradient(120deg, #f4f6fa 60%, #e0e7ef 100%);
+            width: 100vw;
+            box-sizing: border-box;
         }
         .adugna-main {
             flex: 1;
@@ -328,17 +383,19 @@ try {
             min-width: 0;
             display: flex;
             flex-direction: column;
+            width: 100%;
+            box-sizing: border-box;
         }
         .adugna-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             flex-wrap: wrap;
         }
         .adugna-header h1 {
             margin: 0;
-            font-size: 1.7rem;
+            font-size: 1.5rem;
             color: #2563eb;
             font-weight: 800;
             letter-spacing: -1px;
@@ -347,28 +404,28 @@ try {
             position: relative;
             display: flex;
             align-items: center;
-            gap: 0.7rem;
+            gap: 0.5rem;
         }
         .adugna-widget-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-            gap: 1.3rem;
-            margin-bottom: 2.2rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
             width: 100%;
         }
         .adugna-section {
-            margin-bottom: 2.2rem;
+            margin-bottom: 1.5rem;
             background: #fff;
-            border-radius: 12px;
+            border-radius: 10px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.5rem 1.1rem;
+            padding: 1.1rem 0.8rem;
         }
         .adugna-section h2 {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             color: #2563eb;
-            margin-bottom: 1.1rem;
+            margin-bottom: 0.8rem;
             border-bottom: 1px solid #f0f2f5;
-            padding-bottom: 0.4rem;
+            padding-bottom: 0.3rem;
             font-weight: 700;
         }
         .adugna-table-container {
@@ -380,10 +437,10 @@ try {
             background: #fff;
         }
         th, td {
-            padding: 10px 12px;
+            padding: 8px 8px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
-            font-size: 0.97rem;
+            font-size: 0.93rem;
         }
         th {
             background: #f8f9fa;
@@ -396,12 +453,22 @@ try {
         .adugna-section pre.error-log {
             background: #222;
             color: #f1c40f;
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            max-height: 300px;
+            padding: 0.8rem;
+            border-radius: 7px;
+            font-size: 0.92rem;
+            max-height: 250px;
             overflow-y: auto;
         }
+        /* Outstanding, interactive hover effect for cards */
+        .adugna-card {
+            cursor: pointer;
+            transition: box-shadow 0.18s, transform 0.18s;
+        }
+        .adugna-card:active {
+            transform: scale(0.98);
+            box-shadow: 0 1px 4px rgba(44,62,80,0.09);
+        }
+        /* Responsive design */
         @media (max-width: 1100px) {
             .adugna-widget-grid {
                 grid-template-columns: 1fr 1fr;
@@ -413,24 +480,24 @@ try {
             }
             .adugna-widget-grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
+                gap: 0.7rem;
             }
             .adugna-section {
-                padding: 1rem 0.5rem;
+                padding: 0.7rem 0.3rem;
             }
         }
         @media (max-width: 600px) {
             .adugna-main {
-                padding: 10px 2px 80px;
+                padding: 8px 1px 60px;
             }
             .adugna-card, .adugna-section {
-                padding: 1rem 0.5rem;
+                padding: 0.6rem 0.2rem;
             }
             th, td {
-                padding: 8px 6px;
+                padding: 6px 3px;
             }
             .adugna-section h2 {
-                font-size: 1rem;
+                font-size: 0.95rem;
             }
         }
     </style>
@@ -449,14 +516,14 @@ try {
                     <?php if ($unreadMessagesCount > 0): ?>
                         <a href="messages.php" class="adugna-btn-secondary" style="position:relative;">
                             <i class="fas fa-envelope"></i>
-                            <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
+                            <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.78em;font-weight:600;">
                                 <?= $unreadMessagesCount ?>
                             </span>
-                            <span style="margin-left:1.7em;">New Messages</span>
+                            <span style="margin-left:1.3em;">New</span>
                         </a>
                     <?php endif; ?>
                     <a href="profile.php" class="adugna-btn-secondary">
-                        <i class="fas fa-user-circle"></i> My Profile
+                        <i class="fas fa-user-circle"></i>
                     </a>
                 </div>
             </header>
@@ -670,7 +737,7 @@ try {
             </div>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
+    <?php include 'includes/footer.php'; ?>
 
     <script>
         // Survey Participation Chart
