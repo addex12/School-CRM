@@ -11,7 +11,7 @@ $logTables = [
 $logFiles = [
     __DIR__ . '/../error_log',
     __DIR__ . '/../logs/error.log',
-    __DIR__ . '/../logs/raw_activity/log',
+    __DIR__ . '/../logs/raw_activity.log',
     __DIR__ . '/../logs/user_activity.log'
 ];
 
