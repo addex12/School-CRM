@@ -154,44 +154,111 @@ function handleChangePassword($pdo, $user) {
 
 ?>
 
-<div class="profile-container">
-    <div class="profile-header">
-        <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
-             alt="Profile Picture"
-             onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
-        <h1><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h1>
-    </div>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-        <div>
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username'] ?? '') ?>" required>
-        </div>
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email'] ?? '') ?>" required>
-        </div>
-        <div>
-            <label for="avatar">Profile Picture:</label>
-            <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif">
-        </div>
-        <button type="submit" name="update_profile">Update Profile</button>
-    </form>
+<?php include_once '../includes/header.php'; ?>
+<?php include_once '../includes/sidebar.php'; ?>
 
-    <form method="POST">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-        <div>
-            <label for="current_password">Current Password:</label>
-            <input type="password" id="current_password" name="current_password" required>
+<div class="main-content-container">
+    <div class="profile-main-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
+                     alt="Profile Picture"
+                     onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
+            </div>
+            <div class="profile-info">
+                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
+                <div class="card-text">Email: <?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
+                <span class="badge bg-primary">Role: <?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
+            </div>
         </div>
-        <div>
-            <label for="new_password">New Password:</label>
-            <input type="password" id="new_password" name="new_password" required>
+
+        <?php if (isset($_SESSION['success'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+
+        <div class="profile-forms-row">
+            <div class="profile-form-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <input type="hidden" name="update_profile" value="1">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username:</label>
+                            <input type="text" id="username" name="username" 
+                                   class="erpnext-input"
+                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
+                                   required
+                                   pattern="[a-zA-Z0-9_]{3,30}"
+                                   title="3-30 characters (letters, numbers, underscores)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email:</label>
+                            <input type="email" id="email" name="email" 
+                                   class="erpnext-input"
+                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
+                                   required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="avatar" class="form-label">Profile Picture:</label>
+                            <input type="file" id="avatar" name="avatar" 
+                                   class="erpnext-input"
+                                   accept="image/jpeg,image/png,image/gif">
+                            <small class="form-text text-muted">Max 2MB (JPG, PNG, GIF only)</small>
+                        </div>
+                        <button type="submit" class="erpnext-btn btn-primary w-100">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="profile-form-card">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">Change Password</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <input type="hidden" name="change_password" value="1">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password:</label>
+                            <input type="password" id="current_password" name="current_password" 
+                                   class="erpnext-input" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password:</label>
+                            <input type="password" id="new_password" name="new_password" 
+                                   class="erpnext-input"
+                                   required
+                                   pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
+                                   title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
+                            <small class="form-text text-muted">Minimum 8 characters with at least one number and uppercase letter</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password:</label>
+                            <input type="password" id="confirm_password" name="confirm_password" 
+                                   class="erpnext-input" required>
+                        </div>
+                        <button type="submit" class="erpnext-btn btn-secondary w-100">Change Password</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div>
-            <label for="confirm_password">Confirm New Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password" required>
-        </div>
-        <button type="submit" name="change_password">Change Password</button>
-    </form>
+    </div>
 </div>
+
+<?php include_once '../includes/footer.php'; ?>
