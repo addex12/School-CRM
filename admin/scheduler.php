@@ -374,6 +374,15 @@ $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
                         : ucfirst($currentSchedule) ?>
                 </div>
                 <div class="adugna-note">
+                    <strong>Next Log Clear:</strong>
+                    <?= $nextClear ? htmlspecialchars($nextClear) : 'Never' ?>
+                </div>
+                <div class="adugna-note">
+                    <strong>Next System Log Clear:</strong>
+                    <?= $nextSystemClear ? htmlspecialchars($nextSystemClear) : 'Never' ?>
+                    
+                </div>
+                <div class="adugna-note">
                     <em>Note: Logs are also cleared automatically by the system CRON job based on the selected schedule.</em>
                 </div>
             </div>
@@ -382,9 +391,13 @@ $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
             <?php include __DIR__ . '/includes/footer.php'; ?>
 
     <script>
-        document.getElementById('interval').addEventListener('change', function() {
-            document.getElementById('adugna-customSchedule').style.display = this.value === 'custom' ? 'inline' : 'none';
+        // Show custom schedule input if 'custom' is selected
+        document.addEventListener('DOMContentLoaded', function() {
+            var intervalSelect = document.getElementById('interval');
+            var customSchedule = document.getElementById('adugna-customSchedule');
+            customSchedule.style.display = intervalSelect.value === 'custom' ? 'inline' : 'none';
         });
+
     </script>
 </body>
 </html>
