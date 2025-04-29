@@ -43,6 +43,14 @@ if (!$user) {
     exit();
 }
 
+// Fetch role name for user (fixes "Unknown Role")
+function getRoleName($role_id, $pdo) {
+    $stmt = $pdo->prepare("SELECT name FROM roles WHERE id = ?");
+    $stmt->execute([$role_id]);
+    return $stmt->fetchColumn() ?: 'Unknown Role';
+}
+$user['role_name'] = isset($user['role_id']) ? getRoleName($user['role_id'], $pdo) : 'Unknown Role';
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF Validation
@@ -162,8 +170,12 @@ function handleChangePassword($pdo, $user) {
 
 ?>
 
+<!-- Consistent layout and sidebar/footer styling as in admin/dashboard.php -->
 <div class="admin-dashboard" style="display:flex;min-height:100vh;background:#f4f6fa;">
-    <?php include_once 'includes/admin_sidebar.php'; ?>
+    <?php 
+    // Use the same sidebar include as dashboard.php
+    include __DIR__ . '/includes/admin_sidebar.php'; 
+    ?>
     <div class="admin-main" style="flex:1;padding:2rem 2.5rem;">
         <div class="main-content-container">
             <div class="profile-main-container">
@@ -176,7 +188,7 @@ function handleChangePassword($pdo, $user) {
                     <div class="adugna-profile-info">
                         <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
                         <div class="card-text">Email: <?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
-                        <span class="adugna-badge">Role: <?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                        <span class="adugna-badge">Role: <?= htmlspecialchars($user['role_name']) ?></span>
                         <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
                     </div>
                 </div>
@@ -274,7 +286,10 @@ function handleChangePassword($pdo, $user) {
                 </div>
             </div>
         </div>
-        <?php include_once 'includes/footer.php'; ?>
+        <?php 
+        // Use the same footer include as dashboard.php
+        include __DIR__ . '/includes/footer.php'; 
+        ?>
     </div>
 </div>
 
