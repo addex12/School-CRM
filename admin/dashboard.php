@@ -27,82 +27,59 @@ if (!isset($pdo) || !$pdo) {
 $dashboardConfigPath = realpath(__DIR__ . '/../config/dashboard.json');
 if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
     $dashboardConfig = json_decode(file_get_contents($dashboardConfigPath), true);
-    $widgets = $dashboardConfig['widgets'] ?? [
-        [
-            "title" => "Total Users",
-            "icon" => "fa-users",
-            "color" => "blue",
-            "query" => "SELECT COUNT(*) FROM users"
-        ],
-        [
-            "title" => "Active Users",
-            "icon" => "fa-user-check",
-            "color" => "green",
-            "query" => "SELECT COUNT(*) FROM users WHERE status = 'active'"
-        ],
-        [
-            "title" => "Inactive Users",
-            "icon" => "fa-user-times",
-            "color" => "red",
-            "query" => "SELECT COUNT(*) FROM users WHERE status = 'inactive'"
-        ],
-        [
-            "title" => "Total Courses",
-            "icon" => "fa-book",
-            "color" => "purple",
-            "query" => "SELECT COUNT(*) FROM courses"
-        ],
-        [
-            "title" => "Enrolled Students",
-            "icon" => "fa-user-graduate",
-            "color" => "orange",
-            "query" => "SELECT COUNT(*) FROM course_enrollments"
-        ],
-        [
-            "title" => "New Feedback",
-            "icon" => "fa-comments",
-            "color" => "teal",
-            "query" => "SELECT COUNT(*) FROM feedback WHERE is_read = 0"
-        ],
-        [
-            "title" => "Open Tickets",
-            "icon" => "fa-ticket-alt",
-            "color" => "red",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'open'"
-        ],
-        [
-            "title" => "In Progress Tickets",
-            "icon" => "fa-spinner",
-            "color" => "blue",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'in_progress'"
-        ],
-        [
-            "title" => "On Hold Tickets",
-            "icon" => "fa-pause-circle",
-            "color" => "yellow",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'on_hold'"
-        ],
-        [
-            "title" => "Resolved Tickets",
-            "icon" => "fa-check-circle",
-            "color" => "green",
-            "query" => "SELECT COUNT(*) FROM support_tickets WHERE status = 'resolved'"
-        ],
-    ];
+    $widgets = $dashboardConfig['widgets'] ?? [];
 } else {
-    error_log("Dashboard configuration file not found or unreadable.");
     $widgets = [];
 }
 
-foreach ($widgets as &$widget) {
-    try {
-        $stmt = $pdo->query($widget['query']);
-        $widget['count'] = $stmt->fetchColumn() ?? 0;
-    } catch (Exception $e) {
-        $widget['count'] = "Error";
-        error_log("Widget Error: " . $e->getMessage());
-    }
+// Always add these custom amazing cards (replace duplicated/old ones)
+try {
+    // Total Students
+    $stmt = $pdo->query("SELECT COUNT(*) FROM students");
+    $totalStudents = $stmt->fetchColumn() ?: 0;
+    // Total Teachers
+    $stmt = $pdo->query("SELECT COUNT(*) FROM teachers");
+    $totalTeachers = $stmt->fetchColumn() ?: 0;
+    // Total Classes
+    $stmt = $pdo->query("SELECT COUNT(*) FROM classes");
+    $totalClasses = $stmt->fetchColumn() ?: 0;
+    // Total Parents
+    $stmt = $pdo->query("SELECT COUNT(*) FROM parents");
+    $totalParents = $stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {
+    $totalStudents = $totalTeachers = $totalClasses = $totalParents = 0;
 }
+
+// Remove duplicated "Resolved Tickets" card and add new cards
+$widgets = array_filter($widgets, function($w) {
+    return $w['title'] !== "Resolved Tickets";
+});
+array_unshift($widgets,
+    [
+        "title" => "Total Students",
+        "icon" => "fa-user-graduate",
+        "color" => "blue",
+        "count" => $totalStudents
+    ],
+    [
+        "title" => "Total Teachers",
+        "icon" => "fa-chalkboard-teacher",
+        "color" => "green",
+        "count" => $totalTeachers
+    ],
+    [
+        "title" => "Total Classes",
+        "icon" => "fa-school",
+        "color" => "purple",
+        "count" => $totalClasses
+    ],
+    [
+        "title" => "Total Parents",
+        "icon" => "fa-users",
+        "color" => "teal",
+        "count" => $totalParents
+    ]
+);
 
 // Fetch unread messages from users to admin
 $unreadMessagesCount = 0;
@@ -229,91 +206,172 @@ try {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../assets/js/dashboard.js" defer></script>
     <style>
-        .admin-dashboard {
-            display: flex;
-            min-height: 100vh;
-            background: #f4f6fa;
-        }
-        .admin-main {
-            flex: 1;
-            padding: 2rem 2.5rem;
-        }
-        .users-header {
-            display: flex;
-            justify-content: space-between;
+        /* Adugna custom styles for patenting */
+        .adugna-btn, .adugna-btn-secondary {
+            display: inline-flex;
             align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .users-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-        }
-        .users-header .btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
+            gap: 0.3em;
+            font-size: 0.95rem;
+            padding: 0.45rem 1rem;
             border-radius: 6px;
+            border: none;
+            cursor: pointer;
             font-weight: 500;
-            transition: background 0.18s;
+            transition: background 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             text-decoration: none;
         }
-        .users-header .btn:hover {
-            background: #217dbb;
+        .adugna-btn {
+            background: #2563eb;
+            color: #fff;
         }
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2.5rem;
+        .adugna-btn:hover {
+            background: #1741a6;
         }
-        .dashboard-widget {
+        .adugna-btn-secondary {
+            background: #f1f5f9;
+            color: #2563eb;
+            border: 1px solid #dbeafe;
+        }
+        .adugna-btn-secondary:hover {
+            background: #e0e7ef;
+            color: #1741a6;
+        }
+        .adugna-card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.09);
+            padding: 1.5rem 1.2rem;
             text-align: center;
-            transition: transform 0.15s, box-shadow 0.15s;
+            transition: transform 0.13s, box-shadow 0.13s;
             position: relative;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .dashboard-widget i {
-            font-size: 2.2rem;
-            margin-bottom: 0.7rem;
-            color: #f1c40f;
+        .adugna-card:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 24px rgba(44,62,80,0.13);
         }
-        .widget-blue { border-top: 4px solid #3498db; }
-        .widget-green { border-top: 4px solid #27ae60; }
-        .widget-orange { border-top: 4px solid #f39c12; }
-        .widget-red { border-top: 4px solid #e74c3c; }
-        .widget-purple { border-top: 4px solid #8e44ad; }
-        .widget-teal { border-top: 4px solid #16a085; }
-        .widget-yellow { border-top: 4px solid #f1c40f; }
-        .dashboard-widget h3 {
-            font-size: 2.1rem;
-            margin: 0.5rem 0 0.2rem 0;
-            color: #2c3e50;
+        .adugna-card i {
+            font-size: 1.6rem;
+            margin-bottom: 0.5rem;
+            color: #2563eb;
+            background: #f1f5f9;
+            border-radius: 50%;
+            padding: 0.5em;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
         }
-        .dashboard-widget p {
-            color: #7f8c8d;
+        .adugna-card .adugna-card-title {
             font-size: 1.1rem;
-            margin: 0;
+            color: #34495e;
+            margin: 0.2rem 0 0.1rem 0;
+            font-weight: 600;
         }
-        .dashboard-section {
-            margin-bottom: 2.5rem;
+        .adugna-card .adugna-card-count {
+            font-size: 2.2rem;
+            color: #2563eb;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+        .adugna-card-blue { border-top: 4px solid #2563eb; }
+        .adugna-card-green { border-top: 4px solid #22c55e; }
+        .adugna-card-orange { border-top: 4px solid #f59e42; }
+        .adugna-card-red { border-top: 4px solid #e74c3c; }
+        .adugna-card-purple { border-top: 4px solid #8e44ad; }
+        .adugna-card-teal { border-top: 4px solid #14b8a6; }
+        .adugna-card-yellow { border-top: 4px solid #f1c40f; }
+        .adugna-card:not(:last-child) { margin-bottom: 0.5rem; }
+        .adugna-quick-links {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            justify-content: flex-start;
+        }
+        .adugna-quick-link {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 0.8rem 1.1rem;
+            text-align: center;
+            min-width: 110px;
+            transition: box-shadow 0.15s, transform 0.13s;
+            font-size: 0.97rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .adugna-quick-link:hover {
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .adugna-quick-link i {
+            font-size: 1.2rem;
+            margin-bottom: 0.2rem;
+            color: #2563eb;
+        }
+        .adugna-quick-link span {
+            margin-top: 0.1rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+        .adugna-dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: linear-gradient(120deg, #f4f6fa 60%, #e0e7ef 100%);
+        }
+        .adugna-main {
+            flex: 1;
+            padding: 2rem 2.5rem;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .adugna-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .adugna-header h1 {
+            margin: 0;
+            font-size: 1.7rem;
+            color: #2563eb;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        .adugna-profile-menu {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .adugna-widget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.3rem;
+            margin-bottom: 2.2rem;
+            width: 100%;
+        }
+        .adugna-section {
+            margin-bottom: 2.2rem;
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
+            padding: 1.5rem 1.1rem;
         }
-        .dashboard-section h2 {
-            font-size: 1.3rem;
-            color: #34495e;
-            margin-bottom: 1.2rem;
+        .adugna-section h2 {
+            font-size: 1.15rem;
+            color: #2563eb;
+            margin-bottom: 1.1rem;
             border-bottom: 1px solid #f0f2f5;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.4rem;
+            font-weight: 700;
         }
-        .table-container {
+        .adugna-table-container {
             overflow-x: auto;
         }
         table {
@@ -322,19 +380,20 @@ try {
             background: #fff;
         }
         th, td {
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
+            font-size: 0.97rem;
         }
         th {
             background: #f8f9fa;
             font-weight: 600;
-            color: #34495e;
+            color: #2563eb;
         }
         tr:hover {
             background: #f4f8fb;
         }
-        .dashboard-section pre.error-log {
+        .adugna-section pre.error-log {
             background: #222;
             color: #f1c40f;
             padding: 1rem;
@@ -343,136 +402,105 @@ try {
             max-height: 300px;
             overflow-y: auto;
         }
-        .quick-links {
-            display: flex;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        .quick-link {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.2rem 1.5rem;
-            text-align: center;
-            min-width: 140px;
-            transition: box-shadow 0.15s;
-        }
-        .quick-link:hover {
-            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
-        }
-        .quick-link i {
-            font-size: 1.7rem;
-            margin-bottom: 0.5rem;
-            color: #3498db;
-        }
-        .quick-link span {
-            display: block;
-            margin-top: 0.3rem;
-            color: #34495e;
-            font-weight: 500;
-        }
-        @media (max-width: 900px) {
-            .widget-grid {
-                grid-template-columns: 1fr;
+        @media (max-width: 1100px) {
+            .adugna-widget-grid {
+                grid-template-columns: 1fr 1fr;
             }
-            .dashboard-section {
+        }
+        @media (max-width: 800px) {
+            .adugna-main {
+                padding: 1rem 0.5rem;
+            }
+            .adugna-widget-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .adugna-section {
                 padding: 1rem 0.5rem;
             }
         }
         @media (max-width: 600px) {
-            .admin-main {
+            .adugna-main {
                 padding: 10px 2px 80px;
             }
-            .dashboard-widget, .dashboard-section {
+            .adugna-card, .adugna-section {
                 padding: 1rem 0.5rem;
             }
             th, td {
                 padding: 8px 6px;
             }
-            .widget-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            .dashboard-section h2 {
-                font-size: 1.1rem;
+            .adugna-section h2 {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="adugna-dashboard">
         <?php
         // Make unreadMessagesCount available to sidebar
         $ADMIN_UNREAD_MESSAGES = $unreadMessagesCount;
         include __DIR__ . '/includes/admin_sidebar.php';
         ?>
-        <div class="admin-main">
-            <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between;">
-                <h1 style="margin:0;"><?= htmlspecialchars($pageTitle) ?></h1>
-                <?php if ($unreadMessagesCount > 0): ?>
-                    <a href="messages.php" class="erpnext-btn btn-secondary" style="position:relative;">
-                        <i class="fas fa-envelope"></i>
-                        <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
-                            <?= $unreadMessagesCount ?>
-                        </span>
-                        New Messages
-                    </a>
-                <div class="profile-menu" style="position: relative;">
-                    <a href="profile.php" class="erpnext-btn btn-secondary" style="position:relative;">
+        <div class="adugna-main">
+            <header class="adugna-header">
+                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <div class="adugna-profile-menu">
+                    <?php if ($unreadMessagesCount > 0): ?>
+                        <a href="messages.php" class="adugna-btn-secondary" style="position:relative;">
+                            <i class="fas fa-envelope"></i>
+                            <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;">
+                                <?= $unreadMessagesCount ?>
+                            </span>
+                            <span style="margin-left:1.7em;">New Messages</span>
+                        </a>
+                    <?php endif; ?>
+                    <a href="profile.php" class="adugna-btn-secondary">
                         <i class="fas fa-user-circle"></i> My Profile
                     </a>
-                <?php endif; ?>
+                </div>
             </header>
             <div class="content">
 
                 <!-- Quick Links Section -->
-                <div class="quick-links">
-                    <a href="users.php" class="quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
-                    <!--<a href="students.php" class="quick-link"><i class="fas fa-user-graduate"></i><span>Students</span></a>
-                    <a href="teachers.php" class="quick-link"><i class="fas fa-chalkboard-teacher"></i><span>Teachers</span></a>
-                    <a href="classes.php" class="quick-link"><i class="fas fa-school"></i><span>Classes</span></a>
-                    <a href="curriculums.php" class="quick-link"><i class="fas fa-list"></i><span>Curriculums</span></a>
-                    <a href="sections.php" class="quick-link"><i class="fas fa-th-large"></i><span>Sections</span></a>
-                    <a href="subjects.php" class="quick-link"><i class="fas fa-book"></i><span>Subjects</span></a>
-                    <a href="grading_scales.php" class="quick-link"><i class="fas fa-chart-line"></i><span>Grading Scales</span></a>
-                    <a href="grades.php" class="quick-link"><i class="fas fa-file-alt"></i><span>Grades</span></a> -->
-                    <a href="surveys.php" class="quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
-                    <a href="feedback.php" class="quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
-                    <a href="support_tickets.php" class="quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
+                <div class="adugna-quick-links">
+                    <a href="users.php" class="adugna-quick-link"><i class="fas fa-users"></i><span>Manage Users</span></a>
+                    <a href="surveys.php" class="adugna-quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
+                    <a href="feedback.php" class="adugna-quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
+                    <a href="support_tickets.php" class="adugna-quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
                 </div>
 
                 <!-- Widgets Section -->
-                <div class="widget-grid">
+                <div class="adugna-widget-grid">
                     <?php foreach ($widgets as $widget): ?>
-                        <div class="dashboard-widget widget-<?= htmlspecialchars($widget['color']) ?>">
+                        <div class="adugna-card adugna-card-<?= htmlspecialchars($widget['color']) ?>">
                             <i class="fas <?= htmlspecialchars($widget['icon']) ?>"></i>
-                            <h3><?= htmlspecialchars($widget['count']) ?></h3>
-                            <p><?= htmlspecialchars($widget['title']) ?></p>
+                            <div class="adugna-card-count"><?= htmlspecialchars($widget['count']) ?></div>
+                            <div class="adugna-card-title"><?= htmlspecialchars($widget['title']) ?></div>
                         </div>
                     <?php endforeach; ?>
                 </div>
 
                 <!-- Survey Participation Chart -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>Survey Participation</h2>
                     <canvas id="surveyParticipationChart" height="80"></canvas>
                 </div>
 
                 <!-- Feedback Ratings Chart -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>Feedback Ratings</h2>
                     <canvas id="feedbackRatingsChart" height="80"></canvas>
                 </div>
 
                 <!-- Support Ticket Status Chart -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>Support Ticket Status</h2>
                     <canvas id="ticketStatusChart" height="80"></canvas>
                 </div>
 
                 <!-- System Stats Section -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>System Stats</h2>
                     <ul>
                         <li>PHP Version: <?= phpversion() ?></li>
@@ -483,7 +511,7 @@ try {
                 </div>
 
                 <!-- Error Log Section -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>Recent Error Log</h2>
                     <?php if (!empty($errorLogLines)): ?>
                         <pre class="error-log"><?= htmlspecialchars(implode("\n", $errorLogLines)) ?></pre>
@@ -493,9 +521,9 @@ try {
                 </div>
 
                 <!-- Activity Log Section -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>Recent Activity Log</h2>
-                    <div class="table-container">
+                    <div class="adugna-table-container">
                         <table>
                             <thead>
                                 <tr>
@@ -530,9 +558,9 @@ try {
                 </div>
 
                 <!-- User Activity Logs Section -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>User Activity Logs</h2>
-                    <div class="table-container">
+                    <div class="adugna-table-container">
                         <table>
                             <thead>
                                 <tr>
@@ -561,9 +589,9 @@ try {
                 </div>
 
                 <!-- Feedback Section -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>Recent Feedback</h2>
-                    <div class="table-container">
+                    <div class="adugna-table-container">
                         <table>
                             <thead>
                                 <tr>
@@ -598,9 +626,9 @@ try {
                 </div>
 
                 <!-- Support Tickets Section -->
-                <div class="dashboard-section">
+                <div class="adugna-section">
                     <h2>Recent Support Tickets</h2>
-                    <div class="table-container">
+                    <div class="adugna-table-container">
                         <table>
                             <thead>
                                 <tr>
