@@ -19,6 +19,9 @@ if (isset($_SESSION['success'])): ?>
     <?php unset($_SESSION['success']); ?>
 <?php endif;
 
+// Set default timezone for survey page
+date_default_timezone_set('Africa/Nairobi');
+
 // Fetch all public surveys
 try {
     $stmt = $pdo->prepare("

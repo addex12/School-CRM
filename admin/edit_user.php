@@ -1,4 +1,6 @@
 <?php
+// Set default timezone for user edit
+date_default_timezone_set('Africa/Nairobi');
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();

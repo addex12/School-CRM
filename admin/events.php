@@ -5,6 +5,9 @@ require_once '../includes/config.php';
 
 $pageTitle = "Events";
 
+// Set default timezone for events
+date_default_timezone_set('Africa/Nairobi');
+
 // Fetch all events
 try {
     $stmt = $pdo->query("SELECT * FROM events ORDER BY start_date DESC");
