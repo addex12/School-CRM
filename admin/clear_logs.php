@@ -64,6 +64,15 @@ switch ($schedule) {
         $intervalSeconds = 86400;
 }
 
+// Update CRON job if called directly (e.g., after schedule change)
+if (php_sapi_name() === 'cli' || isset($_SERVER['REQUEST_METHOD'])) {
+    $cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
+    if ($cronScript && is_executable($cronScript)) {
+        // Run in background to avoid blocking web requests
+        exec("bash " . escapeshellarg($cronScript) . " >/dev/null 2>&1 &");
+    }
+}
+
 // Get last clear time
 $now = time();
 $lastClear = @file_get_contents($lastClearFile);

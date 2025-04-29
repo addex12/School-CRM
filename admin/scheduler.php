@@ -61,6 +61,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_schedule'])) {
     $message = "Auto-clear schedule updated.";
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_cron'])) {
+    $cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
+    if ($cronScript && is_executable($cronScript)) {
+        $output = [];
+        $returnVar = 0;
+        exec("bash " . escapeshellarg($cronScript) . " 2>&1", $output, $returnVar);
+        if ($returnVar === 0) {
+            $message = "CRON job setup successfully.<br>" . htmlspecialchars(implode("\n", $output));
+        } else {
+            $error = "Failed to set up CRON job.<br>" . htmlspecialchars(implode("\n", $output));
+        }
+    } else {
+        $error = "Cron setup script not found or not executable: $cronScript";
+    }
+}
+
 try {
     // Use the existing $pdo connection
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_logs'])) {
@@ -229,14 +245,19 @@ $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
             <div class="adugna-container">
                 <div class="adugna-title"><i class="fa fa-clock" style="font-size:1em;margin-right:0.3em;"></i> System Log Scheduler</div>
                 <?php if ($message): ?>
-                    <div class="adugna-alert adugna-alert-success"><?= htmlspecialchars($message) ?></div>
+                    <div class="adugna-alert adugna-alert-success"><?= $message ?></div>
                 <?php endif; ?>
                 <?php if ($error): ?>
-                    <div class="adugna-alert adugna-alert-danger"><?= htmlspecialchars($error) ?></div>
+                    <div class="adugna-alert adugna-alert-danger"><?= $error ?></div>
                 <?php endif; ?>
                 <form method="post" style="margin-bottom:1.2em;">
                     <button type="submit" name="clear_logs" class="adugna-btn adugna-btn-danger" onclick="return confirm('Are you sure you want to clear all system logs and log files?');">
                         <i class="fa fa-trash"></i> Clear All System Logs & Log Files Now
+                    </button>
+                </form>
+                <form method="post" style="margin-bottom:1.2em;">
+                    <button type="submit" name="setup_cron" class="adugna-btn adugna-btn-primary" onclick="return confirm('Set up the system CRON job for automatic log clearing?');">
+                        <i class="fa fa-clock"></i> Setup/Update System CRON Job
                     </button>
                 </form>
                 <div style="margin-bottom:1em;">
