@@ -8,165 +8,165 @@
  */
 ?>
 <style>
-    .admin-footer {
-        position: relative;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
-        color: #f5f6fa;
-        padding: 16px 20px;
-        display: flex;
-        align-items: center;
-        border-top: 1px solid #374150;
-        font-size: 12px;
-        z-index: 100;
-        box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
-        min-height: 50px;
-    }
-    .footer-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
-    .footer-section {
-        flex: 1 1 0;
-        min-width: 0;
-        padding: 0 8px;
-        display: flex;
+/* Adugna Admin Footer Styles */
+.adugna-footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
+    color: #f5f6fa;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #374150;
+    font-size: 12px;
+    z-index: 100;
+    box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
+    min-height: 44px;
+}
+.adugna-footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.adugna-footer-section {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.adugna-footer-main-info {
+    max-width: 180px;
+    font-weight: 500;
+}
+.adugna-footer-main-info h4 {
+    margin: 0 0 2px 0;
+    font-size: 13px;
+    color: #f1c40f;
+    letter-spacing: 0.5px;
+}
+.adugna-footer-main-info p {
+    margin: 0;
+    font-size: 10px;
+    color: #bfc9d1;
+}
+.adugna-quick-link-list {
+    display: flex;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+.adugna-footer-link {
+    color: #f5f6fa;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.2s, background 0.2s;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #2563eb;
+    margin-right: 2px;
+    border: 1px solid #215967;
+    box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+    display: inline-block;
+}
+.adugna-footer-link:hover {
+    color: #fff;
+    background: #215967;
+    text-decoration: none;
+}
+.adugna-developer-info {
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 120px;
+}
+.adugna-social-links {
+    display: flex;
+    gap: 7px;
+    margin-top: 2px;
+}
+.adugna-social-link {
+    color: #f5f6fa;
+    font-size: 13px;
+    transition: color 0.2s, transform 0.2s;
+    background: #007bfc;
+    border-radius: 50%;
+    padding: 3px 5px;
+    display: inline-block;
+}
+.adugna-social-link:hover {
+    color: #f1c40f;
+    background: #215967;
+    transform: scale(1.08);
+}
+@media (max-width: 900px) {
+    .adugna-footer-content {
         flex-direction: column;
-        gap: 2px;
+        gap: 6px;
+        align-items: flex-start;
     }
-    .footer-main-info {
-        max-width: 200px;
-        font-weight: 500;
+    .adugna-developer-info {
+        text-align: left;
     }
-    .footer-main-info h4 {
-        margin: 0 0 3px 0;
-        font-size: 14px;
-        color: #f1c40f;
-        letter-spacing: 0.5px;
+}
+@media (max-width: 600px) {
+    .adugna-footer {
+        padding: 8px 4px;
+        font-size: 10px;
     }
-    .footer-main-info p {
-        margin: 0;
-        font-size: 11px;
-        color: #bfc9d1;
+    .adugna-footer-main-info {
+        max-width: 100%;
     }
-    .quick-link-list {
-        display: flex;
-        gap: 12px;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        flex-wrap: wrap;
+    .adugna-footer-section {
+        padding: 0 2px;
     }
-    .footer-link {
-        color: #f5f6fa;
-        text-decoration: none;
-        font-size: 11px;
-        font-weight: 500;
-        transition: color 0.2s;
-        padding: 5px 10px;
-        border-radius: 4px;
-        background: #2563eb;
-        margin-right: 4px;
-        border: 1px solid #215967;
-        box-shadow: 0 1px 2px rgba(44,62,80,0.04);
-        display: inline-block;
+    .adugna-quick-link-list {
+        gap: 6px;
     }
-    .footer-link:hover {
-        color: #fff;
-        background: #215967;
-        text-decoration: none;
+    .adugna-social-links {
+        gap: 4px;
     }
-    .developer-info {
-        text-align: right;
-        flex-shrink: 0;
-        min-width: 140px;
+    .adugna-footer-link {
+        padding: 3px 6px;
+        font-size: 9px;
     }
-    .social-links {
-        display: flex;
-        gap: 10px;
-        margin-top: 2px;
-    }
-    .social-link {
-        color: #f5f6fa;
-        font-size: 16px;
-        transition: color 0.2s, transform 0.2s;
-        background: #007bfc;
-        border-radius: 50%;
-        padding: 4px 6px;
-        display: inline-block;
-    }
-    .social-link:hover {
-        color: #f1c40f;
-        background: #215967;
-        transform: scale(1.1);
-    }
-    @media (max-width: 900px) {
-        .footer-content {
-            flex-direction: column;
-            gap: 8px;
-            align-items: flex-start;
-        }
-        .developer-info {
-            text-align: left;
-        }
-    }
-    @media (max-width: 600px) {
-        .admin-footer {
-            padding: 10px 8px;
-            font-size: 11px;
-        }
-        .footer-main-info {
-            max-width: 100%;
-        }
-        .footer-section {
-            padding: 0 4px;
-        }
-        .quick-link-list {
-            gap: 8px;
-        }
-        .social-links {
-            gap: 6px;
-        }
-        .footer-link {
-            padding: 4px 8px;
-            font-size: 10px;
-        }
-    }
+}
 </style>
 
-<footer class="admin-footer">
-    <div class="footer-content">
-        <div class="footer-section footer-main-info">
+<footer class="adugna-footer">
+    <div class="adugna-footer-content">
+        <div class="adugna-footer-section adugna-footer-main-info">
             <h4><?php echo $pageTitle ?? 'Admin Panel'; ?></h4>
-            <p>&copy; <?php echo date('Y'); ?> School Survey System</p>
+            <p>&copy; <?php echo date('Y'); ?> School CRM System</p>
         </div>
-        <div class="footer-section">
-            <ul class="quick-link-list">
-                <li><a href="dashboard.php" class="footer-link">Dashboard</a></li>
-                <li><a href="surveys.php" class="footer-link">Surveys</a></li>
-                <li><a href="users.php" class="footer-link">Users</a></li>
-                <li><a href="../../logout.php" class="footer-link">Logout</a></li>
+        <div class="adugna-footer-section">
+            <ul class="adugna-quick-link-list">
+                <li><a href="dashboard.php" class="adugna-footer-link"><i class="fas fa-home" style="font-size:11px;margin-right:2px;"></i>Dashboard</a></li>
+                <li><a href="users.php" class="adugna-footer-link"><i class="fas fa-users" style="font-size:11px;margin-right:2px;"></i>Users</a></li>
+                <li><a href="../../logout.php" class="adugna-footer-link"><i class="fas fa-sign-out-alt" style="font-size:11px;margin-right:2px;"></i>Logout</a></li>
             </ul>
         </div>
-        <div class="footer-section developer-info">
-            <div class="social-links">
-                <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="social-link" aria-label="LinkedIn">
+        <div class="adugna-footer-section adugna-developer-info">
+            <div class="adugna-social-links">
+                <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="adugna-social-link" aria-label="LinkedIn">
                     <i class="fab fa-linkedin"></i>
                 </a>
-                <a href="https://twitter.com/eleganceict1" target="_blank" class="social-link" aria-label="Twitter">
+                <a href="https://twitter.com/eleganceict1" target="_blank" class="adugna-social-link" aria-label="Twitter">
                     <i class="fab fa-twitter"></i>
                 </a>
-                <a href="https://github.com/addex12" target="_blank" class="social-link" aria-label="GitHub">
+                <a href="https://github.com/addex12" target="_blank" class="adugna-social-link" aria-label="GitHub">
                     <i class="fab fa-github"></i>
                 </a>
             </div>
-            <p style="margin: 6px 0 0 0; font-size:10px; color:#bfc9d1;">
+            <p style="margin: 5px 0 0 0; font-size:9px; color:#bfc9d1;">
                 Developed by Adugna Gizaw
             </p>
         </div>
