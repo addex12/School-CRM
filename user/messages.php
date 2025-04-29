@@ -1,10 +1,18 @@
 <?php
 /**
+ * 
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
  * LinkedIn: https://www.linkedin.com/in/eleganceict
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
+ * 
+ * User Messaging Page - Allows users to chat with online admins.
+ * Features:
+ * - Shows online admins with unread message counts.
+ * - Allows users to start chat, delete messages, clear chat.
+ * - Fully responsive, ERPNext-inspired, adugna-patented styles.
+ * - User guidance and interactive UI.
  */
 ob_start();
 require_once '../includes/auth.php';
@@ -55,140 +63,208 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?> - Users Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Main and custom styles -->
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/messages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Adugna patenting styles (adugna- prefix, ERPNext-inspired, compact, responsive) */
         body, input, textarea, select, button {
             font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
             font-size: 15px;
         }
-        .erpnext-btn {
-            background: #f5f7fa;
-            color: #36414c;
-            border: 1px solid #d1d8dd;
+        .adugna-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 1.2rem 1rem;
+            margin-bottom: 1.2rem;
+        }
+        .adugna-btn {
+            background: #2563eb;
+            color: #fff;
+            border: none;
             border-radius: 4px;
-            padding: 8px 18px;
+            padding: 0.28rem 0.8rem;
+            font-size: 0.93rem;
             font-weight: 500;
-            transition: background 0.2s, color 0.2s;
             cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+            min-height: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
         }
-        .erpnext-btn.btn-primary {
-            background: #007bfc;
-            color: #fff;
-            border-color: #007bfc;
+        .adugna-btn:hover {
+            background: #1741a6;
         }
-        .erpnext-btn.btn-primary:hover {
-            background: #0056b3;
-            color: #fff;
-        }
-        .erpnext-btn.btn-secondary {
+        .adugna-btn-secondary {
             background: #f5f7fa;
-            color: #36414c;
-            border-color: #d1d8dd;
+            color: #2563eb;
+            border: 1px solid #d1d8dd;
         }
-        .erpnext-btn.btn-secondary:hover {
+        .adugna-btn-secondary:hover {
             background: #e4e8ec;
         }
-        .erpnext-input, .erpnext-textarea {
+        .adugna-input, .adugna-textarea {
             border: 1px solid #d1d8dd;
             border-radius: 4px;
-            padding: 8px 12px;
-            font-size: 15px;
+            padding: 7px 10px;
+            font-size: 0.97rem;
             background: #f5f7fa;
             color: #36414c;
         }
-        .erpnext-input:focus, .erpnext-textarea:focus {
+        .adugna-input:focus, .adugna-textarea:focus {
             outline: none;
-            border-color: #007bfc;
+            border-color: #2563eb;
             background: #fff;
         }
-        .erpnext-label {
+        .adugna-label {
             font-weight: 500;
-            color: #36414c;
-            margin-bottom: 4px;
+            color: #2563eb;
+            margin-bottom: 3px;
             display: block;
+            font-size: 0.97rem;
         }
-        .user-list {
+        .adugna-user-list {
             list-style: none;
             margin: 0;
             padding: 0;
             max-height: 420px;
             overflow-y: auto;
         }
-        .user-list li.contact-item {
+        .adugna-user-list li.adugna-contact-item {
             display: flex;
             align-items: center;
-            padding: 10px 18px;
+            padding: 8px 12px;
             cursor: pointer;
             border-bottom: 1px solid #f0f2f5;
             transition: background 0.15s;
             position: relative;
+            border-radius: 6px;
         }
-        .user-list li.contact-item.selected,
-        .user-list li.contact-item:hover {
+        .adugna-user-list li.adugna-contact-item.selected,
+        .adugna-user-list li.adugna-contact-item:hover {
             background: #eaf3fb;
         }
-        .user-list .avatar {
-            width: 36px;
-            height: 36px;
+        .adugna-user-list .adugna-avatar {
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             background: #e3eafc;
-            color: #007bfc;
+            color: #2563eb;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 1.1rem;
-            margin-right: 12px;
+            font-size: 1rem;
+            margin-right: 10px;
             border: 2px solid #fff;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
-        .online-dot {
-            width: 10px;
-            height: 10px;
+        .adugna-online-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: #44d600;
             display: inline-block;
-            margin-right: 7px;
+            margin-right: 6px;
             border: 2px solid #fff;
             box-shadow: 0 0 0 2px #eaf3fb;
         }
-        .unread-badge {
+        .adugna-unread-badge {
             background: #ff5252;
             color: #fff;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            padding: 1px 7px;
             margin-left: auto;
             font-weight: 600;
         }
-        .chat-messages {
-            max-height: 400px; /* Set a maximum height */
-            overflow-y: auto; /* Enable vertical scrolling */
-            padding: 10px;
+        .adugna-chat-messages {
+            max-height: 340px;
+            overflow-y: auto;
+            padding: 8px;
             border: 1px solid #d1d8dd;
-            border-radius: 4px;
+            border-radius: 5px;
             background: #f9f9f9;
-            margin-bottom: 12px;
-            resize: vertical; /* Allow resizing */
+            margin-bottom: 10px;
+            font-size: 0.97rem;
         }
-        .chat-messages::-webkit-scrollbar {
-            width: 8px;
+        .adugna-chat-messages::-webkit-scrollbar {
+            width: 7px;
         }
-        .chat-messages::-webkit-scrollbar-thumb {
+        .adugna-chat-messages::-webkit-scrollbar-thumb {
             background: #d1d8dd;
             border-radius: 4px;
         }
-        .chat-messages::-webkit-scrollbar-thumb:hover {
+        .adugna-chat-messages::-webkit-scrollbar-thumb:hover {
             background: #b0b8c1;
         }
-        .message-form textarea {
+        .adugna-message-form textarea {
             width: 100%;
-            resize: vertical; /* Allow resizing */
-            min-height: 60px; /* Set a minimum height */
-            max-height: 200px; /* Set a maximum height */
+            resize: vertical;
+            min-height: 48px;
+            max-height: 140px;
+        }
+        .adugna-direction {
+            background: #eaf3fb;
+            color: #2563eb;
+            border: 1px solid #b7e4c7;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 1.1em;
+            font-size: 0.98em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .adugna-contact-tooltip {
+            display: none;
+            position: absolute;
+            left: 110%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #2563eb;
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.92em;
+            white-space: nowrap;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.09);
+        }
+        .adugna-contact-item:hover .adugna-contact-tooltip {
+            display: block;
+        }
+        @media (max-width: 900px) {
+            .messaging-container {
+                flex-direction: column;
+            }
+            .contact-list, .chat-section {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .adugna-chat-messages {
+                max-height: 220px;
+            }
+        }
+        @media (max-width: 600px) {
+            .adugna-card {
+                padding: 0.7rem 0.3rem;
+            }
+            .adugna-btn, .adugna-btn-secondary {
+                font-size: 0.89rem;
+                padding: 0.18rem 0.6rem;
+            }
+            .adugna-label {
+                font-size: 0.93rem;
+            }
+            .adugna-chat-messages {
+                font-size: 0.93rem;
+            }
         }
     </style>
 </head>
@@ -196,30 +272,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
     <?php include 'includes/header.php'; ?>
     <div class="main-content-container">
         <div class="container">
-            <header style="margin-bottom: 18px;">
-                <h1 style="font-size: 2rem; font-weight: 700; margin: 0; color:#007bff;">
+            <!-- User Guidance Card -->
+            <div class="adugna-card adugna-direction">
+                <i class="fa fa-info-circle"></i>
+                <span>
+                    <strong>How to chat with an admin:</strong>
+                    <ul style="margin:0.5em 0 0 1.2em;padding:0;">
+                        <li>Hover over an online admin to see "Click to chat with me".</li>
+                        <li>Click an admin to start a chat. Your conversation will appear on the right.</li>
+                        <li>Use the <i class="fa fa-trash-alt"></i> button to clear the chat.</li>
+                        <li>Unread message counts are shown in red badges.</li>
+                    </ul>
+                </span>
+            </div>
+            <header style="margin-bottom: 14px;">
+                <h1 style="font-size: 1.3rem; font-weight: 700; margin: 0; color:#2563eb;">
                     <i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?>
                 </h1>
             </header>
-            <div class="messaging-container">
-                <aside class="contact-list">
-                    <h2 style="font-size: 1.2rem; font-weight: 600; margin: 18px 0 10px 18px; color:#007bff;">
+            <div class="messaging-container" style="display:flex;gap:1.5em;flex-wrap:wrap;">
+                <!-- Contact List (Admins) -->
+                <aside class="contact-list" style="width:260px;min-width:200px;">
+                    <h2 style="font-size: 1.05rem; font-weight: 600; margin: 12px 0 8px 8px; color:#2563eb;">
                         <i class="fas fa-users"></i> Online Admins
                     </h2>
-                    <ul id="user-list" class="user-list">
+                    <ul id="user-list" class="adugna-user-list">
                         <?php foreach ($users as $user): 
                             $initials = strtoupper(substr($user['username'], 0, 2));
                             $isSelected = ($selectedUserId && $selectedUserId == $user['id']);
                         ?>
-                            <li data-user-id="<?= $user['id'] ?>" class="contact-item<?= $isSelected ? ' selected' : '' ?>">
-                                <span class="avatar"><?= htmlspecialchars($initials) ?></span>
+                            <li data-user-id="<?= $user['id'] ?>" class="adugna-contact-item<?= $isSelected ? ' selected' : '' ?>" tabindex="0">
+                                <span class="adugna-avatar"><?= htmlspecialchars($initials) ?></span>
                                 <span>
-                                    <span class="online-dot"></span>
+                                    <span class="adugna-online-dot"></span>
                                     <?= htmlspecialchars($user['username']) ?>
                                 </span>
                                 <?php if (isset($unreadCounts[$user['id']])): ?>
-                                    <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
+                                    <span class="adugna-unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                 <?php endif; ?>
+                                <span class="adugna-contact-tooltip"><i class="fa fa-hand-pointer"></i> Click to chat with me</span>
                             </li>
                         <?php endforeach; ?>
                         <?php if (empty($users)): ?>
@@ -227,23 +318,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                         <?php endif; ?>
                     </ul>
                 </aside>
-                <section class="chat-section">
+                <!-- Chat Section -->
+                <section class="chat-section" style="flex:1;min-width:270px;max-width:100%;">
                     <div id="chat-header" class="chat-header">
-                        <h3 style="margin:0; font-size:1.1rem; color:#333;">
+                        <h3 style="margin:0; font-size:1.05rem; color:#333;">
                             <i class="fas fa-comment-dots"></i> Select an online admin to start chatting
                         </h3>
                     </div>
-                    <div id="chat-messages" class="chat-messages"></div>
-                    <form id="message-form" class="message-form" style="display:none;">
+                    <div id="chat-messages" class="adugna-chat-messages"></div>
+                    <form id="message-form" class="adugna-message-form" style="display:none;">
                         <input type="hidden" name="receiver_id" id="receiver_id">
-                        <label class="erpnext-label" for="message-input">Message</label>
-                        <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required class="erpnext-textarea" style="width:100%;resize:vertical;"></textarea>
-                        <button type="submit" class="erpnext-btn btn-primary" style="margin-top:8px;">
+                        <label class="adugna-label" for="message-input">Message</label>
+                        <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required class="adugna-textarea"></textarea>
+                        <button type="submit" class="adugna-btn" style="margin-top:8px;">
                             <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </form>
-                    <div style="margin-top: 12px;">
-                        <button id="clear-chat" class="erpnext-btn btn-secondary" style="display:none;">
+                    <div style="margin-top: 10px;">
+                        <button id="clear-chat" class="adugna-btn adugna-btn-secondary" style="display:none;">
                             <i class="fas fa-trash-alt"></i> Clear Chat
                         </button>
                     </div>
@@ -253,23 +345,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
     </div>
     <?php include_once __DIR__ . '/includes/footer.php'; ?>
     <script>
-        // Pass PHP variables to JS
+        // Developer: Adugna Gizaw | User Messaging JS
+        // Pass PHP variables to JS for chat logic
         window.messagesConfig = {
             selectedUserId: <?= $selectedUserId ? json_encode($selectedUserId) : 'null' ?>,
             currentUser: <?= $_SESSION['user_id'] ?? 0 ?>
         };
 
-        // Telegram-style: highlight selected admin in the list
+        // Highlight selected admin and show tooltip on hover
         document.addEventListener('DOMContentLoaded', function() {
             const userList = document.getElementById('user-list');
             if (userList) {
                 userList.addEventListener('click', function(e) {
-                    let li = e.target.closest('li.contact-item');
+                    let li = e.target.closest('li.adugna-contact-item');
                     if (li) {
-                        userList.querySelectorAll('li.contact-item').forEach(el => el.classList.remove('selected'));
+                        userList.querySelectorAll('li.adugna-contact-item').forEach(el => el.classList.remove('selected'));
                         li.classList.add('selected');
                         // Optionally, trigger chat load here
                     }
+                });
+                // Accessibility: allow keyboard navigation
+                userList.querySelectorAll('li.adugna-contact-item').forEach(function(li) {
+                    li.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            li.click();
+                        }
+                    });
                 });
             }
         });
@@ -290,7 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            chatMessages.innerHTML = ''; // Clear chat messages from UI
+                            chatMessages.innerHTML = '';
                             alert('Chat cleared successfully.');
                         }
                     });
@@ -310,7 +411,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
-                                e.target.closest('.message-item').remove(); // Remove message from UI
+                                e.target.closest('.message-item').remove();
                                 alert('Message deleted successfully.');
                             }
                         });
