@@ -58,6 +58,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
             $_POST['settings']['site_icon'] = $targetFile;
         }
 
+        // --- FIX: Ensure unchecked checkboxes are saved as '0' ---
+        // List all checkbox fields here
+        $checkboxFields = ['allow_user_registration'];
+        foreach ($checkboxFields as $cb) {
+            if (!isset($_POST['settings'][$cb])) {
+                $_POST['settings'][$cb] = '0';
+            }
+        }
+
         // Save all settings to DB
         foreach ($_POST['settings'] as $key => $value) {
             $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?)

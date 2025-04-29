@@ -151,6 +151,12 @@ try {
     $siteName = 'School CRM';
 }
 
+// Always define $allowRegistration to avoid undefined variable warning
+$allowRegistration = true;
+if (isset($settings['allow_user_registration']) && $settings['allow_user_registration'] == '0') {
+    $allowRegistration = false;
+}
+
 // Use fixed filenames for images as set in admin/settings.php
 $siteLogo = 'uploads/logo.png';
 $loginBgImage = 'uploads/bg.png';
