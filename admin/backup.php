@@ -9,6 +9,9 @@ GitHub: https://github.com/addex12
 // Set timezone for backup/restore
 date_default_timezone_set('Africa/Nairobi');
 
+// Increase max execution time to 10 minutes for large backups
+set_time_limit(600);
+
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
