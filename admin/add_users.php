@@ -1,10 +1,10 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
  */
 ob_start(); // Start output buffering
 require_once '../includes/auth.php';
@@ -254,14 +254,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Generate CSRF token
 $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
-
-// Generate CSRF token
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+    <!-- Adugna Gizaw: Responsive, compact, ERPNext-inspired add user page with adugna- prefix -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
@@ -270,63 +268,159 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="../assets/css/erpnext.css">
     <link rel="stylesheet" href="../assets/css/erpnext_form.css">
-
     <style>
-        .erpnext-form-grid {
-            flex: 1 1 100%; /* Allow cards to take full width on larger screens */
+        /**
+         * Adugna Gizaw: Custom adugna- styles for compact, ERPNext-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         */
+        .adugna-form-grid {
+            flex: 1 1 100%;
             display: flex;
-            flex-direction: column; /* Stack cards vertically */
-            align-items: center; /* Center align the cards */
-            gap: 1.5rem; /* Add spacing between cards */
-            margin: 0 auto; /* Center the grid horizontally */
+            flex-direction: column;
+            align-items: center;
+            gap: 1.2rem;
+            margin: 0 auto;
         }
-
-        .erpnext-card {
-            width: 90%; /* Adjust card width for better responsiveness */
-            max-width: 500px; /* Limit the maximum width of the cards */
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            background: white;
-            align-content: center;
+        .adugna-card {
+            width: 92%;
+            max-width: 420px;
+            padding: 1.1rem 1.3rem 1.2rem 1.3rem;
+            box-shadow: 0 1px 4px rgba(25, 118, 210, 0.09);
+            background: #fff;
             border-radius: 8px;
-            margin: 0 auto; /* Center the card horizontally */
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
         }
-
+        .adugna-card h2 {
+            font-size: 1.13em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 0.5em;
+            letter-spacing: 0.01em;
+        }
+        .adugna-form-group {
+            margin-bottom: 0.7em;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
+        }
+        .adugna-form-group label {
+            font-size: 0.97em;
+            color: #444;
+            font-weight: 500;
+        }
+        .adugna-form-group input,
+        .adugna-form-group select {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #d0d7de;
+            font-size: 0.97em;
+            background: #f9fbfd;
+            color: #222;
+        }
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 14px;
+            font-size: 0.97em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
+        }
+        .adugna-btn i {
+            font-size: 1em;
+        }
+        .adugna-btn:hover {
+            background: #145ea8;
+        }
+        .adugna-btn-secondary {
+            background: #e3eafc;
+            color: #1976d2;
+            border: 1px solid #b6d0f7;
+        }
+        .adugna-btn-secondary:hover {
+            background: #d0e2fa;
+        }
+        .adugna-progress-bar-container {
+            width: 100%;
+            background: #f0f4fa;
+            border-radius: 4px;
+            margin-bottom: 0.5em;
+            height: 22px;
+            overflow: hidden;
+            display: block;
+        }
+        .adugna-progress-bar {
+            background: #1976d2;
+            color: #fff;
+            height: 100%;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.93em;
+            transition: width 0.3s;
+            line-height: 22px;
+        }
+        .adugna-error-message, .adugna-success-message {
+            padding: 8px 12px;
+            border-radius: 5px;
+            margin-bottom: 1em;
+            font-size: 0.97em;
+        }
+        .adugna-error-message {
+            background: #fbeaea;
+            color: #e74c3c;
+            border: 1px solid #f8d7da;
+        }
+        .adugna-success-message {
+            background: #eafaf1;
+            color: #27ae60;
+            border: 1px solid #d4f5e9;
+        }
         @media (max-width: 768px) {
-            .erpnext-form-grid {
-                flex: 1 1 100%; /* Allow cards to take full width on smaller screens */
+            .adugna-form-grid {
+                flex: 1 1 100%;
             }
-            .erpnext-card {
-                width: 100%; /* Make cards take full width on smaller screens */
+            .adugna-card {
+                width: 100%;
+                max-width: 99vw;
             }
         }
-
         @media (max-width: 480px) {
-            .erpnext-card {
-                width: 95%; /* Slightly reduce width for very small screens */
+            .adugna-card {
+                width: 98%;
+                padding: 0.7rem 0.5rem 1rem 0.5rem;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Adugna Gizaw: Main admin dashboard layout -->
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <header class="admin-header">
                 <?= htmlspecialchars($pageTitle) ?>
             </header>
-
             <div class="admin-content">
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="erpnext-error-message">
+                    <!-- Adugna Gizaw: Error message for failed actions -->
+                    <div class="adugna-error-message">
                         <?= htmlspecialchars($_SESSION['error']);
                         unset($_SESSION['error']); ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['bulk_import_errors'])): ?>
-                    <div class="erpnext-error-message">
+                    <!-- Adugna Gizaw: Error list for bulk import -->
+                    <div class="adugna-error-message">
                         <h3>Some rows were skipped due to errors:</h3>
                         <ul>
                             <?php foreach ($_SESSION['bulk_import_errors'] as $error): ?>
@@ -338,30 +432,28 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                 <?php endif; ?>
 
                 <?php if (isset($_SESSION['success'])): ?>
-                    <div class="erpnext-success-message">
+                    <!-- Adugna Gizaw: Success message for actions -->
+                    <div class="adugna-success-message">
                         <?= htmlspecialchars($_SESSION['success']);
                         unset($_SESSION['success']); ?>
                     </div>
                 <?php endif; ?>
 
-                <div class="erpnext-form-grid">
-                    <!-- Single User Form -->
-                    <div class="erpnext-card">
-                        <h2>Create Single User</h2>
+                <div class="adugna-form-grid">
+                    <!-- Adugna Gizaw: Single User Form Card -->
+                    <div class="adugna-card">
+                        <h2><i class="fas fa-user-plus" style="font-size:1em;margin-right:4px;"></i>Create Single User</h2>
                         <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-
-                            <div class="erpnext-form-group">
+                            <div class="adugna-form-group">
                                 <label>Username</label>
                                 <input type="text" name="username" required>
                             </div>
-
-                            <div class="erpnext-form-group">
+                            <div class="adugna-form-group">
                                 <label>Email Address</label>
                                 <input type="email" name="email" required>
                             </div>
-
-                            <div class="erpnext-form-group">
+                            <div class="adugna-form-group">
                                 <label>User Role</label>
                                 <select name="role_id" required>
                                     <?php foreach ($roles as $role): ?>
@@ -371,34 +463,31 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                                     <?php endforeach; ?>
                                 </select>
                             </div>
-
-                            <button type="submit" name="create_user" class="erpnext-btn erpnext-btn-primary">
-                                Create User
+                            <button type="submit" name="create_user" class="adugna-btn">
+                                <i class="fas fa-plus"></i> Create User
                             </button>
                         </form>
                     </div>
-
-                    <!-- Bulk Import -->
-                    <div class="erpnext-card">
-                        <h2>Bulk Import Users</h2>
+                    <!-- Adugna Gizaw: Bulk Import Card -->
+                    <div class="adugna-card">
+                        <h2><i class="fas fa-users" style="font-size:1em;margin-right:4px;"></i>Bulk Import Users</h2>
                         <div style="margin-bottom:1rem;">
                             <p>Download our CSV template to ensure proper formatting:</p>
-                            <a href="download_template.php" class="erpnext-btn erpnext-btn-secondary">
-                                Download Template
+                            <a href="download_template.php" class="adugna-btn adugna-btn-secondary">
+                                <i class="fas fa-download"></i> Download Template
                             </a>
                         </div>
-
                         <form method="POST" enctype="multipart/form-data" id="bulkImportForm">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
-                            <div class="erpnext-form-group">
+                            <div class="adugna-form-group">
                                 <label>Upload CSV File</label>
                                 <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
                             </div>
-                            <div class="erpnext-progress-bar-container" id="progressContainer" style="display:none;">
-                                <div class="erpnext-progress-bar" id="progressBar" style="width:0%;">0%</div>
+                            <div class="adugna-progress-bar-container" id="progressContainer" style="display:none;">
+                                <div class="adugna-progress-bar" id="progressBar" style="width:0%;">0%</div>
                             </div>
-                            <button type="submit" name="bulk_import" class="erpnext-btn erpnext-btn-primary" id="importBtn">
-                                Import Users
+                            <button type="submit" name="bulk_import" class="adugna-btn" id="importBtn">
+                                <i class="fas fa-upload"></i> Import Users
                             </button>
                         </form>
                     </div>
@@ -408,6 +497,9 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     </div>
     <?php include './includes/footer.php'; ?>
     <script>
+        /**
+         * Adugna Gizaw: AJAX bulk import progress bar logic for interactive feedback.
+         */
         document.addEventListener('DOMContentLoaded', function() {
             var form = document.getElementById('bulkImportForm');
             var progressContainer = document.getElementById('progressContainer');
@@ -446,8 +538,8 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                             if (xhr.status === 200) {
                                 var parser = new DOMParser();
                                 var doc = parser.parseFromString(xhr.responseText, 'text/html');
-                                var errorMsg = doc.querySelector('.erpnext-error-message');
-                                var successMsg = doc.querySelector('.erpnext-success-message');
+                                var errorMsg = doc.querySelector('.adugna-error-message');
+                                var successMsg = doc.querySelector('.adugna-success-message');
                                 if (errorMsg) {
                                     progressBar.style.background = '#e74c3c';
                                     progressBar.textContent = errorMsg.textContent.trim();
