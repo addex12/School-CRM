@@ -64,69 +64,30 @@ switch ($schedule) {
         $intervalSeconds = 86400;
 }
 
-// Update CRON job if called directly (e.g., after schedule change)
-$cronScript = realpath(__DIR__ . '/create_clear_logs_cron.sh');
-if ($cronScript && is_executable($cronScript)) {
-    exec("bash " . escapeshellarg($cronScript) . " >/dev/null 2>&1 &");
-} else {
-    error_log("CRON setup script not found or not executable: " . ($cronScript ?: (__DIR__ . '/create_clear_logs_cron.sh')));
-}
+// --- Remove all CRON/cronScript logic ---
 
-// Get last clear time
+// Ensure last/next clear files exist
 $now = time();
-$lastClearFile = realpath($lastClearFile);
-$nextClearFile = realpath($nextClearFile);
-if (!$lastClearFile || !$nextClearFile) {
-    error_log("Error: Unable to resolve paths for last clear or next clear files.");
-    exit;
-}
 if (!file_exists($lastClearFile)) {
     file_put_contents($lastClearFile, date('Y-m-d H:i:s', $now));
 }
 if (!file_exists($nextClearFile)) {
-    file_put_contents($nextClearFile, date('Y-m-d H:i:s', $now));
+    file_put_contents($nextClearFile, date('Y-m-d H:i:s', $now + $intervalSeconds));
 }
 if (!file_exists($scheduleConfigFile)) {
     file_put_contents($scheduleConfigFile, json_encode(['interval' => $schedule]));
 }
-$lastClearFile = realpath($lastClearFile);
-$nextClearFile = realpath($nextClearFile);
-if (!$lastClearFile || !$nextClearFile) {
-    error_log("Error: Unable to resolve paths for last clear or next clear files.");
-    exit;
-}
-if (!is_writable($lastClearFile) || !is_writable($nextClearFile)) {
-    error_log("Error: Last clear or next clear files are not writable.");
-    exit;
-}
-if (!is_writable($scheduleConfigFile)) {
-    error_log("Error: Schedule config file is not writable.");
-    exit;
-}
-if (!is_writable($cronScript)) {
-    error_log("Error: CRON setup script is not writable.");
-    exit;
-}
-if (!is_writable($logFiles[0]) || !is_writable($logFiles[1]) || !is_writable($logFiles[2]) || !is_writable($logFiles[3])) {
-    error_log("Error: Log files are not writable.");
-    exit;
-}
 
+// Read last/next clear times
 $lastClear = @file_get_contents($lastClearFile);
 $lastClearTs = $lastClear ? strtotime($lastClear) : 0;
-if ($lastClearTs === false) {
-    error_log("Error: Unable to parse last clear time.");
-    $lastClearTs = 0;
-}
 $nextClear = @file_get_contents($nextClearFile);
 $nextClearTs = $nextClear ? strtotime($nextClear) : 0;
-if ($nextClearTs === false) {
-    error_log("Error: Unable to parse next clear time.");
-    $nextClearTs = 0;
-}
 
-// Calculate next clear time
-$nextClearTs = $lastClearTs > 0 ? $lastClearTs + $intervalSeconds : $now + $intervalSeconds;
+// Calculate next clear time if not set
+if ($lastClearTs > 0 && $nextClearTs < $now) {
+    $nextClearTs = $lastClearTs + $intervalSeconds;
+}
 
 // Only clear logs if the scheduled time has passed
 if ($now >= $nextClearTs) {
