@@ -76,6 +76,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['set_schedule'])) {
     }
 }
 
+// Handle manual CRON setup/update button
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['setup_cron'])) {
+    $cronScript = realpath(__DIR__ . '/../create_clear_logs_cron.sh');
+    if ($cronScript && is_executable($cronScript)) {
+        $output = [];
+        $returnVar = 0;
+        exec("bash " . escapeshellarg($cronScript) . " 2>&1", $output, $returnVar);
+        if ($returnVar === 0) {
+            $message .= "<br>CRON job setup successfully.<br>" . htmlspecialchars(implode("\n", $output));
+        } else {
+            $error .= "<br>Failed to set up CRON job.<br>" . htmlspecialchars(implode("\n", $output));
+        }
+    } else {
+        $error .= "<br>Cron setup script not found or not executable: " . htmlspecialchars($cronScript ?: (__DIR__ . '/create_clear_logs_cron.sh'));
+    }
+}
+
 try {
     // Use the existing $pdo connection
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_logs'])) {
