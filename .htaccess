@@ -3,9 +3,11 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [QSA,L]
 
-# Force HTTPS (uncomment if using HTTPS)
-# RewriteCond %{HTTPS} off
-# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Force HTTPS and redirect crm.flipperschool.com and crm.flipperschools.com to flipperschool.com/login.php
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^crm\.flipperschool\.com$ [NC,OR]
+RewriteCond %{HTTP_HOST} ^crm\.flipperschools\.com$ [NC]
+RewriteRule ^(.*)$ https://flipperschool.com/login.php [L,R=301]
 
 # Prevent directory listing
 Options -Indexes
