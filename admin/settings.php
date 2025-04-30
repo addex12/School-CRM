@@ -67,6 +67,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
             }
         }
 
+        // Handle multiple login background images
+        if (isset($_FILES['login_bg_images']) && !empty($_FILES['login_bg_images']['name'][0])) {
+            $bgImages = [];
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            foreach ($_FILES['login_bg_images']['tmp_name'] as $idx => $tmpName) {
+                if ($_FILES['login_bg_images']['error'][$idx] === UPLOAD_ERR_OK) {
+                    $fileType = mime_content_type($tmpName);
+                    if (in_array($fileType, $allowedTypes)) {
+                        $ext = pathinfo($_FILES['login_bg_images']['name'][$idx], PATHINFO_EXTENSION);
+                        $fileName = 'bg_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
+                        $targetFile = $uploadDir . $fileName;
+                        move_uploaded_file($tmpName, $targetFile);
+                        $bgImages[] = $fileName;
+                    }
+                }
+            }
+            // Merge with existing images if any
+            $existing = [];
+            if (!empty($settings['login_bg_images'])) {
+                $existing = json_decode($settings['login_bg_images'], true) ?: [];
+            }
+            $allImages = array_merge($existing, $bgImages);
+            $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+            $stmt->execute(['login_bg_images', json_encode($allImages)]);
+            $settings['login_bg_images'] = json_encode($allImages);
+        }
+        // Remove background image if requested
+        if (isset($_POST['remove_bg_image'])) {
+            $remove = $_POST['remove_bg_image'];
+            $existing = json_decode($settings['login_bg_images'] ?? '[]', true) ?: [];
+            $existing = array_filter($existing, function($img) use ($remove) { return $img !== $remove; });
+            // Remove file from uploads
+            $filePath = $uploadDir . $remove;
+            if (file_exists($filePath)) unlink($filePath);
+            $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+            $stmt->execute(['login_bg_images', json_encode(array_values($existing))]);
+            $settings['login_bg_images'] = json_encode(array_values($existing));
+        }
+
         // Save all settings to DB
         foreach ($_POST['settings'] as $key => $value) {
             $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?)
@@ -384,6 +423,28 @@ $settings_fields = [
                     <?php endforeach; ?>
                     <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Save Settings</button>
                 </form>
+            </div>
+            <div class="adugna-card">
+                <h2>Login Background Images (Slider)</h2>
+                <form method="POST" enctype="multipart/form-data" style="margin-bottom:1em;">
+                    <input type="file" name="login_bg_images[]" multiple accept="image/*">
+                    <button type="submit" class="adugna-btn"><i class="fas fa-upload"></i> Upload Images</button>
+                </form>
+                <div style="display:flex; flex-wrap:wrap; gap:12px;">
+                    <?php $bgImgs = json_decode($settings['login_bg_images'] ?? '[]', true) ?: [];
+                    foreach ($bgImgs as $img): ?>
+                        <div style="position:relative; display:inline-block;">
+                            <img src="../uploads/<?= htmlspecialchars($img) ?>" style="height:60px; border-radius:6px; box-shadow:0 2px 8px #0002;">
+                            <form method="POST" style="position:absolute;top:0;right:0;">
+                                <input type="hidden" name="remove_bg_image" value="<?= htmlspecialchars($img) ?>">
+                                <button type="submit" class="adugna-btn" style="padding:2px 7px;font-size:0.9em;background:#e74c3c; color:#fff; border-radius:0 6px 0 6px;">&times;</button>
+                            </form>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php if (empty($bgImgs)): ?>
+                        <span style="color:#888;">No background images uploaded yet.</span>
+                    <?php endif; ?>
+                </div>
             </div>
             <div class="adugna-card">
                 <h2>Other Admin Tools</h2>

@@ -165,6 +165,15 @@ $siteLogo = 'uploads/logo.png';
 $loginBgImage = 'uploads/bg.png';
 $siteBanner = 'uploads/banner.png';
 $siteIcon = 'uploads/icon.png';
+
+// Fetch all login background images for slider
+try {
+    $stmt = $pdo->query("SELECT setting_value FROM system_settings WHERE setting_key = 'login_bg_images'");
+    $bgImagesSetting = $stmt->fetchColumn();
+    $loginBgImages = $bgImagesSetting ? json_decode($bgImagesSetting, true) : [];
+} catch (Exception $e) {
+    $loginBgImages = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -257,12 +266,32 @@ $siteIcon = 'uploads/icon.png';
             align-items: center;
             padding: 2rem 1rem;
             min-width: 0;
-            background:
-                url('<?= htmlspecialchars($loginBgImage) ?>') center center/cover no-repeat;
+            background: #f9fafb;
             position: relative;
+            overflow: hidden;
         }
-        /* Adugna Gizaw: Compact card style for login form */
-        .adugna-card {
+        .login-bg-slider {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .login-bg-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        .login-bg-slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+        .adugna-card { 
             background: #fff;
             border-radius: var(--adugna-card-radius);
             box-shadow: 0 2px 12px rgba(79,70,229,0.08), 0 1.5px 4px rgba(0,0,0,0.03);
@@ -273,6 +302,7 @@ $siteIcon = 'uploads/icon.png';
             flex-direction: column;
             gap: 1.2rem;
             position: relative;
+            z-index: 2;
         }
         /* Adugna Gizaw: Logo and site name */
         .adugna-logo {
@@ -527,6 +557,13 @@ $siteIcon = 'uploads/icon.png';
         </div>
         <!-- Right: Login Card -->
         <div class="adugna-login-right">
+            <?php if (!empty($loginBgImages)): ?>
+            <div class="login-bg-slider" id="loginBgSlider">
+                <?php foreach ($loginBgImages as $idx => $img): ?>
+                    <div class="login-bg-slide<?= $idx === 0 ? ' active' : '' ?>" style="background-image:url('uploads/<?= htmlspecialchars($img) ?>');"></div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
             <div class="adugna-card">
                 <!-- Adugna Gizaw: Logo and site name -->
                 <div class="adugna-logo">
@@ -948,6 +985,18 @@ $siteIcon = 'uploads/icon.png';
                     }
                 });
             }, 1000);
+        });
+        // Login background slider
+        document.addEventListener('DOMContentLoaded', function() {
+            var slides = document.querySelectorAll('.login-bg-slide');
+            if (slides.length > 1) {
+                let idx = 0;
+                setInterval(function() {
+                    slides[idx].classList.remove('active');
+                    idx = (idx + 1) % slides.length;
+                    slides[idx].classList.add('active');
+                }, 4000);
+            }
         });
     </script>
 </body>
