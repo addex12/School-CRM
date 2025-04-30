@@ -1,11 +1,11 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 // Set timezone for change password page
 date_default_timezone_set('Africa/Nairobi');
 
@@ -48,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,71 +57,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .change-password-container {
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-main-content {
+            max-width: 420px;
+            margin: 38px auto 0 auto;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            max-width: 600px;
-            margin: 2rem auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 22px 18px 28px 18px;
+            transition: box-shadow 0.2s;
         }
-        .change-password-container h1 {
-            font-size: 1.5rem;
-            color: #34495e;
-            margin-bottom: 1.5rem;
+        .adugna-header-title {
+            font-size: 1.25em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
             text-align: center;
         }
-        .form-group {
-            margin-bottom: 1.25rem;
+        .adugna-form-group {
+            margin-bottom: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
         }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
+        .adugna-form-group label {
+            font-size: 0.97em;
+            color: #444;
             font-weight: 500;
-            color: #34495e;
         }
-        .form-control {
-            width: 100%;
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #dfe6e9;
+        .adugna-form-group input {
+            padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.9rem;
-            color: #2d3436;
+            border: 1px solid #d0d7de;
+            font-size: 0.97em;
+            background: #f9fbfd;
+            color: #222;
         }
-        .form-control:focus {
-            outline: none;
-            border-color: #0984e3;
-            box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.2);
-        }
-        .btn-primary {
-            background-color: #0984e3;
+        .adugna-btn {
+            background: #1976d2;
             color: #fff;
             border: none;
-            padding: 0.5rem 1rem;
             border-radius: 4px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            padding: 5px 14px;
+            font-size: 0.97em;
             cursor: pointer;
-            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
+            text-decoration: none;
         }
-        .btn-primary:hover {
-            background-color: #74b9ff;
+        .adugna-btn i {
+            font-size: 1em;
         }
-        .alert {
-            padding: 0.75rem 1rem;
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: #145ea8;
         }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .adugna-alert-success {
+            background: #eafaf1;
+            color: #27ae60;
+            border: 1px solid #d4f5e9;
+            border-radius: 5px;
+            padding: 10px 18px;
+            margin-bottom: 1em;
+            font-size: 0.97em;
+            text-align: center;
         }
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
+        .adugna-alert-error {
+            background: #ffeaea;
+            color: #e74c3c;
             border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px 18px;
+            margin-bottom: 1em;
+            font-size: 0.97em;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .adugna-main-content { padding: 0.7rem 0.2rem 1rem 0.2rem; }
+            .adugna-header-title { font-size: 1.05em; }
         }
     </style>
 </head>
@@ -130,34 +153,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <div class="change-password-container">
-                <h1>Change Password</h1>
+            <div class="adugna-main-content">
+                <div class="adugna-header-title">
+                    <i class="fas fa-key"></i> <?= htmlspecialchars($pageTitle) ?>
+                </div>
                 <?php if (!empty($_SESSION['success'])): ?>
-                    <div class="alert alert-success">
+                    <div class="adugna-alert-success">
                         <?= htmlspecialchars($_SESSION['success']) ?>
                     </div>
                     <?php unset($_SESSION['success']); ?>
                 <?php endif; ?>
                 <?php if (!empty($_SESSION['error'])): ?>
-                    <div class="alert alert-danger">
+                    <div class="adugna-alert-error">
                         <?= htmlspecialchars($_SESSION['error']) ?>
                     </div>
                     <?php unset($_SESSION['error']); ?>
                 <?php endif; ?>
                 <form method="POST" action="">
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="current_password">Current Password</label>
-                        <input type="password" id="current_password" name="current_password" class="form-control" required>
+                        <input type="password" id="current_password" name="current_password" required>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="new_password">New Password</label>
-                        <input type="password" id="new_password" name="new_password" class="form-control" required>
+                        <input type="password" id="new_password" name="new_password" required>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="confirm_password">Confirm New Password</label>
-                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" required>
+                        <input type="password" id="confirm_password" name="confirm_password" required>
                     </div>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
+                    <button type="submit" class="adugna-btn">
+                        <i class="fas fa-save"></i> Change Password
+                    </button>
                 </form>
             </div>
         </div>
