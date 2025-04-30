@@ -367,7 +367,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
         .adugna-progress-bar-container {
             width: 100%;
-            background: #f0f4fa;
+            background:rgb(4, 31, 237);
             border-radius: 4px;
             margin-bottom: 0.5em;
             height: 22px;
