@@ -25,6 +25,9 @@ $survey = null;
 $fields = [];
 $analytics = [];
 $total_responses = 0;
+// Initialize to avoid undefined variable warnings
+$response_trend = [];
+$anon_stats = [];
 
 if ($selected_survey_id) {
     // Fetch survey details
