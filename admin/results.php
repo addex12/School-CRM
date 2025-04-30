@@ -603,18 +603,18 @@ $chart_json = json_encode($chart_data);
             <div class="chart-section mb-5">
                 <div class="row">
                     <div class="col-12">
-                        <div class="adugna-chart-container adugna-card">
+                        <div class="adugna-chart-container adugna-card" style="max-width:600px;margin:auto;">
                             <h3 class="adugna-chart-title">Response Summary</h3>
-                            <canvas id="summaryChart" height="100"></canvas>
+                            <canvas id="summaryChart" height="180" style="max-height:220px;max-width:100%;"></canvas>
                         </div>
                     </div>
                 </div>
                 <?php foreach ($fields as $field): ?>
                     <div class="row">
                         <div class="col-12">
-                            <div class="adugna-chart-container adugna-card">
+                            <div class="adugna-chart-container adugna-card" style="max-width:600px;margin:auto;">
                                 <h3 class="adugna-chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
-                                <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
+                                <canvas id="fieldChart-<?= $field['id'] ?>" height="180" style="max-height:220px;max-width:100%;"></canvas>
                             </div>
                         </div>
                     </div>
@@ -758,51 +758,68 @@ $chart_json = json_encode($chart_data);
                     datasets: [{
                         label: 'Responses',
                         data: data,
-                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
-                        borderColor: 'rgba(67, 97, 238, 1)',
+                        backgroundColor: 'rgba(67, 97, 238, 0.18)',
+                        borderColor: '#4361ee',
                         borderWidth: 2,
-                        tension: 0.3,
+                        tension: 0.4,
                         fill: true,
-                        pointBackgroundColor: 'rgba(67, 97, 238, 1)',
-                        pointRadius: 3,
-                        pointHoverRadius: 5
+                        pointBackgroundColor: '#4895ef',
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointBorderWidth: 2,
+                        pointBorderColor: '#fff',
+                        shadowOffsetX: 2,
+                        shadowOffsetY: 2,
+                        shadowBlur: 6,
+                        shadowColor: 'rgba(67,97,238,0.18)'
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         title: {
-                            display: true,
-                            text: 'Response Trend Over Time',
-                            font: { size: 14 }
+                            display: false
                         },
                         legend: { display: false },
                         tooltip: {
+                            backgroundColor: '#fff',
+                            titleColor: '#4361ee',
+                            bodyColor: '#222',
+                            borderColor: '#4361ee',
+                            borderWidth: 1,
                             callbacks: {
                                 label: ctx => `Responses: ${ctx.raw}`
                             }
                         }
                     },
+                    layout: {
+                        padding: 10
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
                             title: {
-                                display: true,
-                                text: 'Number of Responses',
-                                font: { weight: 'bold' }
+                                display: false
                             },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
+                                color: 'rgba(67,97,238,0.07)'
+                            },
+                            ticks: {
+                                color: '#4361ee',
+                                font: { size: 11 }
                             }
                         },
                         x: {
                             title: {
-                                display: true,
-                                text: 'Questions',
-                                font: { weight: 'bold' }
+                                display: false
                             },
                             grid: {
                                 display: false
+                            },
+                            ticks: {
+                                color: '#222',
+                                font: { size: 11 }
                             }
                         }
                     }
@@ -810,7 +827,7 @@ $chart_json = json_encode($chart_data);
             });
         }
 
-        // Developer: Field-specific charts
+        // Field-specific charts
         chartData.fields.forEach(field => {
             const fieldAnalytics = chartData.analytics[field.id] || [];
             const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
@@ -826,35 +843,54 @@ $chart_json = json_encode($chart_data);
                         datasets: [{
                             label: 'Responses',
                             data: data,
-                            backgroundColor: '#4895ef',
-                            borderWidth: 1
+                            backgroundColor: [
+                                '#4895ef', '#4361ee', '#3f37c9', '#f72585', '#b5179e', '#7209b7', '#560bad', '#480ca8'
+                            ],
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            hoverBackgroundColor: '#f72585'
                         }]
                     },
                     options: {
                         responsive: true,
+                        maintainAspectRatio: false,
                         plugins: {
                             title: {
-                                display: true,
-                                text: field.field_label,
-                                font: { size: 13 }
+                                display: false
                             },
                             legend: { display: false },
                             tooltip: {
+                                backgroundColor: '#fff',
+                                titleColor: '#4361ee',
+                                bodyColor: '#222',
+                                borderColor: '#4361ee',
+                                borderWidth: 1,
                                 callbacks: {
                                     label: ctx => `${ctx.label}: ${ctx.raw}`
                                 }
                             }
                         },
+                        layout: {
+                            padding: 10
+                        },
                         scales: {
                             y: {
                                 beginAtZero: true,
                                 grid: {
-                                    color: 'rgba(0, 0, 0, 0.05)'
+                                    color: 'rgba(67,97,238,0.07)'
+                                },
+                                ticks: {
+                                    color: '#4361ee',
+                                    font: { size: 11 }
                                 }
                             },
                             x: {
                                 grid: {
                                     display: false
+                                },
+                                ticks: {
+                                    color: '#222',
+                                    font: { size: 11 }
                                 }
                             }
                         }
