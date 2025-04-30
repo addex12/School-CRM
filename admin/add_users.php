@@ -420,42 +420,12 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header"> 
-              <?= htmlspecialchars($pageTitle) ?>
+            <header class="admin-header" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.01em; color: #1976d2; background: #f5f8ff; padding: 1.1rem 0 1.1rem 0; border-bottom: 1px solid #e0eaff;">
+                <?= htmlspecialchars($pageTitle) ?>
             </header>
-            <div class="admin-content">
-                <?php if (isset($_SESSION['error'])): ?>
-                    <!-- Adugna Gizaw: Error message for failed actions -->
-                    <div class="adugna-error-message">
-                        <?= htmlspecialchars($_SESSION['error']);
-                        unset($_SESSION['error']); ?>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (isset($_SESSION['bulk_import_errors'])): ?>
-                    <!-- Adugna Gizaw: Error list for bulk import -->
-                    <div class="adugna-error-message">
-                        <h3>Some rows were skipped due to errors:</h3>
-                        <ul>
-                            <?php foreach ($_SESSION['bulk_import_errors'] as $error): ?>
-                                <li><?= htmlspecialchars($error) ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                        <?php unset($_SESSION['bulk_import_errors']); ?>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (isset($_SESSION['success'])): ?>
-                    <!-- Adugna Gizaw: Success message for actions -->
-                    <div class="adugna-success-message">
-                        <?= htmlspecialchars($_SESSION['success']);
-                        unset($_SESSION['success']); ?>
-                    </div>
-                <?php endif; ?>
-
-                <div class="adugna-form-grid">
-                    <!-- Adugna Gizaw: Single User Form Card -->
-                    <div class="adugna-card">
+            <div class="admin-content" style="display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; background: #f5f8ff; padding: 2.5rem 0;">
+                <div class="adugna-form-grid" style="width: 100%; max-width: 900px; display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: center; align-items: flex-start;">
+                    <div class="adugna-card" style="flex: 1 1 340px; min-width: 320px; max-width: 420px; margin: 0;">
                         <h2><i class="fas fa-user-plus" style="font-size:1em;"></i>Create Single User</h2>
                         <form method="POST">
                             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -482,8 +452,7 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
                             </button>
                         </form>
                     </div>
-                    <!-- Adugna Gizaw: Bulk Import Card -->
-                    <div class="adugna-card">
+                    <div class="adugna-card" style="flex: 1 1 340px; min-width: 320px; max-width: 420px; margin: 0;">
                         <h2><i class="fas fa-users" style="font-size:1em;"></i>Bulk Import Users</h2>
                         <div style="margin-bottom:1rem;">
                             <p>Download our CSV template to ensure proper formatting:</p>
