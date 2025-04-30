@@ -5,10 +5,10 @@ Email: gizawadugna@gmail.com
 LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
-*
-* System Logs Page: Displays system logs if table exists, else creates the table automatically.
-* All custom styles use adugna- prefix for patenting.
 */
+
+// System Logs Page: Displays system logs if table exists, else creates the table automatically.
+// All custom styles use adugna- prefix for patenting.
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -44,7 +44,8 @@ $logs = [];
 $error = '';
 if ($tableExists) {
     try {
-        $stmt = $pdo->query("SELECT * FROM system_logs ORDER BY created_at DESC LIMIT 100");
+        // Fetch logs and join with users table for username
+        $stmt = $pdo->query("SELECT l.*, u.username FROM system_logs l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC LIMIT 100");
         $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $error = "Failed to fetch system logs: " . $e->getMessage();
