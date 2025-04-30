@@ -510,6 +510,335 @@ $chart_json = json_encode($chart_data);
         .adugna-btn:active {
             transform: scale(0.97);
         }
+        /**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
+/* Adugna: All adugna- styles are compact, responsive, visually outstanding, and content/screen aware.
+   Charts, bars, and Gantt charts are made attractive and friendly. Sidebar/footer styles are not touched. */
+body {
+    background: #f6f7fb;
+    min-height: 100vh;
+}
+.admin-dashboard {
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: flex-start;
+}
+.admin-main {
+    flex: 1 1 0;
+    max-width: 1100px;
+    margin: 2.5vw auto;
+    padding: 1.5vw 2vw;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.admin-header {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.2em;
+}
+.admin-header h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5em;
+    text-align: center;
+    letter-spacing: 0.01em;
+}
+.header-actions {
+    display: flex;
+    gap: 0.4em;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Adugna: Card styling for outstanding, compact look */
+.adugna-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(44,62,80,0.10);
+    padding: 1.2em 1.5em;
+    margin: 1.2em 0;
+    width: 100%;
+    max-width: 900px;
+    transition: box-shadow 0.18s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.adugna-card:hover, .adugna-card:focus-within {
+    box-shadow: 0 8px 32px rgba(44,62,80,0.13);
+}
+
+/* Adugna: Survey stats card row */
+.survey-stats {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 1em;
+    width: 100%;
+    flex-wrap: wrap;
+}
+.stat-card {
+    flex: 1 1 120px;
+    min-width: 100px;
+    background: linear-gradient(135deg, #f7faff 60%, #eaf2fb 100%);
+    border-radius: 7px;
+    margin: 0.15em 0;
+    padding: 0.7em 0.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(67,97,238,0.09);
+    transition: background 0.13s, box-shadow 0.13s;
+}
+.stat-card:hover {
+    background: #eaf2fb;
+    box-shadow: 0 2px 8px rgba(67,97,238,0.13);
+}
+.stat-value {
+    font-size: 1.08rem;
+    font-weight: 700;
+    color: #4361ee;
+    margin-bottom: 0.1em;
+}
+.stat-label {
+    font-size: 0.72rem;
+    color: #2c3e50;
+    opacity: 0.8;
+}
+
+/* Adugna: Button styling, compact and consistent */
+.adugna-btn {
+    background: #f4f7fa;
+    color: #2c3e50;
+    border: 1px solid #e3e6eb;
+    padding: 0.16rem 0.52rem;
+    border-radius: 3px;
+    font-weight: 500;
+    font-size: 0.78rem;
+    transition: background 0.13s, color 0.13s, border 0.13s;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2em;
+    min-height: 28px;
+}
+.adugna-btn-primary {
+    background: linear-gradient(90deg, #3498db 60%, #4361ee 100%);
+    color: #fff;
+    border-color: #3498db;
+}
+.adugna-btn-primary:hover, .adugna-btn-primary:focus {
+    background: #217dbb;
+    color: #fff;
+}
+.adugna-btn-secondary {
+    background: #f4f7fa;
+    color: #2c3e50;
+    border-color: #e3e6eb;
+}
+.adugna-btn-secondary:hover, .adugna-btn-secondary:focus {
+    background: #e2efda;
+    color: #215967;
+}
+.adugna-btn-danger {
+    background: #e74c3c;
+    color: #fff;
+    border-color: #e74c3c;
+}
+.adugna-btn-danger:hover, .adugna-btn-danger:focus {
+    background: #c0392b;
+    color: #fff;
+}
+.adugna-btn-info {
+    background: #00bcd4;
+    color: #fff;
+    border-color: #00bcd4;
+}
+.adugna-btn-info:hover, .adugna-btn-info:focus {
+    background: #0097a7;
+    color: #fff;
+}
+.adugna-btn-sm {
+    font-size: 0.72rem;
+    padding: 0.09rem 0.32rem;
+}
+
+/* Adugna: Chart container - outstanding, content/screen aware */
+.adugna-chart-container {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1em 1.2em;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.09);
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.adugna-chart-title {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 1.01rem;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #f0f0f0;
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+/* Adugna: Outstanding, interactive chart canvas */
+.adugna-chart-container canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 220px !important;
+    margin: 0 auto;
+    display: block;
+    background: #f8fafc;
+    border-radius: 7px;
+    box-shadow: 0 1px 4px rgba(67,97,238,0.06);
+}
+
+/* Adugna: Table styling */
+.adugna-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+.adugna-table th, .adugna-table td {
+    padding: 5px 7px;
+    text-align: center;
+}
+.adugna-table th {
+    font-size: 0.78rem;
+    font-weight: 600;
+    background: #f7faff;
+}
+.adugna-table td {
+    font-size: 0.72rem;
+}
+.adugna-table tr:hover {
+    background-color: #f8f9fa;
+}
+.adugna-badge {
+    font-size: 0.58em;
+    padding: 0.13em 0.28em;
+    border-radius: 2px;
+    background: #e3e6eb;
+    color: #2c3e50;
+}
+.adugna-pagination .page-link {
+    padding: 0.15rem 0.32rem;
+    font-size: 0.68rem;
+}
+.adugna-filter-form {
+    background: #fff;
+    padding: 0.7em 0.9em;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.09);
+    margin-bottom: 13px;
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.adugna-filter-form .row {
+    width: 100%;
+    justify-content: center;
+}
+.adugna-filter-form .form-group label {
+    font-size: 0.72rem;
+}
+.adugna-filter-form .form-control {
+    font-size: 0.72rem;
+    padding: 0.13rem 0.32rem;
+}
+.adugna-filter-form .btn {
+    font-size: 0.72rem;
+    padding: 0.13rem 0.32rem;
+}
+.adugna-icon, .adugna-btn i, .header-actions .dropdown-toggle i, .header-actions a i {
+    font-size: 0.72rem !important;
+    vertical-align: middle;
+}
+@media (max-width: 1100px) {
+    .admin-main, .adugna-card, .adugna-chart-container, .adugna-filter-form {
+        max-width: 98vw;
+        padding-left: 2vw;
+        padding-right: 2vw;
+    }
+}
+@media (max-width: 900px) {
+    .adugna-card, .adugna-chart-container, .adugna-filter-form {
+        padding: 0.5em 0.3em;
+    }
+    .adugna-table th, .adugna-table td {
+        font-size: 0.62rem;
+    }
+    .survey-stats {
+        gap: 0.5em;
+    }
+    .adugna-chart-container canvas {
+        height: 160px !important;
+    }
+}
+@media (max-width: 700px) {
+    .admin-main {
+        padding: 1vw 0.5vw;
+    }
+    .adugna-card, .adugna-chart-container, .adugna-filter-form {
+        padding: 0.3em 0.1em;
+    }
+    .survey-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+    .stat-card {
+        width: 100%;
+        margin-bottom: 0.3em;
+    }
+    .adugna-chart-container canvas {
+        height: 120px !important;
+    }
+}
+@media (max-width: 600px) {
+    .admin-main {
+        padding: 0.5vw 0.2vw;
+    }
+    .adugna-card, .adugna-chart-container, .adugna-filter-form {
+        padding: 0.18em 0.05em;
+    }
+    .adugna-table th, .adugna-table td {
+        font-size: 0.58rem;
+    }
+    .header-actions {
+        flex-direction: column;
+        gap: 0.3em;
+        align-items: center;
+    }
+    .adugna-chart-container canvas {
+        height: 90px !important;
+    }
+}
+.adugna-btn:active {
+    transform: scale(0.97);
+}
     </style>
 </head>
 <body>
