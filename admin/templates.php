@@ -251,7 +251,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_template'])) {
                                     <tr>
                                         <td><?= htmlspecialchars($template['id']) ?></td>
                                         <td><?= htmlspecialchars($template['name']) ?></td>
-                                        <td><?= date('M j, Y g:i A', strtotime($template['created_at'])) ?></td>
+                                        <td>
+                                            <?php if (!empty($template['created_at'])): ?>
+                                                <?= date('M j, Y g:i A', strtotime($template['created_at'])) ?>
+                                            <?php else: ?>
+                                                <span style="color:#aaa;">N/A</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="template_id" value="<?= $template['id'] ?>">
