@@ -284,7 +284,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_restore_cache']
     if (file_exists($progressFile)) {
         unlink($progressFile);
     }
-    header("Location: restore.php");
+    // Show success message after clearing cache, then do nothing else
+    echo "<script>alert('Restore progress cache cleared successfully!');window.location='restore.php';</script>";
     exit();
 }
 ?>
