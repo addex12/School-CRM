@@ -4,6 +4,7 @@
         "github.copilot",
         "codeium.codeium",
         "ms-vscode.azure-repos",
-        "ms-azuretools.vscode-azureresourcegroups"
+        "ms-azuretools.vscode-azureresourcegroups",
+        "esbenp.prettier-vscode"
     ]
 }
