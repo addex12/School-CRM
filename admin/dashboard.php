@@ -135,7 +135,8 @@ try {
 // Fetch new survey responses (unseen by admin)
 $newSurveyResponses = 0;
 try {
-    $stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses WHERE is_seen_admin = 0");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM survey_responses WHERE is_seen_admin = 0");
+    $stmt->execute();
     $newSurveyResponses = $stmt->fetchColumn() ?: 0;
 } catch (Exception $e) {
     $newSurveyResponses = 0;
@@ -144,7 +145,8 @@ try {
 // Fetch new feedback (unseen by admin)
 $newFeedback = 0;
 try {
-    $stmt = $pdo->query("SELECT COUNT(*) FROM feedback WHERE is_seen_admin = 0");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM feedback WHERE is_seen_admin = 0");
+    $stmt->execute();
     $newFeedback = $stmt->fetchColumn() ?: 0;
 } catch (Exception $e) {
     $newFeedback = 0;
@@ -153,7 +155,8 @@ try {
 // Fetch new tickets (unseen by admin)
 $newTickets = 0;
 try {
-    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE is_seen_admin = 0");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM support_tickets WHERE is_seen_admin = 0");
+    $stmt->execute();
     $newTickets = $stmt->fetchColumn() ?: 0;
 } catch (Exception $e) {
     $newTickets = 0;
