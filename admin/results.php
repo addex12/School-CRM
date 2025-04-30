@@ -522,7 +522,7 @@ $chart_json = json_encode($chart_data);
             -->
             <header class="admin-header">
                 <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
-                <!-- Developer: Align export and back buttons horizontally and centered -->
+                <!-- Developer: Align export, print, and back buttons horizontally and centered -->
                 <div class="header-actions" style="display:flex;gap:0.5em;align-items:center;justify-content:center;width:100%;flex-wrap:wrap;">
                     <div style="display:flex;gap:0.5em;align-items:center;">
                         <div class="dropdown">
@@ -534,6 +534,10 @@ $chart_json = json_encode($chart_data);
                                 <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf adugna-icon"></i> PDF</a></li>
                             </ul>
                         </div>
+                        <!-- Print Button -->
+                        <button type="button" class="adugna-btn adugna-btn-secondary" id="adugna-print-btn">
+                            <i class="fas fa-print adugna-icon"></i> Print
+                        </button>
                         <a href="surveys.php" class="adugna-btn adugna-btn-secondary">
                             <i class="fas fa-arrow-left adugna-icon"></i> Back
                         </a>
@@ -721,7 +725,7 @@ $chart_json = json_encode($chart_data);
 </html>
 <!--
     Developer: Adugna Gizaw
-    JS for charts, PDF export, and interactivity. All code is commented for clarity.
+    JS for charts, PDF export, print, and interactivity. All code is commented for clarity.
 -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -906,4 +910,76 @@ $chart_json = json_encode($chart_data);
         });
     }
 </script>
+<script>
+    // Developer: Adugna Gizaw
+    // Print button logic - hides sidebar and prints only the main content, page-breaks for sections
+    document.addEventListener('DOMContentLoaded', function() {
+        var printBtn = document.getElementById('adugna-print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', function() {
+                // Hide sidebar and show only main content for printing
+                document.body.classList.add('adugna-print-mode');
+                window.print();
+                // After print, restore
+                window.onafterprint = function() {
+                    document.body.classList.remove('adugna-print-mode');
+                };
+            });
+        }
+    });
+</script>
+<style>
+/**
+ * Developer: Adugna Gizaw
+ * Print styles: Hide sidebar, center main, add page breaks for major sections.
+ */
+@media print {
+    body.adugna-print-mode {
+        background: #fff !important;
+    }
+    body.adugna-print-mode .admin-dashboard {
+        display: block !important;
+    }
+    body.adugna-print-mode .admin-sidebar,
+    body.adugna-print-mode .admin-sidebar *,
+    body.adugna-print-mode .header-actions,
+    body.adugna-print-mode .adugna-btn,
+    body.adugna-print-mode .dropdown-menu,
+    body.adugna-print-mode .dropdown-toggle {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    body.adugna-print-mode .admin-main {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100vw !important;
+        width: 100vw !important;
+        background: #fff !important;
+        box-shadow: none !important;
+    }
+    body.adugna-print-mode .adugna-card,
+    body.adugna-print-mode .adugna-chart-container,
+    body.adugna-print-mode .adugna-filter-form {
+        box-shadow: none !important;
+        border: none !important;
+        background: #fff !important;
+        page-break-inside: avoid;
+    }
+    body.adugna-print-mode .survey-stats,
+    body.adugna-print-mode .filter-section,
+    body.adugna-print-mode .chart-section,
+    body.adugna-print-mode .response-table-section {
+        page-break-after: always;
+    }
+    body.adugna-print-mode .response-table-section {
+        page-break-after: auto;
+    }
+    body.adugna-print-mode .adugna-table th,
+    body.adugna-print-mode .adugna-table td {
+        color: #222 !important;
+        background: #fff !important;
+        border: 1px solid #eee !important;
+    }
+}
+</style>
 <script src="../assets/js/results-export.js"></script>
