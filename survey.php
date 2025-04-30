@@ -63,7 +63,23 @@ try {
                     Available from <?= htmlspecialchars($survey['starts_at']) ?> to <?= htmlspecialchars($survey['ends_at']) ?>
                 </div>
                 <?php if ($status === '<span style="color:#28a745;">Ongoing</span>'): ?>
-                    <a href="/survey_response.php?id=<?= $survey['id'] ?>" class="btn-take-survey">Take the Survey</a>
+                    <?php
+                        // Check if the survey is anonymous
+                        $survey_id = $survey['id'];
+                        $stmt2 = $pdo->prepare("SELECT is_anonymous FROM surveys WHERE id = ?");
+                        $stmt2->execute([$survey_id]);
+                        $survey_row = $stmt2->fetch(PDO::FETCH_ASSOC);
+                        $is_anonymous = isset($survey_row['is_anonymous']) ? $survey_row['is_anonymous'] : 1;
+                    ?>
+                    <?php if ($is_anonymous): ?>
+                        <a href="/survey_response.php?id=<?= $survey['id'] ?>" class="btn-take-survey">Take the Survey</a>
+                    <?php else: ?>
+                        <form action="/survey_response.php" method="get" style="display:inline;">
+                            <input type="hidden" name="id" value="<?= $survey['id'] ?>">
+                            <input type="email" name="email" placeholder="Enter your email" required style="padding:6px;border-radius:4px;border:1px solid #ccc;">
+                            <button type="submit" class="btn-take-survey" style="margin-left:5px;">Take the Survey</button>
+                        </form>
+                    <?php endif; ?>
                 <?php elseif ($status === '<span style="color:#ffc107;">Upcoming</span>'): ?>
                     <span class="btn-take-survey" style="background:#ffc107;cursor:not-allowed;">Not Yet Open</span>
                 <?php else: ?>
