@@ -219,11 +219,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
                     <i class="fas fa-arrow-left"></i> Back to Backup
                 </a>
             </div>
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 <div class="adugna-card">
                     <h2><i class="fas fa-file-archive"></i> Select Backup File</h2>
                     <p>Choose a backup file to restore your system.</p>
                     <input type="text" name="backup_file" placeholder="Enter backup file name" required style="width:100%;padding:0.4rem 0.7rem;font-size:0.93rem;border:1px solid #e3e6eb;border-radius:4px;margin-bottom:0.7rem;">
+                    <div style="margin-bottom:0.7rem;">
+                        <label for="upload_file" style="font-size:0.95em;color:#34495e;">Or upload backup file:</label>
+                        <input type="file" name="upload_file" id="upload_file" accept=".zip,.sql" style="margin-top:0.3em;">
+                        <button type="submit" name="upload_and_restore" class="adugna-btn adugna-blue" style="margin-left:0.7em;">
+                            <i class="fas fa-upload"></i> Upload & Restore
+                        </button>
+                    </div>
                     <button type="submit" name="restore_backup" class="adugna-btn adugna-green">
                         <i class="fas fa-upload"></i> Restore
                     </button>
@@ -235,6 +242,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
                     <div class="adugna-progress" id="progress"></div>
                 </div>
                 <p id="progress-message" style="margin-top: 0.5rem; font-size: 0.9rem; color: #7f8c8d;">No progress yet.</p>
+                <form method="post" style="margin-top:1em;">
+                    <button type="submit" name="clear_restore_cache" class="adugna-btn adugna-grey" style="font-size:0.92em;">
+                        <i class="fas fa-trash"></i> Clear Failed Cache
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -265,4 +277,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
     </script>
 </body>
 </html>
+<?php
+// Clear failed restore cache if requested
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_restore_cache'])) {
+    $progressFile = __DIR__ . '/../restore_progress.txt';
+    if (file_exists($progressFile)) {
+        unlink($progressFile);
+    }
+    header("Location: restore.php");
+    exit();
+}
+?>
 
