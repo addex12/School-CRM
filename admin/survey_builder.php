@@ -1,11 +1,11 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */ob_start();
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/ob_start();
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -210,58 +210,104 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .form-container {
-            max-width: 900px;
-            margin: 0 auto;
+        /* Adugna Gizaw: All custom styles use adugna- prefix for patenting and clarity */
+        body {
+            background: linear-gradient(120deg, #f0f4ff 0%, #f9fafb 100%);
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+        }
+        .admin-main {
+            margin-left: 260px;
+            padding: 2rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .adugna-card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2.2rem 2rem 2.5rem 2rem;
-        }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #215967; }
-        input[type="text"], textarea, select, input[type="datetime-local"] {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            background: #f9fafb;
-            font-size: 1rem;
-        }
-        textarea { min-height: 100px; }
-        .alert { background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1.5rem; border: 1px solid #fca5a5; }
-        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
-            display: inline-block;
-            padding: 10px 22px;
-            font-size: 15px;
-            border-radius: 4px;
+            border-radius: 1.1rem;
+            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
             border: none;
-            background: #f5f7fa;
-            color: #215967;
-            font-weight: 600;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
-            cursor: pointer;
-            margin-right: 8px;
-            text-decoration: none;
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 900px;
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
         }
-        .btn-primary { background: #3b82f6; color: #fff; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-secondary { background: #eaeaea; color: #666; }
-        .btn-secondary:hover { background: #e2efda; color: #215967; }
+        .form-container {
+            /* Use adugna-card for consistent look */
+            composes: adugna-card;
+            background: #fff;
+            border-radius: 1.1rem;
+            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: none;
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+        .adugna-form-group, .form-group {
+            margin-bottom: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #215967;
+            margin-bottom: 0.3em;
+            font-size: 1.01em;
+            letter-spacing: 0.01em;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="datetime-local"],
+        .form-group select,
+        .form-group textarea {
+            max-width: 420px;
+            min-width: 180px;
+            width: 100%;
+            border-radius: 0.5em;
+            border: 1.5px solid #e5e7eb;
+            background: #f3f4f6;
+            padding: 0.65em 1em;
+            font-size: 1em;
+            transition: border 0.18s, box-shadow 0.18s;
+            box-sizing: border-box;
+            margin-bottom: 0.1em;
+        }
+        .form-group textarea {
+            min-height: 70px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border: 1.5px solid #4f46e5;
+            background: #fff;
+            box-shadow: 0 0 0 2px #a5b4fc33;
+        }
+        .form-group input[type="text"]:hover,
+        .form-group input[type="datetime-local"]:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border: 1.5px solid #a5b4fc;
+        }
         .roles-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 10px;
+            width: 100%;
+            max-width: 420px;
         }
         .question-box {
             border: 1px solid #e5e7eb;
             padding: 15px;
             margin-bottom: 20px;
-            border-radius: 6px;
+            border-radius: 0.7em;
             background: #f9f9f9;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
         }
         .question-header {
             display: flex;
@@ -269,23 +315,89 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
             margin-bottom: 10px;
             font-weight: 600;
             color: #215967;
+            align-items: center;
+        }
+        .question-header .erpnext-btn, .question-header .adugna-btn {
+            padding: 0.18rem 0.7rem;
+            font-size: 0.93em;
         }
         .question-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
+        .help-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .adugna-btn, .erpnext-btn, .btn, .btn-primary, .btn-secondary {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff;
+            border: none;
+            border-radius: 0.5em;
+            padding: 0.28rem 0.85rem;
+            font-size: 0.97em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+            text-decoration: none;
+        }
+        .adugna-btn i, .erpnext-btn i {
+            font-size: 0.97em;
+        }
+        .adugna-btn:hover, .adugna-btn:focus,
+        .erpnext-btn:hover, .erpnext-btn:focus {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .btn-secondary, .adugna-btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+        .btn-secondary:hover, .adugna-btn-secondary:hover {
+            background: #e5e7eb;
+            color: #22223b;
+        }
+        .btn-primary, .adugna-btn-primary {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff;
+        }
+        .btn-primary:hover, .adugna-btn-primary:hover {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+        }
         .add-question { margin-bottom: 20px; }
-        .help-text { font-size: 0.9em; color: #666; margin-top: 5px; }
+        .alert {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #fca5a5;
+        }
         @media (max-width: 900px) {
             .form-container, .admin-main { padding: 1rem; }
             .question-content { grid-template-columns: 1fr; gap: 10px; }
+            .form-group input[type="text"],
+            .form-group input[type="datetime-local"],
+            .form-group select,
+            .form-group textarea { max-width: 100%; }
         }
         @media (max-width: 600px) {
             .form-container, .admin-main { padding: 4px; }
             .question-header { flex-direction: column; gap: 6px; align-items: flex-start; }
             .question-content { grid-template-columns: 1fr; gap: 8px; }
-            .erpnext-btn, .btn, .btn-primary { padding: 6px 10px; font-size: 0.95em; }
+            .adugna-btn, .erpnext-btn, .btn, .btn-primary { padding: 0.18rem 0.7rem; font-size: 0.93em; }
+        }
+        @keyframes adugnaFadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: none;}
         }
     </style>
 </head>
@@ -293,10 +405,10 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header">
+            <header class="admin-header" style="width:100%;max-width:900px;margin:0 auto 1.2rem auto;">
                 <h1 style="color:#215967;font-weight:700;"><i class="fas fa-poll"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
-            <div class="form-container">
+            <div class="form-container adugna-card">
                 <h2 style="color:#215967;font-weight:600;"><?= $survey ? "Edit Survey" : "Create New Survey" ?></h2>
                 <?php if (isset($_SESSION['error'])): ?>
                     <div class="alert"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
@@ -386,7 +498,7 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                                 <div class="question-box" data-index="<?= $index ?>">
                                     <div class="question-header">
                                         <span>Question <?= $index + 1 ?></span>
-                                        <button type="button" class="erpnext-btn btn-secondary remove-question">Remove</button>
+                                        <button type="button" class="adugna-btn adugna-btn-secondary remove-question"><i class="fas fa-trash"></i> Remove</button>
                                     </div>
                                     <div class="question-content">
                                         <div class="form-group">
@@ -427,14 +539,15 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
-                    <button type="button" class="erpnext-btn btn-secondary add-question"><i class="fas fa-plus"></i> Add Question</button>
-                    <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-save"></i> Save Survey</button>
+                    <button type="button" class="adugna-btn adugna-btn-secondary add-question"><i class="fas fa-plus"></i> Add Question</button>
+                    <button type="submit" class="adugna-btn adugna-btn-primary"><i class="fas fa-save"></i> Save Survey</button>
                 </form>
             </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
+    // Adugna Gizaw: Interactive add/remove question logic, compact and responsive
     $(document).ready(function() {
         // Add new question
         $('.add-question').click(function() {
@@ -443,7 +556,7 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                 <div class="question-box" data-index="${index}">
                     <div class="question-header">
                         <span>Question ${index + 1}</span>
-                        <button type="button" class="erpnext-btn btn-secondary remove-question">Remove</button>
+                        <button type="button" class="adugna-btn adugna-btn-secondary remove-question"><i class="fas fa-trash"></i> Remove</button>
                     </div>
                     <div class="question-content">
                         <div class="form-group">
