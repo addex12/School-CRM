@@ -522,19 +522,22 @@ $chart_json = json_encode($chart_data);
             -->
             <header class="admin-header">
                 <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
-                <div class="header-actions">
-                    <div class="dropdown">
-                        <button class="adugna-btn adugna-btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-download adugna-icon"></i> Export
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv adugna-icon"></i> CSV</a></li>
-                            <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf adugna-icon"></i> PDF</a></li>
-                        </ul>
+                <!-- Developer: Align export and back buttons horizontally and centered -->
+                <div class="header-actions" style="display:flex;gap:0.5em;align-items:center;justify-content:center;width:100%;flex-wrap:wrap;">
+                    <div style="display:flex;gap:0.5em;align-items:center;">
+                        <div class="dropdown">
+                            <button class="adugna-btn adugna-btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-download adugna-icon"></i> Export
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv adugna-icon"></i> CSV</a></li>
+                                <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf adugna-icon"></i> PDF</a></li>
+                            </ul>
+                        </div>
+                        <a href="surveys.php" class="adugna-btn adugna-btn-secondary">
+                            <i class="fas fa-arrow-left adugna-icon"></i> Back
+                        </a>
                     </div>
-                    <a href="surveys.php" class="adugna-btn adugna-btn-secondary">
-                        <i class="fas fa-arrow-left adugna-icon"></i> Back
-                    </a>
                 </div>
             </header>
 
