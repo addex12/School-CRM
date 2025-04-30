@@ -25,8 +25,9 @@ if (isset($_GET['survey_id']) && is_numeric($_GET['survey_id'])) {
 
 // Validate survey access and get survey details
 try {
+
     $stmt = $pdo->prepare("
-        SELECT s.id, s.title, s.description, s.is_anonymous,
+        SELECT s.id, s.title, s.description, s.is_anonymous, s.starts_at, s.ends_at,
                sf.id AS field_id, sf.field_type, sf.field_label, 
                sf.field_options, sf.is_required, sf.display_order
         FROM surveys s
@@ -34,8 +35,6 @@ try {
         WHERE s.id = :survey_id
           AND s.is_public = 1
           AND s.is_active = 1
-          AND (s.starts_at IS NULL OR s.starts_at <= NOW())
-          AND (s.ends_at IS NULL OR s.ends_at >= NOW())
         ORDER BY sf.display_order
     ");
     $stmt->execute([':survey_id' => $survey_id]);
@@ -63,6 +62,8 @@ try {
         'title' => $survey_data[0]['title'],
         'description' => $survey_data[0]['description'],
         'is_anonymous' => $survey_data[0]['is_anonymous'],
+        'starts_at' => $survey_data[0]['starts_at'],
+        'ends_at' => $survey_data[0]['ends_at'],
         'questions' => []
     ];
 
@@ -75,13 +76,31 @@ try {
             'required' => $row['is_required']
         ];
     }
+
+    // Determine survey status
+    $now = date('Y-m-d H:i:s');
+    if (!empty($survey['starts_at']) && $now < $survey['starts_at']) {
+        $survey_status = 'upcoming';
+    } elseif (
+        (!empty($survey['starts_at']) && $now >= $survey['starts_at']) &&
+        (empty($survey['ends_at']) || $now <= $survey['ends_at'])
+    ) {
+        $survey_status = 'ongoing';
+    } elseif (!empty($survey['ends_at']) && $now > $survey['ends_at']) {
+        $survey_status = 'ended';
+    } else {
+        $survey_status = 'unknown';
+    }
 } catch (Exception $e) {
     error_log("Error validating survey access: " . $e->getMessage());
     die("An error occurred while loading the survey.");
 }
 
-// Process form submission
+// Process form submission (only if ongoing)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if ($survey_status !== 'ongoing') {
+        die("This survey is not open for responses at this time.");
+    }
     try {
         $pdo->beginTransaction();
 
@@ -258,7 +277,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="survey-container">
         <h1 class="survey-title"><?= htmlspecialchars($survey['title']) ?></h1>
         <p class="survey-description"><?= htmlspecialchars($survey['description']) ?></p>
-        
+        <div style="margin-bottom:10px;">
+            <?php if ($survey_status === 'upcoming'): ?>
+                <span style="color:#ffc107;font-weight:bold;">This survey is not yet open. It will be available from <?= htmlspecialchars($survey['starts_at']) ?>.</span>
+            <?php elseif ($survey_status === 'ended'): ?>
+                <span style="color:#dc3545;font-weight:bold;">This survey has ended. It was available until <?= htmlspecialchars($survey['ends_at']) ?>.</span>
+            <?php elseif ($survey_status === 'ongoing'): ?>
+                <span style="color:#28a745;font-weight:bold;">This survey is currently open.</span>
+            <?php endif; ?>
+        </div>
         <form method="POST">
             <?php if ($survey['is_anonymous']): ?>
                 <div class="anonymous-notice">
@@ -267,7 +294,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php else: ?>
                 <div class="question-group">
                     <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                    <input type="email" name="email" class="form-control" required>
+                    <input type="email" name="email" class="form-control" required <?= $survey_status !== 'ongoing' ? 'disabled' : '' ?>>
                 </div>
             <?php endif; ?>
             
@@ -282,16 +309,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     
                     <?php switch ($question['type']):
                         case 'text': ?>
-                            <input type="text" name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?>>
+                            <input type="text" name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?> <?= $survey_status !== 'ongoing' ? 'disabled' : '' ?>>
                             <?php break; 
                         case 'textarea': ?>
-                            <textarea name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?>></textarea>
+                            <textarea name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?> <?= $survey_status !== 'ongoing' ? 'disabled' : '' ?>></textarea>
                             <?php break;  
                         case 'radio': ?>
                             <ul class="options-list">
                                 <?php foreach ($question['options'] as $option): ?>
                                     <li class="form-check">
-                                        <input type="radio" name="field_<?= $question['id'] ?>" value="<?= htmlspecialchars($option) ?>" <?= $question['required'] ? 'required' : '' ?>>
+                                        <input type="radio" name="field_<?= $question['id'] ?>" value="<?= htmlspecialchars($option) ?>" <?= $question['required'] ? 'required' : '' ?> <?= $survey_status !== 'ongoing' ? 'disabled' : '' ?>>
                                         <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
                                     </li>
                                 <?php endforeach; ?>
@@ -301,14 +328,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <ul class="options-list">
                                 <?php foreach ($question['options'] as $option): ?>
                                     <li class="form-check">
-                                        <input type="checkbox" name="field_<?= $question['id'] ?>[]" value="<?= htmlspecialchars($option) ?>">
+                                        <input type="checkbox" name="field_<?= $question['id'] ?>[]" value="<?= htmlspecialchars($option) ?>" <?= $survey_status !== 'ongoing' ? 'disabled' : '' ?>>
                                         <label class="form-check-label"><?= htmlspecialchars($option) ?></label>
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
                             <?php break; 
                         case 'select': ?>
-                            <select name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?>>
+                            <select name="field_<?= $question['id'] ?>" class="form-control" <?= $question['required'] ? 'required' : '' ?> <?= $survey_status !== 'ongoing' ? 'disabled' : '' ?>>
                                 <option value="">-- Select --</option>
                                 <?php foreach ($question['options'] as $option): ?>
                                     <option value="<?= htmlspecialchars($option) ?>"><?= htmlspecialchars($option) ?></option>
@@ -320,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endforeach; ?>
             
             <div class="text-center">
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" <?= $survey_status !== 'ongoing' ? 'disabled style="background:#ccc;cursor:not-allowed;"' : '' ?>>
                     <i class="fas fa-paper-plane"></i> Submit Survey
                 </button>
             </div>
