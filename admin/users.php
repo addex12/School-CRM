@@ -27,245 +27,196 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/add_users.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .users-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
+        /* Adugna Gizaw: All custom styles use adugna- prefix for patenting. Admin_sidebar/footer CSS untouched. */
+        body { background: #f5f7fa; }
+        .adugna-main {
+            margin-left: 250px;
+            padding: 2vw 2vw 2vw 2vw;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .users-header {
+        .adugna-card {
+            background: #fff;
+            border-radius: 1.1rem;
+            box-shadow: 0 4px 24px 0 rgba(80, 112, 255, 0.10), 0 2px 8px 0 rgba(80, 112, 255, 0.04);
+            border: 1px solid #e5e7eb;
+            padding: 2.2rem 2vw 2vw 2vw;
+            margin-bottom: 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
+            transition: box-shadow 0.2s, border 0.2s;
+        }
+        .adugna-card h2 {
+            color: #215967;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            font-size: clamp(1.1rem, 2vw, 1.5rem);
+            letter-spacing: 0.01em;
+        }
+        .adugna-header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        .users-header h2 {
+        .adugna-header-bar h2 {
             margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
+            font-size: 1.25rem;
+            color: #215967;
         }
-        .users-header .btn {
-            background: #3498db;
+        .adugna-btn {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
             color: #fff;
             border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
+            border-radius: 0.4em;
+            padding: 0.13rem 0.7rem;
+            font-size: 0.92em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2em;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             text-decoration: none;
         }
-        .users-header .btn:hover {
-            background: #217dbb;
+        .adugna-btn i { font-size: 0.92em; }
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-1px) scale(1.03);
         }
-        .users-table {
+        .adugna-table-responsive { width: 100%; overflow-x: auto; }
+        .adugna-table {
             width: 100%;
             border-collapse: collapse;
+            background: #fff;
+            font-size: 0.98em;
         }
-        .users-table th, .users-table td {
-            padding: 12px 16px;
+        .adugna-table th, .adugna-table td {
+            padding: 9px 10px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
         }
-        .users-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #34495e;
+        .adugna-table th {
+            background: #e2efda;
+            font-weight: 700;
+            color: #215967;
+            font-size: 1em;
         }
-        .users-table tr:hover {
-            background: #f4f8fb;
-        }
-        .user-actions a {
-            margin-right: 8px;
-            color: #3498db;
+        .adugna-table tr:hover { background: #f4f8fb; }
+        .adugna-table td:last-child, .adugna-table th:last-child { text-align: right; }
+        .adugna-user-actions a {
+            margin-right: 7px;
+            color: #2563eb;
             text-decoration: none;
-            font-size: 1.1em;
+            font-size: 1em;
         }
-        .user-actions a:last-child {
-            margin-right: 0;
+        .adugna-user-actions a:last-child { margin-right: 0; }
+        .adugna-search-bar {
+            font-size: 0.97em;
+            padding: 0.5em 1em;
+            border-radius: 0.4em;
+            border: 1.2px solid #e5e7eb;
+            background: #f9fafb;
+            margin-bottom: 1.2rem;
+            width: 100%;
+            max-width: 320px;
         }
-        /* Ensure the admin-main content aligns properly with the sidebar */
-        .admin-main {
-            margin-left: var(--sidebar-width, 240px); /* Use CSS variable for sidebar width */
-            transition: margin-left 0.2s ease; /* Smooth transition for sidebar toggle */
+        @media (max-width: 900px) {
+            .adugna-card { padding: 1.2rem 1vw; }
+            .adugna-main { padding: 1.2rem 1vw; }
         }
-
-        .admin-sidebar.collapsed ~ .admin-main {
-            margin-left: var(--sidebar-collapsed-width, 60px); /* Adjust margin when sidebar is collapsed */
-        }
-
-        /* Define CSS variables for sidebar sizes */
-        :root {
-            --sidebar-width: 240px; /* Default sidebar width */
-            --sidebar-collapsed-width: 60px; /* Collapsed sidebar width */
-        }
-
-        /* Adjust the page title alignment */
-        .admin-header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #34495e;
-            text-align: left; /* Align title to the left */
-            padding-left: 1rem; /* Add padding to align with content */
-        }
-
-        /* Ensure all content is flexible and resizable */
-        .content {
-            padding: 1.5rem; /* Add padding for better spacing */
-            overflow-x: auto; /* Prevent content from hiding under the sidebar */
-        }
-
-        /* Responsive adjustments for smaller screens */
         @media (max-width: 600px) {
-            body {
-                font-size: 0.85rem; /* Further reduce font size for smaller screens */
-                text-align: center; /* Center content on smaller screens */
-                display: flex; /* Use flexbox for centering */
-                flex-direction: column; /* Stack elements vertically */
-                align-items: center; /* Center align items horizontally */
-                justify-content: center; /* Center align items vertically */
-            }
-
-            .admin-header h1 {
-                font-size: 0.9rem; /* Adjust title font size */
-                text-align: center; /* Center title */
-            }
-
-            .users-header h2 {
-                font-size: 1rem; /* Adjust header font size */
-                text-align: center; /* Center header */
-            }
-
-            .users-table th, .users-table td {
-                font-size: 0.75rem; /* Reduce table font size */
-            }
-
-            .users-header .btn {
-                padding: 0.5rem 1rem; /* Adjust button padding */
-                font-size: 0.85rem; /* Adjust button font size */
-                display: inline-block; /* Ensure button is centered */
-            }
-
-            .erpnext-search-bar {
-                font-size: 0.85rem; /* Adjust search bar font size */
-                padding: 0.4rem; /* Adjust padding for better spacing */
-                margin: 0 auto; /* Center search bar */
-                display: block; /* Ensure it takes full width */
-            }
-
-            .content {
-                padding: 0.8rem; /* Adjust padding for better spacing */
-                text-align: center; /* Center content */
-            }
-
-            .users-table {
-                font-size: 0.8rem; /* Adjust table font size */
-            }
-
-            .users-container {
-                margin: 0 auto; /* Center the container */
-                max-width: 90%; /* Limit the width for better alignment */
-                text-align: center; /* Center text inside the container */
-            }
+            .adugna-table th, .adugna-table td { padding: 7px 4px; font-size: 0.93em; }
+            .adugna-main { padding: 7px 2px 80px; }
+            .adugna-card { padding: 0.7rem 2vw; }
+            .adugna-header-bar { flex-direction: column; gap: 0.7rem; align-items: flex-start; }
         }
-
-        /* General responsive adjustments */
-        body {
-            font-size: 1rem; /* Base font size */
-            line-height: 1.5; /* Improve readability */
+        @media (max-width: 400px) {
+            .adugna-card { padding: 2px; }
         }
-
-        .admin-main {
-            padding: 1rem; /* Add padding for better spacing */
-        }
-
-        .erpnext-card {
-            padding: 1.5rem; /* Adjust padding for better spacing */
-        }
-
-        .users-header h2 {
-            font-size: 1.3rem; /* Adjust font size for better responsiveness */
-        }
-
-        .users-table {
-            width: 100%; /* Ensure table takes full width */
-            table-layout: auto; /* Allow flexible column widths */
-        }
-
-        .users-table th, .users-table td {
-            word-wrap: break-word; /* Allow text to wrap within cells */
+        @keyframes adugnaFadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: none;}
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+        <div class="adugna-main">
+            <header class="admin-header" style="width:100%;max-width:1100px;margin:0 auto 1.5rem auto;">
+                <h1 style="color:#215967;font-weight:700;font-size:clamp(1.3rem,2.5vw,2rem);text-align:center;">Manage Users</h1>
             </header>
-            <div class="content">
-                <div class="erpnext-card">
-                    <div class="users-header">
-                        <h2>User List</h2>
-                        <a href="add_users.php" class="erpnext-btn erpnext-btn-primary"><i class="fas fa-user-plus"></i> Add User</a>
-                    </div>
-                    <input type="text" id="userSearch" class="erpnext-search-bar" placeholder="Search users...">
-                    <div class="table-responsive">
-                        <table class="users-table" id="usersTable">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Created At</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (!empty($users)): ?>
-                                    <?php foreach ($users as $user): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($user['id']) ?></td>
-                                            <td><?= htmlspecialchars($user['username']) ?></td>
-                                            <td><?= htmlspecialchars($user['email']) ?></td>
-                                            <td><?= htmlspecialchars($user['role_name'] ?? 'N/A') ?></td>
-                                            <td><?= date('M j, Y g:i A', strtotime($user['created_at'])) ?></td>
-                                            <td>
-                                                <?php if (isset($user['active']) && $user['active'] == 1): ?>
-                                                    <span style="color:#27ae60;font-weight:500;">Active</span>
-                                                <?php else: ?>
-                                                    <span style="color:#e74c3c;font-weight:500;">Inactive</span>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="user-actions">
-                                                <a href="edit_user.php?id=<?= $user['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
-                                                <a href="delete_user.php?id=<?= $user['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')"><i class="fas fa-trash-alt"></i></a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+            <div class="adugna-card">
+                <div class="adugna-header-bar">
+                    <h2>User List</h2>
+                    <a href="add_users.php" class="adugna-btn"><i class="fas fa-user-plus"></i> Add User</a>
+                </div>
+                <input type="text" id="adugnaUserSearch" class="adugna-search-bar" placeholder="Search users...">
+                <div class="adugna-table-responsive">
+                    <table class="adugna-table" id="adugnaUsersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Created At</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($users)): ?>
+                                <?php foreach ($users as $user): ?>
                                     <tr>
-                                        <td colspan="7">No users found.</td>
+                                        <td><?= htmlspecialchars($user['id']) ?></td>
+                                        <td><?= htmlspecialchars($user['username']) ?></td>
+                                        <td><?= htmlspecialchars($user['email']) ?></td>
+                                        <td><?= htmlspecialchars($user['role_name'] ?? 'N/A') ?></td>
+                                        <td><?= date('M j, Y g:i A', strtotime($user['created_at'])) ?></td>
+                                        <td>
+                                            <?php if (isset($user['active']) && $user['active'] == 1): ?>
+                                                <span style="color:#27ae60;font-weight:500;">Active</span>
+                                            <?php else: ?>
+                                                <span style="color:#e74c3c;font-weight:500;">Inactive</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="adugna-user-actions">
+                                            <a href="edit_user.php?id=<?= $user['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
+                                            <a href="delete_user.php?id=<?= $user['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this user?')"><i class="fas fa-trash-alt"></i></a>
+                                        </td>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="7">No users found.</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-    <?php include 'includes/footer.php'; ?>
     <script>
-        // Real-time search for users table
+        // Adugna Gizaw: Real-time search for users table (content/screen-size aware)
         document.addEventListener('DOMContentLoaded', function() {
-            var searchInput = document.getElementById('userSearch');
-            var table = document.getElementById('usersTable');
+            var searchInput = document.getElementById('adugnaUserSearch');
+            var table = document.getElementById('adugnaUsersTable');
             if (searchInput && table) {
-                searchInput.addEventListener('keyup', function() {
+                searchInput.addEventListener('input', function() {
                     var filter = searchInput.value.toLowerCase();
                     var rows = table.querySelectorAll('tbody tr');
                     rows.forEach(function(row) {
