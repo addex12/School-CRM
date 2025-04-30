@@ -388,16 +388,218 @@ $settings_fields = [
             <div class="adugna-card">
                 <h2>Other Admin Tools</h2>
                 <ul class="adugna-admin-tools-list">
-                    <li><a href="user_roles.php" class="adugna-btn"><i class="fas fa-user-tag"></i> Roles</a></li>
-                    <li><a href="manage_roles.php" class="adugna-btn"><i class="fas fa-user-shield"></i> Permissions</a></li>
-                    <li><a href="user_permissions.php" class="adugna-btn"><i class="fas fa-user-lock"></i> User Perms</a></li>
-                    <li><a href="backup.php" class="adugna-btn"><i class="fas fa-database"></i> Backup</a></li>
-                    <li><a href="audit_log.php" class="adugna-btn"><i class="fas fa-history"></i> Audit</a></li>
-                    <li><a href="system_logs.php" class="adugna-btn"><i class="fas fa-file-alt"></i> Logs</a></li>
+                    <li><a href="user_roles.php" class="adugna-btn" title="Manage user roles"><i class="fas fa-user-tag"></i> Roles</a></li>
+                    <li><a href="manage_roles.php" class="adugna-btn" title="Set permissions"><i class="fas fa-user-shield"></i> Permissions</a></li>
+                    <li><a href="user_permissions.php" class="adugna-btn" title="User-specific permissions"><i class="fas fa-user-lock"></i> User Perms</a></li>
+                    <li><a href="backup.php" class="adugna-btn" title="Backup database"><i class="fas fa-database"></i> Backup</a></li>
+                    <li><a href="audit_log.php" class="adugna-btn" title="View audit logs"><i class="fas fa-history"></i> Audit</a></li>
+                    <li><a href="system_logs.php" class="adugna-btn" title="System logs"><i class="fas fa-file-alt"></i> Logs</a></li>
                 </ul>
             </div>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <style>
+        /* Adugna Gizaw: Outstanding, modern, responsive, and interactive settings page enhancements */
+        body {
+            background: linear-gradient(120deg, #f0f4ff 0%, #f9fafb 100%);
+            min-height: 100vh;
+        }
+        .adugna-admin-main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+        }
+        .adugna-card {
+            border-radius: 1.1rem;
+            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: none;
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 2rem;
+            background: rgba(255,255,255,0.98);
+            transition: box-shadow 0.2s;
+        }
+        .adugna-card:hover {
+            box-shadow: 0 10px 40px 0 rgba(80, 112, 255, 0.13), 0 2px 8px 0 rgba(80, 112, 255, 0.06);
+        }
+        .adugna-card h2 {
+            font-size: 1.13rem;
+            margin-bottom: 1.1rem;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .adugna-settings-section {
+            margin-bottom: 2.1rem;
+            padding-bottom: 1.1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .adugna-settings-section:last-child {
+            border-bottom: none;
+        }
+        .adugna-form-group {
+            margin-bottom: 1.3rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .adugna-form-group label {
+            font-size: 1.01em;
+            margin-bottom: 0.3em;
+            color: #374151;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+        .adugna-form-group input[type="text"],
+        .adugna-form-group input[type="email"],
+        .adugna-form-group input[type="number"],
+        .adugna-form-group input[type="password"],
+        .adugna-form-group select {
+            border-radius: 0.5em;
+            border: 1.5px solid #e5e7eb;
+            background: #f3f4f6;
+            padding: 0.65em 1em;
+            font-size: 1em;
+            transition: border 0.18s;
+        }
+        .adugna-form-group input:focus,
+        .adugna-form-group select:focus {
+            border: 1.5px solid #4f46e5;
+            background: #fff;
+        }
+        .adugna-form-group input[type="checkbox"] {
+            width: 1.1em;
+            height: 1.1em;
+            margin-right: 0.5em;
+            accent-color: #4f46e5;
+            vertical-align: middle;
+        }
+        .adugna-form-group p {
+            font-size: 0.93em;
+            color: #6b7280;
+            margin-top: 0.2em;
+        }
+        .adugna-btn {
+            border-radius: 0.5em;
+            padding: 0.32rem 1.1rem;
+            font-size: 1em;
+            font-weight: 600;
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+            border: none;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+        }
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .adugna-admin-header {
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+            background: linear-gradient(90deg, #f0f4ff 0%, #f9fafb 100%);
+            border-radius: 0.7em;
+        }
+        .adugna-admin-header h1 {
+            color: #4f46e5;
+            font-size: 1.45rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+        }
+        .adugna-admin-header i {
+            font-size: 1.2em;
+        }
+        .adugna-admin-tools-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        .adugna-admin-tools-list li {
+            margin-bottom: 0.2rem;
+        }
+        .adugna-admin-tools-list .adugna-btn {
+            font-size: 0.97em;
+            padding: 0.28rem 0.9rem;
+            gap: 0.3em;
+            background: linear-gradient(90deg, #10b981 0%, #4f46e5 100%);
+        }
+        .adugna-admin-tools-list .adugna-btn:hover {
+            background: linear-gradient(90deg, #4f46e5 0%, #10b981 100%);
+        }
+        .adugna-admin-tools-list i {
+            font-size: 1em;
+        }
+        /* Responsive: stack cards and make font/content adapt */
+        @media (max-width: 900px) {
+            .adugna-admin-main {
+                margin-left: 0;
+                padding: 1rem 0.3rem;
+            }
+            .adugna-card {
+                padding: 1rem 0.7rem;
+                max-width: 100%;
+            }
+            .adugna-admin-header h1 {
+                font-size: 1.1rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .adugna-admin-main {
+                padding: 0.3rem;
+            }
+            .adugna-card {
+                padding: 0.5rem 0.3rem;
+            }
+            .adugna-admin-header h1 {
+                font-size: 1rem;
+            }
+            .adugna-card h2 {
+                font-size: 1em;
+            }
+            .adugna-btn, .adugna-admin-tools-list .adugna-btn {
+                font-size: 0.95em;
+                padding: 0.22rem 0.7rem;
+            }
+        }
+        /* Interactive: subtle hover for form fields */
+        .adugna-form-group input[type="text"]:hover,
+        .adugna-form-group input[type="email"]:hover,
+        .adugna-form-group input[type="number"]:hover,
+        .adugna-form-group input[type="password"]:hover,
+        .adugna-form-group select:hover {
+            border: 1.5px solid #a5b4fc;
+        }
+        /* Animations for card appearance */
+        .adugna-card {
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        @keyframes adugnaFadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: none;}
+        }
+    </style>
+    <script>
+        // Adugna Gizaw: Interactive feedback for file input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.adugna-form-group input[type="file"]').forEach(function(input) {
+                input.addEventListener('change', function() {
+                    if (input.files.length > 0) {
+                        input.parentElement.querySelector('label').style.color = '#10b981';
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
