@@ -48,26 +48,22 @@
 .adugna-footer-content {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
-    gap: 8px;
+    gap: 16px;
     flex-wrap: wrap;
-    flex-direction: row;
 }
 .adugna-footer-section {
-    flex: 1 1 180px;
-    min-width: 120px;
-    max-width: 100%;
+    flex: 1 1 0;
+    min-width: 0;
     padding: 0 6px;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    box-sizing: border-box;
 }
 .adugna-footer-main-info {
-    max-width: 220px;
+    max-width: 180px;
     font-weight: 500;
-    word-break: break-word;
 }
 .adugna-footer-main-info h4 {
     margin: 0 0 2px 0;
@@ -79,11 +75,10 @@
     margin: 0;
     font-size: 10px;
     color: #bfc9d1;
-    word-break: break-word;
 }
 .adugna-quick-link-list {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -102,7 +97,6 @@
     border: 1px solid #215967;
     box-shadow: 0 1px 2px rgba(44,62,80,0.04);
     display: inline-block;
-    white-space: nowrap;
 }
 .adugna-footer-link:hover, .adugna-footer-link:focus {
     color: #fff;
@@ -114,14 +108,11 @@
     text-align: right;
     flex-shrink: 0;
     min-width: 120px;
-    max-width: 100%;
-    word-break: break-word;
 }
 .adugna-social-links {
     display: flex;
     gap: 7px;
     margin-top: 2px;
-    flex-wrap: wrap;
 }
 .adugna-social-link {
     color: #f5f6fa;
@@ -137,21 +128,6 @@
     background: #215967;
     transform: scale(1.08);
 }
-@media (max-width: 1100px) {
-    .adugna-footer-content {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    .adugna-footer-section {
-        max-width: 100%;
-        min-width: 0;
-        padding: 0 2px;
-    }
-    .adugna-developer-info {
-        text-align: left;
-    }
-}
 @media (max-width: 900px) {
     .adugna-footer {
         left: 0 !important;
@@ -160,12 +136,7 @@
     .adugna-footer-content {
         flex-direction: column;
         gap: 6px;
-        align-items: stretch;
-    }
-    .adugna-footer-section {
-        max-width: 100%;
-        min-width: 0;
-        padding: 0 2px;
+        align-items: flex-start;
     }
     .adugna-developer-info {
         text-align: left;
@@ -216,50 +187,3 @@ body, .admin-dashboard, .adugna-main, .adugna-main-content {
         </div>
         <div class="adugna-footer-section adugna-developer-info">
             <div class="adugna-social-links">
-                <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="adugna-social-link" aria-label="LinkedIn">
-                    <i class="fab fa-linkedin"></i>
-                </a>
-                <a href="https://twitter.com/eleganceict1" target="_blank" class="adugna-social-link" aria-label="Twitter">
-                    <i class="fab fa-twitter"></i>
-                </a>
-                <a href="https://github.com/addex12" target="_blank" class="adugna-social-link" aria-label="GitHub">
-                    <i class="fab fa-github"></i>
-                </a>
-            </div>
-            <p style="margin: 5px 0 0 0; font-size:9px; color:#bfc9d1;">
-                Developed by Adugna Gizaw
-            </p>
-        </div>
-    </div>
-</footer>
-<script>
-/**
- * Adugna Gizaw: Make footer aware of adugna-sidebar state (collapsed/expanded).
- * Adds/removes .adugna-sidebar-collapsed on body based on sidebar state.
- */
-(function() {
-    // Detect sidebar and toggle class on body for footer awareness
-    function updateFooterSidebarState() {
-        var sidebar = document.getElementById('adugnaSidebar');
-        if (!sidebar) return;
-        if (sidebar.classList.contains('adugna-collapsed')) {
-            document.body.classList.add('adugna-sidebar-collapsed');
-        } else {
-            document.body.classList.remove('adugna-sidebar-collapsed');
-        }
-    }
-    // Listen for sidebar toggle button
-    var sidebarToggle = document.getElementById('adugnaSidebarToggle');
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function() {
-            setTimeout(updateFooterSidebarState, 260); // match sidebar transition
-        });
-    }
-    // Also update on window resize (sidebar may auto-collapse)
-    window.addEventListener('resize', function() {
-        setTimeout(updateFooterSidebarState, 100);
-    });
-    // Initial check
-    document.addEventListener('DOMContentLoaded', updateFooterSidebarState);
-})();
-</script>
