@@ -236,7 +236,7 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
         }
         .form-container {
             /* Use adugna-card for consistent look */
-            composes: adugna-card;
+            /* Removed invalid property 'composes' */
             background: #fff;
             border-radius: 1.1rem;
             box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);

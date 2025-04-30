@@ -144,7 +144,8 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
             gap: 10px;
         }
         .adugna-preview-field:hover {
-            transform: translateX(5px);
+            transform: translateX(5px) scale(1.01);
+            box-shadow: 0 8px 32px rgba(80,112,255,0.13), 0 2px 8px rgba(80,112,255,0.06);
         }
         .adugna-field-meta {
             display: flex;
@@ -194,7 +195,12 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
         }
         .adugna-response-chart {
             max-width: 100%;
-            height: auto;
+            height: 260px !important;
+            margin-top: 10px;
+            background: #fff;
+            border-radius: 0.7em;
+            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            padding: 0.5em;
         }
         .adugna-meta-grid {
             display: grid;
@@ -225,6 +231,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
             .adugna-form-actions { flex-direction: column !important; gap: 10px !important; }
             .admin-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
             .page-title { font-size: 1.2rem !important; }
+            .adugna-response-chart { height: 180px !important; }
         }
         @keyframes adugnaFadeIn {
             from { opacity: 0; transform: translateY(20px);}
@@ -346,6 +353,7 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                 <?php if (in_array($field['field_type'], ['radio', 'checkbox', 'select'])): ?>
                                     <canvas id="chart-<?= $field['id'] ?>" class="adugna-response-chart" aria-label="Response Chart"></canvas>
                                     <script>
+                                        // Adugna Gizaw: Outstanding chart rendering with adugna- theme and animation
                                         document.addEventListener('DOMContentLoaded', function () {
                                             fetch(`../api/response_data.php?field_id=<?= $field['id'] ?>`)
                                                 .then(response => response.json())
@@ -358,16 +366,56 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                                             datasets: [{
                                                                 label: 'Responses',
                                                                 data: Object.values(data),
-                                                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                                                                borderColor: 'rgba(54, 162, 235, 1)',
-                                                                borderWidth: 1
+                                                                backgroundColor: [
+                                                                    '#4f46e5', '#10b981', '#f59e42', '#f43f5e', '#6366f1', '#fbbf24', '#0ea5e9', '#a21caf'
+                                                                ],
+                                                                borderColor: [
+                                                                    '#4338ca', '#059669', '#ea580c', '#be123c', '#4f46e5', '#b45309', '#0369a1', '#701a75'
+                                                                ],
+                                                                borderWidth: 2,
+                                                                borderRadius: 8,
+                                                                hoverBackgroundColor: '#6366f1',
+                                                                hoverBorderColor: '#1e293b'
                                                             }]
                                                         },
                                                         options: {
                                                             responsive: true,
+                                                            maintainAspectRatio: false,
+                                                            animation: {
+                                                                duration: 1200,
+                                                                easing: 'easeOutElastic'
+                                                            },
                                                             plugins: {
                                                                 legend: { display: false },
-                                                                tooltip: { enabled: true }
+                                                                tooltip: {
+                                                                    enabled: true,
+                                                                    backgroundColor: '#4f46e5',
+                                                                    titleColor: '#fff',
+                                                                    bodyColor: '#fff',
+                                                                    borderColor: '#6366f1',
+                                                                    borderWidth: 1,
+                                                                    padding: 12
+                                                                },
+                                                                title: {
+                                                                    display: true,
+                                                                    text: 'Live Responses',
+                                                                    color: '#4f46e5',
+                                                                    font: { size: 16, weight: 'bold', family: 'Inter, Segoe UI, Arial, sans-serif' }
+                                                                }
+                                                            },
+                                                            scales: {
+                                                                x: {
+                                                                    grid: { color: '#e5e7eb', borderColor: '#e5e7eb' },
+                                                                    ticks: { color: '#374151', font: { size: 13, weight: 'bold' } }
+                                                                },
+                                                                y: {
+                                                                    beginAtZero: true,
+                                                                    grid: { color: '#e5e7eb', borderColor: '#e5e7eb' },
+                                                                    ticks: { color: '#374151', font: { size: 13, weight: 'bold' } }
+                                                                }
+                                                            },
+                                                            layout: {
+                                                                padding: { top: 10, bottom: 10, left: 10, right: 10 }
                                                             }
                                                         }
                                                     });
