@@ -271,101 +271,45 @@ if ($tableExists) {
     </style>
 </head>
 <body>
-    <!-- Adugna Gizaw: Sidebar toggle button for mobile -->
-    <button class="adugna-sidebar-toggle-btn" id="adugnaSidebarToggle" aria-label="Toggle Sidebar">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="adugna-admin-dashboard">
-        <!-- Adugna Gizaw: Sidebar with submenu logic -->
-        <nav class="adugna-sidebar" id="adugnaSidebar">
-            <div class="adugna-logo">
-                <i class="fas fa-school"></i> School CRM
-            </div>
-            <ul>
-                <li>
-                    <a href="dashboard.php" class="adugna-sidebar-link" data-page="dashboard.php">
-                        <span class="adugna-icon"><i class="fas fa-tachometer-alt"></i></span> Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="backup.php" class="adugna-sidebar-link" data-page="backup.php">
-                        <span class="adugna-icon"><i class="fas fa-database"></i></span> Backup
-                    </a>
-                </li>
-                <li>
-                    <a href="restore.php" class="adugna-sidebar-link" data-page="restore.php">
-                        <span class="adugna-icon"><i class="fas fa-upload"></i></span> Restore
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="adugna-sidebar-link adugna-has-submenu" data-submenu="settings">
-                        <span class="adugna-icon"><i class="fas fa-cogs"></i></span> Settings
-                        <span class="adugna-submenu-toggle"><i class="fas fa-chevron-right"></i></span>
-                    </a>
-                    <ul class="adugna-submenu" data-submenu="settings">
-                        <li>
-                            <a href="users.php" class="adugna-sidebar-link" data-page="users.php">
-                                <span class="adugna-icon"><i class="fas fa-users"></i></span> Users
-                            </a>
-                        </li>
-                        <li>
-                            <a href="roles.php" class="adugna-sidebar-link" data-page="roles.php">
-                                <span class="adugna-icon"><i class="fas fa-user-shield"></i></span> Roles
-                            </a>
-                        </li>
-                        <li>
-                            <a href="settings.php" class="adugna-sidebar-link" data-page="settings.php">
-                                <span class="adugna-icon"><i class="fas fa-cogs"></i></span> System Settings
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <a href="system_logs.php" class="adugna-sidebar-link" data-page="system_logs.php">
-                        <span class="adugna-icon"><i class="fas fa-file-alt"></i></span> System Logs
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        <div class="adugna-main">
-            <header class="adugna-admin-header">
-                <h1 style="color:#2563eb;font-weight:700;"><i class="fas fa-file-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="adugna-card">
-                <h2><i class="fas fa-database"></i> System Logs</h2>
-                <?php if ($error): ?>
-                    <div class="adugna-alert-error"><?= htmlspecialchars($error) ?></div>
-                <?php elseif (!empty($logs)): ?>
-                    <div class="adugna-table-container">
-                        <table class="adugna-table">
-                            <thead>
+    <?php include 'includes/admin_sidebar.php'; ?>
+    <div class="adugna-main">
+        <header class="adugna-admin-header">
+            <h1 style="color:#2563eb;font-weight:700;"><i class="fas fa-file-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
+        </header>
+        <div class="adugna-card">
+            <h2><i class="fas fa-database"></i> System Logs</h2>
+            <?php if ($error): ?>
+                <div class="adugna-alert-error"><?= htmlspecialchars($error) ?></div>
+            <?php elseif (!empty($logs)): ?>
+                <div class="adugna-table-container">
+                    <table class="adugna-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User ID</th>
+                                <th>Action</th>
+                                <th>Description</th>
+                                <th>IP Address</th>
+                                <th>Created At</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($logs as $log): ?>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>User ID</th>
-                                    <th>Action</th>
-                                    <th>Description</th>
-                                    <th>IP Address</th>
-                                    <th>Created At</th>
+                                    <td><?= htmlspecialchars($log['id']) ?></td>
+                                    <td><?= htmlspecialchars($log['user_id']) ?></td>
+                                    <td><?= htmlspecialchars($log['action']) ?></td>
+                                    <td><?= htmlspecialchars($log['description']) ?></td>
+                                    <td><?= htmlspecialchars($log['ip_address']) ?></td>
+                                    <td><?= htmlspecialchars($log['created_at']) ?></td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($logs as $log): ?>
-                                    <tr>
-                                        <td><?= htmlspecialchars($log['id']) ?></td>
-                                        <td><?= htmlspecialchars($log['user_id']) ?></td>
-                                        <td><?= htmlspecialchars($log['action']) ?></td>
-                                        <td><?= htmlspecialchars($log['description']) ?></td>
-                                        <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                        <td><?= htmlspecialchars($log['created_at']) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php else: ?>
-                    <p style="color:#888;">No system logs found.</p>
-                <?php endif; ?>
-            </div>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <p style="color:#888;">No system logs found.</p>
+            <?php endif; ?>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
