@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
@@ -44,19 +51,26 @@ foreach ($admins as $a) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .messaging-container {
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-messaging-container {
             display: flex;
             height: 70vh;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             background: #fff;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
             position: relative;
         }
-        .contact-list {
+        .adugna-contact-list {
             width: 270px;
             border-right: 1px solid #e5e7eb;
             overflow-y: auto;
@@ -64,47 +78,47 @@ foreach ($admins as $a) {
             display: flex;
             flex-direction: column;
         }
-        .contact-list-header {
+        .adugna-contact-list-header {
             padding: 1rem 1.2rem 0.5rem 1.2rem;
             font-size: 1.1rem;
             font-weight: 700;
-            color: #215967;
+            color: #1976d2;
             background: #f5f7fa;
         }
-        .search-bar {
+        .adugna-search-bar {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1.2rem 0.5rem 1.2rem;
             background: #f5f7fa;
         }
-        .search-bar input {
+        .adugna-search-bar input {
             flex: 1;
-            padding: 8px 12px;
+            padding: 7px 10px;
             border: 1px solid #e5e7eb;
             border-radius: 5px;
-            background: #f9fafb;
-            font-size: 1rem;
+            background: #f9fbfd;
+            font-size: 0.97em;
         }
-        .search-bar .erpnext-btn {
-            padding: 8px 16px;
-            font-size: 1em;
+        .adugna-search-bar .adugna-btn {
+            padding: 7px 13px;
+            font-size: 0.97em;
         }
-        .online-users {
+        .adugna-online-users {
             padding: 0.5rem 1.2rem 0.5rem 1.2rem;
             background: #f5f7fa;
             border-bottom: 1px solid #e5e7eb;
-            color: #215967;
+            color: #1976d2;
             font-size: 0.98em;
         }
-        .online-section-title {
+        .adugna-online-section-title {
             font-weight: 600;
-            color: #215967;
+            color: #1976d2;
             margin-bottom: 0.2em;
             margin-top: 0.5em;
             font-size: 0.97em;
         }
-        .online-admin-pill {
+        .adugna-online-admin-pill {
             display: inline-block;
             background: #007bff;
             color: #fff;
@@ -114,7 +128,7 @@ foreach ($admins as $a) {
             margin-right: 0.4em;
             margin-bottom: 0.2em;
         }
-        .online-user-pill {
+        .adugna-online-user-pill {
             display: inline-block;
             background: #27ae60;
             color: #fff;
@@ -124,14 +138,14 @@ foreach ($admins as $a) {
             margin-right: 0.4em;
             margin-bottom: 0.2em;
         }
-        .user-list {
+        .adugna-user-list {
             list-style: none;
             margin: 0;
             padding: 0;
             flex: 1;
             overflow-y: auto;
         }
-        .user-list li {
+        .adugna-user-list li {
             padding: 10px 1.2rem;
             cursor: pointer;
             border-bottom: 1px solid #eee;
@@ -141,13 +155,13 @@ foreach ($admins as $a) {
             font-size: 1em;
             transition: background 0.13s;
         }
-        .user-list li:hover {
+        .adugna-user-list li:hover {
             background-color: #e2efda;
         }
-        .user-list li.selected {
+        .adugna-user-list li.selected {
             background-color: #dbeafe;
         }
-        .user-list .online-dot {
+        .adugna-user-list .adugna-online-dot {
             width: 10px;
             height: 10px;
             background: #27ae60;
@@ -155,7 +169,7 @@ foreach ($admins as $a) {
             display: inline-block;
             margin-right: 7px;
         }
-        .unread-badge {
+        .adugna-unread-badge {
             background-color: #e74c3c;
             color: white;
             border-radius: 50%;
@@ -164,71 +178,71 @@ foreach ($admins as $a) {
             margin-left: 7px;
             font-weight: 600;
         }
-        .user-list li.unread-highlight {
+        .adugna-user-list li.unread-highlight {
             background: #fffbe6 !important;
             font-weight: 600;
             border-left: 4px solid #e74c3c;
         }
-        .chat-section {
+        .adugna-chat-section {
             flex: 1;
             display: flex;
             flex-direction: column;
             min-width: 0;
             border-radius: 0 20px 20px 0;
             background: #eaeff7;
-            box-shadow: 0 1px 3px rgba(44,62,80,0.04);
+            box-shadow: 0 1px 3px rgba(25,118,210,0.04);
         }
-        .chat-header {
+        .adugna-chat-header {
             padding: 1rem 1.5rem 0.7rem 1.5rem;
             font-size: 1.1rem;
             font-weight: 600;
-            color: #215967;
+            color: #1976d2;
             border-bottom: 1px solid #e5e7eb;
             background: #f5f7fa;
         }
-        .chat-messages {
+        .adugna-chat-messages {
             flex: 1;
             padding: 15px 18px;
             overflow-y: auto;
             background: #eaeff7;
         }
-        .message-form {
+        .adugna-message-form {
             padding: 15px 18px;
             border-top: 1px solid #e5e7eb;
             background: #fff;
             display: flex;
             gap: 1rem;
         }
-        .message-form textarea {
+        .adugna-message-form textarea {
             flex: 1;
             padding: 10px 12px;
             border: 1px solid #e5e7eb;
             border-radius: 5px;
-            background: #f9fafb;
+            background: #f9fbfd;
             font-size: 1rem;
             resize: none;
         }
-        .message-form .erpnext-btn {
+        .adugna-message-form .adugna-btn {
             padding: 10px 22px;
             font-size: 1em;
         }
-        .chat-message {
+        .adugna-chat-message {
             margin-bottom: 7px;
             padding: 9px 14px;
             border-radius: 18px;
             max-width: 85%;
             word-break: break-word;
             font-size: 0.97em;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.07);
+            box-shadow: 0 1px 2px rgba(25,118,210,0.07);
             position: relative;
             clear: both;
             display: flex;
             flex-direction: column;
         }
-        .chat-message.own {
+        .adugna-chat-message.own {
             background: #d1f7c4;
             margin-left: auto;
-            color: #215967;
+            color: #1976d2;
             border-bottom-right-radius: 4px;
             border-bottom-left-radius: 18px;
             border-top-left-radius: 18px;
@@ -236,7 +250,7 @@ foreach ($admins as $a) {
             align-self: flex-end;
             border: 1px solid #b2e59f;
         }
-        .chat-message.other {
+        .adugna-chat-message.other {
             background: #fff;
             margin-right: auto;
             color: #222d32;
@@ -247,20 +261,20 @@ foreach ($admins as $a) {
             align-self: flex-start;
             border: 1px solid #e0e0e0;
         }
-        .msg-time {
+        .adugna-msg-time {
             font-size: 10px;
             color: #aaa;
             margin-top: 2px;
             display: block;
             text-align: right;
         }
-        .chat-message strong {
+        .adugna-chat-message strong {
             font-size: 0.95em;
             color: #007bff;
             font-weight: 600;
             margin-bottom: 2px;
         }
-        .edit-btn, .delete-btn {
+        .adugna-edit-btn, .adugna-delete-btn {
             background: none;
             border: none;
             color: #3b82f6;
@@ -268,32 +282,32 @@ foreach ($admins as $a) {
             margin-left: 6px;
             cursor: pointer;
         }
-        .edit-btn:hover, .delete-btn:hover {
+        .adugna-edit-btn:hover, .adugna-delete-btn:hover {
             color: #e74c3c;
         }
         @media (max-width: 900px) {
-            .messaging-container {
+            .adugna-messaging-container {
                 flex-direction: column;
                 height: auto;
                 min-height: 400px;
             }
-            .contact-list {
+            .adugna-contact-list {
                 width: 100%;
                 border-right: none;
                 border-bottom: 1px solid #e5e7eb;
                 min-height: 60px;
                 max-height: 120px;
             }
-            .chat-section {
+            .adugna-chat-section {
                 min-width: 0;
             }
         }
         @media (max-width: 600px) {
-            .messaging-container {
+            .adugna-messaging-container {
                 flex-direction: column;
                 height: auto;
             }
-            .contact-list {
+            .adugna-contact-list {
                 width: 100%;
                 min-width: 0;
                 max-width: 100vw;
@@ -301,13 +315,13 @@ foreach ($admins as $a) {
                 border-bottom: 1px solid #e5e7eb;
                 font-size: 0.98em;
             }
-            .chat-section {
+            .adugna-chat-section {
                 min-width: 0;
             }
-            .chat-messages {
+            .adugna-chat-messages {
                 padding: 8px;
             }
-            .message-form {
+            .adugna-message-form {
                 padding: 8px;
             }
         }
@@ -317,31 +331,33 @@ foreach ($admins as $a) {
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header"><h1 style="color:#215967;font-weight:700;"><i class="fas fa-envelope"></i> <?= htmlspecialchars($pageTitle) ?></h1></header>
+            <header class="admin-header">
+                <h1 style="color:#1976d2;font-weight:700;"><i class="fas fa-envelope"></i> <?= htmlspecialchars($pageTitle) ?></h1>
+            </header>
             <div class="content">
-                <div class="messaging-container">
-                    <aside class="contact-list">
-                        <div class="contact-list-header">Users</div>
-                        <div class="search-bar" style="margin-bottom:0.5rem; padding-bottom:0;">
+                <div class="adugna-messaging-container">
+                    <aside class="adugna-contact-list">
+                        <div class="adugna-contact-list-header">Users</div>
+                        <div class="adugna-search-bar" style="margin-bottom:0.5rem; padding-bottom:0;">
                             <input type="text" id="userSearch" placeholder="Search users..." style="flex:1;min-width:0;">
-                            <button class="erpnext-btn btn-primary" id="searchUserBtn" style="margin-left:0;"><i class="fas fa-search"></i></button>
-                            <button class="erpnext-btn btn-secondary" id="clearUserSearch" style="margin-left:0;">Clear</button>
+                            <button class="adugna-btn adugna-btn-sm" id="searchUserBtn" style="margin-left:0;"><i class="fas fa-search"></i></button>
+                            <button class="adugna-btn adugna-btn-secondary adugna-btn-sm" id="clearUserSearch" style="margin-left:0;">Clear</button>
                         </div>
-                        <div class="online-users">
-                            <div class="online-section-title"><i class="fas fa-circle" style="color:#007bff;font-size:0.9em;"></i> Online Admins</div>
+                        <div class="adugna-online-users">
+                            <div class="adugna-online-section-title"><i class="fas fa-circle" style="color:#007bff;font-size:0.9em;"></i> Online Admins</div>
                             <?php foreach ($admins as $admin): ?>
                                 <?php if (in_array($admin['id'], $onlineAdmins)): ?>
-                                    <span class="online-admin-pill"><?= htmlspecialchars($admin['username']) ?> (Admin)</span>
+                                    <span class="adugna-online-admin-pill"><?= htmlspecialchars($admin['username']) ?> (Admin)</span>
                                 <?php endif; ?>
                             <?php endforeach; ?>
-                            <div class="online-section-title" style="margin-top:0.7em;"><i class="fas fa-circle" style="color:#27ae60;font-size:0.9em;"></i> Online Users</div>
+                            <div class="adugna-online-section-title" style="margin-top:0.7em;"><i class="fas fa-circle" style="color:#27ae60;font-size:0.9em;"></i> Online Users</div>
                             <?php foreach ($users as $user): ?>
                                 <?php if (in_array($user['id'], $onlineUsers)): ?>
-                                    <span class="online-user-pill"><?= htmlspecialchars($user['username']) ?></span>
+                                    <span class="adugna-online-user-pill"><?= htmlspecialchars($user['username']) ?></span>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </div>
-                        <ul id="user-list" class="user-list">
+                        <ul id="user-list" class="adugna-user-list">
                             <li data-user-id="broadcast" class="contact-item">Broadcast to All Users</li>
                             <?php foreach ($users as $user): 
                                 $isOnline = in_array($user['id'], $onlineUsers);
@@ -350,26 +366,22 @@ foreach ($admins as $a) {
                                 <li data-user-id="<?= $user['id'] ?>" class="contact-item<?= $isOnline ? ' online' : '' ?><?= $hasUnread ? ' unread-highlight' : '' ?>">
                                     <span>
                                         <?php if ($isOnline): ?>
-                                            <span class="online-dot"></span>
+                                            <span class="adugna-online-dot"></span>
                                         <?php endif; ?>
                                         <?= htmlspecialchars($user['username']) ?>
                                     </span>
                                     <?php if ($hasUnread): ?>
-                                        <span class="unread-badge"><?= $unreadCounts[$user['id']] ?></span>
+                                        <span class="adugna-unread-badge"><?= $unreadCounts[$user['id']] ?></span>
                                     <?php endif; ?>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     </aside>
-                    <section class="chat-section">
-                        <div class="message-card-header">
-                            <span id="chat-header-title">
-                                <i class="fas fa-paper-plane" style="color:#007bff;margin-right:6px;"></i>
-                                <span id="chat-header-user">Select a user to start chatting</span>
-                            </span>
-                            <?php
-                            $totalUnread = array_sum($unreadCounts);
-                            ?>
+                    <section class="adugna-chat-section">
+                        <div class="adugna-chat-header" id="chat-header">
+                            <i class="fas fa-paper-plane" style="color:#007bff;margin-right:6px;"></i>
+                            <span id="chat-header-user">Select a user to start chatting</span>
+                            <?php $totalUnread = array_sum($unreadCounts); ?>
                             <?php if ($totalUnread > 0): ?>
                                 <span class="message-notification-bell" id="messageNotificationBell" title="Unread Messages">
                                     <i class="fas fa-bell"></i>
@@ -377,11 +389,11 @@ foreach ($admins as $a) {
                                 </span>
                             <?php endif; ?>
                         </div>
-                        <div id="chat-messages" class="chat-messages"></div>
-                        <form id="message-form" class="message-form" style="display:none;">
+                        <div id="chat-messages" class="adugna-chat-messages"></div>
+                        <form id="message-form" class="adugna-message-form" style="display:none;">
                             <input type="hidden" name="receiver_id" id="receiver_id">
                             <textarea name="message" id="message-input" rows="2" placeholder="Type your message..." required></textarea>
-                            <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                            <button type="submit" class="adugna-btn adugna-btn-sm"><i class="fas fa-paper-plane"></i></button>
                         </form>
                     </section>
                 </div>
