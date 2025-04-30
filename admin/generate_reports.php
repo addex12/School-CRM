@@ -248,14 +248,14 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                 <?php endif; ?>
             </form>
             <div class="adugna-report-actions">
-                <button onclick="exportTableToCSV('report.csv')" class="adugna-btn adugna-btn-secondary"><i class="fas fa-download"></i> Export CSV</button>
-                <button onclick="window.print()" class="adugna-btn adugna-btn-secondary"><i class="fas fa-print"></i> Print</button>
+                <button type="button" onclick="adugnaExportTableToCSV('report.csv')" class="adugna-btn adugna-btn-secondary"><i class="fas fa-download"></i> Export CSV</button>
+                <button type="button" onclick="window.print()" class="adugna-btn adugna-btn-secondary"><i class="fas fa-print"></i> Print</button>
             </div>
             <div id="report-results" class="adugna-report-table-container">
-                <?php if (empty($reportData)): ?>
+                <?php if (empty($reportData) || !is_array($reportData) || count($reportData) === 0): ?>
                     <p style="color:#888;text-align:center;">No data found for the selected criteria.</p>
                 <?php else: ?>
-                    <table class="adugna-report-table" id="report-table">
+                    <table class="adugna-report-table" id="adugna-report-table">
                         <thead>
                             <tr>
                                 <?php foreach (array_keys($reportData[0]) as $col): ?>
@@ -267,7 +267,7 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                             <?php foreach ($reportData as $row): ?>
                                 <tr>
                                     <?php foreach ($row as $cell): ?>
-                                        <td><?= htmlspecialchars($cell) ?></td>
+                                        <td><?= is_null($cell) ? '' : htmlspecialchars($cell) ?></td>
                                     <?php endforeach; ?>
                                 </tr>
                             <?php endforeach; ?>
@@ -276,15 +276,24 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                 <?php endif; ?>
             </div>
             <script>
-            // Adugna Gizaw: Export table to CSV, compact and responsive
-            function exportTableToCSV(filename) {
+            // Adugna Gizaw: Export table to CSV, compact and responsive, fixes for empty/print
+            function adugnaExportTableToCSV(filename) {
                 var csv = [];
-                var rows = document.querySelectorAll("#report-table tr");
+                var table = document.getElementById("adugna-report-table");
+                if (!table) {
+                    alert("No data to export.");
+                    return;
+                }
+                var rows = table.querySelectorAll("tr");
                 for (var i = 0; i < rows.length; i++) {
                     var row = [], cols = rows[i].querySelectorAll("td, th");
                     for (var j = 0; j < cols.length; j++)
-                        row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+                        row.push('"' + (cols[j].innerText || '').replace(/"/g, '""') + '"');
                     csv.push(row.join(","));
+                }
+                if (csv.length < 2) {
+                    alert("No data to export.");
+                    return;
                 }
                 var csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
                 var downloadLink = document.createElement("a");
@@ -293,7 +302,13 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
                 downloadLink.style.display = "none";
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
+                setTimeout(function() { document.body.removeChild(downloadLink); }, 100);
             }
+            // Print fix: ensure only the report table prints
+            window.onbeforeprint = function() {
+                var main = document.querySelector('.adugna-main-content');
+                if (main) main.style.background = "#fff";
+            };
             </script>
         </div>
         <?php include 'includes/footer.php'; ?>
