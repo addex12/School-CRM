@@ -64,10 +64,10 @@ GitHub: https://github.com/addex12
     margin-bottom: 2px;
 }
 .adugna-sidebar a.adugna-active, .adugna-sidebar a:hover {
-    background: linear-gradient(90deg, #fff 10%, #49a09d 120%);
+    background: linear-gradient(90deg, #879de5 10%, #49a09d 120%);
     color: #5f2c82;
     border-left: 4px solid #f9d423;
-    box-shadow: 0 2px 12px #49a09d33;
+    box-shadow: 0 2px 12px #60bebb33;
     font-weight: 700;
 }
 .adugna-sidebar .adugna-icon {
