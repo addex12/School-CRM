@@ -48,7 +48,7 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     transition: background 0.2s;
 }
 .adugna-sidebar-toggle-btn:hover {
-    background: #f0f0f0;
+    background:rgb(45, 71, 198);
 }
 .adugna-sidebar-toggle-btn .adugna-hamburger {
     width: 24px;
