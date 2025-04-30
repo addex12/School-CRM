@@ -15,7 +15,8 @@ if (file_exists($configPath)) {
 $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 ?>
 <style>
-.admin-sidebar {
+/* Adugna Gizaw: Sidebar styles with adugna- prefix, always visible on desktop, responsive, and active highlighting */
+.adugna-sidebar {
     width: 240px;
     background: #222d32;
     color: #fff;
@@ -29,10 +30,7 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     display: flex;
     flex-direction: column;
 }
-.admin-sidebar.collapsed {
-    width: 90px;
-}
-.admin-sidebar .sidebar-header {
+.adugna-sidebar .adugna-sidebar-header {
     padding: 1rem 1rem;
     font-size: 1rem;
     font-weight: 700;
@@ -44,164 +42,133 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     align-items: center;
     justify-content: space-between;
 }
-.admin-sidebar .sidebar-toggle {
+.adugna-sidebar .adugna-sidebar-toggle {
     background: none;
     border: none;
     color: #fff;
-    font-size: 1rem; /* Increased font size for better visibility */
+    font-size: 1rem;
     cursor: pointer;
     margin-left: 5px;
-    padding: 0.4rem 0.6rem; /* Smaller padding */
-    position: fixed; /* Ensure it stays visible */
-    top: 10px; /* Adjust position */
-    left: 55px; /* Adjust position */
-    z-index: 300; /* Ensure it is above other elements */
+    padding: 0.4rem 0.6rem;
+    position: fixed;
+    top: 10px;
+    left: 55px;
+    z-index: 300;
 }
-.admin-sidebar ul {
+.adugna-sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
     flex: 1;
 }
-.admin-sidebar ul li {
+.adugna-sidebar ul li {
     width: 100%;
 }
-.admin-sidebar ul li a {
+.adugna-sidebar ul li a {
     display: flex;
     align-items: center;
-    padding: 0.6rem 1rem; /* Smaller padding */
+    padding: 0.6rem 1rem;
     color: #fff;
     text-decoration: none;
-    font-size: 0.9rem; /* Reduced font size */
+    font-size: 0.93rem;
     transition: background 0.15s, color 0.15s;
     border-left: 4px solid transparent;
     font-weight: 500;
+    position: relative;
 }
-.admin-sidebar ul li a.active,
-.admin-sidebar ul li a:hover {
+.adugna-sidebar ul li a.adugna-active,
+.adugna-sidebar ul li a:hover {
     background: #1976d2;
     color: #fff;
-    border-left: 4px solid #fff;
+    border-left: 4px solid #f1c40f;
 }
-.admin-sidebar ul li a i {
-    margin-right: 0.8rem; /* Reduced margin */
-    font-size: 1rem; /* Adjusted icon size */
+.adugna-sidebar ul li a i {
+    margin-right: 0.7rem;
+    font-size: 1rem;
     min-width: 22px;
     text-align: center;
 }
-.admin-sidebar.collapsed ul li a span {
-    display: none;
-}
-.admin-sidebar.collapsed .sidebar-header {
-    font-size: 1.5rem;
-    padding: 1.2rem 0.5rem;
-}
-.admin-sidebar.collapsed ul li a {
-    justify-content: center;
-    padding: 0.85rem 0.5rem;
-}
-.admin-sidebar .submenu {
+.adugna-sidebar .adugna-submenu {
     background: #263043;
     padding-left: 0.5rem;
 }
-.admin-sidebar .submenu li a {
-    font-size: 0.85rem; /* Smaller font size for submenu */
-    padding-left: 2rem; /* Adjusted padding */
+.adugna-sidebar .adugna-submenu li a {
+    font-size: 0.89rem;
+    padding-left: 2rem;
     border-left: none;
 }
-.admin-sidebar .submenu li a.active,
-.admin-sidebar .submenu li a:hover {
+.adugna-sidebar .adugna-submenu li a.adugna-active,
+.adugna-sidebar .adugna-submenu li a:hover {
     background: #215967;
     color: #fff;
 }
 @media (max-width: 900px) {
-    .admin-sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        min-height: 100vh;
+    .adugna-sidebar {
         width: 200px;
-        z-index: 200;
-        transition: left 0.2s, width 0.2s;
     }
-    .admin-sidebar.collapsed {
-        width: 90px;
-    }
-    .admin-main {
+    .adugna-main {
         margin-left: 200px;
-    }
-    .admin-sidebar.collapsed ~ .admin-main,
-    body .admin-sidebar.collapsed + .admin-main {
-        margin-left: 60px;
     }
 }
 @media (max-width: 600px) {
-    .admin-sidebar {
+    .adugna-sidebar {
         width: 100vw;
         left: -100vw;
         transition: left 0.2s;
     }
-    .admin-sidebar.open {
+    .adugna-sidebar.open {
         left: 0;
     }
-    .admin-sidebar.collapsed {
-        width: 70px;
-        left: 0;
-    }
-    .admin-main {
+    .adugna-main {
         margin-left: 0 !important;
         padding-left: 0 !important;
-        position: relative; /* Ensure content adjusts properly */
-        z-index: 1; /* Ensure content is above the sidebar */
+        position: relative;
+        z-index: 1;
     }
-    .admin-sidebar .sidebar-toggle {
-        top: 15px; /* Adjust for smaller screens */
-        left: 15px; /* Adjust for smaller screens */
+    .adugna-sidebar .adugna-sidebar-toggle {
+        top: 15px;
+        left: 15px;
     }
 }
-.admin-main {
+.adugna-main {
     margin-left: 240px;
     padding: 20px;
     transition: margin-left 0.2s;
     background: #f4f6fa;
     min-height: 100vh;
 }
-.admin-sidebar.collapsed ~ .admin-main {
-    margin-left: 60px;
-}
 </style>
-<div class="admin-sidebar" id="adminSidebar">
-    <div class="sidebar-header">
+<div class="adugna-sidebar" id="adugnaSidebar">
+    <div class="adugna-sidebar-header">
         <span>Admin</span>
-        <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+        <button class="adugna-sidebar-toggle" id="adugnaSidebarToggle" title="Toggle Sidebar">
             <i class="fas fa-bars"></i>
         </button>
     </div>
     <ul>
         <?php
-        // Helper to render menu recursively
-        function renderSidebarMenu($items, $current = '') {
+        // Helper to render menu recursively with adugna-active class for current page
+        function adugna_renderSidebarMenu($items) {
+            $currentPage = basename($_SERVER['PHP_SELF']);
             foreach ($items as $item) {
                 $hasSub = isset($item['items']) && is_array($item['items']);
                 $icon = isset($item['icon']) ? 'fa-' . $item['icon'] : 'fa-circle';
-                // Fix: Only check 'link' if it exists and is not empty
-                $active = (isset($item['link']) && basename($_SERVER['PHP_SELF']) === $item['link']) ? 'active' : '';
+                $active = (isset($item['link']) && $currentPage === $item['link']) ? 'adugna-active' : '';
                 if ($hasSub) {
                     echo '<li>';
-                    echo '<a href="#" class="sidebar-parent"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <i class="fas fa-chevron-down" style="margin-left:auto;font-size:0.85em;"></i></a>';
-                    echo '<ul class="submenu" style="display:none;">';
-                    renderSidebarMenu($item['items'], $current);
+                    echo '<a href="#" class="adugna-sidebar-parent"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <i class="fas fa-chevron-down" style="margin-left:auto;font-size:0.85em;"></i></a>';
+                    echo '<ul class="adugna-submenu" style="display:none;">';
+                    adugna_renderSidebarMenu($item['items']);
                     echo '</ul>';
                     echo '</li>';
                 } elseif (isset($item['link'])) {
                     echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="' . $active . '"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
                 }
-                // If neither 'items' nor 'link', skip rendering this item
             }
         }
         // Use config if available, else fallback to static menu
         if (!empty($sidebarConfig['menu'])) {
-            renderSidebarMenu($sidebarConfig['menu']);
+            adugna_renderSidebarMenu($sidebarConfig['menu']);
         } else {
             // Fallback static menu (minimal)
             ?>
@@ -228,81 +195,43 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     </ul>
 </div>
 <script>
+/**
+ * Adugna Gizaw: Sidebar toggle and submenu logic.
+ * - Sidebar stays open after navigation on desktop.
+ * - Highlights the active page.
+ * - On mobile, sidebar can be toggled.
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    var sidebar = document.getElementById('adminSidebar');
-    var toggle = document.getElementById('sidebarToggle');
-    var main = document.querySelector('.admin-main');
-    // Helper to set collapsed state
-    function setSidebarCollapsed(collapsed) {
-        if (collapsed) {
-            sidebar.classList.add('collapsed');
-            sidebar.classList.remove('open');
-            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '60px' : '60px';
-            localStorage.setItem('sidebar-collapsed', '1');
-        } else {
-            sidebar.classList.remove('collapsed');
-            sidebar.classList.remove('open');
-            if (main) main.style.marginLeft = window.innerWidth <= 900 ? '200px' : '240px';
-            localStorage.setItem('sidebar-collapsed', '0');
-        }
-    }
-    // Initial state
-    setSidebarCollapsed(localStorage.getItem('sidebar-collapsed') === '1');
-
+    var sidebar = document.getElementById('adugnaSidebar');
+    var toggle = document.getElementById('adugnaSidebarToggle');
+    var main = document.querySelector('.adugna-main');
+    // Sidebar toggle for mobile
     toggle.addEventListener('click', function(e) {
         e.stopPropagation();
-        var isCollapsed = sidebar.classList.contains('collapsed');
-        // On mobile, toggle open/close instead of collapse
         if (window.innerWidth <= 600) {
-            if (sidebar.classList.contains('open')) {
-                sidebar.classList.remove('open');
-            } else {
-                sidebar.classList.add('open');
-            }
-        } else {
-            setSidebarCollapsed(!isCollapsed);
+            sidebar.classList.toggle('open');
         }
     });
-
-    // Allow expanding sidebar by clicking the sidebar header when collapsed (desktop only)
-    sidebar.querySelector('.sidebar-header').addEventListener('click', function(e) {
-        if (window.innerWidth > 600 && sidebar.classList.contains('collapsed')) {
-            setSidebarCollapsed(false);
-        }
-    });
-
-    // Hide sidebar on mobile when clicking outside
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 600 && sidebar.classList.contains('open')) {
-            if (!sidebar.contains(e.target) && e.target !== toggle) {
-                sidebar.classList.remove('open');
-            }
-        }
-    });
-
     // Submenu toggle
-    document.querySelectorAll('.sidebar-parent').forEach(function(parent) {
+    document.querySelectorAll('.adugna-sidebar-parent').forEach(function(parent) {
         parent.addEventListener('click', function(e) {
             e.preventDefault();
             var submenu = parent.nextElementSibling;
-            if (submenu && submenu.classList.contains('submenu')) {
+            if (submenu && submenu.classList.contains('adugna-submenu')) {
                 submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
             }
         });
     });
-
-    // Adjust main content margin dynamically
-    function adjustMainMargin() {
-        const main = document.querySelector('.admin-main');
-        if (window.innerWidth <= 600) {
-            main.style.marginLeft = '0';
-        } else if (document.getElementById('adminSidebar').classList.contains('collapsed')) {
-            main.style.marginLeft = '60px';
-        } else {
-            main.style.marginLeft = '240px';
+    // Highlight active menu on load
+    var current = window.location.pathname.split('/').pop();
+    document.querySelectorAll('.adugna-sidebar ul li a').forEach(function(link) {
+        if (link.getAttribute('href') && link.getAttribute('href').indexOf(current) !== -1) {
+            link.classList.add('adugna-active');
         }
+    });
+    // Keep sidebar open on desktop after navigation
+    if (window.innerWidth > 600) {
+        sidebar.classList.remove('open');
     }
-    window.addEventListener('resize', adjustMainMargin);
-    adjustMainMargin();
 });
 </script>
