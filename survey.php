@@ -34,12 +34,29 @@ try {
         ORDER BY starts_at DESC
     ");
     $stmt->execute();
-    $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $public_surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
-    error_log("Error fetching surveys: " . $e->getMessage());
-    die("An error occurred while loading surveys.");
+    $public_surveys = [];
 }
 ?>
+
+<div class="survey-list-container">
+    <h2>Available Public Surveys</h2>
+    <?php if (!empty($public_surveys)): ?>
+        <?php foreach ($public_surveys as $survey): ?>
+            <div class="survey-item">
+                <div class="survey-title"><?= htmlspecialchars($survey['title']) ?></div>
+                <div class="survey-description"><?= htmlspecialchars($survey['description']) ?></div>
+                <div class="survey-dates">
+                    Available from <?= htmlspecialchars($survey['starts_at']) ?> to <?= htmlspecialchars($survey['ends_at']) ?>
+                </div>
+                <a href="/survey_response.php?id=<?= $survey['id'] ?>" class="btn-take-survey">Take the Survey</a>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>No public surveys are currently available.</p>
+    <?php endif; ?>
+</div>
 
 <!DOCTYPE html>
 <html lang="en">
