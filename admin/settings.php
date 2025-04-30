@@ -325,7 +325,7 @@ $settings_fields = [
 </head>
 <body>
     <div class="adugna-admin-dashboard">
-        <?php include 'admin_sidebar.php'; ?>
+        <?php include 'includes/admin_sidebar.php'; ?>
         <div class="adugna-admin-main">
             <header class="adugna-admin-header">
                 <h1><i class="fas fa-cogs"></i> <?= htmlspecialchars($pageTitle) ?></h1>
