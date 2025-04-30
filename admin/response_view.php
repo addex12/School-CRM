@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/db.php';
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
@@ -67,78 +74,94 @@ foreach ($response_data as $data) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <style>
-        .response-container {
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-response-container {
             max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
+            margin: 24px auto;
+            padding: 18px 12px 28px 12px;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
         }
-        .response-header {
+        .adugna-response-header {
             background: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
+            padding: 18px 18px 18px 18px;
+            border-radius: 8px;
             margin-bottom: 30px;
         }
-        .response-title {
+        .adugna-response-title {
             margin-top: 0;
-            color: #2c3e50;
+            color: #1976d2;
+            font-size: 1.35em;
+            font-weight: 700;
         }
-        .response-meta {
+        .adugna-response-meta {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
             margin-top: 15px;
         }
-        .meta-item {
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .adugna-meta-item {
+            background: #fff;
+            padding: 10px 12px;
+            border-radius: 7px;
+            box-shadow: 0 1px 3px rgba(25,118,210,0.04);
         }
-        .meta-label {
-            font-weight: bold;
+        .adugna-meta-label {
+            font-weight: 600;
             color: #7f8c8d;
-            font-size: 0.9em;
+            font-size: 0.93em;
         }
-        .meta-value {
+        .adugna-meta-value {
             margin-top: 5px;
-            font-size: 1.1em;
+            font-size: 1.08em;
+            color: #222d32;
+            word-break: break-word;
         }
-        .response-items {
+        .adugna-response-items {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 18px;
         }
-        .response-item {
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .adugna-response-item {
+            background: #fff;
+            padding: 18px 18px 14px 18px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(25,118,210,0.04);
             border-left: 4px solid #3498db;
+            transition: box-shadow 0.15s;
         }
-        .response-item.unanswered {
+        .adugna-response-item.unanswered {
             border-left-color: #e74c3c;
             opacity: 0.7;
         }
-        .response-question {
-            font-weight: bold;
+        .adugna-response-question {
+            font-weight: 700;
             margin-bottom: 10px;
-            color: #2c3e50;
+            color: #1976d2;
+            font-size: 1.05em;
         }
-        .response-answer {
-            padding: 10px;
+        .adugna-response-answer {
+            padding: 10px 12px;
             background: #f8f9fa;
             border-radius: 4px;
             margin-top: 10px;
+            word-break: break-word;
         }
-        .rating-stars {
+        .adugna-rating-stars {
             color: #f39c12;
-            font-size: 1.5em;
+            font-size: 1.3em;
             letter-spacing: 2px;
         }
-        .file-preview {
+        .adugna-file-preview {
             max-width: 100%;
             max-height: 300px;
             display: block;
@@ -146,88 +169,109 @@ foreach ($response_data as $data) {
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        .actions {
+        .adugna-actions {
             margin-top: 30px;
             text-align: center;
         }
-        .btn-print {
-            background: #34495e;
-            color: white;
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 7px 18px;
+            font-size: 1em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.15s;
+            font-weight: 500;
+            text-decoration: none;
+            margin-right: 0.7em;
         }
-        .badge {
+        .adugna-btn-print {
+            background: #34495e;
+            color: #fff;
+        }
+        .adugna-btn:hover, .adugna-btn:focus { background: #145ea8; }
+        .adugna-badge {
             display: inline-block;
-            padding: 0.25em 0.4em;
-            font-size: 75%;
+            padding: 0.25em 0.7em;
+            font-size: 0.85em;
             font-weight: 700;
             line-height: 1;
             text-align: center;
             white-space: nowrap;
             vertical-align: baseline;
             border-radius: 0.25rem;
+            background: #e74c3c;
+            color: #fff;
+            margin-left: 0.7em;
         }
-        .bg-danger {
-            background-color: #dc3545 !important;
-            color: white;
-        }
-        .text-muted {
+        .adugna-text-muted {
             color: #6c757d !important;
+        }
+        @media (max-width: 900px) {
+            .adugna-response-container { padding: 10px 2vw 18px 2vw; }
+            .adugna-response-header { padding: 12px 8px; }
+        }
+        @media (max-width: 600px) {
+            .adugna-response-container { padding: 4px 1vw 10px 1vw; }
+            .adugna-response-header { padding: 7px 2px; }
+            .adugna-response-title { font-size: 1.08em; }
+            .adugna-response-meta { grid-template-columns: 1fr; gap: 8px; }
+            .adugna-response-item { padding: 10px 4px 8px 8px; }
+            .adugna-response-question { font-size: 1em; }
+            .adugna-response-answer { font-size: 0.97em; }
         }
     </style>
 </head>
 <body>
     <?php include 'includes/admin_sidebar.php'; ?>
-    
-    <div class="response-container">
-        <div class="response-header">
-            <h2 class="response-title"><?= htmlspecialchars($response['survey_title']) ?></h2>
+    <div class="adugna-response-container">
+        <div class="adugna-response-header">
+            <h2 class="adugna-response-title"><?= htmlspecialchars($response['survey_title']) ?></h2>
             <p class="survey-description"><?= htmlspecialchars($response['survey_description']) ?></p>
-            
-            <div class="response-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Respondent</div>
-                    <div class="meta-value">
+            <div class="adugna-response-meta">
+                <div class="adugna-meta-item">
+                    <div class="adugna-meta-label">Respondent</div>
+                    <div class="adugna-meta-value">
                         <?= $response['is_anonymous'] ? 'Anonymous' : htmlspecialchars($response['username'] ?? 'N/A') ?>
                     </div>
                 </div>
-                
-                <div class="meta-item">
-                    <div class="meta-label">Role</div>
-                    <div class="meta-value"><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></div>
+                <div class="adugna-meta-item">
+                    <div class="adugna-meta-label">Role</div>
+                    <div class="adugna-meta-value"><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></div>
                 </div>
-                
                 <?php if (!$response['is_anonymous'] && $response['email']): ?>
-                <div class="meta-item">
-                    <div class="meta-label">Email</div>
-                    <div class="meta-value"><?= htmlspecialchars($response['email']) ?></div>
+                <div class="adugna-meta-item">
+                    <div class="adugna-meta-label">Email</div>
+                    <div class="adugna-meta-value"><?= htmlspecialchars($response['email']) ?></div>
                 </div>
                 <?php endif; ?>
-                
-                <div class="meta-item">
-                    <div class="meta-label">Submitted At</div>
-                    <div class="meta-value">
+                <div class="adugna-meta-item">
+                    <div class="adugna-meta-label">Submitted At</div>
+                    <div class="adugna-meta-value">
                         <?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <div class="response-items">
+        <div class="adugna-response-items">
             <?php foreach ($fields as $field): ?>
-                <div class="response-item <?= !isset($answered_data[$field['id']]) ? 'unanswered' : '' ?>">
-                    <div class="response-question">
+                <div class="adugna-response-item <?= !isset($answered_data[$field['id']]) ? 'unanswered' : '' ?>">
+                    <div class="adugna-response-question">
                         <?= htmlspecialchars($field['field_label']) ?>
                         <?php if (!isset($answered_data[$field['id']])): ?>
-                            <span class="badge bg-danger">Not answered</span>
+                            <span class="adugna-badge">Not answered</span>
                         <?php endif; ?>
                     </div>
-                    
                     <?php if (isset($answered_data[$field['id']])): ?>
                         <?php $answer = $answered_data[$field['id']]; ?>
-                        
-                        <div class="response-answer">
+                        <div class="adugna-response-answer">
                             <?php switch ($field['field_type']):
                                 case 'rating': ?>
-                                    <div class="rating-stars">
+                                    <div class="adugna-rating-stars">
                                         <?php 
                                         $rating = intval($answer['field_value']);
                                         echo str_repeat('★', $rating) . str_repeat('☆', 5 - $rating);
@@ -235,12 +279,10 @@ foreach ($response_data as $data) {
                                         <span class="rating-value">(<?= $rating ?>/5)</span>
                                     </div>
                                     <?php break;
-                                
                                 case 'radio':
                                 case 'select': ?>
                                     <p><?= htmlspecialchars($answer['field_value']) ?></p>
                                     <?php break;
-                                
                                 case 'checkbox': ?>
                                     <ul>
                                         <?php 
@@ -257,7 +299,6 @@ foreach ($response_data as $data) {
                                         <?php endforeach; ?>
                                     </ul>
                                     <?php break;
-                                
                                 case 'file': ?>
                                     <?php if ($answer['field_value']): ?>
                                         <?php 
@@ -265,43 +306,40 @@ foreach ($response_data as $data) {
                                         if (file_exists($filepath)): 
                                             $fileinfo = pathinfo($filepath);
                                             if (in_array(strtolower($fileinfo['extension']), ['jpg', 'jpeg', 'png', 'gif'])): ?>
-                                                <img src="<?= $filepath ?>" class="file-preview" alt="Uploaded file">
+                                                <img src="<?= $filepath ?>" class="adugna-file-preview" alt="Uploaded file">
                                             <?php else: ?>
-                                                <a href="<?= $filepath ?>" target="_blank" class="btn btn-primary">
+                                                <a href="<?= $filepath ?>" target="_blank" class="adugna-btn">
                                                     <i class="bi bi-download"></i> Download File
                                                 </a>
                                             <?php endif; ?>
                                         <?php else: ?>
-                                            <p class="text-danger">File not found</p>
+                                            <p style="color:#e74c3c;">File not found</p>
                                         <?php endif; ?>
                                     <?php else: ?>
                                         <p>No file uploaded</p>
                                     <?php endif; ?>
                                     <?php break;
-                                
                                 default: ?>
                                     <p><?= nl2br(htmlspecialchars($answer['field_value'])) ?></p>
                             <?php endswitch; ?>
                         </div>
                     <?php else: ?>
-                        <div class="response-answer">
-                            <p class="text-muted">Question was not answered</p>
+                        <div class="adugna-response-answer">
+                            <p class="adugna-text-muted">Question was not answered</p>
                         </div>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         </div>
-        
-        <div class="actions">
-            <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="btn btn-primary">
+        <div class="adugna-actions">
+            <a href="results.php?survey_id=<?= $response['survey_id'] ?>" class="adugna-btn">
                 <i class="bi bi-arrow-left"></i> Back to Results
             </a>
-            <button onclick="window.print()" class="btn btn-print">
+            <button onclick="window.print()" class="adugna-btn adugna-btn-print">
                 <i class="bi bi-printer"></i> Print Response
             </button>
         </div>
     </div>
-
     <?php require_once 'includes/footer.php'; ?>
 </body>
 </html>
