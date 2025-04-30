@@ -501,73 +501,37 @@ try {
             padding-bottom: 0.3rem;
             font-weight: 700;
         }
-        .adugna-table-container {
-            overflow-x: auto;
-        }
-        table {
+        .adugna-chart-container {
             width: 100%;
-            border-collapse: collapse;
+            max-width: 540px;
+            margin: 0 auto 1.2rem auto;
+            background: #f8fafc;
+            border-radius: 12px;
+            box-shadow: 0 1px 8px rgba(44,62,80,0.06);
+            padding: 1.2rem 1.2rem 1.5rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .adugna-chart-canvas {
+            width: 100% !important;
+            max-width: 420px !important;
+            min-width: 220px !important;
+            min-height: 220px !important;
+            max-height: 320px !important;
+            aspect-ratio: 1.5/1 !important;
+            margin: 0 auto;
             background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
         }
-        th, td {
-            padding: 8px 8px;
-            border-bottom: 1px solid #f0f2f5;
-            text-align: left;
-            font-size: 0.93rem;
-        }
-        th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #2563eb;
-        }
-        tr:hover {
-            background: #f4f8fb;
-        }
-        .adugna-section pre.error-log {
-            background: #222;
-            color: #f1c40f;
-            padding: 0.8rem;
-            border-radius: 7px;
-            font-size: 0.92rem;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-        /* Outstanding, interactive hover effect for cards */
-        .adugna-card:active {
-            transform: scale(0.98);
-            box-shadow: 0 1px 4px rgba(44,62,80,0.09);
-        }
-        /* Responsive design */
-        @media (max-width: 1100px) {
-            .adugna-widget-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-        @media (max-width: 800px) {
-            .adugna-main {
-                padding: 1rem 0.5rem;
-            }
-            .adugna-widget-grid {
-                grid-template-columns: 1fr;
-                gap: 0.7rem;
-            }
-            .adugna-section {
-                padding: 0.7rem 0.3rem;
-            }
+        @media (max-width: 900px) {
+            .adugna-chart-container { max-width: 99vw; padding: 0.7rem 0.2rem 1.2rem 0.2rem; }
+            .adugna-chart-canvas { max-width: 98vw !important; }
         }
         @media (max-width: 600px) {
-            .adugna-main {
-                padding: 8px 1px 60px;
-            }
-            .adugna-card, .adugna-section {
-                padding: 0.6rem 0.2rem;
-            }
-            th, td {
-                padding: 6px 3px;
-            }
-            .adugna-section h2 {
-                font-size: 0.95rem;
-            }
+            .adugna-chart-container { padding: 0.3rem 0.1rem 0.7rem 0.1rem; }
+            .adugna-chart-canvas { min-width: 140px !important; min-height: 120px !important; }
         }
     </style>
 </head>
@@ -641,19 +605,25 @@ try {
                 <!-- Survey Participation Chart -->
                 <div class="adugna-section">
                     <h2>Survey Participation</h2>
-                    <canvas id="surveyParticipationChart" height="80"></canvas>
+                    <div class="adugna-chart-container">
+                        <canvas id="surveyParticipationChart" class="adugna-chart-canvas"></canvas>
+                    </div>
                 </div>
 
                 <!-- Feedback Ratings Chart -->
                 <div class="adugna-section">
                     <h2>Feedback Ratings</h2>
-                    <canvas id="feedbackRatingsChart" height="80"></canvas>
+                    <div class="adugna-chart-container">
+                        <canvas id="feedbackRatingsChart" class="adugna-chart-canvas"></canvas>
+                    </div>
                 </div>
 
                 <!-- Support Ticket Status Chart -->
                 <div class="adugna-section">
                     <h2>Support Ticket Status</h2>
-                    <canvas id="ticketStatusChart" height="80"></canvas>
+                    <div class="adugna-chart-container">
+                        <canvas id="ticketStatusChart" class="adugna-chart-canvas"></canvas>
+                    </div>
                 </div>
 
                 <!-- System Stats Section -->
@@ -824,7 +794,7 @@ try {
     <?php include 'includes/footer.php'; ?>
 
     <script>
-        // Survey Participation Chart
+        // Adugna Gizaw: Make charts visually outstanding and responsive
         (function() {
             const ctx = document.getElementById('surveyParticipationChart');
             if (ctx && typeof Chart !== 'undefined') {
@@ -835,22 +805,47 @@ try {
                         datasets: [{
                             label: 'Responses',
                             data: <?= json_encode(array_values($surveyStats)) ?>,
-                            backgroundColor: '#3b82f6'
+                            backgroundColor: [
+                                '#3b82f6', '#22c55e', '#f59e42', '#f1c40f', '#e74c3c', '#8e44ad', '#14b8a6'
+                            ],
+                            borderRadius: 8,
+                            borderSkipped: false,
+                            barPercentage: 0.7,
+                            categoryPercentage: 0.6,
                         }]
                     },
                     options: {
                         responsive: true,
-                        plugins: { legend: { display: false } },
+                        plugins: {
+                            legend: { display: false },
+                            title: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#2563eb',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }
+                        },
                         scales: {
-                            x: { beginAtZero: true },
-                            y: { beginAtZero: true }
+                            x: {
+                                beginAtZero: true,
+                                grid: { display: false },
+                                ticks: { color: '#2563eb', font: { weight: 600 } }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#e5e7eb' },
+                                ticks: { color: '#34495e', font: { weight: 500 } }
+                            }
                         }
                     }
                 });
             }
         })();
 
-        // Feedback Ratings Chart
         (function() {
             const ctx = document.getElementById('feedbackRatingsChart');
             if (ctx && typeof Chart !== 'undefined') {
@@ -861,15 +856,35 @@ try {
                         datasets: [{
                             label: 'Feedback Ratings',
                             data: <?= json_encode(array_values($feedbackRatings)) ?>,
-                            backgroundColor: ['#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c']
+                            backgroundColor: [
+                                '#3b82f6', '#f59e42', '#f1c40f', '#27ae60', '#e74c3c', '#8e44ad'
+                            ],
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            hoverOffset: 10
                         }]
                     },
-                    options: { responsive: true }
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: { color: '#2563eb', font: { weight: 600 } }
+                            },
+                            tooltip: {
+                                backgroundColor: '#2563eb',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }
+                        }
+                    }
                 });
             }
         })();
 
-        // Support Ticket Status Chart
         (function() {
             const ctx = document.getElementById('ticketStatusChart');
             if (ctx && typeof Chart !== 'undefined') {
@@ -880,10 +895,32 @@ try {
                         datasets: [{
                             label: 'Tickets',
                             data: <?= json_encode(array_values($ticketStatus)) ?>,
-                            backgroundColor: ['#3b82f6', '#e74c3c', '#f1c40f', '#27ae60']
+                            backgroundColor: [
+                                '#3b82f6', '#e74c3c', '#f1c40f', '#27ae60', '#8e44ad'
+                            ],
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            hoverOffset: 12
                         }]
                     },
-                    options: { responsive: true }
+                    options: {
+                        responsive: true,
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'bottom',
+                                labels: { color: '#2563eb', font: { weight: 600 } }
+                            },
+                            tooltip: {
+                                backgroundColor: '#2563eb',
+                                titleColor: '#fff',
+                                bodyColor: '#fff',
+                                borderColor: '#fff',
+                                borderWidth: 1
+                            }
+                        }
+                    }
                 });
             }
         })();
