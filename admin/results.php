@@ -952,6 +952,7 @@ $chart_json = json_encode($chart_data);
 /**
  * Developer: Adugna Gizaw
  * Print styles: Hide sidebar, center main, add page breaks for major sections, and fit to A4.
+ * Fix for content cutoff at bottom of PDF/print by using better page-break and box model rules.
  */
 @media print {
     body.adugna-print-mode {
@@ -976,6 +977,9 @@ $chart_json = json_encode($chart_data);
         width: 210mm !important;
         background: #fff !important;
         box-shadow: none !important;
+        /* Prevent content from being cut off at page bottom */
+        box-sizing: border-box !important;
+        overflow: visible !important;
     }
     body.adugna-print-mode .adugna-card,
     body.adugna-print-mode .adugna-chart-container,
@@ -983,24 +987,39 @@ $chart_json = json_encode($chart_data);
         box-shadow: none !important;
         border: none !important;
         background: #fff !important;
-        page-break-inside: avoid;
+        page-break-inside: avoid !important;
         width: 100% !important;
         max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        /* Add margin to avoid cutoff at page bottom */
+        margin-bottom: 12mm !important;
     }
     body.adugna-print-mode .survey-stats,
     body.adugna-print-mode .filter-section,
     body.adugna-print-mode .chart-section,
     body.adugna-print-mode .response-table-section {
-        page-break-after: always;
+        page-break-after: always !important;
+        break-after: page !important;
     }
     body.adugna-print-mode .response-table-section {
-        page-break-after: auto;
+        page-break-after: auto !important;
+        break-after: auto !important;
     }
     body.adugna-print-mode .adugna-table th,
     body.adugna-print-mode .adugna-table td {
         color: #222 !important;
         background: #fff !important;
         border: 1px solid #eee !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+    }
+    /* Prevent table rows from being split across pages */
+    body.adugna-print-mode tr, 
+    body.adugna-print-mode td, 
+    body.adugna-print-mode th {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 }
 </style>
