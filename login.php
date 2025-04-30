@@ -144,12 +144,15 @@ if (isset($user) && is_array($user)) {
 try {
     $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name')");
     $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-    $siteLogo = $settings['site_logo'] ?? 'assets/images/default-logo.png';
-    $siteName = $settings['site_name'] ?? 'School CRM';
+    $siteLogo = isset($settings['site_logo']) && $settings['site_logo'] ? $settings['site_logo'] : 'assets/images/default-logo.png';
+    $siteName = isset($settings['site_name']) && $settings['site_name'] ? $settings['site_name'] : 'School CRM';
 } catch (Exception $e) {
     $siteLogo = 'assets/images/default-logo.png';
     $siteName = 'School CRM';
 }
+// Ensure $siteLogo and $siteName are always strings
+if (!$siteLogo) $siteLogo = 'assets/images/default-logo.png';
+if (!$siteName) $siteName = 'School CRM';
 
 // Always define $allowRegistration to avoid undefined variable warning
 $allowRegistration = true;
