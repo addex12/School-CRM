@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -18,7 +25,7 @@ $user = $userStmt->fetch(PDO::FETCH_ASSOC);
 $stmt = $pdo->prepare("DELETE FROM support_tickets WHERE id = ?");
 $stmt->execute([$id]);
 
-// Notify ticket owner by email
+// Notify ticket owner by email (compact, secure, and ERPNext-inspired)
 if ($user && !empty($user['email'])) {
     $to = $user['email'];
     $mailSubject = "Your Support Ticket Has Been Deleted";
@@ -31,5 +38,6 @@ if ($user && !empty($user['email'])) {
     @mail($to, $mailSubject, $mailMessage);
 }
 
+// Redirect with adugna-compact message
 header("Location: support_tickets.php?msg=Ticket+deleted");
 exit;
