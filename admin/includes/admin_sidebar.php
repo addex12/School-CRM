@@ -29,120 +29,26 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 
 <!-- Sidebar Hamburger Toggle Button (always visible, fixed at top left) -->
 <style>
-/* Adugna Gizaw: Revamped outstanding sidebar styles */
-body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #e0e7ff 100%) !important;
-    font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
-    font-size: 15px;
-    color: #222;
-    letter-spacing: 0.01em;
-}
-.adugna-sidebar {
-    background: linear-gradient(120deg, #2563eb 0%, #38bdf8 100%) !important;
-    color: #fff !important;
-    border-right: 2px solid #e0e7ff;
-    box-shadow: 2px 0 16px rgba(56,189,248,0.13);
-    font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
-    font-size: 1.08em;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-}
-.adugna-sidebar .adugna-logo {
-    font-size: 1.45em;
-    font-weight: 800;
-    color: #fff;
-    padding: 1.3em 1.1em 1em 1.1em;
-    letter-spacing: 0.05em;
-    background: rgba(255,255,255,0.10);
-    border-bottom: 1px solid #e0e7ff33;
-    margin-bottom: 0.7em;
-    display: flex;
-    align-items: center;
-    gap: 0.7em;
-    font-family: 'Montserrat', 'Inter', 'Segoe UI', Arial, sans-serif;
-    text-shadow: 0 2px 8px #2563eb44;
-}
-.adugna-sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.adugna-sidebar-link {
-    display: flex;
-    align-items: center;
-    gap: 0.8em;
-    padding: 0.85em 1.3em;
-    color: #e0e7ff;
-    font-size: 1.07em;
-    font-weight: 600;
-    border-radius: 0.6em;
-    margin: 0.13em 0.6em;
-    transition: background 0.18s, color 0.18s, box-shadow 0.18s, font-size 0.18s;
-    text-decoration: none;
-    position: relative;
-    font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
-    letter-spacing: 0.01em;
-    box-shadow: 0 1px 6px rgba(44,62,80,0.07);
-}
-.adugna-sidebar-link .adugna-icon {
-    min-width: 1.3em;
-    text-align: center;
-    color: #bae6fd;
-    font-size: 1.18em;
-    transition: margin 0.2s, color 0.18s;
-    filter: drop-shadow(0 2px 6px #38bdf855);
-}
-.adugna-sidebar-link.adugna-active, .adugna-sidebar-link:hover, .adugna-sidebar-link:focus {
-    background: linear-gradient(90deg, #38bdf8 0%, #2563eb 100%);
-    color: #fff;
-    box-shadow: 0 4px 18px 0 rgba(80, 112, 255, 0.13);
-    font-size: 1.13em;
-}
-.adugna-sidebar-link.adugna-active .adugna-icon, .adugna-sidebar-link:hover .adugna-icon {
-    color: #fff;
-    text-shadow: 0 2px 8px #2563eb55;
-}
-.adugna-sidebar .adugna-submenu {
-    background: rgba(255,255,255,0.10);
-    border-radius: 0.5em;
-    margin: 0.2em 0.6em 0.2em 1.7em;
-    padding: 0.2em 0.2em 0.2em 0.8em;
-    display: none;
-    font-size: 0.98em;
-}
-.adugna-sidebar .adugna-submenu.adugna-open {
-    display: block;
-}
-.adugna-submenu-toggle {
-    margin-left: auto;
-    color: #bae6fd;
-    font-size: 1em;
-    transition: transform 0.2s, color 0.18s;
-}
-.adugna-submenu-toggle.adugna-rotated {
-    transform: rotate(90deg);
-    color: #fff;
-}
+/* Minimal inline style for demonstration, move to CSS file in production */
 .adugna-sidebar-toggle-btn {
     position: fixed;
-    top: 16px;
-    left: 16px;
-    z-index: 1100;
-    background: #2563eb !important;
-    color: #fff !important;
+    top: 18px;
+    left: 18px;
+    z-index: 1201;
+    background: #fff;
     border: none;
-    box-shadow: 0 2px 8px rgba(80,112,255,0.13);
-    font-size: 1.2em;
-    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
     padding: 8px 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: background 0.2s;
 }
 .adugna-sidebar-toggle-btn:hover {
-    background: #38bdf8 !important;
-    color: #fff !important;
+    background: #f0f0f0;
 }
 .adugna-sidebar-toggle-btn .adugna-hamburger {
     width: 24px;
@@ -154,7 +60,7 @@ body {
     display: block;
     height: 3px;
     width: 100%;
-    background: #fff;
+    background: #333;
     border-radius: 2px;
     margin-bottom: 5px;
     transition: all 0.3s;
@@ -162,57 +68,64 @@ body {
 .adugna-sidebar-toggle-btn .adugna-hamburger span:last-child {
     margin-bottom: 0;
 }
-.adugna-sidebar-overlay {
-    background: rgba(56,189,248,0.13) !important;
+/* Sidebar styles for collapsible behavior */
+.adugna-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 240px;
+    background: #fff;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+    z-index: 1200;
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+    will-change: transform;
 }
-.adugna-sidebar li {
-    margin-bottom: 0.08em;
-}
-.adugna-sidebar .adugna-sidebar-link .adugna-icon i {
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-}
-.adugna-sidebar .adugna-sidebar-link span {
-    font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
-}
-@media (max-width: 1100px) {
-    .adugna-sidebar {
-        font-size: 1em;
-    }
-    .adugna-sidebar .adugna-logo {
-        font-size: 1.15em;
-    }
+.adugna-sidebar.adugna-collapsed {
+    transform: translateX(-100%);
 }
 @media (max-width: 900px) {
     .adugna-sidebar {
-        font-size: 0.98em;
         width: 220px;
+        /* overlays content on mobile */
     }
-    .adugna-sidebar .adugna-logo {
-        font-size: 1em;
-        padding: 1em 0.7em 0.8em 0.7em;
+    .adugna-sidebar.adugna-collapsed {
+        transform: translateX(-110%);
+    }
+    body.adugna-sidebar-open {
+        overflow: hidden;
     }
 }
-@media (max-width: 600px) {
+@media (min-width: 901px) {
     .adugna-sidebar {
-        font-size: 0.95em;
-        width: 98vw;
-        min-width: 0;
-        max-width: 100vw;
+        /* push content, not overlay */
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 1200;
     }
-    .adugna-sidebar .adugna-logo {
-        font-size: 0.95em;
-        padding: 0.7em 0.5em 0.7em 0.5em;
+    .adugna-sidebar.adugna-collapsed {
+        transform: translateX(-100%);
     }
-    .adugna-sidebar-link {
-        font-size: 1em;
-        padding: 0.7em 0.7em;
+    .adugna-main-content {
+        margin-left: 240px;
+        transition: margin-left 0.25s;
     }
-    .adugna-sidebar .adugna-submenu {
-        font-size: 0.93em;
-        margin: 0.1em 0.3em 0.1em 1em;
-        padding: 0.1em 0.1em 0.1em 0.5em;
+    .adugna-sidebar.adugna-collapsed ~ .adugna-main-content {
+        margin-left: 0;
     }
+}
+/* Optional: add overlay for mobile */
+.adugna-sidebar-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1199;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.18);
+}
+.adugna-sidebar.adugna-open + .adugna-sidebar-overlay {
+    display: block;
 }
 </style>
 
@@ -295,7 +208,7 @@ body {
     // Main content wrapper (add class to your main content container for push effect)
     let mainContent = document.querySelector('.adugna-main-content');
 
-    // Collapsible/Uncollapsible logic (classic: slide in/out from left)
+    // Open sidebar
     function openSidebar() {
         sidebar.classList.remove('adugna-collapsed');
         if (window.innerWidth <= 900) {
@@ -306,11 +219,13 @@ body {
             overlay.style.display = 'none';
         }
     }
+    // Close sidebar
     function closeSidebar() {
         sidebar.classList.add('adugna-collapsed');
         document.body.classList.remove('adugna-sidebar-open');
         overlay.style.display = 'none';
     }
+    // Toggle sidebar
     function toggleSidebar() {
         if (sidebar.classList.contains('adugna-collapsed')) {
             openSidebar();
@@ -318,6 +233,7 @@ body {
             closeSidebar();
         }
     }
+    // Initial state: collapsed on mobile, open on desktop
     function handleSidebarOnResize() {
         if (window.innerWidth > 900) {
             sidebar.classList.remove('adugna-collapsed');
@@ -336,6 +252,7 @@ body {
         e.stopPropagation();
         toggleSidebar();
     });
+    // Overlay click closes sidebar
     overlay.addEventListener('click', closeSidebar);
 
     // Submenu logic
