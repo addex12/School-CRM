@@ -884,41 +884,39 @@ $chart_json = json_encode($chart_data);
         var dropdown = document.querySelector('.dropdown');
         if (dropdown) dropdown.style.display = 'none';
 
-        // --- Improved PDF export: Split content into A4-sized slices to avoid bottom cutoff ---
-        html2canvas(content, {scale: 2, useCORS: true, scrollY: -window.scrollY}).then(function(canvas) {
-            var imgData = canvas.toDataURL('image/png');
+        // Developer: Adugna Gizaw
+        // Improved PDF export: Use html2canvas to split content into A4 slices, avoid bottom cutoff
+        html2canvas(content, {scale: 2, useCORS: true, scrollY: -window.scrollY, windowWidth: document.body.scrollWidth}).then(function(canvas) {
             var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
             var pageWidth = pdf.internal.pageSize.getWidth();
             var pageHeight = pdf.internal.pageSize.getHeight();
             var imgWidth = pageWidth - 40;
             var imgHeight = canvas.height * imgWidth / canvas.width;
 
-            // Calculate the number of pages
-            var heightLeft = imgHeight;
-            var position = 20;
-            var pageCanvas, pageCtx, pageImgData;
+            // Calculate the height of one PDF page in canvas pixels
+            var pageCanvasHeight = Math.floor(canvas.width * (pageHeight - 40) / imgWidth);
 
-            if (imgHeight <= pageHeight - 40) {
-                pdf.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
-            } else {
-                var sX = 0, sY = 0, sWidth = canvas.width, sHeight = Math.floor((pageHeight - 40) * canvas.width / imgWidth);
-                var pageNum = 0;
-                while (heightLeft > 0) {
-                    // Create a canvas for the current page slice
-                    pageCanvas = document.createElement('canvas');
-                    pageCanvas.width = canvas.width;
-                    pageCanvas.height = sHeight;
-                    pageCtx = pageCanvas.getContext('2d');
-                    // Draw the current slice
-                    pageCtx.drawImage(canvas, sX, sY, sWidth, sHeight, 0, 0, sWidth, sHeight);
-                    pageImgData = pageCanvas.toDataURL('image/png');
-                    // Add to PDF
-                    if (pageNum > 0) pdf.addPage();
-                    pdf.addImage(pageImgData, 'PNG', 20, 20, imgWidth, pageHeight - 40);
-                    heightLeft -= (pageHeight - 40);
-                    sY += sHeight;
-                    pageNum++;
-                }
+            var renderedHeight = 0;
+            var pageNum = 0;
+
+            while (renderedHeight < canvas.height) {
+                // Create a canvas for the current page slice
+                var pageCanvas = document.createElement('canvas');
+                pageCanvas.width = canvas.width;
+                // Make sure not to exceed the remaining height
+                var sliceHeight = Math.min(pageCanvasHeight, canvas.height - renderedHeight);
+                pageCanvas.height = sliceHeight;
+                var pageCtx = pageCanvas.getContext('2d');
+                // Draw the current slice
+                pageCtx.drawImage(canvas, 0, renderedHeight, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+                var pageImgData = pageCanvas.toDataURL('image/png');
+                // Add to PDF
+                if (pageNum > 0) pdf.addPage();
+                // Calculate the height in PDF units for this slice
+                var pdfImgHeight = sliceHeight * imgWidth / canvas.width;
+                pdf.addImage(pageImgData, 'PNG', 20, 20, imgWidth, pdfImgHeight);
+                renderedHeight += sliceHeight;
+                pageNum++;
             }
             pdf.save('survey_results.pdf');
             if (dropdown) dropdown.style.display = '';
