@@ -78,6 +78,33 @@ if ($selected_survey_id) {
                 $analytics[$field['id']] = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
         }
+
+        // Additional: Prepare data for overall survey response trends (e.g., responses over time)
+        $response_trend = [];
+        if ($selected_survey_id) {
+            $trendStmt = $pdo->prepare("
+                SELECT DATE(submitted_at) as response_date, COUNT(*) as count
+                FROM survey_responses
+                WHERE survey_id = ?
+                GROUP BY response_date
+                ORDER BY response_date ASC
+            ");
+            $trendStmt->execute([$selected_survey_id]);
+            $response_trend = $trendStmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        // Additional: Prepare data for pie chart of anonymous vs non-anonymous responses (if possible)
+        $anon_stats = [];
+        if ($selected_survey_id) {
+            $anonStmt = $pdo->prepare("
+                SELECT is_anonymous, COUNT(*) as count
+                FROM surveys
+                WHERE id = ?
+                GROUP BY is_anonymous
+            ");
+            $anonStmt->execute([$selected_survey_id]);
+            $anon_stats = $anonStmt->fetchAll(PDO::FETCH_ASSOC);
+        }
     }
 }
 
@@ -85,7 +112,9 @@ $chart_data = [
     'survey' => $survey,
     'fields' => $fields,
     'analytics' => $analytics,
-    'total_responses' => $total_responses
+    'total_responses' => $total_responses,
+    'response_trend' => $response_trend,
+    'anon_stats' => $anon_stats
 ];
 $chart_json = json_encode($chart_data);
 ?>
@@ -226,6 +255,31 @@ $chart_json = json_encode($chart_data);
             from { opacity: 0; transform: translateY(20px);}
             to { opacity: 1; transform: none;}
         }
+        /* Adugna Gizaw: Additional compact and responsive adugna- styles for new charts */
+        .adugna-row-flex {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5vw;
+            justify-content: space-between;
+        }
+        .adugna-col-half {
+            flex: 1 1 45%;
+            min-width: 320px;
+            max-width: 48%;
+        }
+        @media (max-width: 900px) {
+            .adugna-row-flex { flex-direction: column; gap: 2vw; }
+            .adugna-col-half { max-width: 100%; min-width: 0; }
+        }
+        .adugna-chart-summary {
+            background: #f3f4f6;
+            border-radius: 1.1rem;
+            padding: 1rem 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+            border-left: 4px solid #4f46e5;
+            font-size: 0.98em;
+        }
     </style>
 </head>
 <body>
@@ -258,6 +312,26 @@ $chart_json = json_encode($chart_data);
                         <p><strong>Total Responses:</strong> <?= number_format($total_responses) ?></p>
                     </div>
                     <?php if ($total_responses > 0): ?>
+                        <!-- Adugna Gizaw: Show overall response trend and anonymous stats in a row -->
+                        <div class="adugna-row-flex">
+                            <div class="adugna-col-half">
+                                <div class="adugna-chart-container">
+                                    <h3 class="adugna-chart-title"><i class="fas fa-chart-line"></i> Responses Over Time</h3>
+                                    <div class="adugna-chart-wrapper" style="height:220px;">
+                                        <canvas id="adugna-trend-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="adugna-col-half">
+                                <div class="adugna-chart-container">
+                                    <h3 class="adugna-chart-title"><i class="fas fa-user-secret"></i> Anonymous vs Non-Anonymous</h3>
+                                    <div class="adugna-chart-wrapper" style="height:220px;">
+                                        <canvas id="adugna-anon-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Adugna Gizaw: Show per-question charts as before -->
                         <?php foreach ($fields as $field): ?>
                             <div class="adugna-chart-container">
                                 <h3 class="adugna-chart-title"><i class="fas fa-chart-bar"></i> <?= htmlspecialchars($field['field_label']) ?></h3>
@@ -282,6 +356,7 @@ $chart_json = json_encode($chart_data);
     </div>
     <script>
         // Adugna Gizaw: Outstanding, interactive, responsive charts with adugna- theme
+
         const colorPalette = [
             '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe',
             '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5',
@@ -289,7 +364,76 @@ $chart_json = json_encode($chart_data);
             '#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fee2e2'
         ];
         const chartData = <?= $chart_json ?>;
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Responses Over Time (Line Chart)
+            if (chartData.response_trend && chartData.response_trend.length > 0) {
+                const ctxTrend = document.getElementById('adugna-trend-chart').getContext('2d');
+                new Chart(ctxTrend, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.response_trend.map(item => item.response_date),
+                        datasets: [{
+                            label: 'Responses',
+                            data: chartData.response_trend.map(item => item.count),
+                            fill: true,
+                            backgroundColor: 'rgba(79,70,229,0.08)',
+                            borderColor: '#4f46e5',
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#6366f1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { mode: 'index', intersect: false }
+                        },
+                        scales: {
+                            x: { grid: { display: false } },
+                            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+                        }
+                    }
+                });
+            }
+
+            // Anonymous vs Non-Anonymous (Pie Chart)
+            if (chartData.anon_stats && chartData.anon_stats.length > 0) {
+                const ctxAnon = document.getElementById('adugna-anon-chart').getContext('2d');
+                const labels = chartData.anon_stats.map(item => item.is_anonymous == 1 ? 'Anonymous' : 'Not Anonymous');
+                const data = chartData.anon_stats.map(item => item.count);
+                new Chart(ctxAnon, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [colorPalette[0], colorPalette[10]],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: true, position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((context.raw / total) * 100);
+                                        return `${context.label}: ${context.raw} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Per-question charts (existing logic)
             if (chartData.total_responses > 0) {
                 chartData.fields.forEach((field, index) => {
                     const fieldAnalytics = chartData.analytics[field.id] || [];
@@ -307,6 +451,7 @@ $chart_json = json_encode($chart_data);
                 });
             }
         });
+
         function getChartType(fieldType) {
             switch(fieldType) {
                 case 'radio':
@@ -321,6 +466,7 @@ $chart_json = json_encode($chart_data);
                     return 'bar';
             }
         }
+
         function createChart(ctx, field, data, chartType, index) {
             switch(chartType) {
                 case 'doughnut':
@@ -490,6 +636,7 @@ $chart_json = json_encode($chart_data);
                     });
             }
         }
+
         function generateLegend(chartId, chart) {
             const legendContainer = document.getElementById(`legend-${chartId}`);
             if (!legendContainer) return;
