@@ -129,6 +129,39 @@ if (
     }
 }
 
+// --- Handle removal of a login background image ---
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['remove_bg_image']) && !empty($_POST['remove_bg_image'])
+) {
+    try {
+        $imgToRemove = $_POST['remove_bg_image'];
+        $stmt = $pdo->query("SELECT setting_value FROM system_settings WHERE setting_key = 'login_bg_images'");
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $existing = [];
+        if ($row && !empty($row['setting_value'])) {
+            $existing = json_decode($row['setting_value'], true) ?: [];
+        }
+        // Remove the image from the array
+        $updated = array_values(array_filter($existing, function($img) use ($imgToRemove) {
+            return $img !== $imgToRemove;
+        }));
+        // Update DB
+        $stmt = $pdo->prepare("UPDATE system_settings SET setting_value = ? WHERE setting_key = 'login_bg_images'");
+        $stmt->execute([json_encode($updated)]);
+        // Delete the file
+        $filePath = '../uploads/' . $imgToRemove;
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
+        $_SESSION['success'] = "Background image removed successfully!";
+        header("Location: settings.php");
+        exit();
+    } catch (Exception $e) {
+        $_SESSION['error'] = "Failed to remove background image: " . $e->getMessage();
+    }
+}
+
 // Fetch all settings
 $stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_group, setting_key");
 $settings = [];
