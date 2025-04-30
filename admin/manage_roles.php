@@ -113,44 +113,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'], $_POST['pe
         }
         .adugna-btn-secondary:hover { background: #d0e2fa; }
         .adugna-btn-sm { padding: 2px 7px; font-size: 0.93em; border-radius: 3px; }
-        .adugna-table-responsive {
-            overflow-x: auto;
-            margin-top: 1em;
-        }
         .adugna-table {
-            width: 100%;
             border-collapse: collapse;
-            font-size: 0.97em;
+            width: 100%;
             background: #fff;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 1px 6px rgba(25,118,210,0.04);
+            box-shadow: 0 1px 4px rgba(25,118,210,0.04);
         }
         .adugna-table th, .adugna-table td {
-            padding: 7px 8px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid #e5e7eb;
             text-align: left;
-            vertical-align: middle;
+            font-size: 0.97em;
         }
         .adugna-table th {
-            background: #f5f7fa;
+            background: #f4f8fb;
             color: #1976d2;
             font-weight: 600;
-            font-size: 0.98em;
         }
-        .adugna-table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .adugna-permissions-list label {
-            display: inline-block;
-            margin-right: 1.2rem;
-            margin-bottom: 0.3rem;
-            font-size: 0.97rem;
-        }
-        .adugna-permissions-list input[type="checkbox"] {
-            accent-color: #2563eb;
-            margin-right: 4px;
-        }
+        .adugna-table tr:last-child td { border-bottom: none; }
+        .adugna-table tr:nth-child(even) { background: #f8fafc; }
         .adugna-actions button {
             background: #f3f4f6;
             border: none;
@@ -162,12 +145,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'], $_POST['pe
             transition: background 0.18s;
         }
         .adugna-actions button:hover { background: #e2efda; }
+        .adugna-permissions-list label {
+            display: inline-block;
+            margin-right: 1.2rem;
+            margin-bottom: 0.3rem;
+            font-size: 0.97rem;
+        }
+        .adugna-permissions-list input[type="checkbox"] {
+            accent-color: #2563eb;
+            margin-right: 4px;
+        }
         @media (max-width: 900px) {
-            .adugna-main-content, .adugna-card { padding: 1rem; }
+            .adugna-main-content { padding: 1rem; }
         }
         @media (max-width: 600px) {
-            .adugna-main-content, .adugna-card { padding: 0.7rem 0.2rem 1rem 0.2rem; }
+            .adugna-main-content { padding: 0.7rem 0.2rem 1rem 0.2rem; }
             .adugna-header-title { font-size: 1.05em; }
+            .adugna-table th, .adugna-table td { padding: 6px 3px; }
         }
     </style>
 </head>
@@ -179,45 +173,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'], $_POST['pe
                 <i class="fas fa-user-shield"></i> Manage Roles & Permissions
             </div>
             <div class="adugna-card">
-                <div class="adugna-table-responsive">
-                    <table class="adugna-table">
-                        <thead>
-                            <tr>
-                                <th>Role Name</th>
-                                <th>Permissions</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($roles as $role): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($role['role_name']) ?></td>
-                                <td>
-                                    <form method="post" action="">
-                                        <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
-                                        <div class="adugna-permissions-list">
-                                        <?php foreach ($permissions as $perm): ?>
-                                            <label>
-                                                <input type="checkbox" name="permissions[]" value="<?= $perm['id'] ?>"
-                                                    <?= in_array($perm['id'], $role_permissions[$role['id']] ?? []) ? 'checked' : '' ?>>
-                                                <?= htmlspecialchars($perm['label']) ?>
-                                            </label>
-                                        <?php endforeach; ?>
-                                        </div>
-                                        <button type="submit" class="adugna-btn adugna-btn-sm" style="margin-top:0.5rem;">
-                                            <i class="fas fa-save"></i> Save
-                                        </button>
-                                    </form>
-                                </td>
-                                <td class="adugna-actions">
-                                    <button title="Edit"><i class="fas fa-edit"></i></button>
-                                    <button title="Delete"><i class="fas fa-trash"></i></button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="adugna-table">
+                    <thead>
+                        <tr>
+                            <th>Role Name</th>
+                            <th>Permissions</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($roles as $role): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($role['role_name']) ?></td>
+                            <td>
+                                <form method="post" action="">
+                                    <input type="hidden" name="role_id" value="<?= $role['id'] ?>">
+                                    <div class="adugna-permissions-list">
+                                    <?php foreach ($permissions as $perm): ?>
+                                        <label>
+                                            <input type="checkbox" name="permissions[]" value="<?= $perm['id'] ?>"
+                                                <?= in_array($perm['id'], $role_permissions[$role['id']] ?? []) ? 'checked' : '' ?>>
+                                            <?= htmlspecialchars($perm['label']) ?>
+                                        </label>
+                                    <?php endforeach; ?>
+                                    </div>
+                                    <button type="submit" class="adugna-btn adugna-btn-sm" style="margin-top:0.5rem;">
+                                        <i class="fas fa-save"></i> Save
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="adugna-actions">
+                                <button title="Edit"><i class="fas fa-edit"></i></button>
+                                <button title="Delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
