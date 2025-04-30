@@ -295,7 +295,7 @@ body {
     // Main content wrapper (add class to your main content container for push effect)
     let mainContent = document.querySelector('.adugna-main-content');
 
-    // Open sidebar
+    // Collapsible/Uncollapsible logic (classic: slide in/out from left)
     function openSidebar() {
         sidebar.classList.remove('adugna-collapsed');
         if (window.innerWidth <= 900) {
@@ -306,13 +306,11 @@ body {
             overlay.style.display = 'none';
         }
     }
-    // Close sidebar
     function closeSidebar() {
         sidebar.classList.add('adugna-collapsed');
         document.body.classList.remove('adugna-sidebar-open');
         overlay.style.display = 'none';
     }
-    // Toggle sidebar
     function toggleSidebar() {
         if (sidebar.classList.contains('adugna-collapsed')) {
             openSidebar();
@@ -320,7 +318,6 @@ body {
             closeSidebar();
         }
     }
-    // Initial state: collapsed on mobile, open on desktop
     function handleSidebarOnResize() {
         if (window.innerWidth > 900) {
             sidebar.classList.remove('adugna-collapsed');
@@ -339,7 +336,6 @@ body {
         e.stopPropagation();
         toggleSidebar();
     });
-    // Overlay click closes sidebar
     overlay.addEventListener('click', closeSidebar);
 
     // Submenu logic
