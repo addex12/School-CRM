@@ -209,6 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_backup'])) {
 </head>
 <body>
     <div class="admin-dashboard">
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="adugna-admin-main">
             <div class="adugna-restore-header">
                 <h1>
