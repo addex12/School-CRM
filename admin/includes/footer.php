@@ -185,7 +185,7 @@ body, .admin-dashboard, .adugna-main, .adugna-main-content {
                 <li><a href="../../logout.php" class="adugna-footer-link"><i class="fas fa-sign-out-alt" style="font-size:11px;margin-right:2px;"></i>Logout</a></li>
             </ul>
         </div>
-        <div class="adugna-footer-section adugna-developer-info">
+        <div class="adugna-footer-section adugna-developer-info" style="text-align:left; min-width:unset; max-width:140px; word-break:break-word;">
             <div class="adugna-social-links">
                 <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="adugna-social-link" aria-label="LinkedIn">
                     <i class="fab fa-linkedin"></i>
@@ -197,7 +197,7 @@ body, .admin-dashboard, .adugna-main, .adugna-main-content {
                     <i class="fab fa-github"></i>
                 </a>
             </div>
-            <p style="margin: 5px 0 0 0; font-size:9px; color:#bfc9d1;">
+            <p style="margin: 5px 0 0 0; font-size:9px; color:#bfc9d1; word-break:break-word;">
                 Developed by Adugna Gizaw
             </p>
         </div>
