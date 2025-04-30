@@ -13,8 +13,11 @@ session_start();
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/config.php';
 
-// Get the survey ID from the query parameters
-$survey_id = $_GET['id'] ?? 0;
+// Get survey_id from GET parameter and validate
+if (!isset($_GET['survey_id']) || !is_numeric($_GET['survey_id'])) {
+    die("Invalid or missing survey ID.");
+}
+$survey_id = (int)$_GET['survey_id'];
 
 // Validate survey access and get survey details
 try {

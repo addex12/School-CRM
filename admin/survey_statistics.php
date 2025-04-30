@@ -1,10 +1,10 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
  */
 require_once '../includes/auth.php';
 requireAdmin();
@@ -101,75 +101,145 @@ $chart_json = json_encode($chart_data);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <style>
-        .chart-container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        /* Adugna Gizaw: All custom styles use adugna- prefix for patenting and clarity */
+        .adugna-card {
+            background: #fff;
+            border-radius: 1.1rem;
+            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: none;
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 900px;
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        .adugna-btn {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff;
+            border: none;
+            border-radius: 0.5em;
+            padding: 0.28rem 0.85rem;
+            font-size: 0.97em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+            text-decoration: none;
+        }
+        .adugna-btn i {
+            font-size: 0.97em;
+        }
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .adugna-btn.adugna-btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
             border: 1px solid #e5e7eb;
         }
-        .chart-title {
+        .adugna-btn.adugna-btn-secondary:hover {
+            background: #e5e7eb;
+            color: #22223b;
+        }
+        .adugna-btn.adugna-btn-sm {
+            padding: 0.18rem 0.6rem;
+            font-size: 0.91em;
+        }
+        .adugna-chart-container {
+            background: #fff;
+            border-radius: 1.1rem;
+            box-shadow: 0 4px 24px rgba(80,112,255,0.08), 0 1.5px 6px rgba(80,112,255,0.03);
+            padding: 1.2rem 1.2rem;
+            margin-bottom: 1.5rem;
+            border: none;
+            width: 100%;
+            max-width: 900px;
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
+        }
+        .adugna-chart-title {
             margin-top: 0;
-            color: #2c3e50;
-            font-size: 1.2rem;
+            color: #4f46e5;
+            font-size: 1.13rem;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
-            font-weight: 600;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
         }
-        .chart-wrapper {
+        .adugna-chart-wrapper {
             position: relative;
-            height: 300px;
+            height: 320px;
             margin: 15px 0;
         }
-        .chart-legend {
+        .adugna-chart-legend {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 15px;
         }
-        .legend-item {
+        .adugna-legend-item {
             display: flex;
             align-items: center;
             font-size: 0.85rem;
         }
-        .legend-color {
+        .adugna-legend-color {
             width: 15px;
             height: 15px;
             border-radius: 3px;
             margin-right: 5px;
             display: inline-block;
         }
-        .survey-summary {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid #e5e7eb;
+        .adugna-survey-summary {
+            background: #f3f4f6;
+            border-radius: 1.1rem;
+            padding: 1.3rem 1.1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+            border-left: 4px solid #4f46e5;
+            max-width: 900px;
+            width: 100%;
         }
-        .survey-summary p {
+        .adugna-survey-summary p {
             margin-bottom: 8px;
-            font-size: 0.95rem;
+            font-size: 0.97rem;
         }
-        .survey-summary strong {
+        .adugna-survey-summary strong {
             color: #4f46e5;
             font-weight: 600;
+        }
+        @media (max-width: 900px) {
+            .adugna-card, .adugna-chart-container, .adugna-survey-summary { padding: 1rem 0.5rem; max-width: 100vw; }
+            .adugna-chart-wrapper { height: 220px; }
+        }
+        @media (max-width: 600px) {
+            .adugna-card, .adugna-chart-container, .adugna-survey-summary { padding: 0.5rem 0.1rem; }
+            .adugna-chart-title { font-size: 1em; }
+            .adugna-chart-wrapper { height: 160px; }
+        }
+        @keyframes adugnaFadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: none;}
         }
     </style>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="admin-dashboard adugna-admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
+        <div class="admin-main adugna-admin-main">
             <header class="admin-header">
-                <h1><i class="fas fa-chart-pie"></i> Survey Statistics</h1>
+                <h1 style="color:#4f46e5;font-weight:800;"><i class="fas fa-chart-pie"></i> Survey Statistics</h1>
             </header>
-            <div class="content">
+            <div class="content" style="width:100%;max-width:900px;margin:0 auto;">
                 <div class="filter-section">
                     <form method="GET" class="filter-form">
                         <label for="survey_id">Select Survey</label>
-                        <select name="survey_id" id="survey_id" class="form-control" onchange="this.form.submit()">
+                        <select name="survey_id" id="survey_id" class="adugna-form-control" onchange="this.form.submit()">
                             <option value="">-- Select a Survey --</option>
                             <?php foreach ($allSurveys as $surveyOption): ?>
                                 <option value="<?= htmlspecialchars($surveyOption['id']) ?>" <?= ($selected_survey_id == $surveyOption['id']) ? 'selected' : '' ?>>
@@ -179,24 +249,22 @@ $chart_json = json_encode($chart_data);
                         </select>
                     </form>
                 </div>
-
                 <?php if ($selected_survey_id && $survey): ?>
-                    <div class="survey-summary">
+                    <div class="adugna-survey-summary">
                         <p><strong>Title:</strong> <?= htmlspecialchars($survey['title']) ?></p>
                         <p><strong>Start Date:</strong> <?= date('M j, Y', strtotime($survey['starts_at'])) ?></p>
                         <p><strong>End Date:</strong> <?= date('M j, Y', strtotime($survey['ends_at'])) ?></p>
                         <p><strong>Anonymous:</strong> <?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></p>
                         <p><strong>Total Responses:</strong> <?= number_format($total_responses) ?></p>
                     </div>
-
                     <?php if ($total_responses > 0): ?>
                         <?php foreach ($fields as $field): ?>
-                            <div class="chart-container">
-                                <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
-                                <div class="chart-wrapper">
+                            <div class="adugna-chart-container">
+                                <h3 class="adugna-chart-title"><i class="fas fa-chart-bar"></i> <?= htmlspecialchars($field['field_label']) ?></h3>
+                                <div class="adugna-chart-wrapper">
                                     <canvas id="fieldChart-<?= $field['id'] ?>"></canvas>
                                 </div>
-                                <div class="chart-legend" id="legend-<?= $field['id'] ?>"></div>
+                                <div class="adugna-chart-legend" id="legend-<?= $field['id'] ?>"></div>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -212,24 +280,20 @@ $chart_json = json_encode($chart_data);
             </div>
         </div>
     </div>
-
     <script>
-        // Color palette for charts
+        // Adugna Gizaw: Outstanding, interactive, responsive charts with adugna- theme
         const colorPalette = [
             '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe',
             '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5',
             '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7',
             '#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fee2e2'
         ];
-
         const chartData = <?= $chart_json ?>;
-
         document.addEventListener('DOMContentLoaded', function() {
             if (chartData.total_responses > 0) {
                 chartData.fields.forEach((field, index) => {
                     const fieldAnalytics = chartData.analytics[field.id] || [];
                     const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
-                    
                     if (fieldAnalytics.length > 0) {
                         const chartType = getChartType(field.field_type);
                         createChart(ctx, field, fieldAnalytics, chartType, index);
@@ -243,7 +307,6 @@ $chart_json = json_encode($chart_data);
                 });
             }
         });
-
         function getChartType(fieldType) {
             switch(fieldType) {
                 case 'radio':
@@ -258,7 +321,6 @@ $chart_json = json_encode($chart_data);
                     return 'bar';
             }
         }
-
         function createChart(ctx, field, data, chartType, index) {
             switch(chartType) {
                 case 'doughnut':
@@ -277,9 +339,7 @@ $chart_json = json_encode($chart_data);
                             maintainAspectRatio: false,
                             cutout: '70%',
                             plugins: {
-                                legend: {
-                                    display: false
-                                },
+                                legend: { display: false },
                                 tooltip: {
                                     callbacks: {
                                         label: function(context) {
@@ -288,22 +348,18 @@ $chart_json = json_encode($chart_data);
                                             return `${context.label}: ${context.raw} (${percentage}%)`;
                                         }
                                     }
-                                },
-                                datalabels: {
-                                    display: false
                                 }
                             },
                             animation: {
                                 animateScale: true,
-                                animateRotate: true
+                                animateRotate: true,
+                                duration: 1200,
+                                easing: 'easeOutElastic'
                             }
                         }
                     });
-                    
-                    // Create custom legend
                     generateLegend(field.id, doughnutChart);
                     break;
-
                 case 'bar':
                     const barChart = new Chart(ctx, {
                         type: 'bar',
@@ -314,7 +370,7 @@ $chart_json = json_encode($chart_data);
                                 data: data.map(item => item.count),
                                 backgroundColor: colorPalette[index % colorPalette.length],
                                 borderWidth: 0,
-                                borderRadius: 4
+                                borderRadius: 8
                             }]
                         },
                         options: {
@@ -322,9 +378,7 @@ $chart_json = json_encode($chart_data);
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: {
-                                    display: false
-                                },
+                                legend: { display: false },
                                 tooltip: {
                                     callbacks: {
                                         label: function(context) {
@@ -337,44 +391,36 @@ $chart_json = json_encode($chart_data);
                                 x: {
                                     beginAtZero: true,
                                     ticks: { precision: 0 },
-                                    grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)'
-                                    }
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
                                 },
-                                y: {
-                                    grid: {
-                                        display: false
-                                    }
-                                }
+                                y: { grid: { display: false } }
+                            },
+                            animation: {
+                                duration: 1200,
+                                easing: 'easeOutElastic'
                             }
                         }
                     });
                     break;
-
                 case 'histogram':
                     const numericValues = data
                         .filter(item => !isNaN(parseFloat(item.field_value)))
                         .map(item => parseFloat(item.field_value));
-
                     if (numericValues.length > 0) {
                         const min = Math.min(...numericValues);
                         const max = Math.max(...numericValues);
                         const binCount = Math.min(10, Math.ceil(Math.sqrt(numericValues.length)));
                         const binSize = (max - min) / binCount;
-
                         const bins = Array(binCount).fill(0);
                         const labels = [];
-
                         for (let i = 0; i < binCount; i++) {
                             const binStart = min + i * binSize;
                             const binEnd = binStart + binSize;
                             labels.push(`${binStart.toFixed(1)}-${binEnd.toFixed(1)}`);
-
-                            bins[i] = numericValues.filter(val => 
+                            bins[i] = numericValues.filter(val =>
                                 val >= binStart && (i === binCount - 1 ? val <= binEnd : val < binEnd)
                             ).length;
                         }
-
                         new Chart(ctx, {
                             type: 'bar',
                             data: {
@@ -384,7 +430,7 @@ $chart_json = json_encode($chart_data);
                                     data: bins,
                                     backgroundColor: colorPalette[10],
                                     borderWidth: 0,
-                                    borderRadius: 4
+                                    borderRadius: 8
                                 }]
                             },
                             options: {
@@ -403,21 +449,18 @@ $chart_json = json_encode($chart_data);
                                 scales: {
                                     y: {
                                         beginAtZero: true,
-                                        grid: {
-                                            color: 'rgba(0, 0, 0, 0.05)'
-                                        }
+                                        grid: { color: 'rgba(0, 0, 0, 0.05)' }
                                     },
-                                    x: {
-                                        grid: {
-                                            display: false
-                                        }
-                                    }
+                                    x: { grid: { display: false } }
+                                },
+                                animation: {
+                                    duration: 1200,
+                                    easing: 'easeOutElastic'
                                 }
                             }
                         });
                     }
                     break;
-
                 default:
                     new Chart(ctx, {
                         type: 'bar',
@@ -428,56 +471,42 @@ $chart_json = json_encode($chart_data);
                                 data: data.map(item => item.count),
                                 backgroundColor: colorPalette[index % colorPalette.length],
                                 borderWidth: 0,
-                                borderRadius: 4
+                                borderRadius: 8
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: {
-                                legend: { display: false }
-                            },
+                            plugins: { legend: { display: false } },
                             scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: 'rgba(0, 0, 0, 0.05)'
-                                    }
-                                },
-                                x: {
-                                    grid: {
-                                        display: false
-                                    }
-                                }
+                                y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+                                x: { grid: { display: false } }
+                            },
+                            animation: {
+                                duration: 1200,
+                                easing: 'easeOutElastic'
                             }
                         }
                     });
             }
         }
-
         function generateLegend(chartId, chart) {
             const legendContainer = document.getElementById(`legend-${chartId}`);
             if (!legendContainer) return;
-            
             const ul = document.createElement('div');
-            ul.className = 'chart-legend';
-            
+            ul.className = 'adugna-chart-legend';
             chart.data.labels.forEach((label, i) => {
                 const li = document.createElement('div');
-                li.className = 'legend-item';
-                
+                li.className = 'adugna-legend-item';
                 const colorSpan = document.createElement('span');
-                colorSpan.className = 'legend-color';
+                colorSpan.className = 'adugna-legend-color';
                 colorSpan.style.backgroundColor = chart.data.datasets[0].backgroundColor[i];
-                
                 const textSpan = document.createElement('span');
                 textSpan.textContent = label;
-                
                 li.appendChild(colorSpan);
                 li.appendChild(textSpan);
                 ul.appendChild(li);
             });
-            
             legendContainer.appendChild(ul);
         }
     </script>
