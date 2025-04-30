@@ -22,15 +22,13 @@ if (isset($_SESSION['success'])): ?>
     <?php unset($_SESSION['success']); ?>
 <?php endif;
 
-// Fetch all public surveys
+// Fetch all public surveys (active and public, regardless of date)
 try {
     $stmt = $pdo->prepare("
         SELECT id, title, description, starts_at, ends_at 
         FROM surveys 
         WHERE is_public = 1 
           AND is_active = 1
-          AND (starts_at IS NULL OR starts_at <= NOW())
-          AND (ends_at IS NULL OR ends_at >= NOW())
         ORDER BY starts_at DESC
     ");
     $stmt->execute();
@@ -44,13 +42,33 @@ try {
     <h2>Available Public Surveys</h2>
     <?php if (!empty($public_surveys)): ?>
         <?php foreach ($public_surveys as $survey): ?>
+            <?php
+                $now = date('Y-m-d H:i:s');
+                $status = '';
+                if (!empty($survey['starts_at']) && $now < $survey['starts_at']) {
+                    $status = '<span style="color:#ffc107;">Upcoming</span>';
+                } elseif (
+                    (!empty($survey['starts_at']) && $now >= $survey['starts_at']) &&
+                    (empty($survey['ends_at']) || $now <= $survey['ends_at'])
+                ) {
+                    $status = '<span style="color:#28a745;">Ongoing</span>';
+                } elseif (!empty($survey['ends_at']) && $now > $survey['ends_at']) {
+                    $status = '<span style="color:#dc3545;">Ended</span>';
+                }
+            ?>
             <div class="survey-item">
-                <div class="survey-title"><?= htmlspecialchars($survey['title']) ?></div>
+                <div class="survey-title"><?= htmlspecialchars($survey['title']) ?> <?= $status ?></div>
                 <div class="survey-description"><?= htmlspecialchars($survey['description']) ?></div>
                 <div class="survey-dates">
                     Available from <?= htmlspecialchars($survey['starts_at']) ?> to <?= htmlspecialchars($survey['ends_at']) ?>
                 </div>
-                <a href="/survey_response.php?id=<?= $survey['id'] ?>" class="btn-take-survey">Take the Survey</a>
+                <?php if ($status === '<span style="color:#28a745;">Ongoing</span>'): ?>
+                    <a href="/survey_response.php?id=<?= $survey['id'] ?>" class="btn-take-survey">Take the Survey</a>
+                <?php elseif ($status === '<span style="color:#ffc107;">Upcoming</span>'): ?>
+                    <span class="btn-take-survey" style="background:#ffc107;cursor:not-allowed;">Not Yet Open</span>
+                <?php else: ?>
+                    <span class="btn-take-survey" style="background:#6c757d;cursor:not-allowed;">Closed</span>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
     <?php else: ?>
