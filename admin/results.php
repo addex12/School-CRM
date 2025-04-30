@@ -233,7 +233,7 @@ $chart_json = json_encode($chart_data);
             margin-bottom: 1.2em;
         }
         .admin-header h1 {
-            font-size: 1.3rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 0.5em;
@@ -242,7 +242,7 @@ $chart_json = json_encode($chart_data);
         }
         .header-actions {
             display: flex;
-            gap: 0.5em;
+            gap: 0.4em;
             align-items: center;
             justify-content: center;
             width: 100%;
@@ -251,19 +251,19 @@ $chart_json = json_encode($chart_data);
         /* Card styling */
         .adugna-card {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 12px rgba(44,62,80,0.10);
-            padding: 1.2em 1.5em;
-            margin: 1.2em 0;
+            border-radius: 7px;
+            box-shadow: 0 2px 10px rgba(44,62,80,0.09);
+            padding: 0.9em 1.1em;
+            margin: 1em 0;
             width: 100%;
             max-width: 900px;
-            transition: box-shadow 0.18s;
+            transition: box-shadow 0.14s;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         .adugna-card:hover, .adugna-card:focus-within {
-            box-shadow: 0 4px 24px rgba(44,62,80,0.18);
+            box-shadow: 0 4px 18px rgba(44,62,80,0.13);
         }
 
         /* Survey stats card row */
@@ -271,34 +271,34 @@ $chart_json = json_encode($chart_data);
             display: flex;
             justify-content: center;
             align-items: stretch;
-            gap: 1.5em;
+            gap: 1em;
             width: 100%;
             flex-wrap: wrap;
         }
         .stat-card {
-            flex: 1 1 180px;
-            min-width: 140px;
+            flex: 1 1 120px;
+            min-width: 100px;
             background: #f7faff;
-            border-radius: 6px;
-            margin: 0.2em 0;
-            padding: 0.8em 0.5em;
+            border-radius: 5px;
+            margin: 0.15em 0;
+            padding: 0.6em 0.4em;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 1px 4px rgba(67,97,238,0.07);
-            transition: background 0.18s;
+            box-shadow: 0 1px 3px rgba(67,97,238,0.06);
+            transition: background 0.13s;
         }
         .stat-card:hover {
             background: #eaf2fb;
         }
         .stat-value {
-            font-size: 1.3rem;
+            font-size: 1.02rem;
             font-weight: 700;
             color: #4361ee;
-            margin-bottom: 0.2em;
+            margin-bottom: 0.1em;
         }
         .stat-label {
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             color: #2c3e50;
             opacity: 0.8;
         }
@@ -308,16 +308,17 @@ $chart_json = json_encode($chart_data);
             background: #f4f7fa;
             color: #2c3e50;
             border: 1px solid #e3e6eb;
-            padding: 0.22rem 0.65rem;
+            padding: 0.16rem 0.52rem;
             border-radius: 3px;
             font-weight: 500;
-            font-size: 0.82rem;
-            transition: background 0.18s, color 0.18s, border 0.18s;
+            font-size: 0.78rem;
+            transition: background 0.13s, color 0.13s, border 0.13s;
             text-decoration: none;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 0.3em;
+            gap: 0.2em;
+            min-height: 28px;
         }
         .adugna-btn-primary {
             background: #3498db;
@@ -356,17 +357,17 @@ $chart_json = json_encode($chart_data);
             color: #fff;
         }
         .adugna-btn-sm {
-            font-size: 0.75rem;
-            padding: 0.15rem 0.45rem;
+            font-size: 0.72rem;
+            padding: 0.09rem 0.32rem;
         }
 
         /* Chart container */
         .adugna-chart-container {
             background: #fff;
-            border-radius: 8px;
-            padding: 1em 1.2em;
-            margin-bottom: 18px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            border-radius: 7px;
+            padding: 0.7em 0.9em;
+            margin-bottom: 13px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             width: 100%;
             max-width: 900px;
             display: flex;
@@ -376,8 +377,8 @@ $chart_json = json_encode($chart_data);
         .adugna-chart-title {
             margin-top: 0;
             color: #2c3e50;
-            font-size: 1.05rem;
-            padding-bottom: 4px;
+            font-size: 0.97rem;
+            padding-bottom: 3px;
             border-bottom: 1px solid #f0f0f0;
             width: 100%;
             text-align: center;
@@ -390,16 +391,16 @@ $chart_json = json_encode($chart_data);
             margin: 0 auto;
         }
         .adugna-table th, .adugna-table td {
-            padding: 7px 10px;
+            padding: 5px 7px;
             text-align: center;
         }
         .adugna-table th {
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             font-weight: 600;
             background: #f7faff;
         }
         .adugna-table td {
-            font-size: 0.8rem;
+            font-size: 0.72rem;
         }
         .adugna-table tr:hover {
             background-color: #f8f9fa;
@@ -407,8 +408,8 @@ $chart_json = json_encode($chart_data);
 
         /* Badge styling */
         .adugna-badge {
-            font-size: 0.62em;
-            padding: 0.18em 0.35em;
+            font-size: 0.58em;
+            padding: 0.13em 0.28em;
             border-radius: 2px;
             background: #e3e6eb;
             color: #2c3e50;
@@ -416,17 +417,17 @@ $chart_json = json_encode($chart_data);
 
         /* Pagination */
         .adugna-pagination .page-link {
-            padding: 0.22rem 0.45rem;
-            font-size: 0.78rem;
+            padding: 0.15rem 0.32rem;
+            font-size: 0.68rem;
         }
 
         /* Filter form */
         .adugna-filter-form {
             background: #fff;
-            padding: 1em 1.2em;
-            border-radius: 8px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-            margin-bottom: 18px;
+            padding: 0.7em 0.9em;
+            border-radius: 7px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            margin-bottom: 13px;
             width: 100%;
             max-width: 900px;
             display: flex;
@@ -438,20 +439,20 @@ $chart_json = json_encode($chart_data);
             justify-content: center;
         }
         .adugna-filter-form .form-group label {
-            font-size: 0.78rem;
+            font-size: 0.72rem;
         }
         .adugna-filter-form .form-control {
-            font-size: 0.78rem;
-            padding: 0.22rem 0.45rem;
+            font-size: 0.72rem;
+            padding: 0.13rem 0.32rem;
         }
         .adugna-filter-form .btn {
-            font-size: 0.78rem;
-            padding: 0.22rem 0.45rem;
+            font-size: 0.72rem;
+            padding: 0.13rem 0.32rem;
         }
 
         /* Icon sizing */
         .adugna-icon, .adugna-btn i, .header-actions .dropdown-toggle i, .header-actions a i {
-            font-size: 0.82rem !important;
+            font-size: 0.72rem !important;
         }
 
         /* Responsive tweaks */
@@ -464,13 +465,13 @@ $chart_json = json_encode($chart_data);
         }
         @media (max-width: 900px) {
             .adugna-card, .adugna-chart-container, .adugna-filter-form {
-                padding: 0.7em 0.5em;
+                padding: 0.5em 0.3em;
             }
             .adugna-table th, .adugna-table td {
-                font-size: 0.72rem;
+                font-size: 0.62rem;
             }
             .survey-stats {
-                gap: 0.7em;
+                gap: 0.5em;
             }
         }
         @media (max-width: 700px) {
@@ -478,7 +479,7 @@ $chart_json = json_encode($chart_data);
                 padding: 1vw 0.5vw;
             }
             .adugna-card, .adugna-chart-container, .adugna-filter-form {
-                padding: 0.5em 0.2em;
+                padding: 0.3em 0.1em;
             }
             .survey-stats {
                 flex-direction: column;
@@ -486,7 +487,7 @@ $chart_json = json_encode($chart_data);
             }
             .stat-card {
                 width: 100%;
-                margin-bottom: 0.5em;
+                margin-bottom: 0.3em;
             }
         }
         @media (max-width: 600px) {
@@ -494,14 +495,14 @@ $chart_json = json_encode($chart_data);
                 padding: 0.5vw 0.2vw;
             }
             .adugna-card, .adugna-chart-container, .adugna-filter-form {
-                padding: 0.35em 0.1em;
+                padding: 0.18em 0.05em;
             }
             .adugna-table th, .adugna-table td {
-                font-size: 0.68rem;
+                font-size: 0.58rem;
             }
             .header-actions {
                 flex-direction: column;
-                gap: 0.5em;
+                gap: 0.3em;
                 align-items: center;
             }
         }
