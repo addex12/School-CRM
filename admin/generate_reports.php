@@ -84,66 +84,74 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
             max-width: 1100px;
             margin: 32px auto 0 auto;
             background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
-            padding: 18px 18px 28px 18px;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(25, 118, 210, 0.09);
+            padding: 28px 28px 38px 28px;
             transition: box-shadow 0.2s;
         }
         .adugna-header-title {
-            font-size: 1.35em;
+            font-size: 1.45em;
             color: #1976d2;
-            font-weight: 700;
-            margin-bottom: 18px;
+            font-weight: 800;
+            margin-bottom: 28px;
             letter-spacing: 0.01em;
+            text-align: center;
         }
         .adugna-report-filters {
-            margin-bottom: 2em;
+            margin-bottom: 2.2em;
             background: #f9f9f9;
-            padding: 1em;
-            border-radius: 8px;
+            padding: 1.2em 1.5em;
+            border-radius: 10px;
             display: flex;
             flex-wrap: wrap;
-            gap: 1.2em;
+            gap: 1.5em;
             align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 6px rgba(25,118,210,0.04);
         }
         .adugna-report-filters label {
-            font-size: 0.97em;
+            font-size: 1em;
             color: #444;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 0.2em;
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
         }
         .adugna-report-filters select,
         .adugna-report-filters input[type="date"] {
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 10px;
+            border-radius: 5px;
             border: 1px solid #d0d7de;
-            font-size: 0.97em;
+            font-size: 1em;
             background: #f9fbfd;
             color: #222;
-            margin-left: 0.4em;
+            margin-left: 0.2em;
         }
         .adugna-report-actions {
-            margin-bottom: 1em;
+            margin-bottom: 1.5em;
             display: flex;
-            gap: 0.7em;
+            gap: 1.2em;
             flex-wrap: wrap;
+            justify-content: flex-end;
         }
         .adugna-btn {
             background: #1976d2;
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 5px 13px;
-            font-size: 0.97em;
+            border-radius: 5px;
+            padding: 7px 18px;
+            font-size: 1em;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             transition: background 0.15s;
-            font-weight: 500;
+            font-weight: 600;
             text-decoration: none;
+            box-shadow: 0 1px 4px rgba(25,118,210,0.07);
         }
-        .adugna-btn i { font-size: 1em; }
+        .adugna-btn i { font-size: 1.1em; }
         .adugna-btn:hover, .adugna-btn:focus { background: #145ea8; }
         .adugna-btn-secondary {
             background: #e3eafc;
@@ -153,19 +161,22 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
         .adugna-btn-secondary:hover { background: #d0e2fa; }
         .adugna-report-table-container {
             overflow-x: auto;
-            margin-top: 1em;
+            margin-top: 1.5em;
+            border-radius: 10px;
+            background: #f8fafc;
+            box-shadow: 0 1px 8px rgba(25,118,210,0.04);
         }
         .adugna-report-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.97em;
+            font-size: 1em;
             background: #fff;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 1px 6px rgba(25,118,210,0.04);
         }
         .adugna-report-table th, .adugna-report-table td {
-            padding: 7px 8px;
+            padding: 11px 12px;
             border-bottom: 1px solid #f0f0f0;
             text-align: left;
             vertical-align: middle;
@@ -173,23 +184,30 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
         .adugna-report-table th {
             background: #f5f7fa;
             color: #1976d2;
-            font-weight: 600;
-            font-size: 0.98em;
+            font-weight: 700;
+            font-size: 1.03em;
+            border-bottom: 2px solid #e3eafc;
         }
         .adugna-report-table tr:nth-child(even) {
             background: #f9f9f9;
         }
+        .adugna-report-table tr:hover {
+            background: #eaf6ff;
+        }
         @media (max-width: 1100px) {
-            .adugna-main-content { max-width: 99vw; margin: 18px 2vw 0 2vw; padding: 10px 4px 18px 4px; }
+            .adugna-main-content { max-width: 99vw; margin: 18px 2vw 0 2vw; padding: 14px 6px 18px 6px; }
         }
         @media (max-width: 900px) {
             .adugna-main-content { padding: 0.7rem 0.5rem 1rem 0.5rem; }
+            .adugna-header-title { font-size: 1.15em; }
             .adugna-report-filters { flex-direction: column; gap: 0.7em; align-items: flex-start; }
+            .adugna-report-actions { justify-content: flex-start; }
         }
         @media (max-width: 600px) {
             .adugna-main-content { padding: 0.5rem 0.2rem 0.7rem 0.2rem; }
-            .adugna-header-title { font-size: 1.1em; }
+            .adugna-header-title { font-size: 1.05em; }
             .adugna-report-table th, .adugna-report-table td { padding: 5px 4px; font-size: 0.95em; }
+            .adugna-report-filters { padding: 0.7em 0.2em; }
         }
     </style>
 </head>
@@ -235,7 +253,7 @@ $reportData = getReportData($pdo, $reportType, $startDate, $endDate, $userId, $s
             </div>
             <div id="report-results" class="adugna-report-table-container">
                 <?php if (empty($reportData)): ?>
-                    <p style="color:#888;">No data found for the selected criteria.</p>
+                    <p style="color:#888;text-align:center;">No data found for the selected criteria.</p>
                 <?php else: ?>
                     <table class="adugna-report-table" id="report-table">
                         <thead>
