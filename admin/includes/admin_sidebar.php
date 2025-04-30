@@ -41,7 +41,7 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     cursor: pointer;
     padding: 8px 10px;
     border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(88, 89, 128, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
