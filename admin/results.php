@@ -522,6 +522,26 @@ $chart_json = json_encode($chart_data);
             -->
             <header class="admin-header">
                 <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
+                <!-- Survey Selector Dropdown -->
+                <form id="adugna-survey-selector-form" method="get" style="margin-bottom:1em;display:flex;justify-content:center;align-items:center;gap:0.7em;">
+                    <label for="adugna-survey-selector" style="font-size:0.92em;font-weight:600;">Select Survey:</label>
+                    <select id="adugna-survey-selector" name="survey_id" class="adugna-btn adugna-btn-secondary" style="min-width:180px;">
+                        <?php
+                        // Developer: Adugna Gizaw - Fetch all surveys for selector (AJAX could be used for large data)
+                        $allSurveys = $pdo->query("SELECT id, title FROM surveys ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+                        foreach ($allSurveys as $s) {
+                            $selected = $s['id'] == $survey_id ? 'selected' : '';
+                            echo '<option value="'.htmlspecialchars($s['id']).'" '.$selected.'>'.htmlspecialchars($s['title']).'</option>';
+                        }
+                        ?>
+                    </select>
+                </form>
+                <script>
+                    // Developer: Change survey on selector change
+                    document.getElementById('adugna-survey-selector').addEventListener('change', function() {
+                        document.getElementById('adugna-survey-selector-form').submit();
+                    });
+                </script>
                 <!-- Developer: Place Export, Print, and Back buttons in separate divs for better alignment and attractiveness -->
                 <div class="header-actions adugna-header-actions-flex">
                     <div class="adugna-header-action">
@@ -619,6 +639,25 @@ $chart_json = json_encode($chart_data);
                         </div>
                     </div>
                 <?php endforeach; ?>
+            </div>
+
+            <!-- Additional Analysis Tools Section -->
+            <div class="adugna-card" style="max-width:900px;margin:1.5em auto;">
+                <h3 class="adugna-chart-title"><i class="fas fa-chart-area adugna-icon"></i> Advanced Analysis Tools</h3>
+                <div class="row" style="display:flex;flex-wrap:wrap;gap:1em;">
+                    <div class="col-md-6" style="flex:1;min-width:320px;">
+                        <div class="adugna-chart-container" style="margin-bottom:0;">
+                            <h4 class="adugna-chart-title" style="font-size:0.98em;"><i class="fas fa-chart-pie adugna-icon"></i> Response Distribution</h4>
+                            <canvas id="adugna-pie-distribution" height="180"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="flex:1;min-width:320px;">
+                        <div class="adugna-chart-container" style="margin-bottom:0;">
+                            <h4 class="adugna-chart-title" style="font-size:0.98em;"><i class="fas fa-chart-gantt adugna-icon"></i> Submission Timeline (Gantt)</h4>
+                            <canvas id="adugna-gantt-timeline" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Responses Table -->
@@ -992,6 +1031,90 @@ $chart_json = json_encode($chart_data);
                 };
             });
         }
+    });
+
+    // Developer: Adugna Gizaw - Advanced Analysis Tools
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Pie Chart: Response Distribution by Field (first field as example)
+        if (chartData.fields.length > 0) {
+            const field = chartData.fields[0];
+            const analytics = chartData.analytics[field.id] || [];
+            const ctxPie = document.getElementById('adugna-pie-distribution').getContext('2d');
+            if (analytics.length > 0) {
+                new Chart(ctxPie, {
+                    type: 'pie',
+                    data: {
+                        labels: analytics.map(item => item.field_value),
+                        datasets: [{
+                            data: analytics.map(item => item.count),
+                            backgroundColor: [
+                                '#4895ef', '#4361ee', '#3f37c9', '#f72585', '#b5179e', '#7209b7', '#560bad', '#480ca8'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true, position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: ctx => `${ctx.label}: ${ctx.raw}`
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Gantt Chart: Submission Timeline (using Chart.js horizontal bar as Gantt)
+        // Developer: For demo, group responses by day and show as bars
+        <?php
+        // Prepare Gantt data (submissions per day)
+        $ganttData = [];
+        $ganttStmt = $pdo->prepare("SELECT DATE(submitted_at) as day, COUNT(*) as count FROM survey_responses WHERE survey_id = ? GROUP BY day ORDER BY day ASC");
+        $ganttStmt->execute([$survey_id]);
+        foreach ($ganttStmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $ganttData[] = $row;
+        }
+        ?>
+        const ganttLabels = <?= json_encode(array_column($ganttData, 'day')) ?>;
+        const ganttCounts = <?= json_encode(array_column($ganttData, 'count')) ?>;
+        const ctxGantt = document.getElementById('adugna-gantt-timeline').getContext('2d');
+        if (ganttLabels.length > 0) {
+            new Chart(ctxGantt, {
+                type: 'bar',
+                data: {
+                    labels: ganttLabels,
+                    datasets: [{
+                        label: 'Submissions',
+                        data: ganttCounts,
+                        backgroundColor: '#4895ef',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `Submissions: ${ctx.raw}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: 'rgba(67,97,238,0.07)' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // Example: Add more analysis tools here (AJAX, JSON, etc.)
+        // You can fetch more data via AJAX and render more charts as needed.
     });
 </script>
 <style>
