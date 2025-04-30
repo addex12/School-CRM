@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -66,171 +73,237 @@ if ($action === 'edit' && $id) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .dashboard-section {
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-main-content {
+            max-width: 900px;
+            margin: 32px auto 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 18px 18px 28px 18px;
+            transition: box-shadow 0.2s;
+        }
+        .adugna-header-title {
+            font-size: 1.25em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+        }
+        .adugna-card {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            margin-bottom: 2rem;
-            padding: 2rem 2.5rem;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+            padding: 1.1rem 1.2rem 1.2rem 1.2rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.2s, width 0.2s;
         }
-        .kb-header { font-size: 1.5rem; color: #215967; font-weight: 700; margin-bottom: 1.5rem; }
-        .erpnext-btn {
-            background: #f5f7fa;
-            color: #36414c;
-            border: 1px solid #d1d8dd;
-            border-radius: 4px;
-            padding: 8px 18px;
-            font-weight: 500;
-            transition: background 0.2s, color 0.2s;
-            cursor: pointer;
-        }
-        .erpnext-btn.btn-primary {
-            background: #007bfc;
-            color: #fff;
-            border-color: #007bfc;
-        }
-        .erpnext-btn.btn-primary:hover {
-            background: #0056b3;
-            color: #fff;
-        }
-        .erpnext-btn.btn-secondary {
-            background: #f5f7fa;
-            color: #36414c;
-            border-color: #d1d8dd;
-        }
-        .erpnext-btn.btn-secondary:hover {
-            background: #e4e8ec;
-        }
-        .erpnext-input {
-            border: 1px solid #d1d8dd;
-            border-radius: 4px;
-            padding: 8px 12px;
-            font-size: 15px;
-            background: #f5f7fa;
-            color: #36414c;
-            width: 100%;
+        .adugna-card-header {
+            font-size: 1.13em;
+            color: #1976d2;
+            font-weight: 700;
             margin-bottom: 1em;
+            letter-spacing: 0.01em;
         }
-        .kb-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(44,62,80,0.04);
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1.2rem;
-            position: relative;
-        }
-        .kb-card-title {
-            font-size: 1.18em;
-            font-weight: 600;
-            color: #215967;
-            margin-bottom: 0.5em;
-        }
-        .kb-card-content {
-            color: #36414c;
-            margin-bottom: 0.7em;
-        }
-        .kb-card-meta {
-            font-size: 0.93em;
-            color: #888;
-            margin-bottom: 0.5em;
-        }
-        .kb-card-actions {
+        .adugna-form-group {
+            margin-bottom: 1rem;
             display: flex;
-            gap: 0.5em;
+            flex-direction: column;
+            gap: 0.2em;
         }
-        .kb-form-section {
-            background: #f9fafb;
-            border-radius: 8px;
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.03);
+        .adugna-form-group label {
+            font-size: 0.97em;
+            color: #444;
+            font-weight: 500;
         }
-        .kb-form-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #215967;
-            margin-bottom: 1em;
+        .adugna-form-group input,
+        .adugna-form-group textarea {
+            padding: 7px 10px;
+            border-radius: 4px;
+            border: 1px solid #d0d7de;
+            font-size: 0.97em;
+            background: #f9fbfd;
+            color: #222;
         }
-        .alert-success {
-            background: #e2efda;
-            color: #215967;
-            border: 1px solid #b7e4c7;
+        .adugna-form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 13px;
+            font-size: 0.97em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .adugna-btn i { font-size: 1em; }
+        .adugna-btn:hover, .adugna-btn:focus { background: #145ea8; }
+        .adugna-btn-secondary {
+            background: #e3eafc;
+            color: #1976d2;
+            border: 1px solid #b6d0f7;
+        }
+        .adugna-btn-secondary:hover { background: #d0e2fa; }
+        .adugna-btn-danger {
+            background: #e74c3c;
+            color: #fff;
+            border: 1px solid #e74c3c;
+        }
+        .adugna-btn-danger:hover { background: #c82333; }
+        .adugna-btn-sm { padding: 2px 7px; font-size: 0.93em; border-radius: 3px; }
+        .adugna-alert-success {
+            background: #eafaf1;
+            color: #27ae60;
+            border: 1px solid #d4f5e9;
             border-radius: 5px;
             padding: 10px 18px;
             margin-bottom: 1em;
+            font-size: 0.97em;
+            text-align: center;
         }
-        .alert-error {
+        .adugna-alert-error {
             background: #ffeaea;
             color: #e74c3c;
             border: 1px solid #f5c6cb;
             border-radius: 5px;
             padding: 10px 18px;
             margin-bottom: 1em;
+            font-size: 0.97em;
+            text-align: center;
+        }
+        .adugna-kb-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(25,118,210,0.04);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+        .adugna-kb-card-title {
+            font-size: 1.13em;
+            font-weight: 600;
+            color: #215967;
+            margin-bottom: 0.5em;
+        }
+        .adugna-kb-card-content {
+            color: #36414c;
+            margin-bottom: 0.7em;
+        }
+        .adugna-kb-card-meta {
+            font-size: 0.93em;
+            color: #888;
+            margin-bottom: 0.5em;
+        }
+        .adugna-kb-card-actions {
+            display: flex;
+            gap: 0.5em;
+        }
+        .adugna-kb-form-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 2px rgba(25,118,210,0.03);
+        }
+        .adugna-kb-form-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #215967;
+            margin-bottom: 1em;
+        }
+        .adugna-kb-empty {
+            color: #888;
+            text-align: center;
+            font-size: 1.05em;
+            margin: 2em 0 1em 0;
         }
         @media (max-width: 900px) {
-            .admin-main, .dashboard-section { padding: 1rem 0.5rem; }
+            .adugna-main-content, .adugna-card { padding: 1rem; }
+        }
+        @media (max-width: 600px) {
+            .adugna-main-content, .adugna-card { padding: 0.7rem 0.2rem 1rem 0.2rem; }
+            .adugna-header-title { font-size: 1.05em; }
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <div class="dashboard-section">
-                <div class="kb-header"><i class="fas fa-book"></i> Knowledge Base</div>
-                <?php if ($message): ?>
-                    <div class="alert-success"><?= htmlspecialchars($message) ?></div>
-                <?php endif; ?>
-                <?php if ($error): ?>
-                    <div class="alert-error"><?= htmlspecialchars($error) ?></div>
-                <?php endif; ?>
-
-                <!-- Add/Edit Form -->
-                <div class="kb-form-section">
-                    <div class="kb-form-title">
-                        <?= $editArticle ? 'Edit Article' : 'Add New Article' ?>
-                    </div>
-                    <form method="post" style="margin-bottom:0;">
-                        <input type="hidden" name="action" value="<?= $editArticle ? 'edit' : 'add' ?>">
-                        <?php if ($editArticle): ?>
-                            <input type="hidden" name="id" value="<?= $editArticle['id'] ?>">
-                        <?php endif; ?>
-                        <input type="text" name="title" class="erpnext-input" placeholder="Title" value="<?= htmlspecialchars($editArticle['title'] ?? '') ?>" required>
-                        <textarea name="content" class="erpnext-input" placeholder="Content" rows="5" required><?= htmlspecialchars($editArticle['content'] ?? '') ?></textarea>
-                        <button type="submit" class="erpnext-btn btn-primary"><?= $editArticle ? 'Update' : 'Add' ?> Article</button>
-                        <?php if ($editArticle): ?>
-                            <a href="knowledge_base.php" class="erpnext-btn btn-secondary" style="margin-left:0.7em;">Cancel</a>
-                        <?php endif; ?>
-                    </form>
-                </div>
-
-                <!-- Article List -->
-                <?php if (count($articles) > 0): ?>
-                    <?php foreach ($articles as $article): ?>
-                        <div class="kb-card">
-                            <div class="kb-card-title"><?= htmlspecialchars($article['title']) ?></div>
-                            <div class="kb-card-meta">
-                                Last updated: <?= date('M j, Y g:i a', strtotime($article['updated_at'])) ?>
-                            </div>
-                            <div class="kb-card-content"><?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 300, '...'))) ?></div>
-                            <div class="kb-card-actions">
-                                <a href="knowledge_base.php?action=edit&id=<?= $article['id'] ?>" class="erpnext-btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                                <a href="knowledge_base.php?action=delete&id=<?= $article['id'] ?>" class="erpnext-btn btn-secondary btn-sm" onclick="return confirm('Delete this article?');"><i class="fas fa-trash"></i> Delete</a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="kb-empty">
-                        No knowledge base articles yet.<br>
-                        <span style="font-size:1.2em;">Start by adding your first article!</span>
-                    </div>
-                <?php endif; ?>
+        <div class="adugna-main-content">
+            <div class="adugna-header-title">
+                <i class="fas fa-book"></i> <?= htmlspecialchars($pageTitle) ?>
             </div>
+            <?php if ($message): ?>
+                <div class="adugna-alert-success"><?= htmlspecialchars($message) ?></div>
+            <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="adugna-alert-error"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+
+            <!-- Add/Edit Form -->
+            <div class="adugna-kb-form-section">
+                <div class="adugna-kb-form-title">
+                    <?= $editArticle ? 'Edit Article' : 'Add New Article' ?>
+                </div>
+                <form method="post" style="margin-bottom:0;">
+                    <input type="hidden" name="action" value="<?= $editArticle ? 'edit' : 'add' ?>">
+                    <?php if ($editArticle): ?>
+                        <input type="hidden" name="id" value="<?= $editArticle['id'] ?>">
+                    <?php endif; ?>
+                    <div class="adugna-form-group">
+                        <label for="title">Title</label>
+                        <input type="text" name="title" id="title" value="<?= htmlspecialchars($editArticle['title'] ?? '') ?>" required>
+                    </div>
+                    <div class="adugna-form-group">
+                        <label for="content">Content</label>
+                        <textarea name="content" id="content" rows="5" required><?= htmlspecialchars($editArticle['content'] ?? '') ?></textarea>
+                    </div>
+                    <button type="submit" class="adugna-btn"><?= $editArticle ? 'Update' : 'Add' ?> Article</button>
+                    <?php if ($editArticle): ?>
+                        <a href="knowledge_base.php" class="adugna-btn adugna-btn-secondary" style="margin-left:0.7em;">Cancel</a>
+                    <?php endif; ?>
+                </form>
+            </div>
+
+            <!-- Article List -->
+            <?php if (count($articles) > 0): ?>
+                <?php foreach ($articles as $article): ?>
+                    <div class="adugna-kb-card">
+                        <div class="adugna-kb-card-title"><?= htmlspecialchars($article['title']) ?></div>
+                        <div class="adugna-kb-card-meta">
+                            Last updated: <?= date('M j, Y g:i a', strtotime($article['updated_at'])) ?>
+                        </div>
+                        <div class="adugna-kb-card-content"><?= nl2br(htmlspecialchars(mb_strimwidth($article['content'], 0, 300, '...'))) ?></div>
+                        <div class="adugna-kb-card-actions">
+                            <a href="knowledge_base.php?action=edit&id=<?= $article['id'] ?>" class="adugna-btn adugna-btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                            <a href="knowledge_base.php?action=delete&id=<?= $article['id'] ?>" class="adugna-btn adugna-btn-secondary adugna-btn-sm" onclick="return confirm('Delete this article?');"><i class="fas fa-trash"></i> Delete</a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="adugna-kb-empty">
+                    No knowledge base articles yet.<br>
+                    <span style="font-size:1.2em;">Start by adding your first article!</span>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
-            <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
 </body>
 </html>
