@@ -166,10 +166,10 @@ body, html {
 
 <!-- Hamburger Toggle Button -->
 <button class="adugna-sidebar-toggle-btn" id="adugnaSidebarToggle" aria-label="Toggle sidebar">
-    <span class="adugna-hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
+    <span class="adugna-hamburger" style="display:flex;flex-direction:column;gap:4px;width:28px;height:28px;justify-content:center;align-items:center;">
+        <span style="display:block;width:22px;height:3.5px;background:linear-gradient(90deg,#4f8cff 60%,#ffb347 100%);border-radius:3px;"></span>
+        <span style="display:block;width:22px;height:3.5px;background:linear-gradient(90deg,#4f8cff 60%,#ffb347 100%);border-radius:3px;"></span>
+        <span style="display:block;width:22px;height:3.5px;background:linear-gradient(90deg,#4f8cff 60%,#ffb347 100%);border-radius:3px;"></span>
     </span>
 </button>
 

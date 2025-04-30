@@ -423,9 +423,8 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header" style="display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; letter-spacing: 0.01em; color: #1976d2; background: #f5f8ff; padding: 1.1rem 0 1.1rem 0; border-bottom: 1px solid #e0eaff;">
-                <?= htmlspecialchars($pageTitle) ?>
-            </header>
+        <?= htmlspecialchars($pageTitle) ?>
+        </header>
             <div class="admin-content" style="display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; background: #f5f8ff; padding: 2.5rem 0;">
                 <div class="adugna-form-grid" style="width: 100%; max-width: 900px; display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: center; align-items: flex-start;">
                     <div class="adugna-card" style="flex: 1 1 340px; min-width: 320px; max-width: 420px; margin: 0;">
