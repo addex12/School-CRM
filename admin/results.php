@@ -522,9 +522,9 @@ $chart_json = json_encode($chart_data);
             -->
             <header class="admin-header">
                 <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
-                <!-- Developer: Align export, print, and back buttons horizontally and centered -->
-                <div class="header-actions" style="display:flex;gap:0.5em;align-items:center;justify-content:center;width:100%;flex-wrap:wrap;">
-                    <div style="display:flex;gap:0.5em;align-items:center;">
+                <!-- Developer: Place Export, Print, and Back buttons in separate divs for better alignment and attractiveness -->
+                <div class="header-actions adugna-header-actions-flex">
+                    <div class="adugna-header-action">
                         <div class="dropdown">
                             <button class="adugna-btn adugna-btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
                                 <i class="fas fa-download adugna-icon"></i> Export
@@ -534,10 +534,13 @@ $chart_json = json_encode($chart_data);
                                 <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf adugna-icon"></i> PDF</a></li>
                             </ul>
                         </div>
-                        <!-- Print Button -->
+                    </div>
+                    <div class="adugna-header-action">
                         <button type="button" class="adugna-btn adugna-btn-secondary" id="adugna-print-btn">
                             <i class="fas fa-print adugna-icon"></i> Print
                         </button>
+                    </div>
+                    <div class="adugna-header-action">
                         <a href="surveys.php" class="adugna-btn adugna-btn-secondary">
                             <i class="fas fa-arrow-left adugna-icon"></i> Back
                         </a>
