@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -61,109 +68,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Edit Ticket - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .erpnext-card {
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-main-content {
+            max-width: 500px;
+            margin: 38px auto 0 auto;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 22px 18px 28px 18px;
+            transition: box-shadow 0.2s;
         }
-        .erpnext-btn {
-            background: #f5f7fa;
-            color: #36414c;
-            border: 1px solid #d1d8dd;
-            border-radius: 4px;
-            padding: 8px 16px;
-            font-size: 0.95rem;
+        .adugna-header-title {
+            font-size: 1.25em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+            text-align: center;
+        }
+        .adugna-form-group {
+            margin-bottom: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
+        }
+        .adugna-form-group label {
+            font-size: 0.97em;
+            color: #444;
             font-weight: 500;
-            transition: background 0.2s, color 0.2s;
+        }
+        .adugna-form-group input,
+        .adugna-form-group select {
+            padding: 7px 10px;
+            border-radius: 4px;
+            border: 1px solid #d0d7de;
+            font-size: 0.97em;
+            background: #f9fbfd;
+            color: #222;
+        }
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 13px;
+            font-size: 0.97em;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
             text-decoration: none;
-            display: inline-block;
         }
-        .erpnext-btn.btn-primary {
-            background: #007bfc;
-            color: #fff;
-            border-color: #007bfc;
+        .adugna-btn i { font-size: 1em; }
+        .adugna-btn:hover, .adugna-btn:focus { background: #145ea8; }
+        .adugna-btn-secondary {
+            background: #e3eafc;
+            color: #1976d2;
+            border: 1px solid #b6d0f7;
         }
-        .erpnext-btn.btn-primary:hover {
-            background: #0056b3;
-            color: #fff;
-        }
-        .erpnext-btn.btn-secondary {
-            background: #f5f7fa;
-            color: #36414c;
-            border-color: #d1d8dd;
-        }
-        .erpnext-btn.btn-secondary:hover {
-            background: #e4e8ec;
+        .adugna-btn-secondary:hover { background: #d0e2fa; }
+        .adugna-error-message {
+            background: #ffeaea;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px 18px;
+            margin-bottom: 1em;
+            font-size: 0.97em;
         }
         @media (max-width: 600px) {
-            .erpnext-card {
-                padding: 1rem;
-            }
-            .erpnext-btn {
-                padding: 6px 12px;
-                font-size: 0.85rem;
-            }
+            .adugna-main-content { padding: 0.7rem 0.2rem 1rem 0.2rem; }
+            .adugna-header-title { font-size: 1.05em; }
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1>Edit Ticket</h1>
-            </header>
-            <div class="content">
-                <div class="erpnext-card" style="max-width:500px; margin:auto;">
-                    <?php if ($error): ?>
-                        <div style="color:#e74c3c;"><?= htmlspecialchars($error) ?></div>
-                    <?php endif; ?>
-                    <form method="post">
-                        <div style="margin-bottom:1rem;">
-                            <label for="subject">Subject</label>
-                            <input type="text" name="subject" id="subject" value="<?= htmlspecialchars($ticket['subject']) ?>" required>
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="status">Status</label>
-                            <select name="status" id="status" required>
-                                <?php
-                                $statusStmt = $pdo->query("SHOW COLUMNS FROM support_tickets LIKE 'status'");
-                                $statusRow = $statusStmt->fetch(PDO::FETCH_ASSOC);
-                                if ($statusRow && preg_match("/^enum\((.*)\)$/", $statusRow['Type'], $matches)) {
-                                    $statuses = str_getcsv($matches[1], ',', "'");
-                                    foreach ($statuses as $status) {
-                                        $selected = $ticket['status'] === $status ? 'selected' : '';
-                                        echo "<option value=\"" . htmlspecialchars($status) . "\" $selected>" . htmlspecialchars(ucwords(str_replace('_', ' ', $status))) . "</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div style="margin-bottom:1rem;">
-                            <label for="priority">Priority</label>
-                            <select name="priority" id="priority" required>
-                                <?php
-                                $priorityStmt = $pdo->query("SHOW COLUMNS FROM support_tickets LIKE 'priority'");
-                                $priorityRow = $priorityStmt->fetch(PDO::FETCH_ASSOC);
-                                if ($priorityRow && preg_match("/^enum\((.*)\)$/", $priorityRow['Type'], $matches)) {
-                                    $priorities = str_getcsv($matches[1], ',', "'");
-                                    foreach ($priorities as $priority) {
-                                        $selected = $ticket['priority'] === $priority ? 'selected' : '';
-                                        echo "<option value=\"" . htmlspecialchars($priority) . "\" $selected>" . htmlspecialchars(ucwords($priority)) . "</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <button type="submit" class="erpnext-btn btn-primary">Update Ticket</button>
-                        <a href="support_tickets.php" class="erpnext-btn btn-secondary">Cancel</a>
-                    </form>
-                </div>
+        <div class="adugna-main-content">
+            <div class="adugna-header-title">
+                <i class="fas fa-ticket-alt"></i> Edit Ticket
             </div>
+            <?php if ($error): ?>
+                <div class="adugna-error-message"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+            <form method="post">
+                <div class="adugna-form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" name="subject" id="subject" value="<?= htmlspecialchars($ticket['subject']) ?>" required>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" required>
+                        <?php
+                        $statusStmt = $pdo->query("SHOW COLUMNS FROM support_tickets LIKE 'status'");
+                        $statusRow = $statusStmt->fetch(PDO::FETCH_ASSOC);
+                        if ($statusRow && preg_match("/^enum\((.*)\)$/", $statusRow['Type'], $matches)) {
+                            $statuses = str_getcsv($matches[1], ',', "'");
+                            foreach ($statuses as $status) {
+                                $selected = $ticket['status'] === $status ? 'selected' : '';
+                                echo "<option value=\"" . htmlspecialchars($status) . "\" $selected>" . htmlspecialchars(ucwords(str_replace('_', ' ', $status))) . "</option>";
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="priority">Priority</label>
+                    <select name="priority" id="priority" required>
+                        <?php
+                        $priorityStmt = $pdo->query("SHOW COLUMNS FROM support_tickets LIKE 'priority'");
+                        $priorityRow = $priorityStmt->fetch(PDO::FETCH_ASSOC);
+                        if ($priorityRow && preg_match("/^enum\((.*)\)$/", $priorityRow['Type'], $matches)) {
+                            $priorities = str_getcsv($matches[1], ',', "'");
+                            foreach ($priorities as $priority) {
+                                $selected = $ticket['priority'] === $priority ? 'selected' : '';
+                                echo "<option value=\"" . htmlspecialchars($priority) . "\" $selected>" . htmlspecialchars(ucwords($priority)) . "</option>";
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+                <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Update Ticket</button>
+                <a href="support_tickets.php" class="adugna-btn adugna-btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+            </form>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
