@@ -423,7 +423,6 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-        <?= htmlspecialchars($pageTitle) ?>
         </header>
             <div class="admin-content" style="display: flex; justify-content: center; align-items: flex-start; min-height: 80vh; background: #f5f8ff; padding: 2.5rem 0;">
                 <div class="adugna-form-grid" style="width: 100%; max-width: 900px; display: flex; flex-wrap: wrap; gap: 2.5rem; justify-content: center; align-items: flex-start;">
