@@ -71,7 +71,7 @@
       "title": "Role Management",
       "icon": "user-shield",
       "items": [
-        { "title": "User Roles", "icon": "user-tag", "link": "user_roles.php" },
+        { "title": "User Roles", "icon": "user-tag", "link": "user_roles.php" }
       ],
       "id": "role-management-menu"
     },
