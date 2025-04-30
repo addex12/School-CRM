@@ -1,10 +1,10 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
  */
 ob_start();
 require_once '../includes/auth.php';
@@ -130,6 +130,33 @@ try {
 } catch (Exception $e) {
     $unreadMessagesCount = 0;
     error_log("Unread Messages Error: " . $e->getMessage());
+}
+
+// Fetch new survey responses (unseen by admin)
+$newSurveyResponses = 0;
+try {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM survey_responses WHERE is_seen_admin = 0");
+    $newSurveyResponses = $stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {
+    $newSurveyResponses = 0;
+}
+
+// Fetch new feedback (unseen by admin)
+$newFeedback = 0;
+try {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM feedback WHERE is_seen_admin = 0");
+    $newFeedback = $stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {
+    $newFeedback = 0;
+}
+
+// Fetch new tickets (unseen by admin)
+$newTickets = 0;
+try {
+    $stmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE is_seen_admin = 0");
+    $newTickets = $stmt->fetchColumn() ?: 0;
+} catch (Exception $e) {
+    $newTickets = 0;
 }
 
 // Fetch recent activity log
@@ -421,6 +448,37 @@ try {
             align-items: center;
             gap: 0.5rem;
         }
+        .adugna-alert-icon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            margin-left: 0.2em;
+            margin-right: 0.2em;
+            font-size: 1.1em;
+            color: #2563eb;
+            background: #f1f5f9;
+            border-radius: 50%;
+            padding: 0.18em 0.22em;
+            transition: background 0.13s;
+        }
+        .adugna-alert-icon:hover {
+            background: #e0e7ef;
+            color: #1741a6;
+        }
+        .adugna-alert-badge {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.72em;
+            font-weight: 700;
+            min-width: 18px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.09);
+        }
         .adugna-widget-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
@@ -523,17 +581,38 @@ try {
         <div class="adugna-main">
             <header class="adugna-header">
                 <h1><?= htmlspecialchars($pageTitle) ?></h1>
+                <!-- Adugna Gizaw: Profile menu with new alerts (messages, survey responses, feedback, tickets) -->
                 <div class="adugna-profile-menu">
-                    <?php if ($unreadMessagesCount > 0): ?>
-                        <a href="messages.php" class="adugna-btn-secondary" style="position:relative;">
-                            <i class="fas fa-envelope"></i>
-                            <span style="position:absolute;top:-8px;right:-8px;background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.78em;font-weight:600;">
-                                <?= $unreadMessagesCount ?>
-                            </span>
-                            <span style="margin-left:1.3em;">New</span>
-                        </a>
-                    <?php endif; ?>
-                    <a href="profile.php" class="adugna-btn-secondary">
+                    <!-- New Messages -->
+                    <a href="messages.php" class="adugna-alert-icon" title="New Messages">
+                        <i class="fas fa-envelope"></i>
+                        <?php if ($unreadMessagesCount > 0): ?>
+                            <span class="adugna-alert-badge"><?= $unreadMessagesCount ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <!-- New Survey Responses -->
+                    <a href="all_responses.php" class="adugna-alert-icon" title="New Survey Responses">
+                        <i class="fas fa-poll"></i>
+                        <?php if ($newSurveyResponses > 0): ?>
+                            <span class="adugna-alert-badge"><?= $newSurveyResponses ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <!-- New Feedback -->
+                    <a href="feedback.php" class="adugna-alert-icon" title="New Feedback">
+                        <i class="fas fa-comment-dots"></i>
+                        <?php if ($newFeedback > 0): ?>
+                            <span class="adugna-alert-badge"><?= $newFeedback ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <!-- New Tickets -->
+                    <a href="support_tickets.php" class="adugna-alert-icon" title="New Tickets">
+                        <i class="fas fa-ticket-alt"></i>
+                        <?php if ($newTickets > 0): ?>
+                            <span class="adugna-alert-badge"><?= $newTickets ?></span>
+                        <?php endif; ?>
+                    </a>
+                    <!-- Profile -->
+                    <a href="profile.php" class="adugna-btn-secondary" style="margin-left:0.3em;">
                         <i class="fas fa-user-circle"></i>
                     </a>
                 </div>
