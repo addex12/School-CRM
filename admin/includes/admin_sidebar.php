@@ -124,18 +124,43 @@ body {
     color: #fff;
 }
 .adugna-sidebar-toggle-btn {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 1100;
     background: #2563eb !important;
     color: #fff !important;
     border: none;
     box-shadow: 0 2px 8px rgba(80,112,255,0.13);
     font-size: 1.2em;
+    border-radius: 4px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
 }
 .adugna-sidebar-toggle-btn:hover {
     background: #38bdf8 !important;
     color: #fff !important;
 }
+.adugna-sidebar-toggle-btn .adugna-hamburger {
+    width: 24px;
+    height: 18px;
+    display: inline-block;
+    position: relative;
+}
 .adugna-sidebar-toggle-btn .adugna-hamburger span {
-    background: #2563eb !important;
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #fff;
+    border-radius: 2px;
+    margin-bottom: 5px;
+    transition: all 0.3s;
+}
+.adugna-sidebar-toggle-btn .adugna-hamburger span:last-child {
+    margin-bottom: 0;
 }
 .adugna-sidebar-overlay {
     background: rgba(56,189,248,0.13) !important;
