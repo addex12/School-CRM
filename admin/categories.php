@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 // Set timezone for categories management
 date_default_timezone_set('Africa/Nairobi');
 
@@ -85,164 +92,147 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="content">
-                <?php include 'includes/alerts.php'; ?>
-
-                <section class="form-section card">
-                    <h2>Add New Category</h2>
-                    <form method="POST">
-                        <div class="form-group">
-                            <label for="name">Category Name</label>
-                            <input type="text" name="name" id="name" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="description">Description</label>
-                            <textarea name="description" id="description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <button type="submit" name="add_category" class="btn btn-primary btn-sm">
-                            <i class="fa fa-plus fa-sm"></i> Add Category
-                        </button>
-                    </form>
-                </section>
-
-                <section class="table-section card">
-                    <h2>Existing Categories</h2>
-                    <?php if (count($categories) > 0): ?>
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Description</th>
-                                        <th>Created At</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($categories as $category): ?>
-                                        <tr>
-                                            <td><?= htmlspecialchars($category['id']) ?></td>
-                                            <td><?= htmlspecialchars($category['name']) ?></td>
-                                            <td><?= htmlspecialchars($category['description'] ?? 'N/A') ?></td>
-                                            <td><?= date('M j, Y g:i A', strtotime($category['created_at'])) ?></td>
-                                            <td>
-                                                <button class="btn btn-secondary btn-sm" onclick="editCategory(<?= $category['id'] ?>, '<?= htmlspecialchars($category['name']) ?>', '<?= htmlspecialchars($category['description']) ?>')">
-                                                    <i class="fa fa-edit fa-sm"></i> Edit
-                                                </button>
-                                                <form method="POST" style="display:inline;">
-                                                    <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
-                                                    <button type="submit" name="delete_category" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this category?')">
-                                                        <i class="fa fa-trash fa-sm"></i> Delete
-                                                    </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    <?php else: ?>
-                        <p>No categories found.</p>
-                    <?php endif; ?>
-                </section>
-            </div>
-        </div>
-    </div>
-
-    <!-- Edit Modal -->
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Edit Category</h2>
-            <form method="POST">
-                <input type="hidden" name="category_id" id="editCategoryId">
-                <div class="form-group">
-                    <label for="editName">Category Name</label>
-                    <input type="text" name="name" id="editName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="editDescription">Description</label>
-                    <textarea name="description" id="editDescription" class="form-control" rows="3"></textarea>
-                </div>
-                <button type="submit" name="edit_category" class="btn btn-primary btn-sm">
-                    <i class="fa fa-save fa-sm"></i> Save Changes
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function editCategory(id, name, description) {
-            document.getElementById('editCategoryId').value = id;
-            document.getElementById('editName').value = name;
-            document.getElementById('editDescription').value = description;
-            document.getElementById('editModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-    </script>
-
     <style>
-        .card {
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
 
-        .btn {
+        .adugna-main-content {
+            max-width: 1000px;
+            margin: 32px auto 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 18px 18px 28px 18px;
+            transition: box-shadow 0.2s;
+        }
+        .adugna-header-title {
+            font-size: 1.35em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+        }
+        .adugna-card {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+            padding: 1.1rem 1.2rem 1.2rem 1.2rem;
+            margin-bottom: 1.5rem;
+            transition: box-shadow 0.2s, width 0.2s;
+        }
+        .adugna-card-header {
+            font-size: 1.13em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 1em;
+            letter-spacing: 0.01em;
+        }
+        .adugna-form-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
+        }
+        .adugna-form-group label {
+            font-size: 0.97em;
+            color: #444;
+            font-weight: 500;
+        }
+        .adugna-form-group input,
+        .adugna-form-group textarea {
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #d0d7de;
+            font-size: 0.97em;
+            background: #f9fbfd;
+            color: #222;
+        }
+        .adugna-form-group textarea {
+            min-height: 70px;
+            resize: vertical;
+        }
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 13px;
+            font-size: 0.97em;
+            cursor: pointer;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            padding: 8px 12px;
-            border: none;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .adugna-btn i {
+            font-size: 1em;
+        }
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: #145ea8;
+        }
+        .adugna-btn-secondary {
+            background: #e3eafc;
+            color: #1976d2;
+            border: 1px solid #b6d0f7;
+        }
+        .adugna-btn-secondary:hover {
+            background: #d0e2fa;
+        }
+        .adugna-btn-danger {
+            background: #dc3545;
+            color: #fff;
+            border: 1px solid #dc3545;
+        }
+        .adugna-btn-danger:hover {
+            background: #c82333;
+        }
+        .adugna-btn-sm {
+            padding: 2px 7px;
+            font-size: 0.93em;
             border-radius: 3px;
-            font-size: 12px;
-            cursor: pointer;
         }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .btn-secondary {
-            background-color: #6c757d;
-            color: #fff;
-        }
-
-        .btn-danger {
-            background-color: #dc3545;
-            color: #fff;
-        }
-
-        .btn-sm {
-            padding: 6px 10px;
-            font-size: 11px;
-        }
-
-        .fa-sm {
-            font-size: 0.875em;
-        }
-
-        .table-responsive {
+        .adugna-table-responsive {
             overflow-x: auto;
+            margin-top: 1em;
         }
-
-        .modal {
+        .adugna-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.97em;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(25,118,210,0.04);
+        }
+        .adugna-table th, .adugna-table td {
+            padding: 7px 8px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .adugna-table th {
+            background: #f5f7fa;
+            color: #1976d2;
+            font-weight: 600;
+            font-size: 0.98em;
+        }
+        .adugna-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .adugna-table-actions {
+            display: flex;
+            gap: 0.5em;
+        }
+        .adugna-modal {
             display: none;
             position: fixed;
             z-index: 1000;
@@ -253,69 +243,155 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.4);
         }
-
-        .modal-content {
+        .adugna-modal-content {
             background-color: #fefefe;
-            margin: 15% auto;
+            margin: 8% auto;
             padding: 15px;
             border: 1px solid #888;
-            width: 50%;
-            border-radius: 6px;
+            width: 90%;
+            max-width: 420px;
+            border-radius: 8px;
         }
-
-        .close {
+        .adugna-modal-close {
             color: #aaa;
             float: right;
             font-size: 24px;
             font-weight: bold;
         }
-
-        .close:hover,
-        .close:focus {
-            color: black;
+        .adugna-modal-close:hover,
+        .adugna-modal-close:focus {
+            color: #1976d2;
             text-decoration: none;
             cursor: pointer;
         }
-
-        @media (max-width: 900px) {
-            .form-section, .table-section {
-                padding: 10px !important;
-                margin: 8px 0 !important;
-            }
+        @media (max-width: 1100px) {
+            .adugna-main-content { max-width: 99vw; margin: 18px 2vw 0 2vw; padding: 10px 4px 18px 4px; }
         }
-
+        @media (max-width: 900px) {
+            .adugna-main-content, .adugna-card { padding: 0.7rem 0.5rem 1rem 0.5rem; }
+        }
         @media (max-width: 600px) {
-            .form-section, .table-section {
-                padding: 6px !important;
-                margin: 4px 0 !important;
-            }
-            .form-actions {
-                flex-direction: column !important;
-                gap: 8px !important;
-            }
-            .admin-header {
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 6px !important;
-            }
-            .page-title, h1, h2 {
-                font-size: 1rem !important;
-            }
-            .table-responsive, .table {
-                display: block;
-                width: 100%;
-                overflow-x: auto;
-            }
-            th, td {
-                white-space: nowrap;
-                font-size: 0.85em;
-            }
-            .modal-content {
-                width: 90% !important;
-                min-width: 0 !important;
-            }
+            .adugna-main-content, .adugna-card { padding: 0.5rem 0.2rem 0.7rem 0.2rem; }
+            .adugna-header-title { font-size: 1.1em; }
+            .adugna-modal-content { width: 98% !important; min-width: 0 !important; }
         }
     </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <div class="adugna-main-content">
+            <header class="adugna-header-title">
+                <i class="fas fa-layer-group"></i> <?= htmlspecialchars($pageTitle) ?>
+            </header>
+            <?php include 'includes/alerts.php'; ?>
+
+            <!-- Adugna Gizaw: Add New Category Form -->
+            <div class="adugna-card">
+                <div class="adugna-card-header"><i class="fas fa-plus"></i> Add New Category</div>
+                <form method="POST">
+                    <div class="adugna-form-group">
+                        <label for="name">Category Name</label>
+                        <input type="text" name="name" id="name" required>
+                    </div>
+                    <div class="adugna-form-group">
+                        <label for="description">Description</label>
+                        <textarea name="description" id="description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" name="add_category" class="adugna-btn adugna-btn-sm">
+                        <i class="fas fa-plus"></i> Add Category
+                    </button>
+                </form>
+            </div>
+
+            <!-- Adugna Gizaw: Existing Categories Table -->
+            <div class="adugna-card">
+                <div class="adugna-card-header"><i class="fas fa-list"></i> Existing Categories</div>
+                <?php if (count($categories) > 0): ?>
+                    <div class="adugna-table-responsive">
+                        <table class="adugna-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Created At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($categories as $category): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($category['id']) ?></td>
+                                        <td><?= htmlspecialchars($category['name']) ?></td>
+                                        <td><?= htmlspecialchars($category['description'] ?? 'N/A') ?></td>
+                                        <td><?= date('M j, Y g:i A', strtotime($category['created_at'])) ?></td>
+                                        <td class="adugna-table-actions">
+                                            <button class="adugna-btn adugna-btn-secondary adugna-btn-sm" onclick="editCategory(<?= $category['id'] ?>, '<?= htmlspecialchars(addslashes($category['name'])) ?>', '<?= htmlspecialchars(addslashes($category['description'])) ?>')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="category_id" value="<?= $category['id'] ?>">
+                                                <button type="submit" name="delete_category" class="adugna-btn adugna-btn-danger adugna-btn-sm" onclick="return confirm('Are you sure you want to delete this category?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <p style="color:#888;">No categories found.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adugna Gizaw: Edit Modal for Category -->
+    <div id="adugna-edit-modal" class="adugna-modal">
+        <div class="adugna-modal-content">
+            <span class="adugna-modal-close" onclick="closeModal()">&times;</span>
+            <h2 style="margin-bottom:1em;"><i class="fas fa-edit"></i> Edit Category</h2>
+            <form method="POST">
+                <input type="hidden" name="category_id" id="adugna-editCategoryId">
+                <div class="adugna-form-group">
+                    <label for="adugna-editName">Category Name</label>
+                    <input type="text" name="name" id="adugna-editName" required>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="adugna-editDescription">Description</label>
+                    <textarea name="description" id="adugna-editDescription" rows="3"></textarea>
+                </div>
+                <button type="submit" name="edit_category" class="adugna-btn adugna-btn-sm">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Adugna Gizaw: Show modal for editing category, fill with selected values.
+         */
+        function editCategory(id, name, description) {
+            document.getElementById('adugna-editCategoryId').value = id;
+            document.getElementById('adugna-editName').value = name;
+            document.getElementById('adugna-editDescription').value = description;
+            document.getElementById('adugna-edit-modal').style.display = 'block';
+        }
+        function closeModal() {
+            document.getElementById('adugna-edit-modal').style.display = 'none';
+        }
+        // Optional: close modal when clicking outside
+        window.onclick = function(event) {
+            var modal = document.getElementById('adugna-edit-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
