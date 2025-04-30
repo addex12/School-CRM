@@ -157,7 +157,7 @@ $settings_fields = [
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Adugna Gizaw: Sidebar and layout styles with adugna- prefix for patenting */
+        /* Adugna Gizaw: All custom styles use adugna- prefix for patenting and clarity */
         .adugna-sidebar {
             width: 220px;
             background: #232f3e;
@@ -427,7 +427,7 @@ $settings_fields = [
         <i class="fas fa-bars"></i>
     </button>
     <div class="adugna-admin-dashboard">
-        <!-- Adugna Gizaw: Sidebar with submenu logic -->
+        <!-- Adugna Gizaw: Sidebar with submenu logic (do not touch Admin_sidebar or footer CSS) -->
         <nav class="adugna-sidebar" id="adugnaSidebar">
             <div class="adugna-logo">
                 <i class="fas fa-school"></i> School CRM
