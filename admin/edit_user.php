@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 // Set timezone for user edit page
 date_default_timezone_set('Africa/Nairobi');
 require_once '../includes/config.php';
@@ -111,74 +118,118 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .form-container {
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-main-content {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 32px auto 0 auto;
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2.2rem 2rem 2.5rem 2rem;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 22px 18px 28px 18px;
+            transition: box-shadow 0.2s;
         }
-        .form-group { margin-bottom: 1.5rem; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: #215967; }
-        input[type="text"], input[type="email"], select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            background: #f9fafb;
-            font-size: 1rem;
+        .adugna-header-title {
+            font-size: 1.25em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
+            text-align: center;
         }
-        .form-actions {
+        .adugna-form-group {
+            margin-bottom: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
+        }
+        .adugna-form-group label {
+            font-size: 0.97em;
+            color: #444;
+            font-weight: 500;
+        }
+        .adugna-form-group input,
+        .adugna-form-group select {
+            padding: 7px 10px;
+            border-radius: 4px;
+            border: 1px solid #d0d7de;
+            font-size: 0.97em;
+            background: #f9fbfd;
+            color: #222;
+        }
+        .adugna-form-actions {
             margin-top: 2rem;
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
-        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
-            display: inline-block;
-            padding: 10px 22px;
-            font-size: 15px;
-            border-radius: 4px;
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
             border: none;
-            background: #f5f7fa;
-            color: #215967;
-            font-weight: 600;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            border-radius: 4px;
+            padding: 5px 13px;
+            font-size: 0.97em;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
             text-decoration: none;
         }
-        .btn-primary, .erpnext-btn.btn-primary {
-            background: #3b82f6;
+        .adugna-btn i { font-size: 1em; }
+        .adugna-btn:hover, .adugna-btn:focus { background: #145ea8; }
+        .adugna-btn-secondary {
+            background: #e3eafc;
+            color: #1976d2;
+            border: 1px solid #b6d0f7;
+        }
+        .adugna-btn-secondary:hover { background: #d0e2fa; }
+        .adugna-btn-danger {
+            background: #e74c3c;
             color: #fff;
+            border: 1px solid #e74c3c;
         }
-        .btn-primary:hover, .erpnext-btn.btn-primary:hover {
+        .adugna-btn-danger:hover { background: #c82333; }
+        .adugna-btn-info {
             background: #2563eb;
+            color: #fff;
+            border: 1px solid #2563eb;
         }
-        .btn-secondary, .erpnext-btn.btn-secondary {
-            background: #eaeaea;
-            color: #666;
+        .adugna-btn-info:hover { background: #1741a6; }
+        .adugna-error-message {
+            background: #ffeaea;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px 18px;
+            margin-bottom: 1em;
+            font-size: 0.97em;
         }
-        .btn-secondary:hover, .erpnext-btn.btn-secondary:hover {
-            background: #e2efda;
-            color: #215967;
+        .adugna-success-message {
+            background: #eafaf1;
+            color: #27ae60;
+            border: 1px solid #d4f5e9;
+            border-radius: 5px;
+            padding: 10px 18px;
+            margin-bottom: 1em;
+            font-size: 0.97em;
         }
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #fca5a5;
-        }
+        hr { margin: 2rem 0; border: none; border-top: 1px solid #e5e7eb; }
         @media (max-width: 900px) {
-            .form-container, .admin-main { padding: 1rem; }
+            .adugna-main-content { padding: 1rem; }
         }
         @media (max-width: 600px) {
-            .form-container, .admin-main { padding: 4px; }
-            .erpnext-btn, .btn, .btn-primary { padding: 6px 10px; font-size: 0.95em; }
+            .adugna-main-content { padding: 0.7rem 0.2rem 1rem 0.2rem; }
+            .adugna-btn, .adugna-btn-primary { padding: 6px 10px; font-size: 0.95em; }
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -189,65 +240,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <header class="admin-header">
-                <h1 style="color:#215967;font-weight:700;"><i class="fas fa-user-edit"></i> <?= htmlspecialchars($pageTitle) ?></h1>
-            </header>
-            <div class="form-container">
-                <?php if (isset($_SESSION['error'])): ?>
-                    <div class="error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
-                <?php endif; ?>
-                <?php if (isset($_SESSION['success'])): ?>
-                    <div class="alert alert-success" style="background:#dcfce7;color:#27ae60;padding:1rem;margin-bottom:1rem;border-radius:6px;">
-                        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
-                    </div>
-                <?php endif; ?>
-                <form method="POST">
-                    <input type="hidden" name="update_user">
-                    <div class="form-group">
-                        <label for="username">Username:</label>
-                        <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username']); ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email:</label>
-                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']); ?>" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Role:</label>
-                        <select id="role" name="role_id" required>
-                            <?php foreach ($roles as $role): ?>
-                                <option value="<?= $role['id']; ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : ''; ?>>
-                                    <?= htmlspecialchars($role['role_name']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <a href="users.php" class="erpnext-btn btn-secondary">Cancel</a>
-                        <button type="submit" class="erpnext-btn btn-primary"><i class="fas fa-save"></i> Update User</button>
-                    </div>
-                </form>
-                <hr style="margin:2rem 0;">
-                <h3 style="color:#215967;">Password Management</h3>
-                <form method="POST" style="margin-bottom:1.2rem;">
-                    <button type="submit" name="reset_random_password" class="erpnext-btn btn-info" onclick="return confirm('Reset password and send to user email?')">
-                        <i class="fas fa-random"></i> Reset Random Password & Email
-                    </button>
-                </form>
-                <form method="POST" style="display:flex;gap:1rem;align-items:center;">
-                    <input type="password" name="manual_password" placeholder="Enter new password" required style="flex:1;min-width:180px;">
-                    <button type="submit" name="reset_manual_password" class="erpnext-btn btn-primary">
-                        <i class="fas fa-key"></i> Set Password Manually
-                    </button>
-                </form>
-                <hr style="margin:2rem 0;">
-                <h3 style="color:#e74c3c;">Danger Zone</h3>
-                <form method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This cannot be undone!');">
-                    <button type="submit" name="delete_user" class="erpnext-btn btn-danger">
-                        <i class="fas fa-trash"></i> Delete User
-                    </button>
-                </form>
+        <div class="adugna-main-content">
+            <div class="adugna-header-title">
+                <i class="fas fa-user-edit"></i> <?= htmlspecialchars($pageTitle) ?>
             </div>
+            <?php if (isset($_SESSION['error'])): ?>
+                <div class="adugna-error-message"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['success'])): ?>
+                <div class="adugna-success-message">
+                    <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                </div>
+            <?php endif; ?>
+            <form method="POST">
+                <input type="hidden" name="update_user">
+                <div class="adugna-form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="<?= htmlspecialchars($user['username']); ?>" required>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<?= htmlspecialchars($user['email']); ?>" required>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="role">Role:</label>
+                    <select id="role" name="role_id" required>
+                        <?php foreach ($roles as $role): ?>
+                            <option value="<?= $role['id']; ?>" <?= $role['id'] == $user['role_id'] ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($role['role_name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="adugna-form-actions">
+                    <a href="users.php" class="adugna-btn adugna-btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+                    <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Update User</button>
+                </div>
+            </form>
+            <hr>
+            <h3 style="color:#215967;">Password Management</h3>
+            <form method="POST" style="margin-bottom:1.2rem;">
+                <button type="submit" name="reset_random_password" class="adugna-btn adugna-btn-info" onclick="return confirm('Reset password and send to user email?')">
+                    <i class="fas fa-random"></i> Reset Random Password & Email
+                </button>
+            </form>
+            <form method="POST" style="display:flex;gap:1rem;align-items:center;">
+                <input type="password" name="manual_password" placeholder="Enter new password" required style="flex:1;min-width:180px;">
+                <button type="submit" name="reset_manual_password" class="adugna-btn">
+                    <i class="fas fa-key"></i> Set Password Manually
+                </button>
+            </form>
+            <hr>
+            <h3 style="color:#e74c3c;">Danger Zone</h3>
+            <form method="POST" onsubmit="return confirm('Are you sure you want to delete this user? This cannot be undone!');">
+                <button type="submit" name="delete_user" class="adugna-btn adugna-btn-danger">
+                    <i class="fas fa-trash"></i> Delete User
+                </button>
+            </form>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
