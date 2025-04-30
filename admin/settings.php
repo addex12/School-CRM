@@ -67,45 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
             }
         }
 
-        // Handle multiple login background images
-        if (isset($_FILES['login_bg_images']) && !empty($_FILES['login_bg_images']['name'][0])) {
-            $bgImages = [];
-            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-            foreach ($_FILES['login_bg_images']['tmp_name'] as $idx => $tmpName) {
-                if ($_FILES['login_bg_images']['error'][$idx] === UPLOAD_ERR_OK) {
-                    $fileType = mime_content_type($tmpName);
-                    if (in_array($fileType, $allowedTypes)) {
-                        $ext = pathinfo($_FILES['login_bg_images']['name'][$idx], PATHINFO_EXTENSION);
-                        $fileName = 'bg_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
-                        $targetFile = $uploadDir . $fileName;
-                        move_uploaded_file($tmpName, $targetFile);
-                        $bgImages[] = $fileName;
-                    }
-                }
-            }
-            // Merge with existing images if any
-            $existing = [];
-            if (!empty($settings['login_bg_images'])) {
-                $existing = json_decode($settings['login_bg_images'], true) ?: [];
-            }
-            $allImages = array_merge($existing, $bgImages);
-            $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
-            $stmt->execute(['login_bg_images', json_encode($allImages)]);
-            $settings['login_bg_images'] = json_encode($allImages);
-        }
-        // Remove background image if requested
-        if (isset($_POST['remove_bg_image'])) {
-            $remove = $_POST['remove_bg_image'];
-            $existing = json_decode($settings['login_bg_images'] ?? '[]', true) ?: [];
-            $existing = array_filter($existing, function($img) use ($remove) { return $img !== $remove; });
-            // Remove file from uploads
-            $filePath = $uploadDir . $remove;
-            if (file_exists($filePath)) unlink($filePath);
-            $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
-            $stmt->execute(['login_bg_images', json_encode(array_values($existing))]);
-            $settings['login_bg_images'] = json_encode(array_values($existing));
-        }
-
         // Save all settings to DB
         foreach ($_POST['settings'] as $key => $value) {
             $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?)
@@ -123,6 +84,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
         exit();
     } catch (Exception $e) {
         $_SESSION['error'] = "Failed to update settings: " . $e->getMessage();
+    }
+}
+
+// --- Handle multiple login background images upload (separate form) ---
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_FILES['login_bg_images']) && !empty($_FILES['login_bg_images']['name'][0])
+) {
+    try {
+        $uploadDir = '../uploads/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+        $bgImages = [];
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        foreach ($_FILES['login_bg_images']['tmp_name'] as $idx => $tmpName) {
+            if ($_FILES['login_bg_images']['error'][$idx] === UPLOAD_ERR_OK) {
+                $fileType = mime_content_type($tmpName);
+                if (in_array($fileType, $allowedTypes)) {
+                    $ext = pathinfo($_FILES['login_bg_images']['name'][$idx], PATHINFO_EXTENSION);
+                    $fileName = 'bg_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $ext;
+                    $targetFile = $uploadDir . $fileName;
+                    move_uploaded_file($tmpName, $targetFile);
+                    $bgImages[] = $fileName;
+                }
+            }
+        }
+        // Merge with existing images if any
+        $stmt = $pdo->query("SELECT setting_value FROM system_settings WHERE setting_key = 'login_bg_images'");
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $existing = [];
+        if ($row && !empty($row['setting_value'])) {
+            $existing = json_decode($row['setting_value'], true) ?: [];
+        }
+        $allImages = array_merge($existing, $bgImages);
+        $stmt = $pdo->prepare("INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
+        $stmt->execute(['login_bg_images', json_encode($allImages)]);
+        $_SESSION['success'] = "Background images uploaded successfully!";
+        header("Location: settings.php");
+        exit();
+    } catch (Exception $e) {
+        $_SESSION['error'] = "Failed to upload background images: " . $e->getMessage();
     }
 }
 
