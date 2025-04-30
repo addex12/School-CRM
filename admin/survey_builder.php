@@ -548,12 +548,24 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                 </form>
                 <?php if (($survey['is_public'] ?? false) && ($survey['id'] ?? $survey_id ?? false)): ?>
                     <div class="adugna-card" style="margin-top:1.5rem;">
-                        <h3 style="color:#215967;font-weight:600;margin-bottom:0.5em;">Public Survey Link</h3>
+                        <h3 style="color:#215967;font-weight:600;margin-bottom:0.5em;">Share Survey</h3>
                         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
                             <input type="text" id="publicSurveyLink" value="https://crm.flipperschool.com/survey_response.php?id=<?= $survey['id'] ?? $survey_id ?>" readonly style="width:350px;max-width:100%;padding:7px 10px;border:1px solid #e5e7eb;border-radius:4px;font-size:1em;background:#f3f4f6;">
                             <button class="adugna-btn adugna-btn-secondary" id="copySurveyLink"><i class="fas fa-copy"></i> Copy Link</button>
+                            <button class="adugna-btn adugna-btn-primary" id="copyShareMessage"><i class="fas fa-share-alt"></i> Copy Share Message</button>
                         </div>
                         <div style="font-size:0.95em;color:#666;margin-top:0.4em;">Share this link to allow anyone to fill the survey without login.</div>
+                        <div style="margin-top:1.2em;max-width:420px;">
+                            <div style="border:1px solid #e5e7eb;border-radius:7px;padding:1em;background:#f8fafc;box-shadow:0 1px 4px rgba(44,62,80,0.04);">
+                                <div style="font-size:1.15em;font-weight:600;color:#215967;line-height:1.3;">
+                                    <?= htmlspecialchars($survey['title'] ?? '') ?>
+                                </div>
+                                <div style="color:#444;margin:0.5em 0 0.7em 0;font-size:0.98em;">
+                                    <?= nl2br(htmlspecialchars($survey['description'] ?? '')) ?>
+                                </div>
+                                <a href="https://crm.flipperschool.com/survey_response.php?id=<?= $survey['id'] ?? $survey_id ?>" target="_blank" style="color:#fff;background:#007bff;padding:7px 16px;border-radius:4px;text-decoration:none;font-size:0.97em;display:inline-block;">Take the Survey</a>
+                            </div>
+                        </div>
                     </div>
                     <script>
                     document.getElementById('copySurveyLink').onclick = function() {
@@ -563,6 +575,20 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                         document.execCommand('copy');
                         this.textContent = 'Copied!';
                         setTimeout(() => { this.innerHTML = '<i class="fas fa-copy"></i> Copy Link'; }, 1200);
+                    };
+                    document.getElementById('copyShareMessage').onclick = function() {
+                        var title = <?= json_encode($survey['title'] ?? '') ?>;
+                        var desc = <?= json_encode($survey['description'] ?? '') ?>;
+                        var link = document.getElementById('publicSurveyLink').value;
+                        var msg = `${title}\n${desc ? desc + '\n' : ''}Take the survey: ${link}`;
+                        var temp = document.createElement('textarea');
+                        temp.value = msg;
+                        document.body.appendChild(temp);
+                        temp.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(temp);
+                        this.textContent = 'Copied!';
+                        setTimeout(() => { this.innerHTML = '<i class="fas fa-share-alt"></i> Copy Share Message'; }, 1200);
                     };
                     </script>
                 <?php endif; ?>
