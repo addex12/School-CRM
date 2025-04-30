@@ -173,6 +173,14 @@ $chart_json = json_encode($chart_data);
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--
+        Developer: Adugna Gizaw
+        Email: gizawadugna@gmail.com
+        LinkedIn: https://www.linkedin.com/in/eleganceict
+        Twitter: https://twitter.com/eleganceict1
+        GitHub: https://github.com/addex12
+        Custom styles use adugna- prefix for patenting and ERPNext/frappe/Jinja2 inspiration.
+    -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($survey['title']) ?> Results - Admin Panel</title>
@@ -186,110 +194,180 @@ $chart_json = json_encode($chart_data);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="../assets/css/add_users.css">
     <style>
-        /* ERPNext card and button styling */
-        .erpnext-card {
+        /**
+         * Developer: Adugna Gizaw
+         * Custom adugna- styles for ERPNext/frappe/Jinja2-inspired compact UI.
+         * All styles are responsive, compact, and screen-aware.
+         */
+
+        /* Card styling */
+        .adugna-card {
             background: #fff;
-            border-radius: 6px; /* Reduced border radius */
-            box-shadow: 0 1px 4px rgba(44,62,80,0.05); /* Lighter shadow */
-            padding: 1rem; /* Smaller padding */
-            margin: 1rem 0; /* Smaller margin */
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(44,62,80,0.07);
+            padding: 0.75rem 1rem;
+            margin: 0.7rem 0;
+            transition: box-shadow 0.18s;
         }
-        .erpnext-btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.3rem 0.6rem; /* Smaller button size */
-            border-radius: 3px; /* Reduced border radius */
+        .adugna-card:hover {
+            box-shadow: 0 2px 8px rgba(44,62,80,0.13);
+        }
+
+        /* Button styling */
+        .adugna-btn {
+            background: #f4f7fa;
+            color: #2c3e50;
+            border: 1px solid #e3e6eb;
+            padding: 0.25rem 0.7rem;
+            border-radius: 3px;
             font-weight: 500;
-            font-size: 0.8rem; /* Smaller font size */
-            transition: background 0.18s;
+            font-size: 0.82rem;
+            transition: background 0.18s, color 0.18s, border 0.18s;
             text-decoration: none;
             cursor: pointer;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
         }
-        .erpnext-btn-primary {
+        .adugna-btn-primary {
             background: #3498db;
+            color: #fff;
+            border-color: #3498db;
         }
-        .erpnext-btn-primary:hover {
+        .adugna-btn-primary:hover, .adugna-btn-primary:focus {
             background: #217dbb;
+            color: #fff;
         }
-        .erpnext-btn-secondary {
-            background: #eaeaea;
-            color: #666;
+        .adugna-btn-secondary {
+            background: #f4f7fa;
+            color: #2c3e50;
+            border-color: #e3e6eb;
         }
-        .erpnext-btn-secondary:hover {
+        .adugna-btn-secondary:hover, .adugna-btn-secondary:focus {
             background: #e2efda;
             color: #215967;
         }
-        .erpnext-btn-danger {
+        .adugna-btn-danger {
             background: #e74c3c;
             color: #fff;
+            border-color: #e74c3c;
         }
-        .erpnext-btn-danger:hover {
+        .adugna-btn-danger:hover, .adugna-btn-danger:focus {
             background: #c0392b;
-        }
-        .erpnext-btn-info {
-            background: #00bcd4;
             color: #fff;
         }
-        .erpnext-btn-info:hover {
+        .adugna-btn-info {
+            background: #00bcd4;
+            color: #fff;
+            border-color: #00bcd4;
+        }
+        .adugna-btn-info:hover, .adugna-btn-info:focus {
             background: #0097a7;
+            color: #fff;
         }
-        .chart-container {
-            background: white;
-            border-radius: 6px; /* Reduced border radius */
-            padding: 10px; /* Smaller padding */
-            margin-bottom: 15px; /* Smaller margin */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Lighter shadow */
+        .adugna-btn-sm {
+            font-size: 0.75rem;
+            padding: 0.18rem 0.5rem;
         }
-        .chart-title {
+
+        /* Chart container */
+        .adugna-chart-container {
+            background: #fff;
+            border-radius: 5px;
+            padding: 0.7rem;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .adugna-chart-title {
             margin-top: 0;
             color: #2c3e50;
-            font-size: 0.9rem; /* Smaller font size */
-            padding-bottom: 6px; /* Reduced padding */
-            border-bottom: 1px solid #eee;
+            font-size: 0.92rem;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #f0f0f0;
         }
-        .response-table th, .response-table td {
-            padding: 6px 8px; /* Smaller padding */
+
+        /* Table styling */
+        .adugna-table th, .adugna-table td {
+            padding: 5px 7px;
         }
-        .response-table th {
-            font-size: 0.85rem; /* Smaller font size */
+        .adugna-table th {
+            font-size: 0.8rem;
+            font-weight: 600;
         }
-        .response-table td {
-            font-size: 0.8rem; /* Smaller font size */
+        .adugna-table td {
+            font-size: 0.78rem;
         }
-        .response-table tr:hover {
+        .adugna-table tr:hover {
             background-color: #f8f9fa;
         }
-        .badge {
-            font-size: 0.65em; /* Smaller badge size */
-            padding: 0.25em 0.4em; /* Reduced padding */
+
+        /* Badge styling */
+        .adugna-badge {
+            font-size: 0.62em;
+            padding: 0.18em 0.35em;
+            border-radius: 2px;
+            background: #e3e6eb;
+            color: #2c3e50;
         }
-        .pagination .page-link {
-            padding: 0.3rem 0.5rem; /* Smaller pagination buttons */
-            font-size: 0.8rem; /* Smaller font size */
+
+        /* Pagination */
+        .adugna-pagination .page-link {
+            padding: 0.22rem 0.45rem;
+            font-size: 0.78rem;
         }
-        .filter-form {
-            background: white;
-            padding: 10px; /* Smaller padding */
-            border-radius: 6px; /* Reduced border radius */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Lighter shadow */
-            margin-bottom: 15px; /* Smaller margin */
+
+        /* Filter form */
+        .adugna-filter-form {
+            background: #fff;
+            padding: 0.7rem;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 12px;
         }
-        .filter-form .form-group label {
-            font-size: 0.8rem; /* Smaller label font size */
+        .adugna-filter-form .form-group label {
+            font-size: 0.78rem;
         }
-        .filter-form .form-control {
-            font-size: 0.8rem; /* Smaller input font size */
-            padding: 0.3rem 0.5rem; /* Reduced padding */
+        .adugna-filter-form .form-control {
+            font-size: 0.78rem;
+            padding: 0.22rem 0.45rem;
         }
-        .filter-form .btn {
-            font-size: 0.8rem; /* Smaller button font size */
-            padding: 0.3rem 0.6rem; /* Reduced padding */
+        .adugna-filter-form .btn {
+            font-size: 0.78rem;
+            padding: 0.22rem 0.45rem;
         }
-        .header-actions .dropdown-toggle i,
-        .header-actions a i {
-            font-size: 0.85rem; /* Smaller icon size */
+
+        /* Icon sizing */
+        .adugna-icon, .adugna-btn i, .header-actions .dropdown-toggle i, .header-actions a i {
+            font-size: 0.82rem !important;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 900px) {
+            .adugna-card, .adugna-chart-container, .adugna-filter-form {
+                padding: 0.5rem 0.5rem;
+            }
+            .adugna-table th, .adugna-table td {
+                font-size: 0.72rem;
+            }
+        }
+        @media (max-width: 600px) {
+            .adugna-card, .adugna-chart-container, .adugna-filter-form {
+                padding: 0.35rem 0.2rem;
+            }
+            .adugna-table th, .adugna-table td {
+                font-size: 0.68rem;
+            }
+            .header-actions {
+                flex-direction: column;
+                gap: 0.5em;
+            }
+        }
+        /* Outstanding, interactive hover/focus for cards and buttons */
+        .adugna-card:focus-within, .adugna-card:hover {
+            box-shadow: 0 2px 8px rgba(44,62,80,0.13);
+        }
+        .adugna-btn:active {
+            transform: scale(0.97);
         }
     </style>
 </head>
@@ -298,67 +376,73 @@ $chart_json = json_encode($chart_data);
         <?php include 'includes/admin_sidebar.php'; ?>
         
         <div class="admin-main">
+            <!--
+                Developer: Adugna Gizaw
+                Header with compact, responsive actions and adugna- styles.
+            -->
             <header class="admin-header">
-                <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
-                <div class="header-actions">
+                <h1 style="font-size:1.1rem;"><?= htmlspecialchars($survey['title']) ?> Results</h1>
+                <div class="header-actions" style="display:flex;gap:0.5em;align-items:center;">
                     <div class="dropdown">
-                        <button class="erpnext-btn erpnext-btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
-                            <i class="fas fa-download"></i> Export
+                        <button class="adugna-btn adugna-btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-download adugna-icon"></i> Export
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv"></i> CSV</a></li>
-                            <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf"></i> PDF</a></li>
+                            <li><a class="dropdown-item" href="export_csv.php?survey_id=<?= $survey_id ?>"><i class="fas fa-file-csv adugna-icon"></i> CSV</a></li>
+                            <li><a class="dropdown-item" href="#" id="export-pdf"><i class="fas fa-file-pdf adugna-icon"></i> PDF</a></li>
                         </ul>
                     </div>
-                    <a href="surveys.php" class="erpnext-btn erpnext-btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Surveys
+                    <a href="surveys.php" class="adugna-btn adugna-btn-secondary">
+                        <i class="fas fa-arrow-left adugna-icon"></i> Back
                     </a>
                 </div>
             </header>
 
             <!-- Survey Stats Cards -->
-            <div class="survey-stats mb-4 erpnext-card">
-                <div class="stat-card">
-                    <div class="stat-value"><?= number_format($total_responses) ?></div>
-                    <div class="stat-label">Total Responses</div>
+            <div class="survey-stats mb-4 adugna-card" style="display:flex;gap:1em;flex-wrap:wrap;">
+                <!-- Developer: Compact stat cards, responsive -->
+                <div class="stat-card" style="flex:1;min-width:120px;">
+                    <div class="stat-value" style="font-size:1.1rem;"><?= number_format($total_responses) ?></div>
+                    <div class="stat-label adugna-badge">Total Responses</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= date('M j, Y', strtotime($survey['starts_at'])) ?></div>
-                    <div class="stat-label">Start Date</div>
+                <div class="stat-card" style="flex:1;min-width:120px;">
+                    <div class="stat-value" style="font-size:1.1rem;"><?= date('M j, Y', strtotime($survey['starts_at'])) ?></div>
+                    <div class="stat-label adugna-badge">Start Date</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= date('M j, Y', strtotime($survey['ends_at'])) ?></div>
-                    <div class="stat-label">End Date</div>
+                <div class="stat-card" style="flex:1;min-width:120px;">
+                    <div class="stat-value" style="font-size:1.1rem;"><?= date('M j, Y', strtotime($survey['ends_at'])) ?></div>
+                    <div class="stat-label adugna-badge">End Date</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value"><?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></div>
-                    <div class="stat-label">Anonymous</div>
+                <div class="stat-card" style="flex:1;min-width:120px;">
+                    <div class="stat-value" style="font-size:1.1rem;"><?= $survey['is_anonymous'] ? 'Yes' : 'No' ?></div>
+                    <div class="stat-label adugna-badge">Anonymous</div>
                 </div>
             </div>
 
             <!-- Filter Section -->
             <div class="filter-section">
-                <form method="GET" class="filter-form erpnext-card">
+                <!-- Developer: Filter form with adugna- styles, responsive -->
+                <form method="GET" class="adugna-filter-form adugna-card">
                     <input type="hidden" name="survey_id" value="<?= $survey_id ?>">
-                    <div class="row">
-                        <div class="col-md-5">
+                    <div class="row" style="display:flex;flex-wrap:wrap;gap:0.5em;">
+                        <div class="col-md-5" style="flex:1;min-width:140px;">
                             <div class="form-group">
                                 <label for="start_date">From Date</label>
                                 <input type="date" class="form-control" name="start_date" value="<?= htmlspecialchars($_GET['start_date'] ?? '') ?>">
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-5" style="flex:1;min-width:140px;">
                             <div class="form-group">
                                 <label for="end_date">To Date</label>
                                 <input type="date" class="form-control" name="end_date" value="<?= htmlspecialchars($_GET['end_date'] ?? '') ?>">
                             </div>
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary mr-2">
-                                <i class="fas fa-filter"></i> Filter
+                        <div class="col-md-2 d-flex align-items-end" style="display:flex;align-items:end;gap:0.3em;">
+                            <button type="submit" class="adugna-btn adugna-btn-primary adugna-btn-sm mr-2">
+                                <i class="fas fa-filter adugna-icon"></i> Filter
                             </button>
-                            <a href="results.php?survey_id=<?= $survey_id ?>" class="btn btn-outline-secondary">
-                                <i class="fas fa-sync-alt"></i> Reset
+                            <a href="results.php?survey_id=<?= $survey_id ?>" class="adugna-btn adugna-btn-secondary adugna-btn-sm">
+                                <i class="fas fa-sync-alt adugna-icon"></i> Reset
                             </a>
                         </div>
                     </div>
@@ -369,18 +453,17 @@ $chart_json = json_encode($chart_data);
             <div class="chart-section mb-5">
                 <div class="row">
                     <div class="col-12">
-                        <div class="chart-container erpnext-card">
-                            <h3 class="chart-title">Response Summary</h3>
+                        <div class="adugna-chart-container adugna-card">
+                            <h3 class="adugna-chart-title">Response Summary</h3>
                             <canvas id="summaryChart" height="100"></canvas>
                         </div>
                     </div>
                 </div>
-                
                 <?php foreach ($fields as $field): ?>
                     <div class="row">
                         <div class="col-12">
-                            <div class="chart-container erpnext-card">
-                                <h3 class="chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
+                            <div class="adugna-chart-container adugna-card">
+                                <h3 class="adugna-chart-title"><?= htmlspecialchars($field['field_label']) ?></h3>
                                 <canvas id="fieldChart-<?= $field['id'] ?>" height="100"></canvas>
                             </div>
                         </div>
@@ -389,12 +472,11 @@ $chart_json = json_encode($chart_data);
             </div>
 
             <!-- Responses Table -->
-            <div class="response-table-section erpnext-card">
-                <h3 class="mb-3">Individual Responses</h3>
-                
+            <div class="response-table-section adugna-card">
+                <h3 class="mb-3" style="font-size:1rem;">Individual Responses</h3>
                 <?php if ($total_responses > 0): ?>
                     <div class="table-responsive">
-                        <table class="response-table">
+                        <table class="adugna-table" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>#</th>
@@ -422,10 +504,7 @@ $chart_json = json_encode($chart_data);
                                             <?php endif; ?>
                                         </td>
                                         <td><?= htmlspecialchars($response['role_name'] ?? 'N/A') ?></td>
-                                        
-                                        <?php 
-                                        // --- BEGIN: Use response_data_map for answers ---
-                                        foreach ($fields as $field): 
+                                        <?php foreach ($fields as $field): 
                                             $val = $response_data_map[$response['id']][$field['id']] ?? null;
                                         ?>
                                             <td>
@@ -434,12 +513,10 @@ $chart_json = json_encode($chart_data);
                                                     '<span class="text-muted">N/A</span>' ?>
                                             </td>
                                         <?php endforeach; ?>
-                                        <!-- --- END: Use response_data_map for answers --- -->
-                                        
                                         <td><?= date('M j, Y g:i A', strtotime($response['submitted_at'])) ?></td>
                                         <td>
-                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="erpnext-btn erpnext-btn-info btn-sm">
-                                                <i class="fas fa-eye"></i> View
+                                            <a href="response_view.php?id=<?= $response['id'] ?>" class="adugna-btn adugna-btn-info adugna-btn-sm">
+                                                <i class="fas fa-eye adugna-icon"></i> View
                                             </a>
                                         </td>
                                     </tr>
@@ -447,30 +524,25 @@ $chart_json = json_encode($chart_data);
                             </tbody>
                         </table>
                     </div>
-
                     <!-- Pagination -->
                     <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
+                        <ul class="adugna-pagination pagination justify-content-center">
                             <?php if ($page > 1): ?>
                                 <li class="page-item">
                                     <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page - 1 ?><?= $date_filter ?>">
-                                        <i class="fas fa-chevron-left"></i> Previous
+                                        <i class="fas fa-chevron-left adugna-icon"></i> Prev
                                     </a>
                                 </li>
                             <?php endif; ?>
-                            
                             <?php 
-                            // Show page numbers
                             $start_page = max(1, $page - 2);
                             $end_page = min($total_pages, $page + 2);
-                            
                             if ($start_page > 1) {
                                 echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page=1'.$date_filter.'">1</a></li>';
                                 if ($start_page > 2) {
                                     echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
                                 }
                             }
-                            
                             for ($i = $start_page; $i <= $end_page; $i++): ?>
                                 <li class="page-item <?= $i == $page ? 'active' : '' ?>">
                                     <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $i ?><?= $date_filter ?>">
@@ -478,7 +550,6 @@ $chart_json = json_encode($chart_data);
                                     </a>
                                 </li>
                             <?php endfor; 
-                            
                             if ($end_page < $total_pages) {
                                 if ($end_page < $total_pages - 1) {
                                     echo '<li class="page-item disabled"><span class="page-link">...</span></li>';
@@ -486,11 +557,10 @@ $chart_json = json_encode($chart_data);
                                 echo '<li class="page-item"><a class="page-link" href="?survey_id='.$survey_id.'&page='.$total_pages.$date_filter.'">'.$total_pages.'</a></li>';
                             }
                             ?>
-                            
                             <?php if ($page < $total_pages): ?>
                                 <li class="page-item">
                                     <a class="page-link" href="?survey_id=<?= $survey_id ?>&page=<?= $page + 1 ?><?= $date_filter ?>">
-                                        Next <i class="fas fa-chevron-right"></i>
+                                        Next <i class="fas fa-chevron-right adugna-icon"></i>
                                     </a>
                                 </li>
                             <?php endif; ?>
@@ -498,7 +568,7 @@ $chart_json = json_encode($chart_data);
                     </nav>
                 <?php else: ?>
                     <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i> No responses found for this survey. Please check back later.
+                        <i class="fas fa-info-circle adugna-icon"></i> No responses found for this survey. Please check back later.
                     </div>
                 <?php endif; ?>
             </div>
@@ -506,16 +576,21 @@ $chart_json = json_encode($chart_data);
     </div>
 </body> 
 </html>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> 
-   <script>
-    // Pass PHP data to JavaScript
+<!--
+    Developer: Adugna Gizaw
+    JS for charts, PDF export, and interactivity. All code is commented for clarity.
+-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script> 
+<script>
+    // Developer: Adugna Gizaw
+    // Pass PHP data to JavaScript for charts
     const chartData = <?= $chart_json ?>;
 
-    // Initialize charts when DOM is loaded
+    // Developer: Initialize charts on DOM load
     document.addEventListener('DOMContentLoaded', function () {
         // Summary chart - Response trend over time
         if (chartData.total_responses > 0) {
@@ -539,8 +614,8 @@ $chart_json = json_encode($chart_data);
                         tension: 0.3,
                         fill: true,
                         pointBackgroundColor: 'rgba(67, 97, 238, 1)',
-                        pointRadius: 4,
-                        pointHoverRadius: 6
+                        pointRadius: 3,
+                        pointHoverRadius: 5
                     }]
                 },
                 options: {
@@ -549,7 +624,7 @@ $chart_json = json_encode($chart_data);
                         title: {
                             display: true,
                             text: 'Response Trend Over Time',
-                            font: { size: 16 }
+                            font: { size: 14 }
                         },
                         legend: { display: false },
                         tooltip: {
@@ -585,7 +660,7 @@ $chart_json = json_encode($chart_data);
             });
         }
 
-        // Field-specific charts
+        // Developer: Field-specific charts
         chartData.fields.forEach(field => {
             const fieldAnalytics = chartData.analytics[field.id] || [];
             const ctx = document.getElementById(`fieldChart-${field.id}`).getContext('2d');
@@ -611,7 +686,7 @@ $chart_json = json_encode($chart_data);
                             title: {
                                 display: true,
                                 text: field.field_label,
-                                font: { size: 14 }
+                                font: { size: 13 }
                             },
                             legend: { display: false },
                             tooltip: {
@@ -636,12 +711,12 @@ $chart_json = json_encode($chart_data);
                     }
                 });
             } else {
-                ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle"></i> No response data available for this question.</div>';
+                ctx.canvas.parentNode.innerHTML += '<div class="alert alert-info mt-3"><i class="fas fa-info-circle adugna-icon"></i> No response data available for this question.</div>';
             }
         });
     });
 
-    // PDF Export functionality
+    // Developer: PDF Export functionality
     document.addEventListener('DOMContentLoaded', function() {
         var exportBtn = document.getElementById('export-pdf');
         if (exportBtn) {
@@ -652,12 +727,10 @@ $chart_json = json_encode($chart_data);
         }
     });
 
+    // Developer: Export results to PDF using html2canvas and jsPDF
     function exportResultsToPDF() {
-        // Select the main content to export (adjust selector as needed)
         var content = document.querySelector('.admin-main');
         if (!content) return;
-
-        // Hide export dropdown for PDF
         var dropdown = document.querySelector('.dropdown');
         if (dropdown) dropdown.style.display = 'none';
 
