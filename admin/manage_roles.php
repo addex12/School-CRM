@@ -7,6 +7,9 @@ Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
 */
 
+// Ensure DB connection and permissions
+require_once '../includes/config.php';
+
 // Fetch roles
 $roles = [];
 $result = $pdo->query("SELECT id, role_name FROM roles");
@@ -34,17 +37,19 @@ if ($res) {
     }
 }
 
-// Handle permission update
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'], $_POST['permissions'])) {
+// Handle permission update (fix: allow empty permissions array)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['role_id'])) {
     $role_id = intval($_POST['role_id']);
-    $perms = array_map('intval', $_POST['permissions']);
+    $perms = isset($_POST['permissions']) ? array_map('intval', $_POST['permissions']) : [];
 
     // Remove all current permissions
     $pdo->prepare("DELETE FROM role_permissions WHERE role_id = ?")->execute([$role_id]);
-    // Add selected permissions
-    $stmt = $pdo->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)");
-    foreach ($perms as $perm_id) {
-        $stmt->execute([$role_id, $perm_id]);
+    // Add selected permissions if any
+    if (!empty($perms)) {
+        $stmt = $pdo->prepare("INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)");
+        foreach ($perms as $perm_id) {
+            $stmt->execute([$role_id, $perm_id]);
+        }
     }
     header("Location: manage_roles.php");
     exit;
