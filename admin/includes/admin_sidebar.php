@@ -15,7 +15,6 @@ if (file_exists($configPath)) {
 $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 ?>
 <style>
-/* ERPNext/modern sidebar styling */
 .admin-sidebar {
     width: 240px;
     background: #222d32;
