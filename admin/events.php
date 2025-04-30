@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -95,211 +102,196 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-    .admin-sidebar {
-        position: fixed; /* Ensure the sidebar stays fixed */
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100%;
-        z-index: 1000; /* Ensure the sidebar is above other elements */
-        background: #2c3e50;
-        overflow-y: auto;
-    }
-
-    .admin-main {
-        margin-left: 250px; /* Adjust for sidebar width */
-        padding: 2rem;
-        transition: margin-left 0.3s ease; /* Smooth transition for sidebar toggle */
-        min-height: 100vh; /* Ensure the main content takes full height */
-        box-sizing: border-box;
-        overflow-x: hidden; /* Prevent horizontal scrolling */
-    }
-
-    @media (max-width: 768px) {
-        .admin-sidebar {
-            width: 100%; /* Sidebar takes full width on smaller screens */
-            height: auto;
-            position: relative; /* Sidebar becomes part of the flow */
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-main-content {
+            max-width: 1100px;
+            margin: 32px auto 0 auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
+            padding: 18px 18px 28px 18px;
+            transition: box-shadow 0.2s;
         }
-
-        .admin-main {
-            margin-left: 0; /* Remove margin for smaller screens */
-            padding: 1rem; /* Adjust padding for smaller screens */
+        .adugna-header-title {
+            font-size: 1.35em;
+            color: #1976d2;
+            font-weight: 700;
+            margin-bottom: 18px;
+            letter-spacing: 0.01em;
         }
-    }
-
-    .events-container {
-        max-width: 100%; /* Allow full width */
-        margin: 0 auto;
-        padding: 1rem;
-        box-sizing: border-box; /* Include padding in width calculations */
-    }
-    .events-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap; /* Allow wrapping for smaller screens */
-    }
-    .events-header h1 {
-        font-size: 1.8rem;
-        color: #34495e;
-        margin-bottom: 0.5rem; /* Add spacing for smaller screens */
-    }
-    .btn {
-        background: #007bfc;
-        color: #fff;
-        border: none;
-        padding: 0.4rem 0.8rem;
-        border-radius: 4px;
-        font-weight: 500;
-        font-size: 0.9rem;
-        transition: background 0.18s, transform 0.18s;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-    }
-    .btn:hover {
-        background: #0056b3;
-        transform: translateY(-2px);
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    }
-    .events-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
-        gap: 1rem;
-    }
-    .event-card {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        background: #fff;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 1rem;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-    .event-card input, .event-card textarea, .event-card button {
-        font-size: 0.9rem;
-        padding: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        width: 100%; /* Ensure inputs take full width */
-        box-sizing: border-box;
-    }
-    .event-card .actions {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-    }
-    .event-card .actions button {
-        flex: 1;
-    }
-    .event-form {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 1rem;
-        background: #fff;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    }
-    .event-form .form-group {
-        margin-bottom: 1rem;
-    }
-    .event-form label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-    }
-    .event-form input, .event-form textarea {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-    @media (max-width: 768px) {
-        .events-header {
+        .adugna-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 13px;
+            font-size: 0.97em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.15s;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .adugna-btn i { font-size: 1em; }
+        .adugna-btn:hover, .adugna-btn:focus { background: #145ea8; }
+        .adugna-btn-danger {
+            background: #e74c3c;
+            color: #fff;
+            border: 1px solid #e74c3c;
+        }
+        .adugna-btn-danger:hover { background: #c82333; }
+        .adugna-btn-sm { padding: 2px 7px; font-size: 0.93em; border-radius: 3px; }
+        .adugna-events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .adugna-events-header h1 {
+            font-size: 1.3rem;
+            color: #1976d2;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        .adugna-events-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+        .adugna-event-card {
+            display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            gap: 0.5rem;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 6px rgba(25,118,210,0.05);
+            transition: box-shadow 0.15s, transform 0.13s;
         }
-        .event-card {
-            padding: 0.8rem;
+        .adugna-event-card:hover {
+            box-shadow: 0 4px 16px rgba(25,118,210,0.13);
+            transform: translateY(-2px) scale(1.01);
         }
-        .event-card h2 {
-            font-size: 1rem;
+        .adugna-event-card input, .adugna-event-card textarea, .adugna-event-card button {
+            font-size: 0.95em;
+            padding: 0.5rem;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
         }
-        .event-card p {
-            font-size: 0.9rem;
+        .adugna-event-card .adugna-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
-    }
-    @media (max-width: 480px) {
-        .btn {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
+        .adugna-event-card .adugna-actions button {
+            flex: 1;
         }
-        .event-card {
-            padding: 0.6rem;
+        .adugna-event-form {
+            max-width: 600px;
+            margin: 2rem auto 0 auto;
+            padding: 1rem;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(25,118,210,0.05);
         }
-    }
+        .adugna-event-form .adugna-form-group {
+            margin-bottom: 1rem;
+        }
+        .adugna-event-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #1976d2;
+        }
+        .adugna-event-form input, .adugna-event-form textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d0d7de;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.97em;
+        }
+        @media (max-width: 1100px) {
+            .adugna-main-content { max-width: 99vw; margin: 18px 2vw 0 2vw; padding: 10px 4px 18px 4px; }
+        }
+        @media (max-width: 900px) {
+            .adugna-events-header { flex-direction: column; align-items: flex-start; gap: 0.7em; }
+            .adugna-event-card { padding: 0.8rem; }
+        }
+        @media (max-width: 600px) {
+            .adugna-main-content { padding: 0.5rem 0.2rem 0.7rem 0.2rem; }
+            .adugna-events-header h1 { font-size: 1.05rem; }
+            .adugna-event-card { padding: 0.6rem; }
+            .adugna-btn { padding: 4px 8px; font-size: 0.93em; }
+        }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
-            <div class="events-container">
-                <div class="events-header">
-                    <h1><?= htmlspecialchars($pageTitle) ?></h1>
-                    <a href="#addEventForm" class="btn"><i class="fas fa-plus"></i> Add Event</a>
-                </div>
-
-                <?php include 'includes/alerts.php'; ?>
-
-                <div class="events-list">
-                    <?php if (!empty($events)): ?>
-                        <?php foreach ($events as $event): ?>
-                            <div class="event-card">
-                                <form method="POST">
-                                    <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
-                                    <input type="text" name="title" value="<?= htmlspecialchars($event['title'] ?? '') ?>" required>
-                                    <textarea name="description" rows="2"><?= htmlspecialchars($event['description'] ?? '') ?></textarea>
-                                    <input type="datetime-local" name="start_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($event['start_date'] ?? ''))) ?>" required>
-                                    <input type="datetime-local" name="end_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($event['end_date'] ?? ''))) ?>" required>
-                                    <div class="actions">
-                                        <button type="submit" name="edit_event">Save</button>
-                                        <button type="submit" name="delete_event" style="background: #e74c3c;">Delete</button>
-                                    </div>
-                                </form>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <p>No events found.</p>
-                    <?php endif; ?>
-                </div>
-
-                <form id="addEventForm" method="POST" class="event-form">
-                    <h2>Add New Event</h2>
-                    <div class="form-group">
-                        <label for="title">Event Title</label>
-                        <input type="text" name="title" id="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea name="description" id="description" rows="3"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="start_date">Start Date</label>
-                        <input type="datetime-local" name="start_date" id="start_date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="end_date">End Date</label>
-                        <input type="datetime-local" name="end_date" id="end_date" required>
-                    </div>
-                    <button type="submit" name="add_event" class="btn">Add Event</button>
-                </form>
+        <div class="adugna-main-content">
+            <div class="adugna-events-header">
+                <h1><i class="fas fa-calendar-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
+                <a href="#addEventForm" class="adugna-btn adugna-btn-sm"><i class="fas fa-plus"></i> Add Event</a>
             </div>
+            <?php include 'includes/alerts.php'; ?>
+            <div class="adugna-events-list">
+                <?php if (!empty($events)): ?>
+                    <?php foreach ($events as $event): ?>
+                        <div class="adugna-event-card">
+                            <form method="POST">
+                                <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
+                                <input type="text" name="title" value="<?= htmlspecialchars($event['title'] ?? '') ?>" required>
+                                <textarea name="description" rows="2"><?= htmlspecialchars($event['description'] ?? '') ?></textarea>
+                                <input type="datetime-local" name="start_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($event['start_date'] ?? ''))) ?>" required>
+                                <input type="datetime-local" name="end_date" value="<?= htmlspecialchars(date('Y-m-d\TH:i', strtotime($event['end_date'] ?? ''))) ?>" required>
+                                <div class="adugna-actions">
+                                    <button type="submit" name="edit_event" class="adugna-btn adugna-btn-sm"><i class="fas fa-save"></i> Save</button>
+                                    <button type="submit" name="delete_event" class="adugna-btn adugna-btn-danger adugna-btn-sm"><i class="fas fa-trash"></i> Delete</button>
+                                </div>
+                            </form>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="color:#888;">No events found.</p>
+                <?php endif; ?>
+            </div>
+            <form id="addEventForm" method="POST" class="adugna-event-form" style="margin-top:2rem;">
+                <h2 style="color:#1976d2;font-size:1.1em;"><i class="fas fa-plus"></i> Add New Event</h2>
+                <div class="adugna-form-group">
+                    <label for="title">Event Title</label>
+                    <input type="text" name="title" id="title" required>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="description">Description</label>
+                    <textarea name="description" id="description" rows="3"></textarea>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="datetime-local" name="start_date" id="start_date" required>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="datetime-local" name="end_date" id="end_date" required>
+                </div>
+                <button type="submit" name="add_event" class="adugna-btn adugna-btn-sm"><i class="fas fa-plus"></i> Add Event</button>
+            </form>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
