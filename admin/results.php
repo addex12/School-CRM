@@ -909,8 +909,7 @@ $chart_json = json_encode($chart_data);
             if (dropdown) dropdown.style.display = '';
         });
     }
-</script>
-<script>
+
     // Developer: Adugna Gizaw
     // Print button logic - hides sidebar and prints only the main content, page-breaks for sections
     document.addEventListener('DOMContentLoaded', function() {
@@ -919,10 +918,28 @@ $chart_json = json_encode($chart_data);
             printBtn.addEventListener('click', function() {
                 // Hide sidebar and show only main content for printing
                 document.body.classList.add('adugna-print-mode');
+                // Set up A4 page size for print
+                var style = document.createElement('style');
+                style.id = 'adugna-print-a4-style';
+                style.innerHTML = `
+                    @media print {
+                        @page {
+                            size: A4 portrait;
+                            margin: 12mm 8mm 12mm 8mm;
+                        }
+                        .admin-main, .adugna-card, .adugna-chart-container, .adugna-filter-form {
+                            width: 210mm !important;
+                            max-width: 210mm !important;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
                 window.print();
                 // After print, restore
                 window.onafterprint = function() {
                     document.body.classList.remove('adugna-print-mode');
+                    var s = document.getElementById('adugna-print-a4-style');
+                    if (s) s.remove();
                 };
             });
         }
@@ -931,7 +948,7 @@ $chart_json = json_encode($chart_data);
 <style>
 /**
  * Developer: Adugna Gizaw
- * Print styles: Hide sidebar, center main, add page breaks for major sections.
+ * Print styles: Hide sidebar, center main, add page breaks for major sections, and fit to A4.
  */
 @media print {
     body.adugna-print-mode {
@@ -950,10 +967,10 @@ $chart_json = json_encode($chart_data);
         visibility: hidden !important;
     }
     body.adugna-print-mode .admin-main {
-        margin: 0 !important;
+        margin: 0 auto !important;
         padding: 0 !important;
-        max-width: 100vw !important;
-        width: 100vw !important;
+        max-width: 210mm !important;
+        width: 210mm !important;
         background: #fff !important;
         box-shadow: none !important;
     }
@@ -964,6 +981,8 @@ $chart_json = json_encode($chart_data);
         border: none !important;
         background: #fff !important;
         page-break-inside: avoid;
+        width: 100% !important;
+        max-width: 100% !important;
     }
     body.adugna-print-mode .survey-stats,
     body.adugna-print-mode .filter-section,
