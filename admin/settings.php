@@ -399,5 +399,58 @@ $settings_fields = [
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <style>
+        /* Adugna Gizaw: Make textboxes and textareas compact, attractive, and not too long */
+        .adugna-form-group input[type="text"],
+        .adugna-form-group input[type="email"],
+        .adugna-form-group input[type="number"],
+        .adugna-form-group input[type="password"],
+        .adugna-form-group select,
+        .adugna-form-group textarea {
+            max-width: 420px;
+            min-width: 180px;
+            width: 100%;
+            border-radius: 0.5em;
+            border: 1.5px solid #e5e7eb;
+            background: #f3f4f6;
+            padding: 0.65em 1em;
+            font-size: 1em;
+            transition: border 0.18s, box-shadow 0.18s;
+            box-sizing: border-box;
+            margin-bottom: 0.1em;
+        }
+        .adugna-form-group textarea {
+            min-height: 70px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .adugna-form-group input:focus,
+        .adugna-form-group select:focus,
+        .adugna-form-group textarea:focus {
+            border: 1.5px solid #4f46e5;
+            background: #fff;
+            box-shadow: 0 0 0 2px #a5b4fc33;
+        }
+        .adugna-form-group input[type="text"]:hover,
+        .adugna-form-group input[type="email"]:hover,
+        .adugna-form-group input[type="number"]:hover,
+        .adugna-form-group input[type="password"]:hover,
+        .adugna-form-group select:hover,
+        .adugna-form-group textarea:hover {
+            border: 1.5px solid #a5b4fc;
+        }
+        @media (max-width: 600px) {
+            .adugna-form-group input[type="text"],
+            .adugna-form-group input[type="email"],
+            .adugna-form-group input[type="number"],
+            .adugna-form-group input[type="password"],
+            .adugna-form-group select,
+            .adugna-form-group textarea {
+                max-width: 100%;
+                font-size: 0.97em;
+                padding: 0.5em 0.7em;
+            }
+        }
+    </style>
 </body>
 </html>
