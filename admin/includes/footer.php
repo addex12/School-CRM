@@ -48,22 +48,26 @@
 .adugna-footer-content {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
-    gap: 16px;
+    gap: 8px;
     flex-wrap: wrap;
+    flex-direction: row;
 }
 .adugna-footer-section {
-    flex: 1 1 0;
-    min-width: 0;
+    flex: 1 1 180px;
+    min-width: 120px;
+    max-width: 100%;
     padding: 0 6px;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    box-sizing: border-box;
 }
 .adugna-footer-main-info {
-    max-width: 180px;
+    max-width: 220px;
     font-weight: 500;
+    word-break: break-word;
 }
 .adugna-footer-main-info h4 {
     margin: 0 0 2px 0;
@@ -75,10 +79,11 @@
     margin: 0;
     font-size: 10px;
     color: #bfc9d1;
+    word-break: break-word;
 }
 .adugna-quick-link-list {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -97,6 +102,7 @@
     border: 1px solid #215967;
     box-shadow: 0 1px 2px rgba(44,62,80,0.04);
     display: inline-block;
+    white-space: nowrap;
 }
 .adugna-footer-link:hover, .adugna-footer-link:focus {
     color: #fff;
@@ -108,11 +114,14 @@
     text-align: right;
     flex-shrink: 0;
     min-width: 120px;
+    max-width: 100%;
+    word-break: break-word;
 }
 .adugna-social-links {
     display: flex;
     gap: 7px;
     margin-top: 2px;
+    flex-wrap: wrap;
 }
 .adugna-social-link {
     color: #f5f6fa;
@@ -128,6 +137,21 @@
     background: #215967;
     transform: scale(1.08);
 }
+@media (max-width: 1100px) {
+    .adugna-footer-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    .adugna-footer-section {
+        max-width: 100%;
+        min-width: 0;
+        padding: 0 2px;
+    }
+    .adugna-developer-info {
+        text-align: left;
+    }
+}
 @media (max-width: 900px) {
     .adugna-footer {
         left: 0 !important;
@@ -136,7 +160,12 @@
     .adugna-footer-content {
         flex-direction: column;
         gap: 6px;
-        align-items: flex-start;
+        align-items: stretch;
+    }
+    .adugna-footer-section {
+        max-width: 100%;
+        min-width: 0;
+        padding: 0 2px;
     }
     .adugna-developer-info {
         text-align: left;
