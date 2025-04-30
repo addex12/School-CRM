@@ -35,6 +35,16 @@ body {
     background: linear-gradient(120deg, #4f46e5 0%, #38bdf8 100%) !important;
     color: #fff !important;
     border-right: 2px solid #e0e7ff;
+    width: 220px;
+    min-width: 60px;
+    max-width: 220px;
+    transition: width 0.2s;
+    overflow-x: hidden;
+}
+.adugna-sidebar.adugna-collapsed {
+    width: 60px !important;
+    min-width: 60px !important;
+    max-width: 60px !important;
 }
 .adugna-sidebar .adugna-logo {
     font-size: 1.3em;
@@ -48,6 +58,11 @@ body {
     display: flex;
     align-items: center;
     gap: 0.7em;
+    transition: opacity 0.2s, width 0.2s;
+}
+.adugna-sidebar.adugna-collapsed .adugna-logo span,
+.adugna-sidebar.adugna-collapsed .adugna-logo i + span {
+    display: none;
 }
 .adugna-sidebar ul {
     list-style: none;
@@ -73,6 +88,13 @@ body {
     text-align: center;
     color: #bae6fd;
     font-size: 1.1em;
+    transition: margin 0.2s;
+}
+.adugna-sidebar.adugna-collapsed ul li .adugna-icon {
+    margin-right: 0;
+}
+.adugna-sidebar.adugna-collapsed ul li span:not(.adugna-icon) {
+    display: none;
 }
 .adugna-sidebar-link.adugna-active, .adugna-sidebar-link:hover, .adugna-sidebar-link:focus {
     background: linear-gradient(90deg, #38bdf8 0%, #4f46e5 100%);
@@ -121,6 +143,23 @@ body {
 @media (max-width: 900px) {
     .adugna-sidebar {
         box-shadow: 2px 0 16px rgba(56,189,248,0.13);
+        left: 0;
+        z-index: 1002;
+        position: fixed;
+        height: 100vh;
+    }
+    .adugna-sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(56,189,248,0.13) !important;
+        z-index: 1001;
+    }
+    body.adugna-sidebar-open .adugna-sidebar {
+        left: 0;
+    }
+    body.adugna-sidebar-open .adugna-sidebar-overlay {
+        display: block;
     }
 }
 </style>
@@ -205,7 +244,7 @@ body {
     // Main content wrapper (add class to your main content container for push effect)
     let mainContent = document.querySelector('.adugna-main-content');
 
-    // Open sidebar
+    // Collapsible/Uncollapsible logic
     function openSidebar() {
         sidebar.classList.remove('adugna-collapsed');
         if (window.innerWidth <= 900) {
@@ -216,13 +255,11 @@ body {
             overlay.style.display = 'none';
         }
     }
-    // Close sidebar
     function closeSidebar() {
         sidebar.classList.add('adugna-collapsed');
         document.body.classList.remove('adugna-sidebar-open');
         overlay.style.display = 'none';
     }
-    // Toggle sidebar
     function toggleSidebar() {
         if (sidebar.classList.contains('adugna-collapsed')) {
             openSidebar();
@@ -249,7 +286,6 @@ body {
         e.stopPropagation();
         toggleSidebar();
     });
-    // Overlay click closes sidebar
     overlay.addEventListener('click', closeSidebar);
 
     // Submenu logic
