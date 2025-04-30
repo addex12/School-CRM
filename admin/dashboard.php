@@ -32,56 +32,18 @@ if ($dashboardConfigPath && is_readable($dashboardConfigPath)) {
     $widgets = [];
 }
 
-// --- AUTO-INSERT USERS INTO PARENTS, TEACHERS, STUDENTS TABLES IF MISSING ---
-
-// Helper function to insert missing users into role tables
-function syncRoleTable($pdo, $roleName, $roleTable) {
-    // Get role_id for the role name
-    $stmt = $pdo->prepare("SELECT id FROM roles WHERE role_name = ?");
-    $stmt->execute([$roleName]);
-    $roleId = $stmt->fetchColumn();
-    if (!$roleId) return;
-
-    // Get all user ids for this role
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE role_id = ?");
-    $stmt->execute([$roleId]);
-    $userIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-    if (!$userIds) return;
-
-    // Get all user_ids already in the role table
-    $stmt = $pdo->prepare("SELECT user_id FROM $roleTable");
-    $stmt->execute();
-    $existing = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-    // Insert missing users
-    $missing = array_diff($userIds, $existing);
-    foreach ($missing as $userId) {
-        $sql = "INSERT INTO $roleTable (user_id) VALUES (?)";
-        $pdo->prepare($sql)->execute([$userId]);
-    }
-}
-
-// Sync all role tables
-syncRoleTable($pdo, 'parent', 'parents');
-syncRoleTable($pdo, 'teacher', 'teachers');
-syncRoleTable($pdo, 'student', 'students');
-
 // Fetch new amazing cards data
 try {
-    // Total Students (count users with role student)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role_id = (SELECT id FROM roles WHERE role_name = 'student')");
-    $stmt->execute();
+    // Total Students
+    $stmt = $pdo->query("SELECT COUNT(*) FROM students");
     $totalStudents = $stmt->fetchColumn() ?: 0;
 
-    // Total Teachers (count users with role teacher)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role_id = (SELECT id FROM roles WHERE role_name = 'teacher')");
-    $stmt->execute();
+    // Total Teachers
+    $stmt = $pdo->query("SELECT COUNT(*) FROM teachers");
     $totalTeachers = $stmt->fetchColumn() ?: 0;
 
-    // Total Parents (count users with role parent)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE role_id = (SELECT id FROM roles WHERE role_name = 'parent')");
-    $stmt->execute();
+    // Total Parents
+    $stmt = $pdo->query("SELECT COUNT(*) FROM parents");
     $totalParents = $stmt->fetchColumn() ?: 0;
 
     // Ongoing Tickets (open, in_progress, on_hold)
@@ -584,7 +546,6 @@ try {
                     <a href="surveys.php" class="adugna-quick-link"><i class="fas fa-poll"></i><span>Surveys</span></a>
                     <a href="feedback.php" class="adugna-quick-link"><i class="fas fa-comments"></i><span>Feedback</span></a>
                     <a href="support_tickets.php" class="adugna-quick-link"><i class="fas fa-ticket-alt"></i><span>Support Tickets</span></a>
-                    <a href="scheduler.php" class="adugna-quick-link"><i class="fa fa-clock"></i> Log Scheduler</a>
                 </div>
 
                 <!-- Widgets Section -->
