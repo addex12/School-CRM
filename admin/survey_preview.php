@@ -1,11 +1,11 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
@@ -49,194 +49,186 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Improved layout structure */
-        .admin-dashboard {
+        /* Adugna Gizaw: All custom styles use adugna- prefix for patenting and clarity */
+        .adugna-admin-dashboard, .admin-dashboard {
             display: flex;
             min-height: 100vh;
             flex-direction: column;
+            background: linear-gradient(120deg, #f0f4ff 0%, #f9fafb 100%);
         }
-
-        .admin-main {
+        .adugna-admin-main, .admin-main {
             flex: 1;
             margin-left: 250px;
-            padding: 20px 30px 80px; /* Added bottom padding for footer */
-            overflow-y: auto;
-            background: #f8f9fa;
+            padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+            background: transparent;
+            min-width: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-
-        .preview-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 30px;
+        .adugna-card {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            border-radius: 1.1rem;
+            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: none;
+            padding: 1.5rem 1.5rem;
+            margin-bottom: 2rem;
+            width: 100%;
+            max-width: 900px;
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
         }
-
-        .survey-info {
+        .adugna-btn {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff;
+            border: none;
+            border-radius: 0.5em;
+            padding: 0.28rem 0.85rem;
+            font-size: 0.97em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3em;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+            text-decoration: none;
+        }
+        .adugna-btn i {
+            font-size: 0.97em;
+        }
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-2px) scale(1.04);
+        }
+        .adugna-btn.adugna-btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+        .adugna-btn.adugna-btn-secondary:hover {
+            background: #e5e7eb;
+            color: #22223b;
+        }
+        .adugna-btn.adugna-btn-sm {
+            padding: 0.18rem 0.6rem;
+            font-size: 0.91em;
+        }
+        .adugna-preview-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 1.5rem 1.5rem;
+            background: #fff;
+            border-radius: 1.1rem;
+            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+        }
+        .adugna-survey-info {
             margin-bottom: 30px;
-            padding: 25px;
+            padding: 1.3rem 1.1rem;
             background: #f1f4f7;
-            border-radius: 8px;
+            border-radius: 1.1rem;
             border-left: 4px solid #4361ee;
         }
-
-        .preview-field {
+        .adugna-preview-field {
             margin-bottom: 25px;
-            padding: 20px;
+            padding: 1.1rem 1rem;
             border: 1px solid #e9ecef;
-            border-radius: 6px;
+            border-radius: 0.7em;
             transition: transform 0.2s ease;
+            background: #f9fafb;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-
-        .preview-field:hover {
+        .adugna-preview-field:hover {
             transform: translateX(5px);
         }
-
-        .field-meta {
-            margin-top: 15px;
-            padding-top: 15px;
+        .adugna-field-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 0.95em;
+            margin-top: 10px;
+            padding-top: 10px;
             border-top: 1px solid #eee;
-            font-size: 0.9em;
-            color: #6c757d;
         }
-
-        .rating-star {
+        .adugna-rating-star {
             color: #ffd700;
-            font-size: 1.5em;
-            margin-right: 5px;
+            font-size: 1.3em;
+            margin-right: 3px;
         }
-
-        .required {
+        .adugna-required {
             color: #dc3545;
             margin-left: 5px;
         }
-
-        .form-actions {
+        .adugna-form-actions {
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid #eee;
             text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
-
-        /* Status indicators */
-        .status-active { color: #28a745; font-weight: 500; }
-        .status-inactive { color: #6c757d; }
-        .status-upcoming { color: #ffc107; }
-        .status-ended { color: #dc3545; }
-
-        /* Form elements */
-        .form-control {
+        .adugna-form-control {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid #ced4da;
             border-radius: 4px;
             margin-top: 8px;
+            background: #f9fafb;
+            font-size: 1em;
         }
-
-        .options {
+        .adugna-options {
             margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
-        .form-check {
+        .adugna-form-check {
             margin-bottom: 8px;
+            min-width: 120px;
         }
-
-        .response-chart {
+        .adugna-response-chart {
             max-width: 100%;
             height: auto;
         }
-
-        /* ERPNext card and button styling */
-        .erpnext-card {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
-            margin: 2rem 0;
+        .adugna-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
         }
-        .erpnext-btn {
-            background: #3498db;
-            color: #fff;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            font-weight: 500;
-            transition: background 0.18s;
-            text-decoration: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-        .erpnext-btn-primary {
-            background: #3498db;
-        }
-        .erpnext-btn-primary:hover {
-            background: #217dbb;
-        }
-        .erpnext-btn-secondary {
-            background: #eaeaea;
-            color: #666;
-        }
-        .erpnext-btn-secondary:hover {
-            background: #e2efda;
+        .adugna-meta-item label {
+            font-weight: 600;
             color: #215967;
         }
-        .erpnext-btn-danger {
-            background: #e74c3c;
-            color: #fff;
+        .adugna-meta-item p {
+            margin: 0.2em 0 0 0;
+            color: #374151;
         }
-        .erpnext-btn-danger:hover {
-            background: #c0392b;
-        }
-        .erpnext-btn-info {
-            background: #00bcd4;
-            color: #fff;
-        }
-        .erpnext-btn-info:hover {
-            background: #0097a7;
-        }
-
+        .adugna-status-active { color: #28a745; font-weight: 500; }
+        .adugna-status-inactive { color: #6c757d; }
+        .adugna-status-upcoming { color: #ffc107; }
+        .adugna-status-ended { color: #dc3545; }
         @media (max-width: 900px) {
-            .admin-main {
-                margin-left: 0 !important;
-                padding: 10px 5px 80px !important;
-            }
-            .preview-container, .survey-info {
-                padding: 12px !important;
-                margin: 10px 0 !important;
-            }
-            .meta-grid {
-                grid-template-columns: 1fr !important;
-                gap: 10px !important;
-            }
+            .admin-main, .adugna-admin-main { margin-left: 0 !important; padding: 1rem 0.3rem !important; }
+            .adugna-preview-container, .adugna-survey-info { padding: 1rem !important; margin: 10px 0 !important; }
+            .adugna-meta-grid { grid-template-columns: 1fr !important; gap: 10px !important; }
         }
         @media (max-width: 600px) {
-            .admin-main {
-                padding: 5px 2px 80px !important;
-            }
-            .preview-container, .survey-info {
-                padding: 8px !important;
-                margin: 6px 0 !important;
-            }
-            .preview-field {
-                padding: 10px !important;
-            }
-            .form-actions {
-                flex-direction: column !important;
-                gap: 10px !important;
-            }
-            .admin-header {
-                flex-direction: column !important;
-                align-items: flex-start !important;
-                gap: 8px !important;
-            }
-            .page-title {
-                font-size: 1.2rem !important;
-            }
+            .admin-main, .adugna-admin-main { padding: 0.5rem 0.1rem !important; }
+            .adugna-preview-container, .adugna-survey-info { padding: 0.5rem !important; margin: 6px 0 !important; }
+            .adugna-preview-field { padding: 0.5rem !important; }
+            .adugna-form-actions { flex-direction: column !important; gap: 10px !important; }
+            .admin-header { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+            .page-title { font-size: 1.2rem !important; }
         }
-        .table-responsive {
-            overflow-x: auto;
-            width: 100%;
+        @keyframes adugnaFadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: none;}
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -244,47 +236,45 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="admin-dashboard">
+    <div class="admin-dashboard adugna-admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        
-        <div class="admin-main">
+        <div class="admin-main adugna-admin-main">
             <header class="admin-header" style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
                 <h1 class="page-title" style="margin: 0; flex: 1;"><?= htmlspecialchars($survey['title']) ?> Preview</h1>
                 <div class="header-actions" style="flex-shrink: 0;">
-                    <a href="surveys.php" class="erpnext-btn erpnext-btn-secondary" style="margin-right: 10px;">
+                    <a href="surveys.php" class="adugna-btn adugna-btn-secondary" style="margin-right: 10px;">
                         <i class="fas fa-arrow-left"></i> Back to Surveys
                     </a>
                 </div>
             </header>
-
-            <div class="content" style="margin-top: 20px;">
-                <div class="survey-info erpnext-card" aria-label="Survey Information">
+            <div class="content" style="margin-top: 20px; width:100%; max-width:900px; margin-left:auto; margin-right:auto;">
+                <div class="adugna-survey-info adugna-card" aria-label="Survey Information">
                     <div class="survey-meta">
-                        <h2>Survey Details</h2>
-                        <div class="meta-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
-                            <div class="meta-item">
+                        <h2 style="color:#215967;">Survey Details</h2>
+                        <div class="adugna-meta-grid">
+                            <div class="adugna-meta-item">
                                 <label>Description:</label>
                                 <p><?= !empty($survey['description']) ? htmlspecialchars($survey['description']) : '<em>No description provided.</em>' ?></p>
                             </div>
-                            <div class="meta-item">
+                            <div class="adugna-meta-item">
                                 <label>Target Audience:</label>
                                 <p id="target-roles" aria-live="polite">Loading...</p>
                             </div>
-                            <div class="meta-item">
+                            <div class="adugna-meta-item">
                                 <label>Status:</label>
                                 <p>
                                     <?php if (!$survey['is_active']): ?>
-                                        <span class="status-inactive">Inactive</span>
+                                        <span class="adugna-status-inactive">Inactive</span>
                                     <?php elseif (strtotime($survey['starts_at']) > time()): ?>
-                                        <span class="status-upcoming">Upcoming</span>
+                                        <span class="adugna-status-upcoming">Upcoming</span>
                                     <?php elseif (strtotime($survey['ends_at']) < time()): ?>
-                                        <span class="status-ended">Ended</span>
+                                        <span class="adugna-status-ended">Ended</span>
                                     <?php else: ?>
-                                        <span class="status-active">Active</span>
+                                        <span class="adugna-status-active">Active</span>
                                     <?php endif; ?>
                                 </p>
                             </div>
-                            <div class="meta-item">
+                            <div class="adugna-meta-item">
                                 <label>Schedule:</label>
                                 <p>
                                     <?php if (!empty($survey['starts_at']) && !empty($survey['ends_at'])): ?>
@@ -298,37 +288,33 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                         </div>
                     </div>
                 </div>
-
-                <div class="preview-container erpnext-card" aria-label="Survey Fields Preview">
+                <div class="adugna-preview-container adugna-card" aria-label="Survey Fields Preview">
                     <?php if (empty($fields)): ?>
                         <div class="alert alert-info" role="alert" style="text-align:center;">
                             No fields have been added to this survey yet.
                         </div>
                     <?php else: ?>
                         <?php foreach ($fields as $field): ?>
-                            <div class="preview-field" tabindex="0" aria-label="Field Preview" style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="adugna-preview-field" tabindex="0" aria-label="Field Preview">
                                 <div class="field-header" style="display: flex; align-items: center; gap: 8px;">
                                     <h3 style="margin: 0;"><?= htmlspecialchars($field['field_label']) ?>
                                         <?php if ($field['is_required']): ?>
-                                            <span class="required" aria-label="Required">*</span>
+                                            <span class="adugna-required" aria-label="Required">*</span>
                                         <?php endif; ?>
                                     </h3>
                                 </div>
-                                
                                 <?php if ($field['field_type'] === 'text'): ?>
-                                    <input type="text" class="form-control" disabled placeholder="Text input" aria-label="Text input preview">
-
+                                    <input type="text" class="adugna-form-control" disabled placeholder="Text input" aria-label="Text input preview">
                                 <?php elseif ($field['field_type'] === 'textarea'): ?>
-                                    <textarea class="form-control" rows="4" disabled placeholder="Textarea input" aria-label="Textarea input preview"></textarea>
-
+                                    <textarea class="adugna-form-control" rows="4" disabled placeholder="Textarea input" aria-label="Textarea input preview"></textarea>
                                 <?php elseif (in_array($field['field_type'], ['radio', 'checkbox', 'dropdown'])): ?>
-                                    <div class="options" aria-label="Options" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                    <div class="adugna-options" aria-label="Options">
                                         <?php
                                         $options = json_decode($field['field_options'], true);
                                         if (is_array($options) && count($options) > 0):
                                             foreach ($options as $option):
                                         ?>
-                                            <div class="form-check" style="min-width: 120px;">
+                                            <div class="adugna-form-check">
                                                 <input class="form-check-input" 
                                                        type="<?= $field['field_type'] === 'radio' ? 'radio' : 'checkbox' ?>" 
                                                        disabled>
@@ -340,29 +326,25 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                             endforeach;
                                         else:
                                         ?>
-                                            <div class="form-check">
+                                            <div class="adugna-form-check">
                                                 <em>No options defined.</em>
                                             </div>
                                         <?php endif; ?>
                                     </div>
-
                                 <?php elseif ($field['field_type'] === 'rating'): ?>
-                                    <div class="rating-container" aria-label="Rating preview" style="display: flex; gap: 2px;">
+                                    <div class="adugna-rating-container" aria-label="Rating preview" style="display: flex; gap: 2px;">
                                         <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <span class="rating-star" aria-hidden="true">★</span>
+                                            <span class="adugna-rating-star" aria-hidden="true">★</span>
                                         <?php endfor; ?>
                                     </div>
-
                                 <?php elseif ($field['field_type'] === 'file'): ?>
-                                    <div class="file-preview">
-                                        <input type="file" class="form-control" disabled aria-label="File upload preview">
+                                    <div class="adugna-file-preview">
+                                        <input type="file" class="adugna-form-control" disabled aria-label="File upload preview">
                                         <small class="form-text text-muted">File upload preview</small>
                                     </div>
-
                                 <?php endif; ?>
-
                                 <?php if (in_array($field['field_type'], ['radio', 'checkbox', 'select'])): ?>
-                                    <canvas id="chart-<?= $field['id'] ?>" class="response-chart" aria-label="Response Chart"></canvas>
+                                    <canvas id="chart-<?= $field['id'] ?>" class="adugna-response-chart" aria-label="Response Chart"></canvas>
                                     <script>
                                         document.addEventListener('DOMContentLoaded', function () {
                                             fetch(`../api/response_data.php?field_id=<?= $field['id'] ?>`)
@@ -395,28 +377,22 @@ $pageTitle = "Preview: " . htmlspecialchars($survey['title']);
                                 <?php else: ?>
                                     <p><em>No graphical representation available for this field type.</em></p>
                                 <?php endif; ?>
-
-                                <div class="field-meta" style="display: flex; flex-wrap: wrap; gap: 20px; font-size: 0.95em;">
-                                    <div class="meta-row" style="display: flex; gap: 18px;">
-                                        <span><strong>Type:</strong> <?= ucfirst(str_replace('_', ' ', $field['field_type'])) ?></span>
-                                        <span><strong>Technical Name:</strong> <code><?= htmlspecialchars($field['field_name']) ?></code></span>
-                                        <span><strong>Required:</strong> <?= $field['is_required'] ? 'Yes' : 'No' ?></span>
-                                    </div>
+                                <div class="adugna-field-meta">
+                                    <span><strong>Type:</strong> <?= ucfirst(str_replace('_', ' ', $field['field_type'])) ?></span>
+                                    <span><strong>Technical Name:</strong> <code><?= htmlspecialchars($field['field_name']) ?></code></span>
+                                    <span><strong>Required:</strong> <?= $field['is_required'] ? 'Yes' : 'No' ?></span>
                                 </div>
                             </div>
                         <?php endforeach; ?>
                     <?php endif; ?>
-
-                    <div class="form-actions" style="display: flex; justify-content: center; gap: 20px;">
-                    <a href="results.php?survey_id=<?= $survey['id'] ?>" title="Results"><i class="fas fa-chart-bar"></i></a>
+                    <div class="adugna-form-actions">
+                        <a href="results.php?survey_id=<?= $survey['id'] ?>" title="Results" class="adugna-btn adugna-btn-secondary"><i class="fas fa-chart-bar"></i> Results</a>
                     </div>
                 </div>
             </div>
         </div>
-        
     </div>
-        <?php include 'includes/footer.php'; ?>
-
+    <?php include 'includes/footer.php'; ?>
     <script>
         // Add smooth scrolling behavior
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
