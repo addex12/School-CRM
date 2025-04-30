@@ -1,4 +1,11 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
 // credentials_dashboard.php
 $title = "Activity Monitoring Dashboard";
 require_once '../includes/auth.php';
@@ -215,255 +222,166 @@ usort($allEntries, function($a, $b) {
     <meta charset="UTF-8">
     <title><?php echo htmlspecialchars($title); ?></title>
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --critical: #e74c3c;
-            --high: #f39c12;
-            --medium: #f1c40f;
-            --low: #2ecc71;
-            --info: #3498db;
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-main-content {
+            max-width: 99vw;
+            margin: 32px auto 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(25, 118, 210, 0.09);
+            padding: 28px 18px 38px 18px;
+            transition: box-shadow 0.2s;
         }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f7fa;
-            color: #333;
+        .adugna-header-title {
+            font-size: 1.35em;
+            color: #1976d2;
+            font-weight: 800;
+            margin-bottom: 28px;
+            letter-spacing: 0.01em;
+            text-align: center;
         }
-        
-        .container {
-            padding: 20px;
-            max-width: 99%;
-            margin: 0 auto;
+        .adugna-stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
         }
-        
-        .dashboard-header {
+        .adugna-stat-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(25,118,210,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .adugna-stat-card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .dashboard-title {
-            color: #215967;
-            margin: 0;
-            font-size: 28px;
-        }
-        
-        .dashboard-controls {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .security-table {
+            margin-bottom: 10px;
             width: 100%;
-            margin: 20px 0;
-            font-size: 0.9em;
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 8px;
+        }
+        .adugna-stat-card-title {
+            font-size: 0.98em;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        .adugna-stat-card-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .adugna-stat-card-footer {
+            font-size: 0.85em;
+            color: #95a5a6;
+            margin-top: auto;
+        }
+        .adugna-table-responsive {
+            overflow-x: auto;
+            margin-top: 1.5em;
+            border-radius: 10px;
+            background: #f8fafc;
+            box-shadow: 0 1px 8px rgba(25,118,210,0.04);
+        }
+        .adugna-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.97em;
+            background: #fff;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 6px rgba(25,118,210,0.04);
         }
-        
-        .security-table thead tr {
-            background-color: #2c3e50;
-            color: #ffffff;
-        }
-        
-        .security-table th {
-            padding: 12px 15px;
+        .adugna-log-table th, .adugna-log-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
             text-align: left;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            vertical-align: middle;
         }
-        
-        .security-table td {
-            padding: 10px 15px;
-            vertical-align: top;
-            border-bottom: 1px solid #e0e0e0;
+        .adugna-log-table th {
+            background: #f5f7fa;
+            color: #1976d2;
+            font-weight: 700;
+            font-size: 1.03em;
+            border-bottom: 2px solid #e3eafc;
         }
-        
-        .security-table tbody tr {
-            transition: background-color 0.2s;
+        .adugna-log-table tr:nth-child(even) {
+            background: #f9f9f9;
         }
-        
-        .security-table tbody tr:nth-of-type(even) {
-            background-color: #f8f9fa;
+        .adugna-log-table tr:hover {
+            background: #eaf6ff;
         }
-        
-        .security-table tbody tr:hover {
-            background-color: #e9f7fe;
-        }
-        
-        .risk-critical {
-            background-color: rgba(231, 76, 60, 0.1);
-            border-left: 4px solid var(--critical);
-        }
-        
-        .risk-high {
-            background-color: rgba(243, 156, 18, 0.1);
-            border-left: 4px solid var(--high);
-        }
-        
-        .risk-medium {
-            background-color: rgba(241, 196, 15, 0.1);
-            border-left: 4px solid var(--medium);
-        }
-        
-        .risk-low {
-            background-color: rgba(46, 204, 113, 0.1);
-            border-left: 4px solid var(--low);
-        }
-        
-        .badge {
+        .adugna-badge {
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.8em;
             font-weight: bold;
-            color: white;
+            color: #fff;
             display: inline-block;
             min-width: 70px;
             text-align: center;
         }
-        
-        .badge-critical {
-            background-color: var(--critical);
-        }
-        
-        .badge-high {
-            background-color: var(--high);
-        }
-        
-        .badge-medium {
-            background-color: var(--medium);
-        }
-        
-        .badge-low {
-            background-color: var(--low);
-        }
-        
-        .badge-info {
-            background-color: var(--info);
-        }
-        
-        .sensitive-value {
+        .adugna-badge-critical { background: #e74c3c; }
+        .adugna-badge-high { background: #f39c12; }
+        .adugna-badge-medium { background: #f1c40f; color: #222; }
+        .adugna-badge-low { background: #2ecc71; }
+        .adugna-badge-info { background: #3498db; }
+        .adugna-sensitive-value {
             font-family: 'Courier New', monospace;
             background-color: #fff8e1;
             padding: 2px 4px;
             border-radius: 3px;
             word-break: break-all;
         }
-        
-        .username-value {
-            color: #2980b9;
-            font-weight: bold;
-        }
-        
-        .password-value {
-            color: #c0392b;
-            font-weight: bold;
-        }
-        
-        .action-btn {
+        .adugna-username-value { color: #2980b9; font-weight: bold; }
+        .adugna-password-value { color: #c0392b; font-weight: bold; }
+        .adugna-action-btn {
             padding: 5px 10px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 0.8em;
             transition: all 0.2s;
+            background: #1976d2;
+            color: #fff;
+            margin-bottom: 2px;
         }
-        
-        .action-btn:hover {
-            opacity: 0.8;
-        }
-        
-        .btn-view {
-            background-color: #3498db;
-            color: white;
-        }
-        
-        .btn-block {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .btn-allow {
-            background-color: #2ecc71;
-            color: white;
-        }
-        
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .stat-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .stat-card-title {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            font-weight: 600;
-        }
-        
-        .stat-card-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-        
-        .stat-card-footer {
-            font-size: 0.8em;
-            color: #95a5a6;
-            margin-top: auto;
-        }
-        
-        .modal {
+        .adugna-action-btn:hover { background: #145ea8; }
+        .adugna-btn-block { background: #e74c3c; }
+        .adugna-btn-block:hover { background: #c82333; }
+        .adugna-btn-view { background: #3498db; }
+        .adugna-btn-view:hover { background: #2563eb; }
+        .adugna-modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0,0,0,0.7);
             z-index: 1000;
             overflow: auto;
         }
-        
-        .modal-content {
+        .adugna-modal-content {
             background-color: #fff;
             margin: 5% auto;
             padding: 20px;
             border-radius: 8px;
-            width: 80%;
+            width: 90%;
             max-width: 900px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.13);
             max-height: 80vh;
             overflow-y: auto;
         }
-        
-        .modal-header {
+        .adugna-modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -471,578 +389,205 @@ usort($allEntries, function($a, $b) {
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
-        
-        .modal-title {
-            font-size: 1.5em;
+        .adugna-modal-title {
+            font-size: 1.2em;
             color: #2c3e50;
             margin: 0;
         }
-        
-        .close-modal {
+        .adugna-close-modal {
             background: none;
             border: none;
             font-size: 1.5em;
             cursor: pointer;
             color: #7f8c8d;
         }
-        
-        .timeline-container {
-            margin-top: 30px;
+        @media (max-width: 900px) {
+            .adugna-main-content, .adugna-stats-container { padding: 1rem; }
         }
-        
-        .timeline-item {
-            position: relative;
-            padding-left: 30px;
-            margin-bottom: 20px;
-            border-left: 2px solid #3498db;
-        }
-        
-        .timeline-time {
-            font-size: 0.8em;
-            color: #7f8c8d;
-            margin-bottom: 5px;
-        }
-        
-        .timeline-content {
-            background: #f8f9fa;
-            padding: 10px 15px;
-            border-radius: 6px;
-        }
-        
-        .filter-container {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .filter-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 10px;
-        }
-        
-        .filter-group {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .filter-label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
-        
-        .filter-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-        
-        .filter-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .chart-container {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            height: 300px;
+        @media (max-width: 600px) {
+            .adugna-main-content, .adugna-stats-container { padding: 0.7rem 0.2rem 1rem 0.2rem; }
+            .adugna-header-title { font-size: 1.05em; }
+            .adugna-modal-content { width: 99%; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="dashboard-header">
-            <h1 class="dashboard-title">
+    <div class="admin-dashboard">
+        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <div class="adugna-main-content">
+            <div class="adugna-header-title">
                 <i class="fas fa-shield-alt"></i> <?php echo htmlspecialchars($title); ?>
-            </h1>
-            <div class="dashboard-controls">
-                <button id="refreshBtn" class="action-btn btn-info">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-                <button id="exportBtn" class="action-btn btn-info">
-                    <i class="fas fa-file-export"></i> Export
-                </button>
             </div>
-        </div>
-        
-        <!-- Statistics Cards -->
-        <div class="stats-container">
-            <div class="stat-card">
-                <div class="stat-card-header">
-                    <span class="stat-card-title">Total Events</span>
-                    <i class="fas fa-chart-bar"></i>
+            <!-- Adugna Gizaw: Stats Cards -->
+            <div class="adugna-stats-container">
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Total Events</span>
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="adugna-stat-card-value"><?php echo count($allEntries); ?></div>
+                    <div class="adugna-stat-card-footer">Last 24h: <?php echo count(array_filter($allEntries, function($e) {
+                        return strtotime($e['timestamp']) > strtotime('-24 hours');
+                    })); ?></div>
                 </div>
-                <div class="stat-card-value"><?php echo count($allEntries); ?></div>
-                <div class="stat-card-footer">Last 24h: <?php echo count(array_filter($allEntries, function($e) {
-                    return strtotime($e['timestamp']) > strtotime('-24 hours');
-                })); ?></div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-card-header">
-                    <span class="stat-card-title">Critical Risks</span>
-                    <i class="fas fa-exclamation-triangle"></i>
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Critical Risks</span>
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="adugna-stat-card-value" style="color: #e74c3c;">
+                        <?php echo count(array_filter($allEntries, function($e) {
+                            return $e['risk_level'] === 'Critical';
+                        })); ?>
+                    </div>
+                    <div class="adugna-stat-card-footer">Requires immediate attention</div>
                 </div>
-                <div class="stat-card-value" style="color: var(--critical);">
-                    <?php echo count(array_filter($allEntries, function($e) {
-                        return $e['risk_level'] === 'Critical';
-                    })); ?>
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Login Attempts</span>
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <div class="adugna-stat-card-value">
+                        <?php echo count(array_filter($allEntries, function($e) {
+                            return $e['type'] === 'Login Attempt';
+                        })); ?>
+                    </div>
+                    <div class="adugna-stat-card-footer">Failed: <?php echo count(array_filter($allEntries, function($e) {
+                        return $e['type'] === 'Login Attempt' && $e['status'] === 'Attempted';
+                    })); ?></div>
                 </div>
-                <div class="stat-card-footer">Requires immediate attention</div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-card-header">
-                    <span class="stat-card-title">Login Attempts</span>
-                    <i class="fas fa-sign-in-alt"></i>
-                </div>
-                <div class="stat-card-value">
-                    <?php echo count(array_filter($allEntries, function($e) {
-                        return $e['type'] === 'Login Attempt';
-                    })); ?>
-                </div>
-                <div class="stat-card-footer">Failed: <?php echo count(array_filter($allEntries, function($e) {
-                    return $e['type'] === 'Login Attempt' && $e['status'] === 'Attempted';
-                })); ?></div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-card-header">
-                    <span class="stat-card-title">Password Exposures</span>
-                    <i class="fas fa-key"></i>
-                </div>
-                <div class="stat-card-value" style="color: var(--high);">
-                    <?php echo count(array_filter($allEntries, function($e) {
-                        return !empty($e['password']);
-                    })); ?>
-                </div>
-                <div class="stat-card-footer">Including autofill events</div>
-            </div>
-        </div>
-        
-        <!-- Filter Controls -->
-        <div class="filter-container">
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label class="filter-label">Date Range</label>
-                    <input type="date" id="dateFrom" class="filter-input">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">to</label>
-                    <input type="date" id="dateTo" class="filter-input">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Risk Level</label>
-                    <select id="riskLevel" class="filter-input">
-                        <option value="">All</option>
-                        <option value="Critical">Critical</option>
-                        <option value="High">High</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Low">Low</option>
-                    </select>
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Password Exposures</span>
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="adugna-stat-card-value" style="color: #f39c12;">
+                        <?php echo count(array_filter($allEntries, function($e) {
+                            return !empty($e['password']);
+                        })); ?>
+                    </div>
+                    <div class="adugna-stat-card-footer">Including autofill events</div>
                 </div>
             </div>
-            <div class="filter-row">
-                <div class="filter-group">
-                    <label class="filter-label">Event Type</label>
-                    <select id="eventType" class="filter-input">
-                        <option value="">All</option>
-                        <option value="Login Attempt">Login Attempt</option>
-                        <option value="Password Autofill">Password Autofill</option>
-                        <option value="Form Input">Form Input</option>
-                        <option value="Form Submission">Form Submission</option>
-                        <option value="Clipboard Copy">Clipboard Copy</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">IP Address</label>
-                    <input type="text" id="ipFilter" class="filter-input" placeholder="Filter by IP">
-                </div>
-                <div class="filter-group">
-                    <label class="filter-label">Username</label>
-                    <input type="text" id="usernameFilter" class="filter-input" placeholder="Filter by username">
-                </div>
+            <!-- Adugna Gizaw: Main Data Table -->
+            <div class="adugna-table-responsive">
+                <table class="adugna-log-table" id="adugna-log-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Event Type</th>
+                            <th>Risk Level</th>
+                            <th>Details</th>
+                            <th>User/IP</th>
+                            <th>Location</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Sensitive Data</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($allEntries as $entry): ?>
+                        <tr class="risk-<?php echo strtolower($entry['risk_level']); ?>">
+                            <td>
+                                <?php echo !empty($entry['timestamp']) ? 
+                                    date('M j, H:i:s', strtotime($entry['timestamp'])) : 'N/A'; ?>
+                            </td>
+                            <td><?= htmlspecialchars($entry['type']) ?></td>
+                            <td>
+                                <span class="adugna-badge adugna-badge-<?= strtolower($entry['risk_level']) ?>">
+                                    <?= htmlspecialchars($entry['risk_level']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div><?= htmlspecialchars($entry['action']) ?></div>
+                                <small style="color:#888;">
+                                    <?= htmlspecialchars(basename($entry['page'])) ?>
+                                </small>
+                            </td>
+                            <td>
+                                <div><?= htmlspecialchars($entry['ip_address']) ?></div>
+                                <small style="color:#888;">
+                                    <?= htmlspecialchars(substr($entry['user_agent'], 0, 30) . (strlen($entry['user_agent']) > 30 ? '...' : '')) ?>
+                                </small>
+                            </td>
+                            <td><?= htmlspecialchars($entry['geolocation']) ?></td>
+                            <td class="adugna-username-value"><?= htmlspecialchars($entry['username']) ?></td>
+                            <td class="adugna-password-value adugna-sensitive-value"><?= htmlspecialchars($entry['password']) ?></td>
+                            <td>
+                                <?php if (!empty($entry['sensitive_data'])): ?>
+                                    <ul style="margin: 0; padding-left: 20px;">
+                                        <?php foreach ($entry['sensitive_data'] as $type => $values): ?>
+                                            <li>
+                                                <strong><?= ucfirst($type) ?>:</strong> 
+                                                <?= htmlspecialchars(implode(', ', $values)) ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <button class="adugna-action-btn adugna-btn-view" onclick="adugnaShowDetails('<?= md5($entry['evidence']) ?>')">
+                                    <i class="fas fa-search"></i> Details
+                                </button>
+                                <?php if ($entry['risk_level'] === 'Critical' || $entry['risk_level'] === 'High'): ?>
+                                    <button class="adugna-action-btn adugna-btn-block" style="margin-top: 5px;">
+                                        <i class="fas fa-ban"></i> Block
+                                    </button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-            <div class="filter-actions">
-                <button id="resetFilters" class="action-btn">
-                    <i class="fas fa-undo"></i> Reset
-                </button>
-                <button id="applyFilters" class="action-btn btn-info">
-                    <i class="fas fa-filter"></i> Apply Filters
-                </button>
-            </div>
-        </div>
-        
-        <!-- Main Data Table -->
-        <table id="securityTable" class="security-table display nowrap" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Event Type</th>
-                    <th>Risk Level</th>
-                    <th>Details</th>
-                    <th>User/IP</th>
-                    <th>Location</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Sensitive Data</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($allEntries as $entry): ?>
-                <tr class="risk-<?php echo strtolower($entry['risk_level']); ?>">
-                    <td>
-                        <?php echo !empty($entry['timestamp']) ? 
-                            date('M j, H:i:s', strtotime($entry['timestamp'])) : 'N/A'; ?>
-                    </td>
-                    <td><?php echo htmlspecialchars($entry['type']); ?></td>
-                    <td>
-                        <span class="badge badge-<?php echo strtolower($entry['risk_level']); ?>">
-                            <?php echo htmlspecialchars($entry['risk_level']); ?>
-                        </span>
-                    </td>
-                    <td>
-                        <div><?php echo htmlspecialchars($entry['action']); ?></div>
-                        <small class="text-muted">
-                            <?php echo htmlspecialchars(basename($entry['page'])); ?>
-                        </small>
-                    </td>
-                    <td>
-                        <div><?php echo htmlspecialchars($entry['ip_address']); ?></div>
-                        <small class="text-muted">
-                            <?php echo htmlspecialchars(substr($entry['user_agent'], 0, 30) . 
-                                (strlen($entry['user_agent']) > 30 ? '...' : '')); ?>
-                        </small>
-                    </td>
-                    <td><?php echo htmlspecialchars($entry['geolocation']); ?></td>
-                    <td class="username-value">
-                        <?php echo htmlspecialchars($entry['username']); ?>
-                    </td>
-                    <td class="password-value sensitive-value">
-                        <?php echo htmlspecialchars($entry['password']); ?>
-                    </td>
-                    <td>
-                        <?php if (!empty($entry['sensitive_data'])): ?>
-                            <ul style="margin: 0; padding-left: 20px;">
-                                <?php foreach ($entry['sensitive_data'] as $type => $values): ?>
-                                    <li>
-                                        <strong><?php echo ucfirst($type); ?>:</strong> 
-                                        <?php echo htmlspecialchars(implode(', ', $values)); ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php endif; ?>
-                    </td>
-                    <td>
-                        <button class="action-btn btn-view view-details" data-id="<?php echo md5($entry['evidence']); ?>">
-                            <i class="fas fa-search"></i> Details
-                        </button>
-                        <?php if ($entry['risk_level'] === 'Critical' || $entry['risk_level'] === 'High'): ?>
-                            <button class="action-btn btn-block" style="margin-top: 5px;">
-                                <i class="fas fa-ban"></i> Block
-                            </button>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-        
-        <!-- Details Modal -->
-        <div id="detailsModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">Event Details</h3>
-                    <button class="close-modal">&times;</button>
-                </div>
-                <div id="modalBody"></div>
-                <div class="timeline-container" id="relatedEvents">
-                    <h4>Related Events</h4>
-                    <!-- Will be populated by JavaScript -->
+            <!-- Adugna Gizaw: Details Modal -->
+            <div id="adugnaDetailsModal" class="adugna-modal">
+                <div class="adugna-modal-content">
+                    <div class="adugna-modal-header">
+                        <h3 class="adugna-modal-title">Event Details</h3>
+                        <button class="adugna-close-modal" onclick="adugnaCloseModal()">&times;</button>
+                    </div>
+                    <div id="adugnaModalBody"></div>
                 </div>
             </div>
         </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
-
-    <!-- JavaScript Libraries -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script>
-        $(document).ready(function() {
-            // Initialize DataTable with enhanced features
-            const table = $('#securityTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'copy', 'csv', 'excel', 'pdf', 'print'
-                ],
-                pageLength: 25,
-                order: [[0, 'desc']],
-                responsive: true,
-                scrollX: true,
-                columnDefs: [
-                    { responsivePriority: 1, targets: 0 }, // Timestamp
-                    { responsivePriority: 2, targets: 2 }, // Risk Level
-                    { responsivePriority: 3, targets: 6 }, // Username
-                    { responsivePriority: 4, targets: 7 }, // Password
-                    { responsivePriority: 5, targets: -1 } // Actions
-                ]
-            });
-            
-            // Apply filters
-            $('#applyFilters').click(function() {
-                const dateFrom = $('#dateFrom').val();
-                const dateTo = $('#dateTo').val();
-                const riskLevel = $('#riskLevel').val();
-                const eventType = $('#eventType').val();
-                const ipFilter = $('#ipFilter').val();
-                const usernameFilter = $('#usernameFilter').val();
-                
-                table.columns().search('').draw(); // Reset all filters
-                
-                // Apply date range filter
-                if (dateFrom || dateTo) {
-                    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
-                        const rowDate = new Date(data[0]);
-                        const fromDate = dateFrom ? new Date(dateFrom) : null;
-                        const toDate = dateTo ? new Date(dateTo + 'T23:59:59') : null;
-                        
-                        if (fromDate && rowDate < fromDate) return false;
-                        if (toDate && rowDate > toDate) return false;
-                        return true;
-                    });
-                }
-                
-                // Apply other filters
-                if (riskLevel) table.column(2).search(riskLevel).draw();
-                if (eventType) table.column(1).search(eventType).draw();
-                if (ipFilter) table.column(4).search(ipFilter).draw();
-                if (usernameFilter) table.column(6).search(usernameFilter).draw();
-                
-                table.draw();
-                $.fn.dataTable.ext.search.pop(); // Remove date filter function
-            });
-            
-            // Reset filters
-            $('#resetFilters').click(function() {
-                $('#dateFrom, #dateTo, #riskLevel, #eventType, #ipFilter, #usernameFilter').val('');
-                table.columns().search('').draw();
-            });
-            
-            // View details modal
-            $('.view-details').click(function() {
-                const eventId = $(this).data('id');
-                const rowData = table.row($(this).closest('tr')).data();
-                
-                // Format modal content
-                let modalHtml = `
-                    <div class="detail-section">
-                        <h4>Event Information</h4>
-                        <table class="detail-table">
-                            <tr>
-                                <th>Timestamp:</th>
-                                <td>${rowData[0]}</td>
-                            </tr>
-                            <tr>
-                                <th>Event Type:</th>
-                                <td>${rowData[1]}</td>
-                            </tr>
-                            <tr>
-                                <th>Risk Level:</th>
-                                <td>${rowData[2]}</td>
-                            </tr>
-                            <tr>
-                                <th>Page:</th>
-                                <td>${rowData[3].split('<')[0].trim()}</td>
-                            </tr>
-                            <tr>
-                                <th>IP Address:</th>
-                                <td>${rowData[4].split('<')[0].trim()}</td>
-                            </tr>
-                            <tr>
-                                <th>Location:</th>
-                                <td>${rowData[5]}</td>
-                            </tr>
-                            <tr>
-                                <th>User Agent:</th>
-                                <td>${rowData[4].split('<small')[1] ? 
-                                    rowData[4].split('<small')[1].replace(/.*>/, '').replace(/<.*/, '') : 
-                                    'N/A'}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    
-                    <div class="detail-section">
-                        <h4>Sensitive Data</h4>
-                        <pre id="rawData"></pre>
-                    </div>
-                `;
-                
-                $('#modalBody').html(modalHtml);
-                
-                // Find the original entry data
-                const originalEntry = <?php echo json_encode($allEntries); ?>.find(e => 
-                    md5(JSON.stringify(e.evidence)) === eventId
-                );
-                
-                if (originalEntry) {
-                    $('#rawData').text(JSON.stringify(originalEntry, null, 2));
-                    
-                    // Show related events (same IP or same session)
-                    const relatedEvents = <?php echo json_encode($allEntries); ?>.filter(e => 
-                        (e.ip_address === originalEntry.ip_address || 
-                         e.session_id === originalEntry.session_id) && 
-                        md5(JSON.stringify(e.evidence)) !== eventId
-                    ).slice(0, 5); // Limit to 5 related events
-                    
-                    if (relatedEvents.length > 0) {
-                        let timelineHtml = '';
-                        relatedEvents.forEach(event => {
-                            timelineHtml += `
-                                <div class="timeline-item">
-                                    <div class="timeline-time">
-                                        ${new Date(event.timestamp).toLocaleString()}
-                                    </div>
-                                    <div class="timeline-content">
-                                        <strong>${event.type}</strong>: ${event.action}<br>
-                                        <small>${event.page}</small>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        $('#relatedEvents').append(timelineHtml);
-                    } else {
-                        $('#relatedEvents').append('<p>No related events found.</p>');
-                    }
-                }
-                
-                $('#detailsModal').show();
-            });
-            
-            // Close modal
-            $('.close-modal').click(function() {
-                $('#detailsModal').hide();
-                $('#relatedEvents').empty();
-            });
-            
-            // Click outside modal to close
-            $(window).click(function(event) {
-                if (event.target === document.getElementById('detailsModal')) {
-                    $('#detailsModal').hide();
-                    $('#relatedEvents').empty();
-                }
-            });
-            
-            // Refresh button
-            $('#refreshBtn').click(function() {
-                location.reload();
-            });
-            
-            // Export button
-            $('#exportBtn').click(function() {
-                table.button('.buttons-excel').trigger();
-            });
-            
-            // Initialize charts
-            initializeCharts();
-        });
-        
-        function initializeCharts() {
-            // Risk Level Distribution Pie Chart
-            const riskLevels = ['Critical', 'High', 'Medium', 'Low'];
-            const riskCounts = riskLevels.map(level => 
-                <?php echo json_encode($allEntries); ?>.filter(e => e.risk_level === level).length
-            );
-            
-            const riskColors = [
-                'rgba(231, 76, 60, 0.7)',
-                'rgba(243, 156, 18, 0.7)',
-                'rgba(241, 196, 15, 0.7)',
-                'rgba(46, 204, 113, 0.7)'
-            ];
-            
-            new Chart(document.getElementById('riskChart'), {
-                type: 'pie',
-                data: {
-                    labels: riskLevels,
-                    datasets: [{
-                        data: riskCounts,
-                        backgroundColor: riskColors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        },
-                        title: {
-                            display: true,
-                            text: 'Risk Level Distribution'
-                        }
-                    }
-                }
-            });
-            
-            // Event Type Distribution Bar Chart
-            const eventTypes = [...new Set(<?php echo json_encode($allEntries); ?>.map(e => e.type))];
-            const eventCounts = eventTypes.map(type => 
-                <?php echo json_encode($allEntries); ?>.filter(e => e.type === type).length
-            );
-            
-            new Chart(document.getElementById('eventTypeChart'), {
-                type: 'bar',
-                data: {
-                    labels: eventTypes,
-                    datasets: [{
-                        label: 'Event Count',
-                        data: eventCounts,
-                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        title: {
-                            display: true,
-                            text: 'Event Type Distribution'
-                        }
-                    }
-                }
-            });
+        // Adugna Gizaw: Details modal logic
+        function adugnaShowDetails(eventId) {
+            const entries = <?= json_encode($allEntries) ?>;
+            const entry = entries.find(e => '<?= md5('') ?>' !== eventId && md5(e.evidence) === eventId);
+            let html = '';
+            if (entry) {
+                html += `<table style="width:100%;font-size:1em;">
+                    <tr><th style="text-align:left;">Timestamp:</th><td>${entry.timestamp}</td></tr>
+                    <tr><th style="text-align:left;">Event Type:</th><td>${entry.type}</td></tr>
+                    <tr><th style="text-align:left;">Risk Level:</th><td>${entry.risk_level}</td></tr>
+                    <tr><th style="text-align:left;">Page:</th><td>${entry.page}</td></tr>
+                    <tr><th style="text-align:left;">IP Address:</th><td>${entry.ip_address}</td></tr>
+                    <tr><th style="text-align:left;">Location:</th><td>${entry.geolocation}</td></tr>
+                    <tr><th style="text-align:left;">User Agent:</th><td>${entry.user_agent}</td></tr>
+                    <tr><th style="text-align:left;">Username:</th><td>${entry.username}</td></tr>
+                    <tr><th style="text-align:left;">Password:</th><td>${entry.password}</td></tr>
+                    <tr><th style="text-align:left;">Sensitive Data:</th><td><pre style="white-space:pre-wrap;">${JSON.stringify(entry.sensitive_data, null, 2)}</pre></td></tr>
+                    <tr><th style="text-align:left;">Evidence:</th><td><pre style="white-space:pre-wrap;">${entry.evidence}</pre></td></tr>
+                </table>`;
+            } else {
+                html = '<p>No details found.</p>';
+            }
+            document.getElementById('adugnaModalBody').innerHTML = html;
+            document.getElementById('adugnaDetailsModal').style.display = 'block';
         }
-        
-        // Simple MD5 function for demo purposes
-        function md5(str) {
-            return CryptoJS.MD5(str).toString();
+        function adugnaCloseModal() {
+            document.getElementById('adugnaDetailsModal').style.display = 'none';
+        }
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('adugnaDetailsModal')) {
+                adugnaCloseModal();
+            }
         }
     </script>
 </body>
