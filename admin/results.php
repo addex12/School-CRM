@@ -839,6 +839,92 @@ body {
 .adugna-btn:active {
     transform: scale(0.97);
 }
+@media print {
+    body.adugna-print-mode {
+        background: #fff !important;
+    }
+    body.adugna-print-mode .admin-dashboard {
+        display: block !important;
+    }
+    body.adugna-print-mode .admin-sidebar,
+    body.adugna-print-mode .admin-sidebar *,
+    body.adugna-print-mode .header-actions,
+    body.adugna-print-mode .adugna-btn,
+    body.adugna-print-mode .dropdown-menu,
+    body.adugna-print-mode .dropdown-toggle {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    body.adugna-print-mode .admin-main {
+        margin: 0 auto !important;
+        padding: 0 !important;
+        max-width: 210mm !important;
+        width: 210mm !important;
+        background: #fff !important;
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+    }
+    body.adugna-print-mode .adugna-card,
+    body.adugna-print-mode .adugna-chart-container,
+    body.adugna-print-mode .adugna-filter-form {
+        box-shadow: none !important;
+        border: none !important;
+        background: #fff !important;
+        page-break-inside: avoid !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        margin-bottom: 12mm !important;
+    }
+    body.adugna-print-mode .survey-stats,
+    body.adugna-print-mode .filter-section,
+    body.adugna-print-mode .chart-section,
+    body.adugna-print-mode .response-table-section {
+        page-break-after: always !important;
+        break-after: page !important;
+    }
+    body.adugna-print-mode .response-table-section {
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
+    body.adugna-print-mode .adugna-table {
+        table-layout: fixed !important;
+        width: 100% !important;
+        word-break: break-word !important;
+    }
+    body.adugna-print-mode .adugna-table th,
+    body.adugna-print-mode .adugna-table td {
+        color: #222 !important;
+        background: #fff !important;
+        border: 1px solid #eee !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        word-break: break-word !important;
+        white-space: pre-line !important;
+        max-width: 180px !important;
+        font-size: 10pt !important;
+    }
+    body.adugna-print-mode .adugna-table th {
+        font-size: 11pt !important;
+    }
+    body.adugna-print-mode .adugna-table tr, 
+    body.adugna-print-mode .adugna-table td, 
+    body.adugna-print-mode .adugna-table th {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    /* Ensure charts are not cut off */
+    body.adugna-print-mode .adugna-chart-container canvas {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        display: block !important;
+        margin: 0 auto !important;
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -1289,14 +1375,25 @@ body {
         var dropdown = document.querySelector('.dropdown');
         if (dropdown) dropdown.style.display = 'none';
 
-        // Developer: Adugna Gizaw
-        // Improved PDF export: Use html2canvas to split content into A4 slices, avoid bottom cutoff
-        html2canvas(content, {scale: 2, useCORS: true, scrollY: -window.scrollY, windowWidth: document.body.scrollWidth}).then(function(canvas) {
+        // Adugna Gizaw: Improved PDF export - ensure table and charts fit page, scale content if needed
+        html2canvas(content, {
+            scale: 2,
+            useCORS: true,
+            scrollY: -window.scrollY,
+            windowWidth: document.body.scrollWidth,
+            backgroundColor: "#fff"
+        }).then(function(canvas) {
             var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
             var pageWidth = pdf.internal.pageSize.getWidth();
             var pageHeight = pdf.internal.pageSize.getHeight();
             var imgWidth = pageWidth - 40;
             var imgHeight = canvas.height * imgWidth / canvas.width;
+
+            // If content is too wide, scale down to fit
+            if (canvas.width > pageWidth) {
+                imgWidth = pageWidth - 40;
+                imgHeight = canvas.height * imgWidth / canvas.width;
+            }
 
             // Calculate the height of one PDF page in canvas pixels
             var pageCanvasHeight = Math.floor(canvas.width * (pageHeight - 40) / imgWidth);

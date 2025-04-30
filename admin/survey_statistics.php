@@ -322,17 +322,17 @@ $chart_json = json_encode($chart_data);
                         <!-- Adugna Gizaw: Show overall response trend and anonymous stats in a row -->
                         <div class="adugna-row-flex">
                             <div class="adugna-col-half">
-                                <div class="adugna-chart-container">
+                                <div class="adugna-chart-container" style="max-width:380px;">
                                     <h3 class="adugna-chart-title"><i class="fas fa-chart-line"></i> Responses Over Time</h3>
-                                    <div class="adugna-chart-wrapper" style="height:220px;">
+                                    <div class="adugna-chart-wrapper" style="height:140px;">
                                         <canvas id="adugna-trend-chart"></canvas>
                                     </div>
                                 </div>
                             </div>
                             <div class="adugna-col-half">
-                                <div class="adugna-chart-container">
+                                <div class="adugna-chart-container" style="max-width:380px;">
                                     <h3 class="adugna-chart-title"><i class="fas fa-user-secret"></i> Anonymous vs Non-Anonymous</h3>
-                                    <div class="adugna-chart-wrapper" style="height:220px;">
+                                    <div class="adugna-chart-wrapper" style="height:140px;">
                                         <canvas id="adugna-anon-chart"></canvas>
                                     </div>
                                 </div>
@@ -340,9 +340,9 @@ $chart_json = json_encode($chart_data);
                         </div>
                         <!-- Adugna Gizaw: Show per-question charts as before -->
                         <?php foreach ($fields as $field): ?>
-                            <div class="adugna-chart-container">
+                            <div class="adugna-chart-container" style="max-width:420px;">
                                 <h3 class="adugna-chart-title"><i class="fas fa-chart-bar"></i> <?= htmlspecialchars($field['field_label']) ?></h3>
-                                <div class="adugna-chart-wrapper">
+                                <div class="adugna-chart-wrapper" style="height:120px;">
                                     <canvas id="fieldChart-<?= $field['id'] ?>"></canvas>
                                 </div>
                                 <div class="adugna-chart-legend" id="legend-<?= $field['id'] ?>"></div>
@@ -368,7 +368,9 @@ $chart_json = json_encode($chart_data);
             '#4f46e5', '#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe',
             '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5',
             '#f59e0b', '#fbbf24', '#fcd34d', '#fde68a', '#fef3c7',
-            '#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fee2e2'
+            '#ef4444', '#f87171', '#fca5a5', '#fecaca', '#fee2e2',
+            '#e67e22', '#e17055', '#fd79a8', '#00b894', '#00cec9',
+            '#0984e3', '#6c5ce7', '#fdcb6e', '#fab1a0', '#d35400'
         ];
         const chartData = <?= $chart_json ?>;
 
@@ -475,6 +477,8 @@ $chart_json = json_encode($chart_data);
         }
 
         function createChart(ctx, field, data, chartType, index) {
+            // Generate a unique color set for each question
+            const localPalette = colorPalette.slice(index * 5, index * 5 + data.length).concat(colorPalette);
             switch(chartType) {
                 case 'doughnut':
                     const doughnutChart = new Chart(ctx, {
@@ -483,7 +487,7 @@ $chart_json = json_encode($chart_data);
                             labels: data.map(item => item.field_value),
                             datasets: [{
                                 data: data.map(item => item.count),
-                                backgroundColor: colorPalette,
+                                backgroundColor: localPalette.slice(0, data.length),
                                 borderWidth: 0
                             }]
                         },
@@ -506,7 +510,7 @@ $chart_json = json_encode($chart_data);
                             animation: {
                                 animateScale: true,
                                 animateRotate: true,
-                                duration: 1200,
+                                duration: 900,
                                 easing: 'easeOutElastic'
                             }
                         }
@@ -521,9 +525,9 @@ $chart_json = json_encode($chart_data);
                             datasets: [{
                                 label: 'Responses',
                                 data: data.map(item => item.count),
-                                backgroundColor: colorPalette[index % colorPalette.length],
+                                backgroundColor: localPalette.slice(0, data.length),
                                 borderWidth: 0,
-                                borderRadius: 8
+                                borderRadius: 7
                             }]
                         },
                         options: {
@@ -549,7 +553,7 @@ $chart_json = json_encode($chart_data);
                                 y: { grid: { display: false } }
                             },
                             animation: {
-                                duration: 1200,
+                                duration: 900,
                                 easing: 'easeOutElastic'
                             }
                         }
@@ -581,9 +585,9 @@ $chart_json = json_encode($chart_data);
                                 datasets: [{
                                     label: 'Frequency',
                                     data: bins,
-                                    backgroundColor: colorPalette[10],
+                                    backgroundColor: localPalette.slice(0, bins.length),
                                     borderWidth: 0,
-                                    borderRadius: 8
+                                    borderRadius: 7
                                 }]
                             },
                             options: {
@@ -607,7 +611,7 @@ $chart_json = json_encode($chart_data);
                                     x: { grid: { display: false } }
                                 },
                                 animation: {
-                                    duration: 1200,
+                                    duration: 900,
                                     easing: 'easeOutElastic'
                                 }
                             }
@@ -622,9 +626,9 @@ $chart_json = json_encode($chart_data);
                             datasets: [{
                                 label: 'Responses',
                                 data: data.map(item => item.count),
-                                backgroundColor: colorPalette[index % colorPalette.length],
+                                backgroundColor: localPalette.slice(0, data.length),
                                 borderWidth: 0,
-                                borderRadius: 8
+                                borderRadius: 7
                             }]
                         },
                         options: {
@@ -636,7 +640,7 @@ $chart_json = json_encode($chart_data);
                                 x: { grid: { display: false } }
                             },
                             animation: {
-                                duration: 1200,
+                                duration: 900,
                                 easing: 'easeOutElastic'
                             }
                         }
