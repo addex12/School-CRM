@@ -30,7 +30,33 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Adugna Gizaw: Outstanding, compact, ERPNext/Jinja2/frappe-inspired, responsive styles with adugna- prefix */
+        /* Adugna Gizaw: Responsive, content-aware, and visually outstanding ticket page */
+        html, body {
+            height: 100%;
+            min-height: 100%;
+        }
+        body {
+            background: linear-gradient(120deg, #f0f4ff 0%, #f9fafb 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        }
+        .adugna-admin-dashboard, .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            width: 100vw;
+            background: transparent;
+        }
+        .admin-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+            min-width: 0;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
         .adugna-card {
             background: #fff;
             border-radius: 0.7em;
@@ -40,9 +66,30 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border: none;
             transition: box-shadow 0.18s;
             animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
+            width: 100%;
+            max-width: 1100px;
+            min-width: 0;
+            box-sizing: border-box;
         }
         .adugna-card:hover {
             box-shadow: 0 8px 32px rgba(80,112,255,0.13), 0 2px 8px rgba(80,112,255,0.06);
+        }
+        .adugna-tickets-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.1rem;
+            flex-wrap: wrap;
+            gap: 0.7em;
+        }
+        .adugna-tickets-header h2 {
+            font-size: 1.13rem;
+            color: #4f46e5;
+            margin: 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
         }
         .adugna-btn {
             background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
@@ -81,19 +128,8 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 0.18rem 0.6rem;
             font-size: 0.91em;
         }
-        .adugna-tickets-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.1rem;
-        }
-        .adugna-tickets-header h2 {
-            font-size: 1.13rem;
-            color: #4f46e5;
-            margin: 0;
-            font-weight: 700;
-        }
         .adugna-table-responsive {
+            width: 100%;
             overflow-x: auto;
         }
         .adugna-tickets-table {
@@ -101,11 +137,13 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border-collapse: collapse;
             font-size: 0.98em;
             background: transparent;
+            min-width: 700px;
         }
         .adugna-tickets-table th, .adugna-tickets-table td {
             padding: 0.55em 0.7em;
             border-bottom: 1px solid #e5e7eb;
             text-align: left;
+            white-space: nowrap;
         }
         .adugna-tickets-table th {
             background: #f3f4f6;
@@ -121,16 +159,26 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
             gap: 0.3em;
         }
         /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .adugna-card { max-width: 98vw; }
+        }
         @media (max-width: 900px) {
+            .admin-main { padding: 1.2rem 0.3rem; }
             .adugna-card { padding: 0.8rem 0.4rem; }
             .adugna-tickets-header h2 { font-size: 1em; }
             .adugna-btn { font-size: 0.95em; }
+            .adugna-tickets-table { min-width: 600px; }
         }
-        @media (max-width: 600px) {
+        @media (max-width: 700px) {
             .adugna-card { padding: 0.5rem 0.2rem; }
             .adugna-tickets-header { flex-direction: column; align-items: flex-start; gap: 0.6em; }
             .adugna-tickets-table th, .adugna-tickets-table td { padding: 0.38em 0.3em; font-size: 0.93em; }
             .adugna-btn, .adugna-btn.adugna-btn-sm { font-size: 0.91em; padding: 0.14rem 0.5rem; }
+            .adugna-tickets-table { min-width: 400px; }
+        }
+        @media (max-width: 500px) {
+            .adugna-tickets-table th, .adugna-tickets-table td { font-size: 0.89em; }
+            .adugna-card { min-width: 0; }
         }
         /* Outstanding fade-in animation */
         @keyframes adugnaFadeIn {
@@ -143,10 +191,10 @@ $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header">
-                <h1><?= htmlspecialchars($pageTitle) ?></h1>
+            <header class="admin-header" style="width:100%;max-width:1100px;margin:0 auto 1.2rem auto;">
+                <h1 style="font-size:1.35rem;color:#4f46e5;font-weight:800;letter-spacing:0.01em;"><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
-            <div class="content">
+            <div class="content" style="width:100%;max-width:1100px;margin:0 auto;">
                 <div class="adugna-card">
                     <div class="adugna-tickets-header">
                         <h2><i class="fas fa-ticket-alt"></i> Support Tickets</h2>
