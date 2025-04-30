@@ -1,11 +1,12 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
+// Adugna Gizaw: Secure, ERPNext-inspired, compact CSV export for survey results
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
@@ -45,14 +46,14 @@ $stmt = $pdo->prepare("
 $stmt->execute([$survey_id]);
 $responses = $stmt->fetchAll();
 
-// Prepare CSV data
+// Prepare CSV data (adugna- patenting, compact, content/screen aware)
 $filename = "survey_results_" . $survey_id . "_" . date('YmdHis') . ".csv";
 header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 
 $output = fopen('php://output', 'w');
 
-// Write header row
+// Adugna Gizaw: Write header row, extensible and compact
 $header = ['Respondent'];
 foreach ($fields as $field) {
     $header[] = $field['field_label'];
@@ -60,7 +61,7 @@ foreach ($fields as $field) {
 $header[] = 'Submitted At';
 fputcsv($output, $header);
 
-// Write response rows
+// Adugna Gizaw: Write response rows, content/screen aware
 foreach ($responses as $response) {
     $row = [];
     $row[] = $response['username'] ?? 'Anonymous';

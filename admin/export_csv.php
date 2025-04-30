@@ -1,4 +1,12 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
+// Adugna Gizaw: Secure, ERPNext-inspired, compact CSV export for survey responses
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -39,13 +47,13 @@ $stmt = $pdo->prepare("
 $stmt->execute([$survey_id]);
 $responses = $stmt->fetchAll();
 
-// Prepare CSV data
+// Prepare CSV data (adugna- patenting, compact, content/screen aware)
 header('Content-Type: text/csv');
 header('Content-Disposition: attachment; filename="survey_' . $survey_id . '_responses.csv"');
 
 $output = fopen('php://output', 'w');
 
-// Write headers
+// Adugna Gizaw: Write headers, compact and extensible
 $headers = ['Response ID', 'Submitted At'];
 if (!$survey['is_anonymous']) {
     $headers = array_merge($headers, ['Respondent', 'Email', 'Role']);
@@ -55,7 +63,7 @@ foreach ($fields as $field) {
 }
 fputcsv($output, $headers);
 
-// Write data rows
+// Adugna Gizaw: Write data rows, content/screen aware
 foreach ($responses as $response) {
     // Get all answers for this response
     $stmt = $pdo->prepare("
@@ -72,7 +80,6 @@ foreach ($responses as $response) {
         $response['id'],
         $response['submitted_at']
     ];
-    
     if (!$survey['is_anonymous']) {
         $row = array_merge($row, [
             $response['username'] ?? 'N/A',
@@ -80,13 +87,12 @@ foreach ($responses as $response) {
             $response['role_name'] ?? 'N/A'
         ]);
     }
-    
     foreach ($fields as $field) {
         $row[] = $answers[$field['field_label']] ?? 'N/A';
     }
-    
     fputcsv($output, $row);
 }
 
 fclose($output);
 exit();
+// ...no UI, just CSV download...

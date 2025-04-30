@@ -1,10 +1,19 @@
 <?php
+/**
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
+// Adugna Gizaw: ERPNext-inspired, adugna-compact, extensible CSV export for users
 if (!function_exists('export_users_csv')) {
     function export_users_csv($pdo, $ids = [], $filters = []) {
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="users_export.csv"');
         if (ob_get_level()) ob_end_clean();
         $out = fopen('php://output', 'w');
+        // Adugna Gizaw: adugna-compact, extensible column headers
         fputcsv($out, ['ID', 'Username', 'Last Active', 'Online', 'Role', 'Status']);
         $where = [];
         $params = [];
@@ -36,6 +45,7 @@ if (!function_exists('export_users_csv')) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // Adugna Gizaw: adugna-compact, content/screen aware row output
             fputcsv($out, [
                 $row['id'],
                 $row['username'],
