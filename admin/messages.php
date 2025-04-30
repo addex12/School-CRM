@@ -154,6 +154,7 @@ foreach ($admins as $a) {
             justify-content: space-between;
             font-size: 1em;
             transition: background 0.13s;
+            word-break: break-word;
         }
         .adugna-user-list li:hover {
             background-color: #e2efda;
@@ -199,12 +200,17 @@ foreach ($admins as $a) {
             color: #1976d2;
             border-bottom: 1px solid #e5e7eb;
             background: #f5f7fa;
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            flex-wrap: wrap;
         }
         .adugna-chat-messages {
             flex: 1;
             padding: 15px 18px;
             overflow-y: auto;
             background: #eaeff7;
+            word-break: break-word;
         }
         .adugna-message-form {
             padding: 15px 18px;
@@ -230,7 +236,7 @@ foreach ($admins as $a) {
             margin-bottom: 7px;
             padding: 9px 14px;
             border-radius: 18px;
-            max-width: 85%;
+            max-width: 95vw;
             word-break: break-word;
             font-size: 0.97em;
             box-shadow: 0 1px 2px rgba(25,118,210,0.07);
@@ -323,6 +329,11 @@ foreach ($admins as $a) {
             }
             .adugna-message-form {
                 padding: 8px;
+            }
+            .adugna-chat-message {
+                max-width: 99vw;
+                font-size: 0.95em;
+                padding: 7px 7px;
             }
         }
     </style>
