@@ -1,10 +1,10 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
  */
 require_once '../includes/auth.php';
 requireAdmin();
@@ -137,95 +137,92 @@ function sort_link($col, $label, $current_sort, $current_order) {
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            background: #f5f7fa;
-        }
-        .admin-main {
-            margin-left: 250px;
-        }
-        .dashboard-section {
+        /* Adugna Gizaw: All custom styles use adugna- prefix for patenting and clarity. Admin_sidebar/footer CSS untouched. */
+        body { background: #f5f7fa; }
+        .adugna-admin-main { margin-left: 250px; }
+        .adugna-dashboard-section {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+            border-radius: 0.7rem;
+            box-shadow: 0 2px 12px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: 1px solid #e5e7eb;
+            padding: 1.1rem 1.1rem;
             margin-bottom: 2rem;
-            padding: 2rem 2.5rem;
+            width: 100%;
+            max-width: 1100px;
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
         }
-        .teachers-header {
+        .adugna-teachers-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
-        .teachers-header h2 {
+        .adugna-teachers-header h2 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: #215967;
-            font-weight: 600;
+            font-weight: 700;
         }
-        .erpnext-btn, .btn, .btn-secondary, .btn-success {
-            display: inline-block;
-            padding: 8px 22px;
-            font-size: 15px;
-            border-radius: 4px;
+        .adugna-btn {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff;
             border: none;
-            background: #f5f7fa;
-            color: #215967;
+            border-radius: 0.4em;
+            padding: 0.13rem 0.7rem;
+            font-size: 0.92em;
             font-weight: 600;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
             cursor: pointer;
-            margin-right: 8px;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2em;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             text-decoration: none;
         }
-        .erpnext-btn:hover, .btn:hover, .btn-secondary:hover, .btn-success:hover {
-            background: #e2efda;
-            color: #215967;
+        .adugna-btn i { font-size: 0.92em; }
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-1px) scale(1.03);
         }
-        .btn-success {
+        .adugna-btn-success {
             background: #27ae60;
             color: #fff;
         }
-        .btn-danger {
+        .adugna-btn-danger {
             background: #e74c3c;
             color: #fff;
         }
-        .btn-sm, .erpnext-btn.btn-sm {
-            padding: 4px 14px;
-            font-size: 13px;
+        .adugna-btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
         }
-        .excel-table {
+        .adugna-btn-secondary:hover {
+            background: #e5e7eb;
+            color: #22223b;
+        }
+        .adugna-btn-sm { padding: 0.12rem 0.5rem; font-size: 0.85em; }
+        .adugna-table-responsive { width: 100%; overflow-x: auto; }
+        .adugna-excel-table {
             border-collapse: collapse;
             width: 100%;
             background: #fff;
+            font-size: 0.98em;
         }
-        .excel-table th, .excel-table td {
-            border: 1px solid #bdbdbd;
-            padding: 10px 12px;
+        .adugna-excel-table th, .adugna-excel-table td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 10px;
             text-align: left;
-            font-size: 1em;
         }
-        .excel-table th {
+        .adugna-excel-table th {
             background: #e2efda;
             color: #215967;
             font-weight: bold;
         }
-        .excel-table tr:nth-child(even) {
-            background: #f9f9f9;
-        }
-        .excel-table tr:hover {
-            background: #f4f8fb;
-        }
-        .table-responsive {
-            overflow-x: auto;
-        }
-        @media (max-width: 900px) {
-            .dashboard-section { padding: 1rem; }
-            .teachers-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
-        }
-        @media (max-width: 600px) {
-            .excel-table th, .excel-table td { padding: 8px 6px; }
-        }
-        .bulk-select-bar {
+        .adugna-excel-table tr:nth-child(even) { background: #f9f9f9; }
+        .adugna-excel-table tr:hover { background: #f4f8fb; }
+        .adugna-bulk-select-bar {
             background: #e2efda;
             border-radius: 6px;
             padding: 1rem 1.5rem;
@@ -234,40 +231,56 @@ function sort_link($col, $label, $current_sort, $current_order) {
             align-items: center;
             gap: 1.5rem;
         }
-        .bulk-select-bar label {
+        .adugna-bulk-select-bar label {
             margin: 0 0.5rem 0 0;
             font-weight: 500;
             color: #215967;
         }
-        .bulk-select-bar select, .bulk-select-bar input {
+        .adugna-bulk-select-bar select, .adugna-bulk-select-bar input {
             min-width: 120px;
+        }
+        @media (max-width: 900px) {
+            .adugna-dashboard-section { padding: 0.7rem; }
+            .adugna-teachers-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+        }
+        @media (max-width: 600px) {
+            .adugna-excel-table th, .adugna-excel-table td { padding: 7px 4px; font-size: 0.93em; }
+            .adugna-admin-main { padding: 7px 2px 80px; }
+        }
+        @media (max-width: 400px) {
+            .adugna-dashboard-section { padding: 2px; }
+            .adugna-teachers-header h2 { font-size: 1em; }
+        }
+        @keyframes adugnaFadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: none;}
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
+        <div class="adugna-admin-main">
             <header class="admin-header">
-                <h1 style="color:#215967; font-weight:700;"><?= esc($pageTitle) ?></h1>
+                <h1 style="color:#215967; font-weight:700;">Teachers</h1>
             </header>
             <div class="content">
-                <div class="dashboard-section">
-                    <div class="teachers-header">
+                <div class="adugna-dashboard-section">
+                    <div class="adugna-teachers-header">
                         <h2>Teacher List</h2>
                         <div>
-                            <a href="add_users.php?role=teacher" class="erpnext-btn btn-sm btn-success"><i class="fas fa-plus"></i> Add Teacher</a>
+                            <a href="add_users.php?role=teacher" class="adugna-btn adugna-btn-sm adugna-btn-success"><i class="fas fa-plus"></i> Add Teacher</a>
                         </div>
                     </div>
                     <!-- Search bar -->
                     <div style="margin-bottom:1.2rem;display:flex;align-items:center;gap:1rem;">
                         <input type="text" id="teacherSearch" placeholder="Search teachers..." style="flex:1;padding:10px 16px;border:1px solid #e5e7eb;border-radius:6px;font-size:1rem;background:#f9fafb;">
-                        <button class="erpnext-btn btn-primary" id="searchBtn" style="padding:10px 18px;"><i class="fas fa-search"></i> Search</button>
-                        <button class="erpnext-btn btn-secondary" id="clearSearch" style="padding:10px 18px;">Clear</button>
+                        <button class="adugna-btn adugna-btn-primary adugna-btn-sm" id="searchBtn"><i class="fas fa-search"></i> Search</button>
+                        <button class="adugna-btn adugna-btn-secondary adugna-btn-sm" id="clearSearch">Clear</button>
                     </div>
                     <!-- Bulk selection bar -->
                     <form method="post" id="bulkAssignTeachersForm">
-                        <div class="bulk-select-bar">
+                        <div class="adugna-bulk-select-bar">
                             <label><input type="checkbox" id="select_all_teachers"> Select All</label>
                             <label>Qualification:
                                 <input type="text" name="bulk_qualification" placeholder="Qualification">
@@ -282,10 +295,10 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                     <option value="inactive">Inactive</option>
                                 </select>
                             </label>
-                            <button type="submit" name="bulk_assign_selected_teachers" class="erpnext-btn btn-sm btn-success">Update Selected</button>
+                            <button type="submit" name="bulk_assign_selected_teachers" class="adugna-btn adugna-btn-sm adugna-btn-success">Update Selected</button>
                         </div>
-                        <div class="table-responsive">
-                            <table class="excel-table" id="teachersTable">
+                        <div class="adugna-table-responsive">
+                            <table class="adugna-excel-table" id="teachersTable">
                                 <thead>
                                     <tr>
                                         <th></th>
@@ -318,8 +331,8 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                                 <td><?= esc($teacher['status'] ?? '-') ?></td>
                                                 <td><?= esc($teacher['created_at'] ?? '-') ?></td>
                                                 <td>
-                                                    <a href="edit_user.php?id=<?= esc($teacher['user_id']) ?>" class="erpnext-btn btn-sm btn-secondary">Edit</a>
-                                                    <a href="teachers.php?delete_teacher=<?= esc($teacher['teacher_id']) ?>" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher and user?')">Delete</a>
+                                                    <a href="edit_user.php?id=<?= esc($teacher['user_id']) ?>" class="adugna-btn adugna-btn-sm adugna-btn-secondary">Edit</a>
+                                                    <a href="teachers.php?delete_teacher=<?= esc($teacher['teacher_id']) ?>" class="adugna-btn adugna-btn-sm adugna-btn-danger" onclick="return confirm('Delete this teacher and user?')">Delete</a>
                                                 </td>
                                             </tr>
                                             <?php if (isset($_GET['edit_teacher']) && $_GET['edit_teacher'] == $teacher['teacher_id']): ?>
@@ -345,8 +358,8 @@ function sort_link($col, $label, $current_sort, $current_order) {
                                                         <label>Status:
                                                             <input type="text" name="status" value="<?= esc($teacher['status']) ?>">
                                                         </label>
-                                                        <button type="submit" name="edit_teacher" class="erpnext-btn btn-sm btn-success">Save</button>
-                                                        <a href="teachers.php" class="erpnext-btn btn-sm btn-secondary">Cancel</a>
+                                                        <button type="submit" name="edit_teacher" class="adugna-btn adugna-btn-sm adugna-btn-success">Save</button>
+                                                        <a href="teachers.php" class="adugna-btn adugna-btn-sm adugna-btn-secondary">Cancel</a>
                                                     </form>
                                                 </td>
                                             </tr>
@@ -365,25 +378,19 @@ function sort_link($col, $label, $current_sort, $current_order) {
             </div>
         </div>
         <script>
-            // Bulk select all checkboxes for teachers
+            // Adugna Gizaw: Bulk select all checkboxes for teachers
             document.addEventListener('DOMContentLoaded', function() {
                 const selectAll = document.getElementById('select_all_teachers');
-                const selectAllHead = document.getElementById('select_all_teachers_head');
                 const checkboxes = document.querySelectorAll('.teacher-checkbox');
-                function toggleAll(checked) {
-                    checkboxes.forEach(cb => cb.checked = checked);
-                }
+                function toggleAll(checked) { checkboxes.forEach(cb => cb.checked = checked); }
                 if (selectAll) selectAll.addEventListener('change', e => toggleAll(e.target.checked));
-                if (selectAllHead) selectAllHead.addEventListener('change', e => toggleAll(e.target.checked));
             });
-
-            // Real-time search/filter functionality using JSON data
+            // Adugna Gizaw: Real-time search/filter functionality using JSON data
             document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.getElementById('teacherSearch');
                 const searchBtn = document.getElementById('searchBtn');
                 const clearBtn = document.getElementById('clearSearch');
                 const tbody = document.getElementById('teachersTbody');
-
                 // Prepare teachers data as JSON for client-side filtering
                 const teachersData = <?=
                     json_encode(array_map(function($t) {
@@ -402,7 +409,6 @@ function sort_link($col, $label, $current_sort, $current_order) {
                         ];
                     }, $teachers));
                 ?>;
-
                 function renderRows(filtered) {
                     if (!filtered.length) {
                         tbody.innerHTML = '<tr><td colspan="12">No teachers found.</td></tr>';
@@ -422,13 +428,12 @@ function sort_link($col, $label, $current_sort, $current_order) {
                             <td>${t.status || '-'}</td>
                             <td>${t.created_at || '-'}</td>
                             <td>
-                                <a href="edit_user.php?id=${t.user_id}" class="erpnext-btn btn-sm btn-secondary">Edit</a>
-                                <a href="teachers.php?delete_teacher=${t.teacher_id}" class="erpnext-btn btn-sm btn-danger" onclick="return confirm('Delete this teacher and user?')">Delete</a>
+                                <a href="edit_user.php?id=${t.user_id}" class="adugna-btn adugna-btn-sm adugna-btn-secondary">Edit</a>
+                                <a href="teachers.php?delete_teacher=${t.teacher_id}" class="adugna-btn adugna-btn-sm adugna-btn-danger" onclick="return confirm('Delete this teacher and user?')">Delete</a>
                             </td>
                         </tr>`;
                     }).join('');
                 }
-
                 function filterRows() {
                     const val = searchInput.value.toLowerCase();
                     const filtered = teachersData.filter(function(t) {
@@ -436,24 +441,9 @@ function sort_link($col, $label, $current_sort, $current_order) {
                     });
                     renderRows(filtered);
                 }
-
-                // Real-time filtering as you type
                 searchInput.addEventListener('input', filterRows);
-
-                // On search button click, show only filtered results (same as real-time)
-                searchBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    filterRows();
-                });
-
-                // Clear search
-                clearBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    searchInput.value = '';
-                    renderRows(teachersData);
-                });
-
-                // Initial render
+                searchBtn.addEventListener('click', function(e) { e.preventDefault(); filterRows(); });
+                clearBtn.addEventListener('click', function(e) { e.preventDefault(); searchInput.value = ''; renderRows(teachersData); });
                 renderRows(teachersData);
             });
         </script>
