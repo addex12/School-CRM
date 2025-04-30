@@ -216,184 +216,188 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
             font-family: "Inter", "Segoe UI", Arial, sans-serif;
             min-height: 100vh;
         }
-        .admin-main {
+        .adugna-admin-main {
             margin-left: 260px;
-            padding: 2rem 2.5rem;
+            padding: 1.2rem 1.2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+        /* Compact ERPNext/Jinja2/frappe-inspired card style */
         .adugna-card {
             background: #fff;
-            border-radius: 1.1rem;
-            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
-            border: none;
-            padding: 1.5rem 1.5rem;
-            margin-bottom: 2rem;
+            border-radius: 0.7rem;
+            box-shadow: 0 2px 12px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: 1px solid #e5e7eb;
+            padding: 1.1rem 1.1rem;
+            margin-bottom: 1.2rem;
             width: 100%;
             max-width: 900px;
             animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
         }
-        .form-container {
-            /* Use adugna-card for consistent look */
-            /* Removed invalid property 'composes' */
+        .adugna-form-container {
             background: #fff;
-            border-radius: 1.1rem;
-            box-shadow: 0 6px 32px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
-            border: none;
-            padding: 1.5rem 1.5rem;
-            margin-bottom: 2rem;
+            border-radius: 0.7rem;
+            box-shadow: 0 2px 12px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: 1px solid #e5e7eb;
+            padding: 1.1rem 1.1rem;
+            margin-bottom: 1.2rem;
             width: 100%;
             max-width: 900px;
         }
-        .adugna-form-group, .form-group {
-            margin-bottom: 1.2rem;
+        .adugna-form-group {
+            margin-bottom: 0.8rem;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
         }
-        .form-group label {
+        .adugna-form-group label {
             font-weight: 600;
             color: #215967;
-            margin-bottom: 0.3em;
-            font-size: 1.01em;
+            margin-bottom: 0.2em;
+            font-size: 0.98em;
             letter-spacing: 0.01em;
         }
-        .form-group input[type="text"],
-        .form-group input[type="datetime-local"],
-        .form-group select,
-        .form-group textarea {
-            max-width: 420px;
-            min-width: 180px;
+        .adugna-form-group input[type="text"],
+        .adugna-form-group input[type="datetime-local"],
+        .adugna-form-group select,
+        .adugna-form-group textarea {
+            max-width: 350px;
+            min-width: 120px;
             width: 100%;
-            border-radius: 0.5em;
-            border: 1.5px solid #e5e7eb;
+            border-radius: 0.4em;
+            border: 1.2px solid #e5e7eb;
             background: #f3f4f6;
-            padding: 0.65em 1em;
-            font-size: 1em;
+            padding: 0.45em 0.8em;
+            font-size: 0.97em;
             transition: border 0.18s, box-shadow 0.18s;
             box-sizing: border-box;
-            margin-bottom: 0.1em;
+            margin-bottom: 0.05em;
         }
-        .form-group textarea {
-            min-height: 70px;
+        .adugna-form-group textarea {
+            min-height: 60px;
             resize: vertical;
             font-family: inherit;
         }
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            border: 1.5px solid #4f46e5;
+        .adugna-form-group input:focus,
+        .adugna-form-group select:focus,
+        .adugna-form-group textarea:focus {
+            border: 1.2px solid #4f46e5;
             background: #fff;
             box-shadow: 0 0 0 2px #a5b4fc33;
         }
-        .form-group input[type="text"]:hover,
-        .form-group input[type="datetime-local"]:hover,
-        .form-group select:hover,
-        .form-group textarea:hover {
-            border: 1.5px solid #a5b4fc;
+        .adugna-form-group input[type="text"]:hover,
+        .adugna-form-group input[type="datetime-local"]:hover,
+        .adugna-form-group select:hover,
+        .adugna-form-group textarea:hover {
+            border: 1.2px solid #a5b4fc;
         }
-        .roles-grid {
+        .adugna-roles-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 7px;
             width: 100%;
-            max-width: 420px;
+            max-width: 350px;
         }
-        .question-box {
+        .adugna-question-box {
             border: 1px solid #e5e7eb;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 0.7em;
+            padding: 10px;
+            margin-bottom: 12px;
+            border-radius: 0.5em;
             background: #f9f9f9;
             box-shadow: 0 1px 4px rgba(44,62,80,0.04);
             animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
         }
-        .question-header {
+        .adugna-question-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 7px;
             font-weight: 600;
             color: #215967;
             align-items: center;
         }
-        .question-header .erpnext-btn, .question-header .adugna-btn {
-            padding: 0.18rem 0.7rem;
-            font-size: 0.93em;
+        .adugna-question-header .adugna-btn {
+            padding: 0.12rem 0.5rem;
+            font-size: 0.85em;
         }
-        .question-content {
+        .adugna-question-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 10px;
         }
-        .help-text {
-            font-size: 0.9em;
+        .adugna-help-text {
+            font-size: 0.85em;
             color: #666;
-            margin-top: 5px;
+            margin-top: 3px;
         }
-        .adugna-btn, .erpnext-btn, .btn, .btn-primary, .btn-secondary {
+        /* Adugna: Compact, ERPNext/frappe-inspired button styles */
+        .adugna-btn {
             background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
             color: #fff;
             border: none;
-            border-radius: 0.5em;
-            padding: 0.28rem 0.85rem;
-            font-size: 0.97em;
+            border-radius: 0.4em;
+            padding: 0.18rem 0.7rem;
+            font-size: 0.89em;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
             display: inline-flex;
             align-items: center;
-            gap: 0.3em;
+            gap: 0.2em;
             box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             text-decoration: none;
         }
-        .adugna-btn i, .erpnext-btn i {
-            font-size: 0.97em;
+        .adugna-btn i {
+            font-size: 0.89em;
         }
-        .adugna-btn:hover, .adugna-btn:focus,
-        .erpnext-btn:hover, .erpnext-btn:focus {
+        .adugna-btn:hover, .adugna-btn:focus {
             background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
             box-shadow: 0 4px 16px rgba(44,62,80,0.13);
-            transform: translateY(-2px) scale(1.04);
+            transform: translateY(-1px) scale(1.03);
         }
-        .btn-secondary, .adugna-btn-secondary {
+        .adugna-btn-secondary {
             background: #f3f4f6;
             color: #374151;
             border: 1px solid #e5e7eb;
         }
-        .btn-secondary:hover, .adugna-btn-secondary:hover {
+        .adugna-btn-secondary:hover {
             background: #e5e7eb;
             color: #22223b;
         }
-        .btn-primary, .adugna-btn-primary {
+        .adugna-btn-primary {
             background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
             color: #fff;
         }
-        .btn-primary:hover, .adugna-btn-primary:hover {
+        .adugna-btn-primary:hover {
             background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
         }
-        .add-question { margin-bottom: 20px; }
-        .alert {
+        .adugna-add-question { margin-bottom: 12px; }
+        .adugna-alert {
             background: #fee2e2;
             color: #dc2626;
-            padding: 1rem;
+            padding: 0.7rem;
             border-radius: 0.375rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             border: 1px solid #fca5a5;
+            font-size: 0.95em;
         }
         @media (max-width: 900px) {
-            .form-container, .admin-main { padding: 1rem; }
-            .question-content { grid-template-columns: 1fr; gap: 10px; }
-            .form-group input[type="text"],
-            .form-group input[type="datetime-local"],
-            .form-group select,
-            .form-group textarea { max-width: 100%; }
+            .adugna-form-container, .adugna-admin-main { padding: 0.7rem; }
+            .adugna-question-content { grid-template-columns: 1fr; gap: 7px; }
+            .adugna-form-group input[type="text"],
+            .adugna-form-group input[type="datetime-local"],
+            .adugna-form-group select,
+            .adugna-form-group textarea { max-width: 100%; }
         }
         @media (max-width: 600px) {
-            .form-container, .admin-main { padding: 4px; }
-            .question-header { flex-direction: column; gap: 6px; align-items: flex-start; }
-            .question-content { grid-template-columns: 1fr; gap: 8px; }
-            .adugna-btn, .erpnext-btn, .btn, .btn-primary { padding: 0.18rem 0.7rem; font-size: 0.93em; }
+            .adugna-form-container, .adugna-admin-main { padding: 2px; }
+            .adugna-question-header { flex-direction: column; gap: 4px; align-items: flex-start; }
+            .adugna-question-content { grid-template-columns: 1fr; gap: 5px; }
+            .adugna-btn { padding: 0.12rem 0.5rem; font-size: 0.85em; }
+        }
+        @media (max-width: 400px) {
+            .adugna-card, .adugna-form-container { padding: 2px; }
+            .adugna-form-group label { font-size: 0.93em; }
         }
         @keyframes adugnaFadeIn {
             from { opacity: 0; transform: translateY(20px);}
@@ -404,28 +408,28 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
+        <div class="adugna-admin-main">
             <header class="admin-header" style="width:100%;max-width:900px;margin:0 auto 1.2rem auto;">
                 <h1 style="color:#215967;font-weight:700;"><i class="fas fa-poll"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
-            <div class="form-container adugna-card">
+            <div class="adugna-form-container adugna-card">
                 <h2 style="color:#215967;font-weight:600;"><?= $survey ? "Edit Survey" : "Create New Survey" ?></h2>
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="alert"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                    <div class="adugna-alert"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
                 <?php endif; ?>
                 <form method="POST" class="survey-form">
                     <input type="hidden" name="id" value="<?= $survey_id ?? '' ?>">
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="title">Survey Title *</label>
                         <input type="text" id="title" name="title" value="<?= htmlspecialchars($survey['title'] ?? '') ?>" required>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="description">Description</label>
                         <textarea id="description" name="description" rows="3"><?= htmlspecialchars($survey['description'] ?? '') ?></textarea>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label>Target Roles *</label>
-                        <div class="roles-grid">
+                        <div class="adugna-roles-grid">
                             <?php foreach ($roles as $role): ?>
                                 <div class="role-checkbox">
                                     <label>
@@ -437,7 +441,7 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="category_id">Category *</label>
                         <select id="category_id" name="category_id" required>
                             <option value="">Select Category</option>
@@ -449,7 +453,7 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="status">Status *</label>
                         <select id="status" name="status" required>
                             <?php foreach ($statuses as $status): ?>
@@ -460,31 +464,31 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="starts_at">Start Date *</label>
                         <input type="datetime-local" id="starts_at" name="starts_at"
                                value="<?= date('Y-m-d\TH:i', strtotime($survey['starts_at'] ?? '+1 day')) ?>" required>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label for="ends_at">End Date *</label>
                         <input type="datetime-local" id="ends_at" name="ends_at"
                                value="<?= date('Y-m-d\TH:i', strtotime($survey['ends_at'] ?? '+1 month')) ?>" required>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label>
                             <input type="checkbox" name="is_anonymous"
                                 <?= isset($survey['is_anonymous']) && $survey['is_anonymous'] ? 'checked' : '' ?>>
                             Make survey anonymous
                         </label>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label>
                             <input type="checkbox" name="is_active"
                                 <?= isset($survey['is_active']) && $survey['is_active'] ? 'checked' : '' ?>>
                             Activate survey
                         </label>
                     </div>
-                    <div class="form-group">
+                    <div class="adugna-form-group">
                         <label>
                             <input type="checkbox" name="is_public"
                                 <?= isset($survey['is_public']) && $survey['is_public'] ? 'checked' : '' ?>>
@@ -495,17 +499,17 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                     <div id="questions-container">
                         <?php if (isset($survey['questions'])): ?>
                             <?php foreach ($survey['questions'] as $index => $question): ?>
-                                <div class="question-box" data-index="<?= $index ?>">
-                                    <div class="question-header">
+                                <div class="adugna-question-box" data-index="<?= $index ?>">
+                                    <div class="adugna-question-header">
                                         <span>Question <?= $index + 1 ?></span>
                                         <button type="button" class="adugna-btn adugna-btn-secondary remove-question"><i class="fas fa-trash"></i> Remove</button>
                                     </div>
-                                    <div class="question-content">
-                                        <div class="form-group">
+                                    <div class="adugna-question-content">
+                                        <div class="adugna-form-group">
                                             <label>Question Text *</label>
                                             <input type="text" name="questions[]" value="<?= htmlspecialchars($question['field_label']) ?>" required>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="adugna-form-group">
                                             <label>Field Type *</label>
                                             <select name="field_types[]" required>
                                                 <option value="text" <?= $question['field_type'] == 'text' ? 'selected' : '' ?>>Text</option>
@@ -519,20 +523,20 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
                                                 <option value="file" <?= $question['field_type'] == 'file' ? 'selected' : '' ?>>File</option>
                                             </select>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="adugna-form-group">
                                             <label>
                                                 <input type="checkbox" name="required[]" <?= $question['is_required'] ? 'checked' : '' ?>>
                                                 Required
                                             </label>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="adugna-form-group">
                                             <label>Options (for radio, checkbox, select)</label>
                                             <textarea name="options[]" rows="3"><?= 
                                                 isset($question['field_options']) ? 
                                                 htmlspecialchars(implode("\n", json_decode($question['field_options']))) : 
                                                 '' 
                                             ?></textarea>
-                                            <p class="help-text">Enter each option on a new line</p>
+                                            <p class="adugna-help-text">Enter each option on a new line</p>
                                         </div>
                                     </div>
                                 </div>
