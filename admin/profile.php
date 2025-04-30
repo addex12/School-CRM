@@ -307,7 +307,15 @@ function handleChangePassword($pdo, $user) {
         ?>
 <!-- Adugna Custom Styles -->
 <style>
-/* --- Begin: Sidebar & Main Layout Styles (from dashboard.php) --- */
+/**
+ * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+ * Sidebar/footer styles are not touched.
+ * All cards, buttons, and messages use adugna- prefix.
+ * Layout is content/screen aware and visually outstanding.
+ */
+html { font-size: 16px; }
+@media (max-width: 900px) { html { font-size: 15px; } }
+@media (max-width: 600px) { html { font-size: 14px; } }
 .admin-dashboard {
     display: flex;
     min-height: 100vh;
@@ -318,19 +326,11 @@ function handleChangePassword($pdo, $user) {
     padding: 2rem 2.5rem;
 }
 @media (max-width: 900px) {
-    .admin-main {
-        padding: 1rem 0.5rem;
-    }
+    .admin-main { padding: 1rem 0.5rem; }
 }
 @media (max-width: 600px) {
-    .admin-main {
-        padding: 10px 2px 80px;
-    }
+    .admin-main { padding: 10px 2px 80px; }
 }
-/* --- End: Sidebar & Main Layout Styles --- */
-
-/* --- Begin: Profile Page Styles (existing) --- */
-/* Adugna ERPNext Card Styling */
 .adugna-card {
     border-radius: 10px;
     box-shadow: 0 4px 24px rgba(44,62,80,0.09), 0 1.5px 4px rgba(44,62,80,0.04);
@@ -511,6 +511,11 @@ function handleChangePassword($pdo, $user) {
     .adugna-profile-form-card {
         min-width: 0;
     }
+    .adugna-profile-info h3,
+    .adugna-profile-info .card-text,
+    .adugna-profile-info .text-muted {
+        word-break: break-word;
+        font-size: 0.98em;
+    }
 }
-/* --- End: Profile Page Styles --- */
 </style>
