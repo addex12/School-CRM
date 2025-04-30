@@ -165,12 +165,11 @@ body {
 </style>
 
 <!-- Sidebar Hamburger Toggle Button (always visible, fixed at top left) -->
-<!-- Hamburger Toggle Button -->
-<button class="adugna-sidebar-toggle-btn" id="adugnaSidebarToggle" aria-label="Toggle sidebar">
-    <span class="adugna-hamburger">
-        <span></span>
-        <span></span>
-        <span></span>
+<button class="adugna-sidebar-toggle-btn" id="adugnaSidebarToggle" aria-label="Toggle sidebar" style="position:fixed;top:16px;left:16px;z-index:1100;">
+    <span class="adugna-hamburger" style="display:inline-block;width:28px;height:28px;position:relative;">
+        <span style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:4px;left:0;transition:all 0.2s;"></span>
+        <span style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:12px;left:0;transition:all 0.2s;"></span>
+        <span style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:20px;left:0;transition:all 0.2s;"></span>
     </span>
 </button>
 
@@ -228,15 +227,8 @@ body {
     </ul>
 </div>
 <div class="adugna-sidebar-overlay" id="adugnaSidebarOverlay"></div>
-<!-- Adugna Gizaw: Sidebar toggle and submenu logic, highlight active, responsive -->
+
 <script>
-/**
- * Adugna Gizaw: Sidebar toggle, submenu logic, and active page highlight.
- * - Sidebar is collapsible via hamburger button.
- * - On desktop, sidebar pushes content; on mobile, overlays content.
- * - Sidebar never covers content on desktop.
- * - Overlay closes sidebar on mobile.
- */
 (function() {
     const sidebar = document.getElementById('adugnaSidebar');
     const toggleBtn = document.getElementById('adugnaSidebarToggle');
@@ -267,7 +259,6 @@ body {
             closeSidebar();
         }
     }
-    // Initial state: collapsed on mobile, open on desktop
     function handleSidebarOnResize() {
         if (window.innerWidth > 900) {
             sidebar.classList.remove('adugna-collapsed');
