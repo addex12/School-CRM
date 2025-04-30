@@ -420,8 +420,8 @@ $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="admin-main">
-            <header class="admin-header">
-                <?= htmlspecialchars($pageTitle) ?>
+            <header class="admin-header"> 
+              <?= htmlspecialchars($pageTitle) ?>
             </header>
             <div class="admin-content">
                 <?php if (isset($_SESSION['error'])): ?>
