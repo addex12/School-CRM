@@ -24,70 +24,175 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 <link rel="stylesheet" href="../assets/css/admin.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../assets/css/active_user.css">
+<!-- Google Fonts: Poppins for modern, elegant look -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <!-- Adugna Gizaw: Use style.css for all sidebar and layout styling -->
 <link rel="stylesheet" href="../assets/css/style.css">
 
-<!-- Sidebar Hamburger Toggle Button (always visible, fixed at top left) -->
 <style>
-/* Minimal inline style for demonstration, move to CSS file in production */
+/* Outstanding, elegant, and responsive sidebar styles */
+body, html {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #f7f9fb;
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
 .adugna-sidebar-toggle-btn {
     position: fixed;
     top: 18px;
     left: 18px;
     z-index: 1201;
-    background: #fff;
+    background: linear-gradient(135deg, #4f8cff 0%, #6ee7b7 100%);
     border: none;
     outline: none;
     cursor: pointer;
-    padding: 8px 10px;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 10px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(79,140,255,0.10);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    transition: background 0.2s, box-shadow 0.2s;
 }
 .adugna-sidebar-toggle-btn:hover {
-    background: #f0f0f0;
+    background: linear-gradient(135deg, #6ee7b7 0%, #4f8cff 100%);
+    box-shadow: 0 6px 24px rgba(79,140,255,0.18);
 }
 .adugna-sidebar-toggle-btn .adugna-hamburger {
-    width: 24px;
-    height: 18px;
+    width: 28px;
+    height: 22px;
     display: inline-block;
     position: relative;
 }
 .adugna-sidebar-toggle-btn .adugna-hamburger span {
     display: block;
-    height: 3px;
+    height: 4px;
     width: 100%;
-    background: #333;
-    border-radius: 2px;
-    margin-bottom: 5px;
+    background: #fff;
+    border-radius: 3px;
+    margin-bottom: 6px;
     transition: all 0.3s;
 }
 .adugna-sidebar-toggle-btn .adugna-hamburger span:last-child {
     margin-bottom: 0;
 }
-/* Sidebar styles for collapsible behavior */
 .adugna-sidebar {
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
-    width: 240px;
-    background: #fff;
-    box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+    width: 270px;
+    background: linear-gradient(135deg, #4f8cff 0%, #6ee7b7 100%);
+    box-shadow: 2px 0 16px rgba(79,140,255,0.10);
     z-index: 1200;
-    transition: transform 0.25s cubic-bezier(.4,0,.2,1);
+    transition: transform 0.25s cubic-bezier(.4,0,.2,1), width 0.25s;
     will-change: transform;
+    color: #fff;
+    border-top-right-radius: 24px;
+    border-bottom-right-radius: 24px;
+    overflow-y: auto;
+    font-family: 'Poppins', Arial, sans-serif;
 }
-.adugna-sidebar.adugna-collapsed {
-    transform: translateX(-100%);
+.adugna-sidebar .adugna-logo {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 32px 0 24px 32px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.adugna-sidebar .adugna-logo i {
+    font-size: 2.2rem;
+    color: #fff;
+    margin-right: 8px;
+}
+.adugna-sidebar ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 32px 0;
+}
+.adugna-sidebar ul li {
+    margin: 0;
+    padding: 0;
+}
+.adugna-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 32px;
+    color: #fff;
+    font-size: 1.13rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 12px 0 0 12px;
+    margin: 4px 0;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    position: relative;
+}
+.adugna-sidebar-link .adugna-icon {
+    font-size: 1.4em;
+    min-width: 28px;
+    text-align: center;
+}
+.adugna-sidebar-link:hover, .adugna-sidebar-link.adugna-active {
+    background: rgba(255,255,255,0.18);
+    color: #222;
+    box-shadow: 0 2px 12px rgba(110,231,183,0.10);
+    font-weight: 600;
+}
+.adugna-sidebar-link.adugna-active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+    border-radius: 6px;
+    background: #fff;
+}
+.adugna-sidebar .adugna-submenu {
+    display: none;
+    flex-direction: column;
+    padding-left: 24px;
+    margin-top: 2px;
+}
+.adugna-sidebar .adugna-submenu.adugna-open {
+    display: flex;
+}
+.adugna-has-submenu {
+    cursor: pointer;
+    position: relative;
+}
+.adugna-submenu-toggle {
+    margin-left: auto;
+    transition: transform 0.25s;
+    color: #fff;
+    font-size: 1em;
+}
+.adugna-submenu-toggle.adugna-rotated {
+    transform: rotate(90deg);
+}
+.adugna-sidebar-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1199;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(79,140,255,0.13);
+    transition: background 0.2s;
+}
+.adugna-sidebar.adugna-open + .adugna-sidebar-overlay {
+    display: block;
 }
 @media (max-width: 900px) {
     .adugna-sidebar {
-        width: 220px;
-        /* overlays content on mobile */
+        width: 90vw;
+        min-width: 0;
+        max-width: 340px;
+        border-radius: 0 18px 18px 0;
+        font-size: 1rem;
     }
     .adugna-sidebar.adugna-collapsed {
         transform: translateX(-110%);
@@ -95,37 +200,36 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     body.adugna-sidebar-open {
         overflow: hidden;
     }
+    .adugna-sidebar .adugna-logo {
+        font-size: 1.5rem;
+        padding: 24px 0 16px 24px;
+    }
+    .adugna-sidebar-link {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
 }
-@media (min-width: 901px) {
+@media (max-width: 600px) {
     .adugna-sidebar {
-        /* push content, not overlay */
-        position: fixed;
-        left: 0;
-        top: 0;
-        height: 100vh;
-        z-index: 1200;
+        width: 100vw;
+        border-radius: 0 0 18px 0;
     }
-    .adugna-sidebar.adugna-collapsed {
-        transform: translateX(-100%);
+    .adugna-sidebar .adugna-logo {
+        font-size: 1.1rem;
+        padding: 16px 0 10px 16px;
     }
-    .adugna-main-content {
-        margin-left: 240px;
-        transition: margin-left 0.25s;
-    }
-    .adugna-sidebar.adugna-collapsed ~ .adugna-main-content {
-        margin-left: 0;
+    .adugna-sidebar-link {
+        padding: 12px 12px;
+        font-size: 0.98rem;
     }
 }
-/* Optional: add overlay for mobile */
-.adugna-sidebar-overlay {
-    display: none;
-    position: fixed;
-    z-index: 1199;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.18);
+.adugna-sidebar::-webkit-scrollbar {
+    width: 7px;
+    background: rgba(255,255,255,0.08);
 }
-.adugna-sidebar.adugna-open + .adugna-sidebar-overlay {
-    display: block;
+.adugna-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.18);
+    border-radius: 6px;
 }
 </style>
 
