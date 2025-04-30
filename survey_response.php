@@ -14,10 +14,14 @@ require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/config.php';
 
 // Get survey_id from GET parameter and validate
-if (!isset($_GET['survey_id']) || !is_numeric($_GET['survey_id'])) {
+$survey_id = null;
+if (isset($_GET['survey_id']) && is_numeric($_GET['survey_id'])) {
+    $survey_id = (int)$_GET['survey_id'];
+} elseif (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $survey_id = (int)$_GET['id'];
+} else {
     die("Invalid or missing survey ID.");
 }
-$survey_id = (int)$_GET['survey_id'];
 
 // Validate survey access and get survey details
 try {
