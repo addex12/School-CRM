@@ -291,8 +291,12 @@ $chart_json = json_encode($chart_data);
         <div class="admin-main adugna-admin-main">
             <header class="admin-header">
                 <h1 style="color:#4f46e5;font-weight:800;"><i class="fas fa-chart-pie"></i> Survey Statistics</h1>
+                <!-- Adugna Gizaw: Print button for interactive, content-aware printing -->
+                <button class="adugna-btn adugna-btn-sm" id="adugna-print-btn" title="Print Statistics" style="float:right;margin-top:-2.2em;">
+                    <i class="fas fa-print"></i> Print
+                </button>
             </header>
-            <div class="content" style="width:100%;max-width:900px;margin:0 auto;">
+            <div class="content" id="adugna-print-area" style="width:100%;max-width:900px;margin:0 auto;">
                 <div class="filter-section">
                     <form method="GET" class="filter-form">
                         <label for="survey_id">Select Survey</label>
@@ -659,6 +663,127 @@ $chart_json = json_encode($chart_data);
             });
             legendContainer.appendChild(ul);
         }
+
+        // Adugna Gizaw: Interactive, content-aware printing function for survey statistics
+        document.getElementById('adugna-print-btn').addEventListener('click', function() {
+            // Clone the print area content
+            const printArea = document.getElementById('adugna-print-area').cloneNode(true);
+
+            // Remove print button from cloned content
+            const printBtn = printArea.querySelector('#adugna-print-btn');
+            if (printBtn) printBtn.remove();
+
+            // Remove admin sidebar and other non-printable elements if present
+            // (Assumes admin_sidebar is outside print area, so nothing to do)
+
+            // Remove chart legends if not needed (optional)
+            // printArea.querySelectorAll('.adugna-chart-legend').forEach(el => el.remove());
+
+            // Prepare a new window for printing
+            const printWindow = window.open('', '', 'width=900,height=700');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Survey Statistics - Print</title>
+                    <link rel="stylesheet" href="../assets/css/style.css">
+                    <style>
+                        body { font-family: "Inter", "Segoe UI", Arial, sans-serif; background: #fff; color: #222; }
+                        .adugna-chart-container, .adugna-survey-summary, .adugna-row-flex, .adugna-col-half { box-shadow:none !important; }
+                        .adugna-btn, .adugna-btn-sm, .adugna-btn-primary, .adugna-btn-secondary { display:none !important; }
+                        .adugna-chart-wrapper { height: 260px !important; }
+                        @media print {
+                            .adugna-btn, .adugna-btn-sm, .adugna-btn-primary, .adugna-btn-secondary { display:none !important; }
+                            .adugna-chart-wrapper { height: 260px !important; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${printArea.innerHTML}
+                    <script>
+                        // Redraw charts for print (Chart.js needs to be re-initialized)
+                        window.onload = function() {
+                            // Copy chartData from opener if available
+                            if (window.opener && window.opener.chartData) {
+                                window.chartData = window.opener.chartData;
+                            }
+                            // Re-render charts for print
+                            if (typeof Chart !== 'undefined' && window.chartData) {
+                                setTimeout(function() {
+                                    document.querySelectorAll('canvas[id^="fieldChart-"], #adugna-trend-chart, #adugna-anon-chart').forEach(function(canvas) {
+                                        const id = canvas.id;
+                                        if (id.startsWith('fieldChart-')) {
+                                            const fieldId = id.replace('fieldChart-', '');
+                                            const field = window.chartData.fields.find(f => f.id == fieldId);
+                                            const data = window.chartData.analytics[fieldId] || [];
+                                            if (field && data.length > 0) {
+                                                const chartType = (function(type) {
+                                                    switch(type) {
+                                                        case 'radio': case 'select': case 'rating': return 'doughnut';
+                                                        case 'checkbox': return 'bar';
+                                                        case 'number': return 'histogram';
+                                                        default: return 'bar';
+                                                    }
+                                                })(field.field_type);
+                                                // Minimal chart rendering for print
+                                                new Chart(canvas.getContext('2d'), {
+                                                    type: chartType === 'histogram' ? 'bar' : chartType,
+                                                    data: {
+                                                        labels: data.map(item => item.field_value),
+                                                        datasets: [{
+                                                            data: data.map(item => item.count),
+                                                            backgroundColor: ['#4f46e5','#6366f1','#818cf8','#a5b4fc','#c7d2fe','#10b981','#34d399'],
+                                                            borderWidth: 0
+                                                        }]
+                                                    },
+                                                    options: { responsive: false, plugins: { legend: { display: false } }, animation: false }
+                                                });
+                                            }
+                                        } else if (id === 'adugna-trend-chart' && window.chartData.response_trend && window.chartData.response_trend.length > 0) {
+                                            new Chart(canvas.getContext('2d'), {
+                                                type: 'line',
+                                                data: {
+                                                    labels: window.chartData.response_trend.map(item => item.response_date),
+                                                    datasets: [{
+                                                        label: 'Responses',
+                                                        data: window.chartData.response_trend.map(item => item.count),
+                                                        fill: true,
+                                                        backgroundColor: 'rgba(79,70,229,0.08)',
+                                                        borderColor: '#4f46e5',
+                                                        tension: 0.3,
+                                                        pointRadius: 2,
+                                                        pointBackgroundColor: '#6366f1'
+                                                    }]
+                                                },
+                                                options: { responsive: false, plugins: { legend: { display: false } }, animation: false }
+                                            });
+                                        } else if (id === 'adugna-anon-chart' && window.chartData.anon_stats && window.chartData.anon_stats.length > 0) {
+                                            new Chart(canvas.getContext('2d'), {
+                                                type: 'pie',
+                                                data: {
+                                                    labels: window.chartData.anon_stats.map(item => item.is_anonymous == 1 ? 'Anonymous' : 'Not Anonymous'),
+                                                    datasets: [{
+                                                        data: window.chartData.anon_stats.map(item => item.count),
+                                                        backgroundColor: ['#4f46e5','#f59e0b'],
+                                                        borderWidth: 0
+                                                    }]
+                                                },
+                                                options: { responsive: false, plugins: { legend: { display: true, position: 'bottom' } }, animation: false }
+                                            });
+                                        }
+                                    });
+                                }, 100);
+                            }
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            // Wait for charts to render, then print
+            setTimeout(() => {
+                printWindow.focus();
+                printWindow.print();
+            }, 600);
+        });
     </script>
 </body>
 </html>

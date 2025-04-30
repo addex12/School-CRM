@@ -305,14 +305,20 @@ function handleChangePassword($pdo, $user) {
 <?php 
         include __DIR__ . '/includes/footer.php'; 
         ?>
-<!-- Adugna Custom Styles -->
-<style>
+<!--
 /**
- * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
- * Sidebar/footer styles are not touched.
- * All cards, buttons, and messages use adugna- prefix.
- * Layout is content/screen aware and visually outstanding.
- */
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
+Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+Sidebar/footer styles are not touched.
+All cards, buttons, and messages use adugna- prefix.
+Layout is content/screen aware and visually outstanding.
+-->
+<style>
 html { font-size: 16px; }
 @media (max-width: 900px) { html { font-size: 15px; } }
 @media (max-width: 600px) { html { font-size: 14px; } }
@@ -331,60 +337,63 @@ html { font-size: 16px; }
 @media (max-width: 600px) {
     .admin-main { padding: 10px 2px 80px; }
 }
+/* Adugna: Compact, ERPNext/frappe-inspired card */
 .adugna-card {
     border-radius: 10px;
     box-shadow: 0 4px 24px rgba(44,62,80,0.09), 0 1.5px 4px rgba(44,62,80,0.04);
     border: 1px solid #e2e2e2;
     background: linear-gradient(135deg, #f8fafc 0%, #f4f6fa 100%);
-    margin-bottom: 28px;
+    margin-bottom: 18px;
     padding: 0;
-    transition: box-shadow 0.2s, transform 0.2s;
+    transition: box-shadow 0.18s, transform 0.18s;
 }
 .adugna-card:hover {
     box-shadow: 0 8px 32px rgba(44,62,80,0.13), 0 2px 8px rgba(44,62,80,0.07);
-    transform: translateY(-2px) scale(1.01);
+    transform: translateY(-1.5px) scale(1.01);
 }
 .adugna-card-header {
     background: #f8fafc;
     border-bottom: 1px solid #e2e2e2;
-    padding: 14px 22px;
-    font-size: 1.07rem;
+    padding: 10px 18px;
+    font-size: 1.01rem;
     font-weight: 700;
     letter-spacing: 0.01em;
     color: #2e86c1;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
 }
 .adugna-card-header.bg-secondary {
     background: #eaf2fb;
     color: #34495e;
 }
 .adugna-card-body {
-    padding: 22px 22px 18px 22px;
+    padding: 16px 16px 12px 16px;
     background: transparent;
 }
 .adugna-profile-avatar img {
-    width: 54px;
-    height: 54px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid #e2e2e2;
     object-fit: cover;
     box-shadow: 0 2px 8px rgba(44,62,80,0.07);
     background: #fff;
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.18s;
 }
 .adugna-profile-avatar img:hover {
     box-shadow: 0 4px 16px rgba(44,62,80,0.13);
 }
 .adugna-btn {
-    font-size: 0.90rem;
-    padding: 0.32rem 1rem;
+    font-size: 0.87rem;
+    padding: 0.28rem 0.85rem;
     border-radius: 4px;
     border: none;
-    transition: background 0.2s, box-shadow 0.2s;
+    transition: background 0.18s, box-shadow 0.18s;
     font-weight: 500;
     box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+    min-height: 28px;
+    min-width: 80px;
 }
 .adugna-btn-primary {
     background: linear-gradient(90deg, #2e86c1 60%, #3498db 100%);
@@ -405,18 +414,18 @@ html { font-size: 16px; }
     color: #1b4f72;
 }
 .adugna-form-label {
-    font-size: 0.93rem;
+    font-size: 0.91rem;
     font-weight: 600;
     color: #2e86c1;
     letter-spacing: 0.01em;
 }
 .adugna-input {
-    font-size: 0.91rem;
-    padding: 0.32rem 0.7rem;
+    font-size: 0.89rem;
+    padding: 0.28rem 0.7rem;
     border-radius: 4px;
     border: 1px solid #d6dbdf;
     background: #f8fafc;
-    transition: border 0.18s;
+    transition: border 0.15s;
 }
 .adugna-input:focus {
     border: 1.5px solid #2e86c1;
@@ -424,8 +433,8 @@ html { font-size: 16px; }
     background: #fff;
 }
 .adugna-badge {
-    font-size: 0.82rem;
-    padding: 0.18em 0.65em;
+    font-size: 0.78rem;
+    padding: 0.14em 0.55em;
     border-radius: 12px;
     background: #eaf2fb;
     color: #2e86c1;
@@ -436,51 +445,51 @@ html { font-size: 16px; }
 .adugna-profile-header {
     display: flex;
     align-items: center;
-    gap: 18px;
-    margin-bottom: 18px;
+    gap: 12px;
+    margin-bottom: 12px;
     background: linear-gradient(90deg, #eaf2fb 60%, #f8fafc 100%);
     border-radius: 8px;
-    padding: 18px 22px;
+    padding: 12px 16px;
     box-shadow: 0 1.5px 4px rgba(44,62,80,0.04);
 }
 .adugna-profile-info h3 {
-    font-size: 1.13rem;
+    font-size: 1.07rem;
     margin-bottom: 0.2em;
     color: #2e86c1;
     font-weight: 700;
 }
 .adugna-profile-info .card-text {
-    font-size: 0.97rem;
+    font-size: 0.93rem;
     color: #34495e;
 }
 .adugna-profile-info .text-muted {
-    font-size: 0.91rem;
+    font-size: 0.89rem;
     color: #7f8c8d !important;
 }
 .adugna-profile-forms-row {
     display: flex;
-    gap: 28px;
+    gap: 18px;
     flex-wrap: wrap;
-    margin-top: 10px;
+    margin-top: 8px;
 }
 .adugna-profile-form-card {
-    flex: 1 1 320px;
-    min-width: 320px;
-    max-width: 420px;
-    transition: box-shadow 0.2s;
+    flex: 1 1 260px;
+    min-width: 260px;
+    max-width: 340px;
+    transition: box-shadow 0.18s;
 }
 .adugna-profile-form-card:hover {
     box-shadow: 0 6px 24px rgba(44,62,80,0.11);
 }
 .adugna-form-text {
-    font-size: 0.83rem;
+    font-size: 0.81rem;
     color: #7f8c8d;
 }
 .alert {
     border-radius: 6px;
-    font-size: 0.96rem;
-    padding: 0.7em 1.2em;
-    margin-bottom: 1.1em;
+    font-size: 0.93rem;
+    padding: 0.6em 1em;
+    margin-bottom: 1em;
     box-shadow: 0 1px 4px rgba(44,62,80,0.07);
 }
 .btn-close {
@@ -489,7 +498,7 @@ html { font-size: 16px; }
 @media (max-width: 900px) {
     .adugna-profile-forms-row {
         flex-direction: column;
-        gap: 18px;
+        gap: 12px;
     }
     .adugna-profile-form-card {
         max-width: 100%;
@@ -497,16 +506,16 @@ html { font-size: 16px; }
     .adugna-profile-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 10px;
-        padding: 14px 10px;
+        gap: 7px;
+        padding: 10px 7px;
     }
 }
 @media (max-width: 600px) {
     .adugna-profile-header {
-        padding: 10px 4px;
+        padding: 7px 2px;
     }
     .adugna-card-body {
-        padding: 12px 6px 10px 6px;
+        padding: 8px 4px 7px 4px;
     }
     .adugna-profile-form-card {
         min-width: 0;
@@ -515,7 +524,7 @@ html { font-size: 16px; }
     .adugna-profile-info .card-text,
     .adugna-profile-info .text-muted {
         word-break: break-word;
-        font-size: 0.98em;
+        font-size: 0.97em;
     }
 }
 </style>
