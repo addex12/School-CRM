@@ -12,16 +12,16 @@ GitHub: https://github.com/addex12
 /* Adugna Gizaw: Outstanding Sidebar styles with adugna- prefix */
 .adugna-sidebar {
     width: 230px;
-    background: linear-gradient(135deg, #3b3071 80%, #1a222c 100%);
-    color: #0a0ef3;
+    background: linear-gradient(135deg, #5f2c82 0%, #49a09d 100%); /* Vibrant purple to teal */
+    color: #fff;
     min-height: 100vh;
     position: fixed;
     left: 0;
     top: 0;
     z-index: 120;
     transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-    box-shadow: 2px 0 16px rgba(44,62,80,0.10);
-    border-right: 2px solid #1a222c;
+    box-shadow: 2px 0 18px rgba(44,62,80,0.13);
+    border-right: 2px solid #49a09d;
 }
 .adugna-sidebar.adugna-closed {
     transform: translateX(-100%);
@@ -31,13 +31,14 @@ GitHub: https://github.com/addex12
     font-weight: 700;
     padding: 1.1rem 1.3rem;
     letter-spacing: 1.5px;
-    background: #1a222c;
+    background: linear-gradient(90deg, #49a09d 0%, #5f2c82 100%);
     margin-bottom: 0.7rem;
     color: #fff;
     display: flex;
     align-items: center;
     gap: 0.7rem;
-    border-bottom: 1.5px solid #25344a;
+    border-bottom: 2px solid #fff2;
+    box-shadow: 0 2px 8px #49a09d33;
 }
 .adugna-sidebar ul {
     list-style: none;
@@ -51,59 +52,65 @@ GitHub: https://github.com/addex12
     display: flex;
     align-items: center;
     padding: 0.62rem 1.3rem;
-    color: #cfd8dc;
-    font-size: 0.97rem;
+    color: #f3f7fa;
+    font-size: 1.01rem;
     text-decoration: none;
-    border-left: 3px solid transparent;
-    transition: background 0.18s, color 0.18s, border-color 0.18s;
+    border-left: 4px solid transparent;
+    transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
     font-weight: 500;
     letter-spacing: 0.01em;
     position: relative;
+    border-radius: 0 20px 20px 0;
+    margin-bottom: 2px;
 }
 .adugna-sidebar a.adugna-active, .adugna-sidebar a:hover {
-    background: linear-gradient(90deg, #25344a 60%, #3498db 120%);
-    color: #fff;
-    border-left: 3px solid #3498db;
-    box-shadow: 0 2px 8px rgba(52,152,219,0.07);
+    background: linear-gradient(90deg, #fff 10%, #49a09d 120%);
+    color: #5f2c82;
+    border-left: 4px solid #f9d423;
+    box-shadow: 0 2px 12px #49a09d33;
+    font-weight: 700;
 }
 .adugna-sidebar .adugna-icon {
-    font-size: 1.08rem;
-    margin-right: 0.7rem;
-    width: 1.3rem;
+    font-size: 1.18rem;
+    margin-right: 0.8rem;
+    width: 1.5rem;
     text-align: center;
-    color: #7ed6df;
+    color: #f9d423;
     transition: color 0.2s;
 }
 .adugna-sidebar a.adugna-active .adugna-icon,
 .adugna-sidebar a:hover .adugna-icon {
-    color: #fff;
+    color: #5f2c82;
 }
 .adugna-sidebar .adugna-submenu-toggle {
     margin-left: auto;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     transition: transform 0.2s;
-    color: #7ed6df;
+    color: #f9d423;
 }
 .adugna-sidebar .adugna-submenu {
     display: none;
-    background: #25344a;
-    border-left: 2px solid #3498db;
+    background: linear-gradient(90deg, #49a09d 60%, #5f2c82 120%);
+    border-left: 2px solid #f9d423;
+    border-radius: 0 0 18px 0;
 }
 .adugna-sidebar .adugna-submenu.adugna-open {
     display: block;
 }
 .adugna-sidebar .adugna-submenu a {
     padding-left: 2.5rem;
-    font-size: 0.93rem;
+    font-size: 0.97rem;
     background: none;
-    color: #b2bec3;
-    border-left: 3px solid transparent;
+    color: #f3f7fa;
+    border-left: 4px solid transparent;
+    border-radius: 0 16px 16px 0;
 }
 .adugna-sidebar .adugna-submenu a.adugna-active,
 .adugna-sidebar .adugna-submenu a:hover {
-    background: linear-gradient(90deg, #34495e 60%, #3498db 120%);
-    color: #fff;
-    border-left: 3px solid #3498db;
+    background: linear-gradient(90deg, #fff 10%, #49a09d 120%);
+    color: #5f2c82;
+    border-left: 4px solid #f9d423;
+    font-weight: 700;
 }
 .adugna-sidebar .adugna-submenu-toggle.adugna-rotated {
     transform: rotate(90deg);
@@ -113,7 +120,7 @@ GitHub: https://github.com/addex12
     position: fixed;
     left: 1rem;
     top: 1rem;
-    background: #232f3e;
+    background: #49a09d;
     color: #fff;
     border: none;
     border-radius: 50%;
@@ -123,13 +130,13 @@ GitHub: https://github.com/addex12
     font-size: 1.2rem;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px #49a09d33;
     cursor: pointer;
     transition: background 0.2s;
 }
 .adugna-sidebar-toggle-btn:hover {
-    background: #3498db;
-    color: #fff;
+    background: #f9d423;
+    color: #5f2c82;
 }
 
 /* Adugna Gizaw: Responsive layout for admin dashboard */
