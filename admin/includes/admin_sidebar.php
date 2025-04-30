@@ -1,14 +1,11 @@
 <?php
 /**
-Developer: Adugna Gizaw
-Email: gizawadugna@gmail.com
-LinkedIn: https://www.linkedin.com/in/eleganceict
-Twitter: https://twitter.com/eleganceict1
-GitHub: https://github.com/addex12
-* All custom styles use adugna- prefix for patenting.
-* Compact ERPNext-inspired sidebar, outstanding, responsive, and interactive.
-* Uses style.css for all styling.
-*/
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ */
 // Sidebar config path
 $configPath = __DIR__ . '/sidebar_config.json';
 $sidebarConfig = [];
@@ -17,165 +14,136 @@ if (file_exists($configPath)) {
 }
 $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
 ?>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
-<link rel="stylesheet" href="../assets/css/style.css">
-<link rel="stylesheet" href="../assets/css/admin.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="../assets/css/active_user.css">
-<!-- Adugna Gizaw: Use style.css for all sidebar and layout styling -->
-<link rel="stylesheet" href="../assets/css/style.css">
 <style>
-/* Adugna Gizaw: Sidebar color theme for outstanding, friendly, elegant look */
-body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #e0e7ff 100%) !important;
-}
+/* Adugna Gizaw: Sidebar styles with adugna- prefix, always visible on desktop, responsive, and active highlighting */
 .adugna-sidebar {
-    background: linear-gradient(120deg, #4f46e5 0%, #38bdf8 100%) !important;
-    color: #fff !important;
-    border-right: 2px solid #e0e7ff;
-    width: 220px;
-    min-width: 60px;
-    max-width: 220px;
+    width: 240px;
+    background: #222d32;
+    color: #fff;
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
     transition: width 0.2s;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
 }
-.adugna-sidebar.adugna-collapsed {
-    width: 60px !important;
-    min-width: 60px !important;
-    max-width: 60px !important;
-}
-.adugna-sidebar .adugna-logo {
-    font-size: 1.3em;
+.adugna-sidebar .adugna-sidebar-header {
+    padding: 1rem 1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: #fff;
-    padding: 1.2em 1.1em 1em 1.1em;
-    letter-spacing: 0.03em;
-    background: rgba(255,255,255,0.07);
-    border-bottom: 1px solid #e0e7ff33;
-    margin-bottom: 0.5em;
+    background: #1976d2;
+    letter-spacing: 1px;
+    text-align: center;
     display: flex;
     align-items: center;
-    gap: 0.7em;
-    transition: opacity 0.2s, width 0.2s;
+    justify-content: space-between;
 }
-.adugna-sidebar.adugna-collapsed .adugna-logo span,
-.adugna-sidebar.adugna-collapsed .adugna-logo i + span {
-    display: none;
+.adugna-sidebar .adugna-sidebar-toggle {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: 5px;
+    padding: 0.4rem 0.6rem;
+    position: fixed;
+    top: 10px;
+    left: 55px;
+    z-index: 300;
 }
 .adugna-sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    flex: 1;
 }
-.adugna-sidebar-link {
+.adugna-sidebar ul li {
+    width: 100%;
+}
+.adugna-sidebar ul li a {
     display: flex;
     align-items: center;
-    gap: 0.7em;
-    padding: 0.7em 1.2em;
-    color: #e0e7ff;
-    font-size: 1em;
-    font-weight: 500;
-    border-radius: 0.5em;
-    margin: 0.1em 0.5em;
-    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    padding: 0.6rem 1rem;
+    color: #fff;
     text-decoration: none;
+    font-size: 0.93rem;
+    transition: background 0.15s, color 0.15s;
+    border-left: 4px solid transparent;
+    font-weight: 500;
     position: relative;
 }
-.adugna-sidebar-link .adugna-icon {
-    min-width: 1.2em;
+.adugna-sidebar ul li a.adugna-active,
+.adugna-sidebar ul li a:hover {
+    background: #1976d2;
+    color: #fff;
+    border-left: 4px solid #f1c40f;
+}
+.adugna-sidebar ul li a i {
+    margin-right: 0.7rem;
+    font-size: 1rem;
+    min-width: 22px;
     text-align: center;
-    color: #bae6fd;
-    font-size: 1.1em;
-    transition: margin 0.2s;
-}
-.adugna-sidebar.adugna-collapsed ul li .adugna-icon {
-    margin-right: 0;
-}
-.adugna-sidebar.adugna-collapsed ul li span:not(.adugna-icon) {
-    display: none;
-}
-.adugna-sidebar-link.adugna-active, .adugna-sidebar-link:hover, .adugna-sidebar-link:focus {
-    background: linear-gradient(90deg, #38bdf8 0%, #4f46e5 100%);
-    color: #fff;
-    box-shadow: 0 2px 12px 0 rgba(80, 112, 255, 0.10);
-}
-.adugna-sidebar-link.adugna-active .adugna-icon, .adugna-sidebar-link:hover .adugna-icon {
-    color: #fff;
 }
 .adugna-sidebar .adugna-submenu {
-    background: rgba(255,255,255,0.07);
-    border-radius: 0.4em;
-    margin: 0.2em 0.5em 0.2em 1.5em;
-    padding: 0.2em 0.2em 0.2em 0.7em;
-    display: none;
+    background: #263043;
+    padding-left: 0.5rem;
 }
-.adugna-sidebar .adugna-submenu.adugna-open {
-    display: block;
+.adugna-sidebar .adugna-submenu li a {
+    font-size: 0.89rem;
+    padding-left: 2rem;
+    border-left: none;
 }
-.adugna-submenu-toggle {
-    margin-left: auto;
-    color: #bae6fd;
-    font-size: 0.95em;
-    transition: transform 0.2s;
-}
-.adugna-submenu-toggle.adugna-rotated {
-    transform: rotate(90deg);
+.adugna-sidebar .adugna-submenu li a.adugna-active,
+.adugna-sidebar .adugna-submenu li a:hover {
+    background: #215967;
     color: #fff;
-}
-.adugna-sidebar-toggle-btn {
-    background: #4f46e5 !important;
-    color: #fff !important;
-    border: none;
-    box-shadow: 0 2px 8px rgba(80,112,255,0.13);
-}
-.adugna-sidebar-toggle-btn:hover {
-    background: #38bdf8 !important;
-    color: #fff !important;
-}
-.adugna-sidebar-toggle-btn .adugna-hamburger span {
-    background: #fff !important;
-}
-.adugna-sidebar-overlay {
-    background: rgba(56,189,248,0.13) !important;
 }
 @media (max-width: 900px) {
     .adugna-sidebar {
-        box-shadow: 2px 0 16px rgba(56,189,248,0.13);
-        left: 0;
-        z-index: 1002;
-        position: fixed;
-        height: 100vh;
+        width: 200px;
     }
-    .adugna-sidebar-overlay {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(56,189,248,0.13) !important;
-        z-index: 1001;
-    }
-    body.adugna-sidebar-open .adugna-sidebar {
-        left: 0;
-    }
-    body.adugna-sidebar-open .adugna-sidebar-overlay {
-        display: block;
+    .adugna-main {
+        margin-left: 200px;
     }
 }
+@media (max-width: 600px) {
+    .adugna-sidebar {
+        width: 100vw;
+        left: -100vw;
+        transition: left 0.2s;
+    }
+    .adugna-sidebar.open {
+        left: 0;
+    }
+    .adugna-main {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        position: relative;
+        z-index: 1;
+    }
+    .adugna-sidebar .adugna-sidebar-toggle {
+        top: 15px;
+        left: 15px;
+    }
+}
+.adugna-main {
+    margin-left: 240px;
+    padding: 20px;
+    transition: margin-left 0.2s;
+    background: #f4f6fa;
+    min-height: 100vh;
+}
 </style>
-
-<!-- Sidebar Hamburger Toggle Button (always visible, fixed at top left) -->
-<button class="adugna-sidebar-toggle-btn" id="adugnaSidebarToggle" aria-label="Toggle sidebar" style="position:fixed;top:16px;left:16px;z-index:1100;">
-    <span class="adugna-hamburger" id="adugnaHamburgerIcon" style="display:inline-block;width:28px;height:28px;position:relative;">
-        <span class="adugna-hamburger-line" style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:4px;left:0;transition:all 0.2s;"></span>
-        <span class="adugna-hamburger-line" style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:12px;left:0;transition:all 0.2s;"></span>
-        <span class="adugna-hamburger-line" style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:20px;left:0;transition:all 0.2s;"></span>
-    </span>
-</button>
-
-<div class="adugna-sidebar adugna-collapsed" id="adugnaSidebar">
-    <div class="adugna-logo">
-        <i class="fas fa-school"></i> School CRM
+<div class="adugna-sidebar" id="adugnaSidebar">
+    <div class="adugna-sidebar-header">
+        <span>Admin</span>
+        <button class="adugna-sidebar-toggle" id="adugnaSidebarToggle" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
     </div>
     <ul>
         <?php
@@ -188,13 +156,13 @@ body {
                 $active = (isset($item['link']) && $currentPage === $item['link']) ? 'adugna-active' : '';
                 if ($hasSub) {
                     echo '<li>';
-                    echo '<a href="#" class="adugna-sidebar-link adugna-has-submenu"><span class="adugna-icon"><i class="fas ' . $icon . '"></i></span> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <span class="adugna-submenu-toggle"><i class="fas fa-chevron-right"></i></span></a>';
-                    echo '<ul class="adugna-submenu">';
+                    echo '<a href="#" class="adugna-sidebar-parent"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <i class="fas fa-chevron-down" style="margin-left:auto;font-size:0.85em;"></i></a>';
+                    echo '<ul class="adugna-submenu" style="display:none;">';
                     adugna_renderSidebarMenu($item['items']);
                     echo '</ul>';
                     echo '</li>';
                 } elseif (isset($item['link'])) {
-                    echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="adugna-sidebar-link ' . $active . '" data-page="' . htmlspecialchars($item['link']) . '"><span class="adugna-icon"><i class="fas ' . $icon . '"></i></span> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
+                    echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="' . $active . '"><i class="fas ' . $icon . '"></i> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
                 }
             }
         }
@@ -204,14 +172,14 @@ body {
         } else {
             // Fallback static menu (minimal)
             ?>
-            <li><a href="dashboard.php" class="adugna-sidebar-link" data-page="dashboard.php"><span class="adugna-icon"><i class="fas fa-tachometer-alt"></i></span> <span>Dashboard</span></a></li>
-            <li><a href="active_users.php" class="adugna-sidebar-link" data-page="active_users.php"><span class="adugna-icon"><i class="fas fa-users"></i></span> <span>Active Users</span></a></li>
-            <li><a href="add_users.php" class="adugna-sidebar-link" data-page="add_users.php"><span class="adugna-icon"><i class="fas fa-user-plus"></i></span> <span>Add Users</span></a></li>
-            <li><a href="roles.php" class="adugna-sidebar-link" data-page="roles.php"><span class="adugna-icon"><i class="fas fa-user-tag"></i></span> <span>Roles</span></a></li>
-            <li><a href="settings.php" class="adugna-sidebar-link" data-page="settings.php"><span class="adugna-icon"><i class="fas fa-cogs"></i></span> <span>Settings</span></a></li>
+            <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+            <li><a href="active_users.php"><i class="fas fa-users"></i> <span>Active Users</span></a></li>
+            <li><a href="add_users.php"><i class="fas fa-user-plus"></i> <span>Add Users</span></a></li>
+            <li><a href="roles.php"><i class="fas fa-user-tag"></i> <span>Roles</span></a></li>
+            <li><a href="settings.php"><i class="fas fa-cogs"></i> <span>Settings</span></a></li>
             <li>
-                <a href="messages.php" class="adugna-sidebar-link" data-page="messages.php">
-                    <span class="adugna-icon"><i class="fas fa-envelope"></i></span>
+                <a href="messages.php">
+                    <i class="fas fa-envelope"></i>
                     Messages
                     <?php if ($unread > 0): ?>
                         <span style="background:#e74c3c;color:#fff;border-radius:50%;padding:2px 7px;font-size:0.85em;font-weight:600;margin-left:6px;">
@@ -220,130 +188,50 @@ body {
                     <?php endif; ?>
                 </a>
             </li>
-            <li><a href="logout.php" class="adugna-sidebar-link" data-page="logout.php"><span class="adugna-icon"><i class="fas fa-sign-out-alt"></i></span> <span>Logout</span></a></li>
+            <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a></li>
             <?php
         }
         ?>
     </ul>
 </div>
-<div class="adugna-sidebar-overlay" id="adugnaSidebarOverlay"></div>
-
 <script>
-(function() {
-    const sidebar = document.getElementById('adugnaSidebar');
-    const toggleBtn = document.getElementById('adugnaSidebarToggle');
-    const overlay = document.getElementById('adugnaSidebarOverlay');
-    const hamburger = document.getElementById('adugnaHamburgerIcon');
-    // Main content wrapper (add class to your main content container for push effect)
-    let mainContent = document.querySelector('.adugna-main-content');
-
-    // Collapsible/Uncollapsible logic
-    function openSidebar() {
-        sidebar.classList.remove('adugna-collapsed');
-        if (window.innerWidth <= 900) {
-            document.body.classList.add('adugna-sidebar-open');
-            overlay.style.display = 'block';
-        } else {
-            document.body.classList.remove('adugna-sidebar-open');
-            overlay.style.display = 'none';
-        }
-        // Animate hamburger to "close" (X) state
-        if (hamburger) {
-            const lines = hamburger.querySelectorAll('.adugna-hamburger-line');
-            if (lines.length === 3) {
-                lines[0].style.transform = 'translateY(8px) rotate(45deg)';
-                lines[1].style.opacity = '0';
-                lines[2].style.transform = 'translateY(-8px) rotate(-45deg)';
-            }
-        }
-    }
-    function closeSidebar() {
-        sidebar.classList.add('adugna-collapsed');
-        document.body.classList.remove('adugna-sidebar-open');
-        overlay.style.display = 'none';
-        // Animate hamburger to "menu" state
-        if (hamburger) {
-            const lines = hamburger.querySelectorAll('.adugna-hamburger-line');
-            if (lines.length === 3) {
-                lines[0].style.transform = 'none';
-                lines[1].style.opacity = '1';
-                lines[2].style.transform = 'none';
-            }
-        }
-    }
-    function toggleSidebar() {
-        if (sidebar.classList.contains('adugna-collapsed')) {
-            openSidebar();
-        } else {
-            closeSidebar();
-        }
-    }
-    function handleSidebarOnResize() {
-        if (window.innerWidth > 900) {
-            sidebar.classList.remove('adugna-collapsed');
-            document.body.classList.remove('adugna-sidebar-open');
-            overlay.style.display = 'none';
-            // Hamburger to "close" state
-            openSidebar();
-        } else {
-            sidebar.classList.add('adugna-collapsed');
-            document.body.classList.remove('adugna-sidebar-open');
-            overlay.style.display = 'none';
-            // Hamburger to "menu" state
-            closeSidebar();
-        }
-    }
-    window.addEventListener('resize', handleSidebarOnResize);
-    handleSidebarOnResize();
-
-    toggleBtn.addEventListener('click', function(e) {
+/**
+ * Adugna Gizaw: Sidebar toggle and submenu logic.
+ * - Sidebar stays open after navigation on desktop.
+ * - Highlights the active page.
+ * - On mobile, sidebar can be toggled.
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('adugnaSidebar');
+    var toggle = document.getElementById('adugnaSidebarToggle');
+    var main = document.querySelector('.adugna-main');
+    // Sidebar toggle for mobile
+    toggle.addEventListener('click', function(e) {
         e.stopPropagation();
-        toggleSidebar();
+        if (window.innerWidth <= 600) {
+            sidebar.classList.toggle('open');
+        }
     });
-    overlay.addEventListener('click', closeSidebar);
-
-    // Submenu logic
-    document.querySelectorAll('.adugna-has-submenu').forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    // Submenu toggle
+    document.querySelectorAll('.adugna-sidebar-parent').forEach(function(parent) {
+        parent.addEventListener('click', function(e) {
             e.preventDefault();
-            const submenu = link.nextElementSibling;
-            const toggleIcon = link.querySelector('.adugna-submenu-toggle');
+            var submenu = parent.nextElementSibling;
             if (submenu && submenu.classList.contains('adugna-submenu')) {
-                submenu.classList.toggle('adugna-open');
-                if (toggleIcon) toggleIcon.classList.toggle('adugna-rotated');
+                submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
             }
         });
     });
-
-    // Highlight active page
-    const currentPage = location.pathname.split('/').pop();
-    document.querySelectorAll('.adugna-sidebar-link[data-page]').forEach(function(link) {
-        if (link.getAttribute('data-page') === currentPage) {
+    // Highlight active menu on load
+    var current = window.location.pathname.split('/').pop();
+    document.querySelectorAll('.adugna-sidebar ul li a').forEach(function(link) {
+        if (link.getAttribute('href') && link.getAttribute('href').indexOf(current) !== -1) {
             link.classList.add('adugna-active');
-            // Open parent submenu if inside submenu
-            const submenu = link.closest('.adugna-submenu');
-            if (submenu) {
-                submenu.classList.add('adugna-open');
-                const parentToggle = submenu.parentElement.querySelector('.adugna-submenu-toggle');
-                if (parentToggle) parentToggle.classList.add('adugna-rotated');
-            }
         }
     });
-
-    // On mobile, close sidebar after navigation
-    document.querySelectorAll('.adugna-sidebar-link[data-page]').forEach(function(link) {
-        link.addEventListener('click', function() {
-            if (window.innerWidth <= 900) {
-                closeSidebar();
-            }
-        });
-    });
-
-    // Optional: close sidebar if user clicks outside on mobile
-    document.addEventListener('click', function(e) {
-        if (window.innerWidth <= 900 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
-            closeSidebar();
-        }
-    });
-})();
+    // Keep sidebar open on desktop after navigation
+    if (window.innerWidth > 600) {
+        sidebar.classList.remove('open');
+    }
+});
 </script>
