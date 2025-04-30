@@ -166,10 +166,10 @@ body {
 
 <!-- Sidebar Hamburger Toggle Button (always visible, fixed at top left) -->
 <button class="adugna-sidebar-toggle-btn" id="adugnaSidebarToggle" aria-label="Toggle sidebar" style="position:fixed;top:16px;left:16px;z-index:1100;">
-    <span class="adugna-hamburger" style="display:inline-block;width:28px;height:28px;position:relative;">
-        <span style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:4px;left:0;transition:all 0.2s;"></span>
-        <span style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:12px;left:0;transition:all 0.2s;"></span>
-        <span style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:20px;left:0;transition:all 0.2s;"></span>
+    <span class="adugna-hamburger" id="adugnaHamburgerIcon" style="display:inline-block;width:28px;height:28px;position:relative;">
+        <span class="adugna-hamburger-line" style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:4px;left:0;transition:all 0.2s;"></span>
+        <span class="adugna-hamburger-line" style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:12px;left:0;transition:all 0.2s;"></span>
+        <span class="adugna-hamburger-line" style="display:block;position:absolute;height:4px;width:100%;background:#fff;border-radius:2px;top:20px;left:0;transition:all 0.2s;"></span>
     </span>
 </button>
 
@@ -233,6 +233,7 @@ body {
     const sidebar = document.getElementById('adugnaSidebar');
     const toggleBtn = document.getElementById('adugnaSidebarToggle');
     const overlay = document.getElementById('adugnaSidebarOverlay');
+    const hamburger = document.getElementById('adugnaHamburgerIcon');
     // Main content wrapper (add class to your main content container for push effect)
     let mainContent = document.querySelector('.adugna-main-content');
 
@@ -246,11 +247,29 @@ body {
             document.body.classList.remove('adugna-sidebar-open');
             overlay.style.display = 'none';
         }
+        // Animate hamburger to "close" (X) state
+        if (hamburger) {
+            const lines = hamburger.querySelectorAll('.adugna-hamburger-line');
+            if (lines.length === 3) {
+                lines[0].style.transform = 'translateY(8px) rotate(45deg)';
+                lines[1].style.opacity = '0';
+                lines[2].style.transform = 'translateY(-8px) rotate(-45deg)';
+            }
+        }
     }
     function closeSidebar() {
         sidebar.classList.add('adugna-collapsed');
         document.body.classList.remove('adugna-sidebar-open');
         overlay.style.display = 'none';
+        // Animate hamburger to "menu" state
+        if (hamburger) {
+            const lines = hamburger.querySelectorAll('.adugna-hamburger-line');
+            if (lines.length === 3) {
+                lines[0].style.transform = 'none';
+                lines[1].style.opacity = '1';
+                lines[2].style.transform = 'none';
+            }
+        }
     }
     function toggleSidebar() {
         if (sidebar.classList.contains('adugna-collapsed')) {
@@ -264,10 +283,14 @@ body {
             sidebar.classList.remove('adugna-collapsed');
             document.body.classList.remove('adugna-sidebar-open');
             overlay.style.display = 'none';
+            // Hamburger to "close" state
+            openSidebar();
         } else {
             sidebar.classList.add('adugna-collapsed');
             document.body.classList.remove('adugna-sidebar-open');
             overlay.style.display = 'none';
+            // Hamburger to "menu" state
+            closeSidebar();
         }
     }
     window.addEventListener('resize', handleSidebarOnResize);
