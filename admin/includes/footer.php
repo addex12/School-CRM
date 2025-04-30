@@ -8,18 +8,12 @@
  */
 ?>
 <style>
-/**
- * Adugna Gizaw: adugna-footer is always fixed at the bottom, content/screen aware, interactive.
- * - Uses adugna- prefix for all custom styles.
- * - Footer never overlaps content: add bottom padding to body/main if needed.
- * - Responsive and visually outstanding.
- * - Footer is aware of adugna-sidebar state (collapsed/expanded).
- */
+/* Adugna Admin Footer Styles */
 .adugna-footer {
-    position: fixed;
-    left: 0;
+    position: relative;
     bottom: 0;
-    width: 100vw;
+    left: 0;
+    width: 100%;
     background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
     color: #f5f6fa;
     padding: 12px 14px;
@@ -27,24 +21,10 @@
     align-items: center;
     border-top: 1px solid #374150;
     font-size: 12px;
-    z-index: 1000;
+    z-index: 100;
     box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
     min-height: 44px;
-    transition: background 0.2s, left 0.25s, width 0.25s;
 }
-
-/* Sidebar-aware footer: shift right if sidebar is expanded on desktop */
-@media (min-width: 901px) {
-    body:not(.adugna-sidebar-collapsed) .adugna-footer {
-        left: 240px; /* match sidebar width */
-        width: calc(100vw - 240px);
-    }
-    body.adugna-sidebar-collapsed .adugna-footer {
-        left: 0;
-        width: 100vw;
-    }
-}
-
 .adugna-footer-content {
     display: flex;
     justify-content: space-between;
@@ -89,7 +69,7 @@
     text-decoration: none;
     font-size: 10px;
     font-weight: 500;
-    transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+    transition: color 0.2s, background 0.2s;
     padding: 4px 8px;
     border-radius: 4px;
     background: #2563eb;
@@ -98,11 +78,10 @@
     box-shadow: 0 1px 2px rgba(44,62,80,0.04);
     display: inline-block;
 }
-.adugna-footer-link:hover, .adugna-footer-link:focus {
+.adugna-footer-link:hover {
     color: #fff;
     background: #215967;
     text-decoration: none;
-    box-shadow: 0 2px 8px #1976d2;
 }
 .adugna-developer-info {
     text-align: right;
@@ -117,22 +96,18 @@
 .adugna-social-link {
     color: #f5f6fa;
     font-size: 13px;
-    transition: color 0.2s, transform 0.2s, background 0.2s;
+    transition: color 0.2s, transform 0.2s;
     background: #007bfc;
     border-radius: 50%;
     padding: 3px 5px;
     display: inline-block;
 }
-.adugna-social-link:hover, .adugna-social-link:focus {
+.adugna-social-link:hover {
     color: #f1c40f;
     background: #215967;
     transform: scale(1.08);
 }
 @media (max-width: 900px) {
-    .adugna-footer {
-        left: 0 !important;
-        width: 100vw !important;
-    }
     .adugna-footer-content {
         flex-direction: column;
         gap: 6px;
@@ -164,15 +139,9 @@
         font-size: 9px;
     }
 }
-/* Ensure page content is never hidden behind the fixed footer */
-body, .admin-dashboard, .adugna-main, .adugna-main-content {
-    padding-bottom: 60px !important;
-    box-sizing: border-box;
-}
 </style>
 
 <footer class="adugna-footer">
-    <!-- Adugna Gizaw: Responsive, fixed, interactive footer. Never overlaps content. Sidebar-aware. -->
     <div class="adugna-footer-content">
         <div class="adugna-footer-section adugna-footer-main-info">
             <h4><?php echo $pageTitle ?? 'Admin Panel'; ?></h4>
@@ -187,3 +156,19 @@ body, .admin-dashboard, .adugna-main, .adugna-main-content {
         </div>
         <div class="adugna-footer-section adugna-developer-info">
             <div class="adugna-social-links">
+                <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="adugna-social-link" aria-label="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://twitter.com/eleganceict1" target="_blank" class="adugna-social-link" aria-label="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://github.com/addex12" target="_blank" class="adugna-social-link" aria-label="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            <p style="margin: 5px 0 0 0; font-size:9px; color:#bfc9d1;">
+                Developed by Adugna Gizaw
+            </p>
+        </div>
+    </div>
+</footer>
