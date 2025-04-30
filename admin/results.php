@@ -198,19 +198,109 @@ $chart_json = json_encode($chart_data);
          * Developer: Adugna Gizaw
          * Custom adugna- styles for ERPNext/frappe/Jinja2-inspired compact UI.
          * All styles are responsive, compact, and screen-aware.
+         * Layout is centered, visually outstanding, and user friendly.
          */
+
+        body {
+            background: #f6f7fb;
+            min-height: 100vh;
+        }
+
+        .admin-dashboard {
+            display: flex;
+            flex-direction: row;
+            min-height: 100vh;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .admin-main {
+            flex: 1 1 0;
+            max-width: 1100px;
+            margin: 2.5vw auto;
+            padding: 1.5vw 2vw;
+            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .admin-header {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.2em;
+        }
+        .admin-header h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5em;
+            text-align: center;
+            letter-spacing: 0.01em;
+        }
+        .header-actions {
+            display: flex;
+            gap: 0.5em;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
 
         /* Card styling */
         .adugna-card {
             background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(44,62,80,0.07);
-            padding: 0.75rem 1rem;
-            margin: 0.7rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+            padding: 1.2em 1.5em;
+            margin: 1.2em 0;
+            width: 100%;
+            max-width: 900px;
             transition: box-shadow 0.18s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .adugna-card:hover {
-            box-shadow: 0 2px 8px rgba(44,62,80,0.13);
+        .adugna-card:hover, .adugna-card:focus-within {
+            box-shadow: 0 4px 24px rgba(44,62,80,0.18);
+        }
+
+        /* Survey stats card row */
+        .survey-stats {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 1.5em;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+        .stat-card {
+            flex: 1 1 180px;
+            min-width: 140px;
+            background: #f7faff;
+            border-radius: 6px;
+            margin: 0.2em 0;
+            padding: 0.8em 0.5em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 1px 4px rgba(67,97,238,0.07);
+            transition: background 0.18s;
+        }
+        .stat-card:hover {
+            background: #eaf2fb;
+        }
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #4361ee;
+            margin-bottom: 0.2em;
+        }
+        .stat-label {
+            font-size: 0.78rem;
+            color: #2c3e50;
+            opacity: 0.8;
         }
 
         /* Button styling */
@@ -218,7 +308,7 @@ $chart_json = json_encode($chart_data);
             background: #f4f7fa;
             color: #2c3e50;
             border: 1px solid #e3e6eb;
-            padding: 0.25rem 0.7rem;
+            padding: 0.22rem 0.65rem;
             border-radius: 3px;
             font-weight: 500;
             font-size: 0.82rem;
@@ -267,35 +357,49 @@ $chart_json = json_encode($chart_data);
         }
         .adugna-btn-sm {
             font-size: 0.75rem;
-            padding: 0.18rem 0.5rem;
+            padding: 0.15rem 0.45rem;
         }
 
         /* Chart container */
         .adugna-chart-container {
             background: #fff;
-            border-radius: 5px;
-            padding: 0.7rem;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border-radius: 8px;
+            padding: 1em 1.2em;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .adugna-chart-title {
             margin-top: 0;
             color: #2c3e50;
-            font-size: 0.92rem;
+            font-size: 1.05rem;
             padding-bottom: 4px;
             border-bottom: 1px solid #f0f0f0;
+            width: 100%;
+            text-align: center;
         }
 
         /* Table styling */
+        .adugna-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
         .adugna-table th, .adugna-table td {
-            padding: 5px 7px;
+            padding: 7px 10px;
+            text-align: center;
         }
         .adugna-table th {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
+            background: #f7faff;
         }
         .adugna-table td {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
         }
         .adugna-table tr:hover {
             background-color: #f8f9fa;
@@ -319,10 +423,19 @@ $chart_json = json_encode($chart_data);
         /* Filter form */
         .adugna-filter-form {
             background: #fff;
-            padding: 0.7rem;
-            border-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            margin-bottom: 12px;
+            padding: 1em 1.2em;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            margin-bottom: 18px;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .adugna-filter-form .row {
+            width: 100%;
+            justify-content: center;
         }
         .adugna-filter-form .form-group label {
             font-size: 0.78rem;
@@ -342,17 +455,46 @@ $chart_json = json_encode($chart_data);
         }
 
         /* Responsive tweaks */
+        @media (max-width: 1100px) {
+            .admin-main, .adugna-card, .adugna-chart-container, .adugna-filter-form {
+                max-width: 98vw;
+                padding-left: 2vw;
+                padding-right: 2vw;
+            }
+        }
         @media (max-width: 900px) {
             .adugna-card, .adugna-chart-container, .adugna-filter-form {
-                padding: 0.5rem 0.5rem;
+                padding: 0.7em 0.5em;
             }
             .adugna-table th, .adugna-table td {
                 font-size: 0.72rem;
             }
+            .survey-stats {
+                gap: 0.7em;
+            }
+        }
+        @media (max-width: 700px) {
+            .admin-main {
+                padding: 1vw 0.5vw;
+            }
+            .adugna-card, .adugna-chart-container, .adugna-filter-form {
+                padding: 0.5em 0.2em;
+            }
+            .survey-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            .stat-card {
+                width: 100%;
+                margin-bottom: 0.5em;
+            }
         }
         @media (max-width: 600px) {
+            .admin-main {
+                padding: 0.5vw 0.2vw;
+            }
             .adugna-card, .adugna-chart-container, .adugna-filter-form {
-                padding: 0.35rem 0.2rem;
+                padding: 0.35em 0.1em;
             }
             .adugna-table th, .adugna-table td {
                 font-size: 0.68rem;
@@ -360,12 +502,10 @@ $chart_json = json_encode($chart_data);
             .header-actions {
                 flex-direction: column;
                 gap: 0.5em;
+                align-items: center;
             }
         }
         /* Outstanding, interactive hover/focus for cards and buttons */
-        .adugna-card:focus-within, .adugna-card:hover {
-            box-shadow: 0 2px 8px rgba(44,62,80,0.13);
-        }
         .adugna-btn:active {
             transform: scale(0.97);
         }
@@ -381,8 +521,8 @@ $chart_json = json_encode($chart_data);
                 Header with compact, responsive actions and adugna- styles.
             -->
             <header class="admin-header">
-                <h1 style="font-size:1.1rem;"><?= htmlspecialchars($survey['title']) ?> Results</h1>
-                <div class="header-actions" style="display:flex;gap:0.5em;align-items:center;">
+                <h1><?= htmlspecialchars($survey['title']) ?> Results</h1>
+                <div class="header-actions">
                     <div class="dropdown">
                         <button class="adugna-btn adugna-btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown">
                             <i class="fas fa-download adugna-icon"></i> Export
