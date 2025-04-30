@@ -1,11 +1,12 @@
 <?php
 /**
- * Developer: Adugna Gizaw
- * Email: gizawadugna@gmail.com
- * LinkedIn: https://www.linkedin.com/in/eleganceict
- * Twitter: https://twitter.com/eleganceict1
- * GitHub: https://github.com/addex12
- */ob_start();
+Developer: Adugna Gizaw
+Email: gizawadugna@gmail.com
+LinkedIn: https://www.linkedin.com/in/eleganceict
+Twitter: https://twitter.com/eleganceict1
+GitHub: https://github.com/addex12
+*/
+ob_start();
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
@@ -33,132 +34,159 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="../assets/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Adugna Gizaw: All custom styles use adugna- prefix for patenting and clarity */
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
-        .admin-main { margin-left: 260px; padding: 2rem 2.5rem; }
-        .surveys-container {
+        .adugna-admin-main { margin-left: 260px; padding: 1.2rem 1.2rem; }
+        .adugna-surveys-container {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 2rem 1.5rem;
+            border-radius: 0.7rem;
+            box-shadow: 0 2px 12px 0 rgba(80, 112, 255, 0.08), 0 1.5px 6px 0 rgba(80, 112, 255, 0.03);
+            border: 1px solid #e5e7eb;
+            padding: 1.1rem 1.1rem;
             margin: 2rem 0;
+            width: 100%;
+            max-width: 1100px;
+            animation: adugnaFadeIn 0.7s cubic-bezier(.4,0,.2,1);
         }
-        .surveys-header {
+        .adugna-surveys-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
-        .surveys-header h2 {
+        .adugna-surveys-header h2 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: #215967;
             font-weight: 700;
         }
-        .erpnext-btn, .btn, .btn-primary, .btn-secondary {
-            display: inline-block;
-            padding: 10px 22px;
-            font-size: 15px;
-            border-radius: 4px;
+        /* Adugna: Compact, ERPNext/frappe-inspired button styles */
+        .adugna-btn {
+            background: linear-gradient(90deg, #4f46e5 0%, #4338ca 100%);
+            color: #fff;
             border: none;
-            background: #f5f7fa;
-            color: #215967;
+            border-radius: 0.4em;
+            padding: 0.13rem 0.7rem;
+            font-size: 0.92em;
             font-weight: 600;
-            transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
             cursor: pointer;
-            margin-right: 8px;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2em;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
             text-decoration: none;
         }
-        .btn-primary { background: #3b82f6; color: #fff; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-secondary { background: #eaeaea; color: #666; }
-        .btn-secondary:hover { background: #e2efda; color: #215967; }
-        .surveys-header .btn-primary {
-            background: #27ae60;
-            color: #fff;
-            margin-left: 1rem;
+        .adugna-btn i {
+            font-size: 0.92em;
         }
-        .surveys-header .btn-primary:hover {
-            background: #219150;
+        .adugna-btn:hover, .adugna-btn:focus {
+            background: linear-gradient(90deg, #4338ca 0%, #4f46e5 100%);
+            box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+            transform: translateY(-1px) scale(1.03);
         }
-        .surveys-table {
+        .adugna-btn-success {
+            background: #e2efda;
+            color: #215967;
+            border: 1px solid #b7e4c7;
+        }
+        .adugna-btn-success:hover {
+            background: #b7e4c7;
+            color: #215967;
+        }
+        .adugna-table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .adugna-surveys-table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
+            font-size: 0.98em;
         }
-        .surveys-table th, .surveys-table td {
-            padding: 12px 16px;
+        .adugna-surveys-table th, .adugna-surveys-table td {
+            padding: 9px 10px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
         }
-        .surveys-table th {
+        .adugna-surveys-table th {
             background: #e2efda;
             font-weight: 700;
             color: #215967;
+            font-size: 1em;
         }
-        .surveys-table tr:hover {
+        .adugna-surveys-table tr:hover {
             background: #f4f8fb;
         }
-        .survey-actions a, .survey-actions button {
-            margin-right: 8px;
-            color: #3b82f6;
+        .adugna-survey-actions a, .adugna-survey-actions button {
+            margin-right: 5px;
+            color: #4f46e5;
             text-decoration: none;
-            font-size: 1.1em;
+            font-size: 1em;
             background: none;
             border: none;
             cursor: pointer;
+            padding: 2px 4px;
         }
-        .survey-actions a:last-child, .survey-actions button:last-child {
+        .adugna-survey-actions a:last-child, .adugna-survey-actions button:last-child {
             margin-right: 0;
         }
-        .status-pill {
-            display: inline-block;
-            padding: 0.3em 0.9em;
-            border-radius: 1em;
-            font-size: 0.97em;
-            font-weight: 600;
-            background: #e2efda;
-            color: #215967;
-        }
-        .status-pill.active { background: #dcfce7; color: #27ae60; }
-        .status-pill.inactive { background: #fee2e2; color: #e74c3c; }
-        .status-pill.closed { background: #f1c40f; color: #fff; }
-        .category-pill {
+        .adugna-status-pill {
             display: inline-block;
             padding: 0.2em 0.7em;
             border-radius: 1em;
             font-size: 0.93em;
+            font-weight: 600;
+            background: #e2efda;
+            color: #215967;
+        }
+        .adugna-status-pill.active { background: #dcfce7; color: #27ae60; }
+        .adugna-status-pill.inactive { background: #fee2e2; color: #e74c3c; }
+        .adugna-status-pill.closed { background: #f1c40f; color: #fff; }
+        .adugna-category-pill {
+            display: inline-block;
+            padding: 0.15em 0.6em;
+            border-radius: 1em;
+            font-size: 0.91em;
             background: #f5f7fa;
             color: #215967;
-            margin-right: 0.5em;
+            margin-right: 0.3em;
         }
         @media (max-width: 900px) {
-            .surveys-container { padding: 1rem 0.5rem; }
-            .surveys-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .adugna-surveys-container { padding: 0.7rem; }
+            .adugna-surveys-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
         }
         @media (max-width: 600px) {
-            .surveys-table th, .surveys-table td { padding: 8px 6px; }
-            .admin-main { padding: 10px 2px 80px; }
+            .adugna-surveys-table th, .adugna-surveys-table td { padding: 7px 4px; font-size: 0.93em; }
+            .adugna-admin-main { padding: 7px 2px 80px; }
+        }
+        @media (max-width: 400px) {
+            .adugna-surveys-container { padding: 2px; }
+            .adugna-surveys-header h2 { font-size: 1em; }
+        }
+        @keyframes adugnaFadeIn {
+            from { opacity: 0; transform: translateY(20px);}
+            to { opacity: 1; transform: none;}
         }
     </style>
 </head>
 <body>
     <div class="admin-dashboard">
         <?php include 'includes/admin_sidebar.php'; ?>
-        <div class="admin-main">
+        <div class="adugna-admin-main">
             <header class="admin-header">
                 <h1 style="color:#215967;font-weight:700;"><?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="content">
-                <div class="surveys-container">
-                    <div class="surveys-header">
+                <div class="adugna-surveys-container">
+                    <div class="adugna-surveys-header">
                         <h2>Survey List</h2>
-                        <a href="survey_builder.php" class="erpnext-btn btn-sm btn-success" style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;">
+                        <a href="survey_builder.php" class="adugna-btn adugna-btn-success">
                             <i class="fas fa-plus"></i> New Survey
                         </a>
                     </div>
-                    <div class="table-responsive">
-                        <table class="surveys-table">
+                    <div class="adugna-table-responsive">
+                        <table class="adugna-surveys-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -183,22 +211,23 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             </td>
                                             <td>
                                                 <?php if ($survey['category']): ?>
-                                                    <span class="category-pill"><?= htmlspecialchars($survey['category']) ?></span>
+                                                    <span class="adugna-category-pill"><?= htmlspecialchars($survey['category']) ?></span>
                                                 <?php else: ?>
-                                                    <span class="category-pill" style="background:#fee2e2;color:#e74c3c;">None</span>
+                                                    <span class="adugna-category-pill" style="background:#fee2e2;color:#e74c3c;">None</span>
                                                 <?php endif; ?>
                                             </td>
                                             <td>
                                                 <?php if ($survey['is_active']): ?>
-                                                    <span class="status-pill active"><?= $survey['status_label'] ?? 'Active' ?></span>
+                                                    <span class="adugna-status-pill active"><?= $survey['status_label'] ?? 'Active' ?></span>
                                                 <?php else: ?>
-                                                    <span class="status-pill inactive"><?= $survey['status_label'] ?? 'Inactive' ?></span>
+                                                    <span class="adugna-status-pill inactive"><?= $survey['status_label'] ?? 'Inactive' ?></span>
                                                 <?php endif; ?>
                                             </td>
                                             <td><?= htmlspecialchars($survey['creator']) ?></td>
                                             <td><?= date('M j, Y', strtotime($survey['starts_at'])) ?></td>
                                             <td><?= date('M j, Y', strtotime($survey['ends_at'])) ?></td>
-                                            <td class="survey-actions">
+                                            <td class="adugna-survey-actions">
+                                                <!-- Compact, consistent action icons -->
                                                 <a href="survey_preview.php?id=<?= $survey['id'] ?>" title="Preview"><i class="fas fa-eye"></i></a>
                                                 <a href="edit_survey.php?id=<?= $survey['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="results.php?survey_id=<?= $survey['id'] ?>" title="Results"><i class="fas fa-chart-bar"></i></a>
@@ -218,30 +247,30 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
     <script>
-        // Interactive row highlight
-        document.querySelectorAll('.surveys-table tbody tr').forEach(function(row) {
+        // Adugna Gizaw: Interactive row highlight for better UX
+        document.querySelectorAll('.adugna-surveys-table tbody tr').forEach(function(row) {
             row.addEventListener('mouseenter', function() { row.style.background = '#e2efda'; });
             row.addEventListener('mouseleave', function() { row.style.background = ''; });
         });
 
-        // ERPNext-style search/filter
+        // Adugna: ERPNext-style search/filter bar
         document.addEventListener('DOMContentLoaded', function() {
             // Add ERPNext-style search bar
             const searchBar = document.createElement('div');
             searchBar.style = 'display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;';
             searchBar.innerHTML = `
-                <input type="text" id="surveySearch" placeholder="Search surveys..." style="flex:1;padding:10px 16px;border:1px solid #e5e7eb;border-radius:6px;font-size:1rem;background:#f9fafb;">
-                <button class="erpnext-btn btn-primary" id="clearSearch" style="padding:10px 18px;">Clear</button>
+                <input type="text" id="adugnaSurveySearch" placeholder="Search surveys..." style="flex:1;padding:10px 16px;border:1px solid #e5e7eb;border-radius:6px;font-size:1rem;background:#f9fafb;">
+                <button class="adugna-btn adugna-btn-success" id="adugnaClearSearch" style="padding:10px 18px;">Clear</button>
             `;
-            const table = document.querySelector('.surveys-table');
+            const table = document.querySelector('.adugna-surveys-table');
             const container = table.parentElement;
             container.insertBefore(searchBar, table);
 
-            const searchInput = document.getElementById('surveySearch');
-            const clearBtn = document.getElementById('clearSearch');
+            const searchInput = document.getElementById('adugnaSurveySearch');
+            const clearBtn = document.getElementById('adugnaClearSearch');
             searchInput.addEventListener('input', function() {
                 const val = this.value.toLowerCase();
-                document.querySelectorAll('.surveys-table tbody tr').forEach(function(row) {
+                document.querySelectorAll('.adugna-surveys-table tbody tr').forEach(function(row) {
                     row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
                 });
             });
@@ -251,12 +280,12 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         });
 
-        // ERPNext-style row click for preview
-        document.querySelectorAll('.surveys-table tbody tr').forEach(function(row) {
+        // Adugna: ERPNext-style row click for preview
+        document.querySelectorAll('.adugna-surveys-table tbody tr').forEach(function(row) {
             row.style.cursor = 'pointer';
             row.addEventListener('click', function(e) {
                 // Only trigger if not clicking an action icon
-                if (!e.target.closest('.survey-actions')) {
+                if (!e.target.closest('.adugna-survey-actions')) {
                     const idCell = row.querySelector('td');
                     if (idCell) {
                         const id = idCell.textContent.trim();
@@ -265,8 +294,8 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             });
         });
-        // ERPNext-style action dropdown (for future extensibility)
-        document.querySelectorAll('.survey-actions').forEach(function(cell) {
+        // Adugna: ERPNext-style action dropdown (for future extensibility)
+        document.querySelectorAll('.adugna-survey-actions').forEach(function(cell) {
             // Could add dropdown here if needed
         });
     </script>
