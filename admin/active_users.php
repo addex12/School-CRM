@@ -366,7 +366,8 @@ function getUserRoleName($roleId) {
                 <!-- Bulk Actions Bar (hidden by default, shown when users selected) -->
                 <div class="adugna-bulk-actions-bar" id="bulkActionsBar" style="display:none;">
                     <span id="selectedCount">0 selected</span>
-                    <button type="button" id="bulkDeleteBtn"><i class="fas fa-trash"></i></button>
+                    <button type="button" id="bulkDeleteBtn"><i class="fas fa-trash"></i> Delete</button>
+                    <button type="button" id="bulkEditBtn"><i class="fas fa-edit"></i> Edit</button>
                     <select id="bulkStatusSelect">
                         <option value="">Set Status...</option>
                         <option value="1">Set Active</option>
@@ -613,6 +614,45 @@ function getUserRoleName($roleId) {
         // Select all checkbox logic
         document.getElementById('selectAll').addEventListener('change', function() {
             document.querySelectorAll('.row-select').forEach(cb => cb.checked = this.checked);
+        });
+
+        // Show/hide bulk actions bar based on selection
+        function updateBulkActionsBar() {
+            const selected = getSelectedUserIds();
+            const bar = document.getElementById('bulkActionsBar');
+            document.getElementById('selectedCount').textContent = selected.length + ' selected';
+            bar.style.display = selected.length > 0 ? '' : 'none';
+        }
+        document.getElementById('allUsersTable').addEventListener('change', function(e) {
+            if (e.target.classList.contains('row-select') || e.target.id === 'selectAll') {
+                updateBulkActionsBar();
+            }
+        });
+        // Bulk Edit: Open modal or inline edit for selected users
+        document.getElementById('bulkEditBtn').addEventListener('click', function() {
+            const ids = getSelectedUserIds();
+            if (!ids.length) return alert('No users selected.');
+            // For demo: prompt for new username, role, status (in real app, use a modal)
+            const newUsername = prompt('Enter new username for all selected (leave blank to skip):');
+            const newRoleId = prompt('Enter new role ID for all selected (leave blank to skip):');
+            const newStatus = prompt('Enter new status (1=Active, 0=Inactive, leave blank to skip):');
+            if (!newUsername && !newRoleId && !newStatus) return;
+            const formData = new FormData();
+            formData.append('ajax', 'bulk_edit');
+            formData.append('ids', JSON.stringify(ids));
+            if (newUsername) formData.append('username', newUsername);
+            if (newRoleId) formData.append('role_id', newRoleId);
+            if (newStatus) formData.append('status', newStatus);
+            fetch('ajax_active_users.php', {
+                method: 'POST',
+                body: formData
+            }).then(res => res.text()).then(function(response) {
+                if (response.trim() === 'success') {
+                    fetchUsersTable();
+                } else {
+                    alert('Bulk edit failed.');
+                }
+            });
         });
 
         // Initial binding and fetch
