@@ -96,7 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->commit();
 
         $_SESSION['success'] = $survey_id ? "Survey updated successfully!" : "Survey created successfully!";
-        header("Location: edit_survey.php?id=" . urlencode($survey_id));
+        // Do not redirect, just reload the page to show the message and link
+        header("Location: survey_builder.php?id=" . urlencode($survey_id));
         exit();
     } catch (PDOException $e) {
         $pdo->rollBack();
