@@ -313,7 +313,7 @@ LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
 */
-Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+Adugna Gizaw: adugna- styles for compact, adugna-inspired, responsive UI.
 Sidebar/footer styles are not touched.
 All cards, buttons, and messages use adugna- prefix.
 Layout is content/screen aware and visually outstanding.
@@ -330,12 +330,36 @@ html { font-size: 16px; }
 .admin-main {
     flex: 1;
     padding: 2rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center all content horizontally */
+    justify-content: flex-start;
+}
+.main-content-container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content */
+}
+.profile-main-container {
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center content */
 }
 @media (max-width: 900px) {
     .admin-main { padding: 1rem 0.5rem; }
+    .main-content-container { max-width: 98vw; }
+    .profile-main-container { max-width: 98vw; }
 }
 @media (max-width: 600px) {
     .admin-main { padding: 10px 2px 80px; }
+    .main-content-container { max-width: 100vw; }
+    .profile-main-container { max-width: 100vw; }
 }
 /* Adugna: Compact, ERPNext/frappe-inspired card */
 .adugna-card {
@@ -346,10 +370,9 @@ html { font-size: 16px; }
     margin-bottom: 18px;
     padding: 0;
     transition: box-shadow 0.18s, transform 0.18s;
-}
-.adugna-card:hover {
-    box-shadow: 0 8px 32px rgba(44,62,80,0.13), 0 2px 8px rgba(44,62,80,0.07);
-    transform: translateY(-1.5px) scale(1.01);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .adugna-card-header {
     background: #f8fafc;
@@ -362,6 +385,7 @@ html { font-size: 16px; }
     display: flex;
     align-items: center;
     gap: 7px;
+    justify-content: center; /* Center header content */
 }
 .adugna-card-header.bg-secondary {
     background: #eaf2fb;
@@ -370,6 +394,15 @@ html { font-size: 16px; }
 .adugna-card-body {
     padding: 16px 16px 12px 16px;
     background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center form content */
+}
+.adugna-profile-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 .adugna-profile-avatar img {
     width: 44px;
@@ -380,9 +413,21 @@ html { font-size: 16px; }
     box-shadow: 0 2px 8px rgba(44,62,80,0.07);
     background: #fff;
     transition: box-shadow 0.18s;
+    margin: 0 auto;
+    display: block;
 }
 .adugna-profile-avatar img:hover {
     box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+}
+.adugna-profile-info {
+    text-align: center;
+    width: 100%;
+}
+.adugna-profile-info h3,
+.adugna-profile-info .card-text,
+.adugna-profile-info .text-muted {
+    text-align: center;
+    width: 100%;
 }
 .adugna-btn {
     font-size: 0.87rem;
@@ -441,6 +486,8 @@ html { font-size: 16px; }
     margin-left: 0.5em;
     font-weight: 600;
     letter-spacing: 0.01em;
+    display: inline-block;
+    margin: 0.5em auto 0 auto;
 }
 .adugna-profile-header {
     display: flex;
@@ -451,6 +498,9 @@ html { font-size: 16px; }
     border-radius: 8px;
     padding: 12px 16px;
     box-shadow: 0 1.5px 4px rgba(44,62,80,0.04);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 .adugna-profile-info h3 {
     font-size: 1.07rem;
@@ -471,12 +521,19 @@ html { font-size: 16px; }
     gap: 18px;
     flex-wrap: wrap;
     margin-top: 8px;
+    justify-content: center; /* Center forms horizontally */
+    align-items: flex-start;
+    width: 100%;
 }
 .adugna-profile-form-card {
     flex: 1 1 260px;
     min-width: 260px;
     max-width: 340px;
     transition: box-shadow 0.18s;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .adugna-profile-form-card:hover {
     box-shadow: 0 6px 24px rgba(44,62,80,0.11);
@@ -484,6 +541,8 @@ html { font-size: 16px; }
 .adugna-form-text {
     font-size: 0.81rem;
     color: #7f8c8d;
+    text-align: center;
+    width: 100%;
 }
 .alert {
     border-radius: 6px;
@@ -491,6 +550,7 @@ html { font-size: 16px; }
     padding: 0.6em 1em;
     margin-bottom: 1em;
     box-shadow: 0 1px 4px rgba(44,62,80,0.07);
+    text-align: center;
 }
 .btn-close {
     font-size: 0.8rem !important;
@@ -499,13 +559,14 @@ html { font-size: 16px; }
     .adugna-profile-forms-row {
         flex-direction: column;
         gap: 12px;
+        align-items: center;
     }
     .adugna-profile-form-card {
         max-width: 100%;
     }
     .adugna-profile-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         gap: 7px;
         padding: 10px 7px;
     }
