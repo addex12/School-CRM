@@ -884,7 +884,8 @@ $chart_json = json_encode($chart_data);
         var dropdown = document.querySelector('.dropdown');
         if (dropdown) dropdown.style.display = 'none';
 
-        html2canvas(content, {scale: 2}).then(function(canvas) {
+        // --- Improved PDF export: Split content into A4-sized slices to avoid bottom cutoff ---
+        html2canvas(content, {scale: 2, useCORS: true, scrollY: -window.scrollY}).then(function(canvas) {
             var imgData = canvas.toDataURL('image/png');
             var pdf = new window.jspdf.jsPDF('p', 'pt', 'a4');
             var pageWidth = pdf.internal.pageSize.getWidth();
@@ -892,20 +893,31 @@ $chart_json = json_encode($chart_data);
             var imgWidth = pageWidth - 40;
             var imgHeight = canvas.height * imgWidth / canvas.width;
 
+            // Calculate the number of pages
+            var heightLeft = imgHeight;
             var position = 20;
-            if (imgHeight < pageHeight - 40) {
+            var pageCanvas, pageCtx, pageImgData;
+
+            if (imgHeight <= pageHeight - 40) {
                 pdf.addImage(imgData, 'PNG', 20, position, imgWidth, imgHeight);
             } else {
-                // Multi-page
-                let heightLeft = imgHeight;
-                let y = position;
+                var sX = 0, sY = 0, sWidth = canvas.width, sHeight = Math.floor((pageHeight - 40) * canvas.width / imgWidth);
+                var pageNum = 0;
                 while (heightLeft > 0) {
-                    pdf.addImage(imgData, 'PNG', 20, y, imgWidth, imgHeight);
+                    // Create a canvas for the current page slice
+                    pageCanvas = document.createElement('canvas');
+                    pageCanvas.width = canvas.width;
+                    pageCanvas.height = sHeight;
+                    pageCtx = pageCanvas.getContext('2d');
+                    // Draw the current slice
+                    pageCtx.drawImage(canvas, sX, sY, sWidth, sHeight, 0, 0, sWidth, sHeight);
+                    pageImgData = pageCanvas.toDataURL('image/png');
+                    // Add to PDF
+                    if (pageNum > 0) pdf.addPage();
+                    pdf.addImage(pageImgData, 'PNG', 20, 20, imgWidth, pageHeight - 40);
                     heightLeft -= (pageHeight - 40);
-                    if (heightLeft > 0) {
-                        pdf.addPage();
-                        y = 0;
-                    }
+                    sY += sHeight;
+                    pageNum++;
                 }
             }
             pdf.save('survey_results.pdf');
