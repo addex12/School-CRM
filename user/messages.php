@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
         .adugna-label {
             font-weight: 500;
             color: #2563eb;
-            margin-bottom: 2px;
+            margin-bottom: 4px; /* Increased for better spacing above textarea */
             display: block;
             font-size: 0.96rem;
         }
@@ -237,12 +237,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
             background: #b0b8c1;
         }
 
-        /* Adugna message form: compact */
-        .adugna-message-form textarea {
+        /* Adugna message form: compact and aligned */
+        .adugna-message-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3em;
+        }
+        .adugna-message-form textarea.adugna-textarea {
             width: 100%;
             resize: vertical;
             min-height: 38px;
             max-height: 100px;
+            margin-bottom: 0.3em; /* Space below textarea before button */
+            box-sizing: border-box;
+            font-size: 0.96rem;
+            border-radius: 3.5px;
+            border: 1px solid #d1d8dd;
+            padding: 7px 10px;
+            background: #f5f7fa;
+            color: #36414c;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .adugna-message-form textarea.adugna-textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #fff;
         }
 
         /* Adugna direction/info card: compact, branded */
@@ -441,7 +460,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                         <input type="hidden" name="receiver_id" id="receiver_id">
                         <label class="adugna-label" for="message-input">Message</label>
                         <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required class="adugna-textarea"></textarea>
-                        <button type="submit" class="adugna-btn" style="margin-top:6px;">
+                        <button type="submit" class="adugna-btn" style="margin-top:2px;">
                             <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </form>
