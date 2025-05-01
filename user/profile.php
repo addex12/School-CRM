@@ -46,7 +46,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Fetch the current user and extended profile data
+// Fetch the current user
 $user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User session expired. Please login again.";
@@ -54,83 +54,8 @@ if (!$user) {
     exit();
 }
 
-// Always fetch the latest username, email, and role from the database
-$stmt = $pdo->prepare("SELECT u.username, u.email, u.avatar, u.last_login, r.role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.id = ? LIMIT 1");
-$stmt->execute([$_SESSION['user_id']]);
-$latestUser = $stmt->fetch(PDO::FETCH_ASSOC);
-if ($latestUser) {
-    $user['username'] = $latestUser['username'];
-    $user['email'] = $latestUser['email'];
-    $user['avatar'] = $latestUser['avatar'];
-    $user['last_login'] = $latestUser['last_login'];
-    $user['role_name'] = $latestUser['role_name'];
-}
-
-// Fetch extended profile data based on role and ensure all columns exist in DB
-$profileData = [];
-$role = strtolower($user['role_name'] ?? '');
-
-// Helper: Ensure all columns exist in DB for profile editing
-function adugna_ensure_profile_columns($pdo, $role) {
-    $alterSqls = [];
-    if ($role === 'teacher') {
-        $alterSqls = [
-            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS qualification VARCHAR(255) DEFAULT NULL;",
-            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS subject_specialization VARCHAR(255) DEFAULT NULL;",
-            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS date_of_birth DATE DEFAULT NULL;",
-            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS gender VARCHAR(20) DEFAULT NULL;",
-            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT NULL;"
-        ];
-    } elseif ($role === 'parent') {
-        $alterSqls = [
-            "ALTER TABLE parents ADD COLUMN IF NOT EXISTS occupation VARCHAR(100) DEFAULT NULL;",
-            "ALTER TABLE parents ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT NULL;",
-            "ALTER TABLE parents ADD COLUMN IF NOT EXISTS phone VARCHAR(20) DEFAULT NULL;"
-        ];
-    } elseif ($role === 'student') {
-        $alterSqls = [
-            "ALTER TABLE students ADD COLUMN IF NOT EXISTS class_id INT DEFAULT NULL;",
-            "ALTER TABLE students ADD COLUMN IF NOT EXISTS section_id INT DEFAULT NULL;",
-            "ALTER TABLE students ADD COLUMN IF NOT EXISTS enrollment_no VARCHAR(50) DEFAULT NULL;",
-            "ALTER TABLE students ADD COLUMN IF NOT EXISTS date_of_birth DATE DEFAULT NULL;",
-            "ALTER TABLE students ADD COLUMN IF NOT EXISTS gender VARCHAR(20) DEFAULT NULL;",
-            "ALTER TABLE students ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT NULL;"
-        ];
-    }
-    if (!empty($alterSqls)) {
-        $migrationFile = __DIR__ . '/../migrations/adugna_profile_columns_' . $role . '.sql';
-        $migrationSql = "-- Developer: Adugna Gizaw\n" . implode("\n", $alterSqls);
-        file_put_contents($migrationFile, $migrationSql);
-    }
-}
-adugna_ensure_profile_columns($pdo, $role);
-
-// Fetch all profile fields for editing (except role, which is read-only)
-if ($role === 'teacher') {
-    $stmt = $pdo->prepare("SELECT * FROM teachers WHERE user_id = ? OR id = ?");
-    $stmt->execute([$user['id'], $user['id']]);
-    $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-} elseif ($role === 'parent') {
-    $stmt = $pdo->prepare("SELECT * FROM parents WHERE user_id = ? OR id = ?");
-    $stmt->execute([$user['id'], $user['id']]);
-    $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-} elseif ($role === 'student') {
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE user_id = ? OR id = ?");
-    $stmt->execute([$user['id'], $user['id']]);
-    $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-}
-
 // Define user ID
 $userId = $_SESSION['user_id'];
-
-// Always fetch the latest username and email from the database for the form fields
-$stmt = $pdo->prepare("SELECT username, email FROM users WHERE id = ? LIMIT 1");
-$stmt->execute([$userId]);
-$latestUser = $stmt->fetch(PDO::FETCH_ASSOC);
-if ($latestUser) {
-    $user['username'] = $latestUser['username'];
-    $user['email'] = $latestUser['email'];
-}
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -143,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle profile update
     if (isset($_POST['update_profile'])) {
-        handleProfileUpdate($pdo, $user, $userId, $role, $profileData);
+        handleProfileUpdate($pdo, $user, $userId);
     }
 
     // Handle password change
@@ -153,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Function to handle profile updates
-function handleProfileUpdate($pdo, $user, $userId, $role, $profileData) {
+function handleProfileUpdate($pdo, $user, $userId) {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
@@ -175,52 +100,12 @@ function handleProfileUpdate($pdo, $user, $userId, $role, $profileData) {
             if ($avatar !== false) {
                 // Update user details
                 $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
-                $pdo->beginTransaction();
-                $ok = $stmt->execute([$username, $email, $avatar, $userId]);
-                // Update extra profile fields for the user's role
-                $extraOk = true;
-                if ($role === 'teacher') {
-                    $fields = ['qualification', 'subject_specialization', 'date_of_birth', 'gender', 'address'];
-                    $update = [];
-                    $params = [];
-                    foreach ($fields as $f) {
-                        $update[] = "$f = ?";
-                        $params[] = $_POST[$f] ?? null;
-                    }
-                    $params[] = $userId;
-                    $stmt2 = $pdo->prepare("UPDATE teachers SET " . implode(',', $update) . " WHERE user_id = ?");
-                    $extraOk = $stmt2->execute($params);
-                } elseif ($role === 'parent') {
-                    $fields = ['occupation', 'address', 'phone'];
-                    $update = [];
-                    $params = [];
-                    foreach ($fields as $f) {
-                        $update[] = "$f = ?";
-                        $params[] = $_POST[$f] ?? null;
-                    }
-                    $params[] = $userId;
-                    $stmt2 = $pdo->prepare("UPDATE parents SET " . implode(',', $update) . " WHERE user_id = ?");
-                    $extraOk = $stmt2->execute($params);
-                } elseif ($role === 'student') {
-                    $fields = ['class_id', 'section_id', 'enrollment_no', 'date_of_birth', 'gender', 'address'];
-                    $update = [];
-                    $params = [];
-                    foreach ($fields as $f) {
-                        $update[] = "$f = ?";
-                        $params[] = $_POST[$f] ?? null;
-                    }
-                    $params[] = $userId;
-                    $stmt2 = $pdo->prepare("UPDATE students SET " . implode(',', $update) . " WHERE user_id = ?");
-                    $extraOk = $stmt2->execute($params);
-                }
-                if ($ok && $extraOk) {
-                    $pdo->commit();
+                if ($stmt->execute([$username, $email, $avatar, $userId])) {
                     $_SESSION['success'] = "Profile updated successfully!";
                     session_regenerate_id(true);
                     header("Location: profile.php");
                     exit();
                 } else {
-                    $pdo->rollBack();
                     $_SESSION['error'] = "Failed to update profile.";
                 }
             }
@@ -312,265 +197,160 @@ function sendPasswordChangeNotification($email) {
     error_log("Password changed notification sent to: $email");
 }
 
-// Helper function to display profile fields safely and user-friendly
-function adugna_display_profile_field($key, $val) {
-    /**
-     * Developer: Adugna Gizaw
-     * Email: gizawadugna@gmail.com
-     * LinkedIn: https://www.linkedin.com/in/eleganceict
-     * Twitter: https://twitter.com/eleganceict1
-     * GitHub: https://github.com/addex12
-     */
-    // If value is null or empty, show 'N/A' for clarity
-    if (is_null($val) || $val === '') return '<span class="adugna-text-muted">N/A</span>';
-    // For date fields, format nicely
-    if (stripos($key, 'date') !== false && strtotime($val)) {
-        return htmlspecialchars(date('M d, Y', strtotime($val)));
-    }
-    // For status, capitalize
-    if ($key === 'status') {
-        return '<span class="adugna-badge" style="background:#28a745;">' . htmlspecialchars(ucfirst($val)) . '</span>';
-    }
-    // For phone, format
-    if ($key === 'phone') {
-        return '<a href="tel:' . htmlspecialchars($val) . '" class="adugna-link">' . htmlspecialchars($val) . '</a>';
-    }
-    // For class_id, section_id, show as ID or N/A
-    if (in_array($key, ['class_id','section_id']) && !$val) {
-        return '<span class="adugna-text-muted">N/A</span>';
-    }
-    // Default: escape value
-    return htmlspecialchars($val);
-}
-
 ?>
 
 <style>
-/* Adugna CRM Profile Custom Styles - adugna- prefix for patenting */
-.adugna-profile-main-container {
-    max-width: 900px;
-    margin: 2vw auto;
+/* Profile Page Custom Styles */
+.profile-main-container {
+    max-width: 800px;
+    margin: 40px auto;
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-    padding: 2vw 2vw 1vw 2vw;
+    border-radius: 8px; /* Smaller card styling */
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); /* Lighter shadow */
+    padding: 24px; /* Reduced padding */
 }
-.adugna-profile-header {
+.profile-header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 1.5vw;
+    margin-bottom: 24px;
 }
-.adugna-profile-avatar {
-    width: 72px;
-    height: 72px;
-    margin-bottom: 10px;
+.profile-avatar {
+    width: 100px; /* Smaller avatar size */
+    height: 100px;
+    margin-bottom: 12px;
     border-radius: 50%;
     overflow: hidden;
-    border: 2px solid #1a73e8;
-    background: #f3f6fa;
+    border: 3px solid #007bff;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    background: #f8f9fa;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.adugna-profile-avatar img {
+.profile-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-.adugna-profile-info {
+.profile-info {
     text-align: center;
 }
-.adugna-profile-info h3 {
-    margin: 0 0 4px 0;
-    font-size: 1.1rem;
-    color: #1a1a1a;
-    font-weight: 600;
+.profile-info h3 {
+    margin: 0 0 6px 0;
+    font-size: 1.25rem; /* Smaller font size */
+    color: #222;
 }
-.adugna-profile-info .adugna-card-text {
+.profile-info .card-text {
     color: #555;
-    margin-bottom: 2px;
-    font-size: 0.97em;
-}
-.adugna-profile-info .adugna-badge {
-    font-size: 0.85rem;
     margin-bottom: 4px;
-    background: #1a73e8;
-    color: #fff;
-    border-radius: 4px;
-    padding: 2px 8px;
-    display: inline-block;
 }
-.adugna-profile-info .adugna-text-muted {
-    font-size: 0.8rem;
-    color: #888;
+.profile-info .badge {
+    font-size: 0.9rem; /* Smaller badge size */
+    margin-bottom: 6px;
 }
-.adugna-profile-forms-row {
+.profile-info .text-muted {
+    font-size: 0.85rem; /* Smaller text size */
+}
+.profile-forms-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 12px;
+    gap: 16px; /* Reduced gap */
+    margin-top: 16px;
 }
-.adugna-profile-form-card {
-    flex: 1 1 320px;
-    background: #f7fafd;
+.profile-form-card {
+    flex: 1 1 340px;
+    background: #f8fafd;
     border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-    padding: 14px 14px 10px 14px;
-    min-width: 260px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    padding: 18px; /* Reduced padding */
+    min-width: 320px;
 }
-.adugna-profile-form-card .adugna-card-header {
-    background: #1a73e8;
+.profile-form-card .card-header {
+    background: #007bff;
     color: #fff;
     border-radius: 8px 8px 0 0;
-    padding: 7px 12px;
-    margin: -14px -14px 10px -14px;
-    font-size: 1em;
+    padding: 10px 16px; /* Reduced padding */
+    margin: -18px -16px 16px -16px;
 }
-.adugna-profile-form-card .adugna-card-header.adugna-bg-secondary {
-    background: #5a6268;
+.profile-form-card .card-header.bg-secondary {
+    background: #6c757d;
 }
-.adugna-btn {
+.erpnext-btn {
     background: #f5f7fa;
-    color: #1a1a1a;
+    color: #36414c;
     border: 1px solid #d1d8dd;
     border-radius: 4px;
-    padding: 5px 10px;
-    font-size: 0.89rem;
+    padding: 6px 12px; /* Smaller button size */
+    font-size: 0.875rem; /* Smaller font size */
     font-weight: 500;
     transition: background 0.2s, color 0.2s;
     cursor: pointer;
-    min-width: 80px;
 }
-.adugna-btn.adugna-btn-primary {
-    background: #1a73e8;
+.erpnext-btn.btn-primary {
+    background: #007bfc;
     color: #fff;
-    border-color: #1a73e8;
+    border-color: #007bfc;
 }
-.adugna-btn.adugna-btn-primary:hover {
-    background: #155ab6;
+.erpnext-btn.btn-primary:hover {
+    background: #0056b3;
     color: #fff;
 }
-.adugna-btn.adugna-btn-secondary {
+.erpnext-btn.btn-secondary {
+    background: #6c757d;
+    color: #fff;
+    border-color: #6c757d;
+}
+.erpnext-btn.btn-secondary:hover {
     background: #5a6268;
-    color: #fff;
-    border-color: #5a6268;
 }
-.adugna-btn.adugna-btn-secondary:hover {
-    background: #444b50;
-}
-.adugna-input, .adugna-textarea {
+.erpnext-input, .erpnext-textarea {
     border: 1px solid #d1d8dd;
     border-radius: 4px;
-    padding: 7px 10px;
-    font-size: 0.89rem;
+    padding: 8px 12px;
+    font-size: 0.875rem; /* Smaller font size */
     background: #f5f7fa;
-    color: #1a1a1a;
+    color: #36414c;
 }
-.adugna-input:focus, .adugna-textarea:focus {
+.erpnext-input:focus, .erpnext-textarea:focus {
     outline: none;
-    border-color: #1a73e8;
+    border-color: #007bfc;
     background: #fff;
 }
 @media (max-width: 600px) {
-    .adugna-profile-main-container {
-        padding: 8px 1vw;
+    .profile-main-container {
+        padding: 10px 2vw;
     }
-    .adugna-profile-header {
+    .profile-header {
         padding: 0;
     }
-    .adugna-profile-forms-row {
+    .profile-forms-row {
         flex-direction: column;
-        gap: 8px;
+        gap: 12px; /* Reduced gap for smaller screens */
     }
 }
 </style>
 
 <?php include_once 'includes/header.php'; ?>
 <div class="main-content-container">
-    <div class="adugna-profile-main-container">
-        <div class="adugna-profile-header">
-            <div class="adugna-profile-avatar">
-                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>"
+    <div class="profile-main-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
                      alt="Profile Picture"
                      onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
             </div>
-            <div class="adugna-profile-info">
-                <?php
-                // Defensive: always set to empty string if not set to avoid warnings/deprecation
-                $username = isset($user['username']) && $user['username'] !== null ? $user['username'] : '';
-                $email = isset($user['email']) && $user['email'] !== null ? $user['email'] : '';
-                $roleName = isset($user['role_name']) && $user['role_name'] !== null ? $user['role_name'] : '';
-                ?>
-                <h3><?= htmlspecialchars($username) ?></h3>
-                <div class="adugna-card-text"><?= htmlspecialchars($email) ?></div>
-                <span class="adugna-badge"><?= htmlspecialchars($roleName) ?></span>
-                <div class="adugna-text-muted mt-2">
-                    Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : '' ?>
-                </div>
+            <div class="profile-info">
+                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
+                <div class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
+                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
             </div>
         </div>
-
-        <?php
-        // Show only the relevant profile details card for the user's role
-        if ($role === 'teacher' && !empty($profileData)) {
-        ?>
-        <div class="adugna-profile-form-card" style="margin-bottom:12px;">
-            <div class="adugna-card-header adugna-bg-secondary">
-                <span>Teacher Profile Details</span>
-            </div>
-            <div class="card-body">
-                <ul style="list-style:none;padding:0;margin:0;">
-                    <?php foreach ($profileData as $key => $val): ?>
-                        <?php if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue; ?>
-                        <li style="margin-bottom:4px;font-size:0.97em;">
-                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= adugna_display_profile_field($key, $val) ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        </div>
-        <?php
-        } elseif ($role === 'parent' && !empty($profileData)) {
-        ?>
-        <div class="adugna-profile-form-card" style="margin-bottom:12px;">
-            <div class="adugna-card-header adugna-bg-secondary">
-                <span>Parent Profile Details</span>
-            </div>
-            <div class="card-body">
-                <ul style="list-style:none;padding:0;margin:0;">
-                    <?php foreach ($profileData as $key => $val): ?>
-                        <?php if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue; ?>
-                        <li style="margin-bottom:4px;font-size:0.97em;">
-                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= adugna_display_profile_field($key, $val) ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        </div>
-        <?php
-        } elseif ($role === 'student' && !empty($profileData)) {
-        ?>
-        <div class="adugna-profile-form-card" style="margin-bottom:12px;">
-            <div class="adugna-card-header adugna-bg-secondary">
-                <span>Student Profile Details</span>
-            </div>
-            <div class="card-body">
-                <ul style="list-style:none;padding:0;margin:0;">
-                    <?php foreach ($profileData as $key => $val): ?>
-                        <?php if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue; ?>
-                        <li style="margin-bottom:4px;font-size:0.97em;">
-                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= adugna_display_profile_field($key, $val) ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-        </div>
-        <?php } ?>
 
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['success']) ?>
+                <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <?php unset($_SESSION['success']); ?>
@@ -578,16 +358,16 @@ function adugna_display_profile_field($key, $val) {
 
         <?php if (isset($_SESSION['error'])): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['error']) ?>
+                <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
 
-        <div class="adugna-profile-forms-row">
-            <div class="adugna-profile-form-card">
-                <div class="adugna-card-header">
-                    <h5 class="mb-0" style="font-size:1em;">Profile Information</h5>
+        <div class="profile-forms-row">
+            <div class="profile-form-card">
+                <div class="card-header">
+                    <h5 class="mb-0">Profile Information</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
@@ -595,57 +375,35 @@ function adugna_display_profile_field($key, $val) {
                         <input type="hidden" name="update_profile" value="1">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username:</label>
-                            <input type="text" id="username" name="username"
-                                   class="adugna-input"
-                                   value="<?= htmlspecialchars($username) ?>"
+                            <input type="text" id="username" name="username" 
+                                   class="erpnext-input"
+                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
                                    required
                                    pattern="[a-zA-Z0-9_]{3,30}"
                                    title="3-30 characters (letters, numbers, underscores)">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email:</label>
-                            <input type="email" id="email" name="email"
-                                   class="adugna-input"
-                                   value="<?= htmlspecialchars($email) ?>"
+                            <input type="email" id="email" name="email" 
+                                   class="erpnext-input"
+                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
                                    required>
                         </div>
                         <div class="mb-3">
-                            <label for="role" class="form-label">Role:</label>
-                            <input type="text" class="adugna-input" value="<?= htmlspecialchars($roleName) ?>" readonly>
-                        </div>
-                        <div class="mb-3">
                             <label for="avatar" class="form-label">Profile Picture:</label>
-                            <input type="file" id="avatar" name="avatar"
-                                   class="adugna-input"
+                            <input type="file" id="avatar" name="avatar" 
+                                   class="erpnext-input"
                                    accept="image/jpeg,image/png,image/gif">
-                            <small class="form-text adugna-text-muted">Max 2MB (JPG, PNG, GIF only)</small>
+                            <small class="form-text text-muted">Max 2MB (JPG, PNG, GIF only)</small>
                         </div>
-                        <?php
-                        // Render editable fields for extra profile details, only for the user's role
-                        foreach ($profileData as $key => $val):
-                            if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue;
-                            $label = ucwords(str_replace('_', ' ', $key));
-                            $type = 'text';
-                            if (stripos($key, 'date') !== false) $type = 'date';
-                            elseif ($key === 'gender') $type = 'text';
-                            elseif ($key === 'address') $type = 'text';
-                            elseif ($key === 'class_id' || $key === 'section_id') $type = 'number';
-                        ?>
-                        <div class="mb-3">
-                            <label for="<?= $key ?>" class="form-label"><?= $label ?>:</label>
-                            <input type="<?= $type ?>" id="<?= $key ?>" name="<?= $key ?>"
-                                   class="adugna-input"
-                                   value="<?= htmlspecialchars($val ?? '') ?>">
-                        </div>
-                        <?php endforeach; ?>
-                        <button type="submit" class="adugna-btn adugna-btn-primary w-100">Update Profile</button>
+                        <button type="submit" class="erpnext-btn btn-primary w-100">Update Profile</button>
                     </form>
                 </div>
             </div>
 
-            <div class="adugna-profile-form-card">
-                <div class="adugna-card-header adugna-bg-secondary">
-                    <h5 class="mb-0" style="font-size:1em;">Change Password</h5>
+            <div class="profile-form-card">
+                <div class="card-header bg-secondary">
+                    <h5 class="mb-0">Change Password</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST">
@@ -653,24 +411,24 @@ function adugna_display_profile_field($key, $val) {
                         <input type="hidden" name="change_password" value="1">
                         <div class="mb-3">
                             <label for="current_password" class="form-label">Current Password:</label>
-                            <input type="password" id="current_password" name="current_password"
-                                   class="adugna-input" required>
+                            <input type="password" id="current_password" name="current_password" 
+                                   class="erpnext-input" required>
                         </div>
                         <div class="mb-3">
                             <label for="new_password" class="form-label">New Password:</label>
-                            <input type="password" id="new_password" name="new_password"
-                                   class="adugna-input"
+                            <input type="password" id="new_password" name="new_password" 
+                                   class="erpnext-input"
                                    required
                                    pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
                                    title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
-                            <small class="form-text adugna-text-muted">Minimum 8 characters with at least one number and uppercase letter</small>
+                            <small class="form-text text-muted">Minimum 8 characters with at least one number and uppercase letter</small>
                         </div>
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label">Confirm New Password:</label>
-                            <input type="password" id="confirm_password" name="confirm_password"
-                                   class="adugna-input" required>
+                            <input type="password" id="confirm_password" name="confirm_password" 
+                                   class="erpnext-input" required>
                         </div>
-                        <button type="submit" class="adugna-btn adugna-btn-secondary w-100">Change Password</button>
+                        <button type="submit" class="erpnext-btn btn-secondary w-100">Change Password</button>
                     </form>
                 </div>
             </div>
