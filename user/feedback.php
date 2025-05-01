@@ -76,111 +76,195 @@ $feedback->execute([$_SESSION['user_id']]);
     <link rel="stylesheet" href="../assets/css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        /* Adugna: Feedback Page Custom Styles - Compact, Responsive, and Branded */
         body, input, textarea, select, button {
             font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
             font-size: 15px;
         }
-        .erpnext-btn {
+        .adugna-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 18px 12px 24px 12px;
+            margin-bottom: 24px;
+        }
+        .adugna-btn {
             background: #f5f7fa;
-            color: #36414c;
-            border: 1px solid #d1d8dd;
+            color: #1a1a1a;
+            border: 1.2px solid #d1d8dd;
             border-radius: 4px;
-            padding: 8px 18px;
+            padding: 4px 12px;
+            font-size: 0.93rem;
             font-weight: 500;
-            transition: background 0.2s, color 0.2s;
+            transition: background 0.18s, color 0.18s;
             cursor: pointer;
+            min-width: 80px;
+            min-height: 28px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .erpnext-btn.btn-primary {
-            background: #007bfc;
+        .adugna-btn.adugna-btn-primary {
+            background: #1a73e8;
             color: #fff;
-            border-color: #007bfc;
+            border-color: #1a73e8;
         }
-        .erpnext-btn.btn-primary:hover {
-            background: #0056b3;
+        .adugna-btn.adugna-btn-primary:hover {
+            background: #155ab6;
             color: #fff;
         }
-        .erpnext-btn.btn-success {
-            background: #28a745;
+        .adugna-btn.adugna-btn-success {
+            background: #27ae60;
             color: #fff;
-            border-color: #28a745;
+            border-color: #27ae60;
         }
-        .erpnext-btn.btn-success:hover {
-            background: #218838;
+        .adugna-btn.adugna-btn-success:hover {
+            background: #219150;
         }
-        .erpnext-input, .erpnext-textarea {
-            border: 1px solid #d1d8dd;
+        .adugna-input, .adugna-textarea {
+            border: 1.2px solid #d1d8dd;
             border-radius: 4px;
-            padding: 8px 12px;
-            font-size: 15px;
+            padding: 6px 10px;
+            font-size: 0.93rem;
             background: #f5f7fa;
-            color: #36414c;
+            color: #1a1a1a;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 2px;
         }
-        .erpnext-input:focus, .erpnext-textarea:focus {
+        .adugna-input:focus, .adugna-textarea:focus {
             outline: none;
-            border-color: #007bfc;
+            border-color: #1a73e8;
             background: #fff;
         }
-        .erpnext-label {
+        .adugna-label {
             font-weight: 500;
-            color: #36414c;
+            color: #1a1a1a;
             margin-bottom: 4px;
             display: block;
         }
-        .rating-stars { color: #ffd700; font-size: 1.5em; }
-        .feedback-history { margin-top: 30px; }
-        .main-content-container {
+        .adugna-rating-stars { color: #ffd700; font-size: 1.2em; }
+        .adugna-feedback-history { margin-top: 30px; }
+        .adugna-main-content-container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 40px 20px 0 20px;
+            padding: 32px 10px 0 10px;
         }
-        .star-rating {
+        .adugna-star-rating {
             direction: rtl;
             unicode-bidi: bidi-override;
             display: inline-block;
         }
-        .star-rating input[type="radio"] {
+        .adugna-star-rating input[type="radio"] {
             display: none;
         }
-        .star-rating label {
+        .adugna-star-rating label {
             color: #ccc;
             cursor: pointer;
             transition: color 0.2s;
+            font-size: 1.5em;
         }
-        .star-rating input[type="radio"]:checked ~ label,
-        .star-rating label:hover,
-        .star-rating label:hover ~ label {
+        .adugna-star-rating input[type="radio"]:checked ~ label,
+        .adugna-star-rating label:hover,
+        .adugna-star-rating label:hover ~ label {
             color: orange;
         }
-        .star-rating input[type="radio"]:checked ~ label {
+        .adugna-star-rating input[type="radio"]:checked ~ label {
             color: orange;
+        }
+        .adugna-feedback-item {
+            background: #f7fafd;
+            border-radius: 8px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+            padding: 12px 10px 16px 10px;
+            margin-bottom: 18px;
+            border: 1.5px solid #e3e8ef;
+        }
+        .adugna-feedback-item h4 {
+            margin: 0 0 4px 0;
+            font-size: 1.01rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .adugna-feedback-item small {
+            color: #888;
+            font-size: 0.85em;
+        }
+        .adugna-alert {
+            background: #e2efda;
+            color: #215967;
+            border: 1px solid #b7e4c7;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 0.97em;
+        }
+        .adugna-alert-error {
+            background: #ffeaea;
+            color: #e74c3c;
+            border: 1px solid #f5c6cb;
+        }
+        .adugna-alert-info {
+            background: #e3f0fc;
+            color: #1a73e8;
+            border: 1px solid #b3d8fd;
+        }
+        .adugna-alert-secondary {
+            background: #f5f7fa;
+            color: #36414c;
+            border: 1px solid #d1d8dd;
+        }
+        .adugna-icon {
+            font-size: 1em;
+            vertical-align: middle;
+            margin-right: 3px;
+        }
+        @media (max-width: 700px) {
+            .adugna-main-content-container {
+                padding: 6px 1vw;
+            }
+            .adugna-card {
+                padding: 10px 4px 14px 4px;
+            }
+            .adugna-feedback-item {
+                padding: 8px 4px 12px 4px;
+            }
+        }
+        @media (max-width: 400px) {
+            .adugna-main-content-container {
+                padding: 2px 0.5vw;
+            }
+            .adugna-card, .adugna-feedback-item {
+                padding: 4px 2px 8px 2px;
+            }
         }
     </style>
 </head>
 <body>
     <?php include 'includes/header.php'; ?>
-    <div class="main-content-container">
-        <div class="container" style="max-width:900px;">
+    <div class="adugna-main-content-container">
+        <div class="adugna-card">
             <div class="content">
-                <h2 style="color:#007bff;">
-                    <i class="fas fa-comment-alt"></i> Submit Feedback
+                <h2 style="color:#1a73e8;font-size:1.2em;">
+                    <i class="fas fa-comment-alt adugna-icon"></i> Submit Feedback
                 </h2>
 
                 <!-- Notification messages -->
                 <?php if (!empty($error)): ?>
-                    <div style="background:#ffeaea;color:#e74c3c;border:1px solid #f5c6cb;padding:10px 18px;border-radius:4px;margin-bottom:18px;">
-                        <i class="fa fa-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
+                    <div class="adugna-alert adugna-alert-error">
+                        <i class="fa fa-exclamation-triangle adugna-icon"></i> <?= htmlspecialchars($error) ?>
                     </div>
                 <?php elseif (!empty($success)): ?>
-                    <div style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;padding:10px 18px;border-radius:4px;margin-bottom:18px;">
-                        <i class="fa fa-check-circle"></i> <?= htmlspecialchars($success) ?>
+                    <div class="adugna-alert">
+                        <i class="fa fa-check-circle adugna-icon"></i> <?= htmlspecialchars($success) ?>
                     </div>
                 <?php endif; ?>
                 
                 <!-- Feedback Form -->
                 <form method="POST">
                     <div class="form-group">
-                        <label class="erpnext-label" for="subject">Subject: <span style="color:#e74c3c">*</span></label>
-                        <select name="subject" id="subject" class="erpnext-input" required>
+                        <label class="adugna-label" for="subject">Subject: <span style="color:#e74c3c">*</span></label>
+                        <select name="subject" id="subject" class="adugna-input" required>
                             <option value="">Select subject...</option>
                             <?php foreach ($subjects as $subject): ?>
                                 <option value="<?= htmlspecialchars($subject) ?>" <?= (isset($_POST['subject']) && $_POST['subject'] === $subject) ? 'selected' : '' ?>><?= htmlspecialchars($subject) ?></option>
@@ -189,13 +273,13 @@ $feedback->execute([$_SESSION['user_id']]);
                     </div>
                     
                     <div class="form-group">
-                        <label class="erpnext-label">Message: <span style="color:#e74c3c">*</span></label>
-                        <textarea name="message" rows="5" required class="erpnext-textarea"><?= htmlspecialchars($_POST['message'] ?? '') ?></textarea>
+                        <label class="adugna-label">Message: <span style="color:#e74c3c">*</span></label>
+                        <textarea name="message" rows="5" required class="adugna-textarea"><?= htmlspecialchars($_POST['message'] ?? '') ?></textarea>
                     </div>
                     
                     <div class="form-group">
-                        <label class="erpnext-label" for="rating">Rating: <span style="color:#e74c3c">*</span></label>
-                        <div class="star-rating" style="font-size:2em; color:gold;">
+                        <label class="adugna-label" for="rating">Rating: <span style="color:#e74c3c">*</span></label>
+                        <div class="adugna-star-rating">
                             <?php for ($i = 5; $i >= 1; $i--): ?>
                                 <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required style="display:none;" <?= (isset($_POST['rating']) && (int)$_POST['rating'] === $i) ? 'checked' : '' ?>>
                                 <label for="star<?= $i ?>" style="cursor:pointer;">&#9733;</label>
@@ -203,42 +287,42 @@ $feedback->execute([$_SESSION['user_id']]);
                         </div>
                     </div>
                     
-                    <button type="submit" class="erpnext-btn btn-primary">Submit Feedback</button>
+                    <button type="submit" class="adugna-btn adugna-btn-primary"><i class="fas fa-paper-plane adugna-icon"></i>Submit Feedback</button>
                 </form>
-
-                <!-- Feedback History -->
-                <div class="feedback-history">
-                    <h3>Your Previous Feedback</h3>
-                    <?php foreach ($feedback as $item): ?>
-                        <div class="feedback-item">
-                            <div class="rating-stars">
-                                <?= str_repeat('★', $item['rating']) . str_repeat('☆', 5 - $item['rating']) ?>
-                            </div>
-                            <h4><?= htmlspecialchars($item['subject']) ?></h4>
-                            <?= nl2br(htmlspecialchars_decode($item['message'])) ?>                        <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
-                            <?php if (!empty($item['admin_reply'])): ?>
-                                <div class="alert alert-info mt-2">
-                                    <strong>Admin Reply:</strong> <?= nl2br(htmlspecialchars($item['admin_reply'])) ?>
-                                </div>
-                                <?php if (empty($item['user_reply'])): ?>
-                                    <form method="post" class="mt-2">
-                                        <input type="hidden" name="feedback_id" value="<?= $item['id'] ?>">
-                                        <div class="form-group">
-                                            <label class="erpnext-label" for="user_reply_<?= $item['id'] ?>">Your Reply:</label>
-                                            <textarea name="user_reply" id="user_reply_<?= $item['id'] ?>" class="erpnext-textarea" rows="2" required></textarea>
-                                        </div>
-                                        <button type="submit" name="user_reply_submit" class="erpnext-btn btn-success">Send Reply</button>
-                                    </form>
-                                <?php else: ?>
-                                    <div class="alert alert-secondary mt-2">
-                                        <strong>Your Reply:</strong> <?= nl2br(htmlspecialchars($item['user_reply'])) ?>
-                                    </div>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
             </div>
+        </div>
+
+        <!-- Feedback History -->
+        <div class="adugna-feedback-history">
+            <h3 style="font-size:1.08em;">Your Previous Feedback</h3>
+            <?php foreach ($feedback as $item): ?>
+                <div class="adugna-feedback-item">
+                    <div class="adugna-rating-stars">
+                        <?= str_repeat('★', $item['rating']) . str_repeat('☆', 5 - $item['rating']) ?>
+                    </div>
+                    <h4><?= htmlspecialchars($item['subject']) ?></h4>
+                    <?= nl2br(htmlspecialchars_decode($item['message'])) ?>                        <small><?= date('M d, Y H:i', strtotime($item['created_at'])) ?></small>
+                    <?php if (!empty($item['admin_reply'])): ?>
+                        <div class="adugna-alert adugna-alert-info mt-2">
+                            <strong>Admin Reply:</strong> <?= nl2br(htmlspecialchars($item['admin_reply'])) ?>
+                        </div>
+                        <?php if (empty($item['user_reply'])): ?>
+                            <form method="post" class="mt-2">
+                                <input type="hidden" name="feedback_id" value="<?= $item['id'] ?>">
+                                <div class="form-group">
+                                    <label class="adugna-label" for="user_reply_<?= $item['id'] ?>">Your Reply:</label>
+                                    <textarea name="user_reply" id="user_reply_<?= $item['id'] ?>" class="adugna-textarea" rows="2" required></textarea>
+                                </div>
+                                <button type="submit" name="user_reply_submit" class="adugna-btn adugna-btn-success"><i class="fas fa-reply adugna-icon"></i>Send Reply</button>
+                            </form>
+                        <?php else: ?>
+                            <div class="adugna-alert adugna-alert-secondary mt-2">
+                                <strong>Your Reply:</strong> <?= nl2br(htmlspecialchars($item['user_reply'])) ?>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
