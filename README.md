@@ -107,7 +107,7 @@ School-CRM/
 - MySQL/MariaDB (Database)
 - JavaScript (Frontend, AJAX, Chart.js)
 - Node.js/Express (AI/REST API integration)
-- HTML5, CSS3 (Responsive, adugna-ERPNext-inspired UI)
+- HTML5, CSS3 (Responsive, adugna-inspired UI)
 - FontAwesome, Bootstrap Icons
 
 ---
