@@ -46,22 +46,17 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Fetch the current user and all columns
+// Fetch the current user and all columns, including role name
 $user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User session expired. Please login again.";
     header("Location: ../login.php");
     exit();
 }
-
-// Fetch role name (never show 'Unknown')
-$roleName = '';
-if (!empty($user['role_id'])) {
-    $stmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
-    $stmt->execute([$user['role_id']]);
-    $roleName = $stmt->fetchColumn() ?: '';
-}
-$user['role_name'] = $roleName;
+// Always fetch username, email, and role from users table (joined with roles)
+$username = $user['username'] ?? '';
+$email = $user['email'] ?? '';
+$roleName = $user['role_name'] ?? '';
 
 // Fetch extra fields from relevant role table
 $extraFields = [];
@@ -394,9 +389,9 @@ function sendPasswordChangeNotification($email) {
                      onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
             </div>
             <div class="profile-info">
-                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
-                <div class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
-                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown') ?></span>
+                <h3><?= htmlspecialchars($username) ?></h3>
+                <div class="card-text"><?= htmlspecialchars($email) ?></div>
+                <span class="badge bg-primary"><?= htmlspecialchars($roleName) ?></span>
                 <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login']) ?? '') : 'Never' ?></div>
             </div>
         </div>
@@ -430,7 +425,7 @@ function sendPasswordChangeNotification($email) {
                             <label for="username" class="form-label">Username:</label>
                             <input type="text" id="username" name="username" 
                                    class="erpnext-input"
-                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
+                                   value="<?= htmlspecialchars($username) ?>" 
                                    required
                                    pattern="[a-zA-Z0-9_]{3,30}"
                                    title="3-30 characters (letters, numbers, underscores)">
@@ -439,7 +434,7 @@ function sendPasswordChangeNotification($email) {
                             <label for="email" class="form-label">Email:</label>
                             <input type="email" id="email" name="email" 
                                    class="erpnext-input"
-                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
+                                   value="<?= htmlspecialchars($email) ?>" 
                                    required>
                         </div>
                         <div class="mb-3">
@@ -463,7 +458,7 @@ function sendPasswordChangeNotification($email) {
                         <?php endforeach; ?>
                         <div class="mb-3">
                             <label class="form-label">Role:</label>
-                            <input type="text" class="erpnext-input" value="<?= htmlspecialchars($user['role_name']) ?>" readonly>
+                            <input type="text" class="erpnext-input" value="<?= htmlspecialchars($roleName) ?>" readonly>
                         </div>
                         <button type="submit" class="erpnext-btn btn-primary w-100">Update Profile</button>
                     </form>
