@@ -496,20 +496,33 @@ function adugna_display_profile_field($key, $val) {
                      onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
             </div>
             <div class="adugna-profile-info">
-                <h3><?= htmlspecialchars($user['username']) ?></h3>
-                <div class="adugna-card-text"><?= htmlspecialchars($user['email']) ?></div>
-                <span class="adugna-badge"><?= htmlspecialchars($user['role_name']) ?></span>
-                <div class="adugna-text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : '' ?></div>
+                <?php
+                // Defensive: always set to empty string if not set to avoid warnings/deprecation
+                $username = isset($user['username']) ? $user['username'] : '';
+                $email = isset($user['email']) ? $user['email'] : '';
+                $roleName = isset($user['role_name']) ? $user['role_name'] : '';
+                ?>
+                <h3><?= htmlspecialchars($username) ?></h3>
+                <div class="adugna-card-text"><?= htmlspecialchars($email) ?></div>
+                <span class="adugna-badge"><?= htmlspecialchars($roleName) ?></span>
+                <div class="adugna-text-muted mt-2">
+                    Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : '' ?>
+                </div>
             </div>
         </div>
 
+        <?php
+        // Show only the relevant profile details card for the user's role
+        if ($role === 'teacher' && !empty($profileData)) {
+        ?>
         <div class="adugna-profile-form-card" style="margin-bottom:12px;">
             <div class="adugna-card-header adugna-bg-secondary">
-                <span>Additional Profile Details</span>
+                <span>Teacher Profile Details</span>
             </div>
             <div class="card-body">
                 <ul style="list-style:none;padding:0;margin:0;">
                     <?php foreach ($profileData as $key => $val): ?>
+                        <?php if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue; ?>
                         <li style="margin-bottom:4px;font-size:0.97em;">
                             <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= adugna_display_profile_field($key, $val) ?>
                         </li>
@@ -517,6 +530,43 @@ function adugna_display_profile_field($key, $val) {
                 </ul>
             </div>
         </div>
+        <?php
+        } elseif ($role === 'parent' && !empty($profileData)) {
+        ?>
+        <div class="adugna-profile-form-card" style="margin-bottom:12px;">
+            <div class="adugna-card-header adugna-bg-secondary">
+                <span>Parent Profile Details</span>
+            </div>
+            <div class="card-body">
+                <ul style="list-style:none;padding:0;margin:0;">
+                    <?php foreach ($profileData as $key => $val): ?>
+                        <?php if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue; ?>
+                        <li style="margin-bottom:4px;font-size:0.97em;">
+                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= adugna_display_profile_field($key, $val) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php
+        } elseif ($role === 'student' && !empty($profileData)) {
+        ?>
+        <div class="adugna-profile-form-card" style="margin-bottom:12px;">
+            <div class="adugna-card-header adugna-bg-secondary">
+                <span>Student Profile Details</span>
+            </div>
+            <div class="card-body">
+                <ul style="list-style:none;padding:0;margin:0;">
+                    <?php foreach ($profileData as $key => $val): ?>
+                        <?php if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue; ?>
+                        <li style="margin-bottom:4px;font-size:0.97em;">
+                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= adugna_display_profile_field($key, $val) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php } ?>
 
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -547,7 +597,7 @@ function adugna_display_profile_field($key, $val) {
                             <label for="username" class="form-label">Username:</label>
                             <input type="text" id="username" name="username"
                                    class="adugna-input"
-                                   value="<?= htmlspecialchars($user['username']) ?>"
+                                   value="<?= htmlspecialchars($username) ?>"
                                    required
                                    pattern="[a-zA-Z0-9_]{3,30}"
                                    title="3-30 characters (letters, numbers, underscores)">
@@ -556,12 +606,12 @@ function adugna_display_profile_field($key, $val) {
                             <label for="email" class="form-label">Email:</label>
                             <input type="email" id="email" name="email"
                                    class="adugna-input"
-                                   value="<?= htmlspecialchars($user['email']) ?>"
+                                   value="<?= htmlspecialchars($email) ?>"
                                    required>
                         </div>
                         <div class="mb-3">
                             <label for="role" class="form-label">Role:</label>
-                            <input type="text" class="adugna-input" value="<?= htmlspecialchars($user['role_name']) ?>" readonly>
+                            <input type="text" class="adugna-input" value="<?= htmlspecialchars($roleName) ?>" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="avatar" class="form-label">Profile Picture:</label>
@@ -571,7 +621,7 @@ function adugna_display_profile_field($key, $val) {
                             <small class="form-text adugna-text-muted">Max 2MB (JPG, PNG, GIF only)</small>
                         </div>
                         <?php
-                        // Render editable fields for extra profile details
+                        // Render editable fields for extra profile details, only for the user's role
                         foreach ($profileData as $key => $val):
                             if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue;
                             $label = ucwords(str_replace('_', ' ', $key));
