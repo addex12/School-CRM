@@ -128,9 +128,9 @@ function handleProfileUpdate($pdo, $user, $userId) {
         if ($stmt->fetch()) {
             $_SESSION['error'] = "Email is already in use by another account.";
         } else {
-            $avatar = handleAvatarUpload($user, $userId);
+            $avatar = handleAvatarUpload($user, $userId); // This will return the new filename if uploaded, or the old one
             if ($avatar !== false) {
-                // Update user details
+                // Always use the new avatar filename if a new file was uploaded
                 $set = 'username = ?, email = ?, avatar = ?';
                 $params = [$username, $email, $avatar, $userId];
                 foreach ($userFields as $col => $val) {
