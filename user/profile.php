@@ -217,6 +217,37 @@ function sendPasswordChangeNotification($email) {
     error_log("Password changed notification sent to: $email");
 }
 
+// Helper function to display profile fields safely and user-friendly
+function adugna_display_profile_field($key, $val) {
+    /**
+     * Developer: Adugna Gizaw
+     * Email: gizawadugna@gmail.com
+     * LinkedIn: https://www.linkedin.com/in/eleganceict
+     * Twitter: https://twitter.com/eleganceict1
+     * GitHub: https://github.com/addex12
+     */
+    // If value is null or empty, show 'N/A' for clarity
+    if (is_null($val) || $val === '') return '<span class="adugna-text-muted">N/A</span>';
+    // For date fields, format nicely
+    if (stripos($key, 'date') !== false && strtotime($val)) {
+        return htmlspecialchars(date('M d, Y', strtotime($val)));
+    }
+    // For status, capitalize
+    if ($key === 'status') {
+        return '<span class="adugna-badge" style="background:#28a745;">' . htmlspecialchars(ucfirst($val)) . '</span>';
+    }
+    // For phone, format
+    if ($key === 'phone') {
+        return '<a href="tel:' . htmlspecialchars($val) . '" class="adugna-link">' . htmlspecialchars($val) . '</a>';
+    }
+    // For class_id, section_id, show as ID or N/A
+    if (in_array($key, ['class_id','section_id']) && !$val) {
+        return '<span class="adugna-text-muted">N/A</span>';
+    }
+    // Default: escape value
+    return htmlspecialchars($val);
+}
+
 ?>
 
 <style>
@@ -386,7 +417,7 @@ function sendPasswordChangeNotification($email) {
                 <ul style="list-style:none;padding:0;margin:0;">
                     <?php foreach ($profileData as $key => $val): ?>
                         <li style="margin-bottom:4px;font-size:0.97em;">
-                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= htmlspecialchars($val) ?>
+                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= adugna_display_profile_field($key, $val) ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
