@@ -215,13 +215,13 @@ Screenshots of the Adugna School CRM System in action:
   <img src="Screenshots/admin-dashboard.png" alt="Admin Dashboard" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/bulk-email.png" alt="Bulk Email" width="800"/>
+  <img src="Screenshots/admin-bulk-email.png" alt="Bulk Email" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/announcements.png" alt="Announcements" width="800"/>
+  <img src="Screenshots/admin-announcements.png" alt="Announcements" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/active-users.png" alt="Active Users" width="800"/>
+  <img src="Screenshots/admin-active-users.png" alt="Active Users" width="800"/>
 </p>
 
 ---
