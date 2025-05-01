@@ -220,153 +220,179 @@ function sendPasswordChangeNotification($email) {
 ?>
 
 <style>
-/* Profile Page Custom Styles */
-.profile-main-container {
-    max-width: 800px;
-    margin: 40px auto;
+/* Adugna CRM Profile Custom Styles - adugna- prefix for patenting */
+.adugna-profile-main-container {
+    max-width: 900px;
+    margin: 2vw auto;
     background: #fff;
-    border-radius: 8px; /* Smaller card styling */
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); /* Lighter shadow */
-    padding: 24px; /* Reduced padding */
+    border-radius: 10px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    padding: 2vw 2vw 1vw 2vw;
 }
-.profile-header {
+.adugna-profile-header {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 1.5vw;
 }
-.profile-avatar {
-    width: 100px; /* Smaller avatar size */
-    height: 100px;
-    margin-bottom: 12px;
+.adugna-profile-avatar {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 10px;
     border-radius: 50%;
     overflow: hidden;
-    border: 3px solid #007bff;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
-    background: #f8f9fa;
+    border: 2px solid #1a73e8;
+    background: #f3f6fa;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.profile-avatar img {
+.adugna-profile-avatar img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-.profile-info {
+.adugna-profile-info {
     text-align: center;
 }
-.profile-info h3 {
-    margin: 0 0 6px 0;
-    font-size: 1.25rem; /* Smaller font size */
-    color: #222;
+.adugna-profile-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    color: #1a1a1a;
+    font-weight: 600;
 }
-.profile-info .card-text {
+.adugna-profile-info .adugna-card-text {
     color: #555;
+    margin-bottom: 2px;
+    font-size: 0.97em;
+}
+.adugna-profile-info .adugna-badge {
+    font-size: 0.85rem;
     margin-bottom: 4px;
+    background: #1a73e8;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    display: inline-block;
 }
-.profile-info .badge {
-    font-size: 0.9rem; /* Smaller badge size */
-    margin-bottom: 6px;
+.adugna-profile-info .adugna-text-muted {
+    font-size: 0.8rem;
+    color: #888;
 }
-.profile-info .text-muted {
-    font-size: 0.85rem; /* Smaller text size */
-}
-.profile-forms-row {
+.adugna-profile-forms-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px; /* Reduced gap */
-    margin-top: 16px;
+    gap: 12px;
+    margin-top: 12px;
 }
-.profile-form-card {
-    flex: 1 1 340px;
-    background: #f8fafd;
+.adugna-profile-form-card {
+    flex: 1 1 320px;
+    background: #f7fafd;
     border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-    padding: 18px; /* Reduced padding */
-    min-width: 320px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    padding: 14px 14px 10px 14px;
+    min-width: 260px;
 }
-.profile-form-card .card-header {
-    background: #007bff;
+.adugna-profile-form-card .adugna-card-header {
+    background: #1a73e8;
     color: #fff;
     border-radius: 8px 8px 0 0;
-    padding: 10px 16px; /* Reduced padding */
-    margin: -18px -16px 16px -16px;
+    padding: 7px 12px;
+    margin: -14px -14px 10px -14px;
+    font-size: 1em;
 }
-.profile-form-card .card-header.bg-secondary {
-    background: #6c757d;
+.adugna-profile-form-card .adugna-card-header.adugna-bg-secondary {
+    background: #5a6268;
 }
-.erpnext-btn {
+.adugna-btn {
     background: #f5f7fa;
-    color: #36414c;
+    color: #1a1a1a;
     border: 1px solid #d1d8dd;
     border-radius: 4px;
-    padding: 6px 12px; /* Smaller button size */
-    font-size: 0.875rem; /* Smaller font size */
+    padding: 5px 10px;
+    font-size: 0.89rem;
     font-weight: 500;
     transition: background 0.2s, color 0.2s;
     cursor: pointer;
+    min-width: 80px;
 }
-.erpnext-btn.btn-primary {
-    background: #007bfc;
+.adugna-btn.adugna-btn-primary {
+    background: #1a73e8;
     color: #fff;
-    border-color: #007bfc;
+    border-color: #1a73e8;
 }
-.erpnext-btn.btn-primary:hover {
-    background: #0056b3;
+.adugna-btn.adugna-btn-primary:hover {
+    background: #155ab6;
     color: #fff;
 }
-.erpnext-btn.btn-secondary {
-    background: #6c757d;
-    color: #fff;
-    border-color: #6c757d;
-}
-.erpnext-btn.btn-secondary:hover {
+.adugna-btn.adugna-btn-secondary {
     background: #5a6268;
+    color: #fff;
+    border-color: #5a6268;
 }
-.erpnext-input, .erpnext-textarea {
+.adugna-btn.adugna-btn-secondary:hover {
+    background: #444b50;
+}
+.adugna-input, .adugna-textarea {
     border: 1px solid #d1d8dd;
     border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 0.875rem; /* Smaller font size */
+    padding: 7px 10px;
+    font-size: 0.89rem;
     background: #f5f7fa;
-    color: #36414c;
+    color: #1a1a1a;
 }
-.erpnext-input:focus, .erpnext-textarea:focus {
+.adugna-input:focus, .adugna-textarea:focus {
     outline: none;
-    border-color: #007bfc;
+    border-color: #1a73e8;
     background: #fff;
 }
 @media (max-width: 600px) {
-    .profile-main-container {
-        padding: 10px 2vw;
+    .adugna-profile-main-container {
+        padding: 8px 1vw;
     }
-    .profile-header {
+    .adugna-profile-header {
         padding: 0;
     }
-    .profile-forms-row {
+    .adugna-profile-forms-row {
         flex-direction: column;
-        gap: 12px; /* Reduced gap for smaller screens */
+        gap: 8px;
     }
 }
 </style>
 
 <?php include_once 'includes/header.php'; ?>
 <div class="main-content-container">
-    <div class="profile-main-container">
-        <div class="profile-header">
-            <div class="profile-avatar">
-                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
+    <div class="adugna-profile-main-container">
+        <div class="adugna-profile-header">
+            <div class="adugna-profile-avatar">
+                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>"
                      alt="Profile Picture"
                      onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
             </div>
-            <div class="profile-info">
+            <div class="adugna-profile-info">
                 <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
-                <div class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
-                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
-                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
+                <div class="adugna-card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
+                <span class="adugna-badge"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                <div class="adugna-text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
             </div>
         </div>
+
+        <?php if (!empty($profileData)): ?>
+        <div class="adugna-profile-form-card" style="margin-bottom:12px;">
+            <div class="adugna-card-header adugna-bg-secondary">
+                <span>Additional Profile Details</span>
+            </div>
+            <div class="card-body">
+                <ul style="list-style:none;padding:0;margin:0;">
+                    <?php foreach ($profileData as $key => $val): ?>
+                        <li style="margin-bottom:4px;font-size:0.97em;">
+                            <strong><?= ucwords(str_replace('_', ' ', $key)) ?>:</strong> <?= htmlspecialchars($val) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -384,10 +410,10 @@ function sendPasswordChangeNotification($email) {
             <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
 
-        <div class="profile-forms-row">
-            <div class="profile-form-card">
-                <div class="card-header">
-                    <h5 class="mb-0">Profile Information</h5>
+        <div class="adugna-profile-forms-row">
+            <div class="adugna-profile-form-card">
+                <div class="adugna-card-header">
+                    <h5 class="mb-0" style="font-size:1em;">Profile Information</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
@@ -395,35 +421,35 @@ function sendPasswordChangeNotification($email) {
                         <input type="hidden" name="update_profile" value="1">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username:</label>
-                            <input type="text" id="username" name="username" 
-                                   class="erpnext-input"
-                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>" 
+                            <input type="text" id="username" name="username"
+                                   class="adugna-input"
+                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>"
                                    required
                                    pattern="[a-zA-Z0-9_]{3,30}"
                                    title="3-30 characters (letters, numbers, underscores)">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email:</label>
-                            <input type="email" id="email" name="email" 
-                                   class="erpnext-input"
-                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>" 
+                            <input type="email" id="email" name="email"
+                                   class="adugna-input"
+                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>"
                                    required>
                         </div>
                         <div class="mb-3">
                             <label for="avatar" class="form-label">Profile Picture:</label>
-                            <input type="file" id="avatar" name="avatar" 
-                                   class="erpnext-input"
+                            <input type="file" id="avatar" name="avatar"
+                                   class="adugna-input"
                                    accept="image/jpeg,image/png,image/gif">
-                            <small class="form-text text-muted">Max 2MB (JPG, PNG, GIF only)</small>
+                            <small class="form-text adugna-text-muted">Max 2MB (JPG, PNG, GIF only)</small>
                         </div>
-                        <button type="submit" class="erpnext-btn btn-primary w-100">Update Profile</button>
+                        <button type="submit" class="adugna-btn adugna-btn-primary w-100">Update Profile</button>
                     </form>
                 </div>
             </div>
 
-            <div class="profile-form-card">
-                <div class="card-header bg-secondary">
-                    <h5 class="mb-0">Change Password</h5>
+            <div class="adugna-profile-form-card">
+                <div class="adugna-card-header adugna-bg-secondary">
+                    <h5 class="mb-0" style="font-size:1em;">Change Password</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST">
@@ -431,24 +457,24 @@ function sendPasswordChangeNotification($email) {
                         <input type="hidden" name="change_password" value="1">
                         <div class="mb-3">
                             <label for="current_password" class="form-label">Current Password:</label>
-                            <input type="password" id="current_password" name="current_password" 
-                                   class="erpnext-input" required>
+                            <input type="password" id="current_password" name="current_password"
+                                   class="adugna-input" required>
                         </div>
                         <div class="mb-3">
                             <label for="new_password" class="form-label">New Password:</label>
-                            <input type="password" id="new_password" name="new_password" 
-                                   class="erpnext-input"
+                            <input type="password" id="new_password" name="new_password"
+                                   class="adugna-input"
                                    required
                                    pattern="(?=.*\d)(?=.*[A-Z]).{8,}"
                                    title="Must contain at least one number, one uppercase letter, and be at least 8 characters">
-                            <small class="form-text text-muted">Minimum 8 characters with at least one number and uppercase letter</small>
+                            <small class="form-text adugna-text-muted">Minimum 8 characters with at least one number and uppercase letter</small>
                         </div>
                         <div class="mb-3">
                             <label for="confirm_password" class="form-label">Confirm New Password:</label>
-                            <input type="password" id="confirm_password" name="confirm_password" 
-                                   class="erpnext-input" required>
+                            <input type="password" id="confirm_password" name="confirm_password"
+                                   class="adugna-input" required>
                         </div>
-                        <button type="submit" class="erpnext-btn btn-secondary w-100">Change Password</button>
+                        <button type="submit" class="adugna-btn adugna-btn-secondary w-100">Change Password</button>
                     </form>
                 </div>
             </div>
