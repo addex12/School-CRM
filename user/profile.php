@@ -52,7 +52,7 @@ if (!$user) {
     exit();
 }
 $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-$stmt->execute([$user['id']]);
+$stmt->execute([$user['id']] ?? '');
 // Always fetch username, email, and role from users table (joined with roles)
 $username = $user['username'] ?? '';
 $email = $user['email'] ?? '';
