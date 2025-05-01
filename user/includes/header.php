@@ -347,7 +347,7 @@ if (isset($_SESSION['user_id'])) {
                             New Announcements
                             <span class="notification-count"><?= $newAnnouncementCount ?></span>
                         </a>
-                        <a href="tickets.php">
+                        <a href="contact.php">
                             <i class="fas fa-ticket-alt"></i>
                             Ticket Responses
                             <span class="notification-count"><?= $newTicketResponseCount ?></span>
