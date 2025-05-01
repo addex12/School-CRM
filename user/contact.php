@@ -25,113 +25,122 @@ if ($user_id) {
 ?>
 
 <style>
-.contact-main-container {
+/* Adugna: Contact Support Page Custom Styles - Compact, Responsive, and Branded */
+.adugna-contact-main-container {
     max-width: 600px;
     margin: 40px auto 0 auto;
     background: #fff;
-    border-radius: 8px; /* Adjusted for smaller card styling */
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05); /* Lighter shadow */
-    padding: 24px; /* Reduced padding */
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    padding: 18px 10px 24px 10px;
 }
-.contact-header {
+.adugna-contact-header {
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 24px;
 }
-.contact-header h2 {
-    color: #007bff;
-    font-size: 1.5rem; /* Smaller font size */
-    margin-bottom: 8px;
+.adugna-contact-header h2 {
+    color: #1a73e8;
+    font-size: 1.18rem;
+    margin-bottom: 6px;
 }
-.contact-header i {
-    margin-right: 8px;
-    font-size: 1.2rem; /* Smaller icon size */
+.adugna-contact-header i {
+    margin-right: 7px;
+    font-size: 1.08rem;
 }
-.contact-form .form-group {
-    margin-bottom: 18px;
+.adugna-contact-form .adugna-form-group {
+    margin-bottom: 15px;
 }
 body, input, textarea, select, button {
     font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
     font-size: 15px;
 }
-.erpnext-btn {
+.adugna-btn {
     background: #f5f7fa;
-    color: #36414c;
-    border: 1px solid #d1d8dd;
+    color: #1a1a1a;
+    border: 1.2px solid #d1d8dd;
     border-radius: 4px;
-    padding: 6px 12px; /* Reduced padding */
-    font-size: 0.875rem; /* Smaller font size */
+    padding: 4px 10px;
+    font-size: 0.89rem;
     font-weight: 500;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.18s, color 0.18s;
     cursor: pointer;
+    min-width: 80px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
-.erpnext-btn.btn-primary {
-    background: #007bfc;
+.adugna-btn.adugna-btn-primary {
+    background: #1a73e8;
     color: #fff;
-    border-color: #007bfc;
+    border-color: #1a73e8;
 }
-.erpnext-btn.btn-primary:hover {
-    background: #0056b3;
+.adugna-btn.adugna-btn-primary:hover {
+    background: #155ab6;
     color: #fff;
 }
-.erpnext-input, .erpnext-textarea {
-    border: 1px solid #d1d8dd;
+.adugna-input, .adugna-textarea {
+    border: 1.2px solid #d1d8dd;
     border-radius: 4px;
-    padding: 8px 12px;
-    font-size: 15px;
+    padding: 6px 10px;
+    font-size: 0.89rem;
     background: #f5f7fa;
-    color: #36414c;
+    color: #1a1a1a;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 2px;
 }
-.erpnext-input:focus, .erpnext-textarea:focus {
+.adugna-input:focus, .adugna-textarea:focus {
     outline: none;
-    border-color: #007bfc;
+    border-color: #1a73e8;
     background: #fff;
 }
-.erpnext-label {
+.adugna-label {
     font-weight: 500;
-    color: #36414c;
+    color: #1a1a1a;
     margin-bottom: 4px;
     display: block;
 }
 @media (max-width: 700px) {
-    .contact-main-container {
-        padding: 12px 2vw;
+    .adugna-contact-main-container {
+        padding: 10px 2vw;
     }
 }
-.main-content-container {
+.adugna-main-content-container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 40px 20px 0 20px;
 }
-.ticket-table {
+.adugna-ticket-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 18px;
 }
-.ticket-table th, .ticket-table td {
-    border: 1px solid #ddd;
-    padding: 6px; /* Reduced padding */
-    font-size: 0.875rem; /* Smaller font size */
+.adugna-ticket-table th, .adugna-ticket-table td {
+    border: 1px solid #e3e8ef;
+    padding: 5px;
+    font-size: 0.89rem;
     text-align: left;
 }
-.ticket-table th {
+.adugna-ticket-table th {
     background-color: #f5f7fa;
-    color: #36414c;
+    color: #1a73e8;
 }
-.ticket-actions a {
-    margin-right: 10px;
+.adugna-ticket-actions a {
+    margin-right: 8px;
     text-decoration: none;
-    color: #007bfc;
-    font-size: 0.875rem; /* Smaller font size */
+    color: #1a73e8;
+    font-size: 0.89rem;
 }
-.ticket-actions a:hover {
+.adugna-ticket-actions a:hover {
     text-decoration: underline;
 }
 </style>
 
 <?php include_once __DIR__ . '/includes/header.php'; ?>
-<div class="main-content-container">
-    <div class="contact-main-container">
-        <div class="contact-header">
+<div class="adugna-main-content-container">
+    <div class="adugna-contact-main-container">
+        <div class="adugna-contact-header">
             <h2>
                 <i class="fas fa-headset"></i> Contact Support
             </h2>
@@ -150,17 +159,15 @@ body, input, textarea, select, button {
         <?php endif; ?>
 
         <!-- Support Ticket Form -->
-        <form id="contact-form" class="contact-form" action="contact-submit.php" method="POST" enctype="multipart/form-data">
+        <form id="contact-form" class="adugna-contact-form" action="contact-submit.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="user_id" value="<?= $user_id ?>">
-            
-            <div class="form-group">
-                <label class="erpnext-label" for="email">Your Email</label>
-                <input type="email" id="email" name="email" class="erpnext-input" value="<?= htmlspecialchars($user_email) ?>" required>
+            <div class="adugna-form-group">
+                <label class="adugna-label" for="email">Your Email</label>
+                <input type="email" id="email" name="email" class="adugna-input" value="<?= htmlspecialchars($user_email) ?>" required>
             </div>
-            
-            <div class="form-group">
-                <label class="erpnext-label" for="subject">Subject</label>
-                <select id="subject" name="subject" class="erpnext-input" required onchange="toggleCustomSubject(this)">
+            <div class="adugna-form-group">
+                <label class="adugna-label" for="subject">Subject</label>
+                <select id="subject" name="subject" class="adugna-input" required onchange="toggleCustomSubject(this)">
                     <option value="" disabled selected>Select a subject</option>
                     <option value="Technical Issue">Technical Issue</option>
                     <option value="Billing Inquiry">Billing Inquiry</option>
@@ -169,37 +176,33 @@ body, input, textarea, select, button {
                     <option value="Feedback">Feedback</option>
                     <option value="Other">Other</option>
                 </select>
-                <input type="text" id="custom-subject" name="custom_subject" class="erpnext-input" placeholder="Enter custom subject" style="display:none; margin-top:10px;">
+                <input type="text" id="custom-subject" name="custom_subject" class="adugna-input" placeholder="Enter custom subject" style="display:none; margin-top:10px;">
             </div>
-            
-            <div class="form-group">
-                <label class="erpnext-label" for="priority">Priority</label>
-                <select id="priority" name="priority" class="erpnext-input" required>
+            <div class="adugna-form-group">
+                <label class="adugna-label" for="priority">Priority</label>
+                <select id="priority" name="priority" class="adugna-input" required>
                     <option value="low">Low</option>
                     <option value="medium" selected>Medium</option>
                     <option value="high">High</option>
                     <option value="critical">Critical</option>
                 </select>
             </div>
-            
-            <div class="form-group">
-                <label class="erpnext-label" for="message">Message</label>
-                <textarea id="message" name="message" class="erpnext-textarea" rows="5" required></textarea>
+            <div class="adugna-form-group">
+                <label class="adugna-label" for="message">Message</label>
+                <textarea id="message" name="message" class="adugna-textarea" rows="5" required></textarea>
             </div>
-            
-            <div class="form-group">
-                <label class="erpnext-label" for="attachment">Attachment (if any)</label>
-                <input type="file" id="attachment" name="attachment" class="erpnext-input">
+            <div class="adugna-form-group">
+                <label class="adugna-label" for="attachment">Attachment (if any)</label>
+                <input type="file" id="attachment" name="attachment" class="adugna-input">
                 <small class="text-muted">Max 5MB (PDF, JPG, PNG, DOCX allowed)</small>
             </div>
-            
-            <button type="submit" class="erpnext-btn btn-primary">Submit Ticket</button>
+            <button type="submit" class="adugna-btn adugna-btn-primary">Submit Ticket</button>
         </form>
 
         <!-- Display User's Support Tickets -->
         <h3>Your Support Tickets</h3>
         <?php if (count($tickets) > 0): ?>
-            <table class="ticket-table">
+            <table class="adugna-ticket-table">
                 <thead>
                     <tr>
                         <th>Ticket #</th>
@@ -218,7 +221,7 @@ body, input, textarea, select, button {
                             <td><?= htmlspecialchars($ticket['priority']) ?></td>
                             <td><?= htmlspecialchars($ticket['status']) ?></td>
                             <td><?= htmlspecialchars($ticket['created_at']) ?></td>
-                            <td class="ticket-actions">
+                            <td class="adugna-ticket-actions">
                                 <a href="view-ticket.php?id=<?= urlencode($ticket['id']) ?>">View</a>
                                 <a href="edit-ticket.php?id=<?= urlencode($ticket['id']) ?>">Edit</a>
                                 <a href="delete-ticket.php?id=<?= urlencode($ticket['id']) ?>" onclick="return confirm('Are you sure you want to delete this ticket?');">Delete</a>
@@ -233,9 +236,9 @@ body, input, textarea, select, button {
     </div>
 </div>
 <?php include_once __DIR__ . '/includes/footer.php'; ?>
-</div>
 <script src="../includes/activity-tracker.js"></script>
 <script>
+    // Adugna: Show custom subject input if 'Other' is selected
     function toggleCustomSubject(select) {
         const customSubjectInput = document.getElementById('custom-subject');
         if (select.value === 'Other') {
