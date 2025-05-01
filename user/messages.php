@@ -262,6 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
             white-space: nowrap;
             z-index: 10;
             box-shadow: 0 2px 8px rgba(44,62,80,0.09);
+            pointer-events: none; /* Ensure not clickable */
         }
         .adugna-contact-item:hover .adugna-contact-tooltip,
         .adugna-contact-item:focus .adugna-contact-tooltip {
@@ -313,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                                         <?= $unreadCounts[$user['id']] ?>
                                     </span>
                                 <?php endif; ?>
-                                <!-- Hover tooltip for chat (not a button, just a hover text) -->
+                                <!-- Tooltip only, not a button. Only shown on hover/focus via CSS. -->
                                 <span class="adugna-contact-tooltip" style="font-size:0.91em;padding:3px 8px;">
                                     <i class="fa fa-hand-pointer"></i> Chat
                                 </span>
