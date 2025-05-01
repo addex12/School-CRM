@@ -1,6 +1,11 @@
 #!/bin/bash
 
 # Usage: ./upload-release-asset.sh <tag> <file>
+# Tagging suggestions:
+#   - Use semantic versioning: v1.0.0, v2.3.4, etc.
+#   - For pre-releases: v0.2.0-alpha, v5.9-beta.3, etc.
+#   - See https://semver.org/ for more info.
+
 TAG=$1
 FILE=$2
 REPO="addex12/School-CRM"
