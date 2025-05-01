@@ -496,10 +496,10 @@ function adugna_display_profile_field($key, $val) {
                      onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
             </div>
             <div class="adugna-profile-info">
-                <h3><?= htmlspecialchars($user['username'] ?? '') ?></h3>
-                <div class="adugna-card-text"><?= htmlspecialchars($user['email'] ?? '') ?></div>
-                <span class="adugna-badge"><?= htmlspecialchars($user['role_name'] ?? '') ?></span>
-                <div class="adugna-text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
+                <h3><?= htmlspecialchars($user['username']) ?></h3>
+                <div class="adugna-card-text"><?= htmlspecialchars($user['email']) ?></div>
+                <span class="adugna-badge"><?= htmlspecialchars($user['role_name']) ?></span>
+                <div class="adugna-text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : '' ?></div>
             </div>
         </div>
 
@@ -520,7 +520,7 @@ function adugna_display_profile_field($key, $val) {
 
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['success'] ?? '') ?>
+                <?= htmlspecialchars($_SESSION['success']) ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <?php unset($_SESSION['success']); ?>
@@ -528,7 +528,7 @@ function adugna_display_profile_field($key, $val) {
 
         <?php if (isset($_SESSION['error'])): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <?= htmlspecialchars($_SESSION['error'] ?? '') ?>
+                <?= htmlspecialchars($_SESSION['error']) ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <?php unset($_SESSION['error']); ?>
@@ -547,7 +547,7 @@ function adugna_display_profile_field($key, $val) {
                             <label for="username" class="form-label">Username:</label>
                             <input type="text" id="username" name="username"
                                    class="adugna-input"
-                                   value="<?= htmlspecialchars($user['username'] ?? '') ?>"
+                                   value="<?= htmlspecialchars($user['username']) ?>"
                                    required
                                    pattern="[a-zA-Z0-9_]{3,30}"
                                    title="3-30 characters (letters, numbers, underscores)">
@@ -556,12 +556,12 @@ function adugna_display_profile_field($key, $val) {
                             <label for="email" class="form-label">Email:</label>
                             <input type="email" id="email" name="email"
                                    class="adugna-input"
-                                   value="<?= htmlspecialchars($user['email'] ?? '') ?>"
+                                   value="<?= htmlspecialchars($user['email']) ?>"
                                    required>
                         </div>
                         <div class="mb-3">
                             <label for="role" class="form-label">Role:</label>
-                            <input type="text" class="adugna-input" value="<?= htmlspecialchars($user['role_name'] ?? '') ?>" readonly>
+                            <input type="text" class="adugna-input" value="<?= htmlspecialchars($user['role_name']) ?>" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="avatar" class="form-label">Profile Picture:</label>
@@ -573,7 +573,6 @@ function adugna_display_profile_field($key, $val) {
                         <?php
                         // Render editable fields for extra profile details
                         foreach ($profileData as $key => $val):
-                            // Skip if key is not editable (e.g., status, id)
                             if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue;
                             $label = ucwords(str_replace('_', ' ', $key));
                             $type = 'text';
