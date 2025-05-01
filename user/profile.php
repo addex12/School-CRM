@@ -46,13 +46,44 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Fetch the current user
+// Fetch the current user and all columns
 $user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User session expired. Please login again.";
     header("Location: ../login.php");
     exit();
 }
+
+// Fetch role name (never show 'Unknown')
+$roleName = '';
+if (!empty($user['role_id'])) {
+    $stmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+    $stmt->execute([$user['role_id']]);
+    $roleName = $stmt->fetchColumn() ?: '';
+}
+$user['role_name'] = $roleName;
+
+// Fetch extra fields from relevant role table
+$extraFields = [];
+$roleTable = '';
+$roleKey = '';
+if ($roleName === 'teacher') {
+    $roleTable = 'teachers'; $roleKey = 'user_id';
+} elseif ($roleName === 'student') {
+    $roleTable = 'students'; $roleKey = 'user_id';
+} elseif ($roleName === 'parent') {
+    $roleTable = 'parents'; $roleKey = 'user_id';
+}
+if ($roleTable) {
+    $stmt = $pdo->prepare("SELECT * FROM $roleTable WHERE $roleKey = ? LIMIT 1");
+    $stmt->execute([$user['id']]);
+    $extraFields = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+}
+
+// Get all user table columns except id, password, role_id, avatar, username, email, created_at, last_active, last_login, online, active, tracking_token, remember_token
+$userColumns = array_diff(array_keys($user), ['id','password','role_id','avatar','username','email','created_at','last_active','last_login','online','active','tracking_token','remember_token','role_name']);
+// Get all extra fields except id, user_id, created_at, status
+$extraColumns = $extraFields ? array_diff(array_keys($extraFields), ['id','user_id','created_at','status']) : [];
 
 // Define user ID
 $userId = $_SESSION['user_id'];
@@ -81,6 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function handleProfileUpdate($pdo, $user, $userId) {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $userFields = $_POST['user_fields'] ?? [];
+    $extraFields = $_POST['extra_fields'] ?? [];
 
     // Validate username
     if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
@@ -99,8 +132,28 @@ function handleProfileUpdate($pdo, $user, $userId) {
             $avatar = handleAvatarUpload($user, $userId);
             if ($avatar !== false) {
                 // Update user details
-                $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
-                if ($stmt->execute([$username, $email, $avatar, $userId])) {
+                $set = 'username = ?, email = ?, avatar = ?';
+                $params = [$username, $email, $avatar, $userId];
+                foreach ($userFields as $col => $val) {
+                    $set .= ", `$col` = ?";
+                    $params[] = $val;
+                }
+                $stmt = $pdo->prepare("UPDATE users SET $set WHERE id = ?");
+                if ($stmt->execute($params)) {
+                    // Update extra fields in role table if any
+                    global $roleTable, $roleKey;
+                    if ($roleTable && $extraFields) {
+                        $set2 = '';
+                        $params2 = [];
+                        foreach ($extraFields as $col => $val) {
+                            $set2 .= ($set2?', ':'') . "`$col` = ?";
+                            $params2[] = $val;
+                        }
+                        if ($set2) {
+                            $params2[] = $userId;
+                            $pdo->prepare("UPDATE $roleTable SET $set2 WHERE $roleKey = ?")->execute($params2);
+                        }
+                    }
                     $_SESSION['success'] = "Profile updated successfully!";
                     session_regenerate_id(true);
                     header("Location: profile.php");
@@ -343,7 +396,7 @@ function sendPasswordChangeNotification($email) {
             <div class="profile-info">
                 <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
                 <div class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
-                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name']) ?></span>
                 <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
             </div>
         </div>
@@ -395,6 +448,22 @@ function sendPasswordChangeNotification($email) {
                                    class="erpnext-input"
                                    accept="image/jpeg,image/png,image/gif">
                             <small class="form-text text-muted">Max 2MB (JPG, PNG, GIF only)</small>
+                        </div>
+                        <?php foreach ($userColumns as $col): ?>
+                            <div class="mb-3">
+                                <label for="<?= htmlspecialchars($col) ?>" class="form-label"><?= ucwords(str_replace('_',' ',$col)) ?>:</label>
+                                <input type="text" id="<?= htmlspecialchars($col) ?>" name="user_fields[<?= htmlspecialchars($col) ?>]" class="erpnext-input" value="<?= htmlspecialchars($user[$col] ?? '') ?>">
+                            </div>
+                        <?php endforeach; ?>
+                        <?php foreach ($extraColumns as $col): ?>
+                            <div class="mb-3">
+                                <label for="<?= htmlspecialchars($col) ?>" class="form-label"><?= ucwords(str_replace('_',' ',$col)) ?>:</label>
+                                <input type="text" id="<?= htmlspecialchars($col) ?>" name="extra_fields[<?= htmlspecialchars($col) ?>]" class="erpnext-input" value="<?= htmlspecialchars($extraFields[$col] ?? '') ?>">
+                            </div>
+                        <?php endforeach; ?>
+                        <div class="mb-3">
+                            <label class="form-label">Role:</label>
+                            <input type="text" class="erpnext-input" value="<?= htmlspecialchars($user['role_name']) ?>" readonly>
                         </div>
                         <button type="submit" class="erpnext-btn btn-primary w-100">Update Profile</button>
                     </form>
