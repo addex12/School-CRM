@@ -88,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             flex-direction: column;
             gap: 0.2em;
+            position: relative; /* For icon positioning */
         }
         .adugna-form-group label {
             font-size: 0.97em;
@@ -101,6 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.97em;
             background: #f9fbfd;
             color: #222;
+            padding-right: 2.2em; /* Space for icon */
         }
         .adugna-btn {
             background: #1976d2;
@@ -143,6 +145,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.97em;
             text-align: center;
         }
+        .adugna-password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 1.1em;
+            z-index: 2;
+            background: none;
+            border: none;
+            padding: 0;
+            outline: none;
+        }
         @media (max-width: 600px) {
             .adugna-main-content { padding: 0.7rem 0.2rem 1rem 0.2rem; }
             .adugna-header-title { font-size: 1.05em; }
@@ -173,14 +189,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="adugna-form-group">
                         <label for="current_password">Current Password</label>
                         <input type="password" id="current_password" name="current_password" required>
+                        <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('current_password', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
                     <div class="adugna-form-group">
                         <label for="new_password">New Password</label>
                         <input type="password" id="new_password" name="new_password" required>
+                        <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('new_password', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
                     <div class="adugna-form-group">
                         <label for="confirm_password">Confirm New Password</label>
                         <input type="password" id="confirm_password" name="confirm_password" required>
+                        <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('confirm_password', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
                     </div>
                     <button type="submit" class="adugna-btn">
                         <i class="fas fa-save"></i> Change Password
@@ -190,5 +215,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <script>
+    // Adugna: Toggle password visibility with standard eye/eye-slash icon
+    function togglePassword(inputId, btn) {
+        var input = document.getElementById(inputId);
+        var icon = btn.querySelector('i');
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = "password";
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+    </script>
 </body>
 </html>

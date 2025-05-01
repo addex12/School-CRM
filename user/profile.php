@@ -27,9 +27,15 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Fallback if user not found
 if (!$user) {
-    $_SESSION['error'] = "User not found.";
-    header("Location: dashboard.php");
-    exit();
+    $user = [
+        'id' => '',
+        'username' => '',
+        'email' => '',
+        'created_at' => '',
+        'last_active' => '',
+        'role_id' => '',
+        'role_name' => ''
+    ];
 }
 ?>
 <!DOCTYPE html>
@@ -172,7 +178,7 @@ if (!$user) {
             <div class="adugna-profile-avatar">
                 <i class="fas fa-user-circle"></i>
             </div>
-            <div class="adugna-profile-username"><?= htmlspecialchars($user['username']) ?></div>
+            <div class="adugna-profile-username"><?= htmlspecialchars($user['username'] ?? 'User') ?></div>
             <div class="adugna-profile-role">
                 <i class="fas fa-user-tag"></i>
                 <?= htmlspecialchars(ucfirst($user['role_name'] ?? 'User')) ?>
@@ -182,19 +188,35 @@ if (!$user) {
         <div class="adugna-profile-details">
             <div class="adugna-profile-row">
                 <i class="fas fa-envelope"></i>
-                <span><?= htmlspecialchars($user['email']) ?></span>
+                <span><?= htmlspecialchars($user['email'] ?? 'N/A') ?></span>
             </div>
             <div class="adugna-profile-row">
                 <i class="fas fa-calendar-plus"></i>
-                <span>Joined: <?= date('M j, Y', strtotime($user['created_at'])) ?></span>
+                <span>
+                    Joined:
+                    <?php
+                        $createdAt = $user['created_at'] ?? '';
+                        echo $createdAt && strtotime($createdAt)
+                            ? date('M j, Y', strtotime($createdAt))
+                            : 'N/A';
+                    ?>
+                </span>
             </div>
             <div class="adugna-profile-row">
                 <i class="fas fa-clock"></i>
-                <span>Last Active: <?= date('M j, Y g:i A', strtotime($user['last_active'])) ?></span>
+                <span>
+                    Last Active:
+                    <?php
+                        $lastActive = $user['last_active'] ?? '';
+                        echo $lastActive && strtotime($lastActive)
+                            ? date('M j, Y g:i A', strtotime($lastActive))
+                            : 'N/A';
+                    ?>
+                </span>
             </div>
             <div class="adugna-profile-row">
                 <i class="fas fa-id-badge"></i>
-                <span>User ID: <?= htmlspecialchars($user['id']) ?></span>
+                <span>User ID: <?= htmlspecialchars($user['id'] ?? '-') ?></span>
             </div>
         </div>
         <!-- Adugna: Profile actions -->
