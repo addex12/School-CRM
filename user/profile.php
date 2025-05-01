@@ -54,6 +54,18 @@ if (!$user) {
     exit();
 }
 
+// Always fetch the latest username, email, and role from the database
+$stmt = $pdo->prepare("SELECT u.username, u.email, u.avatar, u.last_login, r.role_name FROM users u LEFT JOIN roles r ON u.role_id = r.id WHERE u.id = ? LIMIT 1");
+$stmt->execute([$_SESSION['user_id']]);
+$latestUser = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($latestUser) {
+    $user['username'] = $latestUser['username'];
+    $user['email'] = $latestUser['email'];
+    $user['avatar'] = $latestUser['avatar'];
+    $user['last_login'] = $latestUser['last_login'];
+    $user['role_name'] = $latestUser['role_name'];
+}
+
 // Fetch extended profile data based on role and ensure all columns exist in DB
 $profileData = [];
 $role = strtolower($user['role_name'] ?? '');
@@ -93,6 +105,7 @@ function adugna_ensure_profile_columns($pdo, $role) {
 }
 adugna_ensure_profile_columns($pdo, $role);
 
+// Fetch all profile fields for editing (except role, which is read-only)
 if ($role === 'teacher') {
     $stmt = $pdo->prepare("SELECT qualification, subject_specialization, date_of_birth, gender, address FROM teachers WHERE user_id = ?");
     $stmt->execute([$user['id']]);
@@ -130,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Handle profile update
     if (isset($_POST['update_profile'])) {
-        handleProfileUpdate($pdo, $user, $userId);
+        handleProfileUpdate($pdo, $user, $userId, $role, $profileData);
     }
 
     // Handle password change
@@ -140,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Function to handle profile updates
-function handleProfileUpdate($pdo, $user, $userId) {
+function handleProfileUpdate($pdo, $user, $userId, $role, $profileData) {
     $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
@@ -162,12 +175,52 @@ function handleProfileUpdate($pdo, $user, $userId) {
             if ($avatar !== false) {
                 // Update user details
                 $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, avatar = ? WHERE id = ?");
-                if ($stmt->execute([$username, $email, $avatar, $userId])) {
+                $pdo->beginTransaction();
+                $ok = $stmt->execute([$username, $email, $avatar, $userId]);
+                // Update extra profile fields for the user's role
+                $extraOk = true;
+                if ($role === 'teacher') {
+                    $fields = ['qualification', 'subject_specialization', 'date_of_birth', 'gender', 'address'];
+                    $update = [];
+                    $params = [];
+                    foreach ($fields as $f) {
+                        $update[] = "$f = ?";
+                        $params[] = $_POST[$f] ?? null;
+                    }
+                    $params[] = $userId;
+                    $stmt2 = $pdo->prepare("UPDATE teachers SET " . implode(',', $update) . " WHERE user_id = ?");
+                    $extraOk = $stmt2->execute($params);
+                } elseif ($role === 'parent') {
+                    $fields = ['occupation', 'address', 'phone'];
+                    $update = [];
+                    $params = [];
+                    foreach ($fields as $f) {
+                        $update[] = "$f = ?";
+                        $params[] = $_POST[$f] ?? null;
+                    }
+                    $params[] = $userId;
+                    $stmt2 = $pdo->prepare("UPDATE parents SET " . implode(',', $update) . " WHERE user_id = ?");
+                    $extraOk = $stmt2->execute($params);
+                } elseif ($role === 'student') {
+                    $fields = ['class_id', 'section_id', 'enrollment_no', 'date_of_birth', 'gender', 'address'];
+                    $update = [];
+                    $params = [];
+                    foreach ($fields as $f) {
+                        $update[] = "$f = ?";
+                        $params[] = $_POST[$f] ?? null;
+                    }
+                    $params[] = $userId;
+                    $stmt2 = $pdo->prepare("UPDATE students SET " . implode(',', $update) . " WHERE user_id = ?");
+                    $extraOk = $stmt2->execute($params);
+                }
+                if ($ok && $extraOk) {
+                    $pdo->commit();
                     $_SESSION['success'] = "Profile updated successfully!";
                     session_regenerate_id(true);
                     header("Location: profile.php");
                     exit();
                 } else {
+                    $pdo->rollBack();
                     $_SESSION['error'] = "Failed to update profile.";
                 }
             }
@@ -443,14 +496,13 @@ function adugna_display_profile_field($key, $val) {
                      onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
             </div>
             <div class="adugna-profile-info">
-                <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
-                <div class="adugna-card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
-                <span class="adugna-badge"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></span>
+                <h3><?= htmlspecialchars($user['username'] ?? '') ?></h3>
+                <div class="adugna-card-text"><?= htmlspecialchars($user['email'] ?? '') ?></div>
+                <span class="adugna-badge"><?= htmlspecialchars($user['role_name'] ?? '') ?></span>
                 <div class="adugna-text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
             </div>
         </div>
 
-        <?php if (!empty($profileData)): ?>
         <div class="adugna-profile-form-card" style="margin-bottom:12px;">
             <div class="adugna-card-header adugna-bg-secondary">
                 <span>Additional Profile Details</span>
@@ -465,7 +517,6 @@ function adugna_display_profile_field($key, $val) {
                 </ul>
             </div>
         </div>
-        <?php endif; ?>
 
         <?php if (isset($_SESSION['success'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -509,12 +560,35 @@ function adugna_display_profile_field($key, $val) {
                                    required>
                         </div>
                         <div class="mb-3">
+                            <label for="role" class="form-label">Role:</label>
+                            <input type="text" class="adugna-input" value="<?= htmlspecialchars($user['role_name'] ?? '') ?>" readonly>
+                        </div>
+                        <div class="mb-3">
                             <label for="avatar" class="form-label">Profile Picture:</label>
                             <input type="file" id="avatar" name="avatar"
                                    class="adugna-input"
                                    accept="image/jpeg,image/png,image/gif">
                             <small class="form-text adugna-text-muted">Max 2MB (JPG, PNG, GIF only)</small>
                         </div>
+                        <?php
+                        // Render editable fields for extra profile details
+                        foreach ($profileData as $key => $val):
+                            // Skip if key is not editable (e.g., status, id)
+                            if (in_array($key, ['id', 'user_id', 'status', 'created_at'])) continue;
+                            $label = ucwords(str_replace('_', ' ', $key));
+                            $type = 'text';
+                            if (stripos($key, 'date') !== false) $type = 'date';
+                            elseif ($key === 'gender') $type = 'text';
+                            elseif ($key === 'address') $type = 'text';
+                            elseif ($key === 'class_id' || $key === 'section_id') $type = 'number';
+                        ?>
+                        <div class="mb-3">
+                            <label for="<?= $key ?>" class="form-label"><?= $label ?>:</label>
+                            <input type="<?= $type ?>" id="<?= $key ?>" name="<?= $key ?>"
+                                   class="adugna-input"
+                                   value="<?= htmlspecialchars($val ?? '') ?>">
+                        </div>
+                        <?php endforeach; ?>
                         <button type="submit" class="adugna-btn adugna-btn-primary w-100">Update Profile</button>
                     </form>
                 </div>
