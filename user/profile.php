@@ -73,7 +73,7 @@ if ($roleTable) {
     $extraFields = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 }
 
-// Get all user table columns except id, password, role_id, avatar, username, email, created_at, last_active, last_login, online, active, tracking_token, remember_token
+// Get all user table columns except id, password, role_id, avatar, username, email, created_at, last_active, last_login, online, active, tracking_token, remember_token, role_name
 $userColumns = array_diff(array_keys($user), ['id','password','role_id','avatar','username','email','created_at','last_active','last_login','online','active','tracking_token','remember_token','role_name']);
 // Get all extra fields except id, user_id, created_at, status
 $extraColumns = $extraFields ? array_diff(array_keys($extraFields), ['id','user_id','created_at','status']) : [];
@@ -93,6 +93,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle profile update
     if (isset($_POST['update_profile'])) {
         handleProfileUpdate($pdo, $user, $userId);
+        // After update, re-fetch user data to get the latest avatar and other info
+        $user = getCurrentUser();
+        // Also re-fetch extra fields if needed
+        if ($roleTable) {
+            $stmt = $pdo->prepare("SELECT * FROM $roleTable WHERE $roleKey = ? LIMIT 1");
+            $stmt->execute([$user['id']]);
+            $extraFields = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        }
     }
 
     // Handle password change
@@ -394,8 +402,7 @@ function sendPasswordChangeNotification($email) {
                 <h3><?= htmlspecialchars($username) ?></h3>
                 <div class="card-text"><?= htmlspecialchars($email) ?></div>
                 <span class="badge bg-primary"><?= htmlspecialchars($roleName) ?></span>
-                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login']) ?? '') : 'Never' ?></div>
-            </div>
+                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login']) ?? '') : 'Never' ?></div>            </div>
         </div>
 
         <?php if (isset($_SESSION['success'])): ?>
