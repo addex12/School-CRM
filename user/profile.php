@@ -107,16 +107,16 @@ adugna_ensure_profile_columns($pdo, $role);
 
 // Fetch all profile fields for editing (except role, which is read-only)
 if ($role === 'teacher') {
-    $stmt = $pdo->prepare("SELECT * FROM teachers WHERE user_id = ?");
-    $stmt->execute([$user['id']]);
+    $stmt = $pdo->prepare("SELECT * FROM teachers WHERE user_id = ? OR id = ?");
+    $stmt->execute([$user['id'], $user['id']]);
     $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 } elseif ($role === 'parent') {
-    $stmt = $pdo->prepare("SELECT * FROM parents WHERE user_id = ?");
-    $stmt->execute([$user['id']]);
+    $stmt = $pdo->prepare("SELECT * FROM parents WHERE user_id = ? OR id = ?");
+    $stmt->execute([$user['id'], $user['id']]);
     $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 } elseif ($role === 'student') {
-    $stmt = $pdo->prepare("SELECT * FROM students WHERE user_id = ?");
-    $stmt->execute([$user['id']]);
+    $stmt = $pdo->prepare("SELECT * FROM students WHERE user_id = ? OR id = ?");
+    $stmt->execute([$user['id'], $user['id']]);
     $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 }
 
