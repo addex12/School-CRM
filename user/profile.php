@@ -77,6 +77,15 @@ if ($role === 'teacher') {
 // Define user ID
 $userId = $_SESSION['user_id'];
 
+// Always fetch the latest username and email from the database for the form fields
+$stmt = $pdo->prepare("SELECT username, email FROM users WHERE id = ? LIMIT 1");
+$stmt->execute([$userId]);
+$latestUser = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($latestUser) {
+    $user['username'] = $latestUser['username'];
+    $user['email'] = $latestUser['email'];
+}
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF Validation
