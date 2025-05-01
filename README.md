@@ -8,7 +8,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/addex12/School-CRM)](https://github.com/addex12/School-CRM/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/addex12/School-CRM)](https://github.com/addex12/School-CRM/pulls)
 [![GitHub releases](https://img.shields.io/github/v/release/addex12/School-CRM?include_prereleases)](https://github.com/addex12/School-CRM/releases)
-[![GitHub license](https://img.shields.io/github/license/addex12/School-CRM)](LICENSE)
+[![GitHub license](LICENSE)
 [![Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Website](https://img.shields.io/badge/website-flipperschool.com-blue)](https://crm.flipperschool.com)
 [![Demo](https://img.shields.io/badge/demo-live-green)](https://crm.flipperschool.com)
