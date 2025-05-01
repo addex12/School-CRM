@@ -13,8 +13,9 @@ This project is made possible by the contributions of the following individuals:
 To fetch the latest list of contributors, run the following command:
 
 ```bash
-curl -s https://api.github.com/repos/addex12/School-CRM/contributors | jq -r '.[] | "- \(.login) (\(.contributions) contributions)"'
+curl -s https://api.github.com/repos/addex12/School-CRM/contributors | jq -r '.[] | select(.login != "deepsource-autofix[bot]") | "- \(.login) (\(.contributions) contributions)"'
 ```
+<!-- The above command excludes deepsource-autofix[bot] from the contributors list. -->
 
 ## Visualizing Contributions
 
