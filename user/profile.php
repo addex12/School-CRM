@@ -6,16 +6,17 @@ LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
 */
+// Require authentication and config
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireLogin();
 
 $pageTitle = "My Profile";
-$userId = $_SESSION['user_id'];
 
-// Fetch user details (db.sql: users table has id, username, email, password, profile_picture, created_at, last_active, role_id)
+// Fetch user details from DB (join roles for role name)
+$userId = $_SESSION['user_id'];
 $stmt = $pdo->prepare("
-    SELECT u.id, u.username, u.email, u.profile_picture, u.created_at, u.last_active, r.role_name
+    SELECT u.id, u.username, u.email, u.created_at, u.last_active, u.role_id, r.role_name
     FROM users u
     LEFT JOIN roles r ON u.role_id = r.id
     WHERE u.id = ?
@@ -26,70 +27,16 @@ $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Fallback if user not found
 if (!$user) {
-    $_SESSION['error'] = "User not found.";
-    header("Location: dashboard.php");
-    exit();
+    $user = [
+        'id' => '',
+        'username' => '',
+        'email' => '',
+        'created_at' => '',
+        'last_active' => '',
+        'role_id' => '',
+        'role_name' => ''
+    ];
 }
-
-// Handle profile update (name, email, profile picture)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
-    $newName = trim($_POST['username'] ?? '');
-    $newEmail = trim($_POST['email'] ?? '');
-    $profilePicPath = $user['profile_picture'];
-
-    // Handle profile picture upload
-    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['profile_picture']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-        if (in_array($ext, $allowed)) {
-            $uploadDir = '../assets/uploads/profile/';
-            if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
-            $filename = 'user_' . $userId . '_' . time() . '.' . $ext;
-            $dest = $uploadDir . $filename;
-            if (move_uploaded_file($_FILES['profile_picture']['tmp_name'], $dest)) {
-                $profilePicPath = 'assets/uploads/profile/' . $filename;
-            }
-        }
-    }
-
-    // Update user info
-    $stmt = $pdo->prepare("UPDATE users SET username=?, email=?, profile_picture=? WHERE id=?");
-    $stmt->execute([$newName, $newEmail, $profilePicPath, $userId]);
-    $_SESSION['success'] = "Profile updated successfully!";
-    header("Location: profile.php");
-    exit();
-}
-
-// Handle password change
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['change_password'])) {
-    $currentPassword = $_POST['current_password'] ?? '';
-    $newPassword = $_POST['new_password'] ?? '';
-    $confirmPassword = $_POST['confirm_password'] ?? '';
-    // Fetch hashed password
-    $stmt = $pdo->prepare("SELECT password FROM users WHERE id=?");
-    $stmt->execute([$userId]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$row || !password_verify($currentPassword, $row['password'])) {
-        $_SESSION['error'] = "Current password is incorrect.";
-    } elseif (empty($newPassword) || $newPassword !== $confirmPassword) {
-        $_SESSION['error'] = "New passwords do not match or are empty.";
-    } else {
-        $hashed = password_hash($newPassword, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare("UPDATE users SET password=? WHERE id=?");
-        $stmt->execute([$hashed, $userId]);
-        $_SESSION['success'] = "Password changed successfully!";
-    }
-    header("Location: profile.php");
-    exit();
-}
-
-// Use fallback values to avoid undefined warnings
-$username = $user['username'] ?? 'User';
-$email = $user['email'] ?? '';
-$profile_picture = !empty($user['profile_picture']) ? $user['profile_picture'] : '../assets/img/default-avatar.png';
-$role_name = $user['role_name'] ?? 'User';
-$created_at = $user['created_at'] ?? '';
-$last_active = $user['last_active'] ?? '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -110,7 +57,7 @@ $last_active = $user['last_active'] ?? '';
         @media (max-width: 600px) { html { font-size: 14px; } }
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
         .adugna-profile-main {
-            max-width: 440px;
+            max-width: 420px;
             margin: 38px auto 0 auto;
             background: #fff;
             border-radius: 10px;
@@ -123,8 +70,8 @@ $last_active = $user['last_active'] ?? '';
             margin-bottom: 1.5em;
         }
         .adugna-profile-avatar {
-            width: 74px;
-            height: 74px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
             background: #e3eafc;
             display: flex;
@@ -133,13 +80,6 @@ $last_active = $user['last_active'] ?? '';
             margin: 0 auto 0.7em auto;
             font-size: 2.2em;
             color: #1976d2;
-            overflow: hidden;
-        }
-        .adugna-profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
         }
         .adugna-profile-username {
             font-size: 1.18em;
@@ -224,49 +164,6 @@ $last_active = $user['last_active'] ?? '';
             font-size: 0.97em;
             text-align: center;
         }
-        .adugna-form-group {
-            margin-bottom: 1.1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.2em;
-            position: relative;
-        }
-        .adugna-form-group label {
-            font-size: 0.97em;
-            color: #444;
-            font-weight: 500;
-        }
-        .adugna-form-group input[type="text"],
-        .adugna-form-group input[type="email"] {
-            padding: 4px 8px;
-            border-radius: 4px;
-            border: 1px solid #d0d7de;
-            font-size: 0.97em;
-            background: #f9fbfd;
-            color: #222;
-        }
-        .adugna-form-group input[type="file"] {
-            font-size: 0.97em;
-            margin-top: 4px;
-        }
-        .adugna-password-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-            font-size: 1.1em;
-            z-index: 2;
-            background: none;
-            border: none;
-            padding: 0;
-            outline: none;
-        }
-        .adugna-form-group input[type="password"],
-        .adugna-form-group input[type="text"].adugna-password {
-            padding-right: 2.2em;
-        }
         @media (max-width: 600px) {
             .adugna-profile-main { padding: 0.7rem 0.2rem 1rem 0.2rem; }
             .adugna-profile-header { margin-bottom: 1em; }
@@ -279,102 +176,56 @@ $last_active = $user['last_active'] ?? '';
         <!-- Adugna: Profile header with avatar and username -->
         <div class="adugna-profile-header">
             <div class="adugna-profile-avatar">
-                <img src="<?= htmlspecialchars($profile_picture) ?>" alt="Profile Picture" onerror="this.src='../assets/img/default-avatar.png'">
+                <i class="fas fa-user-circle"></i>
             </div>
-            <div class="adugna-profile-username"><?= htmlspecialchars($username) ?></div>
+            <div class="adugna-profile-username"><?= htmlspecialchars($user['username'] ?? 'User') ?></div>
             <div class="adugna-profile-role">
                 <i class="fas fa-user-tag"></i>
-                <?= htmlspecialchars(ucfirst($role_name)) ?>
+                <?= htmlspecialchars(ucfirst($user['role_name'] ?? 'User')) ?>
             </div>
         </div>
-        <!-- Adugna: Success/Error messages -->
-        <?php if (!empty($_SESSION['success'])): ?>
-            <div class="adugna-alert-success"><?= htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?></div>
-        <?php endif; ?>
-        <?php if (!empty($_SESSION['error'])): ?>
-            <div class="adugna-alert-error"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></div>
-        <?php endif; ?>
         <!-- Adugna: Profile details -->
-        <form method="POST" enctype="multipart/form-data" style="margin-bottom:1.5em;">
-            <div class="adugna-form-group">
-                <label for="username">Name</label>
-                <input type="text" id="username" name="username" value="<?= htmlspecialchars($username) ?>" required>
+        <div class="adugna-profile-details">
+            <div class="adugna-profile-row">
+                <i class="fas fa-envelope"></i>
+                <span><?= htmlspecialchars($user['email'] ?? 'N/A') ?></span>
             </div>
-            <div class="adugna-form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="<?= htmlspecialchars($email) ?>" required>
-            </div>
-            <div class="adugna-form-group">
-                <label for="profile_picture">Profile Picture</label>
-                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
-            </div>
-            <button type="submit" name="update_profile" class="adugna-btn">
-                <i class="fas fa-save"></i> Save Changes
-            </button>
-        </form>
-        <!-- Adugna: Change password form -->
-        <form method="POST" autocomplete="off">
-            <div class="adugna-form-group">
-                <label for="current_password">Current Password</label>
-                <input type="password" id="current_password" name="current_password" required>
-                <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('current_password', this)">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-            <div class="adugna-form-group">
-                <label for="new_password">New Password</label>
-                <input type="password" id="new_password" name="new_password" required>
-                <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('new_password', this)">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-            <div class="adugna-form-group">
-                <label for="confirm_password">Confirm New Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
-                <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('confirm_password', this)">
-                    <i class="fas fa-eye"></i>
-                </button>
-            </div>
-            <button type="submit" name="change_password" class="adugna-btn adugna-btn-secondary">
-                <i class="fas fa-key"></i> Change Password
-            </button>
-        </form>
-        <!-- Adugna: Other details (read-only) -->
-        <div class="adugna-profile-details" style="margin-top:1.5em;">
             <div class="adugna-profile-row">
                 <i class="fas fa-calendar-plus"></i>
-                <span>Joined: <?= $created_at && strtotime($created_at) ? date('M j, Y', strtotime($created_at)) : 'N/A' ?></span>
+                <span>
+                    Joined:
+                    <?php
+                        $createdAt = $user['created_at'] ?? '';
+                        echo $createdAt && strtotime($createdAt)
+                            ? date('M j, Y', strtotime($createdAt))
+                            : 'N/A';
+                    ?>
+                </span>
             </div>
             <div class="adugna-profile-row">
                 <i class="fas fa-clock"></i>
-                <span>Last Active: <?= $last_active && strtotime($last_active) ? date('M j, Y g:i A', strtotime($last_active)) : 'N/A' ?></span>
+                <span>
+                    Last Active:
+                    <?php
+                        $lastActive = $user['last_active'] ?? '';
+                        echo $lastActive && strtotime($lastActive)
+                            ? date('M j, Y g:i A', strtotime($lastActive))
+                            : 'N/A';
+                    ?>
+                </span>
             </div>
             <div class="adugna-profile-row">
                 <i class="fas fa-id-badge"></i>
                 <span>User ID: <?= htmlspecialchars($user['id'] ?? '-') ?></span>
             </div>
         </div>
+        <!-- Adugna: Profile actions -->
         <div class="adugna-profile-actions">
+            <a href="edit_profile.php" class="adugna-btn adugna-btn-sm"><i class="fas fa-edit"></i> Edit Profile</a>
             <a href="../logout.php" class="adugna-btn adugna-btn-secondary adugna-btn-sm"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
-    <script>
-    // Adugna: Toggle password visibility with standard eye/eye-slash icon
-    function togglePassword(inputId, btn) {
-        var input = document.getElementById(inputId);
-        var icon = btn.querySelector('i');
-        if (input.type === "password") {
-            input.type = "text";
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            input.type = "password";
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
-    </script>
 </body>
 </html>
 
