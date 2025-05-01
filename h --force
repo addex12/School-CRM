@@ -1,0 +1,1908 @@
+[33mcommit c4d6c27f8b36eb1be74c7b2a302c132c947bf825[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop[m[33m)[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 22:11:02 2025 +0300
+
+    fix: update SonarQube project key placeholder in workflow configuration
+
+[33mcommit 5541ff018c44c1dfccd3ac6d1d6b300098e8492c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 22:08:44 2025 +0300
+
+    fix: replace hardcoded GITHUB_TOKEN with secret reference in SonarQube workflow
+
+[33mcommit 0e0a43083e8a9fe864c81e0c4e924e7bf761f41c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 21:55:32 2025 +0300
+
+    fix: update GITHUB_TOKEN in SonarQube workflow with provided token
+
+[33mcommit 9b36d8643670a28eaf7b1dc899852363a38b263f[m[33m ([m[1;31morigin/develop[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 21:38:32 2025 +0300
+
+    fix: update SonarQube project key in workflow configuration
+
+[33mcommit 26f779e77632c62a91dd255f5b9982321d9c2bcd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 21:37:26 2025 +0300
+
+    fix: ensure survey initialization only occurs if survey data is available
+
+[33mcommit ec25f9cc1c8b090104948baf1e6a40160ceaa566[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 21:30:04 2025 +0300
+
+    feat: add developer information and patent rights to multiple PHP files
+
+[33mcommit 7ae8175698564ea46466cda12cbda54ae84e05cc[m
+Merge: eaceb984 2c50a8ec
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 20:25:03 2025 +0300
+
+    Merge branch 'develop' of https://github.com/addex12/School-CRM into develop
+
+[33mcommit eaceb9841e2099c36d6ec97fa00c84dd430701bf[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 20:24:14 2025 +0300
+
+    fix: add missing comma and include 'github.codespaces' in recommended extensions
+
+[33mcommit 2c50a8ec185ba6d9f333a32f9827f447b9f4bb6a[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 20:06:39 2025 +0300
+
+    Update CNAME
+
+[33mcommit 452aa59a5d5429e9f7062209321cea3c73afd01d[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 20:06:16 2025 +0300
+
+    Create CNAME
+
+[33mcommit c011627e3d3ded06a4d92455cbc87ee0eec07d2f[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 19:57:37 2025 +0300
+
+    Potential fix for code scanning alert no. 1: Workflow does not contain permissions
+    
+    Co-authored-by: Copilot Autofix powered by AI <62310815+github-advanced-security[bot]@users.noreply.github.com>
+
+[33mcommit 1cc7a5aec53ffbae8690fa8dbe6afe12e8be658f[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 19:55:40 2025 +0300
+
+    Create sonarqube.yml
+
+[33mcommit 6ed8fe4229cd97b741b42b9f6ddbeb781a20952f[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 19:54:21 2025 +0300
+
+    Create codeql.yml
+
+[33mcommit b70d74aeec08f2dea95fadd826dd1246d700af1c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 19:49:51 2025 +0300
+
+    fix: refine security policy documentation for clarity and completeness
+
+[33mcommit 13a0b2355449f4ad0e136c7a601419bc8b13a4c1[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 19:46:50 2025 +0300
+
+    Create SECURITY.md
+
+[33mcommit 2398eb3bab08bb4526739579e25fcd6885f85aec[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 19:30:03 2025 +0300
+
+    fix: update subproject commit status to indicate dirty state
+
+[33mcommit a613038c3ee72fc35711496f0348dd9d3a3493f3[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 19:28:48 2025 +0300
+
+    Removes unnecessary wiki pages
+    
+    Deletes API-Endpoints.md, API-Reference.md, Admin-Dashboard.md, Backup--Restore.md, Code-of-Conduct.md, Contributing.md, Custom-Modules.md, Extending.md, FAQ.md, Folder-Structure.md, Home.md, Installation.md, Production-Deployment.md, Security.md, Survey-Management.md, Tickets.md, Troubleshooting.md, User-Dashboard.md from the wiki
+
+[33mcommit a3114e7b2f581b8033eb5ad249e266007c5113d6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 19:26:44 2025 +0300
+
+    feat: migrate wiki documentation to new structure in wiki1 directory
+
+[33mcommit 0d1d915fc8cc076b2473f3c0ee7f0af840314a0a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:36:37 2025 +0300
+
+    fix: update screenshot filenames in README.md for admin consistency
+
+[33mcommit ee5595414484c0b4d70fa0d61792bfe19c960958[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:27:57 2025 +0300
+
+    fix: update screenshot filenames in README.md for admin consistency
+
+[33mcommit c89eee9e0554255ab72187a161066c8ddc33fe93[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:25:00 2025 +0300
+
+    fix: update screenshot paths in README.md for consistency
+
+[33mcommit db5c4d5c268a4b20b0b1b106bd938c09a6818187[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:23:01 2025 +0300
+
+    fix: update screenshot filename for admin dashboard in README.md
+
+[33mcommit 8bddcd1c199758807883510ee03694e3f0f6b7a9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:22:26 2025 +0300
+
+    fix: update screenshot references in README.md for consistency
+
+[33mcommit 7168de4a0b3f0c3860402a67c9ed89f70151243d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:21:33 2025 +0300
+
+    fix: update screenshot filenames in README.md for accuracy
+
+[33mcommit 5f65c9ab6465b69fd35c2a1996c8fe10490098a9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:17:33 2025 +0300
+
+    docs: add note for screenshot directory setup in README.md
+
+[33mcommit 64721b643f1c332f317213b432c583c3f80790d3[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:14:09 2025 +0300
+
+    docs: add additional screenshots to README.md for enhanced visual reference
+
+[33mcommit aa1c7cbfb9cfcb7883dc6617622b7390450462f1[m[33m ([m[1;33mtag: [m[1;33mschool-crm-v1.0.0[m[33m)[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:07:39 2025 +0300
+
+    docs: enhance documentation for upload-release-asset.sh with usage instructions and tagging suggestions
+
+[33mcommit 58179c316a2226a397ddf5d8d2d0a329ab754de8[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:04:44 2025 +0300
+
+    feat: add upload-release-asset.sh script for managing GitHub release assets
+
+[33mcommit da4701d377b1b0237ab2091103d76909d76eecc7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:04:17 2025 +0300
+
+    fix: ensure release creation before uploading asset in upload-release-asset.sh
+
+[33mcommit c088dcf8917d65181b03105fd51fd84cdf9c1fec[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 18:02:32 2025 +0300
+
+    docs: add release version section to README.md with links to current production release and changelogs
+
+[33mcommit 3129fa452a2ef835e9783e16515f3a673511530f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 17:42:06 2025 +0300
+
+    docs: add comprehensive documentation for School CRM System, including installation, API endpoints, user and admin guides, security best practices, and troubleshooting
+
+[33mcommit f3af10c39e9453fed0856e99a0ace62a11966650[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 17:32:55 2025 +0300
+
+    docs: update link text from 'Live Demo' to 'Production Demo' in README.md
+
+[33mcommit 360db1eea6c810b70fafd9dd8336df8d9fbf0835[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 17:30:59 2025 +0300
+
+    Update README.md
+
+[33mcommit d7189b7e2101cfc17b70e10f4b192444caaf96b7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 17:27:20 2025 +0300
+
+    docs: update CONTRIBUTORS.md to clarify exclusion of deepsource-autofix[bot] from contributors list
+
+[33mcommit aa71d894def4109eaba904fb0d407fd366f78ab1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 17:24:33 2025 +0300
+
+    docs: update README.md with hosting instructions and screenshots
+
+[33mcommit fd6ef1273e6c83be98f5efaae39b9eb2665acc57[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 17:11:40 2025 +0300
+
+    Update README.md
+
+[33mcommit 4820a7be08ad597a5e14bcd7af3f6a41079fc771[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 17:10:34 2025 +0300
+
+    Update README.md
+
+[33mcommit 6bef82accb2151b569d7f1aec3d7353cf99e35b0[m
+Author: Adugna Gizaw <gizawadugna@gmail.com>
+Date:   Thu May 1 17:10:05 2025 +0300
+
+    Update README.md
+
+[33mcommit 9397a6f67ea07215c3118f8ab68d0a6cd351859f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 17:05:42 2025 +0300
+
+    style: format LICENSE file for improved readability and consistency
+
+[33mcommit 5bd94727207595e33fd1fdbba824b5960f4e4c16[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 17:01:42 2025 +0300
+
+    style: improve spacing and layout in messaging form for enhanced user experience
+
+[33mcommit ee75915df5203f80504403118aaf35fe8da5f090[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:58:21 2025 +0300
+
+    style: enhance messaging page with updated UI styles for improved user experience and responsiveness
+
+[33mcommit dfe2a4c57db4629ea0cc90e68650d91b21fa4eef[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:54:39 2025 +0300
+
+    style: update tooltip comment for clarity in messaging page
+
+[33mcommit 20b9baa524410a5c27a5872da04e7bf8ff619938[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:46:03 2025 +0300
+
+    style: enhance edit and view ticket pages with custom styles for improved layout and branding
+
+[33mcommit dc215e37bed448e369a552015ef040155da25a55[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:40:17 2025 +0300
+
+    style: update contact support page with custom styles for improved layout and branding
+
+[33mcommit 72db29c1a51363c456d075c315772332a325735e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:37:05 2025 +0300
+
+    style: enhance feedback page with custom styles for improved layout and branding
+
+[33mcommit 055a7217907712768263e21b90c4c019a1d14d64[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:33:59 2025 +0300
+
+    fix: include last_login in user data fetch and display on profile page
+
+[33mcommit cc8b9fa55b455ad4a58ad739747ca597f6559552[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:28:34 2025 +0300
+
+    style: update profile page styles for improved layout and branding
+
+[33mcommit bd8fa462948ed4719703066a91f3e5a4f49d0e71[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:23:15 2025 +0300
+
+    fix: correct parameter order in profile update function to ensure userId is last
+
+[33mcommit fae9b986c815bd089048d521dad07aa50ea24d27[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:17:54 2025 +0300
+
+    fix: add activity tracker script to the login page
+
+[33mcommit 061aacb7394410d2d61db897392dc92575586ed2[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:15:29 2025 +0300
+
+    fix: update user data after profile update to reflect latest avatar and extra fields
+
+[33mcommit 4b1264cd23def16ba8bff70800ca813278bf9f2a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 16:03:53 2025 +0300
+
+    fix: add cache-busting query parameter to avatar image source
+
+[33mcommit d2cf4d7b0fa08e1684a0ce888d901502bee5d04a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:57:22 2025 +0300
+
+    fix: ensure new avatar filename is used when uploaded during profile update
+
+[33mcommit e18709e21ef56ce8e76fd786c3a9f47e660dba4a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:53:02 2025 +0300
+
+    fix: remove last login update and session ID regeneration during profile update
+
+[33mcommit dac8a6f0a50044bf90de1fefea27448c2463ee66[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:48:30 2025 +0300
+
+    fix: make class_id and section_id fields readonly for students during profile update
+
+[33mcommit c9c3afb3e6567c2702d879563670bc5304b76ad4[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:47:20 2025 +0300
+
+    fix: ensure last login update handles null user ID gracefully
+
+[33mcommit 26cc7b83652c04864d411469826ffcc8974b2aca[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:43:04 2025 +0300
+
+    fix: move last login update to ensure it executes after user validation
+
+[33mcommit dd670ac3875ce0b4d2837e98cc96e88bfaa4f6da[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:40:40 2025 +0300
+
+    fix: update last login handling and make class_id and section_id fields readonly for students
+
+[33mcommit 937aed42bcef8dc7e6750e6e5a510f77565fbddd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:30:16 2025 +0300
+
+    fix: validate class_id foreign key for students during profile update
+
+[33mcommit 23cee911431d58443839c9d4ed0d9c74f5f78ce6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:25:55 2025 +0300
+
+    fix: streamline user role fetching and improve profile display logic
+
+[33mcommit 416f6cd97e430b69a720e7156990ab10812979ce[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:23:25 2025 +0300
+
+    fix: improve handling of user role display and last login date formatting
+
+[33mcommit 08118b63c8fc222c7b4eaeecec683cfb24063888[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:17:52 2025 +0300
+
+    feat: enhance user profile fetching and update handling with role-specific fields
+
+[33mcommit 14d6caa023c828967529ca6b5af1be3e3440006e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:13:37 2025 +0300
+
+    refactor: simplify user profile data fetching and improve code readability
+
+[33mcommit 49990d38a5ec8eea52ddd96311b167554d396bc4[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:12:36 2025 +0300
+
+    fix: improve defensive programming for user profile fields to handle null values
+
+[33mcommit 439a5ae46cbefe6f8643c83534a954e7284c1c61[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:10:04 2025 +0300
+
+    feat: enhance profile display with role-specific details and defensive programming for user fields
+
+[33mcommit a12ac521259787c4516fdb4e7f486a740e1b252f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:06:21 2025 +0300
+
+    fix: remove null coalescing operator for user profile fields and improve last login display
+
+[33mcommit 2f207c3b9eeb4416dc77d07d8b8116481744b0df[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:02:06 2025 +0300
+
+    feat: update profile field queries to include user ID for teachers, parents, and students
+
+[33mcommit b95ace086476cc8d7f9eabde8eda0d94c05fcc7d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 15:01:09 2025 +0300
+
+    feat: update profile field queries to select all columns for teachers, parents, and students
+
+[33mcommit 0e414ec3ec8ece16629731e0248d7d7a72038225[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:56:52 2025 +0300
+
+    feat: enhance profile update functionality with role-based fields and improved data fetching
+
+[33mcommit 6bee1a01c0ec91cab5f8e3f20b709674a99cece1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:51:05 2025 +0300
+
+    feat: add dynamic column migration for user profile based on role
+
+[33mcommit 2cafed4d8c40bcc905320dbb0705fef059cf222d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:46:58 2025 +0300
+
+    feat: fetch latest username and email for profile form fields
+
+[33mcommit b42112e7bde402603b31315f7c050b53136c0835[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:44:59 2025 +0300
+
+    feat: add helper function for safe and user-friendly profile field display
+
+[33mcommit 413d8d4f4ac2fbec349e65e2822adbcfaac05e56[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:42:44 2025 +0300
+
+    feat: update profile page styles with responsive design, improved layout, and enhanced UI elements
+
+[33mcommit b916be145ff043d1dd56b628e4ab9b6536f36b8f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:41:05 2025 +0300
+
+    Implement feature X to enhance user experience and fix bug Y in module Z
+
+[33mcommit 207ca8250dbae34dac05a498ef985864384cf3c4[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:23:27 2025 +0300
+
+    feat: enhance profile management with password change functionality, improved error handling, and responsive UI updates
+
+[33mcommit 3f5577e773b504ff3722cc192a2832d02b93a9ad[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:22:28 2025 +0300
+
+    refactor: streamline profile data fetching and enhance user fallback handling
+
+[33mcommit a6f879e5c1074a2cb115b77992faa0d934ba9fda[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:21:53 2025 +0300
+
+    feat: enhance profile management with improved UI, error handling, and password visibility toggle
+
+[33mcommit 642f58d58e3f5cd3d41dfa0e86c0c5ed1e49106b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:19:47 2025 +0300
+
+    feat: implement enhanced profile management with improved error handling, CSRF protection, and responsive UI updates
+
+[33mcommit 2c6710e6c10990d79893717a90525f95dc4cace1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:17:05 2025 +0300
+
+    feat: enhance profile management with password change functionality and profile picture upload
+
+[33mcommit 77ecf0d4db7e9b28c24a3b10e824ec91a631e51d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:10:33 2025 +0300
+
+    feat: add password visibility toggle for improved user experience
+
+[33mcommit e2461b5e0117cb894221f12b3b5322dd1ce329bb[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:09:18 2025 +0300
+
+    fix: improve user profile fallback and enhance display for missing data
+
+[33mcommit 23565a8d2711c81ce052048ef8b9e93606cb981f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 14:04:28 2025 +0300
+
+    refactor: streamline profile page code and enhance UI responsiveness
+
+[33mcommit 911065108a2a33f0461c30ebdc5110701034f798[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:59:57 2025 +0300
+
+    docs: update README.md for improved clarity and feature overview
+
+[33mcommit 185f5e5c682163aa02287854adb1296ca37f4533[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:52:20 2025 +0300
+
+    style: enhance dashboard layout and improve responsiveness with updated CSS classes
+
+[33mcommit a828d19674dba449fe81b039d4cc3cb26a03cec6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:47:49 2025 +0300
+
+    fix: remove announcement link from header and update ticket responses link
+
+[33mcommit 42c719200711313dbb93095cbc9d37c8131cc434[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:46:22 2025 +0300
+
+    fix: update ticket responses link to contact page
+
+[33mcommit eb2584e77af663134af30365c1d9fe4c3068a7fd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:44:41 2025 +0300
+
+    fix: update link to announcements page for consistency
+
+[33mcommit f789ddf78bf4d75004c33b41ca02a20dd19af3c3[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:40:18 2025 +0300
+
+    feat: add announcement_reads table and migration files for ticket responses and tickets
+
+[33mcommit 78e03579fa107dc963dec06e56315f02993257b8[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:27:55 2025 +0300
+
+    fix: update query to use correct column name for unread messages count
+
+[33mcommit cb39f63a77faa2b3c415eb753bd0e8ddcc30e8a2[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:24:52 2025 +0300
+
+    fix: correct column name for unread messages count in header
+
+[33mcommit b99d79bf25010c228150c6dcca4aad0f2a39c4e3[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 13:23:25 2025 +0300
+
+    feat: improve survey query logic to count only unanswered surveys for users
+
+[33mcommit 5039cc4590fe0ea7557ed6797172886e8ce6dc97[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 12:56:04 2025 +0300
+
+    feat: add notification bell with dropdown for new surveys, messages, announcements, and ticket responses
+
+[33mcommit c05d7a444862fcc4673f54dea2db03788590cb5d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 01:51:18 2025 +0300
+
+    feat: enhance print functionality and improve chart responsiveness in survey statistics
+
+[33mcommit cb47611969889f16909d5d72f55ce05d445c0a19[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:56:51 2025 +0300
+
+    feat: enhance results page with responsive design and improved styling for better user experience
+
+[33mcommit b28b398651107d654d80b96fd7ef878ed5a4ef43[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:53:37 2025 +0300
+
+    feat: add Scheduler option to settings menu and refine CSS styles for improved layout and responsiveness
+
+[33mcommit 396ad050359cceb21d7e1349535848c3b631f142[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:49:00 2025 +0300
+
+    feat: update sidebar menu with new survey statistics title and add advanced analysis tools to results page
+
+[33mcommit a18d3a02a83a871676ba95866da7f411f41b893a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:29:00 2025 +0300
+
+    feat: enhance profile page layout with responsive design and centered content
+
+[33mcommit 07bc60db0dde010815959786b9bdd69c04fa28d9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:25:36 2025 +0300
+
+    feat: add interactive print functionality for survey statistics with content-aware styling
+
+[33mcommit 73154d98dbfb92c711e907524392508f86eaa032[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:22:35 2025 +0300
+
+    feat: initialize response trend and anonymous statistics arrays to avoid undefined variable warnings
+
+[33mcommit 52e2f6ef81592fdb51fe69379108b809ac95a8ba[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:12:29 2025 +0300
+
+    feat: add response trend and anonymous statistics charts to survey statistics
+
+[33mcommit fca520a728e70c5179b4e1b232abe96457b9de81[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Thu May 1 00:10:00 2025 +0300
+
+    feat: improve survey accessibility with user-friendly messages and responsive design updates
+
+[33mcommit eed162ab6e5637b8e57bf0534362a85336790d90[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:59:51 2025 +0300
+
+    feat: enhance public survey display with responsive design and email input for non-anonymous surveys
+
+[33mcommit f888f1755e552360468c3193977fba30bf708e6c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:56:39 2025 +0300
+
+    feat: implement survey anonymity handling with email input for non-anonymous surveys
+
+[33mcommit 391f59c8061988706da0156530fbd63f23bbb6b7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:51:24 2025 +0300
+
+    feat: add survey status indicators and disable form submission based on survey availability
+
+[33mcommit 04d00da57425226da7861387bfe00a6fa4335833[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:46:44 2025 +0300
+
+    feat: enhance public survey display with status indicators for upcoming, ongoing, and ended surveys
+
+[33mcommit cb36b60348cbfc5a9861a05fcc75eca883c522c4[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:44:06 2025 +0300
+
+    refactor: improve survey ID validation logic for better clarity and error handling
+
+[33mcommit da15e87e969cfa3ce968134defae7a22cd5243d9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:39:04 2025 +0300
+
+    feat: display available public surveys with details and action button
+
+[33mcommit 45a7d763dcc510363afb4ea7736aa991bc5d9145[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:29:54 2025 +0300
+
+    refactor: change redirect behavior after survey creation/update to reload the page instead
+
+[33mcommit 51bdf821317bc861c1537c11241737c0cd991d42[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:12:32 2025 +0300
+
+    feat: enhance public survey sharing with copy link and share message functionality
+
+[33mcommit ae067c36c5b88beb8d51d10c586c3c2067cfdf24[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 23:10:13 2025 +0300
+
+    feat: add public survey link feature with copy functionality
+
+[33mcommit a6baa8791a87582c5a6157c0ec8787173659d376[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 22:59:46 2025 +0300
+
+    .
+
+[33mcommit 26de798ce6462234ea95571e169f47154ce23357[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 22:48:24 2025 +0300
+
+    refactor: update sidebar button background gradient for improved aesthetics
+
+[33mcommit fedf09b3fcae0116e49b156543f382789a3a3fed[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 22:37:13 2025 +0300
+
+    refactor: implement functionality to remove login background images with database update
+
+[33mcommit cb119b2724ab59407f671623f2161e269e8c8938[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 22:26:47 2025 +0300
+
+    refactor: add Prettier extension for improved code formatting
+
+[33mcommit e2d24bbdb9f3e48e724dbf4ac9b3bb8dcf5bf87c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 22:08:03 2025 +0300
+
+    refactor: add additional VSCode extensions for enhanced development support
+
+[33mcommit 102a46b0ace462b937b1ff076dcc9cda45d086da[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 21:48:49 2025 +0300
+
+    refactor: reorganize background image upload handling for improved functionality and error management
+
+[33mcommit b00e49bad7284a9fb5371be0f04db43dd6f0eae6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 21:41:56 2025 +0300
+
+    refactor: implement login background image slider with upload and removal functionality
+
+[33mcommit ba43cedbdefeb5a7ec5b671f0426492763b7625e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 21:30:04 2025 +0300
+
+    refactor: enhance bulk actions functionality with edit option and dynamic visibility
+
+[33mcommit 9ee6b4dbed85ccc822b2d21e41068c5d4241ae1d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 21:23:18 2025 +0300
+
+    refactor: update progress bar background color for improved aesthetics
+
+[33mcommit 72a0c028fef53fc34962396d5e0069b4e3bae5e6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 21:16:37 2025 +0300
+
+    refactor: update sidebar active link styles for improved aesthetics and visibility
+
+[33mcommit a88f92b6f2a4112f644238e887bc0ce1ca79f1c7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:50:33 2025 +0300
+
+    refactor: update sidebar active link background and box-shadow for improved aesthetics
+
+[33mcommit 108c0e2bb4bf20d0b279c0867452a54791cda3f0[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:48:03 2025 +0300
+
+    refactor: update sidebar link color for improved visibility
+
+[33mcommit 3e03b84cb24fa1afeed83793339f6481c5041377[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:44:10 2025 +0300
+
+    refactor: enhance sidebar styles for improved aesthetics and visibility
+
+[33mcommit e073ffa96200007ece9e157310c4d5cc8987ed1c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:38:50 2025 +0300
+
+    refactor: update sidebar background gradient for improved aesthetics
+
+[33mcommit cccd454770a20b8e3b563c51f6da50ae6d1e74d9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:37:31 2025 +0300
+
+    refactor: update sidebar text color for improved visibility
+
+[33mcommit 13c6508f85949a58cdcbe8358e82e608f918cd7e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:36:28 2025 +0300
+
+    refactor: update sidebar toggle button box-shadow color for improved aesthetics
+
+[33mcommit e9e5c60aa261f1cb317d07a0169b0dcadb30b52b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:33:32 2025 +0300
+
+    refactor: update sidebar toggle button hover background color for improved aesthetics
+
+[33mcommit 568964dc7327789b0126ad5ab3c8033340590080[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:30:59 2025 +0300
+
+    refactor: update sidebar toggle button background color for improved visibility
+
+[33mcommit 628cdc3cad6c3403fdfd58030cf5d17f4e5400cf[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:25:54 2025 +0300
+
+    refactor: ensure site logo and name are always set as strings for consistency
+
+[33mcommit 063390575de6be7d4b3ccf75a1c979bc302ad694[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:21:00 2025 +0300
+
+    refactor: enhance developer info section styles for better text alignment and word breaking
+
+[33mcommit b07dc844a7e9ce7351aa5790c2e058459c9417d2[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:17:15 2025 +0300
+
+    refactor: streamline sidebar code structure and enhance toggle functionality for improved user experience
+
+[33mcommit 2faf6b4993170ceac4dd137de53017e368d732af[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:16:14 2025 +0300
+
+    refactor: remove outdated comment from sidebar styles for clarity
+
+[33mcommit 52c2df9baf5dc5bbb8a1cdbb5228ea9bf6406c31[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:13:05 2025 +0300
+
+    refactor: update sidebar styles and functionality for improved responsiveness and user experience
+
+[33mcommit b35a33402c92a941092b9cfdde62dc1efce55c76[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 20:08:51 2025 +0300
+
+    refactor: change sidebar position from fixed to relative for improved layout and responsiveness
+
+[33mcommit 97120c43e94efef17464da660c6b829a91b33a36[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:13:50 2025 +0300
+
+    refactor: enhance footer styles for responsiveness and interactivity, ensuring it adapts to sidebar state
+
+[33mcommit cc339704f473cb87c148c6f36d876db0315ce655[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:13:11 2025 +0300
+
+    refactor: update footer styles for improved responsiveness and clarity, and enhance developer info section
+
+[33mcommit 7d823326e4f4b6df411fcd3fb49f614ec8217349[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:11:42 2025 +0300
+
+    refactor: enhance sidebar styles and layout for improved aesthetics and responsiveness
+
+[33mcommit b8d8e5c1b1f17c7da899c947e08b766702eea32a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:10:07 2025 +0300
+
+    refactor: streamline sidebar styles and improve loading efficiency by consolidating font-awesome links
+
+[33mcommit 24a6517a5dd7e4e26712e1066e4225c8906a83b9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:08:36 2025 +0300
+
+    refactor: remove redundant page title display for cleaner layout on add user page
+
+[33mcommit 2d71d8a520a232b06984f0b3bde9ece04afb98f3[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:06:50 2025 +0300
+
+    refactor: improve header structure and styling for better layout on add user page
+
+[33mcommit 75cb7aee1942e10a697cbbaffceb87b2d829d5fc[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:05:27 2025 +0300
+
+    refactor: update font-awesome stylesheet links for improved loading and organization
+
+[33mcommit 192e69266c30efe5fd6935488f0388df84017f33[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:02:20 2025 +0300
+
+    refactor: update styles and scripts for improved responsiveness and functionality on add user page
+
+[33mcommit fa608f37192a2ca8396a9429dd04ccbfc6655fed[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 07:00:45 2025 +0300
+
+    refactor: enhance layout and styling of add user page for improved user experience
+
+[33mcommit 21ed3d25c5872aeec99286d2a807705da77f41bf[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:58:47 2025 +0300
+
+    refactor: adjust header formatting for improved readability and consistency
+
+[33mcommit ca5b922e2a2ae857aac95fa405e74ab447ba84bb[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:55:48 2025 +0300
+
+    refactor: enhance sidebar styles and toggle button functionality for improved responsiveness and usability
+
+[33mcommit 9047c07091aa0049d5751921ccb6c2736c22bbf6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:53:28 2025 +0300
+
+    refactor: simplify sidebar toggle button styles and enhance functionality for improved usability
+
+[33mcommit d0a318a729d3fb851125f8e782c5e02fbd92a2bd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:51:42 2025 +0300
+
+    refactor: update hamburger toggle button markup for improved clarity and maintainability
+
+[33mcommit 0370cfd502789cf68fdaee9f929ff3a7b88eec8a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:50:56 2025 +0300
+
+    refactor: enhance hamburger toggle button styles for improved visibility and responsiveness
+
+[33mcommit 79ea17740650e3c9db9e0f494a4511e66d4623b7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:49:03 2025 +0300
+
+    refactor: enhance sidebar layout and toggle functionality for improved responsiveness and usability
+
+[33mcommit a244c362b09e891e3d0b6f5bb32ff48975d72f14[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:46:42 2025 +0300
+
+    refactor: enhance sidebar styles and improve toggle button functionality for better responsiveness and usability
+
+[33mcommit 7a923b9662ba9e48475eeb5047ec406833b52a59[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:44:37 2025 +0300
+
+    refactor: revamp sidebar styles and enhance toggle button functionality for improved usability and responsiveness
+
+[33mcommit f3dd4405b8d560c52480a313d8cd04e979651c0d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:44:04 2025 +0300
+
+    refactor: update sidebar toggle logic for improved clarity and functionality
+
+[33mcommit 26a5f8816b49392f5d47f78ddd859e8b952fec0f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:42:14 2025 +0300
+
+    refactor: enhance sidebar toggle button styles and positioning for improved usability and responsiveness
+
+[33mcommit 871923e0055cf99a21472ecfc37725302fc49897[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:40:25 2025 +0300
+
+    refactor: enhance sidebar styles and improve toggle button functionality for better usability and responsiveness
+
+[33mcommit bda62461c991601971dabc2855af6e90bed7047a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:34:50 2025 +0300
+
+    refactor: streamline sidebar structure and enhance toggle functionality for improved usability and responsiveness
+
+[33mcommit 493af23d1dae80843e073ac581bba761ab9c2028[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:33:43 2025 +0300
+
+    refactor: update sidebar class names and enhance toggle functionality for improved usability and responsiveness
+
+[33mcommit d88fd084499266047798350fceef6e95bc500b51[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:32:44 2025 +0300
+
+    refactor: standardize sidebar class names and improve toggle functionality for better responsiveness
+
+[33mcommit d0abe8c9e261a3b0bdb5caf30355781d9e1be6dd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:32:12 2025 +0300
+
+    refactor: improve sidebar structure and toggle functionality for better usability and responsiveness
+
+[33mcommit 7fd276e4d0bc196a8c006865523763009ca51b2d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:30:51 2025 +0300
+
+    refactor: enhance sidebar toggle button functionality with animated hamburger icon
+
+[33mcommit 413210f7f5af537a8902ca89d2fe750784918ab7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:29:27 2025 +0300
+
+    refactor: enhance footer layout and styles for improved responsiveness and alignment
+
+[33mcommit 513d7c25f6186645e7d05822fdc37761a6420658[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:28:49 2025 +0300
+
+    refactor: improve footer layout and responsiveness with updated styles and flex properties
+
+[33mcommit aaf8512dc2ab0fcc855c7cda5c9bb13bc874e1d8[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:28:21 2025 +0300
+
+    refactor: improve sidebar toggle button styling and position for better accessibility
+
+[33mcommit 55a9d813315a8d49524b2cc32058ed5a5744a27a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:23:03 2025 +0300
+
+    refactor: enhance sidebar functionality with collapsible feature and improved styles
+
+[33mcommit ac5f0f65233c79b4c7aade73aeef501f82169375[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:21:47 2025 +0300
+
+    refactor: optimize database queries for fetching unseen survey responses, feedback, and tickets
+
+[33mcommit 202df6e8d2ceec42c5361a589480a24a0c97c29b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:17:35 2025 +0300
+
+    refactor: enhance sidebar styles for improved aesthetics and responsiveness
+
+[33mcommit d0cf4e1c04aeb1326a98376a8d4d8b312d5c9768[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:08:24 2025 +0300
+
+    refactor: enhance survey view page with improved layout and custom styles
+
+[33mcommit b8ceafb7fef69f2369b37314fa86f5a6593af468[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 06:07:22 2025 +0300
+
+    Enhance admin panel UI with custom styles and responsive design
+    
+    - Added custom styles prefixed with 'adugna-' for consistency across user roles, users, and reports pages.
+    - Improved layout and responsiveness for user roles and users management pages.
+    - Introduced summary cards for quick insights on reports page.
+    - Enhanced table designs for better readability and user experience.
+    - Implemented real-time search functionality for user management.
+    - Updated header styles for better visual hierarchy and alignment.
+    - Added developer information in PHP files for better attribution.
+
+[33mcommit a750f8d72e69d137b19e7453b722a2d2af27d2ca[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:58:25 2025 +0300
+
+    refactor: enhance template creation date display with fallback for missing dates
+
+[33mcommit 99d4f10af2b2531182470cf482b5a5e1b0812395[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:57:15 2025 +0300
+
+    refactor: update styles and structure for consistency across teachers, templates, and tickets pages
+
+[33mcommit 9f03d24f134204c7c16591527a14748ed5623e68[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:46:08 2025 +0300
+
+    refactor: streamline HTML structure and improve readability in system logs page
+
+[33mcommit b447a38e9c4472f424057245bc87975a83b1df3d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:43:17 2025 +0300
+
+    refactor: update comments for clarity and enhance log fetching with user information in system logs
+
+[33mcommit 8b6f95427941cd1b8f51c088446f6341598e698b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:41:47 2025 +0300
+
+    refactor: update class names and styles for improved consistency and user experience in survey management
+
+[33mcommit e7504e4a199538ef4953056dc35cafd6abf26e50[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:38:26 2025 +0300
+
+    refactor: update CSS classes for improved styling and layout consistency in survey builder
+
+[33mcommit 99ec7ad42c4d81e184ee7b5b698891bba7b38e8e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:36:54 2025 +0300
+
+    fix: validate survey ID from GET parameters in survey response handling
+
+[33mcommit cf01c30615d621b81ec69ca1756c15266aaba7e2[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:33:11 2025 +0300
+
+    refactor: remove invalid CSS property and enhance chart rendering with improved styles and animations
+
+[33mcommit 97f8ef9d7f091e3f4ac22476d11c1b7d938a792b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:17:51 2025 +0300
+
+    refactor: streamline survey preview layout and enhance styling for improved user experience
+
+[33mcommit 35598b26f709086ed08644a4189ab838a02d704d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:17:12 2025 +0300
+
+    refactor: remove unused CSS file and update survey builder styles for improved clarity and responsiveness
+
+[33mcommit 2f6683867b61a452b1a168b48d37f677f2db1a83[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:12:16 2025 +0300
+
+    refactor: enhance support tickets page with improved responsive design, styling, and layout adjustments
+
+[33mcommit 0e2a647943d338a1beb4ce3cedd6db72bfa467d9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:11:12 2025 +0300
+
+    feat: enhance settings page with improved form styling for better user experience
+
+[33mcommit a5c098add365207dfbf8ed8abe4b6855322eea3f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:09:44 2025 +0300
+
+    refactor: update support tickets page with improved styling, responsive design, and enhanced user interface elements
+
+[33mcommit 837c82d0582885b2d111be30daf3abb342265200[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:08:31 2025 +0300
+
+    refactor: clean up admin tools section and remove inline styles and scripts for improved maintainability
+
+[33mcommit a89ee0d2ad9f20508218f53b31c6b4d5d9c6602e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:07:58 2025 +0300
+
+    feat: enhance settings page with modern styling, improved responsiveness, and interactive elements
+
+[33mcommit 696ef9317195fab741004cd085d08ab910dd1f63[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:07:11 2025 +0300
+
+    refactor: streamline admin tools section and remove redundant styles and scripts
+
+[33mcommit 45a648e200e5904f279bfd16feab4c9ad0ff8cb7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:05:52 2025 +0300
+
+    feat: enhance settings page with improved styling, responsiveness, and interactive elements
+
+[33mcommit 7c2106eecb238af4ac89c308d0fecb1b7c6b7130[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:04:38 2025 +0300
+
+    fix: update admin sidebar path for correct inclusion in settings page
+
+[33mcommit 8edd7579157190d37d71cf03880e0b8a047ec6f0[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:03:36 2025 +0300
+
+    refactor: remove sidebar implementation and integrate admin sidebar for cleaner structure
+
+[33mcommit 7aa1f2db4f1a448ae5f666415dbf6b9d18cbbb15[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 05:00:37 2025 +0300
+
+    fix: update comments for clarity and patenting in styles and sidebar logic
+
+[33mcommit f8fbe9a8aa173f81e96c14b4286bfc14513aad3d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:50:02 2025 +0300
+
+    fix: enhance chart styling and responsiveness for better data visualization
+
+[33mcommit 85f6617c853ce007deb7c54f7e3012c5b55c816b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:47:33 2025 +0300
+
+    fix: enhance PDF export by splitting content into A4-sized slices to prevent bottom cutoff
+
+[33mcommit ad7bf2a0829e03398fcbbea530de40fd2d14bbf5[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:45:56 2025 +0300
+
+    fix: improve PDF export by splitting content into A4-sized slices to prevent bottom cutoff
+
+[33mcommit cf60b046874e2b507347aabe8b5267380fc9fccf[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:45:14 2025 +0300
+
+    fix: improve print styles to prevent content cutoff and enhance layout for better PDF output
+
+[33mcommit 7d3dcd76e80a8bc2914f0114e0a78012040768cc[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:43:43 2025 +0300
+
+    fix: improve alignment and styling of export, print, and back buttons for better user interface
+
+[33mcommit 8633161bae4e5db55a5edb17293b819b57535972[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:41:36 2025 +0300
+
+    fix: enhance print functionality with A4 page size and improved styles for better layout
+
+[33mcommit 32914b12970e516428a115730b831bc611cca337[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:38:33 2025 +0300
+
+    fix: add print button and functionality to results page for improved usability
+
+[33mcommit e279ee6305d939ecea067fee6a61951b3a30175c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:37:40 2025 +0300
+
+    fix: align export and back buttons horizontally and center in results header for improved layout
+
+[33mcommit 0256dd55d28b5e95c7e3d3e94aff8558d1e5677f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:34:46 2025 +0300
+
+    fix: enhance styles and layout for results page with responsive adugna- design for improved user experience
+
+[33mcommit 5d26c0bc150cf01bd9bd4314fd9508cd84baea47[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:31:26 2025 +0300
+
+    fix: update styles and layout for results page with adugna- prefix for improved responsiveness and design
+
+[33mcommit 2411dcdc0ff04581c7560604bec0e1dfaafb52da[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:27:52 2025 +0300
+
+    fix: show success message after clearing restore progress cache
+
+[33mcommit ee0bf1fe69b6bb2de9c3df870b7b76b559570daf[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:25:24 2025 +0300
+
+    fix: add file upload option for backup restoration in admin panel
+
+[33mcommit 90e0d533aae032684b156fe93969f3b4030590dc[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:24:06 2025 +0300
+
+    fix: include admin sidebar in restore page layout
+
+[33mcommit bd349a8781ae1fe90573a9e00271f9a0652b325b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:21:25 2025 +0300
+
+    fix: update restore page styles to adugna-compact, ERPNext-inspired design and enhance restore status JSON response
+
+[33mcommit 09895be220528b26af5713db8db4bf0c309f8eba[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:17:53 2025 +0300
+
+    fix: enhance responsive design and styling for response details page
+
+[33mcommit 03c8656297491ee068a18a4ae018598e6cf83bf4[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:16:06 2025 +0300
+
+    fix: enhance responsive design and styling for profile page
+
+[33mcommit 9d537358df4835d578dec48ae0538c34ee5541b1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:13:53 2025 +0300
+
+    fix: correct formatting in role management menu item
+
+[33mcommit 80e5d1f9427746d34dc561e3b7f0ad48eaec9265[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:12:52 2025 +0300
+
+    fix: update sidebar configuration to correct role management menu items
+
+[33mcommit de6fe8a1719fa1e72d07c29d49f0ecaf72f65a28[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:11:16 2025 +0300
+
+    fix: remove unused dashboard CSS file to streamline styles
+
+[33mcommit 9142b42920f09dba5e7eb40a64bc89adcbe5017c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:10:08 2025 +0300
+
+    fix: enhance messaging and permissions UI with responsive design and consistent styling
+
+[33mcommit d9348925d1faab0f22dc68a4b79dfe2baeb4ca95[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:05:14 2025 +0300
+
+    fix: update messaging UI with responsive design and consistent styling
+
+[33mcommit 1af666aa6474a5da5b4271c1a5f23217e207d14a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:01:43 2025 +0300
+
+    fix: allow empty permissions array in role permission update handling
+
+[33mcommit 38b723c70788bcaa46ccd10a96cd0c7097df92b6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 04:00:22 2025 +0300
+
+    fix: enhance manage roles page with improved styling and responsive design
+
+[33mcommit f94239cc7116f1db124e893eff640481c39b98ad[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:58:54 2025 +0300
+
+    fix: enhance manage roles page with responsive UI, improved styling, and developer info
+
+[33mcommit 1e1a0d0f10c9b7b02c9df234c7a6f61cc7d76acc[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:57:42 2025 +0300
+
+    fix: enhance activity monitoring dashboard with responsive UI, improved styling, and detailed event information
+
+[33mcommit 03dd52ead5740f9da93559bc1291eb19fbfaec77[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:54:58 2025 +0300
+
+    fix: enhance installation and knowledge base pages with responsive UI, improved styling, and developer info
+
+[33mcommit 91475a4586a81d38812d154cd5cd830163da03e1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:50:39 2025 +0300
+
+    fix: improve CSV export functionality and enhance print behavior in report generation
+
+[33mcommit e973b0c944c63a58937aabdaba1680901a59970b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:48:34 2025 +0300
+
+    fix: enhance report generation page with improved styling and responsive design
+
+[33mcommit 670ea8601188c2052e7c2c61a0fa2f59779410a0[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:46:42 2025 +0300
+
+    fix: enhance report generation page with responsive UI, improved styling, and developer info
+
+[33mcommit a9db5f75007d6d58d851861c05b4b0b61cd697b4[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:45:03 2025 +0300
+
+    fix: enhance feedback page with responsive UI, improved styling, and developer info
+
+[33mcommit 677c2db273bd3ec33dae08bca35c1027ccf0463e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:42:55 2025 +0300
+
+    fix: enhance feedback management page with responsive UI, improved styling, and developer info
+
+[33mcommit ce14535714fe4caf23791020bafd01eaaf72e2a1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:40:15 2025 +0300
+
+    fix: update export scripts with developer info and enhance CSV/JSON export functionality
+
+[33mcommit ae4b02c16405997170cd850cfd9d307f683925c8[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:35:39 2025 +0300
+
+    fix: enhance events page with responsive UI, improved styling, and developer info
+
+[33mcommit 28ed4ba53667595f55f35867266028280fc2ab64[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:33:34 2025 +0300
+
+    fix: enhance user edit page with responsive UI and improved styling
+
+[33mcommit c9d5073773edac8170c757815cbe2d054e080304[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:31:29 2025 +0300
+
+    fix: enhance edit ticket page with responsive UI and improved styling
+
+[33mcommit 45f7650a6030b70a60476ee453bc6b70367683ba[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:29:16 2025 +0300
+
+    fix: update download templates with developer info and enhance UI for survey editing
+
+[33mcommit 9855a44523575048a6cf75ae4f7508444b5941d2[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:25:26 2025 +0300
+
+    fix: update delete_ticket.php with developer info and enhanced email notification comment
+
+[33mcommit 11aaca5d3adbe1d45722a6dba598b86135be7881[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:23:13 2025 +0300
+
+    fix: enhance admin dashboard charts with improved styling and responsiveness
+
+[33mcommit b0252a001e13b4bdbe0406dd831f1c407e3dba77[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:20:05 2025 +0300
+
+    fix: enhance admin dashboard with new alerts for messages, survey responses, feedback, and tickets
+
+[33mcommit 4e4b8abe11a7e0229c36764e11497091b6fec0df[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:16:37 2025 +0300
+
+    fix: enhance classes and clear logs pages with responsive UI and improved styling
+
+[33mcommit 56b775a918b83e674444d137a816d11f79588acd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:13:21 2025 +0300
+
+    fix: correct footer include path in change password page
+
+[33mcommit 86f11ba3fc063c60754f5a662cbcfccb4267b3de[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:12:50 2025 +0300
+
+    fix: refactor change password page with improved styling and responsive design
+
+[33mcommit 189631734eb7ea23076ccbb4b16dfcd55ccee60f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:11:59 2025 +0300
+
+    fix: remove user sync function and optimize student, teacher, and parent count queries
+
+[33mcommit 59ea18b1bf66bb94630c59f1ac5ed17b04f44482[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:10:10 2025 +0300
+
+    fix: refactor categories management UI with responsive design and improved styling
+
+[33mcommit 74e84ce3d8afa096ef3b10a26a0bab2fb5fc0a3b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 03:01:35 2025 +0300
+
+    fix: enhance bulk email admin panel with responsive UI and improved styling
+
+[33mcommit e4d3b8545fb40c74e0bd9f32cc87d2e820220a45[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:58:57 2025 +0300
+
+    fix: enhance bulk email template handling with database integration and error management
+
+[33mcommit f7f91adb0f5e38b37540d4110ca2567d971bfb6e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:53:04 2025 +0300
+
+    fix: refactor bulk email template form for subject and content handling
+
+[33mcommit b4aa8aee49b59d0aef13380dd56a32a0a32405ec[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:48:58 2025 +0300
+
+    fix: refactor bulk email template for improved UI and class handling
+
+[33mcommit 7ce51a2ec5c81636d574010fd846c39fc710813a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:46:02 2025 +0300
+
+    fix: ensure max execution time is set for large backups
+
+[33mcommit ae0742b440103be63e98417d139e60f3d7ae2b8f[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:44:39 2025 +0300
+
+    fix: add real-time backup progress bar and enhance backup form functionality
+
+[33mcommit fb9dff2b37e64b1fd7f0311fb357cba7f03d7ffa[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:40:37 2025 +0300
+
+    fix: enhance backup page with responsive design, improved layout, and new UI elements
+
+[33mcommit 65fa8b780aa96c24ab236327edccbd1a3ae03379[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:38:32 2025 +0300
+
+    fix: enhance audit trail page with responsive design, improved layout, and new UI elements
+
+[33mcommit c2c19bcf0f16c2c37ee89a7bd16247e5fbdd2584[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:36:49 2025 +0300
+
+    fix: enhance audit log page with responsive design, improved layout, and new UI elements
+
+[33mcommit ffca5d3c5ceec7ce225dc25ed97b941ddddc08b8[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:34:47 2025 +0300
+
+    fix: enhance audit log page with improved layout, responsive design, and updated UI elements
+
+[33mcommit 6c783430ef7ff21a9978fb5907f202a699b6664c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:33:48 2025 +0300
+
+    fix: enhance audit log page with responsive design, improved layout, and custom styles
+
+[33mcommit b0f9e39aeb339d119346ccad016fd000662aa927[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:30:51 2025 +0300
+
+    fix: enhance announcements page with responsive design, improved styling, and new UI elements
+
+[33mcommit cb8feda26e4eb5ca5203eaee623c321fa5a80e5c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:28:23 2025 +0300
+
+    fix: enhance all responses page with improved layout, responsive design, and new styling elements
+
+[33mcommit f42ef970add95e06027e3362971285ad4142787a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:25:40 2025 +0300
+
+    fix: enhance all responses page with custom styles, improved layout, and responsive design
+
+[33mcommit 8572d497b9d16bd7f61f4976de44827986f1fa02[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:21:41 2025 +0300
+
+    fix: enhance add user page with responsive font sizes, improved card layout, and transition effects
+
+[33mcommit a4a108c9fff6d9c444c8f5c8e59e8f52bf8cf34b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:17:23 2025 +0300
+
+    fix: refactor add user page for improved styling, responsiveness, and code organization
+
+[33mcommit 53932acbe901cdcc4657efe1bcd76c0f34aba30b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:14:36 2025 +0300
+
+    fix: enhance footer to be aware of sidebar state, improving layout responsiveness
+
+[33mcommit 4df1e280e5ecd8b82e592026a709766fdb028c5b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:12:42 2025 +0300
+
+    fix: update footer styles for fixed positioning, improved responsiveness, and enhanced interactivity
+
+[33mcommit 9b3b70649ebdd543f79da9e258efbb33e9147471[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:10:36 2025 +0300
+
+    fix: move footer include to the end of the document for proper rendering
+
+[33mcommit 16cd9d5b38c2f7bde177bb532ab66147374783de[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:09:15 2025 +0300
+
+    fix: enhance active users page with responsive design, improved styling, and AJAX functionality
+
+[33mcommit 8cf5e33ad3c2b3fb4c28bd40ebebe422f4a410c1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:05:32 2025 +0300
+
+    fix: implement collapsible sidebar with hamburger toggle for improved mobile usability and layout responsiveness
+
+[33mcommit 2490b4fce50e0b9a530c7c1b2b35e2d9b9160431[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 02:02:56 2025 +0300
+
+    fix: add meta tags and stylesheet links for improved sidebar responsiveness and styling
+
+[33mcommit bc119d36f4c7cb48842919c0af8b078570fc9262[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:55:31 2025 +0300
+
+    fix: refactor active users page by removing inline styles, enhancing AJAX functionality, and improving user interaction features
+
+[33mcommit d9332abb381a68721819d8123ed7c9419b696df6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:54:43 2025 +0300
+
+    fix: enhance active users page with responsive sidebar, improved button styling, and mobile toggle functionality
+
+[33mcommit 9d56644249b9821a8f1f2a1a8b6502592fc4719d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:54:18 2025 +0300
+
+    fix: refactor active users page by removing inline styles, enhancing layout responsiveness, and improving button interactions
+
+[33mcommit e78c20e5ae6986855ba01cd5cc1c511741d94e03[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:53:30 2025 +0300
+
+    fix: enhance active users page layout with responsive sidebar and improved button styling
+
+[33mcommit c339e5ccc89e16c9222f38caf7c8120bf4f03de2[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:53:04 2025 +0300
+
+    fix: remove inline styles from active users page and link external CSS for improved maintainability
+
+[33mcommit ac7e55216161b834c39e87bc2940ae1f8f2cedb0[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:52:26 2025 +0300
+
+    fix: remove developer metadata, enhance styling for active users page, and improve layout structure
+
+[33mcommit 648b5b14c08e8811afb337bb47fc1a6ee739d1de[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:51:27 2025 +0300
+
+    fix: update user permissions and reports pages for consistency, enhance styling, and improve structure
+
+[33mcommit 737c7d8015d692d9bc894b9c0baadec6000ec395[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:50:26 2025 +0300
+
+    fix: enhance users page styling, improve layout responsiveness, and refine button interactions
+
+[33mcommit be6534bbfad847e8f039921689e81295a70d121c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:49:46 2025 +0300
+
+    fix: refactor users page layout, enhance styling, and improve search functionality
+
+[33mcommit 03cdb2c6542e61fb01d25a3acecb6f0dd313ae8c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:48:47 2025 +0300
+
+    fix: update users page title, enhance layout, and implement user search functionality
+
+[33mcommit 75e5dea8c58b93ead7e0968f07c242531cdc9119[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:48:00 2025 +0300
+
+    fix: update users page title for consistency and remove unused code for improved clarity
+
+[33mcommit b3e18190887369622031d254ab35a6228bd6b6f7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:45:28 2025 +0300
+
+    fix: update users page title and clean up unused code for improved clarity and structure
+
+[33mcommit 17039fa1e354bad4f02b1f50d85d74b08e9a2fc2[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:40:21 2025 +0300
+
+    fix: refactor users page for improved sidebar functionality, responsive design, and enhanced user interface
+
+[33mcommit da59daa15206ed9336fbb7a150f896812982c70b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:37:30 2025 +0300
+
+    fix: refactor admin sidebar for improved structure, responsive behavior, and active page highlighting
+
+[33mcommit 189392e3f05374747186c8634c52d4106d246f87[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:35:46 2025 +0300
+
+    fix: update active users page with enhanced responsive layout, sidebar toggle, and custom styles
+
+[33mcommit 1db121d54ae092e8e2abe4ad68b98e30b00048b8[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:35:14 2025 +0300
+
+    fix: enhance active users page with improved sidebar styles and responsive layout
+
+[33mcommit 3d3e7d0d88d587e4038c5e3a0653673ab8ddec51[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:30:04 2025 +0300
+
+    fix: update active users page for improved responsiveness and interactive sidebar with submenu logic
+
+[33mcommit a220fbf837cafe9880287f4a269f9bee14e6ceba[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:28:21 2025 +0300
+
+    fix: refactor active users page to implement responsive sidebar with submenu logic and custom styles
+
+[33mcommit 5056626c230e78053802b4afc1f961043667603b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:26:38 2025 +0300
+
+    fix: refactor sidebar styles and layout for improved responsiveness and user experience
+
+[33mcommit f0ebb3e865ab80dda14619f1d7169776ca33e695[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:24:51 2025 +0300
+
+    fix: refactor admin dashboard styles for responsive sidebar and improved layout consistency
+
+[33mcommit a6d4124163fdcf66b5e3f61b4930ff8f0241a629[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:21:07 2025 +0300
+
+    fix: refactor system logs page to implement responsive sidebar with submenu logic and enhance user interaction
+
+[33mcommit 856e60d8350ff67d2a31a661d57a412cab145cc0[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:19:26 2025 +0300
+
+    fix: refactor settings page to implement sidebar with submenu logic and responsive design
+
+[33mcommit 408fadf101928b85cdec2226e9146ab5da316619[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:17:54 2025 +0300
+
+    fix: refactor restore page layout and styles for sidebar consistency and improved user experience
+
+[33mcommit b08ead1368d4cfd898acab724adefaf154e78e1e[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 01:10:01 2025 +0300
+
+    fix: enhance system logs page to create table if missing and improve error handling
+
+[33mcommit 219363ba338941fb4c8134200b722acd74bfead4[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:59:08 2025 +0300
+
+    fix: refactor settings fetching to improve logo and site name retrieval with fallback options
+
+[33mcommit eb1237a5ab4a2865b255724d1602cb223f860738[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:57:49 2025 +0300
+
+    fix: refactor system logs page to check table existence before querying and improve error handling
+
+[33mcommit ea2cad00eb435c69d73722de21c0e8ab60167c17[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:52:23 2025 +0300
+
+    fix: refactor sidebar styles and functionality to use 'adugna-' prefix for consistency
+
+[33mcommit d217bb0cc4881d9ac867b72e0c822ca68723a7d0[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:47:00 2025 +0300
+
+    fix: ensure unchecked checkboxes are saved as '0' in settings update
+
+[33mcommit 2f782eb5bab4e485086cbbafc08e202fd6c2d44a[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:44:30 2025 +0300
+
+    fix: conditionally display registration link based on allowRegistration variable
+
+[33mcommit 588d19cbbe7287dd53cc726aa07f7538de97ac53[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:42:46 2025 +0300
+
+    fix: enhance settings update process by adding file removal for existing images and implementing cache busting
+
+[33mcommit 79c17e4d9867715d00b67b8488fe5f1fd6aae8f8[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:35:11 2025 +0300
+
+    fix: improve login page layout by restructuring CSS for left and right sections and correcting HTML tag
+
+[33mcommit 7d1125c71c15e6ddfffd30f6bd2cdb22f31bfb8b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:32:51 2025 +0300
+
+    fix: correct HTML structure by fixing opening div tag and removing unnecessary closing div
+
+[33mcommit 397447b6fb8f8509310418581b34a104a02bf355[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:31:47 2025 +0300
+
+    fix: add closing div for login card layout to ensure proper structure
+
+[33mcommit 545d61e0ee53ce3eceba2e7e8ed0558cf195babd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:29:43 2025 +0300
+
+    fix: refine login page layout by adjusting background image positioning and improving section styles
+
+[33mcommit 10c960d4198cb26f223ffd56a096ca50ea9abf8d[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:28:27 2025 +0300
+
+    fix: enhance login page layout by removing unnecessary styles and improving background image display
+
+[33mcommit bb1e48fcef7823d237ed83b09a4ad65bae974c51[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:24:46 2025 +0300
+
+    fix: streamline image handling on login page by removing unnecessary mapping and enhancing layout structure
+
+[33mcommit d874dcd8da6a5733e919547cc2ce922bacec1777[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:21:14 2025 +0300
+
+    fix: improve login page background image handling by fetching from database and enhancing URL processing
+
+[33mcommit b6d1fe6e1a78f56d1110735e74a3017453ed5f29[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:16:47 2025 +0300
+
+    fix: update login page to fetch background image from settings and improve fallback handling
+
+[33mcommit 7cc862896ae26aa516d06756d4c2ad9bc6e2e6af[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:09:56 2025 +0300
+
+    fix: simplify 12-hour mode adjustment in Excel date calculations
+
+[33mcommit 31f516fa8c00837bdcc8b71195f637010634888b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:08:49 2025 +0300
+
+    fix: standardize timezone setting across multiple admin pages
+
+[33mcommit 9407c2da632b4beac00fc586ab6490678f592c04[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Wed Apr 30 00:01:14 2025 +0300
+
+    fix: set default timezone to Africa/Nairobi across multiple files
+
+[33mcommit e40d397aed34d572b564c235ad80f30fa2a72add[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:57:10 2025 +0300
+
+    fix: resolve undefined variable warning for next system log clear time
+
+[33mcommit b406ae01448366e57388cbe6ce31cc788f357d46[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:53:42 2025 +0300
+
+    fix: refactor settings page styles with adugna- prefix and improve theming consistency
+
+[33mcommit b50ddcf4598b7e4225f43a4313e40f58f830d7a6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:52:23 2025 +0300
+
+    fix: enhance settings page to support unique file uploads for site logo and login background image
+
+[33mcommit 37f093420d55b181084a2333216bffa5263adb27[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:48:17 2025 +0300
+
+    fix: update login page left section background with school photo and gradient
+
+[33mcommit 44475211bae5b6e5b8c2260771472dee6b803db1[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:43:35 2025 +0300
+
+    fix: refactor login page styles and structure with adugna- prefix for custom classes
+
+[33mcommit 506007d6121671e95e874e2559d7baee3c0054bd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:39:40 2025 +0300
+
+    fix: add hover tooltip for online admins in messaging interface
+
+[33mcommit c22eb8c47643d73603a58290b4d9cd0c2a03f2dd[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:38:24 2025 +0300
+
+    fix: correct HTML structure by removing duplicate closing tag in login page
+
+[33mcommit cc84b9b8e32618915a21fe89d2771da55476a3df[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:37:33 2025 +0300
+
+    fix: enhance login page with improved styles and password visibility toggle
+
+[33mcommit 653f8da8fd527c47c59703ce8ce8ea865446057c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:31:25 2025 +0300
+
+    fix: improve tooltip visibility for online admins in messaging interface
+
+[33mcommit cadc2e15d433578a7fed8c126f7b2842b4094375[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:27:54 2025 +0300
+
+    fix: enhance user messaging page with improved styles and user guidance
+
+[33mcommit 37adebd2b540aaa8c7970986513001fb24cb717c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:19:20 2025 +0300
+
+    fix: add password show/hide toggle for improved user experience
+
+[33mcommit 601988cf3ee9266ab413fd0c8c36a4f431b7bb92[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:16:22 2025 +0300
+
+    fix: enhance feedback submission process with improved validation and user notifications
+
+[33mcommit 7ce7d45a603924662a17c46e864f562c44947d90[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:11:56 2025 +0300
+
+    fix: add password visibility toggle to enhance user experience
+
+[33mcommit f2d5c57e1a3872d20cbb22ca52ade8b4215bb2f3[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:11:20 2025 +0300
+
+    fix: update log clearing logic to simulate cron behavior and improve user feedback
+
+[33mcommit 7b675615dc85b5eca83e2ebbe6a77eb766e0095c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:09:24 2025 +0300
+
+    fix: remove CRON job logic and implement PHP-based log clearing scheduler
+
+[33mcommit 2347d540318ff27561f79382f2e15300da96c50b[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:08:28 2025 +0300
+
+    fix: add show-password attribute to password input for improved user experience
+
+[33mcommit 5301ca6b6486ee619b10702ac06fc0d16dec3aa9[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:04:04 2025 +0300
+
+    fix: remove CRON job logic and improve file existence checks in log clearing process
+
+[33mcommit 3a54cfcf8de29500b393d4c27f2331bcfec51888[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 23:00:18 2025 +0300
+
+    fix: correct path for cron script in scheduler and clean up whitespace
+
+[33mcommit 8a3e9d8e1214b08bc517fb386485518cd78ecf35[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 22:53:14 2025 +0300
+
+    fix: enhance error handling for log clearing process
+
+[33mcommit df0ec09f2d8ee2ed315da4b66392e8cb2ed495c7[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 22:47:24 2025 +0300
+
+    fix: add next log clear information to the scheduler page
+
+[33mcommit cd8e396085b80ff242eaf549a521dd6fa7be7be6[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 22:37:28 2025 +0300
+
+    fix: correct typo in redirect rule for crm.flipperschool.com in .htaccess
+
+[33mcommit 4956e5c5b2bf0ff315b6afefeb0bfa9f59881abb[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 22:36:50 2025 +0300
+
+    fix: optimize HTTPS and typo-domain redirect rules in .htaccess
+
+[33mcommit e3692b5ebdfaa1d90b6b0c194dfa2f3a9b0c232c[m
+Author: Adugna <gizawadugna@gmail.com>
+Date:   Tue Apr 29 22:31:05 2025 +0300
+
+    fix: update logo source to use dynamic site logo from settings
