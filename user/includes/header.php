@@ -299,8 +299,8 @@ if (isset($_SESSION['user_id'])) {
                     $stmt->execute([$userId]);
                     $newSurveyCount = (int)$stmt->fetchColumn();
 
-                    // New Messages: Example - unread messages for user
-                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE recipient_id = ? AND is_read = 0");
+                    // New Messages: unread messages for user (use correct column, e.g., to_user_id)
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE to_user_id = ? AND is_read = 0");
                     $stmt->execute([$userId]);
                     $newMessageCount = (int)$stmt->fetchColumn();
 
