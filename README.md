@@ -179,6 +179,9 @@ You can host School CRM on any standard web hosting that supports PHP and MySQL/
 
 ## 📸 Screenshots
 
+> **Note:** If you see a 404 error for screenshots, make sure the `screenshots/` folder and the referenced images (e.g., `dashboard.png`, `user-management.png`, etc.) exist in your repository.  
+> To add screenshots, create a `screenshots/` directory at the root of your project and upload your images there.
+
 Screenshots of the Adugna School CRM System in action:
 
 <p align="center">
