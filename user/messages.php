@@ -301,22 +301,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                             $isSelected = ($selectedUserId && $selectedUserId == $user['id']);
                         ?>
                             <li data-user-id="<?= $user['id'] ?>" class="adugna-contact-item<?= $isSelected ? ' selected' : '' ?>" tabindex="0" style="position:relative;">
-                                <span class="adugna-avatar"><?= htmlspecialchars($initials) ?></span>
-                                <span>
-                                    <span class="adugna-online-dot"></span>
-                                    <?= htmlspecialchars($user['username']) ?>
+                                <span class="adugna-avatar" style="width:26px;height:26px;font-size:0.98rem;min-width:26px;min-height:26px;line-height:26px;">
+                                    <?= htmlspecialchars($initials) ?>
+                                </span>
+                                <span style="display:flex;align-items:center;gap:4px;">
+                                    <span class="adugna-online-dot" style="width:7px;height:7px;"></span>
+                                    <span style="font-size:0.97em;"><?= htmlspecialchars($user['username']) ?></span>
                                 </span>
                                 <?php if (isset($unreadCounts[$user['id']])): ?>
-                                    <span class="adugna-unread-badge"><?= $unreadCounts[$user['id']] ?></span>
+                                    <span class="adugna-unread-badge" style="font-size:0.81rem;padding:1px 6px;min-width:18px;min-height:16px;line-height:16px;">
+                                        <?= $unreadCounts[$user['id']] ?>
+                                    </span>
                                 <?php endif; ?>
                                 <!-- Hover tooltip for chat (not a button, just a hover text) -->
-                                <span class="adugna-contact-tooltip">
-                                    <i class="fa fa-hand-pointer"></i> Click to chat with me
+                                <span class="adugna-contact-tooltip" style="font-size:0.91em;padding:3px 8px;">
+                                    <i class="fa fa-hand-pointer"></i> Chat
                                 </span>
                             </li>
                         <?php endforeach; ?>
                         <?php if (empty($users)): ?>
-                            <li style="color:#888;">No admins are online.</li>
+                            <li style="color:#888;font-size:0.95em;">No admins are online.</li>
                         <?php endif; ?>
                     </ul>
                 </aside>
