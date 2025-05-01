@@ -1047,3 +1047,4 @@ try {
     </script>
 </body>
 </html>
+<script src="../includes/activity-tracker.js"></script>
