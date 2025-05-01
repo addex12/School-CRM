@@ -69,35 +69,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
     <link rel="stylesheet" href="../assets/css/messages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Adugna patenting styles (adugna- prefix, ERPNext-inspired, compact, responsive) */
+        /**
+         * Adugna patented UI styles - compact, responsive, and branded.
+         * All custom classes use adugna- prefix for branding and patenting.
+         * Designed for outstanding, flexible, and interactive user experience.
+         */
+
+        /* Base font and sizing for all elements */
         body, input, textarea, select, button {
             font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
             font-size: 15px;
+            color: #23272f;
         }
+
+        /* Adugna card: compact, rounded, shadowed container */
         .adugna-card {
             background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(44,62,80,0.07);
-            padding: 1.2rem 1rem;
-            margin-bottom: 1.2rem;
+            border-radius: 9px;
+            box-shadow: 0 1.5px 7px rgba(44,62,80,0.08);
+            padding: 0.85rem 0.7rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.18s;
         }
+
+        /* Adugna button: compact, branded, interactive */
         .adugna-btn {
             background: #2563eb;
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 0.28rem 0.8rem;
-            font-size: 0.93rem;
+            border-radius: 3.5px;
+            padding: 0.18rem 0.65rem;
+            font-size: 0.92rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.18s, box-shadow 0.18s;
-            box-shadow: 0 1px 4px rgba(44,62,80,0.07);
-            min-height: 28px;
+            transition: background 0.16s, box-shadow 0.16s;
+            box-shadow: 0 1px 3px rgba(44,62,80,0.07);
+            min-height: 25px;
             display: inline-flex;
             align-items: center;
-            gap: 0.3em;
+            gap: 0.22em;
+            line-height: 1.1;
         }
-        .adugna-btn:hover {
+        .adugna-btn i {
+            font-size: 0.93em;
+            margin-right: 2px;
+        }
+        .adugna-btn:hover, .adugna-btn:focus {
             background: #1741a6;
         }
         .adugna-btn-secondary {
@@ -105,53 +122,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
             color: #2563eb;
             border: 1px solid #d1d8dd;
         }
-        .adugna-btn-secondary:hover {
+        .adugna-btn-secondary:hover, .adugna-btn-secondary:focus {
             background: #e4e8ec;
         }
+
+        /* Adugna input and textarea: compact, clean, branded */
         .adugna-input, .adugna-textarea {
             border: 1px solid #d1d8dd;
-            border-radius: 4px;
-            padding: 7px 10px;
-            font-size: 0.97rem;
+            border-radius: 3.5px;
+            padding: 6px 9px;
+            font-size: 0.96rem;
             background: #f5f7fa;
             color: #36414c;
+            transition: border-color 0.15s, background 0.15s;
         }
         .adugna-input:focus, .adugna-textarea:focus {
             outline: none;
             border-color: #2563eb;
             background: #fff;
         }
+
+        /* Adugna label: compact, branded */
         .adugna-label {
             font-weight: 500;
             color: #2563eb;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             display: block;
-            font-size: 0.97rem;
+            font-size: 0.96rem;
         }
+
+        /* Adugna user list: compact, scrollable */
         .adugna-user-list {
             list-style: none;
             margin: 0;
             padding: 0;
-            max-height: 420px;
+            max-height: 370px;
             overflow-y: auto;
         }
         .adugna-user-list li.adugna-contact-item {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
+            padding: 6px 9px;
             cursor: pointer;
             border-bottom: 1px solid #f0f2f5;
-            transition: background 0.15s;
+            transition: background 0.13s;
             position: relative;
-            border-radius: 6px;
+            border-radius: 5px;
+            min-height: 34px;
         }
         .adugna-user-list li.adugna-contact-item.selected,
         .adugna-user-list li.adugna-contact-item:hover {
             background: #eaf3fb;
         }
         .adugna-user-list .adugna-avatar {
-            width: 30px;
-            height: 30px;
+            width: 23px;
+            height: 23px;
             border-radius: 50%;
             background: #e3eafc;
             color: #2563eb;
@@ -159,114 +184,192 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 1rem;
-            margin-right: 10px;
+            font-size: 0.93rem;
+            margin-right: 7px;
             border: 2px solid #fff;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
         .adugna-online-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: #44d600;
             display: inline-block;
-            margin-right: 6px;
+            margin-right: 4px;
             border: 2px solid #fff;
             box-shadow: 0 0 0 2px #eaf3fb;
         }
         .adugna-unread-badge {
             background: #ff5252;
             color: #fff;
-            border-radius: 10px;
-            font-size: 0.82rem;
-            padding: 1px 7px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            padding: 0px 5px;
             margin-left: auto;
             font-weight: 600;
+            min-width: 16px;
+            min-height: 14px;
+            line-height: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+
+        /* Adugna chat messages: compact, scrollable, branded */
         .adugna-chat-messages {
-            max-height: 340px;
+            max-height: 260px;
             overflow-y: auto;
-            padding: 8px;
+            padding: 6px;
             border: 1px solid #d1d8dd;
-            border-radius: 5px;
+            border-radius: 4px;
             background: #f9f9f9;
-            margin-bottom: 10px;
-            font-size: 0.97rem;
+            margin-bottom: 7px;
+            font-size: 0.95rem;
         }
         .adugna-chat-messages::-webkit-scrollbar {
-            width: 7px;
+            width: 6px;
         }
         .adugna-chat-messages::-webkit-scrollbar-thumb {
             background: #d1d8dd;
-            border-radius: 4px;
+            border-radius: 3px;
         }
         .adugna-chat-messages::-webkit-scrollbar-thumb:hover {
             background: #b0b8c1;
         }
+
+        /* Adugna message form: compact */
         .adugna-message-form textarea {
             width: 100%;
             resize: vertical;
-            min-height: 48px;
-            max-height: 140px;
+            min-height: 38px;
+            max-height: 100px;
         }
+
+        /* Adugna direction/info card: compact, branded */
         .adugna-direction {
             background: #eaf3fb;
             color: #2563eb;
             border: 1px solid #b7e4c7;
-            border-radius: 6px;
-            padding: 10px 14px;
-            margin-bottom: 1.1em;
-            font-size: 0.98em;
+            border-radius: 5px;
+            padding: 7px 10px;
+            margin-bottom: 0.8em;
+            font-size: 0.96em;
             display: flex;
             align-items: center;
-            gap: 0.5em;
+            gap: 0.4em;
         }
-        @media (max-width: 900px) {
-            .messaging-container {
-                flex-direction: column;
-            }
-            .contact-list, .chat-section {
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-            .adugna-chat-messages {
-                max-height: 220px;
-            }
+        .adugna-direction i {
+            font-size: 1em;
+            margin-right: 4px;
         }
-        @media (max-width: 600px) {
-            .adugna-card {
-                padding: 0.7rem 0.3rem;
-            }
-            .adugna-btn, .adugna-btn-secondary {
-                font-size: 0.89rem;
-                padding: 0.18rem 0.6rem;
-            }
-            .adugna-label {
-                font-size: 0.93rem;
-            }
-            .adugna-chat-messages {
-                font-size: 0.93rem;
-            }
-        }
+
+        /* Adugna contact tooltip: only on hover/focus, not a button */
         .adugna-contact-tooltip {
             display: none;
             position: absolute;
-            left: 110%;
+            left: 108%;
             top: 50%;
             transform: translateY(-50%);
             background: #2563eb;
             color: #fff;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.92em;
+            padding: 2px 7px;
+            border-radius: 3px;
+            font-size: 0.89em;
             white-space: nowrap;
             z-index: 10;
             box-shadow: 0 2px 8px rgba(44,62,80,0.09);
-            pointer-events: none; /* Ensure not clickable */
+            pointer-events: none;
         }
         .adugna-contact-item:hover .adugna-contact-tooltip,
         .adugna-contact-item:focus .adugna-contact-tooltip {
             display: block;
+        }
+
+        /* Adugna chat section header: compact */
+        .adugna-chat-header {
+            margin-bottom: 7px;
+        }
+        .adugna-chat-header h3 {
+            font-size: 1.01rem;
+            color: #333;
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3em;
+        }
+        .adugna-chat-header i {
+            font-size: 1em;
+            margin-right: 3px;
+        }
+
+        /* Adugna responsive layout: outstanding and flexible */
+        .adugna-messaging-container {
+            display: flex;
+            gap: 1em;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+        .adugna-contact-list {
+            width: 210px;
+            min-width: 150px;
+            max-width: 260px;
+            flex-shrink: 0;
+        }
+        .adugna-chat-section {
+            flex: 1;
+            min-width: 200px;
+            max-width: 100%;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 900px) {
+            .adugna-messaging-container {
+                flex-direction: column;
+                gap: 0.7em;
+            }
+            .adugna-contact-list, .adugna-chat-section {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+            }
+            .adugna-chat-messages {
+                max-height: 160px;
+            }
+        }
+        @media (max-width: 600px) {
+            .adugna-card {
+                padding: 0.5rem 0.18rem;
+            }
+            .adugna-btn, .adugna-btn-secondary {
+                font-size: 0.85rem;
+                padding: 0.12rem 0.45rem;
+                min-height: 21px;
+            }
+            .adugna-label {
+                font-size: 0.91rem;
+            }
+            .adugna-chat-messages {
+                font-size: 0.91rem;
+            }
+            .adugna-user-list .adugna-avatar {
+                width: 18px;
+                height: 18px;
+                font-size: 0.8rem;
+            }
+            .adugna-unread-badge {
+                font-size: 0.7rem;
+                min-width: 12px;
+                min-height: 10px;
+            }
+        }
+        @media (max-width: 400px) {
+            body, input, textarea, select, button {
+                font-size: 13px;
+            }
+            .adugna-card {
+                padding: 0.3rem 0.08rem;
+            }
         }
     </style>
 </head>
@@ -274,27 +377,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
     <?php include 'includes/header.php'; ?>
     <div class="main-content-container">
         <div class="container">
-            <!-- User Guidance Card -->
+            <!-- Adugna direction/info card for user guidance -->
             <div class="adugna-card adugna-direction">
                 <i class="fa fa-info-circle"></i>
-                <span>
+                <span></span></span>
                     <strong>How to chat with an admin:</strong>
-                    <ul style="margin:0.5em 0 0 1.2em;padding:0;">
-                        <li>You can Click on one of an online admin to chat with".</li>
+                    <ul style="margin:0.4em 0 0 1.1em;padding:0;">
+                        <li>Click on an online admin to chat.</li>
                         <li>Unread message counts are shown in red badges.</li>
                     </ul>
                 </span>
             </div>
-            <header style="margin-bottom: 14px;">
-                <h1 style="font-size: 1.3rem; font-weight: 700; margin: 0; color:#2563eb;">
-                    <i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?>
+            <!-- Adugna page header -->
+            <header style="margin-bottom: 10px;">
+                <h1 style="font-size: 1.13rem; font-weight: 700; margin: 0; color:#2563eb; display:flex;align-items:center;gap:0.3em;">
+                    <i class="fas fa-comments" style="font-size:1em;"></i> <?= htmlspecialchars($pageTitle) ?>
                 </h1>
             </header>
-            <div class="messaging-container" style="display:flex;gap:1.5em;flex-wrap:wrap;">
-                <!-- Contact List (Admins) -->
-                <aside class="contact-list" style="width:260px;min-width:200px;">
-                    <h2 style="font-size: 1.05rem; font-weight: 600; margin: 12px 0 8px 8px; color:#2563eb;">
-                        <i class="fas fa-users"></i> Online Admins
+            <div class="adugna-messaging-container">
+                <!-- Adugna contact list (Admins) -->
+                <aside class="adugna-contact-list">
+                    <h2 style="font-size: 0.99rem; font-weight: 600; margin: 10px 0 6px 7px; color:#2563eb;display:flex;align-items:center;gap:0.3em;">
+                        <i class="fas fa-users" style="font-size:0.93em;"></i> Online Admins
                     </h2>
                     <ul id="user-list" class="adugna-user-list">
                         <?php foreach ($users as $user): 
@@ -302,33 +406,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                             $isSelected = ($selectedUserId && $selectedUserId == $user['id']);
                         ?>
                             <li data-user-id="<?= $user['id'] ?>" class="adugna-contact-item<?= $isSelected ? ' selected' : '' ?>" tabindex="0" style="position:relative;">
-                                <span class="adugna-avatar" style="width:26px;height:26px;font-size:0.98rem;min-width:26px;min-height:26px;line-height:26px;">
+                                <span class="adugna-avatar"></span>
                                     <?= htmlspecialchars($initials) ?>
                                 </span>
-                                <span style="display:flex;align-items:center;gap:4px;">
-                                    <span class="adugna-online-dot" style="width:7px;height:7px;"></span>
-                                    <span style="font-size:0.97em;"><?= htmlspecialchars($user['username']) ?></span>
+                                <span style="display:flex;align-items:center;gap:3px;">
+                                    <span class="adugna-online-dot"></span>
+                                    <span style="font-size:0.95em;"><?= htmlspecialchars($user['username']) ?></span>
                                 </span>
                                 <?php if (isset($unreadCounts[$user['id']])): ?>
-                                    <span class="adugna-unread-badge" style="font-size:0.81rem;padding:1px 6px;min-width:18px;min-height:16px;line-height:16px;">
+                                    <span class="adugna-unread-badge">
                                         <?= $unreadCounts[$user['id']] ?>
                                     </span>
                                 <?php endif; ?>
-                                <!-- Tooltip only, not a button. Only shown on hover/focus via CSS. -->
-                                <span class="adugna-contact-tooltip" style="font-size:0.91em;padding:3px 8px;">
+                                <!-- Adugna tooltip: only on hover/focus, not a button -->
+                                <span class="adugna-contact-tooltip">
                                     <i class="fa fa-hand-pointer"></i> Chat
                                 </span>
                             </li>
                         <?php endforeach; ?>
                         <?php if (empty($users)): ?>
-                            <li style="color:#888;font-size:0.95em;">No admins are online.</li>
+                            <li style="color:#888;font-size:0.92em;">No admins are online.</li>
                         <?php endif; ?>
                     </ul>
                 </aside>
-                <!-- Chat Section -->
-                <section class="chat-section" style="flex:1;min-width:270px;max-width:100%;">
-                    <div id="chat-header" class="chat-header">
-                        <h3 style="margin:0; font-size:1.05rem; color:#333;">
+                <!-- Adugna chat section -->
+                <section class="adugna-chat-section">
+                    <div id="chat-header" class="adugna-chat-header">
+                        <h3>
                             <i class="fas fa-comment-dots"></i> Select an online admin to start chatting
                         </h3>
                     </div>
@@ -337,11 +441,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                         <input type="hidden" name="receiver_id" id="receiver_id">
                         <label class="adugna-label" for="message-input">Message</label>
                         <textarea name="message" id="message-input" rows="3" placeholder="Type your message..." required class="adugna-textarea"></textarea>
-                        <button type="submit" class="adugna-btn" style="margin-top:8px;">
+                        <button type="submit" class="adugna-btn" style="margin-top:6px;">
                             <i class="fas fa-paper-plane"></i> Send
                         </button>
                     </form>
-                    <div style="margin-top: 10px;">
+                    <div style="margin-top: 7px;">
                         <button id="clear-chat" class="adugna-btn adugna-btn-secondary" style="display:none;">
                             <i class="fas fa-trash-alt"></i> Clear Chat
                         </button>
@@ -352,14 +456,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
     </div>
     <?php include_once __DIR__ . '/includes/footer.php'; ?>
     <script>
-        // Developer: Adugna Gizaw | User Messaging JS
+        /**
+         * Developer: Adugna Gizaw
+         * Adugna Messaging JS - handles UI interactivity and chat logic.
+         */
         // Pass PHP variables to JS for chat logic
         window.messagesConfig = {
             selectedUserId: <?= $selectedUserId ? json_encode($selectedUserId) : 'null' ?>,
             currentUser: <?= $_SESSION['user_id'] ?? 0 ?>
         };
 
-        // Highlight selected admin and show tooltip on hover
+        // Adugna: Highlight selected admin and show tooltip on hover/focus
         document.addEventListener('DOMContentLoaded', function() {
             const userList = document.getElementById('user-list');
             if (userList) {
@@ -371,7 +478,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                         // Optionally, trigger chat load here
                     }
                 });
-                // Accessibility: allow keyboard navigation
+                // Adugna: Accessibility - allow keyboard navigation
                 userList.querySelectorAll('li.adugna-contact-item').forEach(function(li) {
                     li.addEventListener('keydown', function(e) {
                         if (e.key === 'Enter' || e.key === ' ') {
@@ -381,7 +488,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                 });
             }
 
-            // Show "Click to chat with me" tooltip on hover for online admins
+            // Adugna: Tooltip only on hover/focus for online admins
             document.querySelectorAll('.adugna-contact-item').forEach(function(item) {
                 item.addEventListener('mouseenter', function() {
                     var tooltip = item.querySelector('.adugna-contact-tooltip');
@@ -391,7 +498,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                     var tooltip = item.querySelector('.adugna-contact-tooltip');
                     if (tooltip) tooltip.style.display = 'none';
                 });
-                // For accessibility: show tooltip on focus, hide on blur
+                // Accessibility: show tooltip on focus, hide on blur
                 item.addEventListener('focus', function() {
                     var tooltip = item.querySelector('.adugna-contact-tooltip');
                     if (tooltip) tooltip.style.display = 'block';
@@ -407,7 +514,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
             const clearChatButton = document.getElementById('clear-chat');
             const chatMessages = document.getElementById('chat-messages');
 
-            // Handle clear chat
+            // Adugna: Handle clear chat
             clearChatButton.addEventListener('click', function () {
                 const receiverId = document.getElementById('receiver_id').value;
                 if (receiverId && confirm('Are you sure you want to clear this chat?')) {
@@ -426,7 +533,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
                 }
             });
 
-            // Handle delete individual message
+            // Adugna: Handle delete individual message
             chatMessages.addEventListener('click', function (e) {
                 if (e.target.classList.contains('delete-message')) {
                     const messageId = e.target.dataset.messageId;
