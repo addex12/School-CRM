@@ -44,17 +44,18 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Fetch the current user and all columns, including role name
+// Fetch the current user and all columns, including role name and last_login
 $user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User session expired. Please login again.";
     header("Location: ../login.php");
     exit();
 }
-// Always fetch username, email, and role from users table (joined with roles)
+// Always fetch username, email, last_login, and role from users table (joined with roles)
 $username = $user['username'] ?? '';
 $email = $user['email'] ?? '';
 $roleName = $user['role_name'] ?? '';
+$lastLogin = $user['last_login'] ?? null;
 
 // Fetch extra fields from relevant role table
 $extraFields = [];
@@ -450,7 +451,7 @@ function sendPasswordChangeNotification($email) {
                 <h3><?= htmlspecialchars($username) ?></h3>
                 <div class="adugna-card-text"><?= htmlspecialchars($email) ?></div>
                 <span class="adugna-badge"><?= htmlspecialchars($roleName) ?></span>
-                <div class="adugna-text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login']) ?? '') : 'Never' ?></div>            </div>
+                <div class="adugna-text-muted mt-2">Last Login: <?= !empty($lastLogin) ? date('M j, Y g:i a', strtotime($lastLogin)) : 'Never' ?></div>            </div>
         </div>
 
         <?php if (isset($_SESSION['success'])): ?>
