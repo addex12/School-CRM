@@ -341,6 +341,18 @@ try {
         .adugna-form-group {
             position: relative; /* For icon positioning */
         }
+        .adugna-password-wrapper {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .adugna-password-wrapper input[type="password"],
+        .adugna-password-wrapper input[type="text"] {
+            padding-right: 2.2em; /* Space for icon */
+            width: 100%;
+            box-sizing: border-box;
+        }
         .adugna-password-toggle {
             position: absolute;
             right: 10px;
@@ -354,10 +366,11 @@ try {
             border: none;
             padding: 0;
             outline: none;
-        }
-        .adugna-form-group input[type="password"],
-        .adugna-form-group input[type="text"] {
-            padding-right: 2.2em; /* Space for icon */
+            height: 24px;
+            width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .adugna-form-group label {
             display: block;
@@ -614,8 +627,7 @@ try {
                     </div>
                     <div class="adugna-form-group">
                         <label for="password">Password</label>
-                        <div class="adugna-input-wrapper" style="position:relative;">
-                            <i class="fas fa-lock"></i>
+                        <div class="adugna-password-wrapper">
                             <input type="password" id="password" name="password" class="adugna-form-control" placeholder="Enter your password" required autocomplete="current-password">
                             <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('password', this)">
                                 <i class="fas fa-eye"></i>
