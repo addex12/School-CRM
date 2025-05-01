@@ -2,9 +2,6 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
-
 | Version | Supported          |
 | ------- | ------------------ |
 | 5.1.x   | :white_check_mark: |
@@ -14,8 +11,19 @@ currently being supported with security updates.
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability, please report it by emailing the developer at: **gizawadugna@gmail.com**
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+- You will receive an initial response within 72 hours.
+- Please provide as much detail as possible to help us resolve the issue quickly.
+- Once the vulnerability is confirmed, we will work to release a fix as soon as possible and notify you when it is available.
+
+## Project Ownership
+
+This project is maintained and owned by **Adugna Gizaw**.
+
+- **Email:** gizawadugna@gmail.com
+- **LinkedIn:** https://www.linkedin.com/in/eleganceict
+- **Twitter:** https://twitter.com/eleganceict1
+- **GitHub:** https://github.com/addex12
+
+For any security or administrative concerns, please contact the developer directly.
