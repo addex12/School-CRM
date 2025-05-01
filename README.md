@@ -185,18 +185,7 @@ You can host School CRM on any standard web hosting that supports PHP and MySQL/
 Screenshots of the Adugna School CRM System in action:
 
 <p align="center">
-  <img src="screenshots/admin-dashboard.png" alt="School CRM Dashboard" width="800"/>
-</p>
-<p align="center">
-  <img src="screenshots/admin management.png" alt="School CRM User Management" width="800"/>
-</p>
-<p align="center">
-  <img src="screenshots/survey builder.png" alt="School CRM Survey Module" width="800"/>
-</p>
-
-<!-- Added screenshots below -->
-<p align="center">
-  <img src="screenshots/dashboard-full.png" alt="Dashboard Overview" width="800"/>
+  <img src="screenshots/dashboard.png" alt="School CRM Dashboard" width="800"/>
 </p>
 <p align="center">
   <img src="screenshots/edit-user.png" alt="Edit User" width="800"/>
