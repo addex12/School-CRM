@@ -185,43 +185,43 @@ You can host School CRM on any standard web hosting that supports PHP and MySQL/
 Screenshots of the Adugna School CRM System in action:
 
 <p align="center">
-  <img src="screenshots/admin-dashboard.png" alt="School CRM Dashboard" width="800"/>
+  <img src="Screenshots/admin-dashboard.png" alt="School CRM Dashboard" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/edit-user.png" alt="Edit User" width="800"/>
+  <img src="Screenshots/edit-user.png" alt="Edit User" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/survey-statistics.png" alt="Survey Statistics" width="800"/>
+  <img src="Screenshots/survey-statistics.png" alt="Survey Statistics" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/survey-builder.png" alt="Survey Builder" width="800"/>
+  <img src="Screenshots/survey-builder.png" alt="Survey Builder" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/login.png" alt="Login Page" width="800"/>
+  <img src="Screenshots/login.png" alt="Login Page" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/manage-users.png" alt="Manage Users" width="800"/>
+  <img src="Screenshots/manage-users.png" alt="Manage Users" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/survey-responses.png" alt="Survey Responses" width="800"/>
+  <img src="Screenshots/survey-responses.png" alt="Survey Responses" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/admin-messaging.png" alt="Admin Messaging" width="800"/>
+  <img src="Screenshots/admin-messaging.png" alt="Admin Messaging" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/feedback.png" alt="Feedback Management" width="800"/>
+  <img src="Screenshots/feedback.png" alt="Feedback Management" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/admin-dashboard.png" alt="Admin Dashboard" width="800"/>
+  <img src="Screenshots/admin-dashboard.png" alt="Admin Dashboard" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/bulk-email.png" alt="Bulk Email" width="800"/>
+  <img src="Screenshots/bulk-email.png" alt="Bulk Email" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/announcements.png" alt="Announcements" width="800"/>
+  <img src="Screenshots/announcements.png" alt="Announcements" width="800"/>
 </p>
 <p align="center">
-  <img src="screenshots/active-users.png" alt="Active Users" width="800"/>
+  <img src="Screenshots/active-users.png" alt="Active Users" width="800"/>
 </p>
 
 ---
