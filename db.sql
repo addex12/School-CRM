@@ -649,7 +649,7 @@ CREATE TABLE `survey_responses` (
   `user_id` int(11) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `submitted_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `answers` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
+  `answers` longtext CHARACTER SET utf8mb4 COLLATE=utf8mb4_bin NOT NULL CHECK (json_valid(`answers`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -860,7 +860,7 @@ CREATE TABLE `user_activity` (
   `ip_address` varchar(45) NOT NULL,
   `user_agent` text NOT NULL,
   `timestamp` datetime NOT NULL,
-  `details` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`details`)),
+  `details` longtext CHARACTER SET utf8mb4 COLLATE=utf8mb4_bin NOT NULL CHECK (json_valid(`details`)),
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
@@ -882,6 +882,25 @@ CREATE TABLE `user_sessions` (
   `ended_at` datetime DEFAULT NULL,
   `duration` int(11) DEFAULT NULL COMMENT 'In seconds'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `announcement_reads`
+--
+
+CREATE TABLE `announcement_reads` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `announcement_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `read_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_announcement_user` (`announcement_id`, `user_id`),
+  KEY `idx_announcement_id` (`announcement_id`),
+  KEY `idx_user_id` (`user_id`),
+  CONSTRAINT `announcement_reads_ibfk_1` FOREIGN KEY (`announcement_id`) REFERENCES `announcements` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `announcement_reads_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables

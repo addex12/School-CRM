@@ -332,7 +332,7 @@ if (isset($_SESSION['user_id'])) {
                         <?php endif; ?>
                     </span>
                     <div class="notification-dropdown" id="notificationDropdown">
-                        <a href="surveys.php">
+                        <a href="survey.php">
                             <i class="fas fa-poll"></i>
                             New Surveys
                             <span class="notification-count"><?= $newSurveyCount ?></span>
