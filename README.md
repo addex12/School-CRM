@@ -216,7 +216,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) and [CO
 ## 🌐 Links
 
 - [Production Demo](https://crm.flipperschool.com)
-- [Documentation](https://github.com/addex12/School-CRM/wiki)
+- [Documentation (Full Wiki)](https://github.com/addex12/School-CRM/wiki)
 - [Report Issues](https://github.com/addex12/School-CRM/issues)
 - [Releases](https://github.com/addex12/School-CRM/releases)
 - [Contributors](https://github.com/addex12/School-CRM/graphs/contributors)
