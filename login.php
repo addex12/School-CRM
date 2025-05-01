@@ -338,6 +338,27 @@ try {
         /* Adugna Gizaw: Form styles */
         .adugna-login-form { width: 100%; }
         .adugna-form-group { margin-bottom: 0.85rem; }
+        .adugna-form-group {
+            position: relative; /* For icon positioning */
+        }
+        .adugna-password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #888;
+            font-size: 1.1em;
+            z-index: 2;
+            background: none;
+            border: none;
+            padding: 0;
+            outline: none;
+        }
+        .adugna-form-group input[type="password"],
+        .adugna-form-group input[type="text"] {
+            padding-right: 2.2em; /* Space for icon */
+        }
         .adugna-form-group label {
             display: block;
             margin-bottom: 0.3rem;
@@ -596,8 +617,8 @@ try {
                         <div class="adugna-input-wrapper" style="position:relative;">
                             <i class="fas fa-lock"></i>
                             <input type="password" id="password" name="password" class="adugna-form-control" placeholder="Enter your password" required autocomplete="current-password">
-                            <button type="button" id="togglePassword" style="position:absolute; right:0.7rem; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:#6b7280; font-size:1em;" tabindex="-1" aria-label="Show password">
-                                <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                            <button type="button" class="adugna-password-toggle" tabindex="-1" onclick="togglePassword('password', this)">
+                                <i class="fas fa-eye"></i>
                             </button>
                         </div>
                     </div>
@@ -628,6 +649,19 @@ try {
     -->
     <script>
         // Adugna Gizaw: Password show/hide toggle for better UX
+        function togglePassword(inputId, btn) {
+            var input = document.getElementById(inputId);
+            var icon = btn.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
         document.addEventListener('DOMContentLoaded', function() {
             var passwordInput = document.getElementById('password');
             var togglePassword = document.getElementById('togglePassword');
