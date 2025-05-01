@@ -66,25 +66,29 @@ try {
         }
     }
 
-    // Initialize the survey array
-    $survey = [
-        'id' => $survey_data[0]['id'],
-        'title' => $survey_data[0]['title'],
-        'description' => $survey_data[0]['description'],
-        'is_anonymous' => $survey_data[0]['is_anonymous'],
-        'starts_at' => $survey_data[0]['starts_at'],
-        'ends_at' => $survey_data[0]['ends_at'],
-        'questions' => []
-    ];
-
-    foreach ($survey_data as $row) {
-        $survey['questions'][] = [
-            'id' => $row['field_id'],
-            'type' => $row['field_type'],
-            'label' => $row['field_label'],
-            'options' => $row['field_options'] ? json_decode($row['field_options']) : [],
-            'required' => $row['is_required']
+    // Only initialize $survey if $survey_data is not empty
+    if (!empty($survey_data)) {
+        $survey = [
+            'id' => $survey_data[0]['id'],
+            'title' => $survey_data[0]['title'],
+            'description' => $survey_data[0]['description'],
+            'is_anonymous' => $survey_data[0]['is_anonymous'],
+            'starts_at' => $survey_data[0]['starts_at'],
+            'ends_at' => $survey_data[0]['ends_at'],
+            'questions' => []
         ];
+
+        foreach ($survey_data as $row) {
+            $survey['questions'][] = [
+                'id' => $row['field_id'],
+                'type' => $row['field_type'],
+                'label' => $row['field_label'],
+                'options' => $row['field_options'] ? json_decode($row['field_options']) : [],
+                'required' => $row['is_required']
+            ];
+        }
+    } else {
+        $survey = null;
     }
 
     // Determine survey status
