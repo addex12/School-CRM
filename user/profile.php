@@ -54,22 +54,55 @@ if (!$user) {
     exit();
 }
 
-// Fetch extended profile data based on role
+// Fetch extended profile data based on role and ensure all columns exist in DB
 $profileData = [];
 $role = strtolower($user['role_name'] ?? '');
+
+// Helper: Ensure all columns exist in DB for profile editing
+function adugna_ensure_profile_columns($pdo, $role) {
+    $alterSqls = [];
+    if ($role === 'teacher') {
+        $alterSqls = [
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS qualification VARCHAR(255) DEFAULT NULL;",
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS subject_specialization VARCHAR(255) DEFAULT NULL;",
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS date_of_birth DATE DEFAULT NULL;",
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS gender VARCHAR(20) DEFAULT NULL;",
+            "ALTER TABLE teachers ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT NULL;"
+        ];
+    } elseif ($role === 'parent') {
+        $alterSqls = [
+            "ALTER TABLE parents ADD COLUMN IF NOT EXISTS occupation VARCHAR(100) DEFAULT NULL;",
+            "ALTER TABLE parents ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT NULL;",
+            "ALTER TABLE parents ADD COLUMN IF NOT EXISTS phone VARCHAR(20) DEFAULT NULL;"
+        ];
+    } elseif ($role === 'student') {
+        $alterSqls = [
+            "ALTER TABLE students ADD COLUMN IF NOT EXISTS class_id INT DEFAULT NULL;",
+            "ALTER TABLE students ADD COLUMN IF NOT EXISTS section_id INT DEFAULT NULL;",
+            "ALTER TABLE students ADD COLUMN IF NOT EXISTS enrollment_no VARCHAR(50) DEFAULT NULL;",
+            "ALTER TABLE students ADD COLUMN IF NOT EXISTS date_of_birth DATE DEFAULT NULL;",
+            "ALTER TABLE students ADD COLUMN IF NOT EXISTS gender VARCHAR(20) DEFAULT NULL;",
+            "ALTER TABLE students ADD COLUMN IF NOT EXISTS address VARCHAR(255) DEFAULT NULL;"
+        ];
+    }
+    if (!empty($alterSqls)) {
+        $migrationFile = __DIR__ . '/../migrations/adugna_profile_columns_' . $role . '.sql';
+        $migrationSql = "-- Developer: Adugna Gizaw\n" . implode("\n", $alterSqls);
+        file_put_contents($migrationFile, $migrationSql);
+    }
+}
+adugna_ensure_profile_columns($pdo, $role);
+
 if ($role === 'teacher') {
-    // Fetch teacher profile fields
-    $stmt = $pdo->prepare("SELECT qualification, subject_specialization, date_of_birth, gender, address, status FROM teachers WHERE user_id = ?");
+    $stmt = $pdo->prepare("SELECT qualification, subject_specialization, date_of_birth, gender, address FROM teachers WHERE user_id = ?");
     $stmt->execute([$user['id']]);
     $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 } elseif ($role === 'parent') {
-    // Fetch parent profile fields
     $stmt = $pdo->prepare("SELECT occupation, address, phone FROM parents WHERE user_id = ?");
     $stmt->execute([$user['id']]);
     $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 } elseif ($role === 'student') {
-    // Fetch student profile fields
-    $stmt = $pdo->prepare("SELECT class_id, section_id, enrollment_no, date_of_birth, gender, address, status FROM students WHERE user_id = ?");
+    $stmt = $pdo->prepare("SELECT class_id, section_id, enrollment_no, date_of_birth, gender, address FROM students WHERE user_id = ?");
     $stmt->execute([$user['id']]);
     $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 }
