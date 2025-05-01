@@ -191,6 +191,47 @@ Screenshots of the Adugna School CRM System in action:
   <img src="screenshots/survey-module.png" alt="School CRM Survey Module" width="800"/>
 </p>
 
+<!-- Added screenshots below -->
+<p align="center">
+  <img src="screenshots/dashboard-full.png" alt="Dashboard Overview" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/edit-user.png" alt="Edit User" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/survey-statistics.png" alt="Survey Statistics" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/survey-builder.png" alt="Survey Builder" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/login.png" alt="Login Page" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/manage-users.png" alt="Manage Users" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/survey-responses.png" alt="Survey Responses" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/admin-messaging.png" alt="Admin Messaging" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/feedback.png" alt="Feedback Management" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/admin-dashboard.png" alt="Admin Dashboard" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/bulk-email.png" alt="Bulk Email" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/announcements.png" alt="Announcements" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/active-users.png" alt="Active Users" width="800"/>
+</p>
+
 ---
 
 ## 👤 Developer
