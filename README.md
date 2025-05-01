@@ -188,9 +188,6 @@ Screenshots of the Adugna School CRM System in action:
   <img src="Screenshots/admin-dashboard.png" alt="School CRM Dashboard" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/edit-user.png" alt="Edit User" width="800"/>
-</p>
-<p align="center">
   <img src="Screenshots/survey-statistics.png" alt="Survey Statistics" width="800"/>
 </p>
 <p align="center">
@@ -200,16 +197,16 @@ Screenshots of the Adugna School CRM System in action:
   <img src="Screenshots/login.png" alt="Login Page" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/manage-users.png" alt="Manage Users" width="800"/>
+  <img src="Screenshots/admin-user-mgmt.png" alt="Manage Users" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/survey-responses.png" alt="Survey Responses" width="800"/>
+  <img src="Screenshots/admin-survey-responses.png" alt="Survey Responses" width="800"/>
 </p>
 <p align="center">
   <img src="Screenshots/admin-messaging.png" alt="Admin Messaging" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/feedback.png" alt="Feedback Management" width="800"/>
+  <img src="Screenshots/admin-feedback-mgmt.png" alt="Feedback Management" width="800"/>
 </p>
 <p align="center">
   <img src="Screenshots/admin-dashboard.png" alt="Admin Dashboard" width="800"/>
@@ -221,7 +218,7 @@ Screenshots of the Adugna School CRM System in action:
   <img src="Screenshots/admin-announcements.png" alt="Announcements" width="800"/>
 </p>
 <p align="center">
-  <img src="Screenshots/admin-active-users.png" alt="Active Users" width="800"/>
+  <img src="Screenshots/admin-active-users lists.png" alt="Active Users" width="800"/>
 </p>
 
 ---
