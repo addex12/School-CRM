@@ -498,9 +498,9 @@ function adugna_display_profile_field($key, $val) {
             <div class="adugna-profile-info">
                 <?php
                 // Defensive: always set to empty string if not set to avoid warnings/deprecation
-                $username = isset($user['username']) ? $user['username'] : '';
-                $email = isset($user['email']) ? $user['email'] : '';
-                $roleName = isset($user['role_name']) ? $user['role_name'] : '';
+                $username = isset($user['username']) && $user['username'] !== null ? $user['username'] : '';
+                $email = isset($user['email']) && $user['email'] !== null ? $user['email'] : '';
+                $roleName = isset($user['role_name']) && $user['role_name'] !== null ? $user['role_name'] : '';
                 ?>
                 <h3><?= htmlspecialchars($username) ?></h3>
                 <div class="adugna-card-text"><?= htmlspecialchars($email) ?></div>
