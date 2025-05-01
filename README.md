@@ -9,7 +9,7 @@
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/addex12/School-CRM)](https://github.com/addex12/School-CRM/pulls)
 [![GitHub releases](https://img.shields.io/github/v/release/addex12/School-CRM?include_prereleases)](https://github.com/addex12/School-CRM/releases)
 [![Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![Website](https://img.shields.io/badge/orbalia.pythonanywhere.com-blue)]([https://crm.flipperschool.com](https://orbalia.pythonanywhere.com/))
+[![Website](https://img.shields.io/badge/website-flipperschool.com-blue)](https://crm.flipperschool.com)
 [![Demo](https://img.shields.io/badge/demo-live-green)](https://crm.flipperschool.com)
 [![Twitter Follow](https://img.shields.io/twitter/follow/eleganceict1?style=social)](https://twitter.com/eleganceict1)
 
@@ -119,7 +119,7 @@ School-CRM/
    git clone https://github.com/addex12/School-CRM.git
    ```
 2. **Configure your database:**
-   - Import `db.sql` into MySQL/MariaDB.
+   - Import `db.sql` into MySQL/MariaDB using your preferred tool (e.g., phpMyAdmin or MySQL CLI).
    - Update `/includes/config.php` with your DB credentials.
 
 3. **Set up Apache/Nginx:**
@@ -132,8 +132,54 @@ School-CRM/
 5. **(Optional) Configure Node.js backend:**
    - `cd backend && npm install && node server.js`
 
-6. **Access the system:**
+6. **Access the system locally:**
    - Visit `http://localhost/School-CRM/` in your browser.
+
+---
+
+### 🌍 Hosting on a Website (Production Deployment)
+
+You can host School CRM on any standard web hosting that supports PHP and MySQL/MariaDB (e.g., cPanel, Plesk, shared hosting, VPS, or cloud server).
+
+**Steps:**
+1. **Upload Files:**
+   - Upload all files and folders from the `School-CRM` directory to your hosting server's web root (e.g., `public_html/` or `www/`).
+
+2. **Create Database:**
+   - Use your hosting control panel (e.g., cPanel's MySQL Databases or phpMyAdmin) to create a new database and user.
+   - Import `db.sql` into the new database using phpMyAdmin.
+
+3. **Configure Database Connection:**
+   - Edit `/includes/config.php` and set your hosting database credentials.
+
+4. **Set Permissions:**
+   - Ensure `backups`, `logs`, and `uploads` folders are writable (`755` or `775`).
+
+5. **Domain Setup:**
+   - Point your domain or subdomain to the folder where you uploaded School CRM.
+
+6. **Access the System:**
+   - Visit your domain (e.g., `https://yourdomain.com/`) to access School CRM.
+
+**Tech Stack:**  
+- PHP (7.4+), MySQL/MariaDB, JavaScript, JSON, AJAX  
+- Compatible with phpMyAdmin for database management
+
+---
+
+## 📸 Screenshots
+
+Screenshots of the Adugna School CRM System in action:
+
+<p align="center">
+  <img src="screenshots/dashboard.png" alt="School CRM Dashboard" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/user-management.png" alt="School CRM User Management" width="800"/>
+</p>
+<p align="center">
+  <img src="screenshots/survey-module.png" alt="School CRM Survey Module" width="800"/>
+</p>
 
 ---
 
