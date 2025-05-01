@@ -138,6 +138,17 @@ function handleProfileUpdate($pdo, $user, $userId) {
                     // Update extra fields in role table if any
                     global $roleTable, $roleKey;
                     if ($roleTable && $extraFields) {
+                        // Check for class_id foreign key if student
+                        if ($roleTable === 'students' && isset($extraFields['class_id'])) {
+                            $classId = $extraFields['class_id'];
+                            if ($classId) {
+                                $stmtClass = $pdo->prepare("SELECT id FROM classes WHERE id = ?");
+                                $stmtClass->execute([$classId]);
+                                if (!$stmtClass->fetchColumn()) {
+                                    $extraFields['class_id'] = null; // Set to null if not found
+                                }
+                            }
+                        }
                         $set2 = '';
                         $params2 = [];
                         foreach ($extraFields as $col => $val) {
