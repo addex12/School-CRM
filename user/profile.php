@@ -138,13 +138,14 @@ function handleProfileUpdate($pdo, $user, $userId) {
         } else {
             $avatar = handleAvatarUpload($user, $userId); // This will return the new filename if uploaded, or the old one
             if ($avatar !== false) {
-                // Always use the new avatar filename if a new file was uploaded
+                // Always use the new avatar filename or the old one
                 $set = 'username = ?, email = ?, avatar = ?';
-                $params = [$username, $email, $avatar, $userId];
+                $params = [$username, $email, $avatar];
                 foreach ($userFields as $col => $val) {
                     $set .= ", `$col` = ?";
                     $params[] = $val;
                 }
+                $params[] = $userId; // userId must be last for WHERE id = ?
                 $stmt = $pdo->prepare("UPDATE users SET $set WHERE id = ?");
                 if ($stmt->execute($params)) {
                     // Update extra fields in role table if any
