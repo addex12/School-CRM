@@ -30,7 +30,7 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src=../includes/activity-tracker.js"></script>
+    <script src=../includes/activity-tracker.js></script>
     <style>
         body { background: #f5f7fa; font-family: "Inter", "Segoe UI", Arial, sans-serif; }
         .main-header {
@@ -288,8 +288,14 @@ if (isset($_SESSION['user_id'])) {
                 $newSurveyCount = $newMessageCount = $newAnnouncementCount = $newTicketResponseCount = 0;
 
                 if ($userId) {
-                    // New Surveys: Example - surveys assigned to user and not yet responded
-                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM surveys WHERE assigned_to = ? AND is_completed = 0");
+                    // New Surveys: surveys the user has not responded to
+                    $stmt = $pdo->prepare("
+                        SELECT COUNT(*) FROM surveys s
+                        WHERE NOT EXISTS (
+                            SELECT 1 FROM survey_responses sr
+                            WHERE sr.survey_id = s.id AND sr.user_id = ?
+                        )
+                    ");
                     $stmt->execute([$userId]);
                     $newSurveyCount = (int)$stmt->fetchColumn();
 
