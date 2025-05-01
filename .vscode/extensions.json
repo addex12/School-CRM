@@ -6,6 +6,7 @@
         "ms-vscode.azure-repos",
         "ms-azuretools.vscode-azureresourcegroups",
         "esbenp.prettier-vscode",
-        "bugfixer.bugfixerai"
+        "bugfixer.bugfixerai",
+        "github.codespaces"
     ]
 }
