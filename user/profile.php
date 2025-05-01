@@ -396,8 +396,8 @@ function sendPasswordChangeNotification($email) {
             <div class="profile-info">
                 <h3><?= htmlspecialchars($user['username'] ?? 'Unknown') ?></h3>
                 <div class="card-text"><?= htmlspecialchars($user['email'] ?? 'No email provided') ?></div>
-                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name']) ?></span>
-                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login'])) : 'Never' ?></div>
+                <span class="badge bg-primary"><?= htmlspecialchars($user['role_name'] ?? 'Unknown') ?></span>
+                <div class="text-muted mt-2">Last Login: <?= !empty($user['last_login']) ? date('M j, Y g:i a', strtotime($user['last_login']) ?? '') : 'Never' ?></div>
             </div>
         </div>
 
