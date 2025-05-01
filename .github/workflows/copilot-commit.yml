@@ -7,6 +7,9 @@ on:
       - 'feature/**'
       - 'bugfix/**'
 
+permissions:
+  contents: read
+
 jobs:
   copilot-comment:
     runs-on: ubuntu-latest
