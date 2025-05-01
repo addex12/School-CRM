@@ -46,12 +46,32 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// Fetch the current user
+// Fetch the current user and extended profile data
 $user = getCurrentUser();
 if (!$user) {
     $_SESSION['error'] = "User session expired. Please login again.";
     header("Location: ../login.php");
     exit();
+}
+
+// Fetch extended profile data based on role
+$profileData = [];
+$role = strtolower($user['role_name'] ?? '');
+if ($role === 'teacher') {
+    // Fetch teacher profile fields
+    $stmt = $pdo->prepare("SELECT qualification, subject_specialization, date_of_birth, gender, address, status FROM teachers WHERE user_id = ?");
+    $stmt->execute([$user['id']]);
+    $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+} elseif ($role === 'parent') {
+    // Fetch parent profile fields
+    $stmt = $pdo->prepare("SELECT occupation, address, phone FROM parents WHERE user_id = ?");
+    $stmt->execute([$user['id']]);
+    $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+} elseif ($role === 'student') {
+    // Fetch student profile fields
+    $stmt = $pdo->prepare("SELECT class_id, section_id, enrollment_no, date_of_birth, gender, address, status FROM students WHERE user_id = ?");
+    $stmt->execute([$user['id']]);
+    $profileData = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 }
 
 // Define user ID
