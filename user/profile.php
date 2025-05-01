@@ -51,8 +51,6 @@ if (!$user) {
     header("Location: ../login.php");
     exit();
 }
-$stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-$stmt->execute([$user['id']] ?? '');
 // Always fetch username, email, and role from users table (joined with roles)
 $username = $user['username'] ?? '';
 $email = $user['email'] ?? '';
@@ -156,7 +154,6 @@ function handleProfileUpdate($pdo, $user, $userId) {
                         }
                     }
                     $_SESSION['success'] = "Profile updated successfully!";
-                    session_regenerate_id(true);
                     header("Location: profile.php");
                     exit();
                 } else {
