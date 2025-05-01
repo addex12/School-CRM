@@ -11,5 +11,11 @@ if ! command -v gh &> /dev/null; then
   exit 1
 fi
 
-# Upload asset to release
-gh release upload "$TAG" "$FILE" --repo "$REPO"
+# Check if release exists
+if ! gh release view "$TAG" --repo "$REPO" &>/dev/null; then
+  echo "Release with tag $TAG does not exist. Creating release..."
+  gh release create "$TAG" "$FILE" --repo "$REPO" --title "$TAG" --notes "Automated release for $TAG"
+else
+  # Upload asset to release
+  gh release upload "$TAG" "$FILE" --repo "$REPO"
+fi
