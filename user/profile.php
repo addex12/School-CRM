@@ -110,6 +110,12 @@ function handleProfileUpdate($pdo, $user, $userId) {
     $userFields = $_POST['user_fields'] ?? [];
     $extraFields = $_POST['extra_fields'] ?? [];
 
+    // Remove class_id and section_id from extraFields for students (read-only)
+    global $roleTable;
+    if ($roleTable === 'students') {
+        unset($extraFields['class_id'], $extraFields['section_id']);
+    }
+
     // Validate username
     if (!preg_match('/^[a-zA-Z0-9_]{3,30}$/', $username)) {
         $_SESSION['error'] = "Username must be 3-30 characters (letters, numbers, underscores only).";
@@ -138,17 +144,6 @@ function handleProfileUpdate($pdo, $user, $userId) {
                     // Update extra fields in role table if any
                     global $roleTable, $roleKey;
                     if ($roleTable && $extraFields) {
-                        // Check for class_id foreign key if student
-                        if ($roleTable === 'students' && isset($extraFields['class_id'])) {
-                            $classId = $extraFields['class_id'];
-                            if ($classId) {
-                                $stmtClass = $pdo->prepare("SELECT id FROM classes WHERE id = ?");
-                                $stmtClass->execute([$classId]);
-                                if (!$stmtClass->fetchColumn()) {
-                                    $extraFields['class_id'] = null; // Set to null if not found
-                                }
-                            }
-                        }
                         $set2 = '';
                         $params2 = [];
                         foreach ($extraFields as $col => $val) {
