@@ -21,6 +21,16 @@
 
 ---
 
+## 📦 Release Version
+
+**Current Production Release:**  
+[![](https://img.shields.io/github/v/release/addex12/School-CRM)](https://github.com/addex12/School-CRM/releases)
+
+See all releases and changelogs here:  
+👉 [https://github.com/addex12/School-CRM/releases/](https://github.com/addex12/School-CRM/releases/)
+
+---
+
 ## 🚀 Features
 
 ### User Management
