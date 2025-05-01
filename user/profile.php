@@ -32,8 +32,6 @@ function getCurrentUser() {
     $stmt->execute([$_SESSION['user_id']]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
-$stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-$stmt->execute([$user['id']]);
 function requireLogin() {
     if (!isset($_SESSION['user_id'])) {
         $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
@@ -53,6 +51,8 @@ if (!$user) {
     header("Location: ../login.php");
     exit();
 }
+$stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+$stmt->execute([$user['id']]);
 // Always fetch username, email, and role from users table (joined with roles)
 $username = $user['username'] ?? '';
 $email = $user['email'] ?? '';
