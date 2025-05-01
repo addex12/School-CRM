@@ -23,7 +23,6 @@ function getCurrentUser() {
     if (!isset($_SESSION['user_id'])) {
         return false;
     }
-    
     $stmt = $pdo->prepare("
         SELECT u.*, r.role_name 
         FROM users u 
@@ -33,7 +32,8 @@ function getCurrentUser() {
     $stmt->execute([$_SESSION['user_id']]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
-
+$stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+$stmt->execute([$user['id']]);
 function requireLogin() {
     if (!isset($_SESSION['user_id'])) {
         $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
@@ -464,7 +464,11 @@ function sendPasswordChangeNotification($email) {
                         <?php foreach ($extraColumns as $col): ?>
                             <div class="mb-3">
                                 <label for="<?= htmlspecialchars($col) ?>" class="form-label"><?= ucwords(str_replace('_',' ',$col)) ?>:</label>
-                                <input type="text" id="<?= htmlspecialchars($col) ?>" name="extra_fields[<?= htmlspecialchars($col) ?>]" class="erpnext-input" value="<?= htmlspecialchars($extraFields[$col] ?? '') ?>">
+                                <?php if ($roleTable === 'students' && in_array($col, ['class_id', 'section_id'])): ?>
+                                    <input type="text" id="<?= htmlspecialchars($col) ?>" name="extra_fields[<?= htmlspecialchars($col) ?>]" class="erpnext-input" value="<?= htmlspecialchars($extraFields[$col] ?? '') ?>" readonly>
+                                <?php else: ?>
+                                    <input type="text" id="<?= htmlspecialchars($col) ?>" name="extra_fields[<?= htmlspecialchars($col) ?>]" class="erpnext-input" value="<?= htmlspecialchars($extraFields[$col] ?? '') ?>">
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                         <div class="mb-3">
