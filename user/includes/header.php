@@ -180,6 +180,79 @@ if (isset($_SESSION['user_id'])) {
             .announcement-bar { font-size: 0.95em; padding: 6px 0.3em; }
             .header-content { padding: 0.3em 0.2em; }
         }
+        .notification-bell-container {
+            position: relative;
+            margin-left: 1.5em;
+        }
+        .notification-bell {
+            font-size: 1.7em;
+            color: #fff;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.18s;
+        }
+        .notification-bell:hover {
+            color: #f1c40f;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -7px;
+            right: -8px;
+            background: #e74c3c;
+            color: #fff;
+            font-size: 0.85em;
+            font-weight: bold;
+            border-radius: 50%;
+            padding: 2px 7px;
+            min-width: 22px;
+            text-align: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.13);
+        }
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 38px;
+            background: #fff;
+            min-width: 260px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.13);
+            border-radius: 8px;
+            z-index: 1001;
+            padding: 0.5em 0;
+        }
+        .notification-dropdown.active {
+            display: block;
+        }
+        .notification-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            padding: 10px 18px;
+            color: #215967;
+            text-decoration: none;
+            font-size: 1em;
+            border-bottom: 1px solid #f5f7fa;
+            transition: background 0.18s;
+        }
+        .notification-dropdown a:last-child {
+            border-bottom: none;
+        }
+        .notification-dropdown a:hover {
+            background: #e2efda;
+        }
+        .notification-count {
+            background: #2563eb;
+            color: #fff;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.93em;
+            margin-left: auto;
+            font-weight: 600;
+        }
+        @media (max-width: 700px) {
+            .notification-dropdown { min-width: 180px; }
+            .notification-bell { font-size: 1.3em; }
+        }
     </style>
 </head>
 <body>
@@ -206,10 +279,101 @@ if (isset($_SESSION['user_id'])) {
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </nav>
-            <div class="header-avatar-container">
-                <a href="profile.php" title="My Profile">
-                    <img src="../uploads/avatars/<?= htmlspecialchars($avatar) ?>" alt="Profile Picture" class="header-avatar-img" onerror="this.src='../uploads/avatars/default.jpg'">
-                </a>
+            <div style="display:flex;align-items:center;">
+                <!-- Notification Bell -->
+                <?php
+                // --- Notification counts logic ---
+                $userId = $_SESSION['user_id'] ?? null;
+                $userRoleId = $_SESSION['role_id'] ?? null;
+                $newSurveyCount = $newMessageCount = $newAnnouncementCount = $newTicketResponseCount = 0;
+
+                if ($userId) {
+                    // New Surveys: Example - surveys assigned to user and not yet responded
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM surveys WHERE assigned_to = ? AND is_completed = 0");
+                    $stmt->execute([$userId]);
+                    $newSurveyCount = (int)$stmt->fetchColumn();
+
+                    // New Messages: Example - unread messages for user
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM messages WHERE recipient_id = ? AND is_read = 0");
+                    $stmt->execute([$userId]);
+                    $newMessageCount = (int)$stmt->fetchColumn();
+
+                    // New Announcements: Example - announcements not yet seen by user
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM announcements a
+                        LEFT JOIN announcement_reads ar ON a.id = ar.announcement_id AND ar.user_id = ?
+                        WHERE NOW() BETWEEN a.start_date AND a.end_date
+                        AND (a.is_public = 1 OR (a.target_roles IS NOT NULL AND FIND_IN_SET(?, a.target_roles)))
+                        AND ar.id IS NULL
+                    ");
+                    $stmt->execute([$userId, $userRoleId]);
+                    $newAnnouncementCount = (int)$stmt->fetchColumn();
+
+                    // New Ticket Responses: Example - tickets where user is owner and there are unread responses
+                    $stmt = $pdo->prepare("SELECT COUNT(*) FROM ticket_responses tr
+                        INNER JOIN tickets t ON tr.ticket_id = t.id
+                        WHERE t.user_id = ? AND tr.is_read_by_user = 0
+                    ");
+                    $stmt->execute([$userId]);
+                    $newTicketResponseCount = (int)$stmt->fetchColumn();
+                }
+                $totalNotifications = $newSurveyCount + $newMessageCount + $newAnnouncementCount + $newTicketResponseCount;
+                ?>
+                <div class="notification-bell-container">
+                    <span class="notification-bell" id="notificationBell" tabindex="0" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <?php if ($totalNotifications > 0): ?>
+                            <span class="notification-badge"><?= $totalNotifications ?></span>
+                        <?php endif; ?>
+                    </span>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <a href="surveys.php">
+                            <i class="fas fa-poll"></i>
+                            New Surveys
+                            <span class="notification-count"><?= $newSurveyCount ?></span>
+                        </a>
+                        <a href="messages.php">
+                            <i class="fas fa-envelope"></i>
+                            New Messages
+                            <span class="notification-count"><?= $newMessageCount ?></span>
+                        </a>
+                        <a href="announcements.php">
+                            <i class="fas fa-bullhorn"></i>
+                            New Announcements
+                            <span class="notification-count"><?= $newAnnouncementCount ?></span>
+                        </a>
+                        <a href="tickets.php">
+                            <i class="fas fa-ticket-alt"></i>
+                            Ticket Responses
+                            <span class="notification-count"><?= $newTicketResponseCount ?></span>
+                        </a>
+                    </div>
+                </div>
+                <script>
+                // Toggle notification dropdown
+                document.addEventListener('DOMContentLoaded', function() {
+                    const bell = document.getElementById('notificationBell');
+                    const dropdown = document.getElementById('notificationDropdown');
+                    bell.addEventListener('click', function(e) {
+                        dropdown.classList.toggle('active');
+                        e.stopPropagation();
+                    });
+                    document.addEventListener('click', function() {
+                        dropdown.classList.remove('active');
+                    });
+                    bell.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            dropdown.classList.toggle('active');
+                            e.preventDefault();
+                        }
+                    });
+                });
+                </script>
+                <!-- End Notification Bell -->
+                <div class="header-avatar-container">
+                    <a href="profile.php" title="My Profile">
+                        <img src="../uploads/avatars/<?= htmlspecialchars($avatar) ?>" alt="Profile Picture" class="header-avatar-img" onerror="this.src='../uploads/avatars/default.jpg'">
+                    </a>
+                </div>
             </div>
         </div>
         <?php
