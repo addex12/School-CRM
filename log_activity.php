@@ -1,4 +1,13 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ * Patent rights reserved.
+ */
+
 $data = json_decode(file_get_contents('php://input'), true);
 if ($data) {
     $logDir = __DIR__ . '/logs';

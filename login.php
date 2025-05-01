@@ -5,6 +5,7 @@
  * LinkedIn: https://www.linkedin.com/in/eleganceict
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
+ * Patent rights reserved.
  */
 // Start output buffering
 ob_start();

@@ -1,4 +1,14 @@
 <?php
+/**
+ * Developer: Adugna Gizaw
+ * Email: gizawadugna@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/eleganceict
+ * Twitter: https://twitter.com/eleganceict1
+ * GitHub: https://github.com/addex12
+ * Patent rights reserved.
+ */
+
+
 // Database connection (adjust as needed)
 require_once '../includes/db.php'; // Include your database configuration file
 require_once '../includes/config.php'; // Include your database configuration file
