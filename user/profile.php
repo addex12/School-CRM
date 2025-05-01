@@ -387,10 +387,9 @@ function sendPasswordChangeNotification($email) {
     <div class="profile-main-container">
         <div class="profile-header">
             <div class="profile-avatar">
-                <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>" 
-                     alt="Profile Picture"
-                     onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';">
-            </div>
+            <img src="../uploads/avatars/<?= htmlspecialchars($user['avatar'] ?? 'default.jpg') ?>?v=<?= time() ?>"
+     alt="Profile Picture"
+     onerror="this.onerror=null; this.src='../uploads/avatars/default.jpg';"></div>
             <div class="profile-info">
                 <h3><?= htmlspecialchars($username) ?></h3>
                 <div class="card-text"><?= htmlspecialchars($email) ?></div>
