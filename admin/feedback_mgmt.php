@@ -112,20 +112,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * Developer: Adugna Gizaw
          * All custom styles use adugna- prefix for branding and patenting.
          * Compact, outstanding, responsive, content/screen-aware UI.
+         * Layout and cards adapt to any screen size for best usability.
          */
         html { font-size: 16px; }
-        @media (max-width: 900px) { html { font-size: 15px; } }
-        @media (max-width: 600px) { html { font-size: 13.5px; } }
+        @media (max-width: 1200px) { html { font-size: 15px; } }
+        @media (max-width: 900px) { html { font-size: 14px; } }
+        @media (max-width: 700px) { html { font-size: 13px; } }
+        @media (max-width: 500px) { html { font-size: 12px; } }
 
         .adugna-main-content {
             max-width: 1100px;
-            margin: 24px auto 0 auto;
+            margin: 2vw auto 0 auto;
             background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
-            padding: 12px 8px 18px 8px;
+            padding: 2vw 1vw 3vw 1vw;
             transition: box-shadow 0.2s;
+            width: 96vw;
         }
+        @media (max-width: 900px) {
+            .adugna-main-content { max-width: 99vw; padding: 2vw 2vw 3vw 2vw; }
+        }
+        @media (max-width: 600px) {
+            .adugna-main-content { padding: 1vw 0.5vw 2vw 0.5vw; }
+        }
+
+        .adugna-card {
+            background: #fff;
+            border-radius: 7px;
+            box-shadow: 0 1px 6px rgba(25,118,210,0.06);
+            padding: 1.2vw 1.5vw 1.5vw 1.5vw;
+            margin-bottom: 1.1rem;
+            transition: box-shadow 0.2s, width 0.2s;
+            width: 100%;
+        }
+        @media (max-width: 700px) {
+            .adugna-card { padding: 2vw 1vw 2vw 1vw; }
+        }
+        @media (max-width: 500px) {
+            .adugna-card { padding: 2vw 0.5vw 2vw 0.5vw; }
+        }
+
         .adugna-header-title {
             font-size: 1.15em;
             color: #1976d2;
@@ -135,18 +162,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             gap: 7px;
+            flex-wrap: wrap;
         }
         .adugna-header-title i {
             font-size: 1.1em;
         }
-        .adugna-card {
-            background: #fff;
-            border-radius: 7px;
-            box-shadow: 0 1px 6px rgba(25,118,210,0.06);
-            padding: 0.7rem 0.8rem 0.8rem 0.8rem;
-            margin-bottom: 1.1rem;
-            transition: box-shadow 0.2s, width 0.2s;
-        }
+
         .adugna-card-header {
             font-size: 1em;
             color: #1976d2;
@@ -160,11 +181,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .adugna-card-header i {
             font-size: 1em;
         }
+
         .adugna-form-group {
             margin-bottom: 0.7rem;
             display: flex;
             flex-direction: column;
             gap: 0.15em;
+            width: 100%;
         }
         .adugna-form-group label {
             font-size: 0.96em;
@@ -180,11 +203,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.96em;
             background: #f9fbfd;
             color: #222;
+            width: 100%;
+            box-sizing: border-box;
         }
         .adugna-form-group textarea {
             min-height: 70px;
             resize: vertical;
         }
+
         .adugna-btn {
             background: #1976d2;
             color: #fff;
@@ -222,6 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .adugna-btn-info:hover { background: #2563eb; }
         .adugna-btn-sm { padding: 1px 6px; font-size: 0.89em; border-radius: 2px; min-height: 22px; }
+
         .adugna-alert {
             background: #eafaf1;
             color: #27ae60;
@@ -242,16 +269,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #27ae60;
             border: 1px solid #d4f5e9;
         }
+
         .adugna-table {
             width: 100%;
             border-collapse: collapse;
             background: #fff;
+            overflow-x: auto;
+            display: block;
         }
         .adugna-table th, .adugna-table td {
             padding: 7px 8px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
             font-size: 0.95em;
+            white-space: pre-line;
         }
         .adugna-table th {
             background: #e2efda;
@@ -261,10 +292,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .adugna-table tr:hover { background: #f4f8fb; }
         .adugna-feedback-rating span { font-size: 1.1em; }
         .adugna-admin-reply { background: #f5f7fa; border-radius: 4px; padding: 4px 8px; margin-bottom: 4px; color: #215967; font-size: 0.93em; }
+
+        /* Responsive table for small screens */
+        @media (max-width: 700px) {
+            .adugna-table, .adugna-table thead, .adugna-table tbody, .adugna-table th, .adugna-table td, .adugna-table tr {
+                display: block;
+            }
+            .adugna-table thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            .adugna-table tr {
+                border: 1px solid #e2efda;
+                margin-bottom: 8px;
+                border-radius: 5px;
+                box-shadow: 0 1px 4px rgba(25,118,210,0.04);
+                background: #fff;
+            }
+            .adugna-table td {
+                border: none;
+                border-bottom: 1px solid #f0f2f5;
+                position: relative;
+                padding-left: 50%;
+                min-height: 32px;
+            }
+            .adugna-table td:before {
+                position: absolute;
+                top: 8px;
+                left: 8px;
+                width: 45%;
+                white-space: nowrap;
+                font-weight: bold;
+                color: #1976d2;
+                font-size: 0.96em;
+                content: attr(data-label);
+            }
+        }
+
         .adugna-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
         .adugna-modal-content { background-color: #fefefe; margin: 10% auto; padding: 16px; border: 1px solid #888; width: 48%; border-radius: 7px; }
         .adugna-modal-close { color: #aaa; float: right; font-size: 22px; font-weight: bold; }
         .adugna-modal-close:hover, .adugna-modal-close:focus { color: #1976d2; text-decoration: none; cursor: pointer; }
+        @media (max-width: 900px) {
+            .adugna-modal-content { width: 80%; }
+        }
+        @media (max-width: 600px) {
+            .adugna-modal-content { width: 97%; }
+        }
+
         .adugna-star-rating {
             direction: rtl;
             unicode-bidi: bidi-override;
@@ -282,17 +358,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .adugna-star-rating label:hover,
         .adugna-star-rating label:hover ~ label {
             color: orange;
-        }
-        @media (max-width: 900px) {
-            .adugna-main-content, .adugna-card { padding: 0.7rem; }
-            .adugna-modal-content { width: 80%; }
-        }
-        @media (max-width: 600px) {
-            .adugna-main-content, .adugna-card { padding: 0.4rem 0.1rem 0.7rem 0.1rem; }
-            .adugna-header-title { font-size: 0.98em; }
-            .adugna-modal-content { width: 97%; }
-            .adugna-btn, .adugna-btn-primary { padding: 4px 7px; font-size: 0.92em; }
-            .adugna-table th, .adugna-table td { padding: 5px 5px; font-size: 0.92em; }
         }
     </style>
 </head>
@@ -385,11 +450,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <tbody id="feedbackTbody">
                             <?php foreach ($feedbackList as $feedback): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($feedback['id']) ?></td>
-                                    <td><?= htmlspecialchars($feedback['username'] ?? 'Anonymous') ?></td>
-                                    <td><?= htmlspecialchars($feedback['subject']) ?></td>
-                                    <td><?= htmlspecialchars($feedback['message']) ?></td>
-                                    <td class="adugna-feedback-rating">
+                                    <td data-label="ID"><?= htmlspecialchars($feedback['id']) ?></td>
+                                    <td data-label="User"><?= htmlspecialchars($feedback['username'] ?? 'Anonymous') ?></td>
+                                    <td data-label="Subject"><?= htmlspecialchars($feedback['subject']) ?></td>
+                                    <td data-label="Message"><?= htmlspecialchars($feedback['message']) ?></td>
+                                    <td data-label="Rating" class="adugna-feedback-rating">
                                         <?php
                                         $full = intval($feedback['rating']);
                                         $empty = 5 - $full;
@@ -397,7 +462,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         for ($i=0; $i<$empty; $i++) echo '<span style="color:#ccc;font-size:1.1em">&#9733;</span>';
                                         ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Admin Reply">
                                         <?php if (!empty($feedback['admin_reply'])): ?>
                                             <div class="adugna-admin-reply"><strong>Admin:</strong> <?= htmlspecialchars($feedback['admin_reply']) ?></div>
                                         <?php endif; ?>
@@ -407,8 +472,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <button type="submit" name="admin_reply" class="adugna-btn adugna-btn-info adugna-btn-sm" style="margin-top:1px;">Reply</button>
                                         </form>
                                     </td>
-                                    <td><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
-                                    <td>
+                                    <td data-label="Created At"><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
+                                    <td data-label="Actions">
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="feedback_id" value="<?= $feedback['id'] ?>">
                                             <button type="submit" name="delete_feedback" class="adugna-btn adugna-btn-danger adugna-btn-sm" onclick="return confirm('Are you sure you want to delete this feedback?')"><i class="fas fa-trash"></i></button>
@@ -512,3 +577,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
+```
+</copilot-edited-file>
