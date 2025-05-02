@@ -96,6 +96,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!--
+    Developer: Adugna Gizaw
+    Custom adugna- styles for compact, branded, responsive, visually outstanding UI.
+    All styles use adugna- prefix for patenting and branding.
+    -->
     <meta charset="UTF-8">
     <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
@@ -104,86 +109,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="../assets/js/feedback.js" defer></script>
     <style>
         /**
-         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
-         * Sidebar/footer styles are not touched.
-         * All cards, buttons, and messages use adugna- prefix.
-         * Layout is content/screen aware and visually outstanding.
+         * Developer: Adugna Gizaw
+         * All custom styles use adugna- prefix for branding and patenting.
+         * Compact, outstanding, responsive, content/screen-aware UI.
          */
         html { font-size: 16px; }
         @media (max-width: 900px) { html { font-size: 15px; } }
-        @media (max-width: 600px) { html { font-size: 14px; } }
+        @media (max-width: 600px) { html { font-size: 13.5px; } }
+
         .adugna-main-content {
             max-width: 1100px;
-            margin: 32px auto 0 auto;
+            margin: 24px auto 0 auto;
             background: #fff;
             border-radius: 10px;
-            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.07);
-            padding: 18px 18px 28px 18px;
+            box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+            padding: 12px 8px 18px 8px;
             transition: box-shadow 0.2s;
         }
         .adugna-header-title {
-            font-size: 1.35em;
+            font-size: 1.15em;
             color: #1976d2;
             font-weight: 700;
-            margin-bottom: 18px;
+            margin-bottom: 14px;
             letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .adugna-header-title i {
+            font-size: 1.1em;
         }
         .adugna-card {
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
-            padding: 1.1rem 1.2rem 1.2rem 1.2rem;
-            margin-bottom: 1.5rem;
+            border-radius: 7px;
+            box-shadow: 0 1px 6px rgba(25,118,210,0.06);
+            padding: 0.7rem 0.8rem 0.8rem 0.8rem;
+            margin-bottom: 1.1rem;
             transition: box-shadow 0.2s, width 0.2s;
         }
         .adugna-card-header {
-            font-size: 1.13em;
+            font-size: 1em;
             color: #1976d2;
             font-weight: 700;
-            margin-bottom: 1em;
+            margin-bottom: 0.7em;
             letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .adugna-card-header i {
+            font-size: 1em;
         }
         .adugna-form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 0.7rem;
             display: flex;
             flex-direction: column;
-            gap: 0.2em;
+            gap: 0.15em;
         }
         .adugna-form-group label {
-            font-size: 0.97em;
+            font-size: 0.96em;
             color: #444;
             font-weight: 500;
         }
         .adugna-form-group input,
         .adugna-form-group select,
         .adugna-form-group textarea {
-            padding: 7px 10px;
-            border-radius: 4px;
+            padding: 5px 8px;
+            border-radius: 3px;
             border: 1px solid #d0d7de;
-            font-size: 0.97em;
+            font-size: 0.96em;
             background: #f9fbfd;
             color: #222;
         }
         .adugna-form-group textarea {
-            min-height: 80px;
+            min-height: 70px;
             resize: vertical;
         }
         .adugna-btn {
             background: #1976d2;
             color: #fff;
             border: none;
-            border-radius: 4px;
-            padding: 5px 13px;
-            font-size: 0.97em;
+            border-radius: 3px;
+            padding: 3px 10px;
+            font-size: 0.93em;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             transition: background 0.15s;
             font-weight: 500;
             text-decoration: none;
+            min-height: 26px;
         }
-        .adugna-btn i { font-size: 1em; }
+        .adugna-btn i { font-size: 0.95em; }
         .adugna-btn:hover, .adugna-btn:focus { background: #145ea8; }
         .adugna-btn-secondary {
             background: #e3eafc;
@@ -203,15 +221,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #38bdf8;
         }
         .adugna-btn-info:hover { background: #2563eb; }
-        .adugna-btn-sm { padding: 2px 7px; font-size: 0.93em; border-radius: 3px; }
+        .adugna-btn-sm { padding: 1px 6px; font-size: 0.89em; border-radius: 2px; min-height: 22px; }
         .adugna-alert {
             background: #eafaf1;
             color: #27ae60;
             border: 1px solid #d4f5e9;
-            border-radius: 5px;
-            padding: 10px 18px;
-            margin-bottom: 1em;
-            font-size: 0.97em;
+            border-radius: 4px;
+            padding: 7px 14px;
+            margin-bottom: 0.7em;
+            font-size: 0.95em;
             text-align: center;
         }
         .adugna-alert-error {
@@ -230,10 +248,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: #fff;
         }
         .adugna-table th, .adugna-table td {
-            padding: 10px 12px;
+            padding: 7px 8px;
             border-bottom: 1px solid #f0f2f5;
             text-align: left;
-            font-size: 0.97em;
+            font-size: 0.95em;
         }
         .adugna-table th {
             background: #e2efda;
@@ -241,11 +259,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #215967;
         }
         .adugna-table tr:hover { background: #f4f8fb; }
-        .adugna-feedback-rating span { font-size: 1.2em; }
-        .adugna-admin-reply { background: #f5f7fa; border-radius: 5px; padding: 5px 10px; margin-bottom: 5px; color: #215967; }
+        .adugna-feedback-rating span { font-size: 1.1em; }
+        .adugna-admin-reply { background: #f5f7fa; border-radius: 4px; padding: 4px 8px; margin-bottom: 4px; color: #215967; font-size: 0.93em; }
         .adugna-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.4); }
-        .adugna-modal-content { background-color: #fefefe; margin: 10% auto; padding: 20px; border: 1px solid #888; width: 50%; border-radius: 8px; }
-        .adugna-modal-close { color: #aaa; float: right; font-size: 28px; font-weight: bold; }
+        .adugna-modal-content { background-color: #fefefe; margin: 10% auto; padding: 16px; border: 1px solid #888; width: 48%; border-radius: 7px; }
+        .adugna-modal-close { color: #aaa; float: right; font-size: 22px; font-weight: bold; }
         .adugna-modal-close:hover, .adugna-modal-close:focus { color: #1976d2; text-decoration: none; cursor: pointer; }
         .adugna-star-rating {
             direction: rtl;
@@ -257,7 +275,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #ccc;
             cursor: pointer;
             transition: color 0.2s;
-            font-size: 1.5em;
+            font-size: 1.2em;
+            margin: 0 1px;
         }
         .adugna-star-rating input[type="radio"]:checked ~ label,
         .adugna-star-rating label:hover,
@@ -265,30 +284,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: orange;
         }
         @media (max-width: 900px) {
-            .adugna-main-content, .adugna-card { padding: 1rem; }
+            .adugna-main-content, .adugna-card { padding: 0.7rem; }
+            .adugna-modal-content { width: 80%; }
         }
         @media (max-width: 600px) {
-            .adugna-main-content, .adugna-card { padding: 0.7rem 0.2rem 1rem 0.2rem; }
-            .adugna-header-title { font-size: 1.05em; }
-            .adugna-modal-content { width: 95%; }
-            .adugna-btn, .adugna-btn-primary { padding: 6px 10px; font-size: 0.95em; }
+            .adugna-main-content, .adugna-card { padding: 0.4rem 0.1rem 0.7rem 0.1rem; }
+            .adugna-header-title { font-size: 0.98em; }
+            .adugna-modal-content { width: 97%; }
+            .adugna-btn, .adugna-btn-primary { padding: 4px 7px; font-size: 0.92em; }
+            .adugna-table th, .adugna-table td { padding: 5px 5px; font-size: 0.92em; }
         }
     </style>
 </head>
 <body>
     <!-- Floating global status message -->
     <?php if (!empty($_SESSION['success'])): ?>
-        <div id="statusMsg" class="adugna-alert adugna-alert-success text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:260px;max-width:420px;padding:10px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:6px;">
+        <div id="statusMsg" class="adugna-alert adugna-alert-success text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:350px;padding:8px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:5px;">
             <?= htmlspecialchars($_SESSION['success']) ?>
         </div>
         <?php unset($_SESSION['success']); ?>
     <?php elseif (!empty($_SESSION['error'])): ?>
-        <div id="statusMsg" class="adugna-alert adugna-alert-error text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:260px;max-width:420px;padding:10px 24px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:6px;">
+        <div id="statusMsg" class="adugna-alert adugna-alert-error text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:350px;padding:8px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:5px;">
             <?= htmlspecialchars($_SESSION['error']) ?>
         </div>
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
     <script>
+    // Developer: Adugna Gizaw
     // Auto-hide status message after 3 seconds
     document.addEventListener('DOMContentLoaded', function() {
         var msg = document.getElementById('statusMsg');
@@ -336,16 +358,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php endfor; ?>
                         </div>
                     </div>
-                    <button type="submit" name="add_feedback" class="adugna-btn"><i class="fas fa-plus"></i> Add Feedback</button>
+                    <button type="submit" name="add_feedback" class="adugna-btn"><i class="fas fa-plus"></i> Add</button>
                 </form>
             </div>
             <!-- Feedback List Section -->
             <div class="adugna-card">
                 <div class="adugna-card-header"><i class="fas fa-list"></i> Feedback List</div>
-                <div style="max-width:500px;margin-bottom:24px;">
-                    <canvas id="feedbackChart" height="180"></canvas>
+                <div style="max-width:420px;margin-bottom:18px;">
+                    <canvas id="feedbackChart" height="140"></canvas>
                 </div>
-                <input type="text" id="feedback-search" placeholder="Search feedback..." class="adugna-form-group" style="margin-bottom:1.2rem;">
+                <input type="text" id="feedback-search" placeholder="Search feedback..." class="adugna-form-group" style="margin-bottom:1rem;">
                 <?php if (count($feedbackList) > 0): ?>
                     <table class="adugna-table" id="feedbackTable">
                         <thead>
@@ -371,25 +393,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <?php
                                         $full = intval($feedback['rating']);
                                         $empty = 5 - $full;
-                                        for ($i=0; $i<$full; $i++) echo '<span style="color:gold;font-size:1.2em">&#9733;</span>';
-                                        for ($i=0; $i<$empty; $i++) echo '<span style="color:#ccc;font-size:1.2em">&#9733;</span>';
+                                        for ($i=0; $i<$full; $i++) echo '<span style="color:gold;font-size:1.1em">&#9733;</span>';
+                                        for ($i=0; $i<$empty; $i++) echo '<span style="color:#ccc;font-size:1.1em">&#9733;</span>';
                                         ?>
                                     </td>
                                     <td>
                                         <?php if (!empty($feedback['admin_reply'])): ?>
                                             <div class="adugna-admin-reply"><strong>Admin:</strong> <?= htmlspecialchars($feedback['admin_reply']) ?></div>
                                         <?php endif; ?>
-                                        <form method="POST" style="margin-top:5px;">
+                                        <form method="POST" style="margin-top:4px;">
                                             <input type="hidden" name="feedback_id" value="<?= $feedback['id'] ?>">
                                             <input type="text" name="reply" placeholder="Add reply..." class="adugna-form-group" required>
-                                            <button type="submit" name="admin_reply" class="adugna-btn adugna-btn-info adugna-btn-sm" style="margin-top:2px;">Reply</button>
+                                            <button type="submit" name="admin_reply" class="adugna-btn adugna-btn-info adugna-btn-sm" style="margin-top:1px;">Reply</button>
                                         </form>
                                     </td>
                                     <td><?= date('M j, Y g:i A', strtotime($feedback['created_at'])) ?></td>
                                     <td>
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="feedback_id" value="<?= $feedback['id'] ?>">
-                                            <button type="submit" name="delete_feedback" class="adugna-btn adugna-btn-danger adugna-btn-sm" onclick="return confirm('Are you sure you want to delete this feedback?')">Delete</button>
+                                            <button type="submit" name="delete_feedback" class="adugna-btn adugna-btn-danger adugna-btn-sm" onclick="return confirm('Are you sure you want to delete this feedback?')"><i class="fas fa-trash"></i></button>
                                         </form>
                                     </td>
                                 </tr>
@@ -406,7 +428,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div id="editModal" class="adugna-modal">
         <div class="adugna-modal-content">
             <span class="adugna-modal-close" onclick="closeModal()">&times;</span>
-            <h2 style="color:#1976d2;"><i class="fas fa-edit"></i> Edit Feedback</h2>
+            <h2 style="color:#1976d2;font-size:1.1em;"><i class="fas fa-edit"></i> Edit Feedback</h2>
             <form method="POST">
                 <input type="hidden" name="feedback_id" id="editFeedbackId">
                 <div class="adugna-form-group">
@@ -421,13 +443,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label for="editRating">Rating</label>
                     <input type="number" name="rating" id="editRating" min="1" max="5" required>
                 </div>
-                <button type="submit" name="edit_feedback" class="adugna-btn"><i class="fas fa-save"></i> Save Changes</button>
+                <button type="submit" name="edit_feedback" class="adugna-btn"><i class="fas fa-save"></i> Save</button>
             </form>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Adugna Gizaw: Chart.js feedback ratings bar chart, visually outstanding and responsive
+        // Developer: Adugna Gizaw
+        // Chart.js feedback ratings bar chart, visually outstanding and responsive
         const ratingsData = <?= $ratingsJson ?>;
         const ctx = document.getElementById('feedbackChart').getContext('2d');
         new Chart(ctx, {
@@ -440,7 +463,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     backgroundColor: [
                         '#ff4d4d', '#ff9933', '#ffe066', '#a3e635', '#34d399'
                     ],
-                    borderRadius: 8,
+                    borderRadius: 7,
                     borderSkipped: false,
                     barPercentage: 0.7,
                     categoryPercentage: 0.6,
@@ -450,7 +473,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 responsive: true,
                 plugins: {
                     legend: { display: false },
-                    title: { display: true, text: 'Feedback Ratings Distribution', color: '#1976d2', font: { weight: 700, size: 16 } }
+                    title: { display: true, text: 'Feedback Ratings Distribution', color: '#1976d2', font: { weight: 700, size: 15 } }
                 },
                 scales: {
                     x: { beginAtZero: true, grid: { display: false }, ticks: { color: '#1976d2', font: { weight: 600 } } },
@@ -459,7 +482,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
 
-        // Adugna Gizaw: Feedback search (real-time, compact, responsive)
+        // Developer: Adugna Gizaw
+        // Feedback search (real-time, compact, responsive)
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('feedback-search');
             const tbody = document.getElementById('feedbackTbody');
@@ -472,7 +496,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         });
 
-        // Adugna Gizaw: Edit feedback modal logic
+        // Developer: Adugna Gizaw
+        // Edit feedback modal logic
         function editFeedback(id, subject, message, rating) {
             document.getElementById('editFeedbackId').value = id;
             document.getElementById('editSubject').value = subject;
