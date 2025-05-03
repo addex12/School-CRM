@@ -434,7 +434,7 @@ try {
             color: var(--adugna-primary-dark);
             text-decoration: underline;
         }
-        /* Adugna Gizaw: Compact button style, ERPNext-inspired */
+        /* Adugna Gizaw: Compact button style` */
         .adugna-btn {
             width: 100%;
             padding: 0.58rem 0;
