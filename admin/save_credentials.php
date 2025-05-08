@@ -12,11 +12,6 @@ session_start();
 if (!isset($_SESSION['consent_granted'])) {
 
 
-// Only accept POST requests
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('HTTP/1.1 405 Method Not Allowed');
-    exit();
-}
 
 // Get and validate input
 $data = json_decode(file_get_contents('php://input'), true);
