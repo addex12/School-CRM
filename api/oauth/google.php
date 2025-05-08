@@ -58,10 +58,13 @@ if (isset($_GET['code'])) {
     curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response = curl_exec($ch);
+    if (curl_errno($ch)) {
+        die('OAuth: cURL error: ' . curl_error($ch));
+    }
     curl_close($ch);
     $token_data = json_decode($response, true);
     if (!isset($token_data['access_token'])) {
-        die('Adugna OAuth: Failed to get access token.');
+        die('Adugna OAuth: Failed to get access token. Google response: ' . htmlspecialchars($response));
     }
     $access_token = $token_data['access_token'];
 
