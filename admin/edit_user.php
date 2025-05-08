@@ -84,13 +84,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_random_password
     $hashed = password_hash($new_password, PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
     $stmt->execute([$hashed, $id]);
-    // Send email using settings
-    $to = $user['email'];
-    $subject = "Your password has been reset";
-    $body = "Hello " . $user['username'] . ",\n\nYour account password has been reset by an administrator.\n\nTemporary Password: $new_password\n\nPlease log in using this password and change it immediately for your security.\n\nIf you did not request this change, please contact support immediately.\n\nThank you,\nSchool CRM Team";
-    $headers = "From: $from_name <$from_email>\r\n";
-    @mail($to, $subject, $body, $headers);
-    $_SESSION['success'] = "Password reset and sent to user's email.";
+    // Send email using PHPMailer and settings
+    require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
+    require_once __DIR__ . '/../PHPMailer/SMTP.php';
+    require_once __DIR__ . '/../PHPMailer/Exception.php';
+    use PHPMailer\PHPMailer\PHPMailer;
+    use PHPMailer\PHPMailer\Exception;
+    $mail = new PHPMailer(true);
+    try {
+        $mail->isSMTP();
+        $mail->Host = $email_settings['smtp_host'] ?? '';
+        $mail->Port = $email_settings['smtp_port'] ?? 587;
+        $mail->SMTPAuth = true;
+        $mail->Username = $email_settings['smtp_user'] ?? '';
+        $mail->Password = $email_settings['smtp_pass'] ?? '';
+        if (!empty($email_settings['smtp_secure'])) {
+            $mail->SMTPSecure = $email_settings['smtp_secure'];
+        }
+        $mail->setFrom($from_email, $from_name);
+        $mail->addAddress($user['email']);
+        $mail->isHTML(false);
+        $mail->Subject = "Your password has been reset";
+        $mail->Body = "Hello " . $user['username'] . ",\n\nYour account password has been reset by an administrator.\n\nTemporary Password: $new_password\n\nPlease log in using this password and change it immediately for your security.\n\nIf you did not request this change, please contact support immediately.\n\nThank you,\nSchool CRM Team";
+        $mail->send();
+        $_SESSION['success'] = "Password reset and sent to user's email.";
+    } catch (Exception $e) {
+        $_SESSION['error'] = "Password reset but email could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
     header("Location: edit_user.php?id=" . urlencode($id));
     exit();
 }
