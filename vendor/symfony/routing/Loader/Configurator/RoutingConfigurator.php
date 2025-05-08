@@ -40,9 +40,10 @@ class RoutingConfigurator
      */
     final public function import(string|array $resource, ?string $type = null, bool $ignoreErrors = false, string|array|null $exclude = null): ImportConfigurator
     {
-        $this->loader->setCurrentDir(\dirname($this->path));
+        // Removed setResolver call as PhpFileLoader does not support it
+        $resolverPath = \dirname($this->file);
 
-        $imported = $this->loader->import($resource, $type, $ignoreErrors, $this->file, $exclude) ?: [];
+        $imported = $this->loader->load($resource, $type) ?: [];
         if (!\is_array($imported)) {
             return new ImportConfigurator($this->collection, $imported);
         }
