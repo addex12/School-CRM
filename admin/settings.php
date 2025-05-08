@@ -204,7 +204,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
             $mail->send();
             $_SESSION['success'] = "Test email sent successfully to $testEmail!";
         } catch (Exception $e) {
-            $_SESSION['error'] = "Failed to send test email: " . $e->getMessage();
+            // Add SMTP debug info for troubleshooting
+            $smtpInfo = "SMTP Host: $smtp_host, Port: $smtp_port, Secure: $smtp_secure";
+            $_SESSION['error'] = "Failed to send test email: " . $e->getMessage() . "<br><small>$smtpInfo</small><br>Please check your SMTP settings and network connectivity.";
         }
     } else {
         $_SESSION['error'] = "Invalid test email address.";
