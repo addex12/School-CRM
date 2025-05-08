@@ -87,3 +87,4 @@ if (!function_exists('setUserSession')) {
         }
     }
 }
+ob_end_flush(); // Flush the output buffer
