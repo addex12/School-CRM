@@ -32,10 +32,20 @@ if (!$user) {
 // Fetch all roles for the form select
 $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
 
+// Fetch email settings from system_settings table
+$email_settings = [];
+$stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_group = 'email'");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $email_settings[$row['setting_key']] = $row['setting_value'];
+}
+$from_email = $email_settings['from_email'] ?? $email_settings['smtp_user'] ?? 'noreply@example.com';
+$from_name = $settings['site_name'] ?? 'School CRM';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $role_id = $_POST['role_id'];
+    $active = isset($_POST['active']) ? (int)$_POST['active'] : 0;
     $validation_error = '';
 
     // Validate email format
@@ -60,8 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     if ($validation_error) {
         $_SESSION['error'] = $validation_error;
     } else {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $role_id, $id]);
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ?, active = ? WHERE id = ?");
+        $stmt->execute([$username, $email, $role_id, $active, $id]);
         $_SESSION['success'] = "User updated successfully!";
         header("Location: users.php");
         exit();
@@ -74,11 +84,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_random_password
     $hashed = password_hash($new_password, PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
     $stmt->execute([$hashed, $id]);
-    // Send email
+    // Send email using settings
     $to = $user['email'];
     $subject = "Your password has been reset";
-    $body = "Hello " . $user['username'] . ",\n\nYour new password is: $new_password\n\nPlease login and change it.";
-    @mail($to, $subject, $body);
+    $body = "Hello " . $user['username'] . ",\n\nYour account password has been reset by an administrator.\n\nTemporary Password: $new_password\n\nPlease log in using this password and change it immediately for your security.\n\nIf you did not request this change, please contact support immediately.\n\nThank you,\nSchool CRM Team";
+    $headers = "From: $from_name <$from_email>\r\n";
+    @mail($to, $subject, $body, $headers);
     $_SESSION['success'] = "Password reset and sent to user's email.";
     header("Location: edit_user.php?id=" . urlencode($id));
     exit();
@@ -270,6 +281,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
                                 <?= htmlspecialchars($role['role_name']); ?>
                             </option>
                         <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="active">Account Status:</label>
+                    <select id="active" name="active">
+                        <option value="1" <?= ($user['active'] == 1) ? 'selected' : '' ?>>Activate</option>
+                        <option value="0" <?= ($user['active'] == 0) ? 'selected' : '' ?>>Deactivate</option>
                     </select>
                 </div>
                 <div class="adugna-form-actions">
