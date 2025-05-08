@@ -1,4 +1,8 @@
 <?php
+// Start session at the very top for session reliability
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -6,7 +10,6 @@
  * Twitter: https://twitter.com/eleganceict1
  * GitHub: https://github.com/addex12
  */
-session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
