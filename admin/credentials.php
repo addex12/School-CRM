@@ -4,15 +4,10 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/CredentialManager.php';
 
-// Ensure encryption key is set
-if (!isset($config['encryption_key']) || empty($config['encryption_key'])) {
-    die('<div style="color:red;font-weight:bold;">Fatal error: Encryption key is not set in config.php. Please define $config[\'encryption_key\'].</div>');
-}
-
 // Admin verification
 requireAdmin();
 
-$credentialManager = new CredentialManager($pdo, $config['encryption_key']);
+$credentialManager = new CredentialManager($pdo, 'adugna');
 $credentials = $credentialManager->getAllCredentials();
 
 // Handle password reveal request

@@ -6,7 +6,7 @@ require_once __DIR__ . '/../includes/CredentialManager.php';
 header('Content-Type: application/json');
 
 // Initialize credential manager with encryption key from config
-$credentialManager = new CredentialManager($pdo, $config['encryption_key']);
+$credentialManager = new CredentialManager($pdo, 'adugna');
 
 try {
     switch ($_SERVER['REQUEST_METHOD']) {
