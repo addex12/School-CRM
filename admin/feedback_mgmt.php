@@ -28,7 +28,7 @@ foreach ($feedbackList as $feedback) {
     $r = (int)$feedback['rating'];
     if (isset($ratingsData[$r])) $ratingsData[$r]++;
 }
-$ratingsJson = json_encode(array.values($ratingsData));
+$ratingsJson = json_encode(array_values($ratingsData));
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
