@@ -422,6 +422,28 @@ $settings_fields = [
                                     <?php if ($field['type'] === 'checkbox'): ?>
                                         <input type="checkbox" id="<?= $key ?>" name="settings[<?= $key ?>]" value="1"
                                             <?= !empty($settings[$key]) && $settings[$key] == '1' ? 'checked' : '' ?>>
+                                    <?php elseif ($field['type'] === 'select' && $key === 'smtp_host'): ?>
+                                        <select id="<?= $key ?>" name="settings[<?= $key ?>]">
+                                            <?php
+                                            // SMTP provider autofill mapping
+                                            $smtpProviderData = [
+                                                'smtp.gmail.com' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.mail.yahoo.com' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.office365.com' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.mailgun.org' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.sendgrid.net' => ['port' => 587, 'secure' => 'tls'],
+                                            ];
+                                            foreach ($field['options'] as $optionValue => $optionLabel):
+                                                $dataAttrs = '';
+                                                if (isset($smtpProviderData[$optionValue])) {
+                                                    $dataAttrs = ' data-port="' . $smtpProviderData[$optionValue]['port'] . '" data-secure="' . $smtpProviderData[$optionValue]['secure'] . '"';
+                                                }
+                                            ?>
+                                                <option value="<?= $optionValue ?>"<?= isset($settings[$key]) && $settings[$key] == $optionValue ? ' selected' : '' ?><?= $dataAttrs ?>>
+                                                    <?= $optionLabel ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     <?php elseif ($field['type'] === 'select'): ?>
                                         <select id="<?= $key ?>" name="settings[<?= $key ?>]">
                                             <?php foreach ($field['options'] as $optionValue => $optionLabel): ?>
@@ -499,6 +521,23 @@ $settings_fields = [
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <script>
+    // Autofill SMTP port and security when provider is selected
+    document.addEventListener('DOMContentLoaded', function() {
+        var smtpHost = document.getElementById('smtp_host');
+        var smtpPort = document.getElementById('smtp_port');
+        var smtpSecure = document.getElementById('smtp_secure');
+        if (smtpHost && smtpPort && smtpSecure) {
+            smtpHost.addEventListener('change', function() {
+                var selected = smtpHost.options[smtpHost.selectedIndex];
+                var port = selected.getAttribute('data-port');
+                var secure = selected.getAttribute('data-secure');
+                if (port) smtpPort.value = port;
+                if (secure) smtpSecure.value = secure;
+            });
+        }
+    });
+    </script>
     <style>
         /* Adugna Gizaw: Make textboxes and textareas compact, attractive, and not too long */
         .adugna-form-group input[type="text"],
