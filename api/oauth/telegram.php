@@ -26,13 +26,16 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 $bot_username = $settings['telegram_bot_username'];
 $bot_id = $settings['telegram_bot_id'];
 
+// Determine the origin dynamically
+$origin = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+
 // 2. If no Telegram login data, show Telegram login button
 if (!isset($_GET['id']) && !isset($_GET['hash'])) {
     $login_url = 'https://oauth.telegram.org/auth?bot=' . urlencode($bot_username);
     if (!empty($bot_id)) {
         $login_url .= '&bot_id=' . urlencode($bot_id);
     }
-    $login_url .= '&origin=' . urlencode('https://' . $_SERVER['HTTP_HOST']) . '&embed=0&request_access=write';
+    $login_url .= '&origin=' . urlencode($origin) . '&embed=0&request_access=write';
     header('Location: ' . $login_url);
     exit();
 }
