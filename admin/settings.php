@@ -82,11 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
         clearstatcache(true, $uploadDir . 'banner.png');
         clearstatcache(true, $uploadDir . 'icon.png');
 
-        $_SESSION['success'] = "Settings updated successfully!";
+        $_SESSION['success'] = "<div style='color:#1976d2;font-weight:600;font-size:1.08em;display:flex;align-items:center;gap:0.5em;'><i class='fas fa-check-circle' style='color:#27ae60;'></i>Settings updated successfully! Your changes are now live. 🎉</div>";
         header("Location: settings.php");
         exit();
     } catch (Exception $e) {
-        $_SESSION['error'] = "Failed to update settings: " . $e->getMessage();
+        $_SESSION['error'] = "<div style='color:#e74c3c;font-weight:600;font-size:1.08em;display:flex;align-items:center;gap:0.5em;'><i class='fas fa-times-circle'></i>Oops! Something went wrong while saving your settings. Please try again or contact support.<br><span style='font-size:0.97em;color:#b94a48;'>".htmlspecialchars($e->getMessage())."</span></div>";
     }
 }
 
