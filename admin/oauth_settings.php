@@ -11,7 +11,7 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 requireAdmin();
-
+$pageTitle = "Adugna OAuth Settings";
 // Fetch current settings from DB
 $defaults = [
     'google_client_id' => '',
@@ -64,24 +64,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <div class="adugna-settings-card">
-        <div class="adugna-settings-title"><i class="fas fa-cogs"></i> Adugna OAuth Settings</div>
-        <?php if (!empty($success)): ?>
-            <div class="adugna-success">Settings updated successfully.</div>
-        <?php endif; ?>
-        <form method="post" class="adugna-settings-form">
-            <label for="google_client_id">Google Client ID</label>
-            <input type="text" id="google_client_id" name="google_client_id" value="<?= htmlspecialchars($settings['google_client_id']) ?>">
-            <label for="google_client_secret">Google Client Secret</label>
-            <input type="text" id="google_client_secret" name="google_client_secret" value="<?= htmlspecialchars($settings['google_client_secret']) ?>">
-            <label for="facebook_app_id">Facebook App ID</label>
-            <input type="text" id="facebook_app_id" name="facebook_app_id" value="<?= htmlspecialchars($settings['facebook_app_id']) ?>">
-            <label for="facebook_app_secret">Facebook App Secret</label>
-            <input type="text" id="facebook_app_secret" name="facebook_app_secret" value="<?= htmlspecialchars($settings['facebook_app_secret']) ?>">
-            <label for="telegram_bot_username">Telegram Bot Username</label>
-            <input type="text" id="telegram_bot_username" name="telegram_bot_username" value="<?= htmlspecialchars($settings['telegram_bot_username']) ?>">
-            <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Save Settings</button>
-        </form>
+    <div class="admin-dashboard">
+        <?php include 'includes/admin_sidebar.php'; ?>
+        <div class="adugna-settings-card">
+            <div class="adugna-settings-title"><i class="fas fa-cogs"></i> Adugna OAuth Settings</div>
+            <?php if (!empty($success)): ?>
+                <div class="adugna-success">Settings updated successfully.</div>
+            <?php endif; ?>
+            <form method="post" class="adugna-settings-form">
+                <label for="google_client_id">Google Client ID</label>
+                <input type="text" id="google_client_id" name="google_client_id" value="<?= htmlspecialchars($settings['google_client_id']) ?>">
+                <label for="google_client_secret">Google Client Secret</label>
+                <input type="text" id="google_client_secret" name="google_client_secret" value="<?= htmlspecialchars($settings['google_client_secret']) ?>">
+                <label for="facebook_app_id">Facebook App ID</label>
+                <input type="text" id="facebook_app_id" name="facebook_app_id" value="<?= htmlspecialchars($settings['facebook_app_id']) ?>">
+                <label for="facebook_app_secret">Facebook App Secret</label>
+                <input type="text" id="facebook_app_secret" name="facebook_app_secret" value="<?= htmlspecialchars($settings['facebook_app_secret']) ?>">
+                <label for="telegram_bot_username">Telegram Bot Username</label>
+                <input type="text" id="telegram_bot_username" name="telegram_bot_username" value="<?= htmlspecialchars($settings['telegram_bot_username']) ?>">
+                <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Save Settings</button>
+            </form>
+        </div>
+        <?php include 'includes/footer.php'; ?>
     </div>
 </body>
 </html>
