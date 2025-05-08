@@ -41,19 +41,56 @@ if (!isset($_GET['id']) && !isset($_GET['hash'])) {
 }
 
 // 3. Validate Telegram login data (see Telegram docs for security)
-// For demo, just show the data
 $user = $_GET;
 if (!isset($user['id'])) {
     die('Adugna OAuth: Failed to get Telegram user info.');
 }
 
 // 4. Register or log in the user in your system
-// TODO: Implement user lookup/creation in your database
-// Example: $user['id'], $user['username'], $user['first_name'], $user['last_name']
-// You may want to set $_SESSION['user_id'] and redirect to dashboard
+// Store Telegram credentials in users table
+$telegram_id = $user['id'];
+$email = $user['email'] ?? ($telegram_id . '@telegram.local'); // fallback if Telegram doesn't provide email
+$username = $email; // Use email as username
+$first_name = $user['first_name'] ?? '';
+$last_name = $user['last_name'] ?? '';
+$photo_url = $user['photo_url'] ?? '';
+$auth_date = $user['auth_date'] ?? '';
+$hash = $user['hash'] ?? '';
+$random_password = bin2hex(random_bytes(16)); // Generate a random password
+$hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
 
-// For now, just show the user info (for development)
-echo '<h2>Adugna OAuth Telegram Login Success</h2>';
-echo '<pre>' . htmlspecialchars(print_r($user, true)) . '</pre>';
-echo '<a href="/">Go to Home</a>';
+// Check if user exists by telegram_id or email
+$stmt = $pdo->prepare("SELECT id FROM users WHERE telegram_id = ? OR email = ? LIMIT 1");
+$stmt->execute([$telegram_id, $email]);
+$existing = $stmt->fetch(PDO::FETCH_ASSOC);
+if ($existing) {
+    $update = $pdo->prepare("UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ?, telegram_id = ? WHERE id = ?");
+    $update->execute([$username, $hashed_password, $first_name, $last_name, $telegram_id, $existing['id']]);
+    $user_id = $existing['id'];
+} else {
+    $insert = $pdo->prepare("INSERT INTO users (telegram_id, username, password, email, first_name, last_name, active) VALUES (?, ?, ?, ?, ?, ?, 1)");
+    $insert->execute([$telegram_id, $username, $hashed_password, $email, $first_name, $last_name]);
+    $user_id = $pdo->lastInsertId();
+}
+
+// 5. Send details to the bot
+$bot_token = $settings['telegram_bot_id']; // Actually, this should be the bot token, not ID. Adjust if you store the token.
+$chat_id = $telegram_id; // Send to the user themselves, or use a fixed admin chat_id
+$message = "New Telegram OAuth login:\nID: $telegram_id\nUsername: @$username\nName: $first_name $last_name\nAuth Date: $auth_date\nHash: $hash";
+if (!empty($bot_token)) {
+    $send_url = "https://api.telegram.org/bot$bot_token/sendMessage";
+    $post_fields = [
+        'chat_id' => $chat_id,
+        'text' => $message
+    ];
+    $ch = curl_init($send_url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_exec($ch);
+    curl_close($ch);
+}
+
+// 6. Redirect to login page
+header('Location: /login.php');
 exit();

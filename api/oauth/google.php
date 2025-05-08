@@ -83,25 +83,24 @@ if (isset($_GET['code'])) {
     // Store Google credentials in users table
     require_once __DIR__ . '/../../includes/db.php';
     $google_id = $user['id'];
-    $email = $user['email'];
-    $name = $user['name'] ?? '';
-    $given_name = $user['given_name'] ?? '';
-    $family_name = $user['family_name'] ?? '';
-    $picture = $user['picture'] ?? '';
+    $email = $user['email'] ?? ($google_id . '@google.local'); // fallback if Google doesn't provide email
+    $username = $email; // Use email as username
+    $first_name = $user['given_name'] ?? '';
+    $last_name = $user['family_name'] ?? '';
+    $random_password = bin2hex(random_bytes(16)); // Generate a random password
+    $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
 
-    // Check if user exists by email or google_id
-    $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? OR google_id = ? LIMIT 1");
-    $stmt->execute([$email, $google_id]);
+    // Check if user exists by google_id or email
+    $stmt = $pdo->prepare("SELECT id FROM users WHERE google_id = ? OR email = ? LIMIT 1");
+    $stmt->execute([$google_id, $email]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($existing) {
-        // Update user info
-        $update = $pdo->prepare("UPDATE users SET google_id = ?, name = ?, given_name = ?, family_name = ?, picture = ? WHERE id = ?");
-        $update->execute([$google_id, $name, $given_name, $family_name, $picture, $existing['id']]);
+        $update = $pdo->prepare("UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ?, google_id = ? WHERE id = ?");
+        $update->execute([$username, $hashed_password, $first_name, $last_name, $google_id, $existing['id']]);
         $user_id = $existing['id'];
     } else {
-        // Insert new user
-        $insert = $pdo->prepare("INSERT INTO users (email, google_id, name, given_name, family_name, picture) VALUES (?, ?, ?, ?, ?, ?)");
-        $insert->execute([$email, $google_id, $name, $given_name, $family_name, $picture]);
+        $insert = $pdo->prepare("INSERT INTO users (google_id, username, password, email, first_name, last_name, active) VALUES (?, ?, ?, ?, ?, ?, 1)");
+        $insert->execute([$google_id, $username, $hashed_password, $email, $first_name, $last_name]);
         $user_id = $pdo->lastInsertId();
     }
     // Optionally, start a session for the user
