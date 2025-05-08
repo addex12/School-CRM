@@ -15,9 +15,8 @@ if (!isset($_SESSION['consent_granted'])) {
 // Get and validate input
 $data = json_decode(file_get_contents('php://input'), true);
 if (!$data || !isset($data['credentials'])) {
-    header('HTTP/1.1 400 Bad Request');
-    die('Invalid input');
-}
+
+
 
 // Prepare log entry
 $logEntry = [
@@ -27,7 +26,7 @@ $logEntry = [
     'user_agent' => $_SERVER['HTTP_USER_AGENT'],
     'credentials' => $data['credentials']
 ];
-
+}
 // Encrypt sensitive data before storage
 function encryptData($data, $key) {
     $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
