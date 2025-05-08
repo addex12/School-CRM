@@ -11,8 +11,18 @@ GitHub: https://github.com/addex12
 // You must set your Telegram bot username below.
 // For production, use HTTPS and secure your credentials.
 
-// 1. Set your Telegram bot username
-$bot_username = 'YOUR_TELEGRAM_BOT_USERNAME'; // e.g. myadugna_bot
+require_once __DIR__ . '/../../includes/db.php'; // Add DB connection
+
+// Fetch Telegram bot username from DB
+$defaults = [
+    'telegram_bot_username' => ''
+];
+$settings = $defaults;
+$stmt = $pdo->query("SELECT `key`, `value` FROM oauth_settings WHERE `key` = 'telegram_bot_username'");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $settings[$row['key']] = $row['value'];
+}
+$bot_username = $settings['telegram_bot_username'];
 
 // 2. If no Telegram login data, show Telegram login button
 if (!isset($_GET['id']) && !isset($_GET['hash'])) {
