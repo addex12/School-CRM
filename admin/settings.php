@@ -280,6 +280,45 @@ $settings_fields = [
             ]
         ],
         'from_email' => ['label' => 'From Email', 'type' => 'email'],
+        'smtp_host' => [
+            'label' => 'SMTP Host',
+            'type' => 'text',
+            'placeholder' => 'smtp.yourdomain.com',
+        ],
+        'smtp_port' => [
+            'label' => 'SMTP Port',
+            'type' => 'number',
+            'placeholder' => '587',
+        ],
+        'smtp_user' => [
+            'label' => 'SMTP Username',
+            'type' => 'text',
+            'placeholder' => 'user@yourdomain.com',
+        ],
+        'smtp_pass' => [
+            'label' => 'SMTP Password',
+            'type' => 'password',
+            'placeholder' => '********',
+        ],
+        'smtp_secure' => [
+            'label' => 'SMTP Security',
+            'type' => 'select',
+            'options' => [
+                '' => 'None',
+                'tls' => 'TLS',
+                'ssl' => 'SSL',
+            ],
+        ],
+        'from_email' => [
+            'label' => 'From Email Address',
+            'type' => 'email',
+            'placeholder' => 'noreply@yourdomain.com',
+        ],
+        'from_name' => [
+            'label' => 'From Name',
+            'type' => 'text',
+            'placeholder' => 'School CRM',
+        ],
     ],
     'security' => [
         'password_min_length' => ['label' => 'Password Min Length', 'type' => 'number'],

@@ -12,6 +12,9 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 if (!isset($_GET['id'])) {
     header("Location: users.php");
     exit();
@@ -36,7 +39,7 @@ $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
 $email_settings = [];
 $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_group = 'email'");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $email_settings[$row['setting_key']] = $row['setting_value'];
+$email_settings[$row['setting_key']] = $row['setting_value'];
 }
 $from_email = $email_settings['from_email'] ?? $email_settings['smtp_user'] ?? 'noreply@example.com';
 $from_name = $settings['site_name'] ?? 'School CRM';
@@ -82,14 +85,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_random_password'])) {
     $new_password = bin2hex(random_bytes(4)) . rand(100,999); // 8+ chars
     $hashed = password_hash($new_password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-    $stmt->execute([$hashed, $id]);
-    // Send email using PHPMailer and settings
     require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
     require_once __DIR__ . '/../PHPMailer/SMTP.php';
     require_once __DIR__ . '/../PHPMailer/Exception.php';
-    use PHPMailer\PHPMailer\PHPMailer;
-    use PHPMailer\PHPMailer\Exception;
     $mail = new PHPMailer(true);
     try {
         $mail->isSMTP();
