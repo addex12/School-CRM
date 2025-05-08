@@ -165,6 +165,47 @@ if (
     }
 }
 
+// Handle send test email
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
+    $testEmail = trim($_POST['test_email'] ?? '');
+    if (filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
+        try {
+            // Fetch SMTP settings from DB
+            $smtp_host = $settings['smtp_host'] ?? '';
+            $smtp_port = $settings['smtp_port'] ?? 587;
+            $smtp_user = $settings['smtp_user'] ?? '';
+            $smtp_pass = $settings['smtp_pass'] ?? '';
+            $smtp_secure = $settings['smtp_secure'] ?? '';
+            $from_email = $settings['from_email'] ?? $smtp_user;
+
+            // Use PHPMailer for sending test email
+            require_once '../vendor/autoload.php';
+            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = $smtp_host;
+            $mail->Port = $smtp_port;
+            $mail->SMTPAuth = true;
+            $mail->Username = $smtp_user;
+            $mail->Password = $smtp_pass;
+            if ($smtp_secure) {
+                $mail->SMTPSecure = $smtp_secure;
+            }
+            $mail->setFrom($from_email, 'School CRM');
+            $mail->addAddress($testEmail);
+            $mail->Subject = 'Test Email from School CRM';
+            $mail->Body = 'This is a test email sent from your School CRM settings page.';
+            $mail->send();
+            $_SESSION['success'] = "Test email sent successfully to $testEmail!";
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Failed to send test email: " . $e->getMessage();
+        }
+    } else {
+        $_SESSION['error'] = "Invalid test email address.";
+    }
+    header("Location: settings.php");
+    exit();
+}
+
 // Fetch all settings
 $stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_group, setting_key");
 $settings = [];
@@ -483,6 +524,13 @@ $settings_fields = [
                         </div>
                     <?php endforeach; ?>
                     <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Save Settings</button>
+                </form>
+            </div>
+            <div class="adugna-card">
+                <h2>Send Test Email</h2>
+                <form method="POST" style="display:flex;gap:1em;align-items:center;flex-wrap:wrap;">
+                    <input type="email" name="test_email" placeholder="Enter email address" required style="max-width:260px;">
+                    <button type="submit" name="send_test_email" class="adugna-btn"><i class="fas fa-paper-plane"></i> Send Test Email</button>
                 </form>
             </div>
             <div class="adugna-card">
