@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $role_id = $_POST['role_id'];
+    $is_active = isset($_POST['is_active']) ? 1 : 0;
     $validation_error = '';
 
     // Validate email format
@@ -60,8 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     if ($validation_error) {
         $_SESSION['error'] = $validation_error;
     } else {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $role_id, $id]);
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ?, is_active = ? WHERE id = ?");
+        $stmt->execute([$username, $email, $role_id, $is_active, $id]);
         $_SESSION['success'] = "User updated successfully!";
         header("Location: users.php");
         exit();
@@ -271,6 +272,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
                             </option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+                <div class="adugna-form-group">
+                    <label for="is_active">Account Status:</label>
+                    <input type="checkbox" id="is_active" name="is_active" value="1" <?= (!empty($user['is_active']) && $user['is_active']) ? 'checked' : '' ?>>
+                    <span><?= (!empty($user['is_active']) && $user['is_active']) ? 'Active' : 'Inactive' ?></span>
                 </div>
                 <div class="adugna-form-actions">
                     <a href="users.php" class="adugna-btn adugna-btn-secondary"><i class="fas fa-times"></i> Cancel</a>
