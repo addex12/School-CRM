@@ -19,6 +19,7 @@ $defaults = [
     'facebook_app_id' => '',
     'facebook_app_secret' => '',
     'telegram_bot_username' => '',
+    'telegram_bot_id' => '',
 ];
 $settings = $defaults;
 $stmt = $pdo->query("SELECT `key`, `value` FROM oauth_settings");
@@ -106,6 +107,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="https://t.me/BotFather" target="_blank" class="adugna-btn adugna-btn-sm" style="margin-left:0.5em;font-size:0.85em;padding:2px 8px;vertical-align:middle;" title="Get Telegram Bot Username"><i class="fab fa-telegram-plane"></i> Get</a>
                 </label>
                 <input type="text" id="telegram_bot_username" name="telegram_bot_username" value="<?= htmlspecialchars($settings['telegram_bot_username']) ?>" required pattern="@[a-zA-Z0-9_]{5,32}" placeholder="@your_bot">
+                <label for="telegram_bot_id">Telegram Bot ID
+                    <a href="https://t.me/BotFather" target="_blank" class="adugna-btn adugna-btn-sm" style="margin-left:0.5em;font-size:0.85em;padding:2px 8px;vertical-align:middle;" title="Get Telegram Bot ID"><i class="fab fa-telegram-plane"></i> Get</a>
+                </label>
+                <input type="text" id="telegram_bot_id" name="telegram_bot_id" value="<?= htmlspecialchars($settings['telegram_bot_id']) ?>" required pattern="\d+" placeholder="123456789">
+                <div style="color:#e67e22;font-size:0.97em;margin-bottom:0.7em;"><i class="fas fa-exclamation-triangle"></i> <b>Tip:</b> Enter the numeric Bot ID from @BotFather. This is required for Telegram OAuth login.</div>
                 <button type="button" class="adugna-btn adugna-btn-sm adugna-btn-info" onclick="testOAuth('telegram')"><i class="fas fa-vial"></i> Test Telegram</button>
                 <hr>
                 <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Save Settings</button>
@@ -127,7 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 google_client_secret: document.getElementById('google_client_secret').value,
                 facebook_app_id: document.getElementById('facebook_app_id').value,
                 facebook_app_secret: document.getElementById('facebook_app_secret').value,
-                telegram_bot_username: document.getElementById('telegram_bot_username').value
+                telegram_bot_username: document.getElementById('telegram_bot_username').value,
+                telegram_bot_id: document.getElementById('telegram_bot_id').value
             })
         })
         .then(r => r.json())
