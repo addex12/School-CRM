@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $role_id = $_POST['role_id'];
-    $active = isset($_POST['is_active']) ? 1 : 0;
+    $active = isset($_POST['active']) ? (int)$_POST['active'] : 0;
     $validation_error = '';
 
     // Validate email format
@@ -274,9 +274,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
                     </select>
                 </div>
                 <div class="adugna-form-group">
-                    <label for="is_active">Account Status:</label>
-                    <input type="checkbox" id="is_active" name="is_active" value="1" <?= (!empty($user['active']) && $user['active']) ? 'checked' : '' ?>>
-                    <span><?= (!empty($user['active']) && $user['active']) ? 'Active' : 'Inactive' ?></span>
+                    <label for="active">Account Status:</label>
+                    <select id="active" name="active">
+                        <option value="1" <?= ($user['active'] == 1) ? 'selected' : '' ?>>Activate</option>
+                        <option value="0" <?= ($user['active'] == 0) ? 'selected' : '' ?>>Deactivate</option>
+                    </select>
                 </div>
                 <div class="adugna-form-actions">
                     <a href="users.php" class="adugna-btn adugna-btn-secondary"><i class="fas fa-times"></i> Cancel</a>
