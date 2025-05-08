@@ -12,9 +12,6 @@ require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
-
 if (!isset($_GET['id'])) {
     header("Location: users.php");
     exit();
@@ -35,20 +32,10 @@ if (!$user) {
 // Fetch all roles for the form select
 $roles = $pdo->query("SELECT * FROM roles ORDER BY role_name")->fetchAll();
 
-// Fetch email settings from system_settings table
-$email_settings = [];
-$stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_group = 'email'");
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-$email_settings[$row['setting_key']] = $row['setting_value'];
-}
-$from_email = $email_settings['from_email'] ?? $email_settings['smtp_user'] ?? 'noreply@example.com';
-$from_name = $settings['site_name'] ?? 'School CRM';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     $username = trim($_POST['username']);
     $email = trim($_POST['email']);
     $role_id = $_POST['role_id'];
-    $active = isset($_POST['active']) ? (int)$_POST['active'] : 0;
     $validation_error = '';
 
     // Validate email format
@@ -73,8 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     if ($validation_error) {
         $_SESSION['error'] = $validation_error;
     } else {
-        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ?, active = ? WHERE id = ?");
-        $stmt->execute([$username, $email, $role_id, $active, $id]);
+        $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ? WHERE id = ?");
+        $stmt->execute([$username, $email, $role_id, $id]);
         $_SESSION['success'] = "User updated successfully!";
         header("Location: users.php");
         exit();
@@ -85,35 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_random_password'])) {
     $new_password = bin2hex(random_bytes(4)) . rand(100,999); // 8+ chars
     $hashed = password_hash($new_password, PASSWORD_DEFAULT);
-    require_once __DIR__ . '/../PHPMailer/PHPMailer.php';
-    require_once __DIR__ . '/../PHPMailer/SMTP.php';
-    require_once __DIR__ . '/../PHPMailer/Exception.php';
-    $mail = new PHPMailer(true);
-    try {
-        $mail->isSMTP();
-        $mail->Host = $email_settings['smtp_host'] ?? '';
-        $mail->Port = (int)($email_settings['smtp_port'] ?? 587);
-        $mail->SMTPAuth = true;
-        $mail->Username = $email_settings['smtp_user'] ?? '';
-        $mail->Password = $email_settings['smtp_pass'] ?? '';
-        if (!empty($email_settings['smtp_secure'])) {
-            $mail->SMTPSecure = $email_settings['smtp_secure'];
-        }
-        // Enable debug output for troubleshooting
-        $mail->SMTPDebug = 2;
-        $mail->Debugoutput = function($str, $level) {
-            error_log("SMTP Debug [$level]: $str");
-        };
-        $mail->setFrom($from_email, $from_name);
-        $mail->addAddress($user['email']);
-        $mail->isHTML(false);
-        $mail->Subject = "Your password has been reset";
-        $mail->Body = "Hello " . $user['username'] . ",\n\nYour account password has been reset by an administrator.\n\nTemporary Password: $new_password\n\nPlease log in using this password and change it immediately for your security.\n\nIf you did not request this change, please contact support immediately.\n\nThank you,\nSchool CRM Team";
-        $mail->send();
-        $_SESSION['success'] = "Password reset and sent to user's email.";
-    } catch (Exception $e) {
-        $_SESSION['error'] = "Password reset but email could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    }
+    $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+    $stmt->execute([$hashed, $id]);
+    // Send email
+    $to = $user['email'];
+    $subject = "Your password has been reset";
+    $body = "Hello " . $user['username'] . ",\n\nYour new password is: $new_password\n\nPlease login and change it.";
+    @mail($to, $subject, $body);
+    $_SESSION['success'] = "Password reset and sent to user's email.";
     header("Location: edit_user.php?id=" . urlencode($id));
     exit();
 }
@@ -304,13 +270,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
                                 <?= htmlspecialchars($role['role_name']); ?>
                             </option>
                         <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="adugna-form-group">
-                    <label for="active">Account Status:</label>
-                    <select id="active" name="active">
-                        <option value="1" <?= ($user['active'] == 1) ? 'selected' : '' ?>>Activate</option>
-                        <option value="0" <?= ($user['active'] == 0) ? 'selected' : '' ?>>Deactivate</option>
                     </select>
                 </div>
                 <div class="adugna-form-actions">
