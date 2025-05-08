@@ -73,7 +73,7 @@ if (isset($_GET['code'])) {
     curl_close($ch);
     $user = json_decode($user_json, true);
     if (!$user || !isset($user['email'])) {
-        die('Adugna OAuth: Failed to get user info.');
+        die('OAuth: Failed to get user info.');
     }
 
     // 5. Register or log in the user in your system
