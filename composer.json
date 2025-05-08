@@ -27,7 +27,8 @@
         "league/oauth2-facebook": "^2.2",
         "happyr/linkedin-api-client": "^0.2.2",
         "cboden/ratchet": "^0.4.4",
-        "phpoffice/phpword": "^1.3"
+        "phpoffice/phpword": "^1.3",
+        "scheb/versions": "^2.0"
     },
     "config": {
         "optimize-autoloader": true,

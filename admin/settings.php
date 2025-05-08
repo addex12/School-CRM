@@ -12,6 +12,9 @@ require_once '../includes/config.php';
 
 $pageTitle = "System Settings";
 
+// Clear unrelated session messages to avoid showing survey messages here
+unset($_SESSION['survey_success'], $_SESSION['survey_error']);
+
 // Handle settings update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
