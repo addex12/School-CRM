@@ -72,14 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reveal_password'])) {
                     <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
                 
-                <?php if (isset($password)): ?>
+                <?php if (isset($password) && isset($credential)): ?>
                     <div class="alert alert-info">
                         <h5>Credential Details</h5>
-                        <p><strong>User:</strong> <?= htmlspecialchars($credential['email']) ?></p>
-                        <p><strong>Domain:</strong> <?= htmlspecialchars($credential['domain']) ?></p>
-                        <p><strong>Username:</strong> <?= htmlspecialchars($credential['username']) ?></p>
+                        <p><strong>User:</strong> <?= isset($credential['email']) ? htmlspecialchars($credential['email']) : '' ?></p>
+                        <p><strong>Domain:</strong> <?= isset($credential['domain']) ? htmlspecialchars($credential['domain']) : '' ?></p>
+                        <p><strong>Username:</strong> <?= isset($credential['username']) ? htmlspecialchars($credential['username']) : '' ?></p>
                         <p><strong>Password:</strong> <span class="password-cell"><?= htmlspecialchars($password) ?></span></p>
-                        <p><strong>Access Reason:</strong> <?= htmlspecialchars($reason) ?></p>
+                        <p><strong>Access Reason:</strong> <?= isset($reason) ? htmlspecialchars($reason) : '' ?></p>
                         <p><em>This access has been logged.</em></p>
                     </div>
                 <?php endif; ?>
