@@ -68,6 +68,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php include 'includes/admin_sidebar.php'; ?>
         <div class="adugna-settings-card">
             <div class="adugna-settings-title"><i class="fas fa-cogs"></i> Adugna OAuth Settings</div>
+            <div class="adugna-guide" style="background:#f8f9fa;border-radius:7px;padding:0.8em 1em;margin-bottom:1.2em;font-size:0.97em;color:#215967;box-shadow:0 1px 4px #e5e7eb44;">
+                <strong><i class="fas fa-info-circle" style="color:#3498db;"></i> Guide:</strong> <br>
+                <ul style="margin:0.5em 0 0 1.2em;padding:0;list-style:disc;">
+                    <li>To enable login/registration with Google, Facebook, or Telegram, you must enter the correct credentials for each provider below.</li>
+                    <li>Click the <b>Get</b> button next to each provider to open the official page and create or view your app/bot credentials.</li>
+                    <li>After entering the credentials, click <b>Save Settings</b>. You can use the <b>Test</b> button to check if the connection is working.</li>
+                    <li>If you are unsure what to enter, click the <b>Get</b> button or contact your system administrator for help.</li>
+                    <li>All changes are saved securely and take effect immediately for new logins.</li>
+                </ul>
+            </div>
             <?php if (!empty($success)): ?>
                 <div class="adugna-success">Settings updated successfully.</div>
             <?php endif; ?>

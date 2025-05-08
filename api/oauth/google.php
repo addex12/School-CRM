@@ -11,10 +11,12 @@ GitHub: https://github.com/addex12
 // You must set your Google client ID, client secret, and redirect URI below.
 // For production, use HTTPS and secure your credentials.
 
+require_once __DIR__ . '/../../includes/config.php'; // Load BASE_URL
+
 // 1. Set your Google OAuth2 credentials
 $client_id = 'YOUR_GOOGLE_CLIENT_ID';
 $client_secret = 'YOUR_GOOGLE_CLIENT_SECRET';
-$redirect_uri = 'https://yourdomain.com/api/oauth/google.php'; // Update to your actual redirect URI
+$redirect_uri = rtrim(BASE_URL, '/') . '/api/oauth/google.php'; // Use BASE_URL for flexibility
 
 // 2. If no code, redirect to Google consent screen
 if (!isset($_GET['code'])) {
