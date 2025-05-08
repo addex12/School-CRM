@@ -12,6 +12,8 @@ requireAdmin();
 require_once '../includes/config.php';
 
 $pageTitle = "Manage Surveys";
+$_SESSION['survey_success'] = $_SESSION['survey_success'] ?? null;
+$_SESSION['survey_error'] = $_SESSION['survey_error'] ?? null;
 
 // Fetch all surveys with category and status
 $stmt = $pdo->query("
