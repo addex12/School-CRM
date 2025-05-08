@@ -149,7 +149,7 @@ if (isset($_GET['code']) || ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SE
     unset($_SESSION['google_user'], $_SESSION['google_id']);
     // Redirect to dashboard or home
     if (!headers_sent()) {
-        header('Location: /index.php');
+        header('Location: /login.php');
         exit();
     } else {
         echo "<script>window.location.href='/dashboard.php';</script>";
