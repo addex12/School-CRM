@@ -6,11 +6,9 @@ LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
 */
-var_dump($_SESSION); // TEMP: Debug session values
+// TEMP: Debug session values to error log (safe for headers)
 if (isset($_SESSION)) {
-    echo '<pre style="background:#fffbe6;color:#c7254e;padding:10px;border:1px solid #f5c6cb;">';
-    print_r($_SESSION);
-    echo '</pre>';
+    error_log('SESSION: ' . print_r($_SESSION, true));
 }
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
