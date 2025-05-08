@@ -81,14 +81,46 @@ if (isset($_GET['code'])) {
 
     // 5. Register or log in the user in your system
     // Store Google credentials in users table
+
+    // Collect password from user if not already provided
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password']) && !empty($_POST['password'])) {
+        $user_password = $_POST['password'];
+    } elseif (!isset($_POST['password'])) {
+        // Show password collection form
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Set Your Password</title>
+        </head>
+        <body>
+            <form method="post" action="">
+                <input type="hidden" name="code" value="<?php echo htmlspecialchars($_GET['code']); ?>">
+                <label for="password">Please click to proceed:</label><br>
+                <input type="password" name="password" id="password" required><br>
+                <button type="submit">Login</button>
+            </form>
+        </body>
+        </html>
+        <?php
+        exit();
+    } else {
+        // fallback if password is empty
+        $user_password = null;
+    }
+
     require_once __DIR__ . '/../../includes/db.php';
     $google_id = $user['id'];
     $email = $user['email'] ?? ($google_id . '@google.local'); // fallback if Google doesn't provide email
     $username = $email; // Use email as username
     $first_name = $user['given_name'] ?? '';
     $last_name = $user['family_name'] ?? '';
-    $random_password = bin2hex(random_bytes(16)); // Generate a random password
-    $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
+    if (!empty($user_password)) {
+        $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
+    } else {
+        $random_password = bin2hex(random_bytes(16)); // Generate a random password
+        $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
+    }
 
     // Check if user exists by google_id or email
     $stmt = $pdo->prepare("SELECT id FROM users WHERE google_id = ? OR email = ? LIMIT 1");
