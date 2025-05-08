@@ -70,6 +70,14 @@ if (!function_exists('setUserSession')) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
+                // Always set user_role for admin checks
+                if ($user['role_id'] == 1) {
+                    $_SESSION['user_role'] = 'admin';
+                } else {
+                    $roleStmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+                    $roleStmt->execute([$user['role_id']]);
+                    $_SESSION['user_role'] = $roleStmt->fetchColumn() ?: '';
+                }
                 return true;
             }
             return false;
