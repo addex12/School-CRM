@@ -627,7 +627,7 @@ $settings_fields = [
                 <form method="POST" autocomplete="off" style="margin-bottom:1.5em;">
                     <table style="width:100%;border-collapse:collapse;">
                         <tr><th style="text-align:left;padding:6px 4px;">Setting</th><th style="text-align:left;padding:6px 4px;">Value</th></tr>
-                        <tr><td>SMTP Host</td><td><input type="text" name="settings[smtp_host]" value="<?= htmlspecialchars($settings['smtp_host'] ?? '') ?>" placeholder="smtp.yourdomain.com" style="width:100%"></td></tr>
+                        <tr><td>SMTP Host</td><td><input type="text" name="settings[smtp_host]" value="<?= htmlspecialchars($settings['smtp_host'] ?? '') ?>" placeholder="smtp.yourdomain.com" style="width:100%"<?php if(stripos($settings['smtp_host'] ?? '', 'technobros.net.au') !== false) echo ' readonly'; ?>></td></tr>
                         <tr><td>SMTP Port</td><td><input type="number" name="settings[smtp_port]" value="<?= htmlspecialchars($settings['smtp_port'] ?? '587') ?>" placeholder="587" style="width:100%"></td></tr>
                         <tr><td>SMTP Username</td><td><input type="text" name="settings[smtp_user]" value="<?= htmlspecialchars($settings['smtp_user'] ?? '') ?>" placeholder="user@yourdomain.com" style="width:100%"></td></tr>
                         <tr><td>SMTP Password</td><td><input type="password" name="settings[smtp_pass]" value="<?= htmlspecialchars($settings['smtp_pass'] ?? '') ?>" placeholder="********" style="width:100%"></td></tr>
