@@ -1,7 +1,14 @@
 {
-    "name": "school/survey-system",
-    "description": "A survey system for schools and organizations.",
+    "name": "addex12/school-crm",
+    "description": "School CRM PHP Application",
     "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adugna Gizaw",
+            "email": "gizawadugna@gmail.com"
+        }
+    ],
     "require": {
         "php": "^8.2",
         "phpmailer/phpmailer": "^6.8",
