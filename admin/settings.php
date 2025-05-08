@@ -15,6 +15,13 @@ $pageTitle = "System Settings";
 // Clear unrelated session messages to avoid showing survey messages here
 unset($_SESSION['survey_success'], $_SESSION['survey_error']);
 
+// Fetch all settings BEFORE any POST logic that needs them
+$stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_group, setting_key");
+$settings = [];
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $settings[$row['setting_key']] = $row['setting_value'];
+}
+
 // Handle settings update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
@@ -170,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
     $testEmail = trim($_POST['test_email'] ?? '');
     if (filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
         try {
-            // Fetch SMTP settings from DB
+            // Fetch SMTP settings from $settings (now loaded above)
             $smtp_host = $settings['smtp_host'] ?? '';
             $smtp_port = $settings['smtp_port'] ?? 587;
             $smtp_user = $settings['smtp_user'] ?? '';
