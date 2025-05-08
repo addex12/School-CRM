@@ -84,6 +84,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$feedback_id]);
 
             $_SESSION['success'] = "Feedback deleted successfully!";
+        } elseif (isset($_POST['add_subject'])) {
+            // Add new subject
+            $subject = trim($_POST['subject']);
+            if (empty($subject)) {
+                throw new Exception("Subject is required.");
+            }
+            $stmt = $pdo->prepare("INSERT INTO feedback_subjects (subject, status) VALUES (?, 'active')");
+            $stmt->execute([$subject]);
+            $_SESSION['success'] = "Subject added successfully!";
+        } elseif (isset($_POST['edit_subject'])) {
+            // Edit subject
+            $subject_id = intval($_POST['subject_id']);
+            $subject = trim($_POST['subject']);
+            if (empty($subject)) {
+                throw new Exception("Subject is required.");
+            }
+            $stmt = $pdo->prepare("UPDATE feedback_subjects SET subject = ? WHERE id = ?");
+            $stmt->execute([$subject, $subject_id]);
+            $_SESSION['success'] = "Subject updated successfully!";
+        } elseif (isset($_POST['delete_subject'])) {
+            // Delete subject
+            $subject_id = intval($_POST['subject_id']);
+            $stmt = $pdo->prepare("DELETE FROM feedback_subjects WHERE id = ?");
+            $stmt->execute([$subject_id]);
+            $_SESSION['success'] = "Subject deleted successfully!";
+        } elseif (isset($_POST['toggle_subject_status'])) {
+            // Toggle subject status
+            $subject_id = intval($_POST['subject_id']);
+            $current_status = $_POST['current_status'];
+            $new_status = ($current_status === 'active') ? 'inactive' : 'active';
+            $stmt = $pdo->prepare("UPDATE feedback_subjects SET status = ? WHERE id = ?");
+            $stmt->execute([$new_status, $subject_id]);
+            $_SESSION['success'] = "Subject status updated successfully!";
         }
         header("Location: feedback_mgmt.php");
         exit();
@@ -487,6 +520,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p style="color:#888;">No feedback found.</p>
                 <?php endif; ?>
             </div>
+            <!-- Feedback Subject Manager Section -->
+            <div class="adugna-card">
+                <div class="adugna-card-header"><i class="fas fa-tags"></i> Feedback Subject Manager</div>
+                <form method="POST">
+                    <div class="adugna-form-group">
+                        <label for="subject">New Subject</label>
+                        <input type="text" name="subject" id="subject" required>
+                    </div>
+                    <button type="submit" name="add_subject" class="adugna-btn"><i class="fas fa-plus"></i> Add Subject</button>
+                </form>
+                <div class="adugna-card-header" style="margin-top:1.5rem;"><i class="fas fa-list"></i> Subject List</div>
+                <?php
+                $subjectList = $pdo->query("SELECT * FROM feedback_subjects ORDER BY subject")->fetchAll();
+                if (count($subjectList) > 0): ?>
+                    <table class="adugna-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($subjectList as $subject): ?>
+                                <tr>
+                                    <td data-label="ID"><?= htmlspecialchars($subject['id']) ?></td>
+                                    <td data-label="Subject"><?= htmlspecialchars($subject['subject']) ?></td>
+                                    <td data-label="Status"><?= htmlspecialchars($subject['status']) ?></td>
+                                    <td data-label="Actions">
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="subject_id" value="<?= $subject['id'] ?>">
+                                            <input type="hidden" name="current_status" value="<?= $subject['status'] ?>">
+                                            <button type="submit" name="toggle_subject_status" class="adugna-btn adugna-btn-secondary adugna-btn-sm"><?= $subject['status'] === 'active' ? 'Deactivate' : 'Activate' ?></button>
+                                        </form>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="subject_id" value="<?= $subject['id'] ?>">
+                                            <button type="submit" name="delete_subject" class="adugna-btn adugna-btn-danger adugna-btn-sm" onclick="return confirm('Are you sure you want to delete this subject?')"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                <?php else: ?>
+                    <p style="color:#888;">No subjects found.</p>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
     <!-- Edit Modal -->
@@ -577,5 +658,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
-```
-</copilot-edited-file>
