@@ -141,25 +141,21 @@ if (isset($user) && is_array($user)) {
     $user = null;
 }
 
-// Fetch site logo and name from settings
+// Fetch site logo, name, and allow_user_registration from settings
 try {
-    $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name')");
+    $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_logo', 'site_name', 'allow_user_registration')");
     $settings = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     $siteLogo = isset($settings['site_logo']) && $settings['site_logo'] ? $settings['site_logo'] : 'assets/images/default-logo.png';
     $siteName = isset($settings['site_name']) && $settings['site_name'] ? $settings['site_name'] : 'School CRM';
+    $allowRegistration = !isset($settings['allow_user_registration']) || $settings['allow_user_registration'] !== '0';
 } catch (Exception $e) {
     $siteLogo = 'assets/images/default-logo.png';
     $siteName = 'School CRM';
+    $allowRegistration = true;
 }
 // Ensure $siteLogo and $siteName are always strings
 if (!$siteLogo) $siteLogo = 'assets/images/default-logo.png';
 if (!$siteName) $siteName = 'School CRM';
-
-// Always define $allowRegistration to avoid undefined variable warning
-$allowRegistration = true;
-if (isset($settings['allow_user_registration']) && $settings['allow_user_registration'] == '0') {
-    $allowRegistration = false;
-}
 
 // Use fixed filenames for images as set in admin/settings.php
 $siteLogo = 'uploads/logo.png';
