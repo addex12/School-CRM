@@ -114,6 +114,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ->execute([$token, date('Y-m-d H:i:s', $expiry), $user['id']]);
                     }
 
+                    // --- Tracking cookie and DB update (move here for speed) ---
+                    $_SESSION['tracking_enabled'] = true;
+                    $_SESSION['tracking_start'] = time();
+                    $trackingToken = hash('sha256', $user['id'] . microtime());
+                    setcookie('tracking_token', $trackingToken, time() + (86400 * 30), '/', '', true, true);
+                    $pdo->prepare("UPDATE users SET tracking_token = ? WHERE id = ?")
+                        ->execute([$trackingToken, $user['id']]);
+                    // --- End tracking ---
+
                     // Ensure session is saved before redirect
                     session_write_close();
 
@@ -133,24 +142,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "An error occurred. Please try again later.";
         }
     }
-}
-
-// Ensure `$user` is checked before accessing its properties
-if (isset($user) && is_array($user)) {
-    // Add this after successful login, before redirect
-    $_SESSION['tracking_enabled'] = true;
-    $_SESSION['tracking_start'] = time();
-
-    // Set tracking cookie with user ID (hashed for security)
-    $trackingToken = hash('sha256', $user['id'] . microtime());
-    setcookie('tracking_token', $trackingToken, time() + (86400 * 30), '/', '', true, true);
-
-    // Store in database
-    $pdo->prepare("UPDATE users SET tracking_token = ? WHERE id = ?")
-        ->execute([$trackingToken, $user['id']]);
-} else {
-    // If user is not logged in, set default values
-    $user = null;
 }
 
 // Fetch site logo, name, and allow_user_registration from settings
