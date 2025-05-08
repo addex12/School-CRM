@@ -71,21 +71,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if (!empty($success)): ?>
                 <div class="adugna-success">Settings updated successfully.</div>
             <?php endif; ?>
-            <form method="post" class="adugna-settings-form">
-                <label for="google_client_id">Google Client ID</label>
-                <input type="text" id="google_client_id" name="google_client_id" value="<?= htmlspecialchars($settings['google_client_id']) ?>">
+            <form method="post" class="adugna-settings-form" id="adugna-oauth-form" autocomplete="off" novalidate>
+                <!-- Google -->
+                <label for="google_client_id">Google Client ID
+                    <a href="https://console.developers.google.com/apis/credentials" target="_blank" class="adugna-btn adugna-btn-sm" style="margin-left:0.5em;font-size:0.85em;padding:2px 8px;vertical-align:middle;" title="Get Google credentials"><i class="fab fa-google"></i> Get</a>
+                </label>
+                <input type="text" id="google_client_id" name="google_client_id" value="<?= htmlspecialchars($settings['google_client_id']) ?>" required pattern="[\w\-\.]+\.apps\.googleusercontent\.com" placeholder="xxxxxxx.apps.googleusercontent.com">
                 <label for="google_client_secret">Google Client Secret</label>
-                <input type="text" id="google_client_secret" name="google_client_secret" value="<?= htmlspecialchars($settings['google_client_secret']) ?>">
-                <label for="facebook_app_id">Facebook App ID</label>
-                <input type="text" id="facebook_app_id" name="facebook_app_id" value="<?= htmlspecialchars($settings['facebook_app_id']) ?>">
+                <input type="text" id="google_client_secret" name="google_client_secret" value="<?= htmlspecialchars($settings['google_client_secret']) ?>" required>
+                <button type="button" class="adugna-btn adugna-btn-sm adugna-btn-info" onclick="testOAuth('google')"><i class="fas fa-vial"></i> Test Google</button>
+                <hr>
+                <!-- Facebook -->
+                <label for="facebook_app_id">Facebook App ID
+                    <a href="https://developers.facebook.com/apps/" target="_blank" class="adugna-btn adugna-btn-sm" style="margin-left:0.5em;font-size:0.85em;padding:2px 8px;vertical-align:middle;" title="Get Facebook credentials"><i class="fab fa-facebook-f"></i> Get</a>
+                </label>
+                <input type="text" id="facebook_app_id" name="facebook_app_id" value="<?= htmlspecialchars($settings['facebook_app_id']) ?>" required>
                 <label for="facebook_app_secret">Facebook App Secret</label>
-                <input type="text" id="facebook_app_secret" name="facebook_app_secret" value="<?= htmlspecialchars($settings['facebook_app_secret']) ?>">
-                <label for="telegram_bot_username">Telegram Bot Username</label>
-                <input type="text" id="telegram_bot_username" name="telegram_bot_username" value="<?= htmlspecialchars($settings['telegram_bot_username']) ?>">
+                <input type="text" id="facebook_app_secret" name="facebook_app_secret" value="<?= htmlspecialchars($settings['facebook_app_secret']) ?>" required>
+                <button type="button" class="adugna-btn adugna-btn-sm adugna-btn-info" onclick="testOAuth('facebook')"><i class="fas fa-vial"></i> Test Facebook</button>
+                <hr>
+                <!-- Telegram -->
+                <label for="telegram_bot_username">Telegram Bot Username
+                    <a href="https://t.me/BotFather" target="_blank" class="adugna-btn adugna-btn-sm" style="margin-left:0.5em;font-size:0.85em;padding:2px 8px;vertical-align:middle;" title="Get Telegram Bot Username"><i class="fab fa-telegram-plane"></i> Get</a>
+                </label>
+                <input type="text" id="telegram_bot_username" name="telegram_bot_username" value="<?= htmlspecialchars($settings['telegram_bot_username']) ?>" required pattern="@[a-zA-Z0-9_]{5,32}" placeholder="@your_bot">
+                <button type="button" class="adugna-btn adugna-btn-sm adugna-btn-info" onclick="testOAuth('telegram')"><i class="fas fa-vial"></i> Test Telegram</button>
+                <hr>
                 <button type="submit" class="adugna-btn"><i class="fas fa-save"></i> Save Settings</button>
             </form>
+            <div id="adugna-oauth-test-result" style="margin-top:1em;"></div>
         </div>
         <?php include 'includes/footer.php'; ?>
     </div>
+    <script>
+    // Adugna: Client-side validation and test connection for each provider
+    function testOAuth(provider) {
+        const resultDiv = document.getElementById('adugna-oauth-test-result');
+        resultDiv.innerHTML = '<span style="color:#1976d2"><i class="fas fa-spinner fa-spin"></i> Testing ' + provider.charAt(0).toUpperCase() + provider.slice(1) + ' connection...</span>';
+        fetch('test_oauth.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: provider,
+                google_client_id: document.getElementById('google_client_id').value,
+                google_client_secret: document.getElementById('google_client_secret').value,
+                facebook_app_id: document.getElementById('facebook_app_id').value,
+                facebook_app_secret: document.getElementById('facebook_app_secret').value,
+                telegram_bot_username: document.getElementById('telegram_bot_username').value
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                resultDiv.innerHTML = '<span style="color:#27ae60"><i class="fas fa-check-circle"></i> ' + data.message + '</span>';
+            } else {
+                resultDiv.innerHTML = '<span style="color:#e74c3c"><i class="fas fa-times-circle"></i> ' + (data.message || 'Test failed') + '</span>';
+            }
+        })
+        .catch(() => {
+            resultDiv.innerHTML = '<span style="color:#e74c3c"><i class="fas fa-times-circle"></i> Test failed (network error)</span>';
+        });
+    }
+    // Simple client-side validation
+    const form = document.getElementById('adugna-oauth-form');
+    form.addEventListener('submit', function(e) {
+        let valid = true;
+        form.querySelectorAll('input[required]').forEach(function(input) {
+            if (!input.value.trim()) {
+                input.style.borderColor = '#e74c3c';
+                valid = false;
+            } else {
+                input.style.borderColor = '';
+            }
+        });
+        if (!valid) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+        }
+    });
+    </script>
 </body>
 </html>
