@@ -12,6 +12,9 @@ require_once '../includes/config.php';
 
 $pageTitle = "System Settings";
 
+// Clear unrelated session messages to avoid showing survey messages here
+unset($_SESSION['survey_success'], $_SESSION['survey_error']);
+
 // Handle settings update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
@@ -160,6 +163,47 @@ if (
     } catch (Exception $e) {
         $_SESSION['error'] = "Failed to remove background image: " . $e->getMessage();
     }
+}
+
+// Handle send test email
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
+    $testEmail = trim($_POST['test_email'] ?? '');
+    if (filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
+        try {
+            // Fetch SMTP settings from DB
+            $smtp_host = $settings['smtp_host'] ?? '';
+            $smtp_port = $settings['smtp_port'] ?? 587;
+            $smtp_user = $settings['smtp_user'] ?? '';
+            $smtp_pass = $settings['smtp_pass'] ?? '';
+            $smtp_secure = $settings['smtp_secure'] ?? '';
+            $from_email = $settings['from_email'] ?? $smtp_user;
+
+            // Use PHPMailer for sending test email
+            require_once '../vendor/autoload.php';
+            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->isSMTP();
+            $mail->Host = $smtp_host;
+            $mail->Port = $smtp_port;
+            $mail->SMTPAuth = true;
+            $mail->Username = $smtp_user;
+            $mail->Password = $smtp_pass;
+            if ($smtp_secure) {
+                $mail->SMTPSecure = $smtp_secure;
+            }
+            $mail->setFrom($from_email, 'School CRM');
+            $mail->addAddress($testEmail);
+            $mail->Subject = 'Test Email from School CRM';
+            $mail->Body = 'This is a test email sent from your School CRM settings page.';
+            $mail->send();
+            $_SESSION['success'] = "Test email sent successfully to $testEmail!";
+        } catch (Exception $e) {
+            $_SESSION['error'] = "Failed to send test email: " . $e->getMessage();
+        }
+    } else {
+        $_SESSION['error'] = "Invalid test email address.";
+    }
+    header("Location: settings.php");
+    exit();
 }
 
 // Fetch all settings
@@ -419,6 +463,28 @@ $settings_fields = [
                                     <?php if ($field['type'] === 'checkbox'): ?>
                                         <input type="checkbox" id="<?= $key ?>" name="settings[<?= $key ?>]" value="1"
                                             <?= !empty($settings[$key]) && $settings[$key] == '1' ? 'checked' : '' ?>>
+                                    <?php elseif ($field['type'] === 'select' && $key === 'smtp_host'): ?>
+                                        <select id="<?= $key ?>" name="settings[<?= $key ?>]">
+                                            <?php
+                                            // SMTP provider autofill mapping
+                                            $smtpProviderData = [
+                                                'smtp.gmail.com' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.mail.yahoo.com' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.office365.com' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.mailgun.org' => ['port' => 587, 'secure' => 'tls'],
+                                                'smtp.sendgrid.net' => ['port' => 587, 'secure' => 'tls'],
+                                            ];
+                                            foreach ($field['options'] as $optionValue => $optionLabel):
+                                                $dataAttrs = '';
+                                                if (isset($smtpProviderData[$optionValue])) {
+                                                    $dataAttrs = ' data-port="' . $smtpProviderData[$optionValue]['port'] . '" data-secure="' . $smtpProviderData[$optionValue]['secure'] . '"';
+                                                }
+                                            ?>
+                                                <option value="<?= $optionValue ?>"<?= isset($settings[$key]) && $settings[$key] == $optionValue ? ' selected' : '' ?><?= $dataAttrs ?>>
+                                                    <?= $optionLabel ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
                                     <?php elseif ($field['type'] === 'select'): ?>
                                         <select id="<?= $key ?>" name="settings[<?= $key ?>]">
                                             <?php foreach ($field['options'] as $optionValue => $optionLabel): ?>
@@ -461,6 +527,13 @@ $settings_fields = [
                 </form>
             </div>
             <div class="adugna-card">
+                <h2>Send Test Email</h2>
+                <form method="POST" style="display:flex;gap:1em;align-items:center;flex-wrap:wrap;">
+                    <input type="email" name="test_email" placeholder="Enter email address" required style="max-width:260px;">
+                    <button type="submit" name="send_test_email" class="adugna-btn"><i class="fas fa-paper-plane"></i> Send Test Email</button>
+                </form>
+            </div>
+            <div class="adugna-card">
                 <h2>Login Background Images (Slider)</h2>
                 <form method="POST" enctype="multipart/form-data" style="margin-bottom:1em;">
                     <input type="file" name="login_bg_images[]" multiple accept="image/*">
@@ -496,6 +569,23 @@ $settings_fields = [
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <script>
+    // Autofill SMTP port and security when provider is selected
+    document.addEventListener('DOMContentLoaded', function() {
+        var smtpHost = document.getElementById('smtp_host');
+        var smtpPort = document.getElementsByName('settings[smtp_port]')[0];
+        var smtpSecure = document.getElementById('smtp_secure');
+        if (smtpHost && smtpPort && smtpSecure) {
+            smtpHost.addEventListener('change', function() {
+                var selected = smtpHost.options[smtpHost.selectedIndex];
+                var port = selected.getAttribute('data-port');
+                var secure = selected.getAttribute('data-secure');
+                if (port !== null && port !== '') smtpPort.value = port;
+                if (secure !== null && secure !== '') smtpSecure.value = secure;
+            });
+        }
+    });
+    </script>
     <style>
         /* Adugna Gizaw: Make textboxes and textareas compact, attractive, and not too long */
         .adugna-form-group input[type="text"],
