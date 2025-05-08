@@ -95,7 +95,7 @@ if (isset($_GET['code'])) {
     $stmt->execute([$google_id, $email]);
     $existing = $stmt->fetch(PDO::FETCH_ASSOC);
     if ($existing) {
-        $update = $pdo->prepare("UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ?, google_id = ? WHERE id = ?");
+        $update = $pdo->prepare("UPDATE users SET username = ?, password = ?, first_name = ?, last_name = ?, google_id = ?, active = 1 WHERE id = ?");
         $update->execute([$username, $hashed_password, $first_name, $last_name, $google_id, $existing['id']]);
         $user_id = $existing['id'];
     } else {
@@ -103,10 +103,10 @@ if (isset($_GET['code'])) {
         $insert->execute([$google_id, $username, $hashed_password, $email, $first_name, $last_name]);
         $user_id = $pdo->lastInsertId();
     }
-    // Optionally, start a session for the user
+    // Log the user in by setting session
     session_start();
     $_SESSION['user_id'] = $user_id;
-    // Redirect to login page after registration/login
-    header('Location: /login.php');
+    // Redirect to dashboard or home
+    header('Location: /index.php');
     exit();
 }
