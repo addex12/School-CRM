@@ -525,15 +525,15 @@ $settings_fields = [
     // Autofill SMTP port and security when provider is selected
     document.addEventListener('DOMContentLoaded', function() {
         var smtpHost = document.getElementById('smtp_host');
-        var smtpPort = document.getElementById('smtp_port');
+        var smtpPort = document.getElementsByName('settings[smtp_port]')[0];
         var smtpSecure = document.getElementById('smtp_secure');
         if (smtpHost && smtpPort && smtpSecure) {
             smtpHost.addEventListener('change', function() {
                 var selected = smtpHost.options[smtpHost.selectedIndex];
                 var port = selected.getAttribute('data-port');
                 var secure = selected.getAttribute('data-secure');
-                if (port) smtpPort.value = port;
-                if (secure) smtpSecure.value = secure;
+                if (port !== null && port !== '') smtpPort.value = port;
+                if (secure !== null && secure !== '') smtpSecure.value = secure;
             });
         }
     });
