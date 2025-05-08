@@ -11,7 +11,7 @@ require_once '../includes/auth.php';
 require_once '../includes/config.php';
 require_once '../includes/db.php';
 requireAdmin();
-$pageTitle = "Adugna OAuth Settings";
+$pageTitle = "OAuth Settings";
 // Fetch current settings from DB
 $defaults = [
     'google_client_id' => '',

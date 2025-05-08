@@ -20,7 +20,7 @@ $redirect_uri = rtrim(BASE_URL, '/') . '/api/oauth/google.php'; // Use BASE_URL 
 
 // 2. If no code, redirect to Google consent screen
 if (!isset($_GET['code'])) {
-    $auth_url = 'https://accounts.google.com/o/oauth2/v2/auth?'.http_build_query([
+    $auth_url = 'https://accounts.google.com/sign/oauth2/v2/auth?'.http_build_query([
         'client_id' => $client_id,
         'redirect_uri' => $redirect_uri,
         'response_type' => 'code',
@@ -69,7 +69,7 @@ if (isset($_GET['code'])) {
     // You may want to set $_SESSION['user_id'] and redirect to dashboard
 
     // For now, just show the user info (for development)
-    echo '<h2>Adugna OAuth Google Login Success</h2>';
+    echo '<h2>School CRM OAuth Google Login Success</h2>';
     echo '<pre>' . htmlspecialchars(print_r($user, true)) . '</pre>';
     echo '<a href="/">Go to Home</a>';
     exit();
