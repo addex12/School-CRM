@@ -6,6 +6,7 @@ LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
 */
+var_dump($_SESSION); // TEMP: Debug session values
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 requireAdmin();
