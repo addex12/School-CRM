@@ -12,10 +12,20 @@ GitHub: https://github.com/addex12
 // For production, use HTTPS and secure your credentials.
 
 require_once __DIR__ . '/../../includes/config.php'; // Load BASE_URL
+require_once __DIR__ . '/../../includes/db.php'; // Add DB connection
 
-// 1. Set your Google OAuth2 credentials
-$client_id = 'YOUR_GOOGLE_CLIENT_ID';
-$client_secret = 'YOUR_GOOGLE_CLIENT_SECRET';
+// Fetch Google OAuth2 credentials from DB
+$defaults = [
+    'google_client_id' => '',
+    'google_client_secret' => ''
+];
+$settings = $defaults;
+$stmt = $pdo->query("SELECT `key`, `value` FROM oauth_settings WHERE `key` IN ('google_client_id', 'google_client_secret')");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $settings[$row['key']] = $row['value'];
+}
+$client_id = $settings['google_client_id'];
+$client_secret = $settings['google_client_secret'];
 $redirect_uri = rtrim(BASE_URL, '/') . '/api/oauth/google.php'; // Use BASE_URL for flexibility
 
 // 2. If no code, redirect to Google consent screen
