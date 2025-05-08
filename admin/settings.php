@@ -569,13 +569,15 @@ $settings_fields = [
         </div>
     </div>
     <?php if (!empty($_SESSION['success'])): ?>
-    <div id="statusMsg" class="adugna-alert adugna-alert-success text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:350px;padding:8px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:5px;">
-        <?= preg_replace('/<i class=\'fas fa-check-circle\'[^>]*><\/i>/', '', $_SESSION['success']) ?>
+    <div id="statusMsg" class="adugna-alert adugna-alert-success text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:400px;padding:12px 22px;box-shadow:0 2px 12px rgba(25,118,210,0.13);border-radius:7px;background:linear-gradient(90deg,#eafaf1 60%,#e0f7fa 100%);font-size:1.08em;display:flex;align-items:center;gap:0.7em;">
+        <span style="display:inline-flex;align-items:center;justify-content:center;background:#27ae60;color:#fff;border-radius:50%;width:2.1em;height:2.1em;font-size:1.3em;box-shadow:0 1px 6px #27ae6022;"><i class="fas fa-check"></i></span>
+        <span><?= preg_replace('/<i class=\'fas fa-check-circle\'[^>]*><\/i>/', '', $_SESSION['success']) ?></span>
     </div>
     <?php unset($_SESSION['success']); ?>
 <?php elseif (!empty($_SESSION['error'])): ?>
-    <div id="statusMsg" class="adugna-alert adugna-alert-error text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:350px;padding:8px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:5px;">
-        <?= preg_replace('/<i class=\'fas fa-times-circle\'[^>]*><\/i>/', '', $_SESSION['error']) ?>
+    <div id="statusMsg" class="adugna-alert adugna-alert-error text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:400px;padding:12px 22px;box-shadow:0 2px 12px rgba(231,76,60,0.13);border-radius:7px;background:linear-gradient(90deg,#ffeaea 60%,#ffe3e3 100%);font-size:1.08em;display:flex;align-items:center;gap:0.7em;">
+        <span style="display:inline-flex;align-items:center;justify-content:center;background:#e74c3c;color:#fff;border-radius:50%;width:2.1em;height:2.1em;font-size:1.3em;box-shadow:0 1px 6px #e74c3c22;"><i class="fas fa-times"></i></span>
+        <span><?= preg_replace('/<i class=\'fas fa-times-circle\'[^>]*><\/i>/', '', $_SESSION['error']) ?></span>
     </div>
     <?php unset($_SESSION['error']); ?>
 <?php endif; ?>
