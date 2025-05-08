@@ -11,8 +11,7 @@ require_once __DIR__ . '/../includes/auth.php';
 session_start();
 if (!isset($_SESSION['consent_granted'])) {
     header('HTTP/1.1 403 Forbidden');
-    die('Consent not granted');
-}
+
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -72,3 +71,4 @@ file_put_contents($logFile, json_encode($logEntry) . PHP_EOL, FILE_APPEND);
 // Respond with success
 header('Content-Type: application/json');
 echo json_encode(['status' => 'success']);
+}
