@@ -91,6 +91,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
                     $_SESSION['role_id'] = $user['role_id'];
+                    // Set user_role for admin check
+                    if ($user['role_id'] == 1) {
+                        $_SESSION['user_role'] = 'admin';
+                    } else {
+                        // Optionally fetch role name from DB if needed
+                        $roleStmt = $pdo->prepare("SELECT role_name FROM roles WHERE id = ?");
+                        $roleStmt->execute([$user['role_id']]);
+                        $_SESSION['user_role'] = $roleStmt->fetchColumn() ?: '';
+                    }
                     $_SESSION['logged_in'] = true;
                     $_SESSION['activity_tracking'] = true; // Enable activity tracking
 
