@@ -19,9 +19,8 @@ $pageTitle = "Permissions";
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /**
-         * Adugna Gizaw: adugna- styles for compact, ERPNext/Jinja2/frappe-inspired, responsive UI.
-         * Sidebar/footer styles are not touched.
-         * All cards, buttons, and messages use adugna- prefix.
+         * Adugna Gizaw: adugna- styles for compact, outstanding, responsive UI.
+         * All cards, buttons, and messages use adugna- prefix for branding/patent.
          * Layout is content/screen aware and visually outstanding.
          */
         html { font-size: 16px; }
@@ -56,8 +55,8 @@ $pageTitle = "Permissions";
             color: #fff;
             border: none;
             border-radius: 5px;
-            padding: 0.5rem 1.2rem;
-            font-size: 1em;
+            padding: 0.32rem 0.9rem;
+            font-size: 0.92em;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.18s, box-shadow 0.18s;
@@ -65,8 +64,10 @@ $pageTitle = "Permissions";
             box-shadow: 0 1px 4px rgba(25,118,210,0.07);
             display: inline-flex;
             align-items: center;
-            gap: 0.5em;
+            gap: 0.4em;
+            min-height: 28px;
         }
+        .adugna-btn i { font-size: 0.92em; }
         .adugna-btn:hover, .adugna-btn:focus {
             background: linear-gradient(90deg, #215967 0%, #2563eb 100%);
             box-shadow: 0 2px 8px rgba(25,118,210,0.12);
@@ -79,7 +80,7 @@ $pageTitle = "Permissions";
         .adugna-header h1 {
             color: #2563eb;
             font-weight: 700;
-            font-size: 2rem;
+            font-size: 1.25rem;
             letter-spacing: 0.01em;
             margin: 0;
             display: flex;
@@ -93,7 +94,7 @@ $pageTitle = "Permissions";
         @media (max-width: 600px) {
             .adugna-main-content { padding: 0.5rem; }
             .adugna-card { padding: 0.7rem; }
-            .adugna-header h1 { font-size: 1.2rem; }
+            .adugna-header h1 { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -105,7 +106,7 @@ $pageTitle = "Permissions";
                 <h1><i class="fas fa-shield-alt"></i> <?= htmlspecialchars($pageTitle) ?></h1>
             </header>
             <div class="adugna-card">
-                <h2 style="color:#2563eb;font-weight:600;margin-bottom:1.2rem;font-size:1.15em;">Manage Permissions</h2>
+                <h2 style="color:#2563eb;font-weight:600;margin-bottom:1.2rem;font-size:1.08em;">Manage Permissions</h2>
                 <p>This is a placeholder for the permissions management interface. Implement permission assignment and management here.</p>
                 <a href="manage_roles.php" class="adugna-btn"><i class="fas fa-user-shield"></i> Manage Roles</a>
                 <a href="user_permissions.php" class="adugna-btn"><i class="fas fa-user-lock"></i> User Permissions</a>
