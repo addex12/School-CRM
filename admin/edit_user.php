@@ -92,13 +92,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_random_password
     try {
         $mail->isSMTP();
         $mail->Host = $email_settings['smtp_host'] ?? '';
-        $mail->Port = $email_settings['smtp_port'] ?? 587;
+        $mail->Port = (int)($email_settings['smtp_port'] ?? 587);
         $mail->SMTPAuth = true;
         $mail->Username = $email_settings['smtp_user'] ?? '';
         $mail->Password = $email_settings['smtp_pass'] ?? '';
         if (!empty($email_settings['smtp_secure'])) {
             $mail->SMTPSecure = $email_settings['smtp_secure'];
         }
+        // Enable debug output for troubleshooting
+        $mail->SMTPDebug = 2;
+        $mail->Debugoutput = function($str, $level) {
+            error_log("SMTP Debug [$level]: $str");
+        };
         $mail->setFrom($from_email, $from_name);
         $mail->addAddress($user['email']);
         $mail->isHTML(false);
