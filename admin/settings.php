@@ -185,6 +185,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
             $smtp_secure = $settings['smtp_secure'] ?? '';
             $from_email = $settings['from_email'] ?? $smtp_user;
 
+            // --- Automatic port check for smtp.gmail.com ---
+            if ($smtp_host === 'smtp.gmail.com') {
+                $portToCheck = ($smtp_secure === 'ssl') ? 465 : 587;
+                $connection = @fsockopen($smtp_host, $portToCheck, $errno, $errstr, 5);
+                if (!$connection) {
+                    $_SESSION['error'] = "Cannot connect to smtp.gmail.com on port $portToCheck. Please ensure this port is open in your server firewall. Error: $errstr ($errno)";
+                    header("Location: settings.php");
+                    exit();
+                } else {
+                    fclose($connection);
+                }
+            }
+
             // Use PHPMailer for sending test email
             require_once '../vendor/autoload.php';
             $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
