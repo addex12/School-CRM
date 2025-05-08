@@ -422,7 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <i class="fas fa-comments"></i> <?= htmlspecialchars($pageTitle) ?>
             </div>
             <!-- Add Feedback Section -->
-            <div class="adugna-card">
+           <!-- <div class="adugna-card">
                 <div class="adugna-card-header"><i class="fas fa-plus"></i> Add Feedback</div>
                 <form method="POST">
                     <div class="adugna-form-group">
@@ -458,7 +458,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <button type="submit" name="add_feedback" class="adugna-btn"><i class="fas fa-plus"></i> Add</button>
                 </form>
-            </div>
+            </div> -->
             <!-- Feedback List Section -->
             <div class="adugna-card">
                 <div class="adugna-card-header"><i class="fas fa-list"></i> Feedback List</div>
