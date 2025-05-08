@@ -11,10 +11,21 @@ GitHub: https://github.com/addex12
 // You must set your Facebook App ID, App Secret, and redirect URI below.
 // For production, use HTTPS and secure your credentials.
 
-// 1. Set your Facebook OAuth2 credentials
-$app_id = 'YOUR_FACEBOOK_APP_ID';
-$app_secret = 'YOUR_FACEBOOK_APP_SECRET';
-$redirect_uri = 'https://yourdomain.com/api/oauth/facebook.php'; // Update to your actual redirect URI
+require_once __DIR__ . '/../../includes/db.php'; // Add DB connection
+
+// Fetch Facebook App ID and Secret from DB
+$defaults = [
+    'facebook_app_id' => '',
+    'facebook_app_secret' => ''
+];
+$settings = $defaults;
+$stmt = $pdo->query("SELECT `key`, `value` FROM oauth_settings WHERE `key` IN ('facebook_app_id', 'facebook_app_secret')");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $settings[$row['key']] = $row['value'];
+}
+$app_id = $settings['facebook_app_id'];
+$app_secret = $settings['facebook_app_secret'];
+$redirect_uri = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/api/oauth/facebook.php';
 
 // 2. If no code, redirect to Facebook consent screen
 if (!isset($_GET['code'])) {
