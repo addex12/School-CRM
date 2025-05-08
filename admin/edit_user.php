@@ -325,4 +325,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user'])) {
     <?php include 'includes/footer.php'; ?>
 </body>
 </html>
-<?php ob_end_flush(); ?>
