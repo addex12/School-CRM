@@ -107,7 +107,7 @@ if (isset($_GET['code'])) {
     // Optionally, start a session for the user
     session_start();
     $_SESSION['user_id'] = $user_id;
-    // Redirect to dashboard or home
-    header('Location: /');
+    // Redirect to login page after registration/login
+    header('Location: /login.php');
     exit();
 }
