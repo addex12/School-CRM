@@ -3,6 +3,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 /**
 Developer: Adugna Gizaw
 Email: gizawadugna@gmail.com
