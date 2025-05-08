@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/CredentialManager.php';
+require_once __DIR__ . '../admin/CredentialManager.php';
 
 header('Content-Type: application/json');
 
