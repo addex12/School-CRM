@@ -12,16 +12,6 @@ require_once '../includes/config.php';
 
 $pageTitle = "System Settings";
 
-// Clear unrelated session messages to avoid showing survey messages here
-unset($_SESSION['survey_success'], $_SESSION['survey_error']);
-
-// Fetch all settings BEFORE any POST logic that needs them
-$stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_group, setting_key");
-$settings = [];
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $settings[$row['setting_key']] = $row['setting_value'];
-}
-
 // Handle settings update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
@@ -172,81 +162,6 @@ if (
     }
 }
 
-// Handle send test email
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
-    $testEmail = trim($_POST['test_email'] ?? '');
-    if (filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
-        try {
-            // Fetch SMTP settings from $settings (now loaded above)
-            $smtp_host = $settings['smtp_host'] ?? '';
-            $smtp_port = $settings['smtp_port'] ?? 587;
-            $smtp_user = $settings['smtp_user'] ?? '';
-            $smtp_pass = $settings['smtp_pass'] ?? '';
-            $smtp_secure = $settings['smtp_secure'] ?? '';
-            $from_email = $settings['from_email'] ?? $smtp_user;
-
-            // --- Automatic port check for smtp.gmail.com ---
-            if ($smtp_host === 'smtp.gmail.com') {
-                $portToCheck = ($smtp_secure === 'ssl') ? 465 : 587;
-                $connection = @fsockopen($smtp_host, $portToCheck, $errno, $errstr, 5);
-                if (!$connection) {
-                    $_SESSION['error'] = "Cannot connect to smtp.gmail.com on port $portToCheck. Please ensure this port is open in your server firewall. Error: $errstr ($errno)";
-                    header("Location: settings.php");
-                    exit();
-                } else {
-                    fclose($connection);
-                }
-            }
-
-            // Use PHPMailer for sending test email
-            require_once '../vendor/autoload.php';
-            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-            $mail->isSMTP();
-            $mail->Host = $smtp_host;
-            $mail->Port = $smtp_port;
-            $mail->SMTPAuth = true;
-            $mail->Username = $smtp_user;
-            $mail->Password = $smtp_pass;
-            if ($smtp_secure) {
-                $mail->SMTPSecure = $smtp_secure;
-            }
-            // Set recommended SMTP options for TLS (especially for Gmail)
-            if ($smtp_secure === 'tls') {
-                $mail->SMTPOptions = [
-                    'ssl' => [
-                        'verify_peer' => false,
-                        'verify_peer_name' => false,
-                        'allow_self_signed' => true
-                    ]
-                ];
-            }
-            $mail->setFrom($from_email, 'School CRM');
-            $mail->addAddress($testEmail);
-            $mail->Subject = 'Test Email from School CRM';
-            $mail->Body = 'This is a test email sent from your School CRM settings page.';
-
-            // Enable SMTP debug output and capture it
-            $mail->SMTPDebug = 2;
-            $mail->Debugoutput = function($str, $level) use (&$smtpDebugOutput) {
-                $smtpDebugOutput .= htmlspecialchars($str) . "<br>";
-            };
-            $smtpDebugOutput = '';
-
-            $mail->send();
-            $_SESSION['success'] = "Test email sent successfully to $testEmail!";
-        } catch (Exception $e) {
-            // Add SMTP debug info for troubleshooting
-            $smtpInfo = "SMTP Host: $smtp_host, Port: $smtp_port, Secure: $smtp_secure";
-            $debug = isset($smtpDebugOutput) ? "<br><b>SMTP Debug Output:</b><br>" . $smtpDebugOutput : '';
-            $_SESSION['error'] = "Failed to send test email: " . $e->getMessage() . "<br><small>$smtpInfo</small><br>Please check your SMTP settings and network connectivity." . $debug;
-        }
-    } else {
-        $_SESSION['error'] = "Invalid test email address.";
-    }
-    header("Location: settings.php");
-    exit();
-}
-
 // Fetch all settings
 $stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_group, setting_key");
 $settings = [];
@@ -293,45 +208,6 @@ $settings_fields = [
             ]
         ],
         'from_email' => ['label' => 'From Email', 'type' => 'email'],
-        'smtp_host' => [
-            'label' => 'SMTP Host',
-            'type' => 'text',
-            'placeholder' => 'smtp.yourdomain.com',
-        ],
-        'smtp_port' => [
-            'label' => 'SMTP Port',
-            'type' => 'number',
-            'placeholder' => '587',
-        ],
-        'smtp_user' => [
-            'label' => 'SMTP Username',
-            'type' => 'text',
-            'placeholder' => 'user@yourdomain.com',
-        ],
-        'smtp_pass' => [
-            'label' => 'SMTP Password',
-            'type' => 'password',
-            'placeholder' => '********',
-        ],
-        'smtp_secure' => [
-            'label' => 'SMTP Security',
-            'type' => 'select',
-            'options' => [
-                '' => 'None',
-                'tls' => 'TLS',
-                'ssl' => 'SSL',
-            ],
-        ],
-        'from_email' => [
-            'label' => 'From Email Address',
-            'type' => 'email',
-            'placeholder' => 'noreply@yourdomain.com',
-        ],
-        'from_name' => [
-            'label' => 'From Name',
-            'type' => 'text',
-            'placeholder' => 'School CRM',
-        ],
     ],
     'security' => [
         'password_min_length' => ['label' => 'Password Min Length', 'type' => 'number'],
@@ -543,28 +419,6 @@ $settings_fields = [
                                     <?php if ($field['type'] === 'checkbox'): ?>
                                         <input type="checkbox" id="<?= $key ?>" name="settings[<?= $key ?>]" value="1"
                                             <?= !empty($settings[$key]) && $settings[$key] == '1' ? 'checked' : '' ?>>
-                                    <?php elseif ($field['type'] === 'select' && $key === 'smtp_host'): ?>
-                                        <select id="<?= $key ?>" name="settings[<?= $key ?>]">
-                                            <?php
-                                            // SMTP provider autofill mapping
-                                            $smtpProviderData = [
-                                                'smtp.gmail.com' => ['port' => 587, 'secure' => 'tls'],
-                                                'smtp.mail.yahoo.com' => ['port' => 587, 'secure' => 'tls'],
-                                                'smtp.office365.com' => ['port' => 587, 'secure' => 'tls'],
-                                                'smtp.mailgun.org' => ['port' => 587, 'secure' => 'tls'],
-                                                'smtp.sendgrid.net' => ['port' => 587, 'secure' => 'tls'],
-                                            ];
-                                            foreach ($field['options'] as $optionValue => $optionLabel):
-                                                $dataAttrs = '';
-                                                if (isset($smtpProviderData[$optionValue])) {
-                                                    $dataAttrs = ' data-port="' . $smtpProviderData[$optionValue]['port'] . '" data-secure="' . $smtpProviderData[$optionValue]['secure'] . '"';
-                                                }
-                                            ?>
-                                                <option value="<?= $optionValue ?>"<?= isset($settings[$key]) && $settings[$key] == $optionValue ? ' selected' : '' ?><?= $dataAttrs ?>>
-                                                    <?= $optionLabel ?>
-                                                </option>
-                                            <?php endforeach; ?>
-                                        </select>
                                     <?php elseif ($field['type'] === 'select'): ?>
                                         <select id="<?= $key ?>" name="settings[<?= $key ?>]">
                                             <?php foreach ($field['options'] as $optionValue => $optionLabel): ?>
@@ -628,34 +482,6 @@ $settings_fields = [
                     <?php endif; ?>
                 </div>
             </div>
-            <!-- PHPMailer SMTP Configurator (RECOMMENDED) -->
-            <div class="adugna-card">
-                <h2>PHPMailer SMTP Configuration</h2>
-                <form method="POST" autocomplete="off" style="margin-bottom:1.5em;">
-                    <table style="width:100%;border-collapse:collapse;">
-                        <tr><th style="text-align:left;padding:6px 4px;">Setting</th><th style="text-align:left;padding:6px 4px;">Value</th></tr>
-                        <tr><td>SMTP Host</td><td><input type="text" name="settings[smtp_host]" value="<?= htmlspecialchars($settings['smtp_host'] ?? '') ?>" placeholder="smtp.yourdomain.com" style="width:100%"<?php if(stripos($settings['smtp_host'] ?? '', 'technobros.net.au') !== false) echo ' readonly'; ?>></td></tr>
-                        <tr><td>SMTP Port</td><td><input type="number" name="settings[smtp_port]" value="<?= htmlspecialchars($settings['smtp_port'] ?? '587') ?>" placeholder="587" style="width:100%"></td></tr>
-                        <tr><td>SMTP Username</td><td><input type="text" name="settings[smtp_user]" value="<?= htmlspecialchars($settings['smtp_user'] ?? '') ?>" placeholder="user@yourdomain.com" style="width:100%"></td></tr>
-                        <tr><td>SMTP Password</td><td><input type="password" name="settings[smtp_pass]" value="<?= htmlspecialchars($settings['smtp_pass'] ?? '') ?>" placeholder="********" style="width:100%"></td></tr>
-                        <tr><td>SMTP Security</td><td>
-                            <select name="settings[smtp_secure]" style="width:100%">
-                                <option value="" <?= empty($settings['smtp_secure']) ? 'selected' : '' ?>>None</option>
-                                <option value="tls" <?= (isset($settings['smtp_secure']) && $settings['smtp_secure']==='tls') ? 'selected' : '' ?>>TLS</option>
-                                <option value="ssl" <?= (isset($settings['smtp_secure']) && $settings['smtp_secure']==='ssl') ? 'selected' : '' ?>>SSL</option>
-                            </select>
-                        </td></tr>
-                        <tr><td>From Email</td><td><input type="email" name="settings[from_email]" value="<?= htmlspecialchars($settings['from_email'] ?? '') ?>" placeholder="noreply@yourdomain.com" style="width:100%"></td></tr>
-                        <tr><td>From Name</td><td><input type="text" name="settings[from_name]" value="<?= htmlspecialchars($settings['from_name'] ?? '') ?>" placeholder="School CRM" style="width:100%"></td></tr>
-                    </table>
-                    <button type="submit" class="adugna-btn" style="margin-top:1em;"><i class="fas fa-save"></i> Save PHPMailer Settings</button>
-                </form>
-                <!-- Send Test Email Section -->
-                <form method="POST" style="display:flex;gap:1em;align-items:center;flex-wrap:wrap;">
-                    <input type="email" name="test_email" placeholder="Enter email address" required style="max-width:260px;">
-                    <button type="submit" name="send_test_email" class="adugna-btn"><i class="fas fa-paper-plane"></i> Send Test Email</button>
-                </form>
-            </div>
             <div class="adugna-card">
                 <h2>Other Admin Tools</h2>
                 <ul class="adugna-admin-tools-list">
@@ -670,23 +496,6 @@ $settings_fields = [
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
-    <script>
-    // Autofill SMTP port and security when provider is selected
-    document.addEventListener('DOMContentLoaded', function() {
-        var smtpHost = document.getElementById('smtp_host');
-        var smtpPort = document.getElementsByName('settings[smtp_port]')[0];
-        var smtpSecure = document.getElementById('smtp_secure');
-        if (smtpHost && smtpPort && smtpSecure) {
-            smtpHost.addEventListener('change', function() {
-                var selected = smtpHost.options[smtpHost.selectedIndex];
-                var port = selected.getAttribute('data-port');
-                var secure = selected.getAttribute('data-secure');
-                if (port !== null && port !== '') smtpPort.value = port;
-                if (secure !== null && secure !== '') smtpSecure.value = secure;
-            });
-        }
-    });
-    </script>
     <style>
         /* Adugna Gizaw: Make textboxes and textareas compact, attractive, and not too long */
         .adugna-form-group input[type="text"],
