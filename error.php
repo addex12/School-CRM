@@ -15,7 +15,7 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 // Debugging: Check session variables
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     // Log session data for debugging (remove in production)
     error_log("Access denied. Session data: " . print_r($_SESSION, true));
     header("Location: login.php");
