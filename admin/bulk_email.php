@@ -10,7 +10,7 @@ Email: gizawadugna@gmail.com
 LinkedIn: https://www.linkedin.com/in/eleganceict
 Twitter: https://twitter.com/eleganceict1
 GitHub: https://github.com/addex12
-*/
+ */
 // TEMP: Debug session values to error log (safe for headers)
 if (isset($_SESSION)) {
     error_log('SESSION: ' . print_r($_SESSION, true));
@@ -87,10 +87,14 @@ if ($roleStmt) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Bulk Email - Admin Panel</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= htmlspecialchars($pageTitle) ?> - Admin Panel</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         /**
@@ -99,9 +103,22 @@ if ($roleStmt) {
          * All cards, buttons, and messages use adugna- prefix.
          * Layout is content/screen aware and visually outstanding.
          */
-        html { font-size: 16px; }
-        @media (max-width: 900px) { html { font-size: 15px; } }
-        @media (max-width: 600px) { html { font-size: 14px; } }
+        html {
+            font-size: 16px;
+        }
+
+        @media (max-width: 900px) {
+            html {
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            html {
+                font-size: 14px;
+            }
+        }
+
         .adugna-main-content {
             max-width: 1100px;
             margin: 32px auto 0 auto;
@@ -111,24 +128,28 @@ if ($roleStmt) {
             padding: 18px 18px 28px 18px;
             transition: box-shadow 0.2s;
         }
+
         .adugna-row {
             display: flex;
             gap: 2.5rem;
             flex-wrap: wrap;
         }
+
         .adugna-col {
             flex: 1 1 350px;
             min-width: 320px;
             max-width: 520px;
         }
+
         .adugna-card {
             background: #fff;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(25,118,210,0.07);
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.07);
             padding: 1.1rem 1.2rem 1.2rem 1.2rem;
             margin-bottom: 1.5rem;
             transition: box-shadow 0.2s, width 0.2s;
         }
+
         .adugna-card-header {
             font-size: 1.13em;
             color: #1976d2;
@@ -136,17 +157,20 @@ if ($roleStmt) {
             margin-bottom: 1em;
             letter-spacing: 0.01em;
         }
+
         .adugna-form-group {
             margin-bottom: 1rem;
             display: flex;
             flex-direction: column;
             gap: 0.2em;
         }
+
         .adugna-form-group label {
             font-size: 0.97em;
             color: #444;
             font-weight: 500;
         }
+
         .adugna-form-group input,
         .adugna-form-group select,
         .adugna-form-group textarea {
@@ -157,10 +181,12 @@ if ($roleStmt) {
             background: #f9fbfd;
             color: #222;
         }
+
         .adugna-form-group textarea {
             min-height: 100px;
             resize: vertical;
         }
+
         .adugna-btn {
             background: #1976d2;
             color: #fff;
@@ -176,20 +202,25 @@ if ($roleStmt) {
             font-weight: 500;
             text-decoration: none;
         }
+
         .adugna-btn i {
             font-size: 1em;
         }
+
         .adugna-btn:hover {
             background: #145ea8;
         }
+
         .adugna-btn-secondary {
             background: #e3eafc;
             color: #1976d2;
             border: 1px solid #b6d0f7;
         }
+
         .adugna-btn-secondary:hover {
             background: #d0e2fa;
         }
+
         .adugna-alert-success {
             background: #eafaf1;
             color: #27ae60;
@@ -199,6 +230,7 @@ if ($roleStmt) {
             margin-bottom: 1em;
             font-size: 0.97em;
         }
+
         .adugna-alert-error {
             background: #ffeaea;
             color: #e74c3c;
@@ -208,28 +240,46 @@ if ($roleStmt) {
             margin-bottom: 1em;
             font-size: 0.97em;
         }
+
         @media (max-width: 1100px) {
-            .adugna-main-content { max-width: 99vw; margin: 18px 2vw 0 2vw; padding: 10px 4px 18px 4px; }
+            .adugna-main-content {
+                max-width: 99vw;
+                margin: 18px 2vw 0 2vw;
+                padding: 10px 4px 18px 4px;
+            }
         }
+
         @media (max-width: 900px) {
-            .adugna-row { flex-direction: column; gap: 1.5rem; }
-            .adugna-col { max-width: 100%; }
+            .adugna-row {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .adugna-col {
+                max-width: 100%;
+            }
         }
+
         @media (max-width: 600px) {
-            .adugna-main-content { padding: 0.5rem 0.2rem 0.7rem 0.2rem; }
+            .adugna-main-content {
+                padding: 0.5rem 0.2rem 0.7rem 0.2rem;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="admin-dashboard">
         <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
         <div class="admin-main">
             <div class="adugna-main-content">
                 <?php if (isset($_SESSION['success'])): ?>
-                    <div class="adugna-alert-success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></div>
+                    <div class="adugna-alert-success"><?php echo $_SESSION['success'];
+                                                        unset($_SESSION['success']); ?></div>
                 <?php endif; ?>
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="adugna-alert-error"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                    <div class="adugna-alert-error"><?php echo $_SESSION['error'];
+                                                    unset($_SESSION['error']); ?></div>
                 <?php endif; ?>
                 <div class="adugna-row">
                     <div class="adugna-col">
@@ -294,4 +344,5 @@ if ($roleStmt) {
         <?php include 'includes/footer.php'; ?>
     </div>
 </body>
+
 </html>
