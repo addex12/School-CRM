@@ -114,6 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             ->execute([$token, date('Y-m-d H:i:s', $expiry), $user['id']]);
                     }
 
+                    // Ensure session is saved before redirect
+                    session_write_close();
+
                     // Redirect based on role and active status
                     if ($user['role_id'] == 1 && $user['active'] == 1) {
                         header("Location: " . BASE_URL . "/admin/dashboard.php");
