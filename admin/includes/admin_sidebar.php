@@ -80,6 +80,8 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     z-index: 1200;
     transition: transform 0.25s cubic-bezier(.4,0,.2,1);
     will-change: transform;
+    overflow-y: auto; /* Enable vertical scroll if needed */
+    max-height: 100vh; /* Prevent overflow beyond viewport */
 }
 .adugna-sidebar.adugna-collapsed {
     transform: translateX(-100%);
