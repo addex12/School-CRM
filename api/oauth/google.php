@@ -42,83 +42,86 @@ if (!isset($_GET['code'])) {
     exit();
 }
 
-// 3. Exchange code for access token
-if (isset($_GET['code'])) {
-    $code = $_GET['code'];
-    $token_url = 'https://oauth2.googleapis.com/token';
-    $post_fields = [
-        'code' => $code,
-        'client_id' => $client_id,
-        'client_secret' => $client_secret,
-        'redirect_uri' => $redirect_uri,
-        'grant_type' => 'authorization_code',
-    ];
-    $ch = curl_init($token_url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    if (curl_errno($ch)) {
-        die('OAuth: cURL error: ' . curl_error($ch));
-    }
-    curl_close($ch);
-    $token_data = json_decode($response, true);
-    if (!isset($token_data['access_token'])) {
-        die('OAuth: Failed to get access token. Google response: ' . htmlspecialchars($response));
-    }
-    $access_token = $token_data['access_token'];
+if (isset($_GET['code']) || ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['google_user']))) {
+    session_start();
 
-    // 4. Get user info from Google
-    $userinfo_url = 'https://www.googleapis.com/oauth2/v2/userinfo?access_token=' . urlencode($access_token);
-    $ch = curl_init($userinfo_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $user_json = curl_exec($ch);
-    curl_close($ch);
-    $user = json_decode($user_json, true);
-    if (!$user || !isset($user['email'])) {
-        die('OAuth: Failed to get user info.');
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['google_user'])) {
+        // Password form submitted, use session data
+        $user = $_SESSION['google_user'];
+        $google_id = $_SESSION['google_id'];
+        $user_password = $_POST['password'] ?? null;
+    } else {
+        // First time with code, exchange for token and get user info
+        $code = $_GET['code'];
+        $token_url = 'https://oauth2.googleapis.com/token';
+        $post_fields = [
+            'code' => $code,
+            'client_id' => $client_id,
+            'client_secret' => $client_secret,
+            'redirect_uri' => $redirect_uri,
+            'grant_type' => 'authorization_code',
+        ];
+        $ch = curl_init($token_url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_fields));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        if (curl_errno($ch)) {
+            die('OAuth: cURL error: ' . curl_error($ch));
+        }
+        curl_close($ch);
+        $token_data = json_decode($response, true);
+        if (!isset($token_data['access_token'])) {
+            die('OAuth: Failed to get access token. Google response: ' . htmlspecialchars($response));
+        }
+        $access_token = $token_data['access_token'];
+
+        // 4. Get user info from Google
+        $userinfo_url = 'https://www.googleapis.com/oauth2/v2/userinfo?access_token=' . urlencode($access_token);
+        $ch = curl_init($userinfo_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $user_json = curl_exec($ch);
+        curl_close($ch);
+        $user = json_decode($user_json, true);
+        if (!$user || !isset($user['email'])) {
+            die('OAuth: Failed to get user info.');
+        }
+        // Store user info in session for next POST
+        $_SESSION['google_user'] = $user;
+        $_SESSION['google_id'] = $user['id'];
+        $google_id = $user['id'];
+        $user_password = null;
     }
 
-    // 5. Register or log in the user in your system
-    // Store Google credentials in users table
-
-    // Collect password from user if not already provided
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['password']) && !empty($_POST['password'])) {
-        $user_password = $_POST['password'];
-    } elseif (!isset($_POST['password'])) {
-        // Show password collection form
+    // Show password form if not provided
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($user_password)) {
         ?>
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Set Your Password</title>
+            <title>Login</title>
         </head>
         <body>
             <form method="post" action="">
-                <input type="hidden" name="code" value="<?php echo htmlspecialchars($_GET['code']); ?>">
-                <label for="password">Please click to proceed:</label><br>
-                <input type="password" name="password" id="password" required><br>
-                <button type="submit">Login</button>
+                <label for="password">To continue, please consent to store your password for this account. You may use your browser-saved password (autofill) or enter it manually:</label><br>
+                <input type="password" name="password" id="password" required autocomplete="current-password"><br>
+                <button type="submit" name="consent" value="1">I Consent</button>
             </form>
         </body>
         </html>
         <?php
         exit();
-    } else {
-        // fallback if password is empty
-        $user_password = null;
     }
 
     require_once __DIR__ . '/../../includes/db.php';
-    $google_id = $user['id'];
-    $email = $user['email'] ?? ($google_id . '@google.local'); // fallback if Google doesn't provide email
-    $username = $email; // Use email as username
+    $email = $user['email'] ?? ($google_id . '@google.local');
+    $username = $email;
     $first_name = $user['given_name'] ?? '';
     $last_name = $user['family_name'] ?? '';
     if (!empty($user_password)) {
         $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
     } else {
-        $random_password = bin2hex(random_bytes(16)); // Generate a random password
+        $random_password = bin2hex(random_bytes(16));
         $hashed_password = password_hash($random_password, PASSWORD_DEFAULT);
     }
 
@@ -138,6 +141,8 @@ if (isset($_GET['code'])) {
     // Log the user in by setting session
     session_start();
     $_SESSION['user_id'] = $user_id;
+    // After successful login, clear session data
+    unset($_SESSION['google_user'], $_SESSION['google_id']);
     // Redirect to dashboard or home
     header('Location: /index.php');
     exit();
