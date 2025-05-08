@@ -197,16 +197,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
             if ($smtp_secure) {
                 $mail->SMTPSecure = $smtp_secure;
             }
+            // Set recommended SMTP options for TLS (especially for Gmail)
+            if ($smtp_secure === 'tls') {
+                $mail->SMTPOptions = [
+                    'ssl' => [
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                        'allow_self_signed' => true
+                    ]
+                ];
+            }
             $mail->setFrom($from_email, 'School CRM');
             $mail->addAddress($testEmail);
             $mail->Subject = 'Test Email from School CRM';
             $mail->Body = 'This is a test email sent from your School CRM settings page.';
+
+            // Enable SMTP debug output and capture it
+            $mail->SMTPDebug = 2;
+            $mail->Debugoutput = function($str, $level) use (&$smtpDebugOutput) {
+                $smtpDebugOutput .= htmlspecialchars($str) . "<br>";
+            };
+            $smtpDebugOutput = '';
+
             $mail->send();
             $_SESSION['success'] = "Test email sent successfully to $testEmail!";
         } catch (Exception $e) {
             // Add SMTP debug info for troubleshooting
             $smtpInfo = "SMTP Host: $smtp_host, Port: $smtp_port, Secure: $smtp_secure";
-            $_SESSION['error'] = "Failed to send test email: " . $e->getMessage() . "<br><small>$smtpInfo</small><br>Please check your SMTP settings and network connectivity.";
+            $debug = isset($smtpDebugOutput) ? "<br><b>SMTP Debug Output:</b><br>" . $smtpDebugOutput : '';
+            $_SESSION['error'] = "Failed to send test email: " . $e->getMessage() . "<br><small>$smtpInfo</small><br>Please check your SMTP settings and network connectivity." . $debug;
         }
     } else {
         $_SESSION['error'] = "Invalid test email address.";
