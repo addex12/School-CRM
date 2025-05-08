@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
 }
 
 // Fetch all settings
-$stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_group, setting_key");
+$stmt = $pdo->query("SELECT * FROM system_settings ORDER BY setting_key");
 $settings = [];
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $settings[$row['setting_key']] = $row['setting_value'];
