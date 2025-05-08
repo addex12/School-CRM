@@ -523,7 +523,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Feedback Subject Manager Section -->
             <div class="adugna-card">
                 <div class="adugna-card-header"><i class="fas fa-tags"></i> Feedback Subject Manager</div>
-                <form method="POST">
+                <!-- Add Subject Form -->
+                <form method="POST" style="margin-bottom:1.2em;">
                     <div class="adugna-form-group">
                         <label for="subject">New Subject</label>
                         <input type="text" name="subject" id="subject" required>
@@ -547,7 +548,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <?php foreach ($subjectList as $subject): ?>
                                 <tr>
                                     <td data-label="ID"><?= htmlspecialchars($subject['id']) ?></td>
-                                    <td data-label="Subject"><?= htmlspecialchars($subject['subject']) ?></td>
+                                    <td data-label="Subject">
+                                        <?php if (isset($_GET['edit_subject']) && $_GET['edit_subject'] == $subject['id']): ?>
+                                            <form method="POST" style="display:inline;">
+                                                <input type="hidden" name="subject_id" value="<?= $subject['id'] ?>">
+                                                <input type="text" name="subject" value="<?= htmlspecialchars($subject['subject']) ?>" required style="width:120px;">
+                                                <button type="submit" name="edit_subject" class="adugna-btn adugna-btn-info adugna-btn-sm"><i class="fas fa-save"></i></button>
+                                                <a href="feedback_mgmt.php#subject-mgr" class="adugna-btn adugna-btn-secondary adugna-btn-sm"><i class="fas fa-times"></i></a>
+                                            </form>
+                                        <?php else: ?>
+                                            <?= htmlspecialchars($subject['subject']) ?>
+                                        <?php endif; ?>
+                                    </td>
                                     <td data-label="Status"><?= htmlspecialchars($subject['status']) ?></td>
                                     <td data-label="Actions">
                                         <form method="POST" style="display:inline;">
@@ -555,6 +567,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             <input type="hidden" name="current_status" value="<?= $subject['status'] ?>">
                                             <button type="submit" name="toggle_subject_status" class="adugna-btn adugna-btn-secondary adugna-btn-sm"><?= $subject['status'] === 'active' ? 'Deactivate' : 'Activate' ?></button>
                                         </form>
+                                        <a href="feedback_mgmt.php?edit_subject=<?= $subject['id'] ?>#subject-mgr" class="adugna-btn adugna-btn-info adugna-btn-sm"><i class="fas fa-edit"></i></a>
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="subject_id" value="<?= $subject['id'] ?>">
                                             <button type="submit" name="delete_subject" class="adugna-btn adugna-btn-danger adugna-btn-sm" onclick="return confirm('Are you sure you want to delete this subject?')"><i class="fas fa-trash"></i></button>
