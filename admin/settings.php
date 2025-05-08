@@ -570,12 +570,12 @@ $settings_fields = [
     </div>
     <?php if (!empty($_SESSION['success'])): ?>
     <div id="statusMsg" class="adugna-alert adugna-alert-success text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:350px;padding:8px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:5px;">
-        <?= $_SESSION['success'] ?>
+        <?= preg_replace('/<i class=\'fas fa-check-circle\'[^>]*><\/i>/', '', $_SESSION['success']) ?>
     </div>
     <?php unset($_SESSION['success']); ?>
 <?php elseif (!empty($_SESSION['error'])): ?>
     <div id="statusMsg" class="adugna-alert adugna-alert-error text-center" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:2000;min-width:220px;max-width:350px;padding:8px 18px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:5px;">
-        <?= $_SESSION['error'] ?>
+        <?= preg_replace('/<i class=\'fas fa-times-circle\'[^>]*><\/i>/', '', $_SESSION['error']) ?>
     </div>
     <?php unset($_SESSION['error']); ?>
 <?php endif; ?>
