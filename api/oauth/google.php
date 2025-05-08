@@ -67,7 +67,10 @@ if (isset($_GET['code'])) {
 
     // 4. Get user info from Google
     $userinfo_url = 'https://www.googleapis.com/oauth2/v2/userinfo?access_token=' . urlencode($access_token);
-    $user_json = file_get_contents($userinfo_url);
+    $ch = curl_init($userinfo_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $user_json = curl_exec($ch);
+    curl_close($ch);
     $user = json_decode($user_json, true);
     if (!$user || !isset($user['email'])) {
         die('Adugna OAuth: Failed to get user info.');
