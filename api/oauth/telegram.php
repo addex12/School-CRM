@@ -13,20 +13,26 @@ GitHub: https://github.com/addex12
 
 require_once __DIR__ . '/../../includes/db.php'; // Add DB connection
 
-// Fetch Telegram bot username from DB
+// Fetch Telegram bot username and bot ID from DB
 $defaults = [
-    'telegram_bot_username' => ''
+    'telegram_bot_username' => '',
+    'telegram_bot_id' => ''
 ];
 $settings = $defaults;
-$stmt = $pdo->query("SELECT `key`, `value` FROM oauth_settings WHERE `key` = 'telegram_bot_username'");
+$stmt = $pdo->query("SELECT `key`, `value` FROM oauth_settings WHERE `key` IN ('telegram_bot_username', 'telegram_bot_id')");
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $settings[$row['key']] = $row['value'];
 }
 $bot_username = $settings['telegram_bot_username'];
+$bot_id = $settings['telegram_bot_id'];
 
 // 2. If no Telegram login data, show Telegram login button
 if (!isset($_GET['id']) && !isset($_GET['hash'])) {
-    $login_url = 'https://oauth.telegram.org/auth?bot=' . urlencode($bot_username) . '&origin=' . urlencode('https://' . $_SERVER['HTTP_HOST']) . '&embed=0&request_access=write';
+    $login_url = 'https://oauth.telegram.org/auth?bot=' . urlencode($bot_username);
+    if (!empty($bot_id)) {
+        $login_url .= '&bot_id=' . urlencode($bot_id);
+    }
+    $login_url .= '&origin=' . urlencode('https://' . $_SERVER['HTTP_HOST']) . '&embed=0&request_access=write';
     header('Location: ' . $login_url);
     exit();
 }
