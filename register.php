@@ -175,6 +175,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 2.5rem;
             color: #3498db;
         }
+        /* Adugna Gizaw: Social registration button styles, adugna- prefix for branding and patent. */
+        .adugna-social-register { margin-bottom: 18px; }
+        .adugna-social-btn {
+            border: 1px solid #e0e0e0;
+            background: #fff;
+            color: #222;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 500;
+            padding: 7px 16px;
+            margin: 0 2px 6px 2px;
+            transition: box-shadow 0.13s, border 0.13s;
+            box-shadow: 0 1px 4px rgba(44,62,80,0.04);
+            min-width: 44px;
+        }
+        .adugna-social-btn:hover, .adugna-social-btn:focus {
+            box-shadow: 0 2px 8px rgba(44,62,80,0.09);
+            border: 1.5px solid #3498db;
+            text-decoration: none;
+        }
+        .adugna-google .adugna-social-label { color: #ea4335; }
+        .adugna-telegram .adugna-social-label { color: #229ed9; }
+        .adugna-facebook .adugna-social-label { color: #1877f3; }
+        @media (max-width: 600px) {
+            .adugna-social-btn { font-size: 0.97em; padding: 7px 8px; }
+        }
         @media (max-width: 600px) {
             .register-card {
                 padding: 24px 8px 18px 8px;
@@ -193,6 +219,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="fas fa-user-plus"></i>
         </div>
         <div class="register-title">Create Account</div>
+        <!-- Adugna Gizaw: Social registration options for Gmail, Telegram, Facebook. -->
+        <div class="adugna-social-register" style="text-align:center; margin-bottom:18px;">
+            <!-- Gmail/Google -->
+            <a href="/api/oauth/google.php" class="adugna-btn adugna-social-btn adugna-google" title="Register with Gmail" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
+                <i class="fab fa-google" style="font-size:1.3em;color:#ea4335;"></i> <span class="adugna-social-label">Gmail</span>
+            </a>
+            <!-- Telegram -->
+            <a href="/api/oauth/telegram.php" class="adugna-btn adugna-social-btn adugna-telegram" title="Register with Telegram" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
+                <i class="fab fa-telegram-plane" style="font-size:1.3em;color:#229ed9;"></i> <span class="adugna-social-label">Telegram</span>
+            </a>
+            <!-- Facebook -->
+            <a href="/api/oauth/facebook.php" class="adugna-btn adugna-social-btn adugna-facebook" title="Register with Facebook" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
+                <i class="fab fa-facebook-f" style="font-size:1.3em;color:#1877f3;"></i> <span class="adugna-social-label">Facebook</span>
+            </a>
+        </div>
         <?php if (!empty($errors['general'])): ?>
             <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
         <?php elseif (!empty($_SESSION['register_success'])): ?>
