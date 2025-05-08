@@ -8,7 +8,6 @@ require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
 // Verify user consent session
-session_start();
 if (!isset($_SESSION['consent_granted'])) {
 
 
