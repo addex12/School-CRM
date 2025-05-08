@@ -9,6 +9,10 @@ require_once __DIR__ . '/../includes/auth.php';
 
 // Verify user consent session
 session_start();
+if (!isset($_SESSION['consent_granted'])) {
+    header('HTTP/1.1 403 Forbidden');
+    die('Consent not granted');
+}
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -59,9 +63,6 @@ try {
     ]);
 } catch (PDOException $e) {
     error_log("Database error: " . $e->getMessage());
-    header('HTTP/1.1 500 Internal Server Error');
-    echo json_encode(['status' => 'error', 'message' => 'Database error']);
-    exit();
 }
 
 // Also append to log file
