@@ -594,13 +594,6 @@ $settings_fields = [
                 </form>
             </div>
             <div class="adugna-card">
-                <h2>Send Test Email</h2>
-                <form method="POST" style="display:flex;gap:1em;align-items:center;flex-wrap:wrap;">
-                    <input type="email" name="test_email" placeholder="Enter email address" required style="max-width:260px;">
-                    <button type="submit" name="send_test_email" class="adugna-btn"><i class="fas fa-paper-plane"></i> Send Test Email</button>
-                </form>
-            </div>
-            <div class="adugna-card">
                 <h2>Login Background Images (Slider)</h2>
                 <form method="POST" enctype="multipart/form-data" style="margin-bottom:1em;">
                     <input type="file" name="login_bg_images[]" multiple accept="image/*">
@@ -622,6 +615,7 @@ $settings_fields = [
                     <?php endif; ?>
                 </div>
             </div>
+            <!-- PHPMailer SMTP Configurator (RECOMMENDED) -->
             <div class="adugna-card">
                 <h2>PHPMailer SMTP Configuration</h2>
                 <form method="POST" autocomplete="off" style="margin-bottom:1.5em;">
@@ -642,6 +636,11 @@ $settings_fields = [
                         <tr><td>From Name</td><td><input type="text" name="settings[from_name]" value="<?= htmlspecialchars($settings['from_name'] ?? '') ?>" placeholder="School CRM" style="width:100%"></td></tr>
                     </table>
                     <button type="submit" class="adugna-btn" style="margin-top:1em;"><i class="fas fa-save"></i> Save PHPMailer Settings</button>
+                </form>
+                <!-- Send Test Email Section -->
+                <form method="POST" style="display:flex;gap:1em;align-items:center;flex-wrap:wrap;">
+                    <input type="email" name="test_email" placeholder="Enter email address" required style="max-width:260px;">
+                    <button type="submit" name="send_test_email" class="adugna-btn"><i class="fas fa-paper-plane"></i> Send Test Email</button>
                 </form>
             </div>
             <div class="adugna-card">
