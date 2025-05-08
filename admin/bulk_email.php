@@ -18,7 +18,7 @@ if (isset($_SESSION)) {
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
 requireAdmin();
-
+$pageTitle = "Bulk Email";
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['send_bulk_email'])) {
