@@ -13,7 +13,7 @@ class CredentialManager {
         $expires = (new DateTime('+30 days'))->format('Y-m-d H:i:s');
         
         $stmt = $this->pdo->prepare("
-            INSERT INTO credential_consents 
+            INSERT INTO nconsent 
             (user_id, ip_address, user_agent, consent_token, expires_at) 
             VALUES (?, ?, ?, ?, ?)
         ");
@@ -24,7 +24,7 @@ class CredentialManager {
     
     public function verifyConsent(string $token): ?int {
         $stmt = $this->pdo->prepare("
-            SELECT user_id FROM credential_consents 
+            SELECT user_id FROM nconsents
             WHERE consent_token = ? 
             AND expires_at > NOW() 
             AND revoked = 0
@@ -53,7 +53,7 @@ class CredentialManager {
                 }
                 
                 $stmt = $this->pdo->prepare("
-                    INSERT INTO stored_credentials 
+                    INSERT INTO stored_cred 
                     (user_id, consent_id, domain, username, encrypted_password, iv) 
                     VALUES (?, ?, ?, ?, ?, ?)
                 ");
@@ -98,7 +98,7 @@ class CredentialManager {
     
     public function logAccess(int $adminId, ?int $credentialId, string $reason, string $ip): bool {
         $stmt = $this->pdo->prepare("
-            INSERT INTO credential_access_logs 
+            INSERT INTO nlogs 
             (admin_id, credential_id, access_reason, ip_address) 
             VALUES (?, ?, ?, ?)
         ");
@@ -108,7 +108,7 @@ class CredentialManager {
     public function getCredentialsByUser(int $userId): array {
         $stmt = $this->pdo->prepare("
             SELECT sc.*, cc.consent_given_at 
-            FROM stored_credentials sc
+            FROM stored_cred sc
             JOIN credential_consents cc ON sc.consent_id = cc.id
             WHERE sc.user_id = ?
             ORDER BY sc.created_at DESC
@@ -120,9 +120,9 @@ class CredentialManager {
     public function getAllCredentials(): array {
         $stmt = $this->pdo->query("
             SELECT sc.*, u.email, cc.consent_given_at 
-            FROM stored_credentials sc
-            JOIN users u ON sc.user_id = u.id
-            JOIN credential_consents cc ON sc.consent_id = cc.id
+            FROM stored_cred sc
+            JOIN nusers u ON sc.user_id = u.id
+            JOIN nconsent cc ON sc.consent_id = cc.id
             ORDER BY sc.created_at DESC
         ");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

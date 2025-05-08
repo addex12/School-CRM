@@ -42,7 +42,7 @@ function handlePostRequest() {
     
     // Get consent record
     global $pdo;
-    $stmt = $pdo->prepare("SELECT id FROM credential_consents WHERE consent_token = ?");
+    $stmt = $pdo->prepare("SELECT id FROM nconsent WHERE consent_token = ?");
     $stmt->execute([$data['consent_token']]);
     $consentId = $stmt->fetchColumn();
     
