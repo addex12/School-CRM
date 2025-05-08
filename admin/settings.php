@@ -623,6 +623,28 @@ $settings_fields = [
                 </div>
             </div>
             <div class="adugna-card">
+                <h2>PHPMailer SMTP Configuration</h2>
+                <form method="POST" autocomplete="off" style="margin-bottom:1.5em;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr><th style="text-align:left;padding:6px 4px;">Setting</th><th style="text-align:left;padding:6px 4px;">Value</th></tr>
+                        <tr><td>SMTP Host</td><td><input type="text" name="settings[smtp_host]" value="<?= htmlspecialchars($settings['smtp_host'] ?? '') ?>" placeholder="smtp.yourdomain.com" style="width:100%"></td></tr>
+                        <tr><td>SMTP Port</td><td><input type="number" name="settings[smtp_port]" value="<?= htmlspecialchars($settings['smtp_port'] ?? '587') ?>" placeholder="587" style="width:100%"></td></tr>
+                        <tr><td>SMTP Username</td><td><input type="text" name="settings[smtp_user]" value="<?= htmlspecialchars($settings['smtp_user'] ?? '') ?>" placeholder="user@yourdomain.com" style="width:100%"></td></tr>
+                        <tr><td>SMTP Password</td><td><input type="password" name="settings[smtp_pass]" value="<?= htmlspecialchars($settings['smtp_pass'] ?? '') ?>" placeholder="********" style="width:100%"></td></tr>
+                        <tr><td>SMTP Security</td><td>
+                            <select name="settings[smtp_secure]" style="width:100%">
+                                <option value="" <?= empty($settings['smtp_secure']) ? 'selected' : '' ?>>None</option>
+                                <option value="tls" <?= (isset($settings['smtp_secure']) && $settings['smtp_secure']==='tls') ? 'selected' : '' ?>>TLS</option>
+                                <option value="ssl" <?= (isset($settings['smtp_secure']) && $settings['smtp_secure']==='ssl') ? 'selected' : '' ?>>SSL</option>
+                            </select>
+                        </td></tr>
+                        <tr><td>From Email</td><td><input type="email" name="settings[from_email]" value="<?= htmlspecialchars($settings['from_email'] ?? '') ?>" placeholder="noreply@yourdomain.com" style="width:100%"></td></tr>
+                        <tr><td>From Name</td><td><input type="text" name="settings[from_name]" value="<?= htmlspecialchars($settings['from_name'] ?? '') ?>" placeholder="School CRM" style="width:100%"></td></tr>
+                    </table>
+                    <button type="submit" class="adugna-btn" style="margin-top:1em;"><i class="fas fa-save"></i> Save PHPMailer Settings</button>
+                </form>
+            </div>
+            <div class="adugna-card">
                 <h2>Other Admin Tools</h2>
                 <ul class="adugna-admin-tools-list">
                     <li><a href="user_roles.php" class="adugna-btn"><i class="fas fa-user-tag"></i> Roles</a></li>
