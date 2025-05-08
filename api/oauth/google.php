@@ -64,7 +64,7 @@ if (isset($_GET['code'])) {
     curl_close($ch);
     $token_data = json_decode($response, true);
     if (!isset($token_data['access_token'])) {
-        die('Adugna OAuth: Failed to get access token. Google response: ' . htmlspecialchars($response));
+        die('OAuth: Failed to get access token. Google response: ' . htmlspecialchars($response));
     }
     $access_token = $token_data['access_token'];
 
