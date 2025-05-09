@@ -131,7 +131,24 @@ file_put_contents($nextClearFile, date('Y-m-d H:i:s', $nextClearTs));
 try {
     // Use the existing $pdo connection
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_logs'])) {
-        include __DIR__ . '/clear_logs.php';
+        // Clear database log tables
+        foreach ($logTables as $table) {
+            $pdo->exec("TRUNCATE TABLE `$table`");
+        }
+        // Clear log files
+        foreach ($logFiles as $file) {
+            if (file_exists($file)) {
+                file_put_contents($file, '');
+            }
+        }
+        // Update last/next clear times
+        $lastClearTs = time();
+        $nextClearTs = $lastClearTs + $intervalSeconds;
+        file_put_contents($lastClearFile, date('Y-m-d H:i:s', $lastClearTs));
+        file_put_contents($nextClearFile, date('Y-m-d H:i:s', $nextClearTs));
+        $lastClear = date('Y-m-d H:i:s', $lastClearTs);
+        $nextClear = date('Y-m-d H:i:s', $nextClearTs);
+        $nextSystemClear = $nextClear;
         $message = "System logs and log files cleared successfully.";
     }
 } catch (Exception $e) {
@@ -172,6 +189,16 @@ $nextSystemClear = $nextClear ?? null;
             display: flex;
             min-height: 100vh;
             align-items: flex-start;
+            background: #f4f6fa;
+        }
+        .admin-sidebar {
+            background: #fff;
+            min-width: 220px;
+            max-width: 260px;
+            border-right: 1px solid #e5e7eb;
+            min-height: 100vh;
+            box-shadow: 2px 0 8px rgba(44,62,80,0.04);
+            z-index: 10;
         }
         .admin-main {
             flex: 1 1 0;
@@ -310,6 +337,14 @@ $nextSystemClear = $nextClear ?? null;
             .admin-dashboard {
                 flex-direction: column;
             }
+            .admin-sidebar {
+                min-width: 100%;
+                max-width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                min-height: unset;
+                box-shadow: none;
+            }
             .admin-main {
                 padding: 1rem 0 1rem 0;
             }
@@ -336,7 +371,9 @@ $nextSystemClear = $nextClear ?? null;
 </head>
 <body>
     <div class="admin-dashboard">
-        <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        <div class="admin-sidebar">
+            <?php include __DIR__ . '/includes/admin_sidebar.php'; ?>
+        </div>
         <div class="admin-main">
             <div class="adugna-container">
                 <div class="adugna-title"><i class="fa fa-clock" style="font-size:1em;margin-right:0.3em;"></i> System Log Scheduler</div>
