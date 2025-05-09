@@ -44,8 +44,8 @@ $logs = [];
 $error = '';
 if ($tableExists) {
     try {
-        // Fetch logs and join with users table for username
-        $stmt = $pdo->query("SELECT l.*, u.username FROM system_logs l LEFT JOIN users u ON l.user_id = u.id ORDER BY l.created_at DESC LIMIT 100");
+        // Fetch logs from system_logs table (no username column in your schema)
+        $stmt = $pdo->query("SELECT * FROM system_logs ORDER BY created_at DESC LIMIT 100");
         $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
         $error = "Failed to fetch system logs: " . $e->getMessage();
@@ -287,7 +287,6 @@ if ($tableExists) {
                             <tr>
                                 <th>ID</th>
                                 <th>User ID</th>
-                                <th>Username</th>
                                 <th>Action</th>
                                 <th>Description</th>
                                 <th>IP Address</th>
@@ -299,7 +298,6 @@ if ($tableExists) {
                                 <tr>
                                     <td><?= htmlspecialchars($log['id']) ?></td>
                                     <td><?= htmlspecialchars($log['user_id']) ?></td>
-                                    <td><?= htmlspecialchars($log['username'] ?? '') ?></td>
                                     <td><?= htmlspecialchars($log['action']) ?></td>
                                     <td><?= htmlspecialchars($log['description']) ?></td>
                                     <td><?= htmlspecialchars($log['ip_address']) ?></td>
