@@ -340,14 +340,24 @@ if ($tableExists) {
                 <div class="adugna-alert-error"><?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
             <?php if (isset($_GET['msg'])): ?>
-                <div class="adugna-alert-error" style="color:#2563eb;">
-                    <?php
-                    if ($_GET['msg'] === 'deleted') echo "Log deleted.";
-                    elseif ($_GET['msg'] === 'updated') echo "Log updated.";
-                    elseif ($_GET['msg'] === 'added') echo "Log added.";
-                    elseif ($_GET['msg'] === 'cleared') echo "All logs cleared.";
-                    ?>
-                </div>
+                <?php
+                $msg = $_GET['msg'];
+                $alert = '';
+                if ($msg === 'deleted') {
+                    $alert = '<div class="adugna-alert-success" style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-check-circle"></i> Log deleted successfully.</div>';
+                } elseif ($msg === 'updated') {
+                    $alert = '<div class="adugna-alert-success" style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-check-circle"></i> Log updated successfully.</div>';
+                } elseif ($msg === 'added') {
+                    $alert = '<div class="adugna-alert-success" style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-check-circle"></i> Log added successfully.</div>';
+                } elseif ($msg === 'cleared') {
+                    $alert = '<div class="adugna-alert-success" style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-check-circle"></i> All logs cleared.</div>';
+                } elseif ($msg === 'delete_failed') {
+                    $alert = '<div class="adugna-alert-error" style="background:#ffeaea;color:#e74c3c;border:1px solid #f5c6cb;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-times-circle"></i> Failed to delete log.</div>';
+                } elseif ($msg === 'invalid') {
+                    $alert = '<div class="adugna-alert-error" style="background:#ffeaea;color:#e74c3c;border:1px solid #f5c6cb;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-exclamation-circle"></i> Invalid log ID.</div>';
+                }
+                echo $alert;
+                ?>
             <?php endif; ?>
 
             <!-- Clear All Logs Button -->
