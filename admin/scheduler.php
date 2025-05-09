@@ -486,6 +486,10 @@ $nextSystemClear = $nextClear ?? null;
                     countdownElem.textContent = ' (in ' + parts.join(' ') + ')';
                 } else {
                     countdownElem.textContent = ' (due now)';
+                    // Refresh the page when countdown ends
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
                 }
             }
             updateCountdown();
