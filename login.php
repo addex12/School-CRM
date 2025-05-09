@@ -26,7 +26,6 @@ try {
 } catch (Exception $e) {
     $announcements = [];
 }
-adugna_log_system_action($pdo, $action, $description, $user_id);
 
 // Check if user is already logged in
 if (function_exists('isLoggedIn') && isLoggedIn()) {
