@@ -220,20 +220,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="register-title">Create Account</div>
         <!-- Adugna Gizaw: Social registration options for Gmail, Telegram, Facebook. -->
-        <div class="adugna-social-register" style="text-align:center; margin-bottom:18px;">
+       //**** <div class="adugna-social-register" style="text-align:center; margin-bottom:18px;">
             <!-- Gmail/Google -->
-            <a href="/api/oauth/google.php" class="adugna-btn adugna-social-btn adugna-google" title="Sign up with Gmail" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
-                <i class="fab fa-google" style="font-size:1.3em;color:#ea4335;"></i> <span class="adugna-social-label">Sign up with Gmail</span>
-            </a>
+            //**** <a href="/api/oauth/google.php" class="adugna-btn adugna-social-btn adugna-google" title="Sign up with Gmail" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
+            //****    <i class="fab fa-google" style="font-size:1.3em;color:#ea4335;"></i> <span class="adugna-social-label">Sign up with Gmail</span>
+                //**** </a>
             <!-- Telegram -->
-            <a href="/api/oauth/telegram.php" class="adugna-btn adugna-social-btn adugna-telegram" title="Register with Telegram" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
-                <i class="fab fa-telegram-plane" style="font-size:1.3em;color:#229ed9;"></i> <span class="adugna-social-label">Telegram</span>
-            </a>
+            //**** <a href="/api/oauth/telegram.php" class="adugna-btn adugna-social-btn adugna-telegram" title="Register with Telegram" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
+            //****   <i class="fab fa-telegram-plane" style="font-size:1.3em;color:#229ed9;"></i> <span class="adugna-social-label">Telegram</span>
+            //**** </a>
             <!-- Facebook -->
-            <a href="/api/oauth/facebook.php" class="adugna-btn adugna-social-btn adugna-facebook" title="Register with Facebook" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
+            //****<a href="/api/oauth/facebook.php" class="adugna-btn adugna-social-btn adugna-facebook" title="Register with Facebook" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
                 <i class="fab fa-facebook-f" style="font-size:1.3em;color:#1877f3;"></i> <span class="adugna-social-label">Facebook</span>
-            </a>
-        </div>
+                //**** </a>
+                //****  </div> 
         <?php if (!empty($errors['general'])): ?>
             <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
         <?php elseif (!empty($_SESSION['register_success'])): ?>

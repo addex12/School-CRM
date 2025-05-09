@@ -3,6 +3,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+adugna_log_system_action($pdo, $action, $description, $user_id);
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
