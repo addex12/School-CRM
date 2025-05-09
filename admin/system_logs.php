@@ -47,6 +47,34 @@ function adugna_log_system_action($pdo, $action, $description = '', $user_id = n
     $stmt->execute([$user_id, $action, $description, $ip]);
 }
 
+// CRUD for logs (admin only)
+if (isset($_POST['delete_log']) && isset($_POST['log_id'])) {
+    $log_id = (int)$_POST['log_id'];
+    $stmt = $pdo->prepare("DELETE FROM system_logs WHERE id = ?");
+    $stmt->execute([$log_id]);
+    adugna_log_system_action($pdo, 'Delete Log', "Deleted log ID $log_id", $_SESSION['user_id'] ?? null);
+    header("Location: system_logs.php?msg=deleted");
+    exit;
+}
+if (isset($_POST['edit_log']) && isset($_POST['log_id'])) {
+    $log_id = (int)$_POST['log_id'];
+    $action = trim($_POST['action']);
+    $description = trim($_POST['description']);
+    $stmt = $pdo->prepare("UPDATE system_logs SET action=?, description=? WHERE id=?");
+    $stmt->execute([$action, $description, $log_id]);
+    adugna_log_system_action($pdo, 'Update Log', "Updated log ID $log_id", $_SESSION['user_id'] ?? null);
+    header("Location: system_logs.php?msg=updated");
+    exit;
+}
+if (isset($_POST['add_log'])) {
+    $action = trim($_POST['action']);
+    $description = trim($_POST['description']);
+    $user_id = $_POST['user_id'] !== '' ? (int)$_POST['user_id'] : null;
+    adugna_log_system_action($pdo, $action, $description, $user_id);
+    header("Location: system_logs.php?msg=added");
+    exit;
+}
+
 // Example: Log viewing of the system logs page by the current admin
 if (isset($_SESSION['user_id'])) {
     adugna_log_system_action(
@@ -297,7 +325,27 @@ if ($tableExists) {
             <h2><i class="fas fa-database"></i> System Logs</h2>
             <?php if ($error): ?>
                 <div class="adugna-alert-error"><?= htmlspecialchars($error) ?></div>
-            <?php elseif (!empty($logs)): ?>
+            <?php endif; ?>
+            <?php if (isset($_GET['msg'])): ?>
+                <div class="adugna-alert-error" style="color:#2563eb;">
+                    <?php
+                    if ($_GET['msg'] === 'deleted') echo "Log deleted.";
+                    elseif ($_GET['msg'] === 'updated') echo "Log updated.";
+                    elseif ($_GET['msg'] === 'added') echo "Log added.";
+                    ?>
+                </div>
+            <?php endif; ?>
+
+            <!-- Add Log Form (Admin only) -->
+            <form method="post" style="margin-bottom:1em;display:flex;gap:0.5em;flex-wrap:wrap;">
+                <input type="hidden" name="add_log" value="1">
+                <input type="text" name="action" placeholder="Action" required class="adugna-input" style="min-width:120px;">
+                <input type="text" name="description" placeholder="Description" class="adugna-input" style="min-width:180px;">
+                <input type="number" name="user_id" placeholder="User ID (optional)" class="adugna-input" style="width:90px;">
+                <button type="submit" class="adugna-btn"><i class="fa fa-plus"></i> Add Log</button>
+            </form>
+
+            <?php if (!empty($logs)): ?>
                 <div class="adugna-table-container">
                     <table class="adugna-table">
                         <thead>
@@ -308,17 +356,29 @@ if ($tableExists) {
                                 <th>Description</th>
                                 <th>IP Address</th>
                                 <th>Created At</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($logs as $log): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($log['id']) ?></td>
-                                    <td><?= htmlspecialchars($log['user_id']) ?></td>
-                                    <td><?= htmlspecialchars($log['action']) ?></td>
-                                    <td><?= htmlspecialchars($log['description']) ?></td>
-                                    <td><?= htmlspecialchars($log['ip_address']) ?></td>
-                                    <td><?= htmlspecialchars($log['created_at']) ?></td>
+                                    <form method="post" style="display:contents;">
+                                        <td><?= htmlspecialchars($log['id']) ?></td>
+                                        <td><?= htmlspecialchars($log['user_id']) ?></td>
+                                        <td>
+                                            <input type="text" name="action" value="<?= htmlspecialchars($log['action']) ?>" style="width:110px;">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="description" value="<?= htmlspecialchars($log['description']) ?>" style="width:170px;">
+                                        </td>
+                                        <td><?= htmlspecialchars($log['ip_address']) ?></td>
+                                        <td><?= htmlspecialchars($log['created_at']) ?></td>
+                                        <td>
+                                            <input type="hidden" name="log_id" value="<?= $log['id'] ?>">
+                                            <button type="submit" name="edit_log" class="adugna-btn" style="padding:2px 8px;"><i class="fa fa-save"></i></button>
+                                            <button type="submit" name="delete_log" class="adugna-btn" style="background:#e74c3c;padding:2px 8px;" onclick="return confirm('Delete this log?');"><i class="fa fa-trash"></i></button>
+                                        </td>
+                                    </form>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -327,6 +387,12 @@ if ($tableExists) {
             <?php else: ?>
                 <p style="color:#888;">No system logs found.</p>
             <?php endif; ?>
+        </div>
+        <div class="adugna-card" style="font-size:0.95em;color:#888;">
+            <b>How to log all activities?</b><br>
+            <code>adugna_log_system_action($pdo, $action, $description, $user_id);</code><br>
+            Call this function in <b>every</b> PHP file where you want to log an action (login, logout, create, update, delete, view, etc).<br>
+            For frontend (JS) actions, use AJAX to call a PHP endpoint that calls this function.
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
