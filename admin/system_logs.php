@@ -79,6 +79,14 @@ if (isset($_POST['add_log'])) {
     exit;
 }
 
+// Bulk delete (clear all logs)
+if (isset($_POST['clear_all_logs'])) {
+    $pdo->exec("TRUNCATE TABLE system_logs");
+    adugna_log_system_action($pdo, 'Clear All Logs', 'All system logs cleared', $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? null);
+    header("Location: system_logs.php?msg=cleared");
+    exit;
+}
+
 // REMOVE or COMMENT OUT this block to avoid logging visits to this page
 // if (isset($_SESSION['user_id'])) {
 //     adugna_log_system_action(
@@ -337,9 +345,17 @@ if ($tableExists) {
                     if ($_GET['msg'] === 'deleted') echo "Log deleted.";
                     elseif ($_GET['msg'] === 'updated') echo "Log updated.";
                     elseif ($_GET['msg'] === 'added') echo "Log added.";
+                    elseif ($_GET['msg'] === 'cleared') echo "All logs cleared.";
                     ?>
                 </div>
             <?php endif; ?>
+
+            <!-- Clear All Logs Button -->
+            <form method="post" style="margin-bottom:1em;">
+                <button type="submit" name="clear_all_logs" class="adugna-btn" style="background:#e74c3c;" onclick="return confirm('Are you sure you want to clear ALL system logs?');">
+                    <i class="fa fa-trash"></i> Clear All Logs
+                </button>
+            </form>
 
             <!-- Add Log Form (Admin only) -->
             <form method="post" style="margin-bottom:1em;display:flex;gap:0.5em;flex-wrap:wrap;">
