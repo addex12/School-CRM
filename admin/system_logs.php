@@ -40,6 +40,23 @@ try {
     $tableExists = false;
 }
 
+// Utility function to log system actions
+function adugna_log_system_action($pdo, $action, $description = '', $user_id = null) {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+    $stmt = $pdo->prepare("INSERT INTO system_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$user_id, $action, $description, $ip]);
+}
+
+// Example: Log viewing of the system logs page by the current admin
+if (isset($_SESSION['user_id'])) {
+    adugna_log_system_action(
+        $pdo,
+        'View System Logs',
+        'Admin viewed the system logs page.',
+        $_SESSION['user_id']
+    );
+}
+
 $logs = [];
 $error = '';
 if ($tableExists) {
