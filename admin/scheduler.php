@@ -445,6 +445,7 @@ $nextSystemClear = $nextClear ?? null;
                 <div class="adugna-note">
                     <strong>Next Log Clear:</strong>
                     <?= $nextClear ? htmlspecialchars($nextClear) : 'Never' ?>
+                    <span id="adugna-countdown" style="margin-left:1em;color:#2563eb;font-weight:600;"></span>
                 </div>
                 <div class="adugna-note">
                     <strong>Next System Log Clear:</strong>
@@ -464,8 +465,33 @@ $nextSystemClear = $nextClear ?? null;
             var intervalSelect = document.getElementById('interval');
             var customSchedule = document.getElementById('adugna-customSchedule');
             customSchedule.style.display = intervalSelect.value === 'custom' ? 'inline' : 'none';
-        });
 
+            // Countdown timer for next log clear
+            var countdownElem = document.getElementById('adugna-countdown');
+            <?php if ($nextClear): ?>
+            var nextClearTime = <?= strtotime($nextClear) ?> * 1000;
+            function updateCountdown() {
+                var now = Date.now();
+                var diff = Math.floor((nextClearTime - now) / 1000);
+                if (diff > 0) {
+                    var d = Math.floor(diff / 86400);
+                    var h = Math.floor((diff % 86400) / 3600);
+                    var m = Math.floor((diff % 3600) / 60);
+                    var s = diff % 60;
+                    var parts = [];
+                    if (d > 0) parts.push(d + 'd');
+                    if (h > 0 || d > 0) parts.push(h + 'h');
+                    if (m > 0 || h > 0 || d > 0) parts.push(m + 'm');
+                    parts.push(s + 's');
+                    countdownElem.textContent = ' (in ' + parts.join(' ') + ')';
+                } else {
+                    countdownElem.textContent = ' (due now)';
+                }
+            }
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+            <?php endif; ?>
+        });
     </script>
 </body>
 </html>
