@@ -168,6 +168,19 @@ $nextSystemClear = $nextClear ?? null;
             background: #f4f6fa;
             font-family: "Inter", "Segoe UI", Arial, sans-serif;
         }
+        .admin-dashboard {
+            display: flex;
+            min-height: 100vh;
+            align-items: flex-start;
+        }
+        .admin-main {
+            flex: 1 1 0;
+            padding: 2rem 0 2rem 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .adugna-container {
             max-width: 600px;
             margin: 2rem auto;
@@ -293,6 +306,14 @@ $nextSystemClear = $nextClear ?? null;
             color: #888;
             margin-top: 0.7em;
         }
+        @media (max-width: 900px) {
+            .admin-dashboard {
+                flex-direction: column;
+            }
+            .admin-main {
+                padding: 1rem 0 1rem 0;
+            }
+        }
         @media (max-width: 600px) {
             .adugna-container {
                 padding: 0.7rem 0.3rem;
@@ -306,6 +327,9 @@ $nextSystemClear = $nextClear ?? null;
             }
             .adugna-list li {
                 font-size: 0.91rem;
+            }
+            .admin-main {
+                padding: 0.5rem 0 0.5rem 0;
             }
         }
     </style>
