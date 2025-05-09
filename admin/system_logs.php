@@ -418,6 +418,8 @@ if ($tableExists) {
         </div>
     </div>
     <?php include 'includes/footer.php'; ?>
+    <!-- Move ob_end_flush() here if you use output buffering -->
+    <?php if (function_exists('ob_end_flush')) { ob_end_flush(); } ?>
     <script>
     /**
      * Adugna Gizaw: Sidebar toggle, submenu logic, active page highlight, and responsive sidebar.
