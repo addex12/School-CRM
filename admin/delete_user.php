@@ -5,7 +5,6 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
-require_once 'system_logs.php';
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['error'] = "Invalid user ID.";
