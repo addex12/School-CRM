@@ -25,6 +25,7 @@ $stmt = $pdo->query("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $unreadCounts[$row['sender_id']] = $row['unread'];
 }
+adugna_log_system_action($pdo, $action, $description, $user_id);
 
 // Simulate online users (last_active within 5 minutes)
 $now = time();

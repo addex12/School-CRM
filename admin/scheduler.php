@@ -3,7 +3,6 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-adugna_log_system_action($pdo, $action, $description, $user_id);
 /**
  * Developer: Adugna Gizaw
  * Email: gizawadugna@gmail.com
@@ -157,6 +156,7 @@ try {
 }
 
 $lastClear = @file_get_contents(__DIR__ . '/last_log_clear.txt');
+adugna_log_system_action($pdo, $action, $description, $user_id);
 
 // Calculate next system log clear time for display (fix undefined variable warning)
 $nextSystemClear = $nextClear ?? null;

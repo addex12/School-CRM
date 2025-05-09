@@ -14,7 +14,6 @@ ob_start();
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-adugna_log_system_action($pdo, $action, $description, $user_id);
 // Include configuration first
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/db.php';
@@ -27,6 +26,7 @@ try {
 } catch (Exception $e) {
     $announcements = [];
 }
+adugna_log_system_action($pdo, $action, $description, $user_id);
 
 // Check if user is already logged in
 if (function_exists('isLoggedIn') && isLoggedIn()) {
