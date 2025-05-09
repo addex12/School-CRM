@@ -222,8 +222,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <!-- Adugna Gizaw: Social registration options for Gmail, Telegram, Facebook. -->
         <div class="adugna-social-register" style="text-align:center; margin-bottom:18px;">
             <!-- Gmail/Google -->
-            <a href="/api/oauth/google.php" class="adugna-btn adugna-social-btn adugna-google" title="Register with Gmail" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
-                <i class="fab fa-google" style="font-size:1.3em;color:#ea4335;"></i> <span class="adugna-social-label">Gmail</span>
+            <a href="/api/oauth/google.php" class="adugna-btn adugna-social-btn adugna-google" title="Sign up with Gmail" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
+                <i class="fab fa-google" style="font-size:1.3em;color:#ea4335;"></i> <span class="adugna-social-label">Sign up with Gmail</span>
             </a>
             <!-- Telegram -->
             <a href="/api/oauth/telegram.php" class="adugna-btn adugna-social-btn adugna-telegram" title="Register with Telegram" style="margin:0 4px;display:inline-flex;align-items:center;gap:0.4em;min-width:44px;">
