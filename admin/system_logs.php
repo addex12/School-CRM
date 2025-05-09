@@ -40,11 +40,14 @@ try {
     $tableExists = false;
 }
 
-// Utility function to log system actions
-function adugna_log_system_action($pdo, $action, $description = '', $user_id = null) {
+// Utility function to log system actions (now also logs username)
+function adugna_log_system_action($pdo, $action, $description = '', $user_id = null, $username = null) {
     $ip = $_SERVER['REMOTE_ADDR'] ?? null;
-    $stmt = $pdo->prepare("INSERT INTO system_logs (user_id, action, description, ip_address) VALUES (?, ?, ?, ?)");
-    $stmt->execute([$user_id, $action, $description, $ip]);
+    if ($username === null && isset($_SESSION['username'])) {
+        $username = $_SESSION['username'];
+    }
+    $stmt = $pdo->prepare("INSERT INTO system_logs (user_id, action, description, ip_address, created_at) VALUES (?, ?, ?, ?, NOW())");
+    $stmt->execute([$user_id, $action . ($username ? " (by $username)" : ""), $description, $ip]);
 }
 
 // CRUD for logs (admin only)
@@ -52,7 +55,7 @@ if (isset($_POST['delete_log']) && isset($_POST['log_id'])) {
     $log_id = (int)$_POST['log_id'];
     $stmt = $pdo->prepare("DELETE FROM system_logs WHERE id = ?");
     $stmt->execute([$log_id]);
-    adugna_log_system_action($pdo, 'Delete Log', "Deleted log ID $log_id", $_SESSION['user_id'] ?? null);
+    adugna_log_system_action($pdo, 'Delete Log', "Deleted log ID $log_id", $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? null);
     header("Location: system_logs.php?msg=deleted");
     exit;
 }
@@ -62,7 +65,7 @@ if (isset($_POST['edit_log']) && isset($_POST['log_id'])) {
     $description = trim($_POST['description']);
     $stmt = $pdo->prepare("UPDATE system_logs SET action=?, description=? WHERE id=?");
     $stmt->execute([$action, $description, $log_id]);
-    adugna_log_system_action($pdo, 'Update Log', "Updated log ID $log_id", $_SESSION['user_id'] ?? null);
+    adugna_log_system_action($pdo, 'Update Log', "Updated log ID $log_id", $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? null);
     header("Location: system_logs.php?msg=updated");
     exit;
 }
@@ -70,20 +73,22 @@ if (isset($_POST['add_log'])) {
     $action = trim($_POST['action']);
     $description = trim($_POST['description']);
     $user_id = $_POST['user_id'] !== '' ? (int)$_POST['user_id'] : null;
-    adugna_log_system_action($pdo, $action, $description, $user_id);
+    $username = $_POST['username'] ?? ($_SESSION['username'] ?? null);
+    adugna_log_system_action($pdo, $action, $description, $user_id, $username);
     header("Location: system_logs.php?msg=added");
     exit;
 }
 
-// Example: Log viewing of the system logs page by the current admin
-if (isset($_SESSION['user_id'])) {
-    adugna_log_system_action(
-        $pdo,
-        'View System Logs',
-        'Admin viewed the system logs page.',
-        $_SESSION['user_id']
-    );
-}
+// REMOVE or COMMENT OUT this block to avoid logging visits to this page
+// if (isset($_SESSION['user_id'])) {
+//     adugna_log_system_action(
+//         $pdo,
+//         'View System Logs',
+//         'Admin viewed the system logs page.',
+//         $_SESSION['user_id'],
+//         $_SESSION['username'] ?? null
+//     );
+// }
 
 $logs = [];
 $error = '';
@@ -342,6 +347,7 @@ if ($tableExists) {
                 <input type="text" name="action" placeholder="Action" required class="adugna-input" style="min-width:120px;">
                 <input type="text" name="description" placeholder="Description" class="adugna-input" style="min-width:180px;">
                 <input type="number" name="user_id" placeholder="User ID (optional)" class="adugna-input" style="width:90px;">
+                <input type="text" name="username" placeholder="Username (optional)" class="adugna-input" style="width:120px;">
                 <button type="submit" class="adugna-btn"><i class="fa fa-plus"></i> Add Log</button>
             </form>
 
@@ -352,7 +358,7 @@ if ($tableExists) {
                             <tr>
                                 <th>ID</th>
                                 <th>User ID</th>
-                                <th>Action</th>
+                                <th>Action (with Username)</th>
                                 <th>Description</th>
                                 <th>IP Address</th>
                                 <th>Created At</th>
@@ -366,7 +372,7 @@ if ($tableExists) {
                                         <td><?= htmlspecialchars($log['id']) ?></td>
                                         <td><?= htmlspecialchars($log['user_id']) ?></td>
                                         <td>
-                                            <input type="text" name="action" value="<?= htmlspecialchars($log['action']) ?>" style="width:110px;">
+                                            <input type="text" name="action" value="<?= htmlspecialchars($log['action']) ?>" style="width:160px;">
                                         </td>
                                         <td>
                                             <input type="text" name="description" value="<?= htmlspecialchars($log['description']) ?>" style="width:170px;">

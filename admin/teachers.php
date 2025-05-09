@@ -9,7 +9,7 @@ GitHub: https://github.com/addex12
 require_once '../includes/auth.php';
 requireAdmin();
 require_once '../includes/config.php';
-
+adugna_log_system_action($pdo, $action, $description, $user_id);
 $pageTitle = "Teachers";
 
 // Ensure all users with teacher role are in teachers table

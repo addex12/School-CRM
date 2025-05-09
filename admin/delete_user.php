@@ -1,4 +1,5 @@
 <?php
+ adugna_log_system_action($pdo, $action, $description, $user_id);
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
