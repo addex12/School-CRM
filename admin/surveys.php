@@ -185,6 +185,20 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </header>
             <div class="content">
                 <div class="adugna-surveys-container">
+                    <?php if (isset($_GET['msg'])): ?>
+                        <?php
+                        $msg = $_GET['msg'];
+                        $alert = '';
+                        if ($msg === 'deleted') {
+                            $alert = '<div class="adugna-alert-success" style="background:#e2efda;color:#215967;border:1px solid #b7e4c7;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-check-circle"></i> Survey deleted successfully.</div>';
+                        } elseif ($msg === 'delete_failed') {
+                            $alert = '<div class="adugna-alert-danger" style="background:#ffeaea;color:#e74c3c;border:1px solid #f5c6cb;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-times-circle"></i> Failed to delete survey.</div>';
+                        } elseif ($msg === 'invalid') {
+                            $alert = '<div class="adugna-alert-danger" style="background:#ffeaea;color:#e74c3c;border:1px solid #f5c6cb;padding:10px 18px;border-radius:5px;margin-bottom:1em;"><i class="fa fa-exclamation-circle"></i> Invalid survey ID.</div>';
+                        }
+                        echo $alert;
+                        ?>
+                    <?php endif; ?>
                     <div class="adugna-surveys-header">
                         <h2>Survey List</h2>
                         <a href="survey_builder.php" class="adugna-btn adugna-btn-success">
