@@ -71,14 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, active) VALUES (?, ?, ?, ?, ?)");
         if ($stmt->execute([$username, $email, $hashed_password, $role_id, $active])) {
-            // Send email with username and password (plain text for demo, use secure method in production)
+            // Send email with username only (never send plain password in production)
             $to = $email;
             $subject = "Your School CRM Account Registration";
             $message = "Hello $username,\n\n"
                 . "Thank you for registering at School CRM.\n"
                 . "Your account details:\n"
                 . "Username: $username\n"
-                . "Password: $password\n\n"
+                . "Password: (hidden for your security)\n\n"
                 . "Please wait for an administrator to activate your account.\n\n"
                 . "If you did not register, please ignore this email.";
             $headers = "From: no-reply@school-crm.com\r\n";
