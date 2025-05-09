@@ -37,8 +37,7 @@ if (!$user) {
 $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
 $stmt->execute([$id]);
 
-adugna_log_system_action($pdo, 'Delete User', "Deleted user ID $id", $_SESSION['user_id']);
-
+// Log the action
 $_SESSION['success'] = "User deleted successfully.";
 header("Location: users.php");
 exit();
