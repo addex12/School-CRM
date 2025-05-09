@@ -287,6 +287,7 @@ if ($tableExists) {
                             <tr>
                                 <th>ID</th>
                                 <th>User ID</th>
+                                <th>Username</th>
                                 <th>Action</th>
                                 <th>Description</th>
                                 <th>IP Address</th>
@@ -298,6 +299,7 @@ if ($tableExists) {
                                 <tr>
                                     <td><?= htmlspecialchars($log['id']) ?></td>
                                     <td><?= htmlspecialchars($log['user_id']) ?></td>
+                                    <td><?= htmlspecialchars($log['username'] ?? '') ?></td>
                                     <td><?= htmlspecialchars($log['action']) ?></td>
                                     <td><?= htmlspecialchars($log['description']) ?></td>
                                     <td><?= htmlspecialchars($log['ip_address']) ?></td>
