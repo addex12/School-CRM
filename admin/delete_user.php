@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once '../includes/config.php';
 require_once '../includes/auth.php';
 requireAdmin();
+require_once 'system_logs.php';
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['error'] = "Invalid user ID.";
@@ -36,6 +37,7 @@ if (!$user) {
 $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
 $stmt->execute([$id]);
 
+adugna_log_system_action($pdo, 'Delete User', "Deleted user ID $id", $_SESSION['user_id']);
 
 $_SESSION['success'] = "User deleted successfully.";
 header("Location: users.php");
