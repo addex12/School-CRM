@@ -147,21 +147,23 @@ $unread = isset($ADMIN_UNREAD_MESSAGES) ? (int)$ADMIN_UNREAD_MESSAGES : 0;
     <ul>
         <?php
         // Helper to render menu recursively with adugna-active class for current page
-        function adugna_renderSidebarMenu($items) {
-            $currentPage = basename($_SERVER['PHP_SELF']);
-            foreach ($items as $item) {
-                $hasSub = isset($item['items']) && is_array($item['items']);
-                $icon = isset($item['icon']) ? 'fa-' . $item['icon'] : 'fa-circle';
-                $active = (isset($item['link']) && $currentPage === $item['link']) ? 'adugna-active' : '';
-                if ($hasSub) {
-                    echo '<li>';
-                    echo '<a href="#" class="adugna-sidebar-link adugna-has-submenu"><span class="adugna-icon"><i class="fas ' . $icon . '"></i></span> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <span class="adugna-submenu-toggle"><i class="fas fa-chevron-right"></i></span></a>';
-                    echo '<ul class="adugna-submenu">';
-                    adugna_renderSidebarMenu($item['items']);
-                    echo '</ul>';
-                    echo '</li>';
-                } elseif (isset($item['link'])) {
-                    echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="adugna-sidebar-link ' . $active . '" data-page="' . htmlspecialchars($item['link']) . '"><span class="adugna-icon"><i class="fas ' . $icon . '"></i></span> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
+        if (!function_exists('adugna_renderSidebarMenu')) {
+            function adugna_renderSidebarMenu($items) {
+                $currentPage = basename($_SERVER['PHP_SELF']);
+                foreach ($items as $item) {
+                    $hasSub = isset($item['items']) && is_array($item['items']);
+                    $icon = isset($item['icon']) ? 'fa-' . $item['icon'] : 'fa-circle';
+                    $active = (isset($item['link']) && $currentPage === $item['link']) ? 'adugna-active' : '';
+                    if ($hasSub) {
+                        echo '<li>';
+                        echo '<a href="#" class="adugna-sidebar-link adugna-has-submenu"><span class="adugna-icon"><i class="fas ' . $icon . '"></i></span> <span>' . htmlspecialchars($item['title'] ?? '') . '</span> <span class="adugna-submenu-toggle"><i class="fas fa-chevron-right"></i></span></a>';
+                        echo '<ul class="adugna-submenu">';
+                        adugna_renderSidebarMenu($item['items']);
+                        echo '</ul>';
+                        echo '</li>';
+                    } elseif (isset($item['link'])) {
+                        echo '<li><a href="' . htmlspecialchars($item['link']) . '" class="adugna-sidebar-link ' . $active . '" data-page="' . htmlspecialchars($item['link']) . '"><span class="adugna-icon"><i class="fas ' . $icon . '"></i></span> <span>' . htmlspecialchars($item['title']) . '</span></a></li>';
+                    }
                 }
             }
         }
