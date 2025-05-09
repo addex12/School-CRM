@@ -8,7 +8,9 @@ require_once '../includes/db.php';
 // Get survey ID from query string
 $survey_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($survey_id <= 0) {
-    header("Location: all_responses.php?msg=invalid");
+    // Redirect back to referring page with error
+    $redirect = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'surveys.php';
+    header("Location: $redirect?msg=invalid");
     exit;
 }
 
@@ -18,9 +20,11 @@ if ($survey_id <= 0) {
 // Delete the survey
 $stmt = $pdo->prepare("DELETE FROM surveys WHERE id = ?");
 if ($stmt->execute([$survey_id])) {
-    header("Location: all_responses.php?msg=deleted");
+    $redirect = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'surveys.php';
+    header("Location: $redirect?msg=deleted");
     exit;
 } else {
-    header("Location: all_responses.php?msg=delete_failed");
+    $redirect = !empty($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'surveys.php';
+    header("Location: $redirect?msg=delete_failed");
     exit;
 }
