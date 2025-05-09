@@ -237,6 +237,7 @@ $surveys = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <a href="survey_preview.php?id=<?= $survey['id'] ?>" title="Preview"><i class="fas fa-eye"></i></a>
                                                 <a href="edit_survey.php?id=<?= $survey['id'] ?>" title="Edit"><i class="fas fa-edit"></i></a>
                                                 <a href="results.php?survey_id=<?= $survey['id'] ?>" title="Results"><i class="fas fa-chart-bar"></i></a>
+                                                <a href="delete_survey.php?id=<?= $survey['id'] ?>" title="Delete" onclick="return confirm('Are you sure you want to delete this survey?');"><i class="fas fa-trash" style="color:#e74c3c;"></i></a>
                                             </td>
                                         </tr>
                                     <?php endforeach; ?>
