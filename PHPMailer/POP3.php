@@ -425,18 +425,33 @@ class POP3
 
     /**
      * Add an error to the internal error store.
-     * Also display debug output if it's enabled.
-     *
-     * @param string $error
-     */
-    protected function setError($error)
+                if (method_exists($this, 'logError')) {
+                    $this->logError($e);
+                } else {
+                    error_log(print_r($e, true));
+                }
     {
         $this->errors[] = $error;
         if ($this->do_debug >= self::DEBUG_SERVER) {
             echo '<pre>';
-            foreach ($this->errors as $e) {
-                // Use error_log for debug output instead of print_r
-                error_log(print_r($e, true));
+    /**
+     * Logs an error message.
+     *
+     * @param string $error
+     */
+    protected function logError($error)
+    {
+        // Implement your logging logic here, e.g., save to a file or use a logging library
+        error_log($error);
+    }
+
+    /**
+     * Add an error to the internal error store.
+                if (method_exists($this, 'logError')) {
+                    $this->logError($e);
+                } else {
+                    error_log(print_r($e, true));
+                }
             }
             echo '</pre>';
         }
