@@ -435,7 +435,8 @@ class POP3
         if ($this->do_debug >= self::DEBUG_SERVER) {
             echo '<pre>';
             foreach ($this->errors as $e) {
-                print_r($e);
+                // Use error_log for debug output instead of print_r
+                error_log(print_r($e, true));
             }
             echo '</pre>';
         }
