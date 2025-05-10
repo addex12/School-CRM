@@ -103,6 +103,10 @@ try {
             max-width: 1200px;
             margin: 0 auto;
             padding: 32px 10px 0 10px;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            width: 100%;
         }
 
         /* Adugna: Dashboard container */
@@ -308,6 +312,18 @@ try {
             .adugna-dashboard-header h1 { font-size: 1em; }
             .adugna-section-title { font-size: 0.98em; }
             .adugna-stat-value { font-size: 1.1em; }
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
