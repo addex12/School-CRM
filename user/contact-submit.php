@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $upload_dir = __DIR__ . '/../uploads/';
             if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
+                mkdir($upload_dir, 0755, true);
             }
             $attachment_path = $upload_dir . basename($attachment['name']);
             move_uploaded_file($attachment['tmp_name'], $attachment_path);

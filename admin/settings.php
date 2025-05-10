@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
         $uploadDir = '../uploads/';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+            mkdir($uploadDir, 0755, true);
         }
         // Always overwrite the image if a new file is uploaded
         // Handle logo.png
@@ -102,7 +102,7 @@ if (
     try {
         $uploadDir = '../uploads/';
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+            mkdir($uploadDir, 0755, true);
         }
         $bgImages = [];
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
