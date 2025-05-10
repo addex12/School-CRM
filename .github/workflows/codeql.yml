@@ -126,3 +126,15 @@ jobs:
 # 4. Keep only this advanced (custom) workflow active.
 # 5. Re-run your workflow.
 # See: https://docs.github.com/en/code-security/code-scanning/using-codeql-code-scanning-with-your-existing-ci-system/troubleshooting-codeql-workflows#codeql-analyses-from-advanced-configurations-cannot-be-processed-when-the-default-setup-is-enabled
+
+# --- IMPORTANT: To resolve "Code Scanning could not process the submitted SARIF file":
+# This error is caused by having both the default CodeQL setup and an advanced (custom) CodeQL workflow enabled.
+# 
+# To fix:
+# 1. Go to your repository on GitHub.
+# 2. Navigate to: Security > Code scanning alerts > CodeQL.
+# 3. Click "Disable" on the default CodeQL setup (if enabled).
+# 4. Keep only this advanced (custom) workflow active.
+# 5. Commit and push your changes, then re-run your workflow.
+#
+# Reference: https://docs.github.com/en/code-security/code-scanning/using-codeql-code-scanning-with-your-existing-ci-system/troubleshooting-codeql-workflows#codeql-analyses-from-advanced-configurations-cannot-be-processed-when-the-default-setup-is-enabled
