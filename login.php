@@ -278,6 +278,7 @@ try {
             z-index: 0;
             width: 100%;
             height: 100%;
+            pointer-events: none;
         }
         .login-bg-slide {
             position: absolute;
@@ -288,10 +289,11 @@ try {
             background-position: center;
             opacity: 0;
             transition: opacity 1s;
+            z-index: 1;
         }
         .login-bg-slide.active {
             opacity: 1;
-            z-index: 1;
+            z-index: 2;
         }
         .adugna-card { 
             background: #fff;
@@ -1076,10 +1078,13 @@ try {
             if (slides.length > 1) {
                 let idx = 0;
                 setInterval(function() {
-                    slides[idx].classList.remove('active');
+                    slides.forEach(function(slide, i) {
+                        slide.classList.toggle('active', i === idx);
+                    });
                     idx = (idx + 1) % slides.length;
-                    slides[idx].classList.add('active');
                 }, 4000);
+            } else if (slides.length === 1) {
+                slides[0].classList.add('active');
             }
         });
     </script>
