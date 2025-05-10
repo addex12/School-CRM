@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(res => res.json())
             .then(data => {
                 usersTableBody.innerHTML = '';
-                if (data.users && data.users.length) {
+                if (data.users?.length) {
                     data.users.forEach(user => {
                         usersTableBody.innerHTML += `
 <tr data-id="${user.id}">
