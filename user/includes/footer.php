@@ -10,6 +10,16 @@
 </main>
 <footer class="main-footer">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
         .main-footer {
             background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
             color: #f5f6fa;
@@ -17,8 +27,10 @@
             border-top: 3px solid #007bfc;
             font-size: 14px;
             box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
-            margin-top: 0;
+            margin-top: auto;
             width: 100%;
+            /* Sticky footer */
+            flex-shrink: 0;
         }
         .footer-content {
             display: flex;
@@ -106,8 +118,14 @@
                 padding: 12px 4px 8px 4px;
                 font-size: 12px;
             }
+            .footer-content {
+                flex-direction: column;
+                gap: 6px;
+                align-items: stretch;
+            }
             .footer-section {
                 padding: 0 1px;
+                min-width: 0;
             }
             .footer-section h4 {
                 font-size: 1em;
