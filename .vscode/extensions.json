@@ -7,6 +7,7 @@
         "ms-azuretools.vscode-azureresourcegroups",
         "esbenp.prettier-vscode",
         "bugfixer.bugfixerai",
-        "github.codespaces"
+        "github.codespaces",
+        "deepsourcecorp.deepsource-vscode"
     ]
 }
