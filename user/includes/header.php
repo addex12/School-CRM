@@ -20,6 +20,9 @@ if (isset($_SESSION['user_id'])) {
 } else {
     $avatar = 'default.jpg';
 }
+
+// Sanitize current file name for safe comparison and output
+$currentPage = htmlspecialchars(basename($_SERVER['PHP_SELF']));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -260,19 +263,19 @@ if (isset($_SESSION['user_id'])) {
         <div class="header-content">
             <h1 class="logo">School CRM System</h1>
             <nav class="main-nav">
-                <a href="dashboard.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'dashboard.php' ? 'active' : '' ?>">
+                <a href="dashboard.php" class="<?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
-                <a href="feedback.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'feedback.php' ? 'active' : '' ?>">
+                <a href="feedback.php" class="<?= $currentPage === 'feedback.php' ? 'active' : '' ?>">
                     <i class="fas fa-comment-dots"></i> Feedback
                 </a>
-                <a href="contact.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'contact.php' ? 'active' : '' ?>">
+                <a href="contact.php" class="<?= $currentPage === 'contact.php' ? 'active' : '' ?>">
                     <i class="fas fa-phone"></i> Contact
                 </a>
-                <a href="messages.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'messages.php' ? 'active' : '' ?>">
+                <a href="messages.php" class="<?= $currentPage === 'messages.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Messages
                 </a>
-                <a href="profile.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'profile.php' ? 'active' : '' ?>">
+                <a href="profile.php" class="<?= $currentPage === 'profile.php' ? 'active' : '' ?>">
                     <i class="fas fa-user"></i> Account
                 </a>
                 <a href="../logout.php" class="logout">
