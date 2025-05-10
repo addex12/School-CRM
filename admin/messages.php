@@ -20,10 +20,10 @@ $users = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id 
 $admins = $pdo->query("SELECT id, username, last_active FROM users WHERE role_id = 1  ORDER BY username")->fetchAll(PDO::FETCH_ASSOC);
 
 // Get unread counts for each user (highlight users with unread messages)
-// Securely inject user_id using parameterized query
+// Use parameterized query for security
 $unreadCounts = [];
 $stmt = $pdo->prepare("SELECT sender_id, COUNT(*) as unread FROM messages WHERE is_read = 0 AND receiver_id = ?");
-$stmt->execute([$_SESSION['user_id']]);
+$stmt->execute([isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 0]);
 while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $unreadCounts[$row['sender_id']] = $row['unread'];
 }
@@ -652,3 +652,4 @@ foreach ($admins as $a) {
     </script>
 </body>
 </html>
+

@@ -81,14 +81,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
         $stmt->execute([$username, $email, $role_id, $active, $id]);
         // If user was inactive and now is active, send activation email
         if ($was_inactive && $active == 1) {
+            // Fetch latest first and last name for a personalized greeting
+            $stmt_name = $pdo->prepare("SELECT first_name, last_name FROM users WHERE id = ?");
+            $stmt_name->execute([$id]);
+            $name_row = $stmt_name->fetch(PDO::FETCH_ASSOC);
+            $first_name = $name_row['first_name'] ?? '';
+            $last_name = $name_row['last_name'] ?? '';
             $to = $email;
             $subject = "Your School CRM Account Has Been Activated";
-            $body = "Hello " . $username . ",\n\n"
+            // Professional: Use full name in greeting for clarity and personalization
+            $body = "Hello " . trim($first_name . ' ' . $last_name) . ",\n\n"
                 . "Congratulations! Your School CRM account has been activated by an administrator.\n\n"
                 . "You can now log in using your email and password at: " . (isset($settings['site_url']) ? $settings['site_url'] : 'the login page') . "\n\n"
                 . "If you have any questions, please contact support.\n\n"
                 . "Thank you,\nSchool CRM Team";
             $headers = "From: $from_name <$from_email>\r\n";
+            // Professional: Use mail() for notification, consider using a robust mailer in production
             @mail($to, $subject, $body, $headers);
         }
         $_SESSION['success'] = "User updated successfully!";
@@ -99,14 +107,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
 
 // Handle password reset (random)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_random_password'])) {
-    $new_password = bin2hex(random_bytes(4)) . rand(100,999); // 8+ chars
+    $new_password = bin2hex(random_bytes(4)) . rand(100,999); // 8+ chars, secure random
     $hashed = password_hash($new_password, PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
     $stmt->execute([$hashed, $id]);
-    // Send email using settings
+    // Fetch latest first and last name for email greeting
+    $stmt_name = $pdo->prepare("SELECT first_name, last_name FROM users WHERE id = ?");
+    $stmt_name->execute([$id]);
+    $name_row = $stmt_name->fetch(PDO::FETCH_ASSOC);
+    $first_name = $name_row['first_name'] ?? '';
+    $last_name = $name_row['last_name'] ?? '';
+    // Professional: Send password reset email with full name
     $to = $user['email'];
     $subject = "Your password has been reset";
-    $body = "Hello " . $user['username'] . ",\n\nYour account password has been reset by an administrator.\n\nTemporary Password: $new_password\n\nPlease log in using this password and change it immediately for your security.\n\nIf you did not request this change, please contact support immediately.\n\nThank you,\nSchool CRM Team";
+    $body = "Hello " . trim($first_name . ' ' . $last_name) . ",\n\nYour account password has been reset by an administrator.\n\nTemporary Password: $new_password\n\nPlease log in using this password and change it immediately for your security.\n\nIf you did not request this change, please contact support immediately.\n\nThank you,\nSchool CRM Team";
     $headers = "From: $from_name <$from_email>\r\n";
     @mail($to, $subject, $body, $headers);
     $_SESSION['success'] = "Password reset and sent to user's email.";
@@ -123,6 +137,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_manual_password
         $hashed = password_hash($manual_password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
         $stmt->execute([$hashed, $id]);
+        // Fetch latest first and last name
+        $stmt_name = $pdo->prepare("SELECT first_name, last_name FROM users WHERE id = ?");
+        $stmt_name->execute([$id]);
+        $name_row = $stmt_name->fetch(PDO::FETCH_ASSOC);
+        $first_name = $name_row['first_name'] ?? '';
+        $last_name = $name_row['last_name'] ?? '';
+        // Optionally send email for manual reset (uncomment if needed)
+        /*
+        $to = $user['email'];
+        $subject = "Your password has been reset";
+        $body = "Hello " . trim($first_name . ' ' . $last_name) . ",\n\nYour account password has been reset by an administrator.\n\nTemporary Password: $manual_password\n\nPlease log in using this password and change it immediately for your security.\n\nIf you did not request this change, please contact support immediately.\n\nThank you,\nSchool CRM Team";
+        $headers = "From: $from_name <$from_email>\r\n";
+        @mail($to, $subject, $body, $headers);
+        */
         $_SESSION['success'] = "Password reset successfully.";
         header("Location: edit_user.php?id=" . urlencode($id));
         exit();
