@@ -179,9 +179,13 @@ body, .admin-dashboard, .adugna-main, .adugna-main-content {
             <p>&copy; <?php echo date('Y'); ?> School CRM System</p>
         </div>
         <div class="adugna-footer-section">
+            <?php
+            // Sanitize current file name for safe comparison and output
+            $currentPage = htmlspecialchars(basename($_SERVER['PHP_SELF']));
+            ?>
             <ul class="adugna-quick-link-list">
-                <li><a href="dashboard.php" class="adugna-footer-link"><i class="fas fa-home" style="font-size:11px;margin-right:2px;"></i>Dashboard</a></li>
-                <li><a href="users.php" class="adugna-footer-link"><i class="fas fa-users" style="font-size:11px;margin-right:2px;"></i>Users</a></li>
+                <li><a href="dashboard.php" class="adugna-footer-link<?= $currentPage === 'dashboard.php' ? ' active' : '' ?>"><i class="fas fa-home" style="font-size:11px;margin-right:2px;"></i>Dashboard</a></li>
+                <li><a href="users.php" class="adugna-footer-link<?= $currentPage === 'users.php' ? ' active' : '' ?>"><i class="fas fa-users" style="font-size:11px;margin-right:2px;"></i>Users</a></li>
                 <li><a href="../../logout.php" class="adugna-footer-link"><i class="fas fa-sign-out-alt" style="font-size:11px;margin-right:2px;"></i>Logout</a></li>
             </ul>
         </div>

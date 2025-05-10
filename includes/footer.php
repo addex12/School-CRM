@@ -1,5 +1,8 @@
 <?php
 require_once 'auth.php';
+
+// Sanitize current file name for safe comparison and output
+$currentPage = htmlspecialchars(basename($_SERVER['PHP_SELF']));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,10 +19,10 @@ require_once 'auth.php';
                 <h1>School CRM System</h1>
             </div>
             <nav class="admin-nav">
-                <a href="dashboard.php" <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'class="active"' : '' ?>>Dashboard</a>
-                <a href="surveys.php" <?php echo basename($_SERVER['PHP_SELF']) == 'surveys.php' ? 'class="active"' : '' ?>>Surveys</a>
-                <a href="users.php" <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'class="active"' : '' ?>>Users</a>
-                <a href="results.php" <?php echo basename($_SERVER['PHP_SELF']) == 'results.php' ? 'class="active"' : '' ?>>Results</a>
+                <a href="dashboard.php" <?= $currentPage === 'dashboard.php' ? 'class="active"' : '' ?>>Dashboard</a>
+                <a href="surveys.php" <?= $currentPage === 'surveys.php' ? 'class="active"' : '' ?>>Surveys</a>
+                <a href="users.php" <?= $currentPage === 'users.php' ? 'class="active"' : '' ?>>Users</a>
+                <a href="results.php" <?= $currentPage === 'results.php' ? 'class="active"' : '' ?>>Results</a>
                 <a href="../../logout.php" class="logout">Logout</a>
             </nav>
         </header>
