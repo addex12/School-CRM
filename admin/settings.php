@@ -89,7 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
         clearstatcache(true, $uploadDir . 'banner.png');
         clearstatcache(true, $uploadDir . 'icon.png');
 
-        $_SESSION['success'] = "<div style='color:#1976d2;font-weight:600;font-size:1.08em;display:flex;align-items:center;gap:0.5em;'><i class='fas fa-check-circle' style='color:#27ae60;'></i>Settings updated successfully! Your changes are now live. 🎉</div>";
+        // Store only plain text in session success message
+        $_SESSION['success'] = "Settings updated successfully! Your changes are now live. 🎉";
         header("Location: settings.php");
         exit();
     } catch (Exception $e) {
