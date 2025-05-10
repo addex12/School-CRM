@@ -13,6 +13,9 @@ try {
     $siteLogo = 'assets/images/default-logo.png';
     $siteName = 'School CRM';
 }
+
+// Sanitize current file name for safe comparison and output
+$currentPage = htmlspecialchars(basename($_SERVER['PHP_SELF']));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,21 +36,21 @@ try {
                 <span><?php echo htmlspecialchars($siteName); ?></span>
             </div>
             <nav class="main-nav">
-                <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : '' ?>">
+                <a href="dashboard.php" class="<?= $currentPage === 'dashboard.php' ? 'active' : '' ?>">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
 
-                <a href="feedback.php" class="<?= basename($_SERVER['PHP_SELF']) === 'feedback.php' ? 'active' : '' ?>">
+                <a href="feedback.php" class="<?= $currentPage === 'feedback.php' ? 'active' : '' ?>">
                     <i class="fas fa-comment-dots"></i> Feedback
                 </a>
-                <a href="contact.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'contact.php' ? 'active' : '' ?>">
+                <a href="contact.php" class="<?= $currentPage === 'contact.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Contact
                 </a>
-                <a href="inbox.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'inbox.php' ? 'active' : '' ?>">
+                <a href="inbox.php" class="<?= $currentPage === 'inbox.php' ? 'active' : '' ?>">
                     <i class="fas fa-inbox"></i> Inbox
                 </a>
                 
-                <a href="profile.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'profile.php' ? 'active' : '' ?>">
+                <a href="profile.php" class="<?= $currentPage === 'profile.php' ? 'active' : '' ?>">
                     <i class="fas fa-user"></i> Account
                 </a>
                 <a href="../logout.php" class="logout">
@@ -56,4 +59,4 @@ try {
             </nav>
         </div>
     </header>
-    <main class="content-wrapper">
+    <main class="content-wrapper"></main></main>
