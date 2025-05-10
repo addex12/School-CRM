@@ -2,6 +2,7 @@
 
 [![DeepScan grade](https://deepscan.io/api/teams/26555/projects/29184/branches/938393/badge/grade.svg)](https://deepscan.io/dashboard#view=project&pid=29184&bid=938393)
 [![DeepSource](https://app.deepsource.com/gh/addex12/School-CRM.svg/?label=code+coverage&show_trend=true&token=iL-CJ9qbONuuyfYBYy26FIxq)](https://app.deepsource.com/gh/addex12/School-CRM/)
+[![DeepSource](https://app.deepsource.com/gh/addex12/School-CRM.svg/?label=active+issues&show_trend=true&token=iL-CJ9qbONuuyfYBYy26FIxq)](https://app.deepsource.com/gh/addex12/School-CRM/)
 [![GitHub stars](https://img.shields.io/github/stars/addex12/School-CRM?style=social)](https://github.com/addex12/School-CRM/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/addex12/School-CRM?style=social)](https://github.com/addex12/School-CRM/network/members)
 [![GitHub last commit](https://img.shields.io/github/last-commit/addex12/School-CRM?color=blue)](https://github.com/addex12/School-CRM/commits/main)
