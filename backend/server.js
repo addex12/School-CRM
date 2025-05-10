@@ -33,7 +33,7 @@ app.use((err, req, res, next) => {
     logger.error('Error', { message: err.message, stack: err.stack });
     res.status(500).json({ error: 'Internal Server Error' });
 }); app.listen(3000, () => {
-    console.log('Server is running on port 3000');      
+    logger.info('Server started', { port: 3000 });      
 })
 // Middleware for parsing JSON requests
 app.use(express.json());
@@ -71,7 +71,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal Server Error' });
 });
 app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+    logger.info('Server started', { port: 3000 });
     logger.info('Server started', { port: 3000 });
 });
 // Middleware for request validation
@@ -197,12 +197,12 @@ app.use((req, res, next) => {
 });
 // Middleware for logging
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
+    logger.info('Request', { method: req.method, url: req.url });
     next();
 });
 // Middleware for error handling
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    logger.error('Error', { stack: err.stack });
     res.status(500).json({ error: 'Internal Server Error' });
     next();
 });
