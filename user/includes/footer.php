@@ -162,7 +162,7 @@
         </div>
     </div>
     <div class="footer-bottom">
-        <p>&copy; <?= date('Y') ?> Survey System. All rights reserved.</p>
+        <p>&copy; <?= date('Y') ?> School CRM System. All rights reserved.</p>
     </div>
 </footer>
 <script src="../assets/js/main.js"></script>
