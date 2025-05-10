@@ -149,6 +149,10 @@ $feedback->execute([$_SESSION['user_id']]);
             max-width: 1000px;
             margin: 0 auto;
             padding: 32px 10px 0 10px;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            width: 100%;
         }
         .adugna-star-rating {
             direction: rtl;
@@ -237,6 +241,17 @@ $feedback->execute([$_SESSION['user_id']]);
             .adugna-card, .adugna-feedback-item {
                 padding: 4px 2px 8px 2px;
             }
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
