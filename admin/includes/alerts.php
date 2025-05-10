@@ -28,14 +28,14 @@
 </style>
 <?php if (isset($_SESSION['success'])): ?>
     <div class="alert alert-success alert-dismissible">
-        <i class="fas fa-check-circle"></i> <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($_SESSION['success']); unset($_SESSION['success']); ?>
         <button type="button" class="close" onclick="this.parentElement.style.display='none';">&times;</button>
     </div>
 <?php endif; ?>
 
 <?php if (isset($_SESSION['error'])): ?>
     <div class="alert alert-error alert-dismissible">
-        <i class="fas fa-exclamation-circle"></i> <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+        <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?>
         <button type="button" class="close" onclick="this.parentElement.style.display='none';">&times;</button>
     </div>
 <?php endif; ?>

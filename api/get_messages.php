@@ -10,8 +10,16 @@ require_once '../includes/db.php';
 header('Content-Type: application/json');
 
 // Debugging: Log initial request
-error_log("GET: " . print_r($_GET, true));
-error_log("SESSION: " . print_r($_SESSION, true));
+$sanitizedGet = array_map('htmlspecialchars', $_GET);
+$safeSession = array_map(function($k, $v) {
+    $sensitive = ['password', 'token', 'auth', 'csrf'];
+    foreach ($sensitive as $word) {
+        if (stripos($k, $word) !== false) return '[MASKED]';
+    }
+    return is_scalar($v) ? htmlspecialchars((string)$v) : '[COMPLEX]';
+}, array_keys($_SESSION), $_SESSION);
+error_log("GET: " . print_r($sanitizedGet, true));
+error_log("SESSION: " . print_r($safeSession, true));
 
 // Validate input
 if (!isset($_GET['user_id'])) {
