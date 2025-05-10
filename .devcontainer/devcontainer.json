@@ -157,7 +157,8 @@
 				"junstyle.php-cs-fixer",
 				"ryannaddy.laravel-artisan",
 				"shufo.vscode-blade-formatter",
-				"vmware.vscode-spring-boot"
+				"vmware.vscode-spring-boot",
+				"DeepSourceCorp.deepsource-vscode"
 			]
 		}
 	}
