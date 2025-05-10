@@ -17,6 +17,13 @@ require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
 $pageTitle = 'Register';
+
+// Fetch settings for site_name and banner
+$settings = [];
+$stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_name', 'site_banner')");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $settings[$row['setting_key']] = $row['setting_value'];
+}
 // Use global $pdo from db.php, do not instantiate Database class
 
 class AuthHelper {
@@ -71,14 +78,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, active) VALUES (?, ?, ?, ?, ?)");
         if ($stmt->execute([$username, $email, $hashed_password, $role_id, $active])) {
-            // Send email with username and password (plain text for demo, use secure method in production)
+            // Send email with username only (never send plain password in production)
             $to = $email;
             $subject = "Your School CRM Account Registration";
             $message = "Hello $username,\n\n"
                 . "Thank you for registering at School CRM.\n"
                 . "Your account details:\n"
                 . "Username: $username\n"
-                . "Password: $password\n\n"
+                . "Password: (hidden for your security)\n\n"
                 . "Please wait for an administrator to activate your account.\n\n"
                 . "If you did not register, please ignore this email.";
             $headers = "From: no-reply@school-crm.com\r\n";
@@ -227,6 +234,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="register-wrapper">
     <div class="register-card">
+        <?php
+        // Show banner if exists
+        $bannerPath = 'uploads/banner.png';
+        if (file_exists(__DIR__ . '/uploads/banner.png')): ?>
+            <div style="text-align:center;margin-bottom:12px;">
+                <img src="<?= $bannerPath ?>?v=<?= filemtime(__DIR__ . '/uploads/banner.png') ?>" alt="Site Banner" style="max-width:100%;max-height:80px;border-radius:8px;">
+            </div>
+        <?php endif; ?>
+        <?php if (!empty($settings['site_name'])): ?>
+            <div style="text-align:center;font-size:1.25em;font-weight:700;color:#3498db;margin-bottom:8px;">
+                <?= htmlspecialchars($settings['site_name']) ?>
+            </div>
+        <?php endif; ?>
         <div class="register-logo">
             <i class="fas fa-user-plus"></i>
         </div>
