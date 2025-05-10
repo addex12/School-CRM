@@ -19,7 +19,10 @@ $pageTitle = "System Settings";
 // Clear unrelated session messages to avoid showing survey messages here
 unset($_SESSION['survey_success'], $_SESSION['survey_error']);
 
-// Handle settings update
+/**
+ * Handle settings update form submission.
+ * Processes file uploads, updates settings in the database, and handles checkboxes.
+ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     try {
         $uploadDir = '../uploads/';
@@ -94,7 +97,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_settings'])) {
     }
 }
 
-// --- Handle multiple login background images upload (separate form) ---
+/**
+ * Handle multiple login background images upload.
+ * Processes multiple file uploads and updates the settings in the database.
+ */
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST' &&
     isset($_FILES['login_bg_images']) && !empty($_FILES['login_bg_images']['name'][0])
@@ -136,7 +142,10 @@ if (
     }
 }
 
-// --- Handle removal of a login background image ---
+/**
+ * Handle removal of a login background image.
+ * Updates the settings and deletes the image file.
+ */
 if (
     $_SERVER['REQUEST_METHOD'] === 'POST' &&
     isset($_POST['remove_bg_image']) && !empty($_POST['remove_bg_image'])
@@ -169,7 +178,9 @@ if (
     }
 }
 
-// Handle send test email
+/**
+ * Handle sending a test email using the configured SMTP settings.
+ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
     $testEmail = trim($_POST['test_email'] ?? '');
     if (filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {

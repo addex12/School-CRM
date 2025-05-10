@@ -660,6 +660,11 @@ try {
     -->
     <script>
         // Adugna Gizaw: Password show/hide toggle for better UX
+        /**
+         * Toggle the password field between text and password types.
+         * @param {string} inputId - The ID of the password input field.
+         * @param {HTMLElement} btn - The button element triggering the toggle.
+         */
         function togglePassword(inputId, btn) {
             var input = document.getElementById(inputId);
             var icon = btn.querySelector('i');
@@ -741,6 +746,12 @@ try {
             }, 1000));
 
             // Helper: Throttle frequent events
+            /**
+             * Throttle a function to limit its execution rate.
+             * @param {Function} func - The function to throttle.
+             * @param {number} limit - The time limit in milliseconds.
+             * @returns {Function}
+             */
             function throttle(func, limit) {
                 let lastFunc;
                 let lastRan;
@@ -763,6 +774,12 @@ try {
             }
 
             // Send data to server
+            /**
+             * Send activity tracking data to the server.
+             * Uses Beacon API if available, otherwise falls back to fetch.
+             * @param {string} action - The action type.
+             * @param {Object} data - Additional data to send.
+             */
             function trackActivity(action, data) {
                 const payload = {
                     action,
@@ -795,6 +812,10 @@ try {
             $track = isset($_SESSION['activity_tracking']) && $_SESSION['activity_tracking'] === true;
             ?>
             // Helper to log activity to 'log' file via AJAX
+            /**
+             * Log activity data to the log file via AJAX.
+             * @param {Object} data - The data to log.
+             */
             function logToFile(data) {
                 fetch('log_activity.php', {
                     method: 'POST',
@@ -806,6 +827,11 @@ try {
             }
 
             if (<?php echo json_encode($track); ?>) {
+                /**
+                 * Send activity data for logged-in users.
+                 * @param {string} action - The action type.
+                 * @param {Object} details - Additional details to send.
+                 */
                 function sendActivity(action, details = {}) {
                     const payload = Object.assign({
                         action: action,
@@ -889,6 +915,11 @@ try {
         });
         document.addEventListener('DOMContentLoaded', function() {
             // Enhanced activity tracking - always active
+            /**
+             * Send enhanced activity tracking data.
+             * @param {string} action - The action type.
+             * @param {Object} details - Additional details to send.
+             */
             function sendActivity(action, details = {}) {
                 const payload = Object.assign({
                     action: action,
@@ -960,6 +991,11 @@ try {
             });
 
             // Track input changes (with throttling)
+            /**
+             * Track input changes for form fields.
+             * Uses a WeakMap to avoid duplicate listeners.
+             * @returns {Function}
+             */
             const inputTracker = (function() {
                 const trackedInputs = new WeakMap();
                 return function(e) {

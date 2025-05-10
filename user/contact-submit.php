@@ -17,6 +17,11 @@ require_once __DIR__ . '/../includes/db.php'; // Ensure this file initializes $p
 
 global $pdo; // Ensure $pdo is accessible
 
+/**
+ * Handle the contact form submission.
+ * Validates input, handles file upload, inserts ticket into database,
+ * and redirects with appropriate status.
+ */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         // Validate input
@@ -34,6 +39,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ticket_number = strtoupper(uniqid('TICKET-'));
 
         // Handle file upload if provided
+        /**
+         * Uploads the attachment file if provided and valid.
+         * @param array $attachment - The uploaded file array from $_FILES.
+         * @return string|null - The path to the uploaded file or null.
+         * @throws Exception if file type or size is invalid.
+         */
         $attachment_path = null;
         if ($attachment && $attachment['error'] === UPLOAD_ERR_OK) {
             $allowed_types = ['application/pdf', 'image/jpeg', 'image/png', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
