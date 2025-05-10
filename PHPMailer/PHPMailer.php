@@ -1648,7 +1648,7 @@ class PHPMailer
                     )
                 )
             ) {
-                $header_dkim = $this->DKIM_Add(
+                $header_dkim = $this->dkimAdd(
                     $this->MIMEHeader . $this->mailHeader,
                     $this->encodeHeader($this->secureHeader($this->Subject)),
                     $this->MIMEBody
@@ -4983,7 +4983,7 @@ class PHPMailer
      *
      * @return string
      */
-    public function DKIM_Add($headers_line, $subject, $body)
+    public function dkimAdd($headers_line, $subject, $body)
     {
         $DKIMsignatureType = 'rsa-sha256'; //Signature & hash algorithms
         $DKIMcanonicalization = 'relaxed/simple'; //Canonicalization methods of header & body

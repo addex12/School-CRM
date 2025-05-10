@@ -365,7 +365,7 @@ class SMTP
         $this->edebug('Connection: opened', self::DEBUG_CONNECTION);
 
         //Get any announcement
-        $this->last_reply = $this->get_lines();
+        $this->last_reply = $this->getLines();
         $this->edebug('SERVER -> CLIENT: ' . $this->last_reply, self::DEBUG_SERVER);
         $responseCode = (int)substr($this->last_reply, 0, 3);
         if ($responseCode === 220) {
@@ -790,7 +790,7 @@ class SMTP
                 if (!empty($line_out) && $line_out[0] === '.') {
                     $line_out = '.' . $line_out;
                 }
-                $this->client_send($line_out . static::LE, 'DATA');
+                $this->clientSend($line_out . static::LE, 'DATA');
             }
         }
 
@@ -1035,9 +1035,9 @@ class SMTP
 
             return false;
         }
-        $this->client_send($commandstring . static::LE, $command);
+        $this->clientSend($commandstring . static::LE, $command);
 
-        $this->last_reply = $this->get_lines();
+        $this->last_reply = $this->getLines();
         //Fetch SMTP code and possible error code explanation
         $matches = [];
         if (preg_match('/^([\d]{3})[ -](?:([\d]\\.[\d]\\.[\d]{1,2}) )?/', $this->last_reply, $matches)) {
@@ -1149,7 +1149,7 @@ class SMTP
      *
      * @return int|bool The number of bytes sent to the server or false on error
      */
-    public function client_send($data, $command = '')
+    public function clientSend($data, $command = '')
     {
         //If SMTP transcripts are left enabled, or debug output is posted online
         //it can leak credentials, so hide credentials in all but lowest level
@@ -1249,7 +1249,7 @@ class SMTP
      *
      * @return string
      */
-    protected function get_lines()
+    protected function getLines()
     {
         //If the connection is bad, give up straight away
         if (!is_resource($this->smtp_conn)) {
