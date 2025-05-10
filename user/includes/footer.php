@@ -169,9 +169,9 @@ GitHub: https://github.com/addex12
         <div class="adugna-footer-section adugna-quick-links">
             <h4>Quick Links</h4>
             <ul>
-                <li><a href="dashboard.php" class="adugna-footer-link"><i class="fa fa-home" style="font-size:0.9em;"></i> Dashboard</a></li>
-                <li><a href="faq.php" class="adugna-footer-link" onclick="if(!window.faqExists){alert('FAQ page coming soon!');return false;}"><i class="fa fa-question-circle" style="font-size:0.9em;"></i> FAQ</a></li>
-                <li><a href="terms.php" class="adugna-footer-link" onclick="if(!window.termsExists){alert('Terms of Service page coming soon!');return false;}"><i class="fa fa-file-contract" style="font-size:0.9em;"></i> Terms</a></li>
+                <li><a href="dashboard.php" class="adugna-footer-link<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'dashboard.php' ? ' active' : '' ?>"><i class="fa fa-home" style="font-size:0.9em;"></i> Dashboard</a></li>
+                <li><a href="faq.php" class="adugna-footer-link<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'faq.php' ? ' active' : '' ?>" onclick="if(!window.faqExists){alert('FAQ page coming soon!');return false;}"><i class="fa fa-question-circle" style="font-size:0.9em;"></i> FAQ</a></li>
+                <li><a href="terms.php" class="adugna-footer-link<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'terms.php' ? ' active' : '' ?>" onclick="if(!window.termsExists){alert('Terms of Service page coming soon!');return false;}"><i class="fa fa-file-contract" style="font-size:0.9em;"></i> Terms</a></li>
             </ul>
         </div>
         <!-- Adugna Gizaw: Contact info section, compact and branded -->
