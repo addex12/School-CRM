@@ -95,3 +95,11 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+
+# --- FIX: To resolve "CodeQL analyses from advanced configurations cannot be processed when the default setup is enabled":
+# 1. Go to your repository on GitHub.
+# 2. Navigate to: Security > Code scanning alerts > CodeQL.
+# 3. Click "Disable" on the default CodeQL setup (if enabled).
+# 4. Keep only this advanced (custom) workflow active.
+# 5. Re-run your workflow.
+# See: https://docs.github.com/en/code-security/code-scanning/using-codeql-code-scanning-with-your-existing-ci-system/troubleshooting-codeql-workflows#codeql-analyses-from-advanced-configurations-cannot-be-processed-when-the-default-setup-is-enabled
