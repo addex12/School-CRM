@@ -5,7 +5,7 @@ let connection;
 module.exports = {
     async connect(config) {
         connection = await mysql.createConnection(config);
-        console.log('Database connected');
+        // Use a logger here for server logs, e.g., winston.info('Database connected');
     },
     async getTables() {
         const [rows] = await connection.query('SHOW TABLES');
@@ -21,7 +21,7 @@ module.exports = {
     },
     async close() {
         await connection.end();
-        console.log('Database connection closed');
+        // Use a logger here for server logs, e.g., winston.info('Database connection closed');
     },
     async getDatabaseStructure() {
         const tables = await this.getTables();

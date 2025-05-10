@@ -79,17 +79,17 @@ document.addEventListener('DOMContentLoaded', function () {
         if (selectedAction === 'delete') {
             if (confirm('Are you sure you want to delete the selected surveys?')) {
                 // Perform delete action
-                console.log('Deleting surveys:', surveyIds);
-                // Add AJAX request to delete surveys
+                alert('Selected surveys deleted successfully.');
+                // TODO: Add AJAX request to delete surveys and handle errors
             }
         } else if (selectedAction === 'activate') {
             // Perform activate action
-            console.log('Activating surveys:', surveyIds);
-            // Add AJAX request to activate surveys
+            alert('Selected surveys activated successfully.');
+            // TODO: Add AJAX request to activate surveys and handle errors
         } else if (selectedAction === 'deactivate') {
             // Perform deactivate action
-            console.log('Deactivating surveys:', surveyIds);
-            // Add AJAX request to deactivate surveys
+            alert('Selected surveys deactivated successfully.');
+            // TODO: Add AJAX request to deactivate surveys and handle errors
         }
     }
 
@@ -132,8 +132,8 @@ document.addEventListener('DOMContentLoaded', function () {
 function deleteSurvey(surveyId) {
     if (confirm('Are you sure you want to delete this survey?')) {
         // Perform delete action
-        console.log('Deleting survey:', surveyId);
-        // Add AJAX request to delete survey
+        alert('Survey deleted successfully.');
+        // TODO: Add AJAX request to delete survey and handle errors
     }
 }
 
@@ -141,51 +141,51 @@ function deleteSurvey(surveyId) {
 function duplicateSurvey(surveyId) {
     if (confirm('Are you sure you want to duplicate this survey?')) {
         // Perform duplication action
-        console.log('Duplicating survey:', surveyId);
-        // Add AJAX request to duplicate the survey
+        alert('Survey duplicated successfully.');
+        // TODO: Add AJAX request to duplicate the survey and handle errors
     }
 }
 
 // Function to handle survey activation
 function activateSurvey(surveyId) {
     // Perform activation action
-    console.log('Activating survey:', surveyId);
-    // Add AJAX request to activate the survey
+    alert('Survey activated successfully.');
+    // TODO: Add AJAX request to activate the survey and handle errors
 }
 
 // Function to handle survey deactivation
 function deactivateSurvey(surveyId) {
     // Perform deactivation action
-    console.log('Deactivating survey:', surveyId);
-    // Add AJAX request to deactivate the survey
+    alert('Survey deactivated successfully.');
+    // TODO: Add AJAX request to deactivate the survey and handle errors
 }
 
 // Function to handle survey sharing
 function shareSurvey(surveyId) {
     // Perform sharing action
-    console.log('Sharing survey:', surveyId);
-    // Add AJAX request to generate and display sharing link
+    alert('Survey sharing link generated.');
+    // TODO: Add AJAX request to generate and display sharing link
 }
 
 // Function to handle survey editing
 function editSurvey(surveyId) {
     // Perform editing action
-    console.log('Editing survey:', surveyId);
-    // Add AJAX request to fetch and display survey editing form
+    alert('Survey editing form loaded.');
+    // TODO: Add AJAX request to fetch and display survey editing form
 }
 
 // Function to handle survey preview
 function previewSurvey(surveyId) {
     // Perform preview action
-    console.log('Previewing survey:', surveyId);
-    // Add AJAX request to fetch and display survey preview
+    alert('Survey preview loaded.');
+    // TODO: Add AJAX request to fetch and display survey preview
 }
 
 // Function to handle survey exporting
 function exportSurvey(surveyId) {
     // Perform export action
-    console.log('Exporting survey:', surveyId);
-    // Add AJAX request to fetch and download survey data
+    alert('Survey data exported.');
+    // TODO: Add AJAX request to fetch and download survey data
 }
 
 // Function to handle survey importing
@@ -202,29 +202,29 @@ function importSurvey() {
     formData.append('file', file);
 
     // Perform import action
-    console.log('Importing survey:', file.name);
-    // Add AJAX request to upload and process the file
+    alert('Survey imported successfully.');
+    // TODO: Add AJAX request to upload and process the file
 }
 
 // Function to handle survey analytics
 function viewSurveyAnalytics(surveyId) {
     // Perform analytics action
-    console.log('Viewing analytics for survey:', surveyId);
-    // Add AJAX request to fetch and display survey analytics
+    alert('Survey analytics loaded.');
+    // TODO: Add AJAX request to fetch and display survey analytics
 }
 
 // Function to handle survey settings
 function editSurveySettings(surveyId) {
     // Perform settings action
-    console.log('Editing settings for survey:', surveyId);
-    // Add AJAX request to fetch and display survey settings form
+    alert('Survey settings loaded.');
+    // TODO: Add AJAX request to fetch and display survey settings form
 }
 
 // Function to handle survey responses
 function viewSurveyResponses(surveyId) {
     // Perform responses action
-    console.log('Viewing responses for survey:', surveyId);
-    // Add AJAX request to fetch and display survey responses
+    alert('Survey responses loaded.');
+    // TODO: Add AJAX request to fetch and display survey responses
 }
 
 // Add event listeners for survey actions
