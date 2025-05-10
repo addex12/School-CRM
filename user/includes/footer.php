@@ -23,9 +23,9 @@
         .main-footer {
             background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
             color: #f5f6fa;
-            padding: 8px 4px 4px 4px; /* further reduced padding */
+            padding: 8px 4px 4px 4px;
             border-top: 1.5px solid #007bfc;
-            font-size: clamp(9px, 2vw, 12px); /* responsive font size */
+            font-size: clamp(9px, 2vw, 12px);
             box-shadow: 0 -1px 4px rgba(44,62,80,0.07);
             margin-top: auto;
             width: 100%;
