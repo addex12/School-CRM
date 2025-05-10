@@ -25,6 +25,26 @@ if ($user_id) {
 ?>
 
 <style>
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+body {
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+.adugna-main-content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px 0 20px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    width: 100%;
+}
 /* Adugna: Contact Support Page Custom Styles - Compact, Responsive, and Branded */
 .adugna-contact-main-container {
     max-width: 600px;
@@ -105,11 +125,6 @@ body, input, textarea, select, button {
     .adugna-contact-main-container {
         padding: 10px 2vw;
     }
-}
-.adugna-main-content-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 40px 20px 0 20px;
 }
 .adugna-ticket-table {
     width: 100%;

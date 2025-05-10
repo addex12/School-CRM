@@ -216,6 +216,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
         }
 
         /* Adugna chat messages: compact, scrollable, branded */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-content-container {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            width: 100%;
+        }
         .adugna-chat-messages {
             max-height: 260px;
             overflow-y: auto;
