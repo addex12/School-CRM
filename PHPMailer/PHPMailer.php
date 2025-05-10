@@ -3536,15 +3536,15 @@ class PHPMailer
             //fallthrough
             case 'text':
             default:
-                $matchcount += preg_match_all('/[\000-\010\013\014\016-\037\177-\377]/', $str, $matches);
+                //RFC 2047 section 5.1
+                //Replace every high ascii, control, =, ? and _ characters
+                $pattern = '\000-\010\013\014\016-\037\075\077\137\177-\377' . $pattern;
                 break;
         }
 
         if ($this->has8bitChars($str)) {
             $charset = $this->CharSet;
         } else {
-            $charset = static::CHARSET_ASCII;
-        }
 
         //Q/B encoding adds 8 chars and the charset ("` =?<charset>?[QB]?<content>?=`").
         $overhead = 8 + strlen($charset);
