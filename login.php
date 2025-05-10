@@ -566,7 +566,7 @@ try {
         <!-- Left: Illustration and Announcements -->
         <div class="adugna-login-left">
             <div class="adugna-illustration">
-                <img src="<?= htmlspecialchars($siteLogo) ?>" alt="Site Logo" style="height: 60px;">
+                <img src="<?= htmlspecialchars($siteBanner) ?>" alt="Site Logo" style="height: 60px;">
             </div>
             <div class="adugna-illustration-text">
                 <h3>Flipper International School Customer Relationship Management System</h3>
