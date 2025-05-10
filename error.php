@@ -17,7 +17,14 @@ header("Pragma: no-cache");
 // Debugging: Check session variables
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     // Log session data for debugging (remove in production)
-    error_log("Access denied. Session data: " . print_r($_SESSION, true));
+    $safeSession = array_map(function($k, $v) {
+        $sensitive = ['password', 'token', 'auth', 'csrf'];
+        foreach ($sensitive as $word) {
+            if (stripos($k, $word) !== false) return '[MASKED]';
+        }
+        return is_scalar($v) ? htmlspecialchars((string)$v) : '[COMPLEX]';
+    }, array_keys($_SESSION), $_SESSION);
+    error_log("Access denied. Session data: " . print_r($safeSession, true));
     header("Location: login.php");
     exit;
 }
