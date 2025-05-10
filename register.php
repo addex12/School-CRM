@@ -17,13 +17,6 @@ require_once 'includes/config.php';
 require_once 'includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
 $pageTitle = 'Register';
-
-// Fetch settings for site_name and banner
-$settings = [];
-$stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_name', 'site_banner')");
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $settings[$row['setting_key']] = $row['setting_value'];
-}
 // Use global $pdo from db.php, do not instantiate Database class
 
 class AuthHelper {
@@ -33,31 +26,34 @@ class AuthHelper {
 }
 
 $errors = [];
-$email = '';
+$username = $email = $role = '';
 
 // Move POST handling outside of the AuthHelper check
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
+    // Do not set $role at all, and do not assign any default
 
     // Validation
+    if (empty($username)) $errors['username'] = "Username is required";
     if (empty($email)) $errors['email'] = "Email is required";
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = "Invalid email format";
-
-    // Check if email exists as username or email
-    if (empty($errors)) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
-        $stmt->execute([$email, $email]);
-        $count = $stmt->fetchColumn();
-        if ($count > 0) {
-            $errors['email'] = "Email address is already registered";
-        }
-    }
-
     if (empty($password)) $errors['password'] = "Password is required";
     if (strlen($password) < 6) $errors['password'] = "Password must be at least 6 characters";
     if ($password !== $confirm_password) $errors['confirm_password'] = "Passwords do not match";
+
+    // Check if username or email exists
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$username, $email]);
+        $count = $stmt->fetchColumn();
+        
+        if ($count > 0) {
+            $errors['general'] = "Username or email already exists";
+        }
+    }
 
     // Assign "new" role if it exists, otherwise NULL
     $role_id = null;
@@ -73,17 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        // Use email as username
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, active) VALUES (?, ?, ?, ?, ?)");
-        if ($stmt->execute([$email, $email, $hashed_password, $role_id, $active])) {
-            // Send email with email as username
+        if ($stmt->execute([$username, $email, $hashed_password, $role_id, $active])) {
+            // Send email with username and password (plain text for demo, use secure method in production)
             $to = $email;
             $subject = "Your School CRM Account Registration";
-            $message = "Hello,\n\n"
+            $message = "Hello $username,\n\n"
                 . "Thank you for registering at School CRM.\n"
                 . "Your account details:\n"
-                . "Username (Email): $email\n"
-                . "Password: (hidden for your security)\n\n"
+                . "Username: $username\n"
+                . "Password: $password\n\n"
                 . "Please wait for an administrator to activate your account.\n\n"
                 . "If you did not register, please ignore this email.";
             $headers = "From: no-reply@school-crm.com\r\n";
@@ -232,24 +227,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="register-wrapper">
     <div class="register-card">
-        <?php
-        // Show banner if exists
-        $bannerPath = 'uploads/banner.png';
-        if (file_exists(__DIR__ . '/uploads/banner.png')): ?>
-            <div style="text-align:center;margin-bottom:12px;">
-                <img src="<?= $bannerPath ?>?v=<?= filemtime(__DIR__ . '/uploads/banner.png') ?>" alt="Site Banner" style="max-width:100%;max-height:80px;border-radius:8px;">
-            </div>
-        <?php endif; ?>
-        <?php if (!empty($settings['site_name'])): ?>
-            <div style="text-align:center;font-size:1.25em;font-weight:700;color:#3498db;margin-bottom:8px;">
-                <?= htmlspecialchars($settings['site_name']) ?>
-            </div>
-        <?php endif; ?>
         <div class="register-logo">
             <i class="fas fa-user-plus"></i>
         </div>
         <div class="register-title">Create Account</div>
-        <!-- Display general error or success message -->
+        <!-- Adugna Gizaw: Social registration options for Gmail, Telegram, Facebook. -->
         <?php if (!empty($errors['general'])): ?>
             <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
         <?php elseif (!empty($_SESSION['register_success'])): ?>
@@ -264,7 +246,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php unset($_SESSION['register_success']); ?>
         <?php endif; ?>
         <form method="POST" autocomplete="off">
-            <!-- Remove Username field, only show Email -->
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required value="<?= htmlspecialchars($username ?? '') ?>">
+                <?php if (isset($errors['username'])): ?>
+                    <div class="field-error"><?php echo $errors['username']; ?></div>
+                <?php endif; ?>
+            </div>
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required value="<?= htmlspecialchars($email ?? '') ?>">
