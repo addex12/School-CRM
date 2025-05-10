@@ -75,8 +75,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
     if ($validation_error) {
         $_SESSION['error'] = $validation_error;
     } else {
+        // Check if account is being activated now
+        $was_inactive = ($user['active'] == 0);
         $stmt = $pdo->prepare("UPDATE users SET username = ?, email = ?, role_id = ?, active = ? WHERE id = ?");
         $stmt->execute([$username, $email, $role_id, $active, $id]);
+        // If user was inactive and now is active, send activation email
+        if ($was_inactive && $active == 1) {
+            $to = $email;
+            $subject = "Your School CRM Account Has Been Activated";
+            $body = "Hello " . $username . ",\n\n"
+                . "Congratulations! Your School CRM account has been activated by an administrator.\n\n"
+                . "You can now log in using your email and password at: " . (isset($settings['site_url']) ? $settings['site_url'] : 'the login page') . "\n\n"
+                . "If you have any questions, please contact support.\n\n"
+                . "Thank you,\nSchool CRM Team";
+            $headers = "From: $from_name <$from_email>\r\n";
+            @mail($to, $subject, $body, $headers);
+        }
         $_SESSION['success'] = "User updated successfully!";
         header("Location: users.php");
         exit();
