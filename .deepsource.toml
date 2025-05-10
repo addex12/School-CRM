@@ -1,8 +1,36 @@
-# DeepSource configuration file
-# Learn how to configure: https://docs.deepsource.com/docs/configuration
+# .deepsource.toml - DeepSource configuration for School-CRM
+# Developer: Adugna Gizaw
+# Email: gizawadugna@gmail.com
+# LinkedIn: https://www.linkedin.com/in/eleganceict
+# Twitter: https://twitter.com/eleganceict1
+# GitHub: https://github.com/addex12
+
 version = 1
+
+# Enable analyzers for only the languages you use.
+# Remove or comment out analyzers for languages not present in your repo.
 
 [[analyzers]]
 name = "php"
-name = "java"
-name = "python
+enabled = true
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+# Uncomment if you have Python code
+# [[analyzers]]
+# name = "python"
+# enabled = true
+
+# Exclude files or directories if needed
+# [exclude]
+# paths = [
+#   "vendor/",
+#   "node_modules/",
+#   "tests/"
+# ]
+
+# Configure transformers if needed
+# [transformers]
+# ...existing code...

@@ -1,0 +1,119 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+#
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+#
+name: "CodeQL Advanced"
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+  schedule:
+    - cron: '35 18 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - language: actions
+          build-mode: none
+        - language: javascript-typescript
+          build-mode: none
+        - language: php
+          build-mode: none
+        # Remove python if you do not have Python code in your repo.
+        # - language: python
+        #   build-mode: none
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        build-mode: ${{ matrix.build-mode }}
+        # queries: security-extended,security-and-quality
+
+    - if: matrix.build-mode == 'manual'
+      shell: bash
+      run: |
+        echo 'If you are using a "manual" build mode for one or more of the' \
+          'languages you are analyzing, replace this with the commands to build' \
+          'your code, for example:'
+        echo '  make bootstrap'
+        echo '  make release'
+        exit 1
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+
+    # Lightlytics Publisher step for Terraform plan publishing and analysis
+    - name: Lightlytics Publisher
+      uses: lightlytics/publisher@latest
+      with:
+        working-directory: ./terraform
+        ll-hostname: "env.lightlytics.com"
+        plan-json: "" # optional
+        tfc-token: "" # optional
+        tfc-run-id: "" # optional
+        tf-graph: "" # optional
+        collection-token: ${{ secrets.COLLECTION_TOKEN }}
+        github-token: ${{ secrets.GITHUB_TOKEN }} # optional
+
+# --- NOTE ---
+# "The operation was canceled" is a generic error that can be caused by:
+# - Manually stopping the workflow run.
+# - Workflow timeout (default is 6 hours for GitHub-hosted runners).
+# - Exceeding GitHub Actions usage limits.
+# - A previous step failing and the workflow being set to cancel on failure.
+#
+# To resolve:
+# 1. Check if you or a maintainer manually canceled the workflow.
+# 2. Review the Actions tab for any failed steps before the cancellation.
+# 3. Ensure no steps are running too long or hanging.
+# 4. If using `concurrency` or `cancel-in-progress`, check for overlapping runs.
+# 5. If you see "CodeQL analyses from advanced configurations cannot be processed when the default setup is enabled", follow the previous instructions to disable the default CodeQL setup.
+# 6. If the problem persists, try re-running the workflow or splitting long-running jobs.
+
+# --- FIX: To resolve "CodeQL analyses from advanced configurations cannot be processed when the default setup is enabled":
+# 1. Go to your repository on GitHub.
+# 2. Navigate to: Security > Code scanning alerts > CodeQL.
+# 3. Click "Disable" on the default CodeQL setup (if enabled).
+# 4. Keep only this advanced (custom) workflow active.
+# 5. Re-run your workflow.
+# See: https://docs.github.com/en/code-security/code-scanning/using-codeql-code-scanning-with-your-existing-ci-system/troubleshooting-codeql-workflows#codeql-analyses-from-advanced-configurations-cannot-be-processed-when-the-default-setup-is-enabled
+
+# --- IMPORTANT: To resolve "Code Scanning could not process the submitted SARIF file":
+# This error is caused by having both the default CodeQL setup and an advanced (custom) CodeQL workflow enabled.
+# 
+# To fix:
+# 1. Go to your repository on GitHub.
+# 2. Navigate to: Security > Code scanning alerts > CodeQL.
+# 3. Click "Disable" on the default CodeQL setup (if enabled).
+# 4. Keep only this advanced (custom) workflow active.
+# 5. Commit and push your changes, then re-run your workflow.
+#
+# Reference: https://docs.github.com/en/code-security/code-scanning/using-codeql-code-scanning-with-your-existing-ci-system/troubleshooting-codeql-workflows#codeql-analyses-from-advanced-configurations-cannot-be-processed-when-the-default-setup-is-enabled
