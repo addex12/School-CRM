@@ -416,7 +416,8 @@ function updateSurveyFields($pdo, $survey_id, $questions) {
             <div class="adugna-form-container adugna-card">
                 <h2 style="color:#215967;font-weight:600;"><?= $survey ? "Edit Survey" : "Create New Survey" ?></h2>
                 <?php if (isset($_SESSION['error'])): ?>
-                    <div class="adugna-alert"><?= $_SESSION['error']; unset($_SESSION['error']); ?></div>
+                    <div class="adugna-alert"><?= htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8') ?></div>
+                    <?php unset($_SESSION['error']); ?>
                 <?php endif; ?>
                 <form method="POST" class="survey-form">
                     <input type="hidden" name="id" value="<?= $survey_id ?? '' ?>">

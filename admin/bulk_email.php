@@ -13,7 +13,7 @@ GitHub: https://github.com/addex12
  */
 // TEMP: Debug session values to error log (safe for headers)
 if (isset($_SESSION)) {
-    error_log('SESSION: ' . print_r($_SESSION, true));
+    error_log('Session: ' . print_r(array_map(function($v) { return is_scalar($v) ? htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8') : $v; }, $_SESSION), true));
 }
 require_once '../includes/auth.php';
 require_once '../includes/config.php';
@@ -292,7 +292,9 @@ if ($roleStmt) {
                                     <label for="category">Select Category:</label>
                                     <select id="category" name="category" required>
                                         <?php foreach ($categories as $category): ?>
-                                            <option value="<?php echo $category; ?>"><?php echo ucfirst($category); ?></option>
+                                            <option value="<?= htmlspecialchars($category, ENT_QUOTES, 'UTF-8') ?>">
+                                                <?= htmlspecialchars($category, ENT_QUOTES, 'UTF-8') ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
