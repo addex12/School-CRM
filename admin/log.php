@@ -582,7 +582,7 @@ $filteredEntries = array_slice(array_values($filteredEntries), ($page-1)*$pageSi
                                 <?php endif; ?>
                             </td>
                             <td>
-                                <button class="adugna-action-btn adugna-btn-view" onclick="adugnaShowDetails('<?= md5($entry['evidence']) ?>')">
+                                <button class="adugna-action-btn adugna-btn-view" onclick="adugnaShowDetails('<?= hash('sha256', $entry['evidence']) ?>')">
                                     <i class="fas fa-search"></i> Details
                                 </button>
                                 <?php if ($entry['risk_level'] === 'Critical' || $entry['risk_level'] === 'High'): ?>
@@ -624,27 +624,44 @@ $filteredEntries = array_slice(array_values($filteredEntries), ($page-1)*$pageSi
         // Adugna Gizaw: Details modal logic
         function adugnaShowDetails(eventId) {
             const entries = <?= json_encode($allEntries) ?>;
-            const entry = entries.find(e => '<?= md5('') ?>' !== eventId && md5(e.evidence) === eventId);
-            let html = '';
-            if (entry) {
-                html += `<table style="width:100%;font-size:1em;">
-                    <tr><th style="text-align:left;">Timestamp:</th><td>${entry.timestamp}</td></tr>
-                    <tr><th style="text-align:left;">Event Type:</th><td>${entry.type}</td></tr>
-                    <tr><th style="text-align:left;">Risk Level:</th><td>${entry.risk_level}</td></tr>
-                    <tr><th style="text-align:left;">Page:</th><td>${entry.page}</td></tr>
-                    <tr><th style="text-align:left;">IP Address:</th><td>${entry.ip_address}</td></tr>
-                    <tr><th style="text-align:left;">Location:</th><td>${entry.geolocation}</td></tr>
-                    <tr><th style="text-align:left;">User Agent:</th><td>${entry.user_agent}</td></tr>
-                    <tr><th style="text-align:left;">Username:</th><td>${entry.username}</td></tr>
-                    <tr><th style="text-align:left;">Password:</th><td>${entry.password}</td></tr>
-                    <tr><th style="text-align:left;">Sensitive Data:</th><td><pre style="white-space:pre-wrap;">${JSON.stringify(entry.sensitive_data, null, 2)}</pre></td></tr>
-                    <tr><th style="text-align:left;">Evidence:</th><td><pre style="white-space:pre-wrap;">${entry.evidence}</pre></td></tr>
-                </table>`;
-            } else {
-                html = '<p>No details found.</p>';
+            function sha256(str) {
+                // Simple SHA-256 implementation for browsers supporting crypto.subtle
+                if (window.crypto && window.crypto.subtle) {
+                    const encoder = new TextEncoder();
+                    return window.crypto.subtle.digest('SHA-256', encoder.encode(str)).then(buf => {
+                        return Array.from(new Uint8Array(buf)).map(x => x.toString(16).padStart(2, '0')).join('');
+                    });
+                } else {
+                    // Fallback: not cryptographically secure, but avoids error
+                    return Promise.resolve(str);
+                }
             }
-            document.getElementById('adugnaModalBody').innerHTML = html;
-            document.getElementById('adugnaDetailsModal').style.display = 'block';
+            // Find entry by evidence hash
+            (async () => {
+                for (const entry of entries) {
+                    const hash = await sha256(entry.evidence);
+                    if (hash === eventId) {
+                        let html = `<table style="width:100%;font-size:1em;">
+                            <tr><th style="text-align:left;">Timestamp:</th><td>${entry.timestamp}</td></tr>
+                            <tr><th style="text-align:left;">Event Type:</th><td>${entry.type}</td></tr>
+                            <tr><th style="text-align:left;">Risk Level:</th><td>${entry.risk_level}</td></tr>
+                            <tr><th style="text-align:left;">Page:</th><td>${entry.page}</td></tr>
+                            <tr><th style="text-align:left;">IP Address:</th><td>${entry.ip_address}</td></tr>
+                            <tr><th style="text-align:left;">Location:</th><td>${entry.geolocation}</td></tr>
+                            <tr><th style="text-align:left;">User Agent:</th><td>${entry.user_agent}</td></tr>
+                            <tr><th style="text-align:left;">Username:</th><td>${entry.username}</td></tr>
+                            <tr><th style="text-align:left;">Password:</th><td>${entry.password}</td></tr>
+                            <tr><th style="text-align:left;">Sensitive Data:</th><td><pre style="white-space:pre-wrap;">${JSON.stringify(entry.sensitive_data, null, 2)}</pre></td></tr>
+                            <tr><th style="text-align:left;">Evidence:</th><td><pre style="white-space:pre-wrap;">${entry.evidence}</pre></td></tr>
+                        </table>`;
+                        document.getElementById('adugnaModalBody').innerHTML = html;
+                        document.getElementById('adugnaDetailsModal').style.display = 'block';
+                        return;
+                    }
+                }
+                document.getElementById('adugnaModalBody').innerHTML = '<p>No details found.</p>';
+                document.getElementById('adugnaDetailsModal').style.display = 'block';
+            })();
         }
         function adugnaCloseModal() {
             document.getElementById('adugnaDetailsModal').style.display = 'none';
