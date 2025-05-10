@@ -249,7 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="fas fa-user-plus"></i>
         </div>
         <div class="register-title">Create Account</div>
-        <!-- Adugna Gizaw: Social registration options for Gmail, Telegram, Facebook. -->
+        <!-- Display general error or success message -->
         <?php if (!empty($errors['general'])): ?>
             <div class="error-message"><?= htmlspecialchars($errors['general']) ?></div>
         <?php elseif (!empty($_SESSION['register_success'])): ?>
