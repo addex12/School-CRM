@@ -75,6 +75,7 @@ GitHub: https://github.com/addex12
             font-weight: 500;
             padding: 1px 3px;
             border-radius: 3px;
+            /* Remove background for GitHub and LinkedIn links below */
             background: #2563eb;
             margin-right: 1px;
             border: 1px solid #215967;
@@ -85,11 +86,18 @@ GitHub: https://github.com/addex12
             transition: background 0.18s, color 0.18s;
             line-height: 1.2;
         }
-        .adugna-footer-section ul li a:hover,
-        .adugna-footer-section a:hover {
-            background: #215967;
-            color: #fff;
-            text-decoration: none;
+        /* Remove background for GitHub and LinkedIn links only */
+        .adugna-footer-section a.adugna-footer-link.adugna-no-bg {
+            background: none !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #f5f6fa;
+            padding: 1px 3px;
+        }
+        .adugna-footer-section a.adugna-footer-link.adugna-no-bg:hover {
+            color: #f1c40f;
+            background: none !important;
+            border: none !important;
         }
         .adugna-footer-section p,
         .adugna-footer-section a {
@@ -174,8 +182,8 @@ GitHub: https://github.com/addex12
         <!-- Adugna Gizaw: Developer info section, compact and branded -->
         <div class="adugna-footer-section adugna-developer-info">
             <h4>Developer</h4>
-            <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="adugna-footer-link" title="LinkedIn"><i class="fab fa-linkedin" style="font-size:0.9em;"></i></a>
-            <a href="https://github.com/addex12" target="_blank" class="adugna-footer-link" title="GitHub"><i class="fab fa-github" style="font-size:0.9em;"></i></a>
+            <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="adugna-footer-link adugna-no-bg" title="LinkedIn"><i class="fab fa-linkedin" style="font-size:0.9em;"></i></a>
+            <a href="https://github.com/addex12" target="_blank" class="adugna-footer-link adugna-no-bg" title="GitHub"><i class="fab fa-github" style="font-size:0.9em;"></i></a>
         </div>
     </div>
     <div class="adugna-footer-bottom">
