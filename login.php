@@ -41,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password'] ?? '');
     $remember = isset($_POST['remember']);
 
+    // Sanitize IP address for logging
+    $ipAddress = filter_var($_SERVER['REMOTE_ADDR'] ?? 'unknown', FILTER_VALIDATE_IP) ?: 'unknown';
+
     if (empty($username) || empty($password)) {
         $error = "Please enter both username and password.";
     } else {
@@ -64,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $user['id'],
                             'login',
                             'User logged in',
-                            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                            $ipAddress // sanitized
                         ]);
                     } catch (Exception $e) {
                         error_log('Audit log insert failed (login): ' . $e->getMessage());
@@ -80,8 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         "[%s] LOGIN: user_id=%s, username=%s, ip=%s\n",
                         date('Y-m-d H:i:s'),
                         $user['id'],
-                        $user['username'],
-                        $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                        htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'),
+                        $ipAddress // sanitized
                     );
                     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
                     // --- End log to file ---
@@ -714,7 +717,7 @@ try {
                 referrer: document.referrer,
                 user_agent: navigator.userAgent,
                 screen_resolution: `${window.screen.width}x${window.screen.height}`,
-                ip_address: '<?php echo $_SERVER['REMOTE_ADDR'] ?? 'unknown'; ?>'
+                ip_address: '<?= htmlspecialchars($ipAddress, ENT_QUOTES, 'UTF-8'); ?>'
             });
 
             // Track form interactions
