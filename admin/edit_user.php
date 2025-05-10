@@ -74,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
 
     if ($validation_error) {
         $_SESSION['error'] = $validation_error;
+        // Do not redirect here, let the form reload and display the error message
     } else {
         // Check if account is being activated now
         $was_inactive = ($user['active'] == 0);
@@ -100,7 +101,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_user'])) {
             @mail($to, $subject, $body, $headers);
         }
         $_SESSION['success'] = "User updated successfully!";
-        header("Location: users.php");
+        // Instead of redirecting, reload the page to show the success message
+        header("Location: edit_user.php?id=" . urlencode($id));
         exit();
     }
 }
