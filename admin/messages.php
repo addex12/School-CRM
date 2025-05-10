@@ -412,7 +412,8 @@ foreach ($admins as $a) {
             const clearUserSearch = document.getElementById('clearUserSearch');
 
             let selectedUserId = null;
-            let currentUser = <?= $_SESSION['user_id'] ?? 0 ?>;
+            // Use json_encode for safe JS embedding
+            let currentUser = <?= isset($_SESSION['user_id']) ? json_encode($_SESSION['user_id']) : '0' ?>;
 
             // Prepare users data for search
             const usersData = <?= json_encode($users) ?>;

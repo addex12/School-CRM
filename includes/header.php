@@ -40,14 +40,14 @@ try {
                 <a href="feedback.php" class="<?= basename($_SERVER['PHP_SELF']) === 'feedback.php' ? 'active' : '' ?>">
                     <i class="fas fa-comment-dots"></i> Feedback
                 </a>
-                <a href="contact.php" class="<?= basename($_SERVER['PHP_SELF']) === 'contact.php' ? 'active' : '' ?>">
+                <a href="contact.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'contact.php' ? 'active' : '' ?>">
                     <i class="fas fa-envelope"></i> Contact
                 </a>
-                <a href="inbox.php" class="<?= basename($_SERVER['PHP_SELF']) === 'inbox.php' ? 'active' : '' ?>">
+                <a href="inbox.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'inbox.php' ? 'active' : '' ?>">
                     <i class="fas fa-inbox"></i> Inbox
                 </a>
                 
-                <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active' : '' ?>">
+                <a href="profile.php" class="<?= htmlspecialchars(basename($_SERVER['PHP_SELF'])) === 'profile.php' ? 'active' : '' ?>">
                     <i class="fas fa-user"></i> Account
                 </a>
                 <a href="../logout.php" class="logout">
