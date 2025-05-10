@@ -638,7 +638,7 @@ try {
                     <h2>System Stats</h2>
                     <ul>
                         <li>PHP Version: <?= phpversion() ?></li>
-                        <li>Server Software: <?= $_SERVER['SERVER_SOFTWARE'] ?? 'N/A' ?></li>
+                        <li>Server Software: <?= htmlspecialchars($_SERVER['SERVER_SOFTWARE'] ?? 'N/A', ENT_QUOTES, 'UTF-8') ?></li>
                         <li>Database Host: <?= htmlspecialchars(DB_HOST ?? 'localhost') ?></li>
                         <li>Current Time: <?= date('Y-m-d H:i:s') ?></li>
                     </ul>

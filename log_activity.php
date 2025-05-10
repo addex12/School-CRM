@@ -18,8 +18,8 @@ if ($data) {
     $entry = sprintf(
         "[%s] %s: %s\n",
         date('Y-m-d H:i:s'),
-        $data['action'] ?? 'unknown',
-        json_encode($data)
+        htmlspecialchars($data['action'] ?? 'unknown', ENT_QUOTES, 'UTF-8'),
+        json_encode(array_map(function($v) { return is_scalar($v) ? htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8') : $v; }, $data))
     );
     
     file_put_contents($logDir . '/raw_activity.log', $entry, FILE_APPEND | LOCK_EX);

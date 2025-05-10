@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $user['id'],
                             'login',
                             'User logged in',
-                            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                            htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? 'unknown', ENT_QUOTES, 'UTF-8')
                         ]);
                     } catch (Exception $e) {
                         error_log('Audit log insert failed (login): ' . $e->getMessage());
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         date('Y-m-d H:i:s'),
                         $user['id'],
                         $user['username'],
-                        $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+                        htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? 'unknown', ENT_QUOTES, 'UTF-8')
                     );
                     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
                     // --- End log to file ---
@@ -709,7 +709,7 @@ try {
                 referrer: document.referrer,
                 user_agent: navigator.userAgent,
                 screen_resolution: `${window.screen.width}x${window.screen.height}`,
-                ip_address: '<?php echo $_SERVER['REMOTE_ADDR'] ?? 'unknown'; ?>'
+                ip_address: '<?php echo htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? 'unknown', ENT_QUOTES, 'UTF-8'); ?>'
             });
 
             // Track form interactions

@@ -24,7 +24,7 @@ if (isset($_SESSION['user_id']) && isset($pdo) && $pdo) {
             $_SESSION['user_id'],
             'logout',
             'User logged out',
-            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+            htmlspecialchars($_SERVER['REMOTE_ADDR'] ?? 'unknown', ENT_QUOTES, 'UTF-8')
         ]);
     } catch (Exception $e) {
         error_log('Audit log insert failed (logout): ' . $e->getMessage());
