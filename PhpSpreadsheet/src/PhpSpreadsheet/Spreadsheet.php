@@ -14,6 +14,15 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Iterator;
 use PhpOffice\PhpSpreadsheet\Worksheet\Table;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
+/**
+ * Class Spreadsheet
+ * 
+ * Represents a workbook in PhpSpreadsheet, containing worksheets, properties, macros, and other workbook-level features.
+ * Provides methods to manage sheets, named ranges, document properties, security, macros, and more.
+ * Implements JsonSerializable (throws exception on serialization).
+ *
+ * @package PhpOffice\PhpSpreadsheet
+ */
 class Spreadsheet implements JsonSerializable
 {
     // Allowable values for workbook window visilbity
@@ -1078,17 +1087,16 @@ class Spreadsheet implements JsonSerializable
         $oldCalc = $this->calculationEngine;
         $this->calculationEngine = new Calculation($this);
         if ($oldCalc !== null) {
-            $this->calculationEngine
-                ->setSuppressFormulaErrors(
-                    $oldCalc->getSuppressFormulaErrors()
-                )
-                ->setCalculationCacheEnabled(
+            if ($oldCalc !== null) {
+                $this->calculationEngine
+                    ->setSuppressFormulaErrors(
+                        $oldCalc->getSuppressFormulaErrors()
+                    );
+            }
+                $this->calculationEngine->setCalculationCacheEnabled(
                     $oldCalc->getCalculationCacheEnabled()
-                )
-                ->setBranchPruningEnabled(
-                    $oldCalc->getBranchPruningEnabled()
-                )
-                ->setInstanceArrayReturnType(
+                );
+                $this->calculationEngine->setInstanceArrayReturnType(
                     $oldCalc->getInstanceArrayReturnType()
                 );
         }
