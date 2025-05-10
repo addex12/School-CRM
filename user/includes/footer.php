@@ -23,34 +23,33 @@
         .main-footer {
             background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
             color: #f5f6fa;
-            padding: 28px 18px 18px 18px;
-            border-top: 3px solid #007bfc;
-            font-size: 14px;
-            box-shadow: 0 -2px 8px rgba(44,62,80,0.07);
+            padding: 12px 8px 8px 8px; /* reduced padding */
+            border-top: 2px solid #007bfc; /* thinner border */
+            font-size: 12px; /* smaller font */
+            box-shadow: 0 -1px 4px rgba(44,62,80,0.07);
             margin-top: auto;
             width: 100%;
-            /* Sticky footer */
             flex-shrink: 0;
         }
         .footer-content {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 30px;
+            gap: 14px; /* reduced gap */
             flex-wrap: wrap;
             width: 100%;
         }
         .footer-section {
             flex: 1 1 0;
-            min-width: 180px;
-            padding: 0 10px;
+            min-width: 120px; /* smaller min width */
+            padding: 0 4px;   /* reduced padding */
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 3px; /* reduced gap */
         }
         .footer-section h4 {
-            margin-bottom: 10px;
-            font-size: 1.1em;
+            margin-bottom: 5px; /* reduced margin */
+            font-size: 1em; /* slightly smaller */
             color: #f1c40f;
             font-weight: 600;
             letter-spacing: 0.5px;
@@ -61,18 +60,18 @@
             margin: 0;
         }
         .footer-section ul li {
-            margin: 7px 0;
+            margin: 4px 0; /* reduced margin */
         }
         .footer-section ul li a,
         .footer-section a {
             text-decoration: none;
             color: #f5f6fa;
-            font-size: 13px;
+            font-size: 11px; /* smaller font */
             font-weight: 500;
-            padding: 6px 14px;
+            padding: 4px 8px; /* reduced padding */
             border-radius: 4px;
             background: #2563eb;
-            margin-right: 4px;
+            margin-right: 2px; /* reduced margin */
             border: 1px solid #215967;
             box-shadow: 0 1px 2px rgba(44,62,80,0.04);
             display: inline-block;
@@ -87,7 +86,7 @@
         .footer-section p,
         .footer-section a {
             color: #bfc9d1;
-            font-size: 13px;
+            font-size: 11px; /* smaller font */
         }
         .footer-section .footer-link {
             color: #f5f6fa;
@@ -97,30 +96,30 @@
         }
         .footer-bottom {
             text-align: center;
-            margin-top: 18px;
-            padding: 8px 0 0 0;
-            font-size: 0.98em;
+            margin-top: 8px; /* reduced margin */
+            padding: 4px 0 0 0; /* reduced padding */
+            font-size: 0.95em;
             color: #bfc9d1;
         }
         @media (max-width: 900px) {
             .footer-content {
                 flex-direction: column;
-                gap: 10px;
+                gap: 6px; /* reduced gap */
                 align-items: flex-start;
             }
             .footer-section {
                 min-width: 100%;
-                padding: 0 2px;
+                padding: 0 1px;
             }
         }
         @media (max-width: 600px) {
             .main-footer {
-                padding: 12px 4px 8px 4px;
-                font-size: 12px;
+                padding: 7px 2px 4px 2px;
+                font-size: 10px;
             }
             .footer-content {
                 flex-direction: column;
-                gap: 6px;
+                gap: 3px;
                 align-items: stretch;
             }
             .footer-section {
@@ -128,12 +127,12 @@
                 min-width: 0;
             }
             .footer-section h4 {
-                font-size: 1em;
+                font-size: 0.95em;
             }
             .footer-section ul li a,
             .footer-section a {
-                padding: 5px 10px;
-                font-size: 11px;
+                padding: 3px 6px;
+                font-size: 10px;
             }
         }
     </style>
