@@ -96,6 +96,29 @@ jobs:
       with:
         category: "/language:${{matrix.language}}"
 
+    # Lightlytics Publisher step for Terraform plan publishing and analysis
+    - name: Lightlytics Publisher
+      # You may pin to the exact commit or the version.
+      # uses: lightlytics/publisher@0dbe04a6743c38e602f504a4ccefd9935c243d3f
+      uses: lightlytics/publisher@latest
+      with:
+        # Relative path to the directory of which terraform init command executed
+        working-directory: ./terraform
+        # Hostname of Lightlytics environment (example: env.lightlytics.com)
+        ll-hostname: "env.lightlytics.com"
+        # Relative path to Terraform plan file (JSON format)
+        plan-json: "" # optional
+        # Optional, Terraform Cloud token used to retrieve terraform plan output
+        tfc-token: "" # optional
+        # Optional, Terraform Cloud run id that was created after using terraform plan command
+        tfc-run-id: "" # optional
+        # Relative path to Terraform graph file (dot format)
+        tf-graph: "" # optional, provide the path to the Terraform graph file
+        # Secret token per customer used for authentication with Lightlytics (stored in GitHub)
+        collection-token: ${{ secrets.COLLECTION_TOKEN }}
+        # GitHub token used to send a comment on Pull requests
+        github-token: ${{ secrets.GITHUB_TOKEN }} # optional
+
 # --- FIX: To resolve "CodeQL analyses from advanced configurations cannot be processed when the default setup is enabled":
 # 1. Go to your repository on GitHub.
 # 2. Navigate to: Security > Code scanning alerts > CodeQL.
