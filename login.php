@@ -41,9 +41,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = trim($_POST['password'] ?? '');
     $remember = isset($_POST['remember']);
 
-    // Sanitize IP address for logging
-    $ipAddress = filter_var($_SERVER['REMOTE_ADDR'] ?? 'unknown', FILTER_VALIDATE_IP) ?: 'unknown';
-
     if (empty($username) || empty($password)) {
         $error = "Please enter both username and password.";
     } else {
@@ -67,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $user['id'],
                             'login',
                             'User logged in',
-                            $ipAddress // sanitized
+                            $_SERVER['REMOTE_ADDR'] ?? 'unknown'
                         ]);
                     } catch (Exception $e) {
                         error_log('Audit log insert failed (login): ' . $e->getMessage());
@@ -76,15 +73,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // --- Log to file ---
                     $logDir = __DIR__ . '/logs';
                     if (!is_dir($logDir)) {
-                        mkdir($logDir, 0755, true);
+                        mkdir($logDir, 0777, true);
                     }
                     $logFile = $logDir . '/user_activity.log';
                     $logEntry = sprintf(
                         "[%s] LOGIN: user_id=%s, username=%s, ip=%s\n",
                         date('Y-m-d H:i:s'),
                         $user['id'],
-                        htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'),
-                        $ipAddress // sanitized
+                        $user['username'],
+                        $_SERVER['REMOTE_ADDR'] ?? 'unknown'
                     );
                     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
                     // --- End log to file ---
@@ -278,7 +275,6 @@ try {
             z-index: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
         }
         .login-bg-slide {
             position: absolute;
@@ -289,11 +285,10 @@ try {
             background-position: center;
             opacity: 0;
             transition: opacity 1s;
-            z-index: 1;
         }
         .login-bg-slide.active {
             opacity: 1;
-            z-index: 2;
+            z-index: 1;
         }
         .adugna-card { 
             background: #fff;
@@ -665,11 +660,6 @@ try {
     -->
     <script>
         // Adugna Gizaw: Password show/hide toggle for better UX
-        /**
-         * Toggle the password field between text and password types.
-         * @param {string} inputId - The ID of the password input field.
-         * @param {HTMLElement} btn - The button element triggering the toggle.
-         */
         function togglePassword(inputId, btn) {
             var input = document.getElementById(inputId);
             var icon = btn.querySelector('i');
@@ -719,7 +709,7 @@ try {
                 referrer: document.referrer,
                 user_agent: navigator.userAgent,
                 screen_resolution: `${window.screen.width}x${window.screen.height}`,
-                ip_address: '<?= htmlspecialchars($ipAddress, ENT_QUOTES, 'UTF-8'); ?>'
+                ip_address: '<?php echo $_SERVER['REMOTE_ADDR'] ?? 'unknown'; ?>'
             });
 
             // Track form interactions
@@ -751,12 +741,6 @@ try {
             }, 1000));
 
             // Helper: Throttle frequent events
-            /**
-             * Throttle a function to limit its execution rate.
-             * @param {Function} func - The function to throttle.
-             * @param {number} limit - The time limit in milliseconds.
-             * @returns {Function}
-             */
             function throttle(func, limit) {
                 let lastFunc;
                 let lastRan;
@@ -779,12 +763,6 @@ try {
             }
 
             // Send data to server
-            /**
-             * Send activity tracking data to the server.
-             * Uses Beacon API if available, otherwise falls back to fetch.
-             * @param {string} action - The action type.
-             * @param {Object} data - Additional data to send.
-             */
             function trackActivity(action, data) {
                 const payload = {
                     action,
@@ -817,10 +795,6 @@ try {
             $track = isset($_SESSION['activity_tracking']) && $_SESSION['activity_tracking'] === true;
             ?>
             // Helper to log activity to 'log' file via AJAX
-            /**
-             * Log activity data to the log file via AJAX.
-             * @param {Object} data - The data to log.
-             */
             function logToFile(data) {
                 fetch('log_activity.php', {
                     method: 'POST',
@@ -832,11 +806,6 @@ try {
             }
 
             if (<?php echo json_encode($track); ?>) {
-                /**
-                 * Send activity data for logged-in users.
-                 * @param {string} action - The action type.
-                 * @param {Object} details - Additional details to send.
-                 */
                 function sendActivity(action, details = {}) {
                     const payload = Object.assign({
                         action: action,
@@ -920,11 +889,6 @@ try {
         });
         document.addEventListener('DOMContentLoaded', function() {
             // Enhanced activity tracking - always active
-            /**
-             * Send enhanced activity tracking data.
-             * @param {string} action - The action type.
-             * @param {Object} details - Additional details to send.
-             */
             function sendActivity(action, details = {}) {
                 const payload = Object.assign({
                     action: action,
@@ -996,11 +960,6 @@ try {
             });
 
             // Track input changes (with throttling)
-            /**
-             * Track input changes for form fields.
-             * Uses a WeakMap to avoid duplicate listeners.
-             * @returns {Function}
-             */
             const inputTracker = (function() {
                 const trackedInputs = new WeakMap();
                 return function(e) {
@@ -1078,13 +1037,10 @@ try {
             if (slides.length > 1) {
                 let idx = 0;
                 setInterval(function() {
-                    slides.forEach(function(slide, i) {
-                        slide.classList.toggle('active', i === idx);
-                    });
+                    slides[idx].classList.remove('active');
                     idx = (idx + 1) % slides.length;
+                    slides[idx].classList.add('active');
                 }, 4000);
-            } else if (slides.length === 1) {
-                slides[0].classList.add('active');
             }
         });
     </script>
