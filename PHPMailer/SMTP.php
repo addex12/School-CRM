@@ -640,8 +640,8 @@ class SMTP
     }
 
     /**
-     * Calculate an MD5 HMAC hash.
-     * Works like hash_hmac('md5', $data, $key)
+     * Calculate an HMAC hash using SHA-256 (secure).
+     * Works like hash_hmac('sha256', $data, $key)
      * in case that function is not available.
      *
      * @param string $data The data to hash
@@ -652,28 +652,19 @@ class SMTP
     protected function hmac($data, $key)
     {
         if (function_exists('hash_hmac')) {
-            return hash_hmac('md5', $data, $key);
+            return hash_hmac('sha256', $data, $key);
         }
-
-        //The following borrowed from
-        //https://www.php.net/manual/en/function.mhash.php#27225
-
-        //RFC 2104 HMAC implementation for php.
-        //Creates an md5 HMAC.
-        //Eliminates the need to install mhash to compute a HMAC
-        //by Lance Rushing
-
-        $bytelen = 64; //byte length for md5
+        // Fallback implementation for HMAC-SHA256
+        $bytelen = 64; //byte length for sha256 block size
         if (strlen($key) > $bytelen) {
-            $key = pack('H*', md5($key));
+            $key = pack('H*', hash('sha256', $key));
         }
         $key = str_pad($key, $bytelen, chr(0x00));
         $ipad = str_pad('', $bytelen, chr(0x36));
         $opad = str_pad('', $bytelen, chr(0x5c));
         $k_ipad = $key ^ $ipad;
         $k_opad = $key ^ $opad;
-
-        return md5($k_opad . pack('H*', md5($k_ipad . $data)));
+        return hash('sha256', $k_opad . pack('H*', hash('sha256', $k_ipad . $data)));
     }
 
     /**
