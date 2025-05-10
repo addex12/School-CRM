@@ -33,34 +33,31 @@ class AuthHelper {
 }
 
 $errors = [];
-$username = $email = $role = '';
+$email = '';
 
 // Move POST handling outside of the AuthHelper check
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
-    // Do not set $role at all, and do not assign any default
 
     // Validation
-    if (empty($username)) $errors['username'] = "Username is required";
     if (empty($email)) $errors['email'] = "Email is required";
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = "Invalid email format";
+
+    // Check if email exists as username or email
+    if (empty($errors)) {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$email, $email]);
+        $count = $stmt->fetchColumn();
+        if ($count > 0) {
+            $errors['email'] = "Email address is already registered";
+        }
+    }
+
     if (empty($password)) $errors['password'] = "Password is required";
     if (strlen($password) < 6) $errors['password'] = "Password must be at least 6 characters";
     if ($password !== $confirm_password) $errors['confirm_password'] = "Passwords do not match";
-
-    // Check if username or email exists
-    if (empty($errors)) {
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
-        $stmt->execute([$username, $email]);
-        $count = $stmt->fetchColumn();
-        
-        if ($count > 0) {
-            $errors['general'] = "Username or email already exists";
-        }
-    }
 
     // Assign "new" role if it exists, otherwise NULL
     $role_id = null;
@@ -76,15 +73,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        // Use email as username
         $stmt = $pdo->prepare("INSERT INTO users (username, email, password, role_id, active) VALUES (?, ?, ?, ?, ?)");
-        if ($stmt->execute([$username, $email, $hashed_password, $role_id, $active])) {
-            // Send email with username only (never send plain password in production)
+        if ($stmt->execute([$email, $email, $hashed_password, $role_id, $active])) {
+            // Send email with email as username
             $to = $email;
             $subject = "Your School CRM Account Registration";
-            $message = "Hello $username,\n\n"
+            $message = "Hello,\n\n"
                 . "Thank you for registering at School CRM.\n"
                 . "Your account details:\n"
-                . "Username: $username\n"
+                . "Username (Email): $email\n"
                 . "Password: (hidden for your security)\n\n"
                 . "Please wait for an administrator to activate your account.\n\n"
                 . "If you did not register, please ignore this email.";
@@ -266,13 +264,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php unset($_SESSION['register_success']); ?>
         <?php endif; ?>
         <form method="POST" autocomplete="off">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required value="<?= htmlspecialchars($username ?? '') ?>">
-                <?php if (isset($errors['username'])): ?>
-                    <div class="field-error"><?php echo $errors['username']; ?></div>
-                <?php endif; ?>
-            </div>
+            <!-- Remove Username field, only show Email -->
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required value="<?= htmlspecialchars($email ?? '') ?>">

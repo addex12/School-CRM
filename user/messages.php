@@ -498,7 +498,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_chat_with'])) {
         // Pass PHP variables to JS for chat logic
         window.messagesConfig = {
             selectedUserId: <?= $selectedUserId ? json_encode($selectedUserId) : 'null' ?>,
-            currentUser: <?= $_SESSION['user_id'] ?? 0 ?>
+            currentUser: <?= isset($_SESSION['user_id']) ? json_encode($_SESSION['user_id']) : '0' ?>
         };
 
         // Adugna: Highlight selected admin and show tooltip on hover/focus
