@@ -18,6 +18,21 @@ require_once 'includes/auth.php';
 require_once __DIR__ . '/includes/db.php';
 $pageTitle = 'Register';
 
+// Fetch site settings for allow_user_registration
+try {
+    $stmt = $pdo->prepare("SELECT setting_value FROM system_settings WHERE setting_key = 'allow_user_registration'");
+    $stmt->execute();
+    $allowRegistration = $stmt->fetchColumn();
+} catch (Exception $e) {
+    $allowRegistration = '1'; // Default to enabled if DB error
+}
+
+// Restrict registration if disabled by admin
+if ($allowRegistration !== '1') {
+    header("Location: login.php?error=registration_disabled");
+    exit();
+}
+
 // Fetch settings for site_name and banner
 $settings = [];
 $stmt = $pdo->query("SELECT setting_key, setting_value FROM system_settings WHERE setting_key IN ('site_name', 'site_banner')");
