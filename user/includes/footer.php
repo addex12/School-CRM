@@ -23,9 +23,9 @@
         .main-footer {
             background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
             color: #f5f6fa;
-            padding: 12px 8px 8px 8px; /* reduced padding */
-            border-top: 2px solid #007bfc; /* thinner border */
-            font-size: 12px; /* smaller font */
+            padding: 8px 4px 4px 4px; /* further reduced padding */
+            border-top: 1.5px solid #007bfc;
+            font-size: clamp(9px, 2vw, 12px); /* responsive font size */
             box-shadow: 0 -1px 4px rgba(44,62,80,0.07);
             margin-top: auto;
             width: 100%;
@@ -35,21 +35,21 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 14px; /* reduced gap */
+            gap: 8px;
             flex-wrap: wrap;
             width: 100%;
         }
         .footer-section {
             flex: 1 1 0;
-            min-width: 120px; /* smaller min width */
-            padding: 0 4px;   /* reduced padding */
+            min-width: 90px;
+            padding: 0 2px;
             display: flex;
             flex-direction: column;
-            gap: 3px; /* reduced gap */
+            gap: 2px;
         }
         .footer-section h4 {
-            margin-bottom: 5px; /* reduced margin */
-            font-size: 1em; /* slightly smaller */
+            margin-bottom: 3px;
+            font-size: 1em;
             color: #f1c40f;
             font-weight: 600;
             letter-spacing: 0.5px;
@@ -60,22 +60,23 @@
             margin: 0;
         }
         .footer-section ul li {
-            margin: 4px 0; /* reduced margin */
+            margin: 2px 0;
         }
         .footer-section ul li a,
         .footer-section a {
             text-decoration: none;
             color: #f5f6fa;
-            font-size: 11px; /* smaller font */
+            font-size: inherit;
             font-weight: 500;
-            padding: 4px 8px; /* reduced padding */
+            padding: 2px 5px;
             border-radius: 4px;
             background: #2563eb;
-            margin-right: 2px; /* reduced margin */
+            margin-right: 1px;
             border: 1px solid #215967;
             box-shadow: 0 1px 2px rgba(44,62,80,0.04);
             display: inline-block;
             transition: background 0.18s, color 0.18s;
+            line-height: 1.3;
         }
         .footer-section ul li a:hover,
         .footer-section a:hover {
@@ -86,7 +87,7 @@
         .footer-section p,
         .footer-section a {
             color: #bfc9d1;
-            font-size: 11px; /* smaller font */
+            font-size: inherit;
         }
         .footer-section .footer-link {
             color: #f5f6fa;
@@ -96,15 +97,15 @@
         }
         .footer-bottom {
             text-align: center;
-            margin-top: 8px; /* reduced margin */
-            padding: 4px 0 0 0; /* reduced padding */
+            margin-top: 4px;
+            padding: 2px 0 0 0;
             font-size: 0.95em;
             color: #bfc9d1;
         }
         @media (max-width: 900px) {
             .footer-content {
                 flex-direction: column;
-                gap: 6px; /* reduced gap */
+                gap: 3px;
                 align-items: flex-start;
             }
             .footer-section {
@@ -114,12 +115,12 @@
         }
         @media (max-width: 600px) {
             .main-footer {
-                padding: 7px 2px 4px 2px;
-                font-size: 10px;
+                padding: 4px 1px 2px 1px;
+                font-size: clamp(8px, 3vw, 10px);
             }
             .footer-content {
                 flex-direction: column;
-                gap: 3px;
+                gap: 1px;
                 align-items: stretch;
             }
             .footer-section {
@@ -131,8 +132,17 @@
             }
             .footer-section ul li a,
             .footer-section a {
-                padding: 3px 6px;
-                font-size: 10px;
+                padding: 2px 4px;
+                font-size: inherit;
+            }
+        }
+        @media (max-width: 400px) {
+            .main-footer {
+                font-size: clamp(7px, 4vw, 9px);
+                padding: 2px 0 1px 0;
+            }
+            .footer-section h4 {
+                font-size: 0.9em;
             }
         }
     </style>
