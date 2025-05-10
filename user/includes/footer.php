@@ -35,24 +35,24 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 8px;
+            gap: 2px;
             flex-wrap: wrap;
             width: 100%;
         }
         .footer-section {
             flex: 1 1 0;
-            min-width: 90px;
-            padding: 0 2px;
+            min-width: 60px;
+            padding: 0 1px;
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 1px;
         }
         .footer-section h4 {
-            margin-bottom: 3px;
-            font-size: 1em;
+            margin-bottom: 1px;
+            font-size: 0.95em;
             color: #f1c40f;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
         }
         .footer-section ul {
             list-style-type: none;
@@ -60,23 +60,23 @@
             margin: 0;
         }
         .footer-section ul li {
-            margin: 2px 0;
+            margin: 1px 0;
         }
         .footer-section ul li a,
         .footer-section a {
             text-decoration: none;
             color: #f5f6fa;
-            font-size: inherit;
+            font-size: 0.95em;
             font-weight: 500;
-            padding: 2px 5px;
-            border-radius: 4px;
+            padding: 1px 3px;
+            border-radius: 3px;
             background: #2563eb;
             margin-right: 1px;
             border: 1px solid #215967;
-            box-shadow: 0 1px 2px rgba(44,62,80,0.04);
+            box-shadow: 0 1px 2px rgba(44,62,80,0.03);
             display: inline-block;
             transition: background 0.18s, color 0.18s;
-            line-height: 1.3;
+            line-height: 1.2;
         }
         .footer-section ul li a:hover,
         .footer-section a:hover {
@@ -87,7 +87,8 @@
         .footer-section p,
         .footer-section a {
             color: #bfc9d1;
-            font-size: inherit;
+            font-size: 0.93em;
+            margin: 0;
         }
         .footer-section .footer-link {
             color: #f5f6fa;
@@ -97,15 +98,15 @@
         }
         .footer-bottom {
             text-align: center;
-            margin-top: 4px;
-            padding: 2px 0 0 0;
-            font-size: 0.95em;
+            margin-top: 2px;
+            padding: 1px 0 0 0;
+            font-size: 0.9em;
             color: #bfc9d1;
         }
         @media (max-width: 900px) {
             .footer-content {
                 flex-direction: column;
-                gap: 3px;
+                gap: 1px;
                 align-items: flex-start;
             }
             .footer-section {
@@ -115,12 +116,12 @@
         }
         @media (max-width: 600px) {
             .main-footer {
-                padding: 4px 1px 2px 1px;
-                font-size: clamp(8px, 3vw, 10px);
+                padding: 2px 0 1px 0;
+                font-size: clamp(7px, 3vw, 9px);
             }
             .footer-content {
                 flex-direction: column;
-                gap: 1px;
+                gap: 0;
                 align-items: stretch;
             }
             .footer-section {
@@ -128,21 +129,21 @@
                 min-width: 0;
             }
             .footer-section h4 {
-                font-size: 0.95em;
+                font-size: 0.9em;
             }
             .footer-section ul li a,
             .footer-section a {
-                padding: 2px 4px;
-                font-size: inherit;
+                padding: 1px 2px;
+                font-size: 0.9em;
             }
         }
         @media (max-width: 400px) {
             .main-footer {
-                font-size: clamp(7px, 4vw, 9px);
-                padding: 2px 0 1px 0;
+                font-size: clamp(6px, 4vw, 8px);
+                padding: 1px 0 0 0;
             }
             .footer-section h4 {
-                font-size: 0.9em;
+                font-size: 0.85em;
             }
         }
     </style>
@@ -158,15 +159,10 @@
         <div class="footer-section contact-info">
             <h4>Contact Info</h4>
             <p>Email: <a href="mailto:contactus@flipperschools.com" class="footer-link">contactus@flipperschools.com</a></p>
-            <p>Phone: <a href="tel:+251925582067" class="footer-link">+251925582067</a></p>
         </div>
         <div class="footer-section developer-info">
             <h4>Developer</h4>
-            <p><strong>Adugna Gizaw</strong></p>
-            <p>Email: <a href="mailto:gizawadugna@gmail.com" class="footer-link">gizawadugna@gmail.com</a></p>
-            <p>
                 <a href="https://www.linkedin.com/in/eleganceict" target="_blank" class="footer-link">LinkedIn</a>
-                <a href="https://twitter.com/eleganceict1" target="_blank" class="footer-link">Twitter</a>
                 <a href="https://github.com/addex12" target="_blank" class="footer-link">GitHub</a>
             </p>
         </div>
