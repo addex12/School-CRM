@@ -214,6 +214,26 @@ foreach ($logFiles as $logFile) {
 usort($allEntries, function($a, $b) {
     return strtotime($b['timestamp']) - strtotime($a['timestamp']);
 });
+
+// --- Add filtering, search, and pagination logic ---
+$filterType = $_GET['filter_type'] ?? '';
+$filterRisk = $_GET['filter_risk'] ?? '';
+$searchTerm = $_GET['search'] ?? '';
+$page = max(1, intval($_GET['page'] ?? 1));
+$pageSize = 30;
+
+$filteredEntries = array_filter($allEntries, function($entry) use ($filterType, $filterRisk, $searchTerm) {
+    $match = true;
+    if ($filterType && strtolower($entry['type']) !== strtolower($filterType)) $match = false;
+    if ($filterRisk && strtolower($entry['risk_level']) !== strtolower($filterRisk)) $match = false;
+    if ($searchTerm) {
+        $searchable = strtolower(json_encode($entry));
+        if (strpos($searchable, strtolower($searchTerm)) === false) $match = false;
+    }
+    return $match;
+});
+$totalFiltered = count($filteredEntries);
+$filteredEntries = array_slice(array_values($filteredEntries), ($page-1)*$pageSize, $pageSize);
 ?>
 
 <!DOCTYPE html>
@@ -470,6 +490,37 @@ usort($allEntries, function($a, $b) {
                 </div>
             </div>
             <!-- Adugna Gizaw: Main Data Table -->
+            <form method="get" style="margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+                <input type="text" name="search" placeholder="Search logs..." value="<?= htmlspecialchars($searchTerm) ?>" style="padding:6px 10px;border-radius:4px;border:1px solid #ccc;">
+                <select name="filter_type" style="padding:6px 10px;border-radius:4px;">
+                    <option value="">All Types</option>
+                    <?php foreach(array_unique(array_map(fn($e)=>$e['type'],$allEntries)) as $type): ?>
+                        <option value="<?= htmlspecialchars($type) ?>" <?= $filterType===$type?'selected':'' ?>><?= htmlspecialchars($type) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <select name="filter_risk" style="padding:6px 10px;border-radius:4px;">
+                    <option value="">All Risks</option>
+                    <?php foreach(['Critical','High','Medium','Low'] as $risk): ?>
+                        <option value="<?= $risk ?>" <?= $filterRisk===$risk?'selected':'' ?>><?= $risk ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <button type="submit" class="adugna-action-btn"><i class="fas fa-filter"></i> Filter</button>
+                <a href="?export=1&search=<?=urlencode($searchTerm)?>&filter_type=<?=urlencode($filterType)?>&filter_risk=<?=urlencode($filterRisk)?>" class="adugna-action-btn adugna-btn-view" style="background:#16a085;"><i class="fas fa-download"></i> Export</a>
+            </form>
+
+            <?php
+            // Export filtered logs as CSV
+            if (isset($_GET['export'])) {
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment; filename="filtered_logs.csv"');
+                $out = fopen('php://output', 'w');
+                fputcsv($out, array_keys($allEntries[0]));
+                foreach ($filteredEntries as $row) fputcsv($out, $row);
+                fclose($out);
+                exit;
+            }
+            ?>
+
             <div class="adugna-table-responsive">
                 <table class="adugna-log-table" id="adugna-log-table">
                     <thead>
@@ -487,7 +538,7 @@ usort($allEntries, function($a, $b) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($allEntries as $entry): ?>
+                        <?php foreach ($filteredEntries as $entry): ?>
                         <tr class="risk-<?php echo strtolower($entry['risk_level']); ?>">
                             <td>
                                 <?php echo !empty($entry['timestamp']) ? 
@@ -513,14 +564,18 @@ usort($allEntries, function($a, $b) {
                             </td>
                             <td><?= htmlspecialchars($entry['geolocation']) ?></td>
                             <td class="adugna-username-value"><?= htmlspecialchars($entry['username']) ?></td>
-                            <td class="adugna-password-value adugna-sensitive-value"><?= htmlspecialchars($entry['password']) ?></td>
+                            <td class="adugna-password-value adugna-sensitive-value">
+                                <?php if (!empty($entry['password'])): ?>
+                                    <span style="filter: blur(6px);" title="Click to reveal" onclick="this.style.filter='none';this.title='';">••••••</span>
+                                <?php endif; ?>
+                            </td>
                             <td>
                                 <?php if (!empty($entry['sensitive_data'])): ?>
                                     <ul style="margin: 0; padding-left: 20px;">
                                         <?php foreach ($entry['sensitive_data'] as $type => $values): ?>
                                             <li>
                                                 <strong><?= ucfirst($type) ?>:</strong> 
-                                                <?= htmlspecialchars(implode(', ', $values)) ?>
+                                                <span style="filter: blur(6px);cursor:pointer;" title="Click to reveal" onclick="this.style.filter='none';this.title='';">[hidden]</span>
                                             </li>
                                         <?php endforeach; ?>
                                     </ul>
@@ -541,6 +596,17 @@ usort($allEntries, function($a, $b) {
                     </tbody>
                 </table>
             </div>
+
+            <!-- Pagination -->
+            <div style="margin:18px 0;text-align:center;">
+                <?php $totalPages = ceil($totalFiltered/$pageSize); ?>
+                <?php if ($totalPages > 1): ?>
+                    <?php for ($i=1; $i<=$totalPages; $i++): ?>
+                        <a href="?page=<?= $i ?>&search=<?=urlencode($searchTerm)?>&filter_type=<?=urlencode($filterType)?>&filter_risk=<?=urlencode($filterRisk)?>" style="padding:6px 12px;margin:0 2px;border-radius:4px;background:<?= $i==$page?'#1976d2':'#eee' ?>;color:<?= $i==$page?'#fff':'#1976d2' ?>;text-decoration:none;"> <?= $i ?> </a>
+                    <?php endfor; ?>
+                <?php endif; ?>
+            </div>
+
             <!-- Adugna Gizaw: Details Modal -->
             <div id="adugnaDetailsModal" class="adugna-modal">
                 <div class="adugna-modal-content">
