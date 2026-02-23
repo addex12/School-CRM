@@ -27,7 +27,7 @@
 		"ghcr.io/devcontainers/features/nvidia-cuda:1": {},
 		"ghcr.io/devcontainers/features/oryx:1": {},
 		"ghcr.io/devcontainers/features/php:1": {},
-		"ghcr.io/devcontainers/features/powershell:1": {},
+		"ghcr.io/devcontainers/features/powershell:2": {},
 		"ghcr.io/devcontainers/features/python:1": {},
 		"ghcr.io/devcontainers/features/ruby:1": {},
 		"ghcr.io/devcontainers/features/rust:1": {},
